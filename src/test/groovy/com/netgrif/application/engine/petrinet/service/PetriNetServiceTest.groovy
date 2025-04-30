@@ -198,9 +198,9 @@ class PetriNetServiceTest {
         assert petriNetService.search(search4, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
 
         PetriNetSearch search5 = new PetriNetSearch()
-        Optional<User> actorOpt = userService.findById(testIdentity.toSession().activeActorId)
-        assert actorOpt.isPresent()
-        search5.setAuthor(actorOpt.get())
+        Optional<User> userOpt = userService.findById(testIdentity.toSession().activeActorId)
+        assert userOpt.isPresent()
+        search5.setAuthor(userOpt.get())
         assert petriNetService.search(search5, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
 
         PetriNetSearch search6 = new PetriNetSearch()
@@ -221,7 +221,7 @@ class PetriNetServiceTest {
         search8.setTitle("Process Search Test")
         search8.setDefaultCaseName("Process Search Case Name")
         search8.setInitials("PST")
-        search8.setAuthor(actorOpt.get())
+        search8.setAuthor(userOpt.get())
         assert petriNetService.search(search8, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
     }
 

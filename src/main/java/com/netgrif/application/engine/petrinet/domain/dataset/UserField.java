@@ -12,25 +12,25 @@ import java.util.Set;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ActorField extends FieldWithAllowedRoles<ActorFieldValue> {
+public class UserField extends FieldWithAllowedRoles<UserFieldValue> {
 
-    public ActorField() {
+    public UserField() {
         this(new HashSet<>());
     }
 
-    public ActorField(Set<String> values) {
+    public UserField(Set<String> values) {
         super(values);
     }
 
     @Override
     @QueryType(PropertyType.NONE)
     public DataType getType() {
-        return DataType.ACTOR;
+        return DataType.USER;
     }
 
     @Override
-    public ActorField clone() {
-        ActorField clone = new ActorField();
+    public UserField clone() {
+        UserField clone = new UserField();
         super.clone(clone);
         return clone;
     }

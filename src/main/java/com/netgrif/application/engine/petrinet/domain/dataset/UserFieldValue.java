@@ -9,14 +9,14 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ActorFieldValue {
+public class UserFieldValue {
 
     private String id;
     private String firstname;
     private String lastname;
     private String email;
 
-    public ActorFieldValue(User user) {
+    public UserFieldValue(User user) {
         this.id = user.getStringId();
         this.firstname = user.getFirstname();
         this.lastname = user.getLastname();
@@ -34,9 +34,9 @@ public class ActorFieldValue {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof ActorFieldValue)) {
+        if (!(obj instanceof UserFieldValue)) {
             return false;
         }
-        return this.id != null && ((ActorFieldValue) obj).id != null && this.id.equals(((ActorFieldValue) obj).id);
+        return this.id != null && ((UserFieldValue) obj).id != null && this.id.equals(((UserFieldValue) obj).id);
     }
 }

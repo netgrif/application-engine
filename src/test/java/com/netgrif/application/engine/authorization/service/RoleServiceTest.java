@@ -16,8 +16,8 @@ import com.netgrif.application.engine.history.domain.baseevent.repository.EventL
 import com.netgrif.application.engine.history.domain.actorevents.ActorAssignRoleEventLog;
 import com.netgrif.application.engine.history.domain.actorevents.ActorRemoveRoleEventLog;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.ActorField;
-import com.netgrif.application.engine.petrinet.domain.dataset.ActorListField;
+import com.netgrif.application.engine.petrinet.domain.dataset.UserField;
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -288,39 +288,39 @@ public class RoleServiceTest {
 
     @Test
     public void testResolveCaseRolesOnCase() {
-        ActorListField actorListField = new ActorListField();
-        actorListField.setImportId("actor_list_id");
-        ActorField actorField = new ActorField();
-        actorField.setImportId("actor_id");
+        UserListField userListField = new UserListField();
+        userListField.setImportId("actor_list_id");
+        UserField userField = new UserField();
+        userField.setImportId("actor_id");
 
         Case useCase = new Case();
-        useCase.getDataSet().put(actorListField.getImportId(), actorListField);
-        useCase.getDataSet().put(actorField.getImportId(), actorField);
+        useCase.getDataSet().put(userListField.getImportId(), userListField);
+        useCase.getDataSet().put(userField.getImportId(), userField);
 
         AccessPermissions<CasePermission> netPermissions = new AccessPermissions<>();
-        netPermissions.addPermission(actorListField.getImportId(), CasePermission.VIEW, true);
-        netPermissions.addPermission(actorField.getImportId(), CasePermission.VIEW, true);
+        netPermissions.addPermission(userListField.getImportId(), CasePermission.VIEW, true);
+        netPermissions.addPermission(userField.getImportId(), CasePermission.VIEW, true);
 
         roleService.resolveCaseRolesOnCase(useCase, netPermissions, false);
 
         List<CaseRole> roles = roleService.findAllCaseRoles();
         assert roles.size() == 2;
         assert roles.stream().allMatch(role -> role.getCaseId().equals(useCase.getStringId()));
-        Optional<CaseRole> actorFieldCaseRoleOpt = roles.stream()
-                .filter(role -> role.getImportId().equals(actorField.getImportId()))
+        Optional<CaseRole> userFieldCaseRoleOpt = roles.stream()
+                .filter(role -> role.getImportId().equals(userField.getImportId()))
                 .findFirst();
-        assert actorFieldCaseRoleOpt.isPresent();
-        Optional<CaseRole> actorListFieldCaseRoleOpt = roles.stream()
-                .filter(role -> role.getImportId().equals(actorListField.getImportId()))
+        assert userFieldCaseRoleOpt.isPresent();
+        Optional<CaseRole> userListFieldCaseRoleOpt = roles.stream()
+                .filter(role -> role.getImportId().equals(userListField.getImportId()))
                 .findFirst();
-        assert actorListFieldCaseRoleOpt.isPresent();
+        assert userListFieldCaseRoleOpt.isPresent();
 
-        assert actorField.getCaseRoleIds().size() == 1;
-        assert actorField.getCaseRoleIds().contains(actorFieldCaseRoleOpt.get().getStringId());
-        assert actorListField.getCaseRoleIds().size() == 1;
-        assert actorListField.getCaseRoleIds().contains(actorListFieldCaseRoleOpt.get().getStringId());
-        assert useCase.getCaseRolePermissions().containsKey(actorFieldCaseRoleOpt.get().getStringId());
-        assert useCase.getCaseRolePermissions().containsKey(actorListFieldCaseRoleOpt.get().getStringId());
+        assert userField.getCaseRoleIds().size() == 1;
+        assert userField.getCaseRoleIds().contains(userFieldCaseRoleOpt.get().getStringId());
+        assert userListField.getCaseRoleIds().size() == 1;
+        assert userListField.getCaseRoleIds().contains(userListFieldCaseRoleOpt.get().getStringId());
+        assert useCase.getCaseRolePermissions().containsKey(userFieldCaseRoleOpt.get().getStringId());
+        assert useCase.getCaseRolePermissions().containsKey(userListFieldCaseRoleOpt.get().getStringId());
 
         Case emptyUseCase = new Case();
         emptyUseCase.setPetriNetObjectId(new ObjectId());
@@ -332,43 +332,43 @@ public class RoleServiceTest {
 
     @Test
     public void testResolveCaseRolesOnTask() {
-        ActorListField actorListField = new ActorListField();
-        actorListField.setImportId("actor_list_id");
-        ActorField actorField = new ActorField();
-        actorField.setImportId("actor_id");
+        UserListField userListField = new UserListField();
+        userListField.setImportId("actor_list_id");
+        UserField userField = new UserField();
+        userField.setImportId("actor_id");
 
         Task task = Task.with().transitionId("transition_id").build();
 
         Case useCase = new Case();
-        useCase.getDataSet().put(actorListField.getImportId(), actorListField);
-        useCase.getDataSet().put(actorField.getImportId(), actorField);
+        useCase.getDataSet().put(userListField.getImportId(), userListField);
+        useCase.getDataSet().put(userField.getImportId(), userField);
         useCase.addTask(task);
 
         AccessPermissions<TaskPermission> transitionPermissions = new AccessPermissions<>();
-        transitionPermissions.addPermission(actorListField.getImportId(), TaskPermission.VIEW, true);
-        transitionPermissions.addPermission(actorField.getImportId(), TaskPermission.VIEW, true);
+        transitionPermissions.addPermission(userListField.getImportId(), TaskPermission.VIEW, true);
+        transitionPermissions.addPermission(userField.getImportId(), TaskPermission.VIEW, true);
 
         roleService.resolveCaseRolesOnTask(useCase, task, transitionPermissions, false, false);
 
         List<CaseRole> roles = roleService.findAllCaseRoles();
         assert roles.size() == 2;
         assert roles.stream().allMatch(role -> role.getCaseId().equals(useCase.getStringId()));
-        Optional<CaseRole> actorFieldCaseRoleOpt = roles.stream()
-                .filter(role -> role.getImportId().equals(actorField.getImportId()))
+        Optional<CaseRole> userFieldCaseRoleOpt = roles.stream()
+                .filter(role -> role.getImportId().equals(userField.getImportId()))
                 .findFirst();
-        assert actorFieldCaseRoleOpt.isPresent();
-        Optional<CaseRole> actorListFieldCaseRoleOpt = roles.stream()
-                .filter(role -> role.getImportId().equals(actorListField.getImportId()))
+        assert userFieldCaseRoleOpt.isPresent();
+        Optional<CaseRole> userListFieldCaseRoleOpt = roles.stream()
+                .filter(role -> role.getImportId().equals(userListField.getImportId()))
                 .findFirst();
-        assert actorListFieldCaseRoleOpt.isPresent();
+        assert userListFieldCaseRoleOpt.isPresent();
 
-        assert actorField.getCaseRoleIds().size() == 1;
-        assert actorField.getCaseRoleIds().contains(actorFieldCaseRoleOpt.get().getStringId());
-        assert actorListField.getCaseRoleIds().size() == 1;
-        assert actorListField.getCaseRoleIds().contains(actorListFieldCaseRoleOpt.get().getStringId());
+        assert userField.getCaseRoleIds().size() == 1;
+        assert userField.getCaseRoleIds().contains(userFieldCaseRoleOpt.get().getStringId());
+        assert userListField.getCaseRoleIds().size() == 1;
+        assert userListField.getCaseRoleIds().contains(userListFieldCaseRoleOpt.get().getStringId());
         assert useCase.getCaseRolePermissions().isEmpty();
-        assert task.getCaseRolePermissions().containsKey(actorFieldCaseRoleOpt.get().getStringId());
-        assert task.getCaseRolePermissions().containsKey(actorListFieldCaseRoleOpt.get().getStringId());
+        assert task.getCaseRolePermissions().containsKey(userFieldCaseRoleOpt.get().getStringId());
+        assert task.getCaseRolePermissions().containsKey(userListFieldCaseRoleOpt.get().getStringId());
     }
 
     @Test

@@ -47,11 +47,11 @@
         <id>pos_process_role</id>
         <title>pos create role</title>
     </role>
-    <data type="actorList">
+    <data type="userList">
         <id>neg_case_role</id>
         <title/>
     </data>
-    <data type="actorList">
+    <data type="userList">
         <id>pos_case_role</id>
         <title/>
     </data>

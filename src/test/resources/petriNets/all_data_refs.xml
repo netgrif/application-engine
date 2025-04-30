@@ -138,9 +138,9 @@
         <init>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae magna in libero semper
             vulputate ut eu sapien. Phasellus vel.</init>
     </data>
-    <data type="actor">
-        <id>actor</id>
-        <title>Actor</title>
+    <data type="user">
+        <id>user</id>
+        <title>User</title>
     </data>
     <transition>
         <id>t1</id>
@@ -340,7 +340,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>actor</id>
+                    <id>user</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>
@@ -551,7 +551,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>actor</id>
+                    <id>user</id>
                     <logic>
                         <behavior>visible</behavior>
                     </logic>

@@ -49,11 +49,11 @@
         <title>Text</title>
         <init>text</init>
     </data>
-    <data type="actorList">
+    <data type="userList">
         <id>view_ul_neg</id>
         <title/>
     </data>
-    <data type="actorList">
+    <data type="userList">
         <id>view_ul_pos</id>
         <title/>
     </data>

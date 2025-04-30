@@ -44,14 +44,14 @@ class GroovyShellFactoryTest extends EngineTest {
     void roleActionsTest() {
         userService.metaClass.groovyShellTestMethod = { String string, I18nString i18nString -> println("groovyShellTestMethod") }
 
-        def actorOpt = userService.findById(superCreator.superIdentity.mainActorId)
-        assert actorOpt.isPresent()
+        def userOpt = userService.findById(superCreator.superIdentity.mainActorId)
+        assert userOpt.isPresent()
 //        def roleCount = actor.roles.size()
         def roles = roleService.findAll()
         def roleId = "newRole_1"
         def role = roles.find {it.importId == roleId}
         assert role != null
-        roleService.assignRolesToActor(actorOpt.get().stringId, [role.stringId] as Set)
+        roleService.assignRolesToActor(userOpt.get().stringId, [role.stringId] as Set)
         // todo: release/8.0.0 some assertions to check shell?
 //        actor = userService.findByEmail(userService.getSystem().getEmail())
 //        assert actor.roles.size() == roleCount + 1

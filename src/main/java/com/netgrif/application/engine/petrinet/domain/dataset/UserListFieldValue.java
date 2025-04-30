@@ -9,23 +9,23 @@ import java.util.Set;
 
 @Data
 @NoArgsConstructor
-public class ActorListFieldValue {
+public class UserListFieldValue {
 
-    private LinkedHashSet<ActorFieldValue> actorValues;
+    private LinkedHashSet<UserFieldValue> userValues;
 
-    public ActorListFieldValue(Collection<ActorFieldValue> actorValues) {
-        this.actorValues = new LinkedHashSet<>(actorValues);
+    public UserListFieldValue(Collection<UserFieldValue> userValues) {
+        this.userValues = new LinkedHashSet<>(userValues);
     }
 
-    public ActorListFieldValue(ActorFieldValue actorValue) {
+    public UserListFieldValue(UserFieldValue actorValue) {
         this(Set.of(actorValue));
     }
 
     @Override
     public String toString() {
-        if (actorValues == null) {
+        if (userValues == null) {
             return "";
         }
-        return actorValues.toString();
+        return userValues.toString();
     }
 }

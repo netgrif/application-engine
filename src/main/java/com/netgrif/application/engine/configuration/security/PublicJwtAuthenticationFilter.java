@@ -89,7 +89,7 @@ public abstract class PublicJwtAuthenticationFilter extends PublicAuthentication
             identityOpt = identityService.findByUsername((String) ((LinkedHashMap<?, ?>) claims.get("identity")).get("username"));
         }
 
-        Identity identity = identityOpt.orElseGet(this::createAnonymousIdentityWithActor);
+        Identity identity = identityOpt.orElseGet(this::createAnonymousIdentityWithUser);
 
         LoggedIdentity loggedIdentity = identity.toSession();
         loggedIdentity.eraseCredentials();

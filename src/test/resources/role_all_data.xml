@@ -196,17 +196,17 @@
             </properties>
         </component>
     </data>
-    <data type="actor" immediate="true">
-        <id>actor</id>
-        <title>Actor</title>
+    <data type="user" immediate="true">
+        <id>user</id>
+        <title>User</title>
     </data>
-    <data type="actorList">
-        <id>actorList1</id>
-        <title>ActorList</title>
+    <data type="user">
+        <id>userList1</id>
+        <title>UserList</title>
     </data>
-    <data type="actorList">
-        <id>actorList2</id>
-        <title>ActorList</title>
+    <data type="userList">
+        <id>userList2</id>
+        <title>UserList</title>
     </data>
     <transition>
         <id>t1</id>
@@ -365,7 +365,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>actor</id>
+                    <id>user</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>
@@ -537,7 +537,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>actor</id>
+                    <id>user</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>

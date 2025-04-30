@@ -35,7 +35,7 @@ public class PublicAdvancedAuthenticationFilter extends PublicJwtAuthenticationF
      * todo javadoc
      */
     @Override
-    protected Identity createAnonymousIdentityWithActor() {
+    protected Identity createAnonymousIdentityWithUser() {
         String hash = new ObjectId().toString();
 
         Optional<Identity> anonymIdentityOpt = identityService.findByUsername(AnonymIdentityConstants.usernameOf(hash));

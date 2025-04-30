@@ -178,15 +178,15 @@
         <title/>
         <init dynamic="true">"text"</init>
     </data>
-    <data type="actor">
-        <id>actor_dynamic</id>
+    <data type="user">
+        <id>user_dynamic</id>
         <title/>
-        <init dynamic="true">new ActorFieldValue(userService.findById(loggedOrSystem.activeActorId).get())</init>
+        <init dynamic="true">new UserFieldValue(userService.findById(loggedOrSystem.activeActorId).get())</init>
     </data>
-    <data type="actorList">
-        <id>actorList_dynamic</id>
+    <data type="userList">
+        <id>userList_dynamic</id>
         <title/>
-        <init dynamic="true">new ActorListFieldValue(new ActorFieldValue(userService.findById(loggedOrSystem.activeActorId).get()))</init>
+        <init dynamic="true">new UserListFieldValue(new UserFieldValue(userService.findById(loggedOrSystem.activeActorId).get()))</init>
     </data>
 
     <transition>

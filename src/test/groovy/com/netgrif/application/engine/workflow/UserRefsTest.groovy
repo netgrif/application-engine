@@ -7,8 +7,8 @@ import com.netgrif.application.engine.configuration.properties.SuperAdminConfigu
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
-import com.netgrif.application.engine.petrinet.domain.dataset.ActorListField
-import com.netgrif.application.engine.petrinet.domain.dataset.ActorListFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -68,7 +68,7 @@ class UserRefsTest {
 
     @BeforeEach
     void before() {
-        // todo release/8.0.0 actorList is already tested in RoleServiceTest
+        // todo release/8.0.0 userList is already tested in RoleServiceTest
         helper.truncateDbs()
         helper.login(superCreator.superIdentity)
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/userrefs_test.xml"),
@@ -84,7 +84,7 @@ class UserRefsTest {
             String actorId = identity.toSession().activeActorId
             String taskId = _case.getTaskStringId("t1")
             dataService.setData(taskId, new DataSet([
-                    "actor_list_1": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(actorId)]))
+                    "user_list_1": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(actorId)]))
             ] as Map<String, Field<?>>), superCreator.getLoggedSuper().activeActorId).getCase()
             actorIds.add(actorId)
         }

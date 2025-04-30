@@ -43,7 +43,7 @@ public abstract class PublicAuthenticationFilter extends OncePerRequestFilter {
         this.exceptions = exceptions;
     }
 
-    protected abstract Identity createAnonymousIdentityWithActor();
+    protected abstract Identity createAnonymousIdentityWithUser();
 
     protected void authenticate(HttpServletRequest request, LoggedIdentity loggedIdentity) {
         AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(

@@ -92,10 +92,10 @@
         <id>emptyTaskRef</id>
         <title>Empty task ref</title>
     </data>
-    <data type="actorList">
-        <id>emptyActorList</id>
-        <title>Empty actor list</title>
-        <desc>Actor list description</desc>
+    <data type="userList">
+        <id>emptyUserList</id>
+        <title>Empty user list</title>
+        <desc>User list description</desc>
     </data>
     <data type="enumeration">
         <id>enumeration</id>
@@ -184,11 +184,11 @@
         </validations>
         <init>text</init>
     </data>
-    <data type="actor">
-        <id>actor</id>
-        <title>Actor</title>
-        <placeholder>Actor field placeholder</placeholder>
-        <desc>Actor field description</desc>
+    <data type="user">
+        <id>user</id>
+        <title>User</title>
+        <placeholder>User field placeholder</placeholder>
+        <desc>User field description</desc>
     </data>
     <transition>
         <id>t1</id>
@@ -290,7 +290,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>actor</id>
+                    <id>user</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>
@@ -329,7 +329,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>emptyActorList</id>
+                    <id>emptyUserList</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>

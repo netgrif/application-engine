@@ -71,14 +71,14 @@
 			]]>
         </init>
     </data>
-    <data type="actor" immediate="true">
-        <id>actor</id>
-        <title>Actor</title>
+    <data type="user" immediate="true">
+        <id>user</id>
+        <title>User</title>
         <init dynamic="true">
             <![CDATA[
 			def loggedIdentity = identityService.getLoggedSystemIdentity()
 			def user = userService.findById(loggedIdentity.activeActorId).get()
-			return new com.netgrif.application.engine.petrinet.domain.dataset.ActorFieldValue(user.stringId, user.firstname,
+			return new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(user.stringId, user.firstname,
 			user.lastname, user.email)
 			]]>
         </init>
@@ -144,7 +144,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>actor</id>
+                    <id>user</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>

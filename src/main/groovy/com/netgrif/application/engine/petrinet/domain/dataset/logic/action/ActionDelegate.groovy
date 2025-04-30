@@ -680,14 +680,14 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
             if (field instanceof NumberField) {
                 value = value as Double
             }
-            if (field instanceof ActorListField && (value instanceof String[] || value instanceof List)) {
-                LinkedHashSet<ActorFieldValue> actors = new LinkedHashSet<>()
+            if (field instanceof UserListField && (value instanceof String[] || value instanceof List)) {
+                LinkedHashSet<UserFieldValue> usersactorField = new LinkedHashSet<>()
                 value.each { id ->
-                    Optional<User> actorOpt = userService.findById(id as String)
-                    ActorFieldValue actorFieldValue = actorOpt.isPresent() ? new ActorFieldValue(actorOpt.get()) : new ActorFieldValue()
-                    actors.add(actorFieldValue)
+                    Optional<User> userOpt = userService.findById(id as String)
+                    UserFieldValue userFieldValue = userOpt.isPresent() ? new UserFieldValue(userOpt.get()) : new UserFieldValue()
+                    users.add(userFieldValue)
                 }
-                value = new ActorListFieldValue(actors)
+                value = new UserListFieldValue(users)
             }
             if (value instanceof GString) {
                 value = value.toString()
@@ -1024,23 +1024,23 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return MessageResource.successMessage("Done")
     }
 
-    User findActorByEmail(String email) {
-        Optional<User> actorOpt = userService.findByEmail(email)
-        if (actorOpt.isEmpty()) {
-            log.error("Cannot find actor with email [{}]", email)
+    User findUserByEmail(String email) {
+        Optional<User> userOpt = userService.findByEmail(email)
+        if (userOpt.isEmpty()) {
+            log.error("Cannot find user with email [{}]", email)
             return null
         } else {
-            return actorOpt.get()
+            return userOpt.get()
         }
     }
 
-    User findActorById(String id) {
-        Optional<User> actorOpt = userService.findById(id)
-        if (actorOpt.isEmpty()) {
-            log.error("Cannot find actor with id [{}]", id)
+    User findUserById(String id) {
+        Optional<User> userOpt = userService.findById(id)
+        if (userOpt.isEmpty()) {
+            log.error("Cannot find user with id [{}]", id)
             return null
         } else {
-            return actorOpt.get()
+            return userOpt.get()
         }
     }
 

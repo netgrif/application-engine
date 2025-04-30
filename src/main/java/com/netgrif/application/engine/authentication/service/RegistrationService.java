@@ -129,16 +129,16 @@ public class RegistrationService implements IRegistrationService {
                 .build();
         identity = identityService.encodePasswordAndUpdate(identity, identityParams);
 
-        Optional<User> actorOpt = userService.findById(identity.getMainActorId());
-        if (actorOpt.isEmpty()) {
-            throw new IllegalStateException(String.format("Identity [%s] has no default actor!", identity.getStringId()));
+        Optional<User> userOpt = userService.findById(identity.getMainActorId());
+        if (userOpt.isEmpty()) {
+            throw new IllegalStateException(String.format("Identity [%s] has no default user!", identity.getStringId()));
         }
 
         UserParams userParams = UserParams.with()
                 .firstname(new TextField(registrationRequest.firstname))
                 .lastname(new TextField(registrationRequest.lastname))
                 .build();
-        userService.update(actorOpt.get(), userParams);
+        userService.update(userOpt.get(), userParams);
 
         return identity;
     }

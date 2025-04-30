@@ -8,14 +8,14 @@
 		<property key="initials">PTA</property>
 	</properties>
 	<roleRef type="case">
-		<id>actorList</id>
+		<id>userList</id>
 		<permission>
 			<delete>true</delete>
 			<view>true</view>
 		</permission>
 	</roleRef>
-	<data type="actorList">
-		<id>actorList</id>
+	<data type="userList">
+		<id>userList</id>
 		<title/>
 	</data>
 	<transition>
@@ -24,7 +24,7 @@
 		<y>296</y>
 		<title/>
 		<roleRef>
-			<id>actorList</id>
+			<id>userList</id>
 			<permission>
 				<view>true</view>
 				<reassign>true</reassign>

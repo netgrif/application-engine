@@ -16,8 +16,8 @@ import com.netgrif.application.engine.importer.model.EventType;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.arcs.*;
-import com.netgrif.application.engine.petrinet.domain.dataset.ActorFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.ActorListFieldValue;
+import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.throwable.IllegalMarkingException;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -714,14 +714,14 @@ public class TaskService implements ITaskService {
         return tasks;
     }
 
-    private List<String> getExistingUsers(ActorListFieldValue userListValue) {
+    private List<String> getExistingUsers(UserListFieldValue userListValue) {
         if (userListValue == null) {
             return null;
         }
         // TODO: release/8.0.0 fix null set as user value, remove duplicate code, move this to userservice, optimize to one request to mongo
-        return userListValue.getActorValues().stream()
+        return userListValue.getUserValues().stream()
                 .filter(Objects::nonNull)
-                .map(ActorFieldValue::getId)
+                .map(UserFieldValue::getId)
                 .filter(id -> id != null && userService.existsById(id))
                 .collect(Collectors.toList());
     }

@@ -44,7 +44,7 @@ public class PublicBasicAuthenticationFilter extends PublicJwtAuthenticationFilt
      * todo javadoc
      */
     @Override
-    protected Identity createAnonymousIdentityWithActor() {
+    protected Identity createAnonymousIdentityWithUser() {
         String hash = new ObjectId().toString();
 
         Optional<Identity> anonymIdentityOpt = identityService.findByUsername(AnonymIdentityConstants.usernameOf(hash));
@@ -52,8 +52,8 @@ public class PublicBasicAuthenticationFilter extends PublicJwtAuthenticationFilt
             return anonymIdentityOpt.get();
         }
 
-        Optional<User> anonymActorOpt = userService.findByEmail(AnonymIdentityConstants.usernameOf(USERNAME));
-        User anonymUser = anonymActorOpt.orElseGet(() -> userService.create(UserParams.with()
+        Optional<User> anonymUserOpt = userService.findByEmail(AnonymIdentityConstants.usernameOf(USERNAME));
+        User anonymUser = anonymUserOpt.orElseGet(() -> userService.create(UserParams.with()
                 .email(new TextField(AnonymIdentityConstants.usernameOf(USERNAME)))
                 .firstname(new TextField(AnonymIdentityConstants.FIRSTNAME))
                 .lastname(new TextField(AnonymIdentityConstants.LASTNAME))

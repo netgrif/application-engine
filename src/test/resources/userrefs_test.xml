@@ -8,7 +8,7 @@
         <property key="initials">TSM</property>
     </properties>
     <roleRef type="case">
-        <id>actor_list_1</id>
+        <id>user_list_1</id>
         <permission>
             <view>true</view>
         </permission>
@@ -39,13 +39,13 @@
         <id>remove</id>
         <title>Remove from user ref</title>
     </data>
-    <data type="actorList">
-        <id>actor_list_1</id>
-        <title>ACtor list 1</title>
+    <data type="userList">
+        <id>user_list_1</id>
+        <title>User list 1</title>
     </data>
-    <data type="actorList">
-        <id>actor_list_2</id>
-        <title>Actor list 2</title>
+    <data type="userList">
+        <id>user_list_2</id>
+        <title>User list 2</title>
     </data>
     <transition>
         <id>t1</id>
@@ -59,8 +59,8 @@
                 <view>true</view>
             </permission>
         </roleRef>
-        <roleRef>
-            <id>actor_list_1</id>
+        <roleRef type="case">
+            <id>user_list_1</id>
             <permission>
                 <view>true</view>
             </permission>

@@ -42,7 +42,7 @@ public class PublicSimpleAuthenticationFilter extends PublicAuthenticationFilter
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         if (isPublicApi(request.getRequestURI())) {
-            Identity identity = createAnonymousIdentityWithActor();
+            Identity identity = createAnonymousIdentityWithUser();
             authenticate(request, identity.toSession());
             log.info("Anonymous identity was authenticated.");
         }
@@ -53,7 +53,7 @@ public class PublicSimpleAuthenticationFilter extends PublicAuthenticationFilter
      * todo javadoc
      */
     @Override
-    protected Identity createAnonymousIdentityWithActor() {
+    protected Identity createAnonymousIdentityWithUser() {
         String username = AnonymIdentityConstants.usernameOf(USERNAME);
         Optional<Identity> anonymIdentityOpt = identityService.findByUsername(AnonymIdentityConstants.usernameOf(USERNAME));
         if (anonymIdentityOpt.isPresent()) {

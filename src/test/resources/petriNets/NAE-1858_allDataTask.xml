@@ -80,12 +80,12 @@
             <id>htmltextarea</id>
         </component>
     </data>
-    <data type="actor">
-        <id>actor_0</id>
+    <data type="user">
+        <id>user_0</id>
         <title/>
     </data>
-    <data type="actorList">
-        <id>actorList_0</id>
+    <data type="userList">
+        <id>userList_0</id>
         <title/>
     </data>
     <transition>
@@ -253,7 +253,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>actor_0</id>
+                    <id>user_0</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>
@@ -266,7 +266,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>actorList_0</id>
+                    <id>userList_0</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>

@@ -190,13 +190,13 @@
         <init>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae magna in libero semper
             vulputate ut eu sapien. Phasellus vel.</init>
     </data>
-    <data type="actor" immediate="true">
+    <data type="user" immediate="true">
         <id>actor</id>
         <title>Actor</title>
     </data>
-    <data type="actorList" immediate="true">
-        <id>actorList</id>
-        <title>Actor list</title>
+    <data type="userList" immediate="true">
+        <id>userList</id>
+        <title>User list</title>
     </data>
     <i18n locale="sk">
         <i18nString id="alice">Alica</i18nString>

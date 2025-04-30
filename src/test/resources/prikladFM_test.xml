@@ -133,7 +133,7 @@
         <id>data8</id>
         <title>Miestnosť</title>
     </data>
-    <data type="actor">
+    <data type="user">
         <id>data9</id>
         <title>Odovzdávajúci</title>
         <options>

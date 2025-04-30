@@ -68,10 +68,10 @@ class FieldTest {
         assertBooleanField()
         assertDateField()
         assertFileField()
-        assertActorField()
+        assertUserField()
         assertDateTimeField()
         assertCaseRef()
-        assertActorList()
+        assertUserList()
         assertTaskRef()
         assertMultichoiceMap()
         assertI18nField()
@@ -166,11 +166,11 @@ class FieldTest {
         assert field.placeholder.defaultValue == "File field placeholder"
     }
 
-    private void assertActorField() {
-        ActorField field = net.dataSet["actor"] as ActorField
-        assert field.description.defaultValue == "Actor field description"
-        assert field.title.defaultValue == "Actor"
-        assert field.placeholder.defaultValue == "Actor field placeholder"
+    private void assertUserField() {
+        UserField field = net.dataSet["user"] as UserField
+        assert field.description.defaultValue == "User field description"
+        assert field.title.defaultValue == "User"
+        assert field.placeholder.defaultValue == "User field placeholder"
     }
 
     private void assertDateTimeField() {
@@ -187,10 +187,10 @@ class FieldTest {
         assert field.allowedNets.containsAll(["processId1", "processId2"])
     }
 
-    private void assertActorList() {
-        ActorListField field = net.dataSet["emptyActorList"] as ActorListField
-        assert field.title.defaultValue == "Empty actor list"
-        assert field.description.defaultValue == "Actor list description"
+    private void assertUserList() {
+        UserListField field = net.dataSet["emptyUserList"] as UserListField
+        assert field.title.defaultValue == "Empty user list"
+        assert field.description.defaultValue == "User list description"
         assert field.defaultValue.defaultValue == null
     }
 

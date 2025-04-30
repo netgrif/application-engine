@@ -23,19 +23,19 @@
         <id>pos_getdata_disabled_process_role</id>
         <title>pos process role</title>
     </role>
-    <data type="actorList">
+    <data type="userList">
         <id>neg_case_role</id>
         <title/>
     </data>
-    <data type="actorList">
+    <data type="userList">
         <id>pos_case_role</id>
         <title/>
     </data>
-    <data type="actorList">
+    <data type="userList">
         <id>neg_getdata_disabled_case_role</id>
         <title/>
     </data>
-    <data type="actorList">
+    <data type="userList">
         <id>pos_getdata_disabled_case_role</id>
         <title/>
     </data>

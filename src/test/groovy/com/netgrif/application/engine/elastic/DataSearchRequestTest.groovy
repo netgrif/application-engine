@@ -17,8 +17,8 @@ import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.I18nField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
-import com.netgrif.application.engine.petrinet.domain.dataset.ActorFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.ActorListFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -124,7 +124,7 @@ class DataSearchRequestTest {
         _case.dataSet.get("number").rawValue = 7.0 as Double
         _case.dataSet.get("boolean").rawValue = true
         _case.dataSet.get("text").rawValue = "hello world" as String
-        _case.dataSet.get("actor").rawValue = new ActorFieldValue(testActor1.stringId, testActor1.firstname,
+        _case.dataSet.get("user").rawValue = new UserFieldValue(testActor1.stringId, testActor1.firstname,
                 testActor1.lastname, testActor1.email)
         _case.dataSet.get("date").rawValue = date
         _case.dataSet.get("datetime").rawValue = date.atTime(13, 37)
@@ -134,7 +134,7 @@ class DataSearchRequestTest {
         _case.dataSet.get("multichoice_map").rawValue = ["alice", "bob"].toSet()
         _case.dataSet.get("file").rawValue = FileFieldValue.fromString("singlefile.txt")
         _case.dataSet.get("fileList").rawValue = FileListFieldValue.fromString("multifile1.txt,multifile2.pdf")
-        _case.dataSet.get("actorList").rawValue = new ActorListFieldValue([dataService.makeActorFieldValue(testActor1.stringId), dataService.makeActorFieldValue(testActor2.stringId)])
+        _case.dataSet.get("userList").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testActor1.stringId), dataService.makeUserFieldValue(testActor2.stringId)])
         (_case.dataSet.get("i18n_text") as I18nField).rawValue.defaultValue = "Modified i18n text value"
         (_case.dataSet.get("i18n_divider") as I18nField).rawValue.defaultValue = "Modified i18n divider value"
         workflowService.save(_case)
@@ -157,10 +157,10 @@ class DataSearchRequestTest {
                 new AbstractMap.SimpleEntry<String, String>("boolean.booleanValue" as String, "true" as String),
                 new AbstractMap.SimpleEntry<String, String>("text" as String, "hello world" as String),
                 new AbstractMap.SimpleEntry<String, String>("text.textValue.keyword" as String, "hello world" as String),
-                new AbstractMap.SimpleEntry<String, String>("actor" as String, "${testActor1.fullName} ${testActor1.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("actor.emailValue.keyword" as String, "${testActor1.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("actor.fullNameValue.keyword" as String, "${testActor1.fullName}" as String),
-                new AbstractMap.SimpleEntry<String, String>("actor.actorIdValue" as String, "${testActor1.stringId}" as String),
+                new AbstractMap.SimpleEntry<String, String>("user" as String, "${testActor1.fullName} ${testActor1.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("user.emailValue.keyword" as String, "${testActor1.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("user.fullNameValue.keyword" as String, "${testActor1.fullName}" as String),
+                new AbstractMap.SimpleEntry<String, String>("user.userIdValue" as String, "${testActor1.stringId}" as String),
                 new AbstractMap.SimpleEntry<String, String>("date.timestampValue" as String, "${Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)).getTime()}" as String),
                 new AbstractMap.SimpleEntry<String, String>("datetime.timestampValue" as String, "${Timestamp.valueOf(date.atTime(13, 37)).getTime()}" as String),
                 new AbstractMap.SimpleEntry<String, String>("enumeration" as String, "Alice" as String),
@@ -199,14 +199,14 @@ class DataSearchRequestTest {
                 new AbstractMap.SimpleEntry<String, String>("fileList.fileNameValue.keyword" as String, "multifile2" as String),
                 new AbstractMap.SimpleEntry<String, String>("fileList.fileExtensionValue.keyword" as String, "txt" as String),
                 new AbstractMap.SimpleEntry<String, String>("fileList.fileExtensionValue.keyword" as String, "pdf" as String),
-                new AbstractMap.SimpleEntry<String, String>("actorList" as String, "${testActor1.fullName} ${testActor1.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("actorList" as String, "${testActor2.fullName} ${testActor2.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("actorList.emailValue.keyword" as String, "${testActor1.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("actorList.emailValue.keyword" as String, "${testActor2.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("actorList.fullNameValue.keyword" as String, "${testActor1.fullName}" as String),
-                new AbstractMap.SimpleEntry<String, String>("actorList.fullNameValue.keyword" as String, "${testActor2.fullName}" as String),
-                new AbstractMap.SimpleEntry<String, String>("actorList.actorIdValue" as String, "${testActor1.stringId}" as String),
-                new AbstractMap.SimpleEntry<String, String>("actorList.actorIdValue" as String, "${testActor2.stringId}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList" as String, "${testActor1.fullName} ${testActor1.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList" as String, "${testActor2.fullName} ${testActor2.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.emailValue.keyword" as String, "${testActor1.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.emailValue.keyword" as String, "${testActor2.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.fullNameValue.keyword" as String, "${testActor1.fullName}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.fullNameValue.keyword" as String, "${testActor2.fullName}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.userIdValue" as String, "${testActor1.stringId}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.userIdValue" as String, "${testActor2.stringId}" as String),
                 new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed" as String, "Eve" as String),
                 new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed" as String, "Eva" as String),
                 new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed.textValue.keyword" as String, "Eve" as String),

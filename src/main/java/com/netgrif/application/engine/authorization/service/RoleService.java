@@ -315,8 +315,8 @@ public class RoleService implements IRoleService {
      * */
     @Override
     public List<Role> assignRolesToActor(String actorId, Set<String> roleIds, Map<String, String> params) {
-        Optional<User> actorOpt = userService.findById(actorId);
-        if (actorOpt.isEmpty()) {
+        Optional<User> userOpt = userService.findById(actorId);
+        if (userOpt.isEmpty()) {
             throw new IllegalArgumentException(String.format("Actor with id [%s] does not exist.", actorId));
         }
 
@@ -335,7 +335,7 @@ public class RoleService implements IRoleService {
         if (roles.size() > newRoleAssignments.size()) {
             throw new NotAllRolesAssignedException(roles.size() - newRoleAssignments.size());
         }
-        eventPublisher.publishEvent(new ActorAssignRoleEvent(actorOpt.get(), roles));
+        eventPublisher.publishEvent(new ActorAssignRoleEvent(userOpt.get(), roles));
         runAllSuitableActionsOnRoles(roles, RoleEventType.ASSIGN, EventPhaseType.POST, params);
 
         return roles;
@@ -371,9 +371,9 @@ public class RoleService implements IRoleService {
             throw new NotAllRolesAssignedException(roles.size() - removedAssignments.size());
         }
         if (!removedAssignments.isEmpty()) {
-            Optional<User> actorOpt = userService.findById(actorId);
-            if (actorOpt.isPresent()) {
-                eventPublisher.publishEvent(new ActorRemoveRoleEvent(actorOpt.get(), roles));
+            Optional<User> userOpt = userService.findById(actorId);
+            if (userOpt.isPresent()) {
+                eventPublisher.publishEvent(new ActorRemoveRoleEvent(userOpt.get(), roles));
             } else {
                 log.warn("Removed {} roles from non-existing actor with id [{}]", removedAssignments.size(), actorId);
             }
@@ -404,17 +404,17 @@ public class RoleService implements IRoleService {
         List<Role> rolesToSave = new ArrayList<>();
         AccessPermissions<T> resultPermissions = new AccessPermissions<>();
 
-        actorRefPermissions.forEach((actorListId, permissions) -> {
-            CaseRole caseRole = caseRoleRepository.findByCaseIdAndImportId(useCase.getStringId(), actorListId);
+        actorRefPermissions.forEach((userListId, permissions) -> {
+            CaseRole caseRole = caseRoleRepository.findByCaseIdAndImportId(useCase.getStringId(), userListId);
             if (caseRole == null) {
-                caseRole = new CaseRole(actorListId, useCase.getStringId());
+                caseRole = new CaseRole(userListId, useCase.getStringId());
             }
-            Field<?> actorListField = useCase.getDataSet().getFields().get(actorListId);
-            if (actorListField != null) {
-                ((FieldWithAllowedRoles<?>) actorListField).getCaseRoleIds().add(caseRole.getStringId());
+            Field<?> userListField = useCase.getDataSet().getFields().get(userListId);
+            if (userListField != null) {
+                ((FieldWithAllowedRoles<?>) userListField).getCaseRoleIds().add(caseRole.getStringId());
             } else {
                 throw new IllegalStateException(String.format("Case role [%s} in process [%s] references non existing dataField in case [%s]",
-                        actorListId, useCase.getPetriNetId(), useCase.getStringId()));
+                        userListId, useCase.getPetriNetId(), useCase.getStringId()));
             }
             rolesToSave.add(caseRole);
             resultPermissions.put(caseRole.getStringId(), new HashMap<>(permissions));

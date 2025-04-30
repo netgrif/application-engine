@@ -66,12 +66,12 @@ class GroupRunner extends AbstractOrderedCommandLineRunner {
             return groupNet
         }
         if (groupProperties.isSystemEnabled()) {
-            Optional<User> actorOpt = userService.findById(identityService.loggedSystemIdentity.activeActorId)
-            if (actorOpt.isEmpty()) {
+            Optional<User> userOpt = userService.findById(identityService.loggedSystemIdentity.activeActorId)
+            if (userOpt.isEmpty()) {
                 log.error("System actor does not exist!")
                 return groupNet
             }
-            nextGroupService.createDefaultSystemGroup(actorOpt.get())
+            nextGroupService.createDefaultSystemGroup(userOpt.get())
         }
         return groupNet;
     }
