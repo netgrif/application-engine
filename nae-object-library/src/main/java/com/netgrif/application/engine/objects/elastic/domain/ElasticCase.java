@@ -1,0 +1,131 @@
+package com.netgrif.application.engine.objects.elastic.domain;
+
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.netgrif.application.engine.objects.workflow.domain.Case;
+import com.netgrif.application.engine.objects.workflow.domain.TaskPair;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.io.Serial;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public abstract class ElasticCase implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 7536959921044863265L;
+
+    private String id;
+
+    private String uriNodeId;
+
+    private Long version;
+
+    private Long lastModified;
+
+    private String stringId;
+
+    private String visualId;
+
+    private String processIdentifier;
+
+    private String processId;
+
+    private String title;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime creationDate;
+
+    private Long creationDateSortable;
+
+    private String author;
+
+    private String mongoId;
+
+    private String authorName;
+
+    private String authorEmail;
+
+    private Map<String, DataField> dataSet;
+
+    private Set<String> taskIds;
+
+    private Set<String> taskMongoIds;
+
+    private Set<String> enabledRoles;
+
+    private Set<String> viewRoles;
+
+    private Set<String> viewUserRefs;
+
+    private Set<String> negativeViewRoles;
+
+    private Set<String> viewUsers;
+
+    private Set<String> negativeViewUsers;
+
+    private Map<String, String> tags;
+
+
+    public ElasticCase(Case useCase) {
+        stringId = useCase.getStringId();
+        uriNodeId = useCase.getUriNodeId();
+        mongoId = useCase.getStringId();   //TODO: Duplication
+        lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
+        processIdentifier = useCase.getProcessIdentifier();
+        processId = useCase.getPetriNetId();
+        visualId = useCase.getVisualId();
+        title = useCase.getTitle();
+        creationDate = useCase.getCreationDate();
+        creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
+        author = useCase.getAuthor().getId();
+        authorName = useCase.getAuthor().getFullName();
+        authorEmail = useCase.getAuthor().getEmail();
+        taskIds = useCase.getTasks().stream().map(TaskPair::getTransition).collect(Collectors.toSet());
+        taskMongoIds = useCase.getTasks().stream().map(TaskPair::getTask).collect(Collectors.toSet());
+        enabledRoles = new HashSet<>(useCase.getEnabledRoles());
+        viewRoles = new HashSet<>(useCase.getViewRoles());
+        viewUserRefs = new HashSet<>(useCase.getViewUserRefs());
+        negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
+        viewUsers = new HashSet<>(useCase.getViewUsers());
+        negativeViewUsers = new HashSet<>(useCase.getNegativeViewUsers());
+        tags = new HashMap<>(useCase.getTags());
+
+        dataSet = new HashMap<>();
+    }
+
+    public void update(ElasticCase useCase) {
+        version++;
+        lastModified = useCase.getLastModified();
+        if (useCase.getUriNodeId() != null) {
+            uriNodeId = useCase.getUriNodeId();
+        }
+        title = useCase.getTitle();
+        taskIds = useCase.getTaskIds();
+        taskMongoIds = useCase.getTaskMongoIds();
+        enabledRoles = useCase.getEnabledRoles();
+        viewRoles = useCase.getViewRoles();
+        viewUserRefs = useCase.getViewUserRefs();
+        negativeViewRoles = useCase.getNegativeViewRoles();
+        viewUsers = useCase.getViewUsers();
+        negativeViewUsers = useCase.getNegativeViewUsers();
+        tags = useCase.getTags();
+
+        dataSet = useCase.getDataSet();
+    }
+}

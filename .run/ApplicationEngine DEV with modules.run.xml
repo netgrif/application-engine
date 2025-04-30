@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ApplicationEngine DEV with modules" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="dev" />
+    <module name="application-engine" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="org.springframework.boot.loader.launch.PropertiesLauncher" />
+    <option name="VM_PARAMETERS" value="-Dloader.debug=true" />
+    <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$/application-engine" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
