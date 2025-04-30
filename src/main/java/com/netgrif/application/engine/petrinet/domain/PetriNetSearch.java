@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain;
 
-import com.netgrif.application.engine.authorization.domain.User;
+import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +26,7 @@ public class PetriNetSearch {
 
     private Version version;
 
-    private User author;
+    private Actor author;
 
     private List<String> negativeViewProcessRoles;
 

@@ -24,6 +24,12 @@ public class ActorService implements IActorService {
         this.actorFactories = new ConcurrentHashMap<>();
     }
 
+    @Override
+    public void registerFactory(String actorProcessIdentifier, ActorFactory<?> factory) {
+        this.actorFactories.put(actorProcessIdentifier, factory);
+        log.debug("Registered actor factory [{}] for process [{}].", factory.getClass(), actorProcessIdentifier);
+    }
+
     /**
      * todo javadoc
      * */
@@ -32,24 +38,28 @@ public class ActorService implements IActorService {
         if (caseId == null) {
             return Optional.empty();
         }
-
-        Case actorCase;
         try {
-            actorCase = workflowService.findOne(caseId);
-            ActorFactory<?> factory = this.actorFactories.get(actorCase.getProcessIdentifier());
-            if (factory == null) {
-                log.warn("Actor case with id [{}] of [{}] hasn't got registered factory", caseId, actorCase.getProcessIdentifier());
-                return Optional.empty();
-            }
-            return Optional.of(factory.createActor(actorCase));
+            Actor actor = fromCase(workflowService.findOne(caseId));
+            return Optional.ofNullable(actor);
         } catch (IllegalArgumentException ignored) {
             return Optional.empty();
         }
     }
 
+    /**
+     * todo javadoc
+     * */
     @Override
-    public void registerFactory(String actorProcessIdentifier, ActorFactory<?> factory) {
-        this.actorFactories.put(actorProcessIdentifier, factory);
-        log.debug("Registered actor factory [{}] for process [{}].", factory.getClass(), actorProcessIdentifier);
+    public Actor fromCase(Case actorCase) {
+        if (actorCase == null) {
+            return null;
+        }
+        ActorFactory<?> factory = this.actorFactories.get(actorCase.getProcessIdentifier());
+        if (factory == null) {
+            log.warn("Actor case with id [{}] of [{}] hasn't got registered factory", actorCase.getStringId(),
+                    actorCase.getProcessIdentifier());
+            return null;
+        }
+        return factory.createActor(actorCase);
     }
 }

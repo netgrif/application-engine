@@ -7,7 +7,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.google.common.collect.Lists;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
-import com.netgrif.application.engine.authorization.domain.User;
+import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.configuration.properties.FilterProperties;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
@@ -85,13 +85,13 @@ public class FilterImportExportService implements IFilterImportExportService {
     private FilterProperties filterProperties;
 
     @Override
-    public void createFilterImport(User author) {
-        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER, "Import filters " + author.getFullName(), "", author.getStringId());
+    public void createFilterImport(Actor author) {
+        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER, "Import filters " + author.getName(), "", author.getStringId());
     }
 
     @Override
-    public void createFilterExport(User author) {
-        workflowService.createCaseByIdentifier(EXPORT_NET_IDENTIFIER, "Export filters " + author.getFullName(), "", author.getStringId());
+    public void createFilterExport(Actor author) {
+        workflowService.createCaseByIdentifier(EXPORT_NET_IDENTIFIER, "Export filters " + author.getName(), "", author.getStringId());
     }
 
     /**

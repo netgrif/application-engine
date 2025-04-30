@@ -681,7 +681,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
                 value = value as Double
             }
             if (field instanceof UserListField && (value instanceof String[] || value instanceof List)) {
-                LinkedHashSet<UserFieldValue> usersactorField = new LinkedHashSet<>()
+                LinkedHashSet<UserFieldValue> users = new LinkedHashSet<>()
                 value.each { id ->
                     Optional<User> userOpt = userService.findById(id as String)
                     UserFieldValue userFieldValue = userOpt.isPresent() ? new UserFieldValue(userOpt.get()) : new UserFieldValue()

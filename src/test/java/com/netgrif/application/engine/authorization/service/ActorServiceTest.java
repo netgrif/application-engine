@@ -6,6 +6,7 @@ import com.netgrif.application.engine.authorization.domain.params.UserParams;
 import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.startup.SuperCreator;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,14 +29,15 @@ public class ActorServiceTest {
     private IUserService userService;
 
     @Autowired
+    private IWorkflowService workflowService;
+
+    @Autowired
     private SuperCreator superCreator;
 
     @Test
     public void testFindById() {
         assert actorService.findById(null).isEmpty();
         assert actorService.findById(new ObjectId().toString()).isEmpty();
-        String notActorCaseId = superCreator.getSuperIdentity().getStringId();
-        assert actorService.findById(notActorCaseId).isEmpty();
 
         User user = userService.create(UserParams.with()
                 .email(new TextField("s@meemail.com"))
@@ -43,7 +45,21 @@ public class ActorServiceTest {
 
         Optional<Actor> foundActorOpt = actorService.findById(user.getStringId());
         assert foundActorOpt.isPresent();
-        assert foundActorOpt.get() instanceof User;
-        assert foundActorOpt.get().getStringId().equals(user.getStringId());
+    }
+
+    @Test
+    public void testFromCase() {
+        assert actorService.fromCase(null) == null;
+        String notActorCaseId = superCreator.getSuperIdentity().getStringId();
+        assert actorService.fromCase(workflowService.findOne(notActorCaseId)) == null;
+
+        User user = userService.create(UserParams.with()
+                .email(new TextField("s@meemail.com"))
+                .build());
+
+        Actor builtActor = actorService.fromCase(user.getCase());
+        assert builtActor != null;
+        assert builtActor instanceof User;
+        assert builtActor.getStringId().equals(user.getStringId());
     }
 }
