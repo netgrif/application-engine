@@ -1,0 +1,939 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>data/export_data</id>
+	<initials>EXP</initials>
+	<title>Export data</title>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<caseName>Export data test default case name</caseName>
+	<role>
+		<id>process_role</id>
+		<title>Process role</title>
+	</role>
+	<data type="boolean" immediate="true">
+		<id>boolean</id>
+		<title>Boolean</title>
+		<placeholder>True</placeholder>
+	</data>
+	<data type="button" immediate="true">
+		<id>button</id>
+		<title>Button</title>
+		<placeholder>Push</placeholder>
+		<component>
+			<name>fab</name>
+		</component>
+	</data>
+	<data type="caseRef">
+		<id>caseRef_field</id>
+		<title>CaseRef field</title>
+		<allowedNets>
+			<allowedNet>data/export_data</allowedNet>
+		</allowedNets>
+	</data>
+	<data type="caseRef">
+		<id>caseRef_change_allowed_nets</id>
+		<title>CaseRef field</title>
+		<allowedNets>
+			<allowedNet>data/export_data</allowedNet>
+		</allowedNets>
+	</data>
+	<data type="date" immediate="true">
+		<id>date</id>
+		<title>Date</title>
+		<init>01.01.2019</init>
+	</data>
+	<data type="dateTime" immediate="true">
+		<id>datetime</id>
+		<title>Datetime</title>
+		<init>01.01.2019 20:00</init>
+	</data>
+	<data type="enumeration" immediate="true">
+		<id>enumeration</id>
+		<title>Enumeration</title>
+		<options>
+			<option key="Alice">Alice</option>
+			<option key="Bob">Bob</option>
+			<option key="Carol">Carol</option>
+		</options>
+		<init>Bob</init>
+	</data>
+	<data type="enumeration" immediate="true">
+		<id>enumeration_autocomplete</id>
+		<title>Enumeration autocomplete</title>
+		<options>
+			<option key="Alice">Alice</option>
+			<option key="Bob">Bob</option>
+			<option key="Carol">Carol</option>
+		</options>
+		<init>Bob</init>
+		<component>
+			<name>autocomplete</name>
+		</component>
+	</data>
+	<data type="enumeration" immediate="true">
+		<id>enumeration_list</id>
+		<title>Enumeration list</title>
+		<options>
+			<option key="Alice">Alice</option>
+			<option key="Bob">Bob</option>
+			<option key="Carol">Carol</option>
+		</options>
+		<init>Bob</init>
+		<component>
+			<name>list</name>
+		</component>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>enumeration_map</id>
+		<title>Enumeration Map</title>
+		<options>
+			<option key="al">Alice</option>
+			<option key="bo">Bob</option>
+			<option key="ca">Carol</option>
+		</options>
+		<init>bo</init>
+	</data>
+	<data type="file" immediate="true">
+		<id>file</id>
+		<title>File</title>
+	</data>
+	<data type="fileList" immediate="true">
+		<id>fileList</id>
+		<title>File List</title>
+	</data>
+	<data type="multichoice" immediate="true">
+		<id>multichoice</id>
+		<title>Multichoice</title>
+		<options>
+			<option key="Alice">Alice</option>
+			<option key="Bob">Bob</option>
+			<option key="Carol">Carol</option>
+		</options>
+		<inits>
+			<init>Alice</init>
+			<init>Bob</init>
+		</inits>
+	</data>
+	<data type="multichoice" immediate="true">
+		<id>multichoice_list</id>
+		<title>Multichoice list</title>
+		<options>
+			<option key="Alice">Alice</option>
+			<option key="Bob">Bob</option>
+			<option key="Carol">Carol</option>
+		</options>
+		<init>Alice,Bob</init>
+		<component>
+			<name>list</name>
+		</component>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>multichoice_map</id>
+		<title>Multichoice Map</title>
+		<options>
+			<option key="al">Alice</option>
+			<option key="bo">Bob</option>
+			<option key="ca">Carol</option>
+		</options>
+		<inits>
+			<init>al</init>
+			<init>ca</init>
+		</inits>
+	</data>
+	<data type="number" immediate="true">
+		<id>number</id>
+		<title>Number</title>
+		<init>10000</init>
+	</data>
+	<data type="number" immediate="true">
+		<id>number_currency</id>
+		<title>Number currency</title>
+		<init>10000</init>
+		<component>
+			<name>currency</name>
+			<property key="locale">sk_SK</property>
+			<property key="code">EUR</property>
+			<property key="fractionSize">2</property>
+		</component>
+	</data>
+	<data type="text" immediate="true">
+		<id>password_data</id>
+		<title>Password from data</title>
+		<component>
+			<name>password</name>
+		</component>
+	</data>
+	<data type="text" immediate="true">
+		<id>password_dataref</id>
+		<title>Password from dataRef</title>
+	</data>
+	<data type="stringCollection">
+		<id>stringCollection_field</id>
+		<title>StringCollection field</title>
+	</data>
+	<data type="taskRef">
+		<id>taskRef</id>
+		<title>Task Ref</title>
+		<inits>
+			<init>4</init>
+		</inits>
+	</data>
+	<data type="text">
+		<id>taskref_test_field</id>
+		<title>Text datafield z iného transitionu</title>
+		<init>Field načítaný pomocou taskrefu</init>
+	</data>
+	<data type="i18n">
+		<id>test_i18n</id>
+		<title>test</title>
+		<init name="test">test_default</init>
+	</data>
+	<data type="text" immediate="true">
+		<id>text</id>
+		<title>Text</title>
+		<init>Lorem ipsum</init>
+	</data>
+	<data type="text" immediate="true">
+		<id>text_area</id>
+		<title>Text area</title>
+		<init>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae magna in libero semper
+            vulputate ut eu sapien. Phasellus vel.</init>
+		<component>
+			<name>textarea</name>
+			<property key="color">red</property>
+			<property key="fontSize">12</property>
+		</component>
+	</data>
+	<data type="user" immediate="true">
+		<id>user</id>
+		<title>User</title>
+	</data>
+	<data type="userList">
+		<id>userList1</id>
+		<title>UserList</title>
+	</data>
+	<data type="userList">
+		<id>userList2</id>
+		<title>UserList</title>
+	</data>
+	<i18n locale="en">
+		<i18nString name="test">test_en</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="test">test_de</i18nString>
+	</i18n>
+	<transition>
+		<id>1</id>
+		<x>336</x>
+		<y>272</y>
+		<label>Start task</label>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>number</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<title>Number fields</title>
+			<dataRef>
+				<id>number</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>boolean</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>date</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>file</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>user</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>button</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<event type="set">
+					<id>1</id>
+					<actions phase="post">
+						<action>
+							<![CDATA[
+							generatePdf("1","file")
+							]]>
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>taskRef</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>number_currency</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_area</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_autocomplete</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_list</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>datetime</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>fileList</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>password_data</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_list</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_map</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>password_dataref</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>password</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_map</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.t1,
+					number: f.number,
+					text: f.text,
+					enumeration: f.enumeration,
+					multichoice: f.multichoice,
+					caseRef_change_allowed_nets: f.caseRef_change_allowed_nets,
+					date: f.date;
+
+					make number,visible on trans when { true }
+					make text,required on trans when { true }
+					make enumeration,hidden on trans when { true }
+					make multichoice,forbidden on trans when { true }
+					make date,optional on trans when { true }
+
+					change enumeration options {
+						[ "changed_option": new com.netgrif.application.engine.petrinet.domain.I18nString("changed_option")]
+					}
+
+					change enumeration value { new com.netgrif.application.engine.petrinet.domain.I18nString("changed_option") }
+
+					change caseRef_change_allowed_nets allowedNets {
+						["changed_allowed_nets"]
+					}
+
+					change text validations { "email" }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t1</id>
+		<x>528</x>
+		<y>272</y>
+		<label>End task</label>
+		<dataGroup>
+			<id>number</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<title>Number fields</title>
+			<dataRef>
+				<id>number</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>boolean</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>date</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>file</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>user</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>button</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<event type="set">
+					<id>2</id>
+					<actions phase="post">
+						<action>
+							<![CDATA[
+							generatePdf("1","file")
+							]]>
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>taskRef</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>number_currency</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_area</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_autocomplete</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_list</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>datetime</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>fileList</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>password_data</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_list</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_map</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>password_dataref</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>password</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_map</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>336</x>
+		<y>112</y>
+		<label>Task ref test task</label>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>240</x>
+		<y>272</y>
+		<label>first</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>432</x>
+		<y>272</y>
+		<label>second</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>1</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

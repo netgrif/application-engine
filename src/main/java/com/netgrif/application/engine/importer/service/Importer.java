@@ -32,6 +32,7 @@ import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetM
 import com.netgrif.application.engine.petrinet.service.ArcFactory;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.utils.ImporterUtils;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
@@ -220,7 +221,7 @@ public class Importer {
             net.setDefaultCaseName(toI18NString(document.getCaseName()));
         }
         if (document.getTags() != null) {
-            net.setTags(this.buildTagsMap(document.getTags().getTag()));
+            net.setTags(ImporterUtils.buildTagsMap(document.getTags().getTag()));
         }
 
         return Optional.of(net);
@@ -496,7 +497,7 @@ public class Importer {
         transition.setTitle(importTransition.getLabel() != null ? toI18NString(importTransition.getLabel()) : new I18nString(""));
         transition.setPosition(importTransition.getX(), importTransition.getY());
         if (importTransition.getTags() != null) {
-            transition.setTags(this.buildTagsMap(importTransition.getTags().getTag()));
+            transition.setTags(ImporterUtils.buildTagsMap(importTransition.getTags().getTag()));
         }
 
         if (importTransition.getLayout() != null) {
@@ -1321,15 +1322,5 @@ public class Importer {
         }
         if (!missingMetaData.isEmpty())
             throw new MissingPetriNetMetaDataException(missingMetaData);
-    }
-
-    protected Map<String, String> buildTagsMap(List<Tag> tagsList) {
-        Map<String, String> tags = new HashMap<>();
-        if (tagsList != null) {
-            tagsList.forEach(tag -> {
-                tags.put(tag.getKey(), tag.getValue());
-            });
-        }
-        return tags;
     }
 }
