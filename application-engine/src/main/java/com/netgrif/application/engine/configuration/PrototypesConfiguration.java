@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
 //import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
-import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.pdf.generator.service.PdfDataHelper;
 import com.netgrif.application.engine.pdf.generator.service.PdfDrawer;
@@ -14,7 +13,6 @@ import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 
 @Configuration
