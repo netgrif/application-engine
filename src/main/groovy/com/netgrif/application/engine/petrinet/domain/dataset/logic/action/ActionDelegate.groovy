@@ -1220,7 +1220,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         if (!createDefaultFilters) {
             return []
         }
-        return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.setStringId.eq(identityService.getLoggedSystemIdentity().activeActorId)) })
+        return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.getStringId.eq(identityService.getLoggedSystemIdentity().activeActorId)) })
     }
 
     /**
