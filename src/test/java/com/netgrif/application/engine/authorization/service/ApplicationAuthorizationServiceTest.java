@@ -43,7 +43,7 @@ public class ApplicationAuthorizationServiceTest {
     public void beforeEach() {
         testHelper.truncateDbs();
 
-        testIdentity = identityService.createWithDefaultActor(IdentityParams.with()
+        testIdentity = identityService.createWithDefaultUser(IdentityParams.with()
                 .username(new TextField("username"))
                 .password(new TextField("password"))
                 .firstname(new TextField("firstname"))

@@ -31,7 +31,7 @@ class SystemIdentityRunner extends AbstractOrderedCommandLineRunner {
     }
 
     private Identity createSystemIdentityWithActor() {
-        return service.createWithDefaultActor(IdentityParams.with()
+        return service.createWithDefaultUser(IdentityParams.with()
                 .username(new TextField(SystemIdentityConstants.USERNAME))
                 .firstname(new TextField(SystemIdentityConstants.FIRSTNAME))
                 .lastname(new TextField(SystemIdentityConstants.LASTNAME))

@@ -6,6 +6,7 @@ import com.netgrif.application.engine.authentication.domain.IdentityState;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.authentication.domain.constants.SystemIdentityConstants;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
+import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
@@ -244,8 +245,8 @@ public class IdentityServiceTest {
     }
 
     @Test
-    void testCreateWithDefaultActor() {
-        Identity identity = identityService.createWithDefaultActor(IdentityParams.with()
+    void testCreateWithDefaultUser() {
+        Identity identity = identityService.createWithDefaultUser(IdentityParams.with()
                 .username(new TextField("username"))
                 .password(new TextField("password"))
                 .firstname(new TextField("firstname"))
@@ -253,7 +254,7 @@ public class IdentityServiceTest {
                 .build());
 
         assert ObjectId.isValid(identity.getMainActorId());
-        assert workflowService.findOne(identity.getMainActorId()).getProcessIdentifier().equals("actor");
+        assert workflowService.findOne(identity.getMainActorId()).getProcessIdentifier().equals(UserConstants.PROCESS_IDENTIFIER);
     }
 
     @Test

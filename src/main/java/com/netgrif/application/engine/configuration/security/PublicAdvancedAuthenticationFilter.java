@@ -43,7 +43,7 @@ public class PublicAdvancedAuthenticationFilter extends PublicJwtAuthenticationF
             return anonymIdentityOpt.get();
         }
 
-        Identity identity = identityService.createWithDefaultActor(IdentityParams.with()
+        Identity identity = identityService.createWithDefaultUser(IdentityParams.with()
                 .username(new TextField(AnonymIdentityConstants.usernameOf(hash)))
                 .firstname(new TextField(AnonymIdentityConstants.FIRSTNAME))
                 .lastname(new TextField(AnonymIdentityConstants.LASTNAME))

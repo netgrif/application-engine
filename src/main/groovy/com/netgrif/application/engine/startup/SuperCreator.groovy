@@ -54,7 +54,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
             this.superIdentity = superIdentityOpt.get()
             return
         }
-        this.superIdentity = identityService.createWithDefaultActor(IdentityParams.with()
+        this.superIdentity = identityService.createWithDefaultUser(IdentityParams.with()
                 .username(new TextField(configuration.email))
                 .firstname(new TextField(configuration.name))
                 .lastname(new TextField(configuration.surname))

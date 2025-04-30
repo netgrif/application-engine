@@ -81,7 +81,7 @@ public class RegistrationService implements IRegistrationService {
             identity = identityService.update(identityOpt.get(), identityParams);
         } else {
             log.info("Creating new identity [{}]", request.email);
-            identity = identityService.createWithDefaultActor(identityParams);
+            identity = identityService.createWithDefaultUser(identityParams);
 
             if (request.roles != null && !request.roles.isEmpty()) {
                 roleService.assignRolesToActor(identity.getMainActorId(), request.roles);

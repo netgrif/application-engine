@@ -71,7 +71,7 @@ class LoginAttemptsTest {
         List<ApplicationRole> appRoles = new ArrayList<>()
         appRoles.add(roleService.findApplicationRoleByImportId("admin"))
         appRoles.add(roleService.findApplicationRoleByImportId("default"))
-        identityService.createWithDefaultActor(IdentityParams.with()
+        identityService.createWithDefaultUser(IdentityParams.with()
                 .firstname(new TextField("Test"))
                 .lastname(new TextField("Integration"))
                 .username(new TextField(USER_EMAIL))

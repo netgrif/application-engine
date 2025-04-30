@@ -212,7 +212,7 @@ public class IdentityService implements IIdentityService {
     }
 
     /**
-     * Creates identity based on params. Password is not encoded. Actor is not created.
+     * Creates identity based on params. Password is not encoded. User is not created.
      *
      * @param params Parameters, that are used to create the identity. At least username must be provided.
      *
@@ -233,14 +233,14 @@ public class IdentityService implements IIdentityService {
     }
 
     /**
-     * Creates identity based on params. Password is encoded. Actor is created from the identity parameters.
+     * Creates identity based on params. Password is encoded. User is created from the identity parameters.
      *
      * @param identityParams Parameters, that are used to create the identity. At least username must be provided.
      *
-     * @return Created identity with the actor (as {@link Identity#getMainActorId()}). Cannot be null.
+     * @return Created identity with the User (as {@link Identity#getMainActorId()}). Cannot be null.
      * */
     @Override
-    public Identity createWithDefaultActor(IdentityParams identityParams) {
+    public Identity createWithDefaultUser(IdentityParams identityParams) {
         throwIfInvalidParams(identityParams);
 
         UserParams userParams = UserParams.fromIdentityParams(identityParams);

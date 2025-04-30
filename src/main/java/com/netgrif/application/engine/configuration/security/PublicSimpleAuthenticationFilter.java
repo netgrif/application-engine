@@ -60,7 +60,7 @@ public class PublicSimpleAuthenticationFilter extends PublicAuthenticationFilter
             return anonymIdentityOpt.get();
         }
 
-        Identity anonymIdentity = identityService.createWithDefaultActor(IdentityParams.with()
+        Identity anonymIdentity = identityService.createWithDefaultUser(IdentityParams.with()
                         .username(new TextField(username))
                         .firstname(new TextField(AnonymIdentityConstants.FIRSTNAME))
                         .lastname(new TextField(AnonymIdentityConstants.LASTNAME))

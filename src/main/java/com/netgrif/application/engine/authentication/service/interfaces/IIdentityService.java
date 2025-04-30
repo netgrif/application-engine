@@ -24,7 +24,7 @@ public interface IIdentityService {
     List<Identity> findAll();
 
     Identity create(IdentityParams params);
-    Identity createWithDefaultActor(IdentityParams params);
+    Identity createWithDefaultUser(IdentityParams params);
     Identity encodePasswordAndCreate(IdentityParams params);
     Identity update(Identity identity, IdentityParams params);
     Identity encodePasswordAndUpdate(Identity identity, IdentityParams params);

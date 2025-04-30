@@ -95,7 +95,7 @@ class PetriNetServiceTest {
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
-        testIdentity = identityService.createWithDefaultActor(IdentityParams.with()
+        testIdentity = identityService.createWithDefaultUser(IdentityParams.with()
                 .username(new TextField(CUSTOMER_USER_MAIL))
                 .password(new TextField("password"))
                 .firstname(new TextField("Customer"))
