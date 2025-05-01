@@ -103,7 +103,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Generate certificates
-        run: cd src/main/resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../../../..
+        run: cd application-engine/src/main/resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../../../../..
 
       - name: Build
         run: mvn clean package install -DskipTests=true
@@ -193,6 +193,7 @@ jobs:
       - name: Push Version ${{ steps.getVersion.outputs.version }}
         uses: docker/build-push-action@v6
         with:
+          context: "{{defaultContext}}:application-engine"
           push: true
           tags: netgrif/application-engine:${{ steps.getVersion.outputs.version }}
 
@@ -200,6 +201,7 @@ jobs:
         if:  ${{ !contains(steps.getVersion.outputs.version, '-SNAPSHOT') }}
         uses: docker/build-push-action@v6
         with:
+          context: "{{defaultContext}}:application-engine"
           push: true
           tags: netgrif/application-engine:latest
 
@@ -257,8 +259,8 @@ jobs:
       - name: Build project
         run: |
           mkdir -p netgrif-application-engine-${{ steps.getVersion.outputs.version }}/src/main/resources/
-          cp target/*-exec.jar netgrif-application-engine-${{ steps.getVersion.outputs.version }}
-          cp -R src/main/resources/*  netgrif-application-engine-${{ steps.getVersion.outputs.version }}/src/main/resources/
+          cp application-engine/target/*-exec.jar netgrif-application-engine-${{ steps.getVersion.outputs.version }}
+          cp -R application-engine/src/main/resources/*  netgrif-application-engine-${{ steps.getVersion.outputs.version }}/src/main/resources/
           zip -r netgrif-application-engine-${{ steps.getVersion.outputs.version }}.zip netgrif-application-engine-${{ steps.getVersion.outputs.version }}
 
       - name: Upload binaries to release
