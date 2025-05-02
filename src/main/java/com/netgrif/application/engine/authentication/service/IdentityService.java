@@ -49,12 +49,22 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
     public IdentityService(BCryptPasswordEncoder passwordEncoder, SecurityContextService securityContextService,
                            @Lazy IDataService dataService, @Lazy IWorkflowService workflowService,
                            @Lazy IElasticCaseSearchService elasticCaseSearchService, @Lazy IUserService userService,
-                           SystemCaseFactoryRegistry systemCaseFactoryRegistry, ISessionManagerService sessionManagerService) {
+                           SystemCaseFactoryRegistry systemCaseFactoryRegistry, @Lazy ISessionManagerService sessionManagerService) {
         super(sessionManagerService, dataService, workflowService, systemCaseFactoryRegistry);
         this.passwordEncoder = passwordEncoder;
         this.securityContextService = securityContextService;
         this.elasticCaseSearchService = elasticCaseSearchService;
         this.userService = userService;
+    }
+
+    @Override
+    public LoggedIdentity getLoggedIdentity() {
+        return sessionManagerService.getLoggedIdentity();
+    }
+
+    @Override
+    public LoggedIdentity getLoggedSystemIdentity() {
+        return sessionManagerService.getLoggedSystemIdentity();
     }
 
     /**

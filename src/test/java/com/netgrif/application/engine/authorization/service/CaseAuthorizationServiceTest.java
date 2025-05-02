@@ -8,6 +8,7 @@ import com.netgrif.application.engine.authorization.domain.*;
 import com.netgrif.application.engine.authorization.domain.repositories.CaseRoleRepository;
 import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository;
 import com.netgrif.application.engine.authorization.domain.repositories.RoleAssignmentRepository;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
@@ -34,6 +35,9 @@ public class CaseAuthorizationServiceTest {
 
     @Autowired
     private CaseAuthorizationService authorizationService;
+
+    @Autowired
+    private ISessionManagerService sessionManagerService;
 
     @Autowired
     private IIdentityService identityService;
@@ -77,10 +81,10 @@ public class CaseAuthorizationServiceTest {
                 .build());
 
         testProcess = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/case_authorization_test.xml"),
-                VersionType.MAJOR, identityService.getLoggedSystemIdentity().getActiveActorId()).getNet();
+                VersionType.MAJOR, sessionManagerService.getLoggedSystemIdentity().getActiveActorId()).getNet();
 
         testProcessWithDefault = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/case_authorization_default_test.xml"),
-                VersionType.MAJOR, identityService.getLoggedSystemIdentity().getActiveActorId()).getNet();
+                VersionType.MAJOR, sessionManagerService.getLoggedSystemIdentity().getActiveActorId()).getNet();
 
         testHelper.login(testIdentity);
     }

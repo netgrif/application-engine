@@ -8,7 +8,6 @@ import com.netgrif.application.engine.authentication.service.interfaces.IIdentit
 import com.netgrif.application.engine.authorization.domain.Role
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -29,9 +28,6 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     @Autowired
     private IIdentityService identityService
-
-    @Autowired
-    private INextGroupService groupService
 
     @Autowired
     private IRoleService roleService

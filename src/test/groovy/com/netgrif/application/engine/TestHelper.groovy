@@ -43,8 +43,6 @@ class TestHelper {
     @Autowired
     private UriNodeRepository uriNodeRepository
     @Autowired
-    private GroupRunner groupRunner
-    @Autowired
     private IFieldActionsCacheService actionsCacheService
     @Autowired
     private FilterRunner filterRunner
@@ -74,7 +72,6 @@ class TestHelper {
         systemProcessRunner.run()
         applicationRoleRunner.run()
         systemIdentityRunner.run()
-        groupRunner.run()
         filterRunner.run()
         superCreator.run()
         validationRunner.run()

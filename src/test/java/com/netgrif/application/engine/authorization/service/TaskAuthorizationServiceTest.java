@@ -3,11 +3,11 @@ package com.netgrif.application.engine.authorization.service;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
-import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.domain.*;
 import com.netgrif.application.engine.authorization.domain.repositories.CaseRoleRepository;
 import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository;
 import com.netgrif.application.engine.authorization.domain.repositories.RoleAssignmentRepository;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
@@ -30,6 +30,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -40,7 +41,7 @@ class TaskAuthorizationServiceTest {
     private TaskAuthorizationService authorizationService;
 
     @Autowired
-    private IIdentityService identityService;
+    private ISessionManagerService sessionManagerService;
 
     @Autowired
     private IPetriNetService petriNetService;
@@ -76,17 +77,17 @@ class TaskAuthorizationServiceTest {
     public void beforeEach() throws IOException, MissingPetriNetMetaDataException {
         testHelper.truncateDbs();
 
-        testIdentity = identityService.createWithDefaultUser(IdentityParams.with()
+        testIdentity = importHelper.createIdentity(IdentityParams.with()
                 .username(new TextField("username"))
                 .password(new TextField("password"))
                 .firstname(new TextField("firstname"))
                 .lastname(new TextField("lastname"))
-                .build());
+                .build(), new ArrayList<>());
 
         Process testProcess = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/task_authorization_test.xml"),
-                VersionType.MAJOR, identityService.getLoggedSystemIdentity().getActiveActorId()).getNet();
+                VersionType.MAJOR, sessionManagerService.getLoggedSystemIdentity().getActiveActorId()).getNet();
         Process testProcessWithDefault = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/task_authorization_default_test.xml"),
-                VersionType.MAJOR, identityService.getLoggedSystemIdentity().getActiveActorId()).getNet();
+                VersionType.MAJOR, sessionManagerService.getLoggedSystemIdentity().getActiveActorId()).getNet();
 
         testHelper.login(testIdentity);
 
@@ -142,7 +143,7 @@ class TaskAuthorizationServiceTest {
 
         assert !authorizationService.canCallCancel(taskId);
 
-        updateAssigneeOfTask(taskIdWithDefault, identityService.getActiveActorId());
+        updateAssigneeOfTask(taskIdWithDefault, sessionManagerService.getActiveActorId());
         assert authorizationService.canCallCancel(taskIdWithDefault);
 
         updateAssigneeOfTask(taskId, new ObjectId().toString());
@@ -152,7 +153,7 @@ class TaskAuthorizationServiceTest {
         assignProcessRole(posProcessRole);
         assert !authorizationService.canCallCancel(taskId);
 
-        updateAssigneeOfTask(taskId, identityService.getActiveActorId());
+        updateAssigneeOfTask(taskId, sessionManagerService.getActiveActorId());
         assert authorizationService.canCallCancel(taskId);
 
         ProcessRole negProcessRole = processRoleRepository.findByImportId("neg_process_role");
@@ -225,7 +226,7 @@ class TaskAuthorizationServiceTest {
 
         assert !authorizationService.canCallFinish(taskId);
 
-        updateAssigneeOfTask(taskIdWithDefault, identityService.getActiveActorId());
+        updateAssigneeOfTask(taskIdWithDefault, sessionManagerService.getActiveActorId());
         assert authorizationService.canCallFinish(taskIdWithDefault);
 
         updateAssigneeOfTask(taskId, new ObjectId().toString());
@@ -235,7 +236,7 @@ class TaskAuthorizationServiceTest {
         assignProcessRole(posProcessRole);
         assert !authorizationService.canCallFinish(taskId);
 
-        updateAssigneeOfTask(taskId, identityService.getActiveActorId());
+        updateAssigneeOfTask(taskId, sessionManagerService.getActiveActorId());
         assert authorizationService.canCallFinish(taskId);
 
         ProcessRole negProcessRole = processRoleRepository.findByImportId("neg_process_role");
@@ -270,7 +271,7 @@ class TaskAuthorizationServiceTest {
         updateAssigneeOfTask(taskId, new ObjectId().toString());
         assert !authorizationService.canCallSetData(taskId);
 
-        updateAssigneeOfTask(taskId, identityService.getActiveActorId());
+        updateAssigneeOfTask(taskId, sessionManagerService.getActiveActorId());
         assert authorizationService.canCallSetData(taskId);
 
         updateAssigneeOfTask(taskId, new ObjectId().toString());
@@ -278,7 +279,7 @@ class TaskAuthorizationServiceTest {
         assignAppRole(adminAppRole);
         assert authorizationService.canCallSetData(taskId);
 
-        updateAssigneeOfTask(taskId, identityService.getActiveActorId());
+        updateAssigneeOfTask(taskId, sessionManagerService.getActiveActorId());
         testHelper.logout();
         assert !authorizationService.canCallSetData(taskId);
     }

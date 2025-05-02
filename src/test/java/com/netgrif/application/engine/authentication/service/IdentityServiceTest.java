@@ -4,7 +4,6 @@ import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.IdentityState;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
-import com.netgrif.application.engine.authentication.domain.constants.SystemIdentityConstants;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
 import com.netgrif.application.engine.petrinet.domain.Process;
@@ -13,6 +12,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -23,8 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -58,46 +56,12 @@ public class IdentityServiceTest {
     @Autowired
     private CaseRepository caseRepository;
 
+    @Autowired
+    private SuperCreator superCreator;
+
     @BeforeEach
     public void before() {
         testHelper.truncateDbs();
-    }
-
-    @Test
-    void testGetLoggedIdentity() {
-        assert identityService.getLoggedIdentity() == null;
-
-        LoggedIdentity loggedIdentity = login();
-
-        LoggedIdentity receivedLoggedIdentity = identityService.getLoggedIdentity();
-        assert receivedLoggedIdentity != null;
-        assert receivedLoggedIdentity.getUsername().equals(loggedIdentity.getUsername());
-        assert receivedLoggedIdentity.getPassword().equals(loggedIdentity.getPassword());
-        assert receivedLoggedIdentity.getFullName().equals(loggedIdentity.getFullName());
-        assert receivedLoggedIdentity.getIdentityId().equals(loggedIdentity.getIdentityId());
-        assert receivedLoggedIdentity.getActiveActorId().equals(loggedIdentity.getActiveActorId());
-    }
-
-    @Test
-    void testGetLoggedSystemIdentity() {
-        LoggedIdentity receivedLoggedIdentity = identityService.getLoggedSystemIdentity();
-
-        assert receivedLoggedIdentity != null;
-        assert receivedLoggedIdentity.getUsername().equals(SystemIdentityConstants.USERNAME);
-        assert receivedLoggedIdentity.getFullName().equals(String.join(" ", SystemIdentityConstants.FIRSTNAME,
-                SystemIdentityConstants.LASTNAME));
-        assert ObjectId.isValid(receivedLoggedIdentity.getIdentityId());
-        assert ObjectId.isValid(receivedLoggedIdentity.getActiveActorId());
-        assert !receivedLoggedIdentity.getIdentityId().equals(receivedLoggedIdentity.getActiveActorId());
-    }
-
-    @Test
-    void testGetActiveActorId() {
-        assert identityService.getActiveActorId() == null;
-
-        LoggedIdentity loggedIdentity = login();
-
-        assert identityService.getActiveActorId().equals(loggedIdentity.getActiveActorId());
     }
 
     @Test
@@ -404,29 +368,13 @@ public class IdentityServiceTest {
 
         assert caseRepository.count() == countBefore;
 
-        login();
+        testHelper.login(superCreator.getSuperIdentity());
         List<Identity> removedIdentities = identityService.removeAllByStateAndExpirationDateBefore(IdentityState.BLOCKED,
                 LocalDateTime.now());
 
         assert removedIdentities.size() == 1;
         assert removedIdentities.get(0).getStringId().equals(identity.getStringId());
         assertThrows(IllegalArgumentException.class, () -> workflowService.findOne(identity.getStringId()));
-    }
-
-    private LoggedIdentity login() {
-        LoggedIdentity loggedIdentity = LoggedIdentity.with()
-                .username("username")
-                .password("password")
-                .fullName("fullName")
-                .identityId("identityId")
-                .activeActorId("activeActorId")
-                .build();
-
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedIdentity,
-                loggedIdentity.getPassword(), loggedIdentity.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(token);
-
-        return loggedIdentity;
     }
 
     private Identity createIdentity(String username) {

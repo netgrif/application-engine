@@ -3,7 +3,6 @@ package com.netgrif.application.engine.menu
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams
-import com.netgrif.application.engine.orgstructure.groups.NextGroupService
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
@@ -99,13 +98,7 @@ class MenuImportExportTest {
     private IDataService dataService
 
     @Autowired
-    private GroupRunner groupRunner
-
-    @Autowired
     private CaseRepository caseRepository
-
-    @Autowired
-    private NextGroupService nextGroupService
 
     @Autowired
     private SuperCreator superCreator

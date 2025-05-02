@@ -8,7 +8,7 @@ import com.netgrif.application.engine.authentication.service.interfaces.IIdentit
 
 import com.netgrif.application.engine.authorization.domain.Role
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService
 import com.netgrif.application.engine.petrinet.domain.DataRef
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -45,6 +45,9 @@ class ImportHelper {
     private IIdentityService identityService
 
     @Autowired
+    private ISessionManagerService sessionManagerService
+
+    @Autowired
     private CaseRepository caseRepository
 
     @Autowired
@@ -66,20 +69,17 @@ class ImportHelper {
     private IWorkflowService workflowService
 
     @Autowired
-    private INextGroupService groupService
-
-    @Autowired
     private IRoleService roleService
 
     @Autowired
     private IUriService uriService
 
-    Optional<Process> createNet(String fileName, String release, LoggedIdentity author = identityService.loggedIdentity,
+    Optional<Process> createNet(String fileName, String release, LoggedIdentity author = sessionManagerService.loggedIdentity,
                                 String uriNodeId = uriService.getRoot().stringId) {
         return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author, uriNodeId)
     }
 
-    Optional<Process> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedIdentity author = identityService.loggedIdentity,
+    Optional<Process> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedIdentity author = sessionManagerService.loggedIdentity,
                                 String uriNodeId = uriService.getRoot().stringId) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
         Process petriNet = petriNetService.importPetriNet(netStream, release, author?.activeActorId, uriNodeId).getNet()
@@ -87,7 +87,7 @@ class ImportHelper {
         return Optional.of(petriNet)
     }
 
-    Optional<Process> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedIdentity author = identityService.loggedIdentity) {
+    Optional<Process> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedIdentity author = sessionManagerService.loggedIdentity) {
         Process petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
         if (!petriNet) {
             return createNet(filename, release, author)
@@ -116,11 +116,11 @@ class ImportHelper {
     }
 
     Case createCase(String title, Process net) {
-        return createCase(title, net, identityService.loggedIdentity)
+        return createCase(title, net, sessionManagerService.loggedIdentity)
     }
 
     Case createCaseAsSuper(String title, Process net) {
-        return createCase(title, net, superCreator.loggedSuper ?: identityService.getLoggedSystemIdentity())
+        return createCase(title, net, superCreator.loggedSuper ?: sessionManagerService.getLoggedSystemIdentity())
     }
 
     AssignTaskEventOutcome assignTask(String taskTitle, String caseId, LoggedIdentity assignee) {
@@ -128,7 +128,7 @@ class ImportHelper {
     }
 
     AssignTaskEventOutcome assignTaskToSuper(String taskTitle, String caseId) {
-        return assignTask(taskTitle, caseId, superCreator.loggedSuper ?: identityService.getLoggedSystemIdentity())
+        return assignTask(taskTitle, caseId, superCreator.loggedSuper ?: sessionManagerService.getLoggedSystemIdentity())
     }
 
     FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedIdentity assignee) {
@@ -136,7 +136,7 @@ class ImportHelper {
     }
 
     FinishTaskEventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
-        return finishTask(taskTitle, caseId, superCreator.loggedSuper ?: identityService.getLoggedSystemIdentity())
+        return finishTask(taskTitle, caseId, superCreator.loggedSuper ?: sessionManagerService.getLoggedSystemIdentity())
     }
 
     CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedIdentity assignee) {
@@ -144,7 +144,7 @@ class ImportHelper {
     }
 
     CancelTaskEventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {
-        return cancelTask(taskTitle, caseId, superCreator.loggedSuper ?: identityService.getLoggedSystemIdentity())
+        return cancelTask(taskTitle, caseId, superCreator.loggedSuper ?: sessionManagerService.getLoggedSystemIdentity())
     }
 
     String getTaskId(String taskTitle, String caseId) {
@@ -153,7 +153,7 @@ class ImportHelper {
     }
 
     SetDataEventOutcome setTaskData(String taskId, DataSet dataSet) {
-        dataService.setData(taskId, dataSet, identityService.getLoggedSystemIdentity().activeActorId)
+        dataService.setData(taskId, dataSet, sessionManagerService.getLoggedSystemIdentity().activeActorId)
     }
 
     SetDataEventOutcome setTaskData(String taskTitle, String caseId, DataSet data) {
@@ -161,7 +161,7 @@ class ImportHelper {
     }
 
     List<DataRef> getTaskData(String taskTitle, String caseId) {
-        return dataService.getData(getTaskId(taskTitle, caseId), identityService.getLoggedSystemIdentity().activeActorId).getData()
+        return dataService.getData(getTaskId(taskTitle, caseId), sessionManagerService.getLoggedSystemIdentity().activeActorId).getData()
     }
 
     void updateSuperUser() {
