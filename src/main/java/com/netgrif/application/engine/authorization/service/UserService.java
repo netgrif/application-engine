@@ -28,13 +28,10 @@ import java.util.stream.Collectors;
 @Service
 public class UserService extends CrudSystemCaseService<User> implements IUserService {
 
-    private final IElasticCaseSearchService elasticCaseSearchService;
-
     public UserService(@Lazy IDataService dataService, ISessionManagerService sessionManagerService,
                        @Lazy IElasticCaseSearchService elasticCaseSearchService, @Lazy IWorkflowService workflowService,
                        SystemCaseFactoryRegistry systemCaseFactoryRegistry) {
-        super(sessionManagerService, dataService, workflowService, systemCaseFactoryRegistry);
-        this.elasticCaseSearchService = elasticCaseSearchService;
+        super(sessionManagerService, dataService, workflowService, systemCaseFactoryRegistry, elasticCaseSearchService);
     }
 
     /**
@@ -45,7 +42,7 @@ public class UserService extends CrudSystemCaseService<User> implements IUserSer
         if (email == null) {
             return Optional.empty();
         }
-        return findOneByQuery(emailQuery(email));
+        return findOneByQuery(fulltextFieldQuery(UserConstants.EMAIL_FIELD_ID, email));
     }
 
     /**
@@ -56,7 +53,7 @@ public class UserService extends CrudSystemCaseService<User> implements IUserSer
         if (email == null) {
             return false;
         }
-        return countByQuery(emailQuery(email)) > 0;
+        return countByQuery(fulltextFieldQuery(UserConstants.EMAIL_FIELD_ID, email)) > 0;
     }
 
     @Override
@@ -95,38 +92,5 @@ public class UserService extends CrudSystemCaseService<User> implements IUserSer
     @Override
     protected void postUpdateActions(SystemCase systemCase) {
         // none
-    }
-
-    private Optional<User> findOneByQuery(String query) {
-        CaseSearchRequest request = CaseSearchRequest.builder()
-                .query(buildQuery(Set.of(query)))
-                .build();
-        Page<Case> resultAsPage = elasticCaseSearchService.search(List.of(request), sessionManagerService.getLoggedIdentity(),
-                PageRequest.of(0, 1), Locale.getDefault(), false, null);
-        if (resultAsPage.hasContent()) {
-            return Optional.of(new User(resultAsPage.getContent().get(0)));
-        }
-        return Optional.empty();
-    }
-
-    private long countByQuery(String query) {
-        CaseSearchRequest request = CaseSearchRequest.builder()
-                .query(buildQuery(Set.of(query)))
-                .build();
-        return elasticCaseSearchService.count(List.of(request), sessionManagerService.getLoggedIdentity(), Locale.getDefault(),
-                false, null);
-    }
-
-    private static String buildQuery(Set<String> andQueries) {
-        StringBuilder queryBuilder = new StringBuilder("processIdentifier:").append(UserConstants.PROCESS_IDENTIFIER);
-        for (String query : andQueries) {
-            queryBuilder.append(" AND ");
-            queryBuilder.append(query);
-        }
-        return queryBuilder.toString();
-    }
-
-    private static String emailQuery(String email) {
-        return String.format("dataSet.%s.fulltextValue:\"%s\"", UserConstants.EMAIL_FIELD_ID, email);
     }
 }

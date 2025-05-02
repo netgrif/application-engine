@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
+import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -12,9 +14,12 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.LongStream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,6 +29,7 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
     protected final IDataService dataService;
     protected final IWorkflowService workflowService;
     protected final SystemCaseFactoryRegistry systemCaseFactory;
+    protected final IElasticCaseSearchService elasticCaseSearchService;
 
     // todo javadoc on abstract methods
     protected abstract String getProcessIdentifier();
@@ -130,5 +136,59 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
 
     protected boolean isTextFieldValueEmpty(TextField field) {
         return field.getRawValue() == null || field.getRawValue().trim().isEmpty();
+    }
+
+    protected List<? extends Case> findAllByQuery(String query) {
+        Set<String> singletonQuerySet = query != null ? Set.of(query) : Set.of();
+        CaseSearchRequest request = CaseSearchRequest.builder()
+                .query(buildQuery(singletonQuerySet))
+                .build();
+
+        List<Case> result = new ArrayList<>();
+
+        long identityCount = elasticCaseSearchService.count(List.of(request),sessionManagerService.getLoggedIdentity(),
+                Locale.getDefault(), false, null);
+        long pageCount = (identityCount / 100) + 1;
+        LongStream.range(0, pageCount).forEach(pageIdx -> {
+            Page<Case> pageResult = elasticCaseSearchService.search(List.of(request), sessionManagerService.getLoggedIdentity(),
+                    PageRequest.of((int) pageIdx, 100), Locale.getDefault(), false, null);
+            result.addAll(pageResult.getContent());
+        });
+
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Optional<T> findOneByQuery(String query) {
+        CaseSearchRequest request = CaseSearchRequest.builder()
+                .query(buildQuery(Set.of(query)))
+                .build();
+        Page<Case> resultAsPage = elasticCaseSearchService.search(List.of(request), sessionManagerService.getLoggedIdentity(),
+                PageRequest.of(0, 1), Locale.getDefault(), false, null);
+        if (resultAsPage.hasContent()) {
+            return (Optional<T>) Optional.ofNullable(systemCaseFactory.fromCase(resultAsPage.getContent().get(0)));
+        }
+        return Optional.empty();
+    }
+
+    protected long countByQuery(String query) {
+        CaseSearchRequest request = CaseSearchRequest.builder()
+                .query(buildQuery(Set.of(query)))
+                .build();
+        return elasticCaseSearchService.count(List.of(request), sessionManagerService.getLoggedIdentity(), Locale.getDefault(),
+                false, null);
+    }
+
+    protected String buildQuery(Set<String> andQueries) {
+        StringBuilder queryBuilder = new StringBuilder("processIdentifier:").append(getProcessIdentifier());
+        for (String query : andQueries) {
+            queryBuilder.append(" AND ");
+            queryBuilder.append(query);
+        }
+        return queryBuilder.toString();
+    }
+
+    protected static String fulltextFieldQuery(String fieldId, String fieldValue) {
+        return String.format("dataSet.%s.fulltextValue:\"%s\"", fieldId, fieldValue);
     }
 }

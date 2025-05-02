@@ -10,12 +10,10 @@ import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.params.UserParams;
 import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
-import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.security.service.SecurityContextService;
-import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.CaseParams;
 import com.netgrif.application.engine.workflow.domain.SystemCase;
 import com.netgrif.application.engine.workflow.service.CrudSystemCaseService;
@@ -24,8 +22,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +30,6 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 @Slf4j
 @Service
@@ -43,17 +38,15 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
     // todo: release/8.0.0 make encoder configurable
     private final BCryptPasswordEncoder passwordEncoder;
     private final SecurityContextService securityContextService;
-    private final IElasticCaseSearchService elasticCaseSearchService;
     private final IUserService userService;
 
     public IdentityService(BCryptPasswordEncoder passwordEncoder, SecurityContextService securityContextService,
                            @Lazy IDataService dataService, @Lazy IWorkflowService workflowService,
                            @Lazy IElasticCaseSearchService elasticCaseSearchService, @Lazy IUserService userService,
                            SystemCaseFactoryRegistry systemCaseFactoryRegistry, @Lazy ISessionManagerService sessionManagerService) {
-        super(sessionManagerService, dataService, workflowService, systemCaseFactoryRegistry);
+        super(sessionManagerService, dataService, workflowService, systemCaseFactoryRegistry, elasticCaseSearchService);
         this.passwordEncoder = passwordEncoder;
         this.securityContextService = securityContextService;
-        this.elasticCaseSearchService = elasticCaseSearchService;
         this.userService = userService;
     }
 
@@ -79,7 +72,7 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
         if (username == null) {
             return Optional.empty();
         }
-        return findOneByQuery(usernameQuery(username));
+        return findOneByQuery(fulltextFieldQuery(IdentityConstants.USERNAME_FIELD_ID, username));
     }
 
     /**
@@ -114,7 +107,7 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
         if (username == null) {
             return false;
         }
-        return countByQuery(usernameQuery(username)) > 0;
+        return countByQuery(fulltextFieldQuery(IdentityConstants.USERNAME_FIELD_ID, username)) > 0;
     }
 
     /**
@@ -304,59 +297,6 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
             return;
         }
         params.setPassword(new TextField(passwordEncoder.encode(password)));
-    }
-
-    private Optional<Identity> findOneByQuery(String query) {
-        CaseSearchRequest request = CaseSearchRequest.builder()
-                .query(buildQuery(Set.of(query)))
-                .build();
-        Page<Case> resultAsPage = elasticCaseSearchService.search(List.of(request), sessionManagerService.getLoggedIdentity(),
-                PageRequest.of(0, 1), Locale.getDefault(), false, null);
-        if (resultAsPage.hasContent()) {
-            return Optional.of(new Identity(resultAsPage.getContent().get(0)));
-        }
-        return Optional.empty();
-    }
-
-    private List<? extends Case> findAllByQuery(String query) {
-        Set<String> singletonQuerySet = query != null ? Set.of(query) : Set.of();
-        CaseSearchRequest request = CaseSearchRequest.builder()
-                .query(buildQuery(singletonQuerySet))
-                .build();
-
-        List<Case> result = new ArrayList<>();
-
-        long identityCount = elasticCaseSearchService.count(List.of(request),sessionManagerService.getLoggedIdentity(),
-                Locale.getDefault(), false, null);
-        long pageCount = (identityCount / 100) + 1;
-        LongStream.range(0, pageCount).forEach(pageIdx -> {
-            Page<Case> pageResult = elasticCaseSearchService.search(List.of(request), sessionManagerService.getLoggedIdentity(),
-                    PageRequest.of((int) pageIdx, 100), Locale.getDefault(), false, null);
-            result.addAll(pageResult.getContent());
-        });
-
-        return result;
-    }
-
-    private long countByQuery(String query) {
-        CaseSearchRequest request = CaseSearchRequest.builder()
-                .query(buildQuery(Set.of(query)))
-                .build();
-        return elasticCaseSearchService.count(List.of(request), sessionManagerService.getLoggedIdentity(),
-                Locale.getDefault(), false, null);
-    }
-
-    private static String buildQuery(Set<String> andQueries) {
-        StringBuilder queryBuilder = new StringBuilder("processIdentifier:identity");
-        for (String query : andQueries) {
-            queryBuilder.append(" AND ");
-            queryBuilder.append(query);
-        }
-        return queryBuilder.toString();
-    }
-
-    private static String usernameQuery(String username) {
-        return String.format("dataSet.%s.fulltextValue:\"%s\"", IdentityConstants.USERNAME_FIELD_ID, username);
     }
 
     private static String stateAndExpirationDateBeforeQuery(IdentityState state, LocalDateTime dateTime) {
