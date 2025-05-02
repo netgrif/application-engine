@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.mail;
 
 import com.netgrif.application.engine.objects.auth.domain.RegisteredUser;
-import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
+import com.netgrif.application.engine.auth.service.UserRegistrationService;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.mail.domain.MailDraft;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
@@ -62,7 +62,7 @@ public class MailService implements IMailService {
     protected Configuration configuration;
 
     @Autowired
-    private IRegistrationService registrationService;
+    private UserRegistrationService userRegistrationService;
 
     @Autowired
     private ServerAuthProperties serverAuthProperties;
@@ -73,10 +73,10 @@ public class MailService implements IMailService {
         Map<String, Object> model = new HashMap<>();
 
         recipients.add(user.getEmail());
-        model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
+        model.put(TOKEN, userRegistrationService.encodeToken(user.getEmail(), user.getToken()));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         model.put(VALIDITY, "" + serverAuthProperties.getTokenValidityPeriod());
-        model.put(EXPIRATION, registrationService.generateExpirationDate().format(formatter));
+        model.put(EXPIRATION, userRegistrationService.generateExpirationDate().format(formatter));
         model.put(SERVER, getServerURL());
 
         MailDraft mailDraft = MailDraft.builder(mailFrom, recipients).subject(EmailType.REGISTRATION.getSubject())
@@ -92,9 +92,9 @@ public class MailService implements IMailService {
         Map<String, Object> model = new HashMap<>();
 
         model.put(NAME, user.getFirstName());
-        model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
+        model.put(TOKEN, userRegistrationService.encodeToken(user.getEmail(), user.getToken()));
         model.put(VALIDITY, "" + serverAuthProperties.getTokenValidityPeriod());
-        model.put(EXPIRATION, registrationService.generateExpirationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        model.put(EXPIRATION, userRegistrationService.generateExpirationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         model.put(SERVER, getServerURL());
 
         MailDraft mailDraft = MailDraft.builder(mailFrom, Collections.singletonList(user.getEmail())).subject(EmailType.PASSWORD_RESET.getSubject())

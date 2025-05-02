@@ -1,9 +1,7 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
-import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +22,7 @@ public class TokenServiceTest {
 
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     @Autowired
-    IRegistrationService service;
+    UserRegistrationService service;
     @Autowired
     UserService userService;
 

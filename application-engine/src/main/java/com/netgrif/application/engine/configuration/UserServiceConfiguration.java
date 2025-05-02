@@ -1,9 +1,7 @@
 package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.auth.web.responsebodies.IUserFactory;
-import com.netgrif.application.engine.auth.web.responsebodies.UserFactory;
+import com.netgrif.application.engine.auth.service.UserFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,10 +26,10 @@ public class UserServiceConfiguration {
 //        return new RegistrationService();
 //    }
 
-    @Bean
-    public IUserFactory userFactory() {
-        return new UserFactory();
-    }
+//    @Bean
+//    public UserFactory userFactory() {
+//        return new UserFactoryImpl();
+//    }
 
 //    @Bean
 //    @ConditionalOnMissingBean

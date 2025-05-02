@@ -8,7 +8,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.objects.petrinet.domain.layout.TaskLayout;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import lombok.Data;
-import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
 import java.util.List;

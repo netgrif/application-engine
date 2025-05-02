@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.web;
 
+import com.netgrif.application.engine.adapter.spring.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
@@ -53,6 +54,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
+
+import static com.netgrif.application.engine.adapter.spring.workflow.web.responsebodies.MessageResource.errorMessage;
+import static com.netgrif.application.engine.adapter.spring.workflow.web.responsebodies.MessageResource.successMessage;
 
 @RestController()
 @RequestMapping("/api/workflow")
@@ -183,10 +187,10 @@ public class WorkflowController {
             Case aCase = workflowService.findOne(caseId);
             taskService.reloadTasks(aCase);
 
-            return MessageResource.successMessage("Task reloaded in case [" + caseId + "]");
+            return successMessage("Task reloaded in case [" + caseId + "]");
         } catch (Exception e) {
             log.error("Reloading tasks of case [" + caseId + "] failed:", e);
-            return MessageResource.errorMessage("Reloading tasks in case " + caseId + " has failed!");
+            return errorMessage("Reloading tasks in case " + caseId + " has failed!");
         }
     }
 

@@ -203,6 +203,7 @@
                 <configuration>
                     <source>21</source>
                     <target>21</target>
+                    <compilerArgument>-parameters</compilerArgument>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.mapstruct</groupId>

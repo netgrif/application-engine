@@ -1,11 +1,10 @@
 package com.netgrif.application.engine.auth.service;
 
 
-import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.auth.throwable.InvalidUserTokenException;
 import com.netgrif.application.engine.objects.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.objects.auth.domain.User;
-import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
 import org.junit.jupiter.api.AfterEach;
@@ -24,10 +23,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles({"test"})
 @SpringBootTest
-public class RegistrationServiceTest {
+public class UserRegistrationServiceTest {
 
     @Autowired
-    IRegistrationService service;
+    UserRegistrationService service;
 
     @Autowired
     UserService userService;

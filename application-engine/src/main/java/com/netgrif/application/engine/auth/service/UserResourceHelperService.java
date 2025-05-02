@@ -1,12 +1,10 @@
 package com.netgrif.application.engine.auth.service;
 
+import com.netgrif.application.engine.auth.web.responsebodies.User;
+import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserResourceHelperService;
-import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.auth.web.responsebodies.IUserFactory;
-import com.netgrif.application.engine.auth.web.responsebodies.User;
-import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +22,7 @@ public class UserResourceHelperService implements IUserResourceHelperService {
     private UserService userService;
 
     @Autowired
-    private IUserFactory userFactory;
+    private UserFactory userFactory;
 
     @Autowired
     private IImpersonationService impersonationService;

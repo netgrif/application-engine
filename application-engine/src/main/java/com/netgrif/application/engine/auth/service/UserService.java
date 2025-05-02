@@ -3,7 +3,7 @@
 //import com.netgrif.application.engine.objects.auth.domain.Authority;.*;
 //import com.netgrif.application.engine.objects.auth.domain.Authority;.repositories.AuthorityRepository;
 //import com.netgrif.application.engine.objects.auth.domain.Authority;.repositories.UserRepository;
-//import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
+//import com.netgrif.application.engine.auth.service.RegistrationService;
 //import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 //import com.netgrif.application.engine.event.events.user.UserRegistrationEvent;
 //import com.netgrif.application.engine.orgstructure.groups.config.GroupConfigurationProperties;

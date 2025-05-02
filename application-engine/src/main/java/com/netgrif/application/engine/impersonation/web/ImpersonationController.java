@@ -1,13 +1,12 @@
 package com.netgrif.application.engine.impersonation.web;
 
-import com.netgrif.application.engine.auth.web.responsebodies.User;
+import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAssembler;
 import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserResourceHelperService;
 import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import com.netgrif.application.engine.impersonation.exceptions.IllegalImpersonationAttemptException;
 import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserHasSessionException;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
