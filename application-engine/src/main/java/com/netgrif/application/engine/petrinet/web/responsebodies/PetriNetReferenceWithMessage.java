@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.workflow.web.responsebodies.ResponseMessage;
+import com.netgrif.application.engine.adapter.spring.workflow.web.responsebodies.ResponseMessage;
 import lombok.Data;
 
 import java.util.Locale;

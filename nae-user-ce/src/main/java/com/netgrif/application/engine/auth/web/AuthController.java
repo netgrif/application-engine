@@ -14,7 +14,7 @@ import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
-import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
+import com.netgrif.application.engine.adapter.spring.workflow.web.responsebodies.MessageResource;
 import freemarker.template.TemplateException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

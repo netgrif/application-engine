@@ -1,7 +1,7 @@
 //package com.netgrif.application.engine.auth.web;
 //
 //import com.netgrif.application.engine.auth.web.responsebodies.*;
-//import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
+//import com.netgrif.application.engine.adapter.spring.workflow.web.responsebodies.MessageResource;
 //import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAssembler;
 //import com.netgrif.application.engine.objects.auth.domain.IUser;
 //import com.netgrif.application.engine.objects.auth.domain.LoggedUser;

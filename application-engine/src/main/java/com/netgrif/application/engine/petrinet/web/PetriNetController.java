@@ -21,7 +21,7 @@ import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
-import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
+import com.netgrif.application.engine.adapter.spring.workflow.web.responsebodies.MessageResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

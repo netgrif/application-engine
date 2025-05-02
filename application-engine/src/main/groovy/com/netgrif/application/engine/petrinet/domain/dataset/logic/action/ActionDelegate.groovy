@@ -58,7 +58,7 @@ import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
-import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
+import com.netgrif.application.engine.adapter.spring.workflow.web.responsebodies.MessageResource
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
 import groovy.transform.NamedVariant
