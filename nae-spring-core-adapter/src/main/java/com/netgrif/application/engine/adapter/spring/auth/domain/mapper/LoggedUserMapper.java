@@ -43,7 +43,8 @@ public class LoggedUserMapper {
                 user.getUsername(),
                 Optional.ofNullable(user.getCredentialValue("password")).map(Object::toString).orElse("N/A"),
                 user.getAuthorities(),
-                user.getProcessRoles()
+                user.getProcessRoles(),
+                user.getNegativeProcessRoles()
         );
         loggedUser.setEmail(user.getEmail());
         loggedUser.setFirstName(user.getFirstName());

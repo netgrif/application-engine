@@ -22,13 +22,15 @@ public interface UserService {
 
     IUser saveUser(IUser user, String realmId);
 
+    IUser saveUser(IUser user);
+
     List<User> saveUsers(List<IUser> users);
 
     void deleteAllUsers(Collection<String> realmIds);
 
     Optional<IUser> findUserByUsername(String username, String realmName);
 
-    List<IUser> findAllUsers(String realmName);
+    Page<IUser> findAllUsers(String realmName, Pageable pageable);
 
     IUser createUser(String username, String email, String firstName, String lastName, String password, String realmName);
 
@@ -58,9 +60,13 @@ public interface UserService {
 
     List<IUser> findAllByIds(Collection<String> ids, String realmId);
 
+    Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable);
+
     Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable, Collection<String> realmIds);
 
     List<IUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, Collection<String> realmIds);
+
+    List<IUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds);
 
     void addDefaultAuthorities(IUser user);
 
@@ -78,6 +84,10 @@ public interface UserService {
 
     IUser addRole(IUser user, String roleStringId);
 
+    IUser addNegativeProcessRole(IUser user, ProcessResourceId id);
+
+    IUser addNegativeProcessRole(IUser user, String roleStringId);
+
     Page<IUser> searchAllCoMembers(String query, com.netgrif.application.engine.objects.auth.domain.LoggedUser principal, Pageable pageable);
 
     Page<IUser> searchAllCoMembers(String query, List<ProcessResourceId> roleIds, List<ProcessResourceId> negateRoleIds, com.netgrif.application.engine.objects.auth.domain.LoggedUser loggedUser, Pageable pageable);
@@ -87,6 +97,12 @@ public interface UserService {
     IUser removeRole(IUser user, ProcessResourceId roleId);
 
     IUser removeRole(IUser user, String roleId);
+
+    IUser removeNegativeProcessRole(IUser user, ProcessRole role);
+
+    IUser removeNegativeProcessRole(IUser user, ProcessResourceId roleId);
+
+    IUser removeNegativeProcessRole(IUser user, String roleId);
 
     void removeRoleOfDeletedPetriNet(PetriNet process, Collection<String> realmIds);
 

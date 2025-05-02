@@ -7,7 +7,9 @@ import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @QueryEntity
 public class Group implements Actor {
@@ -55,6 +57,10 @@ public class Group implements Actor {
 
     @Getter
     @Setter
+    protected Set<ProcessRole> negativeProcessRoles;
+
+    @Getter
+    @Setter
     protected Set<String> groupIds;
 
     @Getter
@@ -66,8 +72,9 @@ public class Group implements Actor {
 
     protected Group() {
         id = new ObjectId();
-        authorities = new HashSet<Authority>();
+        authorities = new HashSet<>();
         processRoles = new HashSet<>();
+        negativeProcessRoles = new HashSet<>();
         groupIds = new HashSet<>();
         groups = new HashSet<>();
         memberIds = new HashSet<>();
@@ -127,6 +134,19 @@ public class Group implements Actor {
     @Override
     public void removeProcessRole(ProcessRole role) {
         processRoles.remove(role);
+    }
+
+    @Override
+    public void addNegativeProcessRole(ProcessRole role) {
+        if (negativeProcessRoles.stream().anyMatch(it -> it.getStringId().equals(role.getStringId()))) {
+            return;
+        }
+        negativeProcessRoles.add(role);
+    }
+
+    @Override
+    public void removeNegativeProcessRole(ProcessRole role) {
+        negativeProcessRoles.remove(role);
     }
 
     @Override

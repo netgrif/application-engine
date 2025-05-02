@@ -53,13 +53,15 @@ public abstract class LoggedUser implements Serializable {
 
     private Set<ProcessRole> processRoles;
 
+    private Set<ProcessRole> negativeProcessRoles;
+
     private Set<String> mfaMethod;
 
     private transient Duration sessionTimeout = Duration.ofMinutes(30);
 
     private Map<String, Attribute<?>> attributes;
 
-    public LoggedUser(String id, String username, String password, Collection<Authority> authorities, Collection<ProcessRole> processRoles) {
+    public LoggedUser(String id, String username, String password, Collection<Authority> authorities, Collection<ProcessRole> processRoles, Collection<ProcessRole> negativeProcessRoles) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -72,9 +74,10 @@ public abstract class LoggedUser implements Serializable {
         this.accountNonExpired = true;
         this.accountNonLocked = true;
         this.credentialsNonExpired = true;
+        this.negativeProcessRoles = new HashSet<>(negativeProcessRoles);
     }
 
-    public LoggedUser(String id, String realmId, String username, String password, Collection<? extends Authority> authorities, Set<Group> groups, Set<ProcessRole> processRoles, Map<String, Attribute<?>> attributes, Set<String> mfaMethod, String firstName, String lastName) {
+    public LoggedUser(String id, String realmId, String username, String password, Collection<? extends Authority> authorities, Set<Group> groups, Set<ProcessRole> processRoles, Map<String, Attribute<?>> attributes, Set<String> mfaMethod, String firstName, String lastName, Collection<ProcessRole> negativeProcessRoles) {
         this.id = id;
         this.realmId = realmId;
         this.username = username;
@@ -91,6 +94,7 @@ public abstract class LoggedUser implements Serializable {
         this.accountNonExpired = true;
         this.accountNonLocked = true;
         this.credentialsNonExpired = true;
+        this.negativeProcessRoles = new HashSet<>(negativeProcessRoles);
     }
 
     public boolean isAdmin() {
