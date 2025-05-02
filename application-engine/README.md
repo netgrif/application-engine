@@ -164,7 +164,3 @@ our [Contribution guide](https://github.com/netgrif/application-engine/blob/mast
 
 The software is licensed under NETGRIF Community license. You may be found this license
 at [the LICENSE file](https://github.com/netgrif/application-engine/blob/master/LICENSE) in the repository. 
-
-##  Loading nae-user-ce as symlink to modules
-
-``ln -s nae-user-ce/target/nae-user-ce-*-SNAPSHOT.jar application-engine/modules``
