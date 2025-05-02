@@ -1,0 +1,281 @@
+package com.netgrif.application.engine.auth.web;
+
+import com.netgrif.application.engine.adapter.spring.workflow.web.responsebodies.MessageResource;
+import com.netgrif.application.engine.auth.service.UserFactory;
+import com.netgrif.application.engine.auth.service.UserRegistrationService;
+import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.auth.throwable.InvalidUserTokenException;
+import com.netgrif.application.engine.auth.web.requestbodies.ChangePasswordRequest;
+import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
+import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
+import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
+import com.netgrif.application.engine.mail.MailAttemptService;
+import com.netgrif.application.engine.mail.MailService;
+import com.netgrif.application.engine.objects.auth.domain.IUser;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.auth.domain.RegisteredUser;
+import com.netgrif.application.engine.security.service.ISecurityContextService;
+import freemarker.template.TemplateException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Locale;
+import java.util.Optional;
+
+@Slf4j
+@RestController
+@RequiredArgsConstructor
+@Tag(name = "AuthController")
+@RequestMapping("/api/auth")
+@ConditionalOnProperty(
+        value = "nae.auth.web.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
+public class AuthController {
+
+    private UserRegistrationService registrationService;
+    private ServerAuthProperties serverAuthProperties;
+    private MailAttemptService mailAttemptService;
+    private MailService mailService;
+    private UserFactory userFactory;
+    private UserService userService;
+    private ISecurityContextService securityContextService;
+
+    @Autowired
+    public void setRegistrationService(UserRegistrationService userRegistrationService) {
+        this.registrationService = userRegistrationService;
+    }
+
+    @Autowired
+    public void setServerAuthProperties(ServerAuthProperties serverAuthProperties) {
+        this.serverAuthProperties = serverAuthProperties;
+    }
+
+    @Autowired
+    public void setMailAttemptService(MailAttemptService mailAttemptService) {
+        this.mailAttemptService = mailAttemptService;
+    }
+
+    @Autowired
+    public void setMailService(MailService mailService) {
+        this.mailService = mailService;
+    }
+
+    @Autowired
+    public void setUserFactory(UserFactory userFactory) {
+        this.userFactory = userFactory;
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setSecurityContextService(ISecurityContextService securityContextService) {
+        this.securityContextService = securityContextService;
+    }
+
+    @Operation(
+            summary = "User login",
+            description = "Authenticates a user with the system."
+    )
+    @ApiResponse(responseCode = "200", description = "User logged in successfully")
+    @ApiResponse(responseCode = "401", description = "Unauthorized – Authentication is required and has failed or has not yet been provided")
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+    @GetMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> login(
+            @Parameter(description = "Spring Security authentication object")
+            Authentication auth,
+            @Parameter(description = "Locale information")
+            Locale locale
+    ) {
+        log.info("login");
+        log.debug("locale: {}", locale);
+        log.debug("auth: {}", auth);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        LoggedUser loggedUser = (LoggedUser) authentication.getPrincipal();
+        return ResponseEntity.ok(userFactory.getUser(userService.findById(loggedUser.getId(), null), locale));
+    }
+
+    @Operation(
+            summary = "User login",
+            description = "Authenticates a user with the system and optionally checks for MFA requirements."
+    )
+    @ApiResponse(responseCode = "200", description = "User logged in successfully")
+    @ApiResponse(responseCode = "401", description = "Unauthorized – Authentication is required and has failed or has not yet been provided")
+    @ApiResponse(responseCode = "412", description = "MFA token is required for login")
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+    @GetMapping(value = "/valid", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> validToken(
+            @Parameter(description = "Locale information")
+            Locale locale) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(authentication);
+    }
+
+    @Operation(summary = "New user registration")
+    @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public MessageResource signup(@RequestBody RegistrationRequest regRequest) {
+        try {
+            String email = registrationService.decodeToken(regRequest.token)[0];
+            if (!registrationService.verifyToken(regRequest.token))
+                return MessageResource.errorMessage("Registration of " + email + " has failed! Invalid token!");
+
+            regRequest.password = new String(Base64.getDecoder().decode(regRequest.password));
+            RegisteredUser user = registrationService.registerUser(regRequest);
+            if (user == null)
+                return MessageResource.errorMessage("Registration of " + email + " has failed! No user with this email was found.");
+
+            return MessageResource.successMessage("Registration complete");
+        } catch (InvalidUserTokenException e) {
+            log.error(e.getMessage());
+            return MessageResource.errorMessage("Invalid token!");
+        }
+    }
+
+    @Operation(summary = "Send invitation to a new user", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PostMapping(value = "/invite", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public MessageResource invite(@RequestBody NewUserRequest newUserRequest, Authentication auth) {
+        try {
+            if (!serverAuthProperties.isOpenRegistration() && (auth == null || !((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated().isAdmin())) {
+                return MessageResource.errorMessage("Only admin can invite new users!");
+            }
+
+            newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
+            if (mailAttemptService.isBlocked(newUserRequest.email)) {
+                return MessageResource.successMessage("Done");
+            }
+
+            RegisteredUser user = registrationService.createNewUser(newUserRequest);
+            if (user == null)
+                return MessageResource.successMessage("Done");
+            mailService.sendRegistrationEmail(user);
+
+            mailAttemptService.mailAttempt(newUserRequest.email);
+            return MessageResource.successMessage("Done");
+        } catch (IOException | TemplateException | MessagingException e) {
+            log.error(e.toString());
+            return MessageResource.errorMessage("Failed");
+        }
+    }
+
+    @Operation(summary = "Verify validity of a registration token", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PostMapping(value = "/token/verify", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public MessageResource verifyToken(@RequestBody String token) {
+        try {
+            if (registrationService.verifyToken(token))
+                return MessageResource.successMessage(registrationService.decodeToken(token)[0]);
+            else
+                return MessageResource.errorMessage("Invalid token!");
+        } catch (InvalidUserTokenException e) {
+            log.error(e.getMessage());
+            return MessageResource.errorMessage("Invalid token!");
+        }
+    }
+
+    @Operation(summary = "Verify validity of an authentication token")
+    @GetMapping(value = "/verify", produces = MediaTypes.HAL_JSON_VALUE)
+    public MessageResource verifyAuthToken(Authentication auth) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        return MessageResource.successMessage("Auth Token successfully verified, for user [" + loggedUser.getId() + "] " + loggedUser.getFullName());
+    }
+
+
+    @Operation(summary = "Reset password")
+    @PostMapping(value = "/reset", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public MessageResource resetPassword(@RequestBody String recoveryEmail) {
+        if (mailAttemptService.isBlocked(recoveryEmail)) {
+            return MessageResource.successMessage("Done");
+        }
+        try {
+            RegisteredUser user = registrationService.resetPassword(recoveryEmail);
+            if (user != null) {
+                mailService.sendPasswordResetEmail(user);
+                mailAttemptService.mailAttempt(user.getEmail());
+                return MessageResource.successMessage("Done");
+            } else {
+                return MessageResource.successMessage("Done");
+            }
+        } catch (MessagingException | IOException | TemplateException e) {
+            log.error(e.toString());
+            return MessageResource.errorMessage("Failed");
+        }
+    }
+
+    @Operation(summary = "Account recovery")
+    @PostMapping(value = "/recover", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public MessageResource recoverAccount(@RequestBody RegistrationRequest request) {
+        try {
+            if (!registrationService.verifyToken(request.token))
+                return MessageResource.errorMessage("Invalid token!");
+            RegisteredUser user = registrationService.recover(registrationService.decodeToken(request.token)[0], new String(Base64.getDecoder().decode(request.password)));
+            if (user == null)
+                return MessageResource.errorMessage("Recovery of account has failed!");
+            return MessageResource.successMessage("Account is successfully recovered. You can login now.");
+        } catch (InvalidUserTokenException e) {
+            log.error(e.getMessage());
+            return MessageResource.errorMessage("Invalid token!");
+        }
+    }
+
+    @Operation(summary = "Set a new password", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public MessageResource changePassword(Authentication auth, @RequestBody ChangePasswordRequest request) {
+        try {
+            Optional<IUser> user = userService.findUserByUsername(request.login, null);
+            if (user.isEmpty() || request.password == null || request.newPassword == null) {
+                return MessageResource.errorMessage("Incorrect login!");
+            }
+
+            String newPassword = new String(Base64.getDecoder().decode(request.newPassword));
+            if (!registrationService.isPasswordSufficient(newPassword)) {
+                return MessageResource.errorMessage("Insufficient password!");
+            }
+
+            String password = new String(Base64.getDecoder().decode(request.password));
+            if (registrationService.stringMatchesUserPassword((RegisteredUser) user.get(), password)) {
+                registrationService.changePassword(((RegisteredUser) user.get()), newPassword);
+                securityContextService.saveToken(((LoggedUser) auth.getPrincipal()).getId());
+                securityContextService.reloadSecurityContext((LoggedUser) auth.getPrincipal());
+
+            } else {
+                return MessageResource.errorMessage("Incorrect password!");
+            }
+
+            return MessageResource.successMessage("Password is successfully changed.");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return MessageResource.errorMessage("There has been a problem!");
+        }
+    }
+
+}
