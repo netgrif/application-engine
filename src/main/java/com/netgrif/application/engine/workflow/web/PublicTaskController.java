@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.web;
 
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
-import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -46,12 +46,12 @@ import java.util.Locale;
 public class PublicTaskController extends AbstractTaskController {
 
     final ITaskService taskService;
-    final IIdentityService identityService;
+    final ISessionManagerService sessionManagerService;
 
-    public PublicTaskController(ITaskService taskService, IDataService dataService, IIdentityService identityService) {
+    public PublicTaskController(ITaskService taskService, IDataService dataService, ISessionManagerService sessionManagerService) {
         super(taskService, dataService, null);
         this.taskService = taskService;
-        this.identityService = identityService;
+        this.sessionManagerService = sessionManagerService;
     }
 
     @Override
@@ -72,7 +72,7 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> assign(@PathVariable("id") String taskId) {
-        LoggedIdentity identity = identityService.getLoggedIdentity();
+        LoggedIdentity identity = sessionManagerService.getLoggedIdentity();
         return super.assign(identity, taskId);
     }
 
@@ -87,7 +87,7 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> finish(@PathVariable("id") String taskId) {
-        LoggedIdentity identity = identityService.getLoggedIdentity();
+        LoggedIdentity identity = sessionManagerService.getLoggedIdentity();
         return super.finish(identity, taskId);
     }
 
@@ -102,7 +102,7 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> cancel(@PathVariable("id") String taskId) {
-        LoggedIdentity identity = identityService.getLoggedIdentity();
+        LoggedIdentity identity = sessionManagerService.getLoggedIdentity();
         return super.cancel(identity, taskId);
     }
 
@@ -202,6 +202,6 @@ public class PublicTaskController extends AbstractTaskController {
     @Operation(summary = "Generic task search on Mongo database")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<TaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.application.engine.workflow.domain.Task> assembler, Locale locale) {
-        return super.searchPublic(identityService.getLoggedIdentity(), pageable, searchBody, operation, assembler, locale);
+        return super.searchPublic(sessionManagerService.getLoggedIdentity(), pageable, searchBody, operation, assembler, locale);
     }
 }

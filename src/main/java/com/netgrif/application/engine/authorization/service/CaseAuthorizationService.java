@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.authorization.service;
 
-import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
 import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import com.netgrif.application.engine.authorization.service.interfaces.ICaseAuthorizationService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ApplicationRoleRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -19,10 +19,10 @@ public class CaseAuthorizationService extends AuthorizationService implements IC
     private final IWorkflowService workflowService;
     private final IPetriNetService processService;
 
-    public CaseAuthorizationService(IIdentityService identityService, IRoleAssignmentService roleAssignmentService,
+    public CaseAuthorizationService(ISessionManagerService sessionManagerService, IRoleAssignmentService roleAssignmentService,
                                     ApplicationRoleRunner applicationRoleRunner, IWorkflowService workflowService,
                                     IPetriNetService processService, IRoleService roleService) {
-        super(identityService, roleAssignmentService, applicationRoleRunner, roleService);
+        super(sessionManagerService, roleAssignmentService, applicationRoleRunner, roleService);
         this.workflowService = workflowService;
         this.processService = processService;
     }

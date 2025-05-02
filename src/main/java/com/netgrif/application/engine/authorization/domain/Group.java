@@ -3,33 +3,33 @@ package com.netgrif.application.engine.authorization.domain;
 import com.netgrif.application.engine.authorization.domain.constants.GroupConstants;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.SystemCase;
 
 import java.util.List;
 
-public class Group implements Actor {
-
-    private final Case groupCase;
+public class Group extends SystemCase implements Actor {
 
     public Group(Case groupCase) {
-        this.groupCase = groupCase;
+        super(groupCase);
+    }
+
+    @Override
+    protected CanInitializeOutcome canInitialize(Case groupCase) {
+        return new CanInitializeOutcome("Provided group case is of different process",
+                groupCase.getProcessIdentifier().equals(GroupConstants.PROCESS_IDENTIFIER));
     }
 
     @Override
     public String getName() {
-        return (String) groupCase.getDataSet().get(GroupConstants.NAME_FIELD_ID).getRawValue();
-    }
-
-    @Override
-    public Case getCase() {
-        return groupCase;
+        return (String) getCase().getDataSet().get(GroupConstants.NAME_FIELD_ID).getRawValue();
     }
 
     public List<String> getMemberIds() {
-        return ((CaseField) groupCase.getDataSet().get(GroupConstants.MEMBERS_FIELD_ID)).getRawValue();
+        return ((CaseField) getCase().getDataSet().get(GroupConstants.MEMBERS_FIELD_ID)).getRawValue();
     }
 
     public String getParentGroupId() {
-        List<String> parentGroupIdAsList = ((CaseField) groupCase.getDataSet().get(GroupConstants.PARENT_GROUP_FIELD_ID)).getRawValue();
+        List<String> parentGroupIdAsList = ((CaseField) getCase().getDataSet().get(GroupConstants.PARENT_GROUP_FIELD_ID)).getRawValue();
         if (!parentGroupIdAsList.isEmpty()) {
             return parentGroupIdAsList.get(0);
         }

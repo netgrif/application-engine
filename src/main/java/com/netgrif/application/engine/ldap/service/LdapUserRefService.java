@@ -7,8 +7,6 @@ import com.netgrif.application.engine.configuration.properties.NaeLdapProperties
 import com.netgrif.application.engine.ldap.domain.LdapUserRef;
 import com.netgrif.application.engine.ldap.domain.repository.LdapUserRefRepository;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
-import com.netgrif.application.engine.orgstructure.groups.config.GroupConfigurationProperties;
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -45,13 +43,7 @@ public class LdapUserRefService implements ILdapUserRefService {
 //    private LdapUserService ldapUserService;
 
     @Autowired
-    private INextGroupService groupService;
-
-    @Autowired
     private ApplicationEventPublisher publisher;
-
-    @Autowired
-    private GroupConfigurationProperties groupProperties;
 
     @Autowired
     private NaeLdapProperties ldapProperties;

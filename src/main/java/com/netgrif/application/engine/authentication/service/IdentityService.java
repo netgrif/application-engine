@@ -11,20 +11,24 @@ import com.netgrif.application.engine.authorization.domain.params.UserParams;
 import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.security.service.SecurityContextService;
-import com.netgrif.application.engine.startup.SystemIdentityRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.CaseParams;
+import com.netgrif.application.engine.workflow.domain.SystemCase;
+import com.netgrif.application.engine.workflow.service.CrudSystemCaseService;
+import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -34,84 +38,23 @@ import java.util.stream.LongStream;
 
 @Slf4j
 @Service
-public class IdentityService implements IIdentityService {
+public class IdentityService extends CrudSystemCaseService<Identity> implements IIdentityService {
 
     // todo: release/8.0.0 make encoder configurable
     private final BCryptPasswordEncoder passwordEncoder;
     private final SecurityContextService securityContextService;
-    private final SystemIdentityRunner systemIdentityRunner;
-    private final IDataService dataService;
-    private final IWorkflowService workflowService;
     private final IElasticCaseSearchService elasticCaseSearchService;
     private final IUserService userService;
 
     public IdentityService(BCryptPasswordEncoder passwordEncoder, SecurityContextService securityContextService,
-                           @Lazy SystemIdentityRunner systemIdentityRunner, @Lazy IDataService dataService,
-                           @Lazy IWorkflowService workflowService, @Lazy IElasticCaseSearchService elasticCaseSearchService,
-                           @Lazy IUserService userService) {
+                           @Lazy IDataService dataService, @Lazy IWorkflowService workflowService,
+                           @Lazy IElasticCaseSearchService elasticCaseSearchService, @Lazy IUserService userService,
+                           SystemCaseFactoryRegistry systemCaseFactoryRegistry, ISessionManagerService sessionManagerService) {
+        super(sessionManagerService, dataService, workflowService, systemCaseFactoryRegistry);
         this.passwordEncoder = passwordEncoder;
         this.securityContextService = securityContextService;
-        this.systemIdentityRunner = systemIdentityRunner;
-        this.dataService = dataService;
-        this.workflowService = workflowService;
         this.elasticCaseSearchService = elasticCaseSearchService;
         this.userService = userService;
-    }
-
-    /**
-     * Gets currently logged identity
-     *
-     * @return Currently logged identity. Can be null if nobody is logged in.
-     */
-    @Override
-    public LoggedIdentity getLoggedIdentity() {
-        if (securityContextService.isAuthenticatedPrincipalLoggedIdentity()) {
-            return (LoggedIdentity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        }
-        return null;
-    }
-
-    /**
-     * Gets logged system identity. However, this identity is not managed by session manager.
-     *
-     * @return Logged system identity. Cannot be null.
-     */
-    @Override
-    public LoggedIdentity getLoggedSystemIdentity() {
-        return systemIdentityRunner.getLoggedSystem();
-    }
-
-    /**
-     * Gets id of currently selected actor of logged identity
-     *
-     * @return The id of the selected actor if any identity is logged in. Can be null.
-     */
-    @Override
-    public String getActiveActorId() {
-        LoggedIdentity loggedIdentity = getLoggedIdentity();
-        if (loggedIdentity != null) {
-            return loggedIdentity.getActiveActorId();
-        }
-        return null;
-    }
-
-    /**
-     * Finds identity by id.
-     *
-     * @param id id of the identity. If provided null, empty optional is returned
-     *
-     * @return If the identity exists, it's returned. If not, an empty optional is returned
-     */
-    @Override
-    public Optional<Identity> findById(String id) {
-        if (id == null) {
-            return Optional.empty();
-        }
-        try {
-            return Optional.of(new Identity(workflowService.findOne(id)));
-        } catch (IllegalArgumentException ignored) {
-            return Optional.empty();
-        }
     }
 
     /**
@@ -212,27 +155,6 @@ public class IdentityService implements IIdentityService {
     }
 
     /**
-     * Creates identity based on params. Password is not encoded. User is not created.
-     *
-     * @param params Parameters, that are used to create the identity. At least username must be provided.
-     *
-     * @return Created identity. Cannot be null
-     *
-     * @throws IllegalArgumentException if the input parameters are invalid
-     * */
-    @Override
-    public Identity create(IdentityParams params) {
-        throwIfInvalidParams(params);
-
-        String activeActorId = getActiveActorId();
-        Case identityCase = workflowService.createCaseByIdentifier(IdentityConstants.PROCESS_IDENTIFIER,
-                params.getFullName(), "", activeActorId).getCase();
-        Identity identity = new Identity(dataService.setData(identityCase, params.toDataSet(), activeActorId).getCase());
-        log.debug("Identity [{}][{}] was created by actor [{}].", identity.getStringId(), identity.getFullName(), activeActorId);
-        return identity;
-    }
-
-    /**
      * Creates identity based on params. Password is encoded. User is created from the identity parameters.
      *
      * @param identityParams Parameters, that are used to create the identity. At least username must be provided.
@@ -240,8 +162,9 @@ public class IdentityService implements IIdentityService {
      * @return Created identity with the User (as {@link Identity#getMainActorId()}). Cannot be null.
      * */
     @Override
+    @Transactional
     public Identity createWithDefaultUser(IdentityParams identityParams) {
-        throwIfInvalidParams(identityParams);
+        validateCreateParams(identityParams);
 
         UserParams userParams = UserParams.fromIdentityParams(identityParams);
         User defaultUser = userService.create(userParams);
@@ -254,6 +177,7 @@ public class IdentityService implements IIdentityService {
      * todo javadoc
      * */
     @Override
+    @Transactional
     public Identity encodePasswordAndCreate(IdentityParams params) {
         encodePassword(params);
         return create(params);
@@ -263,27 +187,7 @@ public class IdentityService implements IIdentityService {
      * todo javadoc
      * */
     @Override
-    public Identity update(Identity identity, IdentityParams params) {
-        if (params == null || (params.getUsername() != null && isTextFieldValueEmpty(params.getUsername()))) {
-            throw new IllegalArgumentException("Identity must have an username!");
-        }
-        if (identity == null) {
-            throw new IllegalArgumentException("Please provide identity to be updated");
-        }
-
-        String activeActorId = getActiveActorId();
-        identity = new Identity(dataService.setData(identity.getCase(), params.toDataSet(), activeActorId)
-                .getCase());
-        if (securityContextService.isIdentityLogged(identity.getStringId())) {
-            securityContextService.reloadSecurityContext(identity.toSession());
-        }
-        return identity;
-    }
-
-    /**
-     * todo javadoc
-     * */
-    @Override
+    @Transactional
     public Identity encodePasswordAndUpdate(Identity identity, IdentityParams params) {
         encodePassword(params);
         return update(identity, params);
@@ -293,6 +197,7 @@ public class IdentityService implements IIdentityService {
      * todo javadoc
      * */
     @Override
+    @Transactional
     public Identity addAdditionalActor(Identity identity, String actorId) {
         if (identity == null) {
             throw new IllegalArgumentException("Provided identity is null");
@@ -308,6 +213,7 @@ public class IdentityService implements IIdentityService {
      * todo javadoc
      * */
     @Override
+    @Transactional
     public Identity addAdditionalActors(Identity identity, Set<String> actorIds) {
         if (identity == null) {
             throw new IllegalArgumentException("Provided identity is null");
@@ -333,6 +239,7 @@ public class IdentityService implements IIdentityService {
      * todo javadoc
      * */
     @Override
+    @Transactional
     public List<Identity> removeAllByStateAndExpirationDateBefore(IdentityState state, LocalDateTime dateTime) {
         if (state == null || dateTime == null) {
             throw new IllegalArgumentException("Identity state or expiration date is null");
@@ -346,21 +253,38 @@ public class IdentityService implements IIdentityService {
         return identities;
     }
 
-    private void throwIfInvalidParams(IdentityParams params) {
+    @Override
+    protected String getProcessIdentifier() {
+        return IdentityConstants.PROCESS_IDENTIFIER;
+    }
+
+    @Override
+    protected void validateCreateParams(CaseParams params) throws IllegalArgumentException {
         if (params == null) {
-            throw new IllegalArgumentException("Please provide input values for actor");
+            throw new IllegalArgumentException("Please provide input values for identity");
         }
-        if (isTextFieldOrValueEmpty(params.getUsername())) {
+        IdentityParams typedParams = (IdentityParams) params;
+        if (isTextFieldOrValueEmpty(typedParams.getUsername())) {
             throw new IllegalArgumentException("Identity must have an username!");
         }
     }
 
-    private boolean isTextFieldOrValueEmpty(TextField field) {
-        return field == null || isTextFieldValueEmpty(field);
+    @Override
+    protected void validateUpdateParams(CaseParams params) throws IllegalArgumentException {
+        if (params == null) {
+            throw new IllegalArgumentException("Please provide input values for identity");
+        }
+        IdentityParams typedParams = (IdentityParams) params;
+        if (typedParams.getUsername() != null && isTextFieldValueEmpty(typedParams.getUsername())) {
+            throw new IllegalArgumentException("Identity must have an username!");
+        }
     }
 
-    private boolean isTextFieldValueEmpty(TextField field) {
-        return field.getRawValue() == null || field.getRawValue().trim().isEmpty();
+    @Override
+    protected void postUpdateActions(SystemCase identity) {
+        if (securityContextService.isIdentityLogged(identity.getStringId())) {
+            securityContextService.reloadSecurityContext(((Identity) identity).toSession());
+        }
     }
 
     private void encodePassword(IdentityParams params) {
@@ -376,8 +300,8 @@ public class IdentityService implements IIdentityService {
         CaseSearchRequest request = CaseSearchRequest.builder()
                 .query(buildQuery(Set.of(query)))
                 .build();
-        Page<Case> resultAsPage = elasticCaseSearchService.search(List.of(request), getLoggedIdentity(), PageRequest.of(0, 1),
-                Locale.getDefault(), false, null);
+        Page<Case> resultAsPage = elasticCaseSearchService.search(List.of(request), sessionManagerService.getLoggedIdentity(),
+                PageRequest.of(0, 1), Locale.getDefault(), false, null);
         if (resultAsPage.hasContent()) {
             return Optional.of(new Identity(resultAsPage.getContent().get(0)));
         }
@@ -392,12 +316,12 @@ public class IdentityService implements IIdentityService {
 
         List<Case> result = new ArrayList<>();
 
-        long identityCount = elasticCaseSearchService.count(List.of(request), getLoggedIdentity(), Locale.getDefault(),
-                false, null);
+        long identityCount = elasticCaseSearchService.count(List.of(request),sessionManagerService.getLoggedIdentity(),
+                Locale.getDefault(), false, null);
         long pageCount = (identityCount / 100) + 1;
         LongStream.range(0, pageCount).forEach(pageIdx -> {
-            Page<Case> pageResult = elasticCaseSearchService.search(List.of(request), getLoggedIdentity(), PageRequest.of((int) pageIdx, 100),
-                    Locale.getDefault(), false, null);
+            Page<Case> pageResult = elasticCaseSearchService.search(List.of(request), sessionManagerService.getLoggedIdentity(),
+                    PageRequest.of((int) pageIdx, 100), Locale.getDefault(), false, null);
             result.addAll(pageResult.getContent());
         });
 
@@ -408,8 +332,8 @@ public class IdentityService implements IIdentityService {
         CaseSearchRequest request = CaseSearchRequest.builder()
                 .query(buildQuery(Set.of(query)))
                 .build();
-        return elasticCaseSearchService.count(List.of(request), getLoggedIdentity(), Locale.getDefault(),
-                false, null);
+        return elasticCaseSearchService.count(List.of(request), sessionManagerService.getLoggedIdentity(),
+                Locale.getDefault(), false, null);
     }
 
     private static String buildQuery(Set<String> andQueries) {

@@ -1,7 +1,8 @@
 package com.netgrif.application.engine.authorization.domain;
 
-import com.netgrif.application.engine.workflow.domain.SystemCase;
+import com.netgrif.application.engine.workflow.domain.Case;
 
-public interface Actor extends SystemCase {
+public interface Actor {
     String getName();
+    Case getCase();
 }

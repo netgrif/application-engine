@@ -2,21 +2,21 @@ package com.netgrif.application.engine.authorization.domain;
 
 import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.SystemCase;
 
 /**
  * todo javadoc
  * */
-public class User implements Actor {
-
-    private final Case userCase;
+public class User extends SystemCase implements Actor {
 
     public User(Case userCase) {
-        this.userCase = userCase;
+        super(userCase);
     }
 
     @Override
-    public Case getCase() {
-        return this.userCase;
+    protected CanInitializeOutcome canInitialize(Case userCase) {
+        return new CanInitializeOutcome("Provided user case is of different process",
+                userCase.getProcessIdentifier().equals(UserConstants.PROCESS_IDENTIFIER));
     }
 
     @Override
@@ -35,20 +35,20 @@ public class User implements Actor {
      * todo javadoc
      * */
     public String getEmail() {
-        return (String) userCase.getDataSet().get(UserConstants.EMAIL_FIELD_ID).getRawValue();
+        return (String) getCase().getDataSet().get(UserConstants.EMAIL_FIELD_ID).getRawValue();
     }
 
     /**
      * todo javadoc
      * */
     public String getFirstname() {
-        return (String) userCase.getDataSet().get(UserConstants.FIRSTNAME_FIELD_ID).getRawValue();
+        return (String) getCase().getDataSet().get(UserConstants.FIRSTNAME_FIELD_ID).getRawValue();
     }
 
     /**
      * todo javadoc
      * */
     public String getLastname() {
-        return (String) userCase.getDataSet().get(UserConstants.LASTNAME_FIELD_ID).getRawValue();
+        return (String) getCase().getDataSet().get(UserConstants.LASTNAME_FIELD_ID).getRawValue();
     }
 }

@@ -6,6 +6,7 @@ import com.netgrif.application.engine.authentication.service.interfaces.IIdentit
 import com.netgrif.application.engine.authentication.web.responsebodies.IdentityDTO;
 import com.netgrif.application.engine.authentication.web.responsebodies.IdentityResource;
 import com.netgrif.application.engine.authorization.service.interfaces.IApplicationAuthorizationService;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.settings.domain.Preferences;
 import com.netgrif.application.engine.settings.service.IPreferencesService;
 import com.netgrif.application.engine.settings.web.PreferencesResource;
@@ -37,6 +38,7 @@ import java.util.Optional;
 public class IdentityController {
 
     private final IIdentityService identityService;
+    private final ISessionManagerService sessionManagerService;
     private final IApplicationAuthorizationService authorizationService;
     private final IPreferencesService preferencesService;
 
@@ -45,7 +47,7 @@ public class IdentityController {
     @Operation(summary = "Get identity by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public IdentityResource getIdentity(@PathVariable("id") String identityId) {
-        LoggedIdentity loggedIdentity = identityService.getLoggedIdentity();
+        LoggedIdentity loggedIdentity = sessionManagerService.getLoggedIdentity();
         if (!Objects.equals(loggedIdentity.getIdentityId(), identityId) && authorizationService.hasApplicationRole("admin")) {
             log.info("Identity [{}] is trying to get different identity with ID [{}]", loggedIdentity.getUsername(), identityId);
             throw new IllegalArgumentException(String.format("Could not find identity with id [%s]", identityId));
@@ -67,7 +69,7 @@ public class IdentityController {
     @Operation(summary = "Get identity's preferences", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/preferences", produces = MediaTypes.HAL_JSON_VALUE)
     public PreferencesResource preferences() {
-        LoggedIdentity loggedIdentity = identityService.getLoggedIdentity();
+        LoggedIdentity loggedIdentity = sessionManagerService.getLoggedIdentity();
         Optional<Preferences> preferencesOpt = preferencesService.get(loggedIdentity.getIdentityId());
 
         if (preferencesOpt.isEmpty()) {
@@ -80,7 +82,7 @@ public class IdentityController {
     @Operation(summary = "Set identity's preferences", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource savePreferences(@RequestBody Preferences preferences) {
-        LoggedIdentity loggedIdentity = identityService.getLoggedIdentity();
+        LoggedIdentity loggedIdentity = sessionManagerService.getLoggedIdentity();
         try {
             preferences.setIdentityId(loggedIdentity.getIdentityId());
             preferencesService.save(preferences);

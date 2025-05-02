@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
-import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
@@ -10,6 +9,7 @@ import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventL
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.model.CaseEventType;
 import com.netgrif.application.engine.importer.service.FieldFactory;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.domain.I18nExpression;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Process;
@@ -96,7 +96,7 @@ public class WorkflowService implements IWorkflowService {
     private DataSetInitializer dataSetInitializer;
 
     @Autowired
-    private IIdentityService identityService;
+    private ISessionManagerService sessionManagerService;
 
     @Autowired
     public void setElasticCaseService(IElasticCaseService elasticCaseService) {
@@ -323,7 +323,7 @@ public class WorkflowService implements IWorkflowService {
         DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getProcess().getPreDeleteActions(), useCase, Optional.empty(), params));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
         log.info("[{}]: Actor [{}] is deleting case {}", useCase.getStringId(),
-                identityService.getLoggedIdentity().getActiveActorId(), useCase.getTitle());
+                sessionManagerService.getLoggedIdentity().getActiveActorId(), useCase.getTitle());
 
         roleService.removeAllByCase(useCase.getStringId());
         taskService.deleteTasksByCase(useCase.getStringId());
@@ -343,23 +343,23 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public void deleteInstancesOfPetriNet(Process net) {
         log.info("[{}]: Actor {} is deleting all cases and tasks of Petri net {} version {}", net.getStringId(),
-                identityService.getLoggedIdentity().getActiveActorId(), net.getIdentifier(), net.getVersion().toString());
+                sessionManagerService.getLoggedIdentity().getActiveActorId(), net.getIdentifier(), net.getVersion().toString());
 
         taskService.deleteTasksByPetriNetId(net.getStringId());
         CaseSearchRequest request = new CaseSearchRequest();
         CaseSearchRequest.PetriNet netRequest = new CaseSearchRequest.PetriNet();
         netRequest.processId = net.getStringId();
         request.process = Collections.singletonList(netRequest);
-        long countCases = elasticCaseService.count(Collections.singletonList(request), identityService.getLoggedIdentity(),
+        long countCases = elasticCaseService.count(Collections.singletonList(request), sessionManagerService.getLoggedIdentity(),
                 Locale.getDefault(), false);
         log.info("[{}]: Actor [{}] is deleting {} cases of Petri net {} version {}", net.getStringId(),
-                identityService.getLoggedIdentity().getActiveActorId(), countCases, net.getIdentifier(),
+                sessionManagerService.getLoggedIdentity().getActiveActorId(), countCases, net.getIdentifier(),
                 net.getVersion().toString());
         long pageCount = (countCases / 100) + 1;
         LongStream.range(0, pageCount)
                 .forEach(i -> elasticCaseService.search(
                                 Collections.singletonList(request),
-                                identityService.getLoggedIdentity(),
+                                sessionManagerService.getLoggedIdentity(),
                                 PageRequest.of((int) i, 100),
                                 Locale.getDefault(),
                                 false)

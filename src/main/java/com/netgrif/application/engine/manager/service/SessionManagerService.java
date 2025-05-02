@@ -2,9 +2,12 @@ package com.netgrif.application.engine.manager.service;
 
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
+import com.netgrif.application.engine.security.service.SecurityContextService;
+import com.netgrif.application.engine.startup.SystemIdentityRunner;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
@@ -22,15 +25,57 @@ public class SessionManagerService implements ISessionManagerService {
 
     protected final RedisIndexedSessionRepository repository;
     protected final SessionRegistry sessionRegistry;
+    protected final SecurityContextService securityContextService;
+    protected final SystemIdentityRunner systemIdentityRunner;
 
     protected final String redisUsernameKey;
 
     public SessionManagerService(RedisIndexedSessionRepository repository, SessionRegistry sessionRegistry,
+                                 SecurityContextService securityContextService, SystemIdentityRunner systemIdentityRunner,
                                  @Value("${spring.session.redis.namespace}") String redisNamespace) {
         this.repository = repository;
         this.sessionRegistry = sessionRegistry;
+        this.securityContextService = securityContextService;
+        this.systemIdentityRunner = systemIdentityRunner;
         this.redisUsernameKey = RedisIndexedSessionRepository.DEFAULT_NAMESPACE + ":" + redisNamespace
                 + ":index:org.springframework.session.FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME:";
+    }
+
+    /**
+     * Gets currently logged identity
+     *
+     * @return Currently logged identity. Can be null if nobody is logged in.
+     */
+    @Override
+    public LoggedIdentity getLoggedIdentity() {
+        if (securityContextService.isAuthenticatedPrincipalLoggedIdentity()) {
+            return (LoggedIdentity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        }
+        return null;
+    }
+
+    /**
+     * Gets logged system identity. However, this identity is not managed by session manager.
+     *
+     * @return Logged system identity. Cannot be null.
+     */
+    @Override
+    public LoggedIdentity getLoggedSystemIdentity() {
+        return systemIdentityRunner.getLoggedSystem();
+    }
+
+    /**
+     * Gets id of currently selected actor of logged identity
+     *
+     * @return The id of the selected actor if any identity is logged in. Can be null.
+     */
+    @Override
+    public String getActiveActorId() {
+        LoggedIdentity loggedIdentity = getLoggedIdentity();
+        if (loggedIdentity != null) {
+            return loggedIdentity.getActiveActorId();
+        }
+        return null;
     }
 
     @Override

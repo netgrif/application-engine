@@ -10,24 +10,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Identity implements SystemCase {
-
-    private final Case identityCase;
+public class Identity extends SystemCase {
 
     public Identity(Case identityCase) {
-        this.identityCase = identityCase;
+        super(identityCase);
     }
 
     @Override
-    public Case getCase() {
-        return this.identityCase;
+    protected CanInitializeOutcome canInitialize(Case identityCase) {
+        return new CanInitializeOutcome("Provided identity case is of different process",
+                identityCase.getProcessIdentifier().equals(IdentityConstants.PROCESS_IDENTIFIER));
     }
 
     /**
      * todo javadoc
      * */
     public boolean isActive() {
-        String state = (String) identityCase.getDataSet().get(IdentityConstants.STATE_FIELD_ID).getRawValue();
+        String state = (String) getCase().getDataSet().get(IdentityConstants.STATE_FIELD_ID).getRawValue();
         return state.equalsIgnoreCase(IdentityState.ACTIVE.name());
     }
 
@@ -35,14 +34,14 @@ public class Identity implements SystemCase {
      * todo javadoc
      * */
     public String getFirstname() {
-        return (String) identityCase.getDataSet().get(IdentityConstants.FIRSTNAME_FIELD_ID).getRawValue();
+        return (String) getCase().getDataSet().get(IdentityConstants.FIRSTNAME_FIELD_ID).getRawValue();
     }
 
     /**
      * todo javadoc
      * */
     public String getLastname() {
-        return (String) identityCase.getDataSet().get(IdentityConstants.LASTNAME_FIELD_ID).getRawValue();
+        return (String) getCase().getDataSet().get(IdentityConstants.LASTNAME_FIELD_ID).getRawValue();
     }
 
     /**
@@ -56,7 +55,7 @@ public class Identity implements SystemCase {
      * todo javadoc
      * */
     public String getMainActorId() {
-        List<String> mainActorIdAsList = ((CaseField) identityCase.getDataSet().get(IdentityConstants.MAIN_ACTOR_FIELD_ID)).getRawValue();
+        List<String> mainActorIdAsList = ((CaseField) getCase().getDataSet().get(IdentityConstants.MAIN_ACTOR_FIELD_ID)).getRawValue();
         if (!mainActorIdAsList.isEmpty()) {
             return mainActorIdAsList.get(0);
         }
@@ -67,7 +66,7 @@ public class Identity implements SystemCase {
      * todo javadoc
      * */
     public List<String> getAdditionalActorIds() {
-        return ((CaseField) identityCase.getDataSet().get(IdentityConstants.ADDITIONAL_ACTORS_FIELD_ID)).getRawValue();
+        return ((CaseField) getCase().getDataSet().get(IdentityConstants.ADDITIONAL_ACTORS_FIELD_ID)).getRawValue();
     }
 
     /**
@@ -86,35 +85,35 @@ public class Identity implements SystemCase {
      * todo javadoc
      * */
     public String getRegistrationToken() {
-        return (String) identityCase.getDataSet().get(IdentityConstants.REGISTRATION_TOKEN_FIELD_ID).getRawValue();
+        return (String) getCase().getDataSet().get(IdentityConstants.REGISTRATION_TOKEN_FIELD_ID).getRawValue();
     }
 
     /**
      * todo javadoc
      * */
     public LocalDateTime getExpirationDate() {
-        return (LocalDateTime) identityCase.getDataSet().get(IdentityConstants.EXPIRATION_DATE_FIELD_ID).getRawValue();
+        return (LocalDateTime) getCase().getDataSet().get(IdentityConstants.EXPIRATION_DATE_FIELD_ID).getRawValue();
     }
 
     /**
      * todo javadoc
      * */
     public String getUsername() {
-        return (String) identityCase.getDataSet().get(IdentityConstants.USERNAME_FIELD_ID).getRawValue();
+        return (String) getCase().getDataSet().get(IdentityConstants.USERNAME_FIELD_ID).getRawValue();
     }
 
     /**
      * todo javadoc
      * */
     public String getPassword() {
-        return (String) identityCase.getDataSet().get(IdentityConstants.PASSWORD_FIELD_ID).getRawValue();
+        return (String) getCase().getDataSet().get(IdentityConstants.PASSWORD_FIELD_ID).getRawValue();
     }
 
     /**
      * todo javadoc
      * */
     public LoggedIdentity toSession() {
-        String username = (String) identityCase.getDataSet().get(IdentityConstants.USERNAME_FIELD_ID).getRawValue();
+        String username = (String) getCase().getDataSet().get(IdentityConstants.USERNAME_FIELD_ID).getRawValue();
 
         return LoggedIdentity.with()
                 .username(username)

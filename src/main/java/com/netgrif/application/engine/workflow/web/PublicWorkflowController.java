@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.web;
 
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
-import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
@@ -35,13 +35,13 @@ import java.util.Locale;
 public class PublicWorkflowController {
 
     private final IWorkflowService workflowService;
-    private final IIdentityService identityService;
+    private final ISessionManagerService sessionManagerService;
 
     @PreAuthorize("@caseAuthorizationService.canCallCreate(#body.netId)")
     @PostMapping(value = "/case", consumes = "application/json;charset=UTF-8", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Create new case")
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Locale locale) {
-        LoggedIdentity identity = identityService.getLoggedIdentity();
+        LoggedIdentity identity = sessionManagerService.getLoggedIdentity();
         try {
             CreateCaseEventOutcome outcome = this.workflowService.createCase(body.netId, body.title, body.color,
                     identity.getActiveActorId(), locale);

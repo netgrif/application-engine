@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
-import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.domain.ApplicationRole;
 import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.startup.ApplicationRoleRunner;
 import lombok.RequiredArgsConstructor;
 
@@ -16,7 +16,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public abstract class AuthorizationService {
 
-    protected final IIdentityService identityService;
+    protected final ISessionManagerService sessionManagerService;
     private final IRoleAssignmentService roleAssignmentService;
     private final ApplicationRoleRunner applicationRoleRunner;
     private final IRoleService roleService;
@@ -27,7 +27,7 @@ public abstract class AuthorizationService {
      * */
     protected <T> boolean canCallEvent(AccessPermissions<T> processRolePermissions,
                                        AccessPermissions<T> caseRolePermissions, T permission) {
-        LoggedIdentity loggedIdentity = identityService.getLoggedIdentity();
+        LoggedIdentity loggedIdentity = sessionManagerService.getLoggedIdentity();
         if (loggedIdentity == null || loggedIdentity.getActiveActorId() == null) {
             return false;
         }
@@ -51,7 +51,7 @@ public abstract class AuthorizationService {
     }
 
     protected boolean isAdmin() {
-        LoggedIdentity loggedIdentity = identityService.getLoggedIdentity();
+        LoggedIdentity loggedIdentity = sessionManagerService.getLoggedIdentity();
         if (loggedIdentity == null || loggedIdentity.getActiveActorId() == null) {
             return false;
         }

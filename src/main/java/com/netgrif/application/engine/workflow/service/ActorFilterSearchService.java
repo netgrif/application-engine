@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.startup.FilterRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IActorFilterSearchService;
@@ -22,7 +22,7 @@ public class ActorFilterSearchService implements IActorFilterSearchService {
     private IElasticCaseService caseSearchService;
 
     @Autowired
-    private IIdentityService identityService;
+    private ISessionManagerService sessionManagerService;
 
     @Override
     public List<Case> autocompleteFindFilters(String userInput) {
@@ -32,12 +32,12 @@ public class ActorFilterSearchService implements IActorFilterSearchService {
                                 .query(
                                         String.format("(title:%s*) AND ((dataSet.visibility.keyValue:private AND authorEmail:%s) OR (dataSet.visibility.keyValue:public))",
                                                 userInput,
-                                                identityService.getLoggedIdentity().getUsername())
+                                                sessionManagerService.getLoggedIdentity().getUsername())
                                 )
                                 .transition(Collections.singletonList("view_filter"))
                                 .build()
                 ),
-                identityService.getLoggedIdentity(),
+                sessionManagerService.getLoggedIdentity(),
                 PageRequest.of(0, 100),
                 LocaleContextHolder.getLocale(),
                 true);

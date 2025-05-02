@@ -16,7 +16,7 @@ import com.netgrif.application.engine.importer.service.ImportResult;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.Transition;
@@ -91,9 +91,6 @@ public class PetriNetService implements IPetriNetService {
     private IWorkflowService workflowService;
 
     @Autowired
-    private INextGroupService groupService;
-
-    @Autowired
     private Provider<Importer> importerProvider;
 
     @Autowired
@@ -129,7 +126,7 @@ public class PetriNetService implements IPetriNetService {
     private IElasticPetriNetService elasticPetriNetService;
 
     @Autowired
-    private IIdentityService identityService;
+    private ISessionManagerService sessionManagerService;
 
     @Autowired
     public void setElasticPetriNetService(IElasticPetriNetService elasticPetriNetService) {
@@ -482,10 +479,11 @@ public class PetriNetService implements IPetriNetService {
             this.addValueCriteria(query, queryTotal, Criteria.where("defaultCaseName.defaultValue").regex(criteriaClass.getDefaultCaseName(), "i"));
         }
         if (criteriaClass.getGroup() != null) {
+            // todo 2058
             if (criteriaClass.getGroup().size() == 1) {
-                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(this.groupService.getGroupOwnerEmail(criteriaClass.getGroup().get(0))));
+//                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(this.groupService.getGroupOwnerEmail(criteriaClass.getGroup().get(0))));
             } else {
-                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(this.groupService.getGroupsOwnerEmails(criteriaClass.getGroup())));
+//                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(this.groupService.getGroupsOwnerEmails(criteriaClass.getGroup())));
             }
         }
         if (criteriaClass.getVersion() != null) {
@@ -541,7 +539,7 @@ public class PetriNetService implements IPetriNetService {
         }
 
         log.info("[{}]: Actor [{}] is deleting Petri net {} version {}", process.getStringId(),
-                identityService.getLoggedIdentity().getActiveActorId(), process.getIdentifier(), process.getVersion().toString());
+                sessionManagerService.getActiveActorId(), process.getIdentifier(), process.getVersion().toString());
         this.repository.deleteById(process.getObjectId());
         this.evictCache(process);
         // net functions must be removed from cache after it was deleted from repository

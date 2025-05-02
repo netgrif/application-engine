@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.export.service;
 
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
-import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
@@ -9,6 +8,7 @@ import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearc
 import com.netgrif.application.engine.export.configuration.ExportConfiguration;
 import com.netgrif.application.engine.export.domain.ExportDataConfig;
 import com.netgrif.application.engine.export.service.interfaces.IExportService;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -54,7 +54,7 @@ public class ExportService implements IExportService {
     private ExportConfiguration exportConfiguration;
 
     @Autowired
-    private IIdentityService identityService;
+    private ISessionManagerService sessionManagerService;
 
 
     @Override
@@ -98,12 +98,12 @@ public class ExportService implements IExportService {
 
     @Override
     public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile) throws FileNotFoundException {
-        return fillCsvCaseData(requests, outFile, null, identityService.getLoggedSystemIdentity(), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+        return fillCsvCaseData(requests, outFile, null, sessionManagerService.getLoggedSystemIdentity(), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
     }
 
     @Override
     public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config) throws FileNotFoundException {
-        return fillCsvCaseData(requests, outFile, config, identityService.getLoggedSystemIdentity(), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+        return fillCsvCaseData(requests, outFile, config, sessionManagerService.getLoggedSystemIdentity(), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
     }
 
     @Override
@@ -156,12 +156,12 @@ public class ExportService implements IExportService {
 
     @Override
     public OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile) throws FileNotFoundException {
-        return fillCsvTaskData(requests, outFile, null, identityService.getLoggedSystemIdentity(), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+        return fillCsvTaskData(requests, outFile, null, sessionManagerService.getLoggedSystemIdentity(), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
     }
 
     @Override
     public OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config) throws FileNotFoundException {
-        return fillCsvTaskData(requests, outFile, config, identityService.getLoggedSystemIdentity(), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+        return fillCsvTaskData(requests, outFile, config, sessionManagerService.getLoggedSystemIdentity(), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
     }
 
     @Override

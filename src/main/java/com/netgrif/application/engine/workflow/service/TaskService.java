@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
-import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
 import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
@@ -13,6 +12,7 @@ import com.netgrif.application.engine.history.domain.taskevents.CancelTaskEventL
 import com.netgrif.application.engine.history.domain.taskevents.FinishTaskEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.model.EventType;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.arcs.*;
@@ -103,7 +103,7 @@ public class TaskService implements ITaskService {
     private MultiplicityEvaluator multiplicityEvaluator;
 
     @Autowired
-    private IIdentityService identityService;
+    private ISessionManagerService sessionManagerService;
 
     @Autowired
     private IUserService userService;
@@ -137,7 +137,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public AssignTaskEventOutcome assignTask(String taskId, Map<String, String> params) throws TransitionNotExecutableException {
-        String actorId = identityService.getLoggedIdentity().getActiveActorId();
+        String actorId = sessionManagerService.getLoggedIdentity().getActiveActorId();
         return assignTask(actorId, taskId, params);
     }
 
@@ -224,7 +224,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public FinishTaskEventOutcome finishTask(String taskId, Map<String, String> params) throws IllegalArgumentException, TransitionNotExecutableException {
-        String actorId = identityService.getLoggedIdentity().getActiveActorId();
+        String actorId = sessionManagerService.getLoggedIdentity().getActiveActorId();
         return finishTask(actorId, taskId, params);
     }
 
@@ -542,7 +542,7 @@ public class TaskService implements ITaskService {
             log.info("assignTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
             outcomes.add(assignTask(task.getStringId()));
             log.info("getData [{}] in case [{}]", task.getTitle(), useCase.getTitle());
-            outcomes.add(dataService.getData(task.getStringId(), identityService.getLoggedSystemIdentity().getActiveActorId()));
+            outcomes.add(dataService.getData(task.getStringId(), sessionManagerService.getLoggedSystemIdentity().getActiveActorId()));
             log.info("finishTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
             outcomes.add(finishTask(task.getStringId()));
         } catch (TransitionNotExecutableException e) {
@@ -750,7 +750,7 @@ public class TaskService implements ITaskService {
                 TimeTrigger timeTrigger = (TimeTrigger) taskTrigger;
                 scheduleTaskExecution(task, timeTrigger.getStartDate(), useCase);
             } else if (taskTrigger instanceof AutoTrigger) {
-                task.setAssigneeId(identityService.getLoggedSystemIdentity().getActiveActorId());
+                task.setAssigneeId(sessionManagerService.getLoggedSystemIdentity().getActiveActorId());
             }
         }
         task.setProcessRolePermissions(new AccessPermissions<>(transition.getProcessRolePermissions()));

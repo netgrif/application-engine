@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
-import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
@@ -49,7 +49,7 @@ public class MenuImportExportService implements IMenuImportExportService {
     private static final String GROUP_NAV_TASK = "navigationMenuConfig";
 
     @Autowired
-    IIdentityService identityService;
+    ISessionManagerService sessionManagerService;
 
     @Autowired
     IWorkflowService workflowService;
@@ -148,7 +148,7 @@ public class MenuImportExportService implements IMenuImportExportService {
             Case caseToRemove = workflowService.findOne(id);
             QTask qTask = new QTask("task");
             Task task = taskService.searchOne(qTask.transitionId.eq("view").and(qTask.caseId.eq(caseToRemove.getStringId())));
-            dataService.setData(task, caseToRemoveData, identityService.getLoggedIdentity().getActiveActorId());
+            dataService.setData(task, caseToRemoveData, sessionManagerService.getLoggedIdentity().getActiveActorId());
         });
 
         //Import filters
@@ -170,7 +170,7 @@ public class MenuImportExportService implements IMenuImportExportService {
 //            DataField groupImportResultMessage = new DataField();
 //            groupImportResultMessage.setValue(resultMessage.toString());
 //            groupData.getFields().put("import_results", groupImportResultMessage);
-            dataService.setData(task, groupData, identityService.getLoggedIdentity().getActiveActorId());
+            dataService.setData(task, groupData, sessionManagerService.getLoggedIdentity().getActiveActorId());
         });
 
         importedFilterTaskIds.values().forEach(taskId -> {
@@ -250,13 +250,13 @@ public class MenuImportExportService implements IMenuImportExportService {
                 petriNetService.getNewestVersionByIdentifier("preference_filter_item").getStringId(),
                 item.getEntryName() + "_" + menuIdentifier,
                 "",
-                identityService.getLoggedIdentity().getActiveActorId()
+                sessionManagerService.getLoggedIdentity().getActiveActorId()
         ).getCase();
 
         QTask qTask = new QTask("task");
         Task task = taskService.searchOne(qTask.transitionId.eq("init").and(qTask.caseId.eq(menuItemCase.getStringId())));
         try {
-            taskService.assignTask(task, identityService.getLoggedIdentity().getActiveActorId());
+            taskService.assignTask(task, sessionManagerService.getLoggedIdentity().getActiveActorId());
 //            TODO: release/8.0.0
 //            menuItemCase.getDataSet().get(MENU_IDENTIFIER).setValue(menuIdentifier);
 //            menuItemCase.getDataSet().get(PARENT_ID).setValue(parentId);
@@ -287,7 +287,7 @@ public class MenuImportExportService implements IMenuImportExportService {
     protected FileFieldValue createXML(MenuAndFilters menuAndFilters, String parentId, FileField fileField) throws IOException {
         FileFieldValue ffv = new FileFieldValue();
         try {
-            ffv.setName("menu_" + identityService.getLoggedIdentity().getUsername().replaceAll("\\s+", "") + ".xml");
+            ffv.setName("menu_" + sessionManagerService.getLoggedIdentity().getUsername().replaceAll("\\s+", "") + ".xml");
             ffv.setPath(FileStorageConfiguration.getPath(parentId, fileField.getImportId(), ffv.getName()));
             File f = new File(ffv.getPath());
             XmlMapper xmlMapper = new XmlMapper();

@@ -1,19 +1,21 @@
 package com.netgrif.application.engine.authorization.service;
 
-import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
 import com.netgrif.application.engine.authorization.domain.params.UserParams;
 import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
-import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.CaseParams;
 import com.netgrif.application.engine.workflow.domain.QCase;
+import com.netgrif.application.engine.workflow.domain.SystemCase;
+import com.netgrif.application.engine.workflow.service.CrudSystemCaseService;
+import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,19 +26,15 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class UserService implements IUserService {
+public class UserService extends CrudSystemCaseService<User> implements IUserService {
 
-    private final IDataService dataService;
-    private final IIdentityService identityService;
     private final IElasticCaseSearchService elasticCaseSearchService;
-    private final IWorkflowService workflowService;
 
-    public UserService(@Lazy IDataService dataService, IIdentityService identityService,
-                       @Lazy IElasticCaseSearchService elasticCaseSearchService, @Lazy IWorkflowService workflowService) {
-        this.dataService = dataService;
-        this.identityService = identityService;
+    public UserService(@Lazy IDataService dataService, ISessionManagerService sessionManagerService,
+                       @Lazy IElasticCaseSearchService elasticCaseSearchService, @Lazy IWorkflowService workflowService,
+                       SystemCaseFactoryRegistry systemCaseFactoryRegistry) {
+        super(sessionManagerService, dataService, workflowService, systemCaseFactoryRegistry);
         this.elasticCaseSearchService = elasticCaseSearchService;
-        this.workflowService = workflowService;
     }
 
     /**
@@ -61,99 +59,49 @@ public class UserService implements IUserService {
         return countByQuery(emailQuery(email)) > 0;
     }
 
-    /**
-     * todo javadoc
-     * */
-    @Override
-    public Optional<User> findById(String id) {
-        if (id == null) {
-            return Optional.empty();
-        }
-        try {
-            Case userCase = workflowService.findOne(id);
-            if (!userCase.getProcessIdentifier().equals(UserConstants.PROCESS_IDENTIFIER)) {
-                return Optional.empty();
-            }
-            return Optional.of(new User(userCase));
-        } catch (IllegalArgumentException ignored) {
-            return Optional.empty();
-        }
-    }
-
-    /**
-     * todo javadoc
-     * */
-    @Override
-    public boolean existsById(String id) {
-        if (id == null) {
-            return false;
-        }
-        return workflowService.count(QCase.case$.processIdentifier.eq(UserConstants.PROCESS_IDENTIFIER)
-                .and(QCase.case$.id.eq(new ObjectId(id)))) > 0;
-    }
-
     @Override
     public List<User> findAll() {
         List<Case> result = workflowService.searchAll(QCase.case$.processIdentifier.eq(UserConstants.PROCESS_IDENTIFIER)).getContent();
         return result.stream().map(User::new).collect(Collectors.toList());
     }
 
-    /**
-     * todo javadoc
-     * */
     @Override
-    public User create(UserParams params) {
-        throwIfInvalidParams(params);
-
-        String activeActorId = identityService.getActiveActorId();
-        Case userCase = workflowService.createCaseByIdentifier(UserConstants.PROCESS_IDENTIFIER, params.getFullName(),
-                "", activeActorId).getCase();
-        userCase = dataService.setData(userCase, params.toDataSet(), activeActorId).getCase();
-        log.debug("User [{}] was created by actor [{}].", userCase, activeActorId);
-        return new User(dataService.setData(userCase, params.toDataSet(), activeActorId).getCase());
+    protected String getProcessIdentifier() {
+        return UserConstants.PROCESS_IDENTIFIER;
     }
 
-    /**
-     * todo javadoc
-     * */
     @Override
-    public User update(User user, UserParams params) {
+    protected void validateCreateParams(CaseParams params) throws IllegalArgumentException {
         if (params == null) {
             throw new IllegalArgumentException("Please provide input values for user");
         }
-        if (params.getEmail() != null && isTextFieldValueEmpty(params.getEmail())) {
-            throw new IllegalArgumentException("User must have an email!");
-        }
-        if (user == null) {
-            throw new IllegalArgumentException("Please provide user to be updated");
-        }
-
-        String activeActorId = identityService.getActiveActorId();
-        return new User(dataService.setData(user.getCase(), params.toDataSet(), activeActorId).getCase());
-    }
-
-    private void throwIfInvalidParams(UserParams params) {
-        if (params == null) {
-            throw new IllegalArgumentException("Please provide input values for user");
-        }
-        if (isTextFieldOrValueEmpty(params.getEmail())) {
+        UserParams typedParams = (UserParams) params;
+        if (isTextFieldOrValueEmpty(typedParams.getEmail())) {
             throw new IllegalArgumentException("User must have an email!");
         }
     }
 
-    private boolean isTextFieldOrValueEmpty(TextField field) {
-        return field == null || isTextFieldValueEmpty(field);
+    @Override
+    protected void validateUpdateParams(CaseParams params) throws IllegalArgumentException {
+        if (params == null) {
+            throw new IllegalArgumentException("Please provide input values for user");
+        }
+        UserParams typedParams = (UserParams) params;
+        if (typedParams.getEmail() != null && isTextFieldValueEmpty(typedParams.getEmail())) {
+            throw new IllegalArgumentException("User must have an email!");
+        }
     }
 
-    private boolean isTextFieldValueEmpty(TextField field) {
-        return field.getRawValue() == null || field.getRawValue().trim().isEmpty();
+    @Override
+    protected void postUpdateActions(SystemCase systemCase) {
+        // none
     }
 
     private Optional<User> findOneByQuery(String query) {
         CaseSearchRequest request = CaseSearchRequest.builder()
                 .query(buildQuery(Set.of(query)))
                 .build();
-        Page<Case> resultAsPage = elasticCaseSearchService.search(List.of(request), identityService.getLoggedIdentity(),
+        Page<Case> resultAsPage = elasticCaseSearchService.search(List.of(request), sessionManagerService.getLoggedIdentity(),
                 PageRequest.of(0, 1), Locale.getDefault(), false, null);
         if (resultAsPage.hasContent()) {
             return Optional.of(new User(resultAsPage.getContent().get(0)));
@@ -165,7 +113,7 @@ public class UserService implements IUserService {
         CaseSearchRequest request = CaseSearchRequest.builder()
                 .query(buildQuery(Set.of(query)))
                 .build();
-        return elasticCaseSearchService.count(List.of(request), identityService.getLoggedIdentity(), Locale.getDefault(),
+        return elasticCaseSearchService.count(List.of(request), sessionManagerService.getLoggedIdentity(), Locale.getDefault(),
                 false, null);
     }
 

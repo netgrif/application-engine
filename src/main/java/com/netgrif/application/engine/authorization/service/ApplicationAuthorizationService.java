@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
-import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.domain.ApplicationRole;
 import com.netgrif.application.engine.authorization.service.interfaces.IApplicationAuthorizationService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.startup.ApplicationRoleRunner;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class ApplicationAuthorizationService implements IApplicationAuthorizationService {
 
     private final ApplicationRoleRunner applicationRoleRunner;
-    private final IIdentityService identityService;
+    private final ISessionManagerService sessionManagerService;
     private final IRoleAssignmentService roleAssignmentService;
 
     /**
@@ -26,7 +26,7 @@ public class ApplicationAuthorizationService implements IApplicationAuthorizatio
             return false;
         }
 
-        LoggedIdentity loggedIdentity = identityService.getLoggedIdentity();
+        LoggedIdentity loggedIdentity = sessionManagerService.getLoggedIdentity();
         if (loggedIdentity == null || loggedIdentity.getActiveActorId() == null) {
             return false;
         }
