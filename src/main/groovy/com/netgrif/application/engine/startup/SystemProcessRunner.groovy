@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.startup
 
 import com.netgrif.application.engine.authentication.domain.constants.IdentityConstants
+import com.netgrif.application.engine.authorization.domain.constants.GroupConstants
 import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,8 @@ class SystemProcessRunner extends AbstractOrderedCommandLineRunner {
         // todo: release/8.0.0 make it automatische
         return [
                 new ImportData(IdentityConstants.PROCESS_IDENTIFIER, IdentityConstants.FILE_PATH),
-                new ImportData(UserConstants.PROCESS_IDENTIFIER, UserConstants.FILE_PATH)
+                new ImportData(UserConstants.PROCESS_IDENTIFIER, UserConstants.FILE_PATH),
+                new ImportData(GroupConstants.PROCESS_IDENTIFIER, GroupConstants.FILE_PATH)
         ] as Set
     }
 

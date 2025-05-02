@@ -5,7 +5,6 @@ import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.Process
-import com.netgrif.application.engine.startup.GroupRunner
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.startup.SystemIdentityRunner
 import org.junit.jupiter.api.BeforeEach
@@ -34,9 +33,6 @@ class FieldTest {
 
     @Autowired
     private SystemIdentityRunner systemIdentityRunner
-
-    @Autowired
-    private GroupRunner groupRunner
 
     @Autowired
     private TestHelper testHelper

@@ -17,7 +17,6 @@ class RunnerController {
             SystemIdentityRunner,
             FunctionsCacheRunner,
             FilterRunner,
-            GroupRunner,
             DefaultFiltersRunner,
             DashboardRunner,
             SuperCreator,
