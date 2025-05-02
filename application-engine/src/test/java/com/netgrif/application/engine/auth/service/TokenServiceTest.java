@@ -22,7 +22,7 @@ public class TokenServiceTest {
 
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     @Autowired
-    RegistrationService service;
+    UserRegistrationService service;
     @Autowired
     UserService userService;
 

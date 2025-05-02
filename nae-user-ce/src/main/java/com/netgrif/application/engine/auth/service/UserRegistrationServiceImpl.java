@@ -26,7 +26,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class RegistrationServiceImpl implements RegistrationService {
+public class UserRegistrationServiceImpl implements UserRegistrationService {
 
     @Autowired
     protected BCryptPasswordEncoder bCryptPasswordEncoder;

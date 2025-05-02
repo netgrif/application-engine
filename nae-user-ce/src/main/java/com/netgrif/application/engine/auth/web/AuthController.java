@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.auth.web;
 
-import com.netgrif.application.engine.auth.service.RegistrationService;
+import com.netgrif.application.engine.auth.service.UserRegistrationService;
 import com.netgrif.application.engine.auth.service.UserFactory;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.auth.throwable.InvalidUserTokenException;
@@ -24,7 +24,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springdoc.core.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
@@ -54,7 +53,7 @@ import java.util.Optional;
 )
 public class AuthController {
 
-    private RegistrationService registrationService;
+    private UserRegistrationService registrationService;
     private ServerAuthProperties serverAuthProperties;
     private MailAttemptService mailAttemptService;
     private MailService mailService;
@@ -63,8 +62,8 @@ public class AuthController {
     private ISecurityContextService securityContextService;
 
     @Autowired
-    public void setRegistrationService(RegistrationService registrationService) {
-        this.registrationService = registrationService;
+    public void setRegistrationService(UserRegistrationService userRegistrationService) {
+        this.registrationService = userRegistrationService;
     }
 
     @Autowired

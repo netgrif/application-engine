@@ -43,9 +43,9 @@ public class AuthBeansConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(RegistrationService.class)
-    public RegistrationService registrationService() {
-        return new RegistrationServiceImpl();
+    @ConditionalOnMissingBean(UserRegistrationService.class)
+    public UserRegistrationService registrationService() {
+        return new UserRegistrationServiceImpl();
     }
 
     @Bean

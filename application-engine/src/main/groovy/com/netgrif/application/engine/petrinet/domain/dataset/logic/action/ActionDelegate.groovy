@@ -5,8 +5,8 @@ import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRol
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
 import com.netgrif.application.engine.auth.service.GroupService
-import com.netgrif.application.engine.auth.service.RegistrationService
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
+import com.netgrif.application.engine.auth.service.UserRegistrationService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
@@ -134,7 +134,7 @@ class ActionDelegate {
     ProcessRoleService processRoleService
 
     @Autowired
-    RegistrationService registrationService
+    UserRegistrationService registrationService
 
     @Autowired
     IMailAttemptService mailAttemptService

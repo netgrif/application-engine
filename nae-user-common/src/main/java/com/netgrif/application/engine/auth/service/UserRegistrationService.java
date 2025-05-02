@@ -7,7 +7,7 @@ import com.netgrif.application.engine.objects.auth.domain.RegisteredUser;
 
 import java.time.LocalDateTime;
 
-public interface RegistrationService {
+public interface UserRegistrationService {
 
     void removeExpiredUsers();
 

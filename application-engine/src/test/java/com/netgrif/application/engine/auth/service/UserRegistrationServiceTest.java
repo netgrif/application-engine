@@ -23,10 +23,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles({"test"})
 @SpringBootTest
-public class RegistrationServiceTest {
+public class UserRegistrationServiceTest {
 
     @Autowired
-    RegistrationService service;
+    UserRegistrationService service;
 
     @Autowired
     UserService userService;
