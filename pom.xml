@@ -9,6 +9,10 @@
     <version>7.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <name>NETGRIF Application Engine parent</name>
+    <description>System provides workflow management functions including user, role and data management.</description>
+    <url>https://engine.netgrif.com</url>
+
     <modules>
         <module>nae-object-library</module>
         <module>nae-spring-core-adapter</module>
@@ -91,8 +95,14 @@
     </repositories>
 
     <build>
+        <extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.7.1</version>
+            </extension>
+        </extensions>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -149,5 +159,72 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>github-publish</id>
+            <distributionManagement>
+                <repository>
+                    <id>github</id>
+                    <name>GitHub Packages</name>
+                    <url>https://maven.pkg.github.com/netgrif/application-engine</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>ossrh-publish</id>
+            <distributionManagement>
+                <repository>
+                    <id>ossrh</id>
+                    <name>Central Repository OSSRH</name>
+                    <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <name>Central Repository OSSRG Snapshots</name>
+                    <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>netgrif-nexus-publish</id>
+            <distributionManagement>
+                <repository>
+                    <id>netgrif-nexus-releases</id>
+                    <name>Netgrif Nexus OSS</name>
+                    <url>https://nexus.netgrif.com/repository/maven-releases/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>netgrif-nexus-snapshots</id>
+                    <name>Netgrif Nexus OSS Snapshots</name>
+                    <url>https://nexus.netgrif.com/repository/maven-snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 
 </project>

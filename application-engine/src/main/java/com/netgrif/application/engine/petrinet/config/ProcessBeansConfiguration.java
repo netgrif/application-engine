@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.config;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.RoleActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
@@ -25,7 +26,9 @@ public class ProcessBeansConfiguration {
                                                  RoleActionsRunner roleActionsRunner,
                                                  @Lazy PetriNetService petriNetService,
                                                  @Lazy UserService userService,
-                                                 ISecurityContextService securityContextService) {
+                                                 ISecurityContextService securityContextService,
+                                                 @Lazy GroupService groupService
+                                                 ) {
         return new com.netgrif.application.engine.petrinet.service.ProcessRoleService(
                 processRoleRepository,
                 petriNetRepository,
@@ -33,7 +36,8 @@ public class ProcessBeansConfiguration {
                 roleActionsRunner,
                 petriNetService,
                 userService,
-                securityContextService
+                securityContextService,
+                groupService
         );
     }
 

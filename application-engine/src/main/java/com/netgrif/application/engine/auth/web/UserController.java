@@ -183,7 +183,8 @@ public class UserController {
     })
     public MessageResource assignRolesToUser(@PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
         try {
-            processRoleService.assignRolesToUser(userId, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()), (LoggedUser) auth.getPrincipal());
+            IUser user = userService.findById(userId, null);
+            processRoleService.assignRolesToUser(user, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()), (LoggedUser) auth.getPrincipal());
             log.info("Process roles " + roleIds + " assigned to user " + userId);
             return MessageResource.successMessage("Selected roles assigned to user " + userId);
         } catch (IllegalArgumentException e) {

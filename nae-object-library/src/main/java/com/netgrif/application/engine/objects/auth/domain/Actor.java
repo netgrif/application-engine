@@ -42,6 +42,20 @@ public interface Actor extends Serializable {
     Set<ProcessRole> getProcessRoles();
 
     /**
+     * Gets {@link ProcessRole} objects that are assigned to this authorizing object
+     *
+     * @return set of {@link ProcessRole}
+     * */
+    Set<ProcessRole> getNegativeProcessRoles();
+
+    /**
+     * Sets {@link ProcessRole} objects to this authorizing object
+     *
+     * @param processRoles set of {@link ProcessRole}
+     * */
+    void setNegativeProcessRoles(Set<ProcessRole> processRoles);
+
+    /**
      * Sets {@link ProcessRole} objects to this authorizing object
      *
      * @param processRoles set of {@link ProcessRole}
@@ -110,6 +124,20 @@ public interface Actor extends Serializable {
      * @param role {@link ProcessRole} object to be added
      * */
     void removeProcessRole(ProcessRole role);
+
+    /**
+     * Adds {@link ProcessRole} object to this authorizing object
+     *
+     * @param role {@link ProcessRole} object to be added
+     * */
+    void addNegativeProcessRole(ProcessRole role);
+
+    /**
+     * Adds {@link ProcessRole} object to this authorizing object
+     *
+     * @param role {@link ProcessRole} object to be added
+     * */
+    void removeNegativeProcessRole(ProcessRole role);
 
     /**
      * Sets attribute to authorizing object

@@ -68,6 +68,9 @@ public abstract class User extends AbstractUser implements RegisteredUser, Seria
         this.attributes = new HashMap<>();
         this.credentials = new HashMap<>();
         this.authMethods = new HashSet<>();
+        this.processRoles = new HashSet<>();
+        this.negativeProcessRoles = new HashSet<>();
+        this.authorities = new HashSet<>();
     }
 
     public User(ObjectId id) {
@@ -82,7 +85,7 @@ public abstract class User extends AbstractUser implements RegisteredUser, Seria
 
     @Override
     public String getFullName() {
-        return String.join(" ", firstName, middleName, lastName);
+        return String.join(" ", firstName, middleName != null ? middleName : "", lastName);
     }
 
     @Override
@@ -310,6 +313,16 @@ public abstract class User extends AbstractUser implements RegisteredUser, Seria
     @Override
     public void removeProcessRole(ProcessRole role) {
         this.processRoles.remove(role);
+    }
+
+    @Override
+    public void addNegativeProcessRole(ProcessRole role) {
+        super.addNegativeProcessRole(role);
+    }
+
+    @Override
+    public void removeNegativeProcessRole(ProcessRole role) {
+        super.removeNegativeProcessRole(role);
     }
 
 
