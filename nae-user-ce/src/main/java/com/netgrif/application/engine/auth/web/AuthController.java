@@ -25,6 +25,7 @@ import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.SecurityService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
@@ -61,6 +62,41 @@ public class AuthController {
     private UserService userService;
     private ISecurityContextService securityContextService;
 
+    @Autowired
+    public void setRegistrationService(RegistrationService registrationService) {
+        this.registrationService = registrationService;
+    }
+
+    @Autowired
+    public void setServerAuthProperties(ServerAuthProperties serverAuthProperties) {
+        this.serverAuthProperties = serverAuthProperties;
+    }
+
+    @Autowired
+    public void setMailAttemptService(MailAttemptService mailAttemptService) {
+        this.mailAttemptService = mailAttemptService;
+    }
+
+    @Autowired
+    public void setMailService(MailService mailService) {
+        this.mailService = mailService;
+    }
+
+    @Autowired
+    public void setUserFactory(UserFactory userFactory) {
+        this.userFactory = userFactory;
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setSecurityContextService(ISecurityContextService securityContextService) {
+        this.securityContextService = securityContextService;
+    }
+
     @Operation(
             summary = "User login",
             description = "Authenticates a user with the system."
@@ -68,7 +104,7 @@ public class AuthController {
     @ApiResponse(responseCode = "200", description = "User logged in successfully")
     @ApiResponse(responseCode = "401", description = "Unauthorized – Authentication is required and has failed or has not yet been provided")
     @ApiResponse(responseCode = "500", description = "Internal server error")
-    @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(
             @Parameter(description = "Spring Security authentication object")
             Authentication auth,
