@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.auth.service.GroupService
+import com.netgrif.application.engine.auth.service.RegistrationService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
@@ -8,7 +9,6 @@ import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
 import com.netgrif.application.engine.AsyncRunner
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
-import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
 import com.netgrif.application.engine.configuration.PublicViewProperties
@@ -137,7 +137,7 @@ class ActionDelegate {
     ProcessRoleService processRoleService
 
     @Autowired
-    IRegistrationService registrationService
+    RegistrationService registrationService
 
     @Autowired
     IMailAttemptService mailAttemptService

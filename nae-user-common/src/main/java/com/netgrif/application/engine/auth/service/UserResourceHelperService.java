@@ -7,7 +7,6 @@ import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import java.util.Locale;
 
 public interface UserResourceHelperService {
-    UserResource getResource(LoggedUser loggedUser, Locale locale, boolean small);
 
     User getLocalisedUser(IUser user, IUser impersonated, Locale locale);
 

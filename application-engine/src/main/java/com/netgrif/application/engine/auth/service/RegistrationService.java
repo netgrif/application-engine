@@ -4,7 +4,7 @@
 //import com.netgrif.application.engine.objects.auth.domain.RegisteredUser;
 //import com.netgrif.application.engine.objects.auth.domain.User;
 //import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
-//import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
+//import com.netgrif.application.engine.auth.service.RegistrationService;
 //import com.netgrif.application.engine.auth.service.UserService;
 //import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 //import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;

@@ -4,13 +4,16 @@ import com.netgrif.application.engine.auth.service.RegistrationService;
 import com.netgrif.application.engine.auth.service.UserFactory;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.auth.throwable.InvalidUserTokenException;
+import com.netgrif.application.engine.auth.web.requestbodies.ChangePasswordRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.mail.MailAttemptService;
 import com.netgrif.application.engine.mail.MailService;
+import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.auth.domain.RegisteredUser;
+import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import freemarker.template.TemplateException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.SecurityService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
@@ -35,6 +39,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Locale;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -54,6 +59,7 @@ public class AuthController {
     private MailService mailService;
     private UserFactory userFactory;
     private UserService userService;
+    private ISecurityContextService securityContextService;
 
     @Operation(
             summary = "User login",
@@ -168,73 +174,73 @@ public class AuthController {
         return MessageResource.successMessage("Auth Token successfully verified, for user [" + loggedUser.getId() + "] " + loggedUser.getFullName());
     }
 
-//
-//    @Operation(summary = "Reset password")
-//    @PostMapping(value = "/reset", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-//    public MessageResource resetPassword(@RequestBody String recoveryEmail) {
-//        if (mailAttemptService.isBlocked(recoveryEmail)) {
-//            return MessageResource.successMessage("Done");
-//        }
-//        try {
-//            RegisteredUser user = registrationService.resetPassword(recoveryEmail);
-//            if (user != null) {
-//                mailService.sendPasswordResetEmail(user);
-//                mailAttemptService.mailAttempt(user.getEmail());
-//                return MessageResource.successMessage("Done");
-//            } else {
-//                return MessageResource.successMessage("Done");
-//            }
-//        } catch (MessagingException | IOException | TemplateException e) {
-//            log.error(e.toString());
-//            return MessageResource.errorMessage("Failed");
-//        }
-//    }
-//
-//    @Operation(summary = "Account recovery")
-//    @PostMapping(value = "/recover", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-//    public MessageResource recoverAccount(@RequestBody RegistrationRequest request) {
-//        try {
-//            if (!registrationService.verifyToken(request.token))
-//                return MessageResource.errorMessage("Invalid token!");
-//            RegisteredUser user = registrationService.recover(registrationService.decodeToken(request.token)[0], new String(Base64.getDecoder().decode(request.password)));
-//            if (user == null)
-//                return MessageResource.errorMessage("Recovery of account has failed!");
-//            return MessageResource.successMessage("Account is successfully recovered. You can login now.");
-//        } catch (InvalidUserTokenException e) {
-//            log.error(e.getMessage());
-//            return MessageResource.errorMessage("Invalid token!");
-//        }
-//    }
-//
-//    @Operation(summary = "Set a new password", security = {@SecurityRequirement(name = "BasicAuth")})
-//    @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-//    public MessageResource changePassword(Authentication auth, @RequestBody ChangePasswordRequest request) {
-//        try {
-//            Optional<IUser> user = userService.findUserByUsername(request.login, null);
-//            if (user.isEmpty() || request.password == null || request.newPassword == null) {
-//                return MessageResource.errorMessage("Incorrect login!");
-//            }
-//
-//            String newPassword = new String(Base64.getDecoder().decode(request.newPassword));
-//            if (!registrationService.isPasswordSufficient(newPassword)) {
-//                return MessageResource.errorMessage("Insufficient password!");
-//            }
-//
-//            String password = new String(Base64.getDecoder().decode(request.password));
-//            if (registrationService.stringMatchesUserPassword((RegisteredUser) user.get(), password)) {
-//                registrationService.changePassword(((RegisteredUser) user.get()), newPassword);
-//                securityContextService.saveToken(((LoggedUser) auth.getPrincipal()).getId());
-//                securityContextService.reloadSecurityContext((LoggedUser) auth.getPrincipal());
-//
-//            } else {
-//                return MessageResource.errorMessage("Incorrect password!");
-//            }
-//
-//            return MessageResource.successMessage("Password is successfully changed.");
-//        } catch (Exception e) {
-//            log.error(e.getMessage());
-//            return MessageResource.errorMessage("There has been a problem!");
-//        }
-//    }
+
+    @Operation(summary = "Reset password")
+    @PostMapping(value = "/reset", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public MessageResource resetPassword(@RequestBody String recoveryEmail) {
+        if (mailAttemptService.isBlocked(recoveryEmail)) {
+            return MessageResource.successMessage("Done");
+        }
+        try {
+            RegisteredUser user = registrationService.resetPassword(recoveryEmail);
+            if (user != null) {
+                mailService.sendPasswordResetEmail(user);
+                mailAttemptService.mailAttempt(user.getEmail());
+                return MessageResource.successMessage("Done");
+            } else {
+                return MessageResource.successMessage("Done");
+            }
+        } catch (MessagingException | IOException | TemplateException e) {
+            log.error(e.toString());
+            return MessageResource.errorMessage("Failed");
+        }
+    }
+
+    @Operation(summary = "Account recovery")
+    @PostMapping(value = "/recover", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public MessageResource recoverAccount(@RequestBody RegistrationRequest request) {
+        try {
+            if (!registrationService.verifyToken(request.token))
+                return MessageResource.errorMessage("Invalid token!");
+            RegisteredUser user = registrationService.recover(registrationService.decodeToken(request.token)[0], new String(Base64.getDecoder().decode(request.password)));
+            if (user == null)
+                return MessageResource.errorMessage("Recovery of account has failed!");
+            return MessageResource.successMessage("Account is successfully recovered. You can login now.");
+        } catch (InvalidUserTokenException e) {
+            log.error(e.getMessage());
+            return MessageResource.errorMessage("Invalid token!");
+        }
+    }
+
+    @Operation(summary = "Set a new password", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public MessageResource changePassword(Authentication auth, @RequestBody ChangePasswordRequest request) {
+        try {
+            Optional<IUser> user = userService.findUserByUsername(request.login, null);
+            if (user.isEmpty() || request.password == null || request.newPassword == null) {
+                return MessageResource.errorMessage("Incorrect login!");
+            }
+
+            String newPassword = new String(Base64.getDecoder().decode(request.newPassword));
+            if (!registrationService.isPasswordSufficient(newPassword)) {
+                return MessageResource.errorMessage("Insufficient password!");
+            }
+
+            String password = new String(Base64.getDecoder().decode(request.password));
+            if (registrationService.stringMatchesUserPassword((RegisteredUser) user.get(), password)) {
+                registrationService.changePassword(((RegisteredUser) user.get()), newPassword);
+                securityContextService.saveToken(((LoggedUser) auth.getPrincipal()).getId());
+                securityContextService.reloadSecurityContext((LoggedUser) auth.getPrincipal());
+
+            } else {
+                return MessageResource.errorMessage("Incorrect password!");
+            }
+
+            return MessageResource.successMessage("Password is successfully changed.");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return MessageResource.errorMessage("There has been a problem!");
+        }
+    }
 
 }

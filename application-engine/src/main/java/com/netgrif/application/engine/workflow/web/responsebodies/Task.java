@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;

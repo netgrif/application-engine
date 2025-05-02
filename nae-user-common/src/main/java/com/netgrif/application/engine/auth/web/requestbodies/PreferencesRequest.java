@@ -22,8 +22,7 @@ public class PreferencesRequest {
     private Map<String, List<String>> headers = new HashMap<>();
 
     public Preferences toPreferences() {
-        Preferences preferences = new com.netgrif.application.engine.adapter.spring.auth.domain.Preferences();
-        preferences.setUserId(userId);
+        Preferences preferences = new com.netgrif.application.engine.adapter.spring.auth.domain.Preferences(userId);
         preferences.setLocale(locale);
         preferences.setDrawerWidth(drawerWidth);
         preferences.setTaskFilters(taskFilters);
