@@ -4,6 +4,11 @@ import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.RegistrationService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.auth.service.GroupService
+import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.integration.modules.ModuleHolder
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.AsyncRunner
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
@@ -203,6 +208,8 @@ class ActionDelegate {
 
     FrontendActionOutcome Frontend
 
+    ModuleHolder Module
+
     /**
      * Reference of case and task in which current action is taking place.
      */
@@ -224,6 +231,7 @@ class ActionDelegate {
         this.initTransitionsMap(action.transitionIds)
         this.outcomes = new ArrayList<>()
         this.Frontend = new FrontendActionOutcome(this.useCase, this.task, this.outcomes)
+        this.Module = new ModuleHolder()
     }
 
     def initFieldsMap(Map<String, String> fieldIds) {
