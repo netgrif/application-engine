@@ -17,13 +17,13 @@ import java.util.stream.Collectors;
 
 public class LoggedUserImpl extends LoggedUser implements UserDetails {
 
-    public LoggedUserImpl(String id, String username, String password, Set<Authority> authorities, Set<ProcessRole> processRoles) {
-        super(id, username, password, authorities, processRoles);
+    public LoggedUserImpl(String id, String username, String password, Set<Authority> authorities, Set<ProcessRole> processRoles, Set<ProcessRole> negativeProcessRoles) {
+        super(id, username, password, authorities, processRoles, negativeProcessRoles);
     }
 
     @Builder(builderMethodName = "with")
-    public LoggedUserImpl(String id, String realmId, String createMethod, String username, String email, String password, String firstName, String lastName, Set<Authority> authoritySet, Set<Group> groups, boolean enabled, boolean emailVerified, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, LoggedUser impersonated, Set<ProcessRole> processRoles, Set<String> MFAMethod, Duration sessionTimeout, Map<String,Attribute<?>> attributes) {
-        super(id, realmId, createMethod, username, email, password, firstName, lastName, authoritySet, groups, enabled, emailVerified, accountNonExpired, accountNonLocked, credentialsNonExpired, impersonated, processRoles, MFAMethod, sessionTimeout, attributes);
+    public LoggedUserImpl(String id, String realmId, String createMethod, String username, String email, String password, String firstName, String lastName, Set<Authority> authoritySet, Set<Group> groups, boolean enabled, boolean emailVerified, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, LoggedUser impersonated, Set<ProcessRole> processRoles, Set<String> MFAMethod, Duration sessionTimeout, Map<String,Attribute<?>> attributes, Set<ProcessRole> negativeProcessRoles) {
+        super(id, realmId, createMethod, username, email, password, firstName, lastName, authoritySet, groups, enabled, emailVerified, accountNonExpired, accountNonLocked, credentialsNonExpired, impersonated, processRoles, negativeProcessRoles, MFAMethod, sessionTimeout, attributes);
     }
 
     @Override

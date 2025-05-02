@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.adapter.spring.petrinet.service;
 
+import com.netgrif.application.engine.objects.auth.domain.Group;
+import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
@@ -16,8 +18,12 @@ public interface ProcessRoleService {
     void delete(String id);
     void deleteAll(Collection<String> ids);
     void deleteAll();
-    void assignRolesToUser(String userId, Set<ProcessResourceId> roleIds, LoggedUser user);
-    void assignRolesToUser(String userId, Set<ProcessResourceId> roleIds, LoggedUser user, Map<String, String> params);
+    void assignRolesToUser(IUser user, Set<ProcessResourceId> roleIds, LoggedUser loggedUser);
+    void assignRolesToUser(IUser user, Set<ProcessResourceId> roleIds, LoggedUser loggedUser, Map<String, String> params);
+    void assignRolesToGroup(Group group, Set<ProcessResourceId> requestedRolesIds);
+    void assignNegativeRolesToUser(IUser user, Set<ProcessResourceId> roleIds, LoggedUser loggedUser);
+    void assignNegativeRolesToUser(IUser user, Set<ProcessResourceId> roleIds, LoggedUser loggedUser, Map<String, String> params);
+    void assignNegativeRolesToGroup(Group group, Set<ProcessResourceId> requestedRolesIds);
     ProcessRole getDefaultRole();
     ProcessRole getAnonymousRole();
     Collection<ProcessRole> findAllByIds(Collection<ProcessResourceId> roleIds);
