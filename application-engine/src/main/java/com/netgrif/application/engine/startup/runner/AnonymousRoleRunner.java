@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.startup.runner;
 
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.events.Event;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
@@ -21,12 +22,12 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AnonymousRoleRunner implements ApplicationEngineStartupRunner {
 
-    private final ProcessRoleRepository repository;
+    private final ProcessRoleService processRoleService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("Creating anonymous process role");
-        Set<ProcessRole> role = repository.findAllByImportId(ProcessRole.ANONYMOUS_ROLE);
+        Set<ProcessRole> role = processRoleService.findAllByImportId(ProcessRole.ANONYMOUS_ROLE);
         if (role != null && !role.isEmpty()) {
             log.info("Anonymous role already exists");
             return;
@@ -37,7 +38,7 @@ public class AnonymousRoleRunner implements ApplicationEngineStartupRunner {
         anonymousRole.setName(new I18nString(ProcessRole.ANONYMOUS_ROLE));
         anonymousRole.setDescription("Anonymous system process role");
         anonymousRole.setEvents(new LinkedHashMap<EventType, Event>());
-        repository.save(anonymousRole);
+        processRoleService.save(anonymousRole);
     }
 
 }

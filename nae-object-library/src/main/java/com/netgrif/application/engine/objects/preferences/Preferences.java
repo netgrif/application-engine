@@ -1,10 +1,7 @@
-package com.netgrif.application.engine.settings.domain;
+package com.netgrif.application.engine.objects.preferences;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -20,12 +17,10 @@ import java.util.Map;
  *     <li>case view flex fields</li>
  * </ul>
  */
-@Document
 @Data
 @NoArgsConstructor
-public class Preferences implements Serializable {
+public abstract class Preferences implements Serializable {
 
-    @Id
     private String userId;
 
     private String locale;
@@ -35,19 +30,16 @@ public class Preferences implements Serializable {
     /**
      * taskViewId: [filterIds]
      */
-    @Field
     private Map<String, List<String>> taskFilters = new HashMap<>();
 
     /**
      * caseViewId: [filterIds]
      */
-    @Field
     private Map<String, List<String>> caseFilters = new HashMap<>();
 
     /**
      * caseViewId: [headersIds]
      */
-    @Field
     private Map<String, List<String>> headers = new HashMap<>();
 
     public Preferences(String userId) {
