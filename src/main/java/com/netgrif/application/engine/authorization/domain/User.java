@@ -2,12 +2,11 @@ package com.netgrif.application.engine.authorization.domain;
 
 import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.SystemCase;
 
 /**
  * todo javadoc
  * */
-public class User extends SystemCase implements Actor {
+public class User extends Actor {
 
     public User(Case userCase) {
         super(userCase);

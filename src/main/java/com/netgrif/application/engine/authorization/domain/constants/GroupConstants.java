@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.authorization.domain.constants;
 
 public class GroupConstants {
+    public static final String DEFAULT_GROUP_NAME = "default";
+
     public static final String PROCESS_IDENTIFIER = "group";
     public static final String FILE_PATH = "engine-processes/group.xml";
     public static final String NAME_FIELD_ID = "name";

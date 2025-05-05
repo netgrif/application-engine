@@ -9,7 +9,7 @@ import com.netgrif.application.engine.authorization.domain.repositories.CaseRole
 import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository;
 import com.netgrif.application.engine.authorization.domain.repositories.RoleRepository;
 import com.netgrif.application.engine.authorization.domain.throwable.NotAllRolesAssignedException;
-import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
+import com.netgrif.application.engine.authorization.service.interfaces.IAllActorService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.event.events.authorization.ActorAssignRoleEvent;
@@ -48,7 +48,7 @@ public class RoleService implements IRoleService {
     private final IRoleAssignmentService roleAssignmentService;
     private final ActionRunner actionRunner;
     private final ApplicationEventPublisher eventPublisher;
-    private IActorService actorService;
+    private IAllActorService actorService;
     private ITaskService taskService;
     private IWorkflowService workflowService;
 
@@ -69,7 +69,7 @@ public class RoleService implements IRoleService {
 
     @Lazy
     @Autowired
-    public void setActorService(IActorService actorService) {
+    public void setActorService(IAllActorService actorService) {
         this.actorService = actorService;
     }
 

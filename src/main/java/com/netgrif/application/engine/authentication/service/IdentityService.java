@@ -15,7 +15,6 @@ import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.security.service.SecurityContextService;
 import com.netgrif.application.engine.workflow.domain.CaseParams;
-import com.netgrif.application.engine.workflow.domain.SystemCase;
 import com.netgrif.application.engine.workflow.service.CrudSystemCaseService;
 import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -157,7 +156,7 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
     @Override
     @Transactional
     public Identity createWithDefaultUser(IdentityParams identityParams) {
-        validateCreateParams(identityParams);
+        validateAndFixCreateParams(identityParams);
 
         UserParams userParams = UserParams.fromIdentityParams(identityParams);
         User defaultUser = userService.create(userParams);
@@ -252,7 +251,7 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
     }
 
     @Override
-    protected void validateCreateParams(CaseParams params) throws IllegalArgumentException {
+    protected void validateAndFixCreateParams(CaseParams params) throws IllegalArgumentException {
         if (params == null) {
             throw new IllegalArgumentException("Please provide input values for identity");
         }
@@ -263,7 +262,7 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
     }
 
     @Override
-    protected void validateUpdateParams(CaseParams params) throws IllegalArgumentException {
+    protected void validateAndFixUpdateParams(CaseParams params) throws IllegalArgumentException {
         if (params == null) {
             throw new IllegalArgumentException("Please provide input values for identity");
         }
@@ -274,9 +273,9 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
     }
 
     @Override
-    protected void postUpdateActions(SystemCase identity) {
+    protected void postUpdateActions(Identity identity) {
         if (securityContextService.isIdentityLogged(identity.getStringId())) {
-            securityContextService.reloadSecurityContext(((Identity) identity).toSession());
+            securityContextService.reloadSecurityContext(identity.toSession());
         }
     }
 

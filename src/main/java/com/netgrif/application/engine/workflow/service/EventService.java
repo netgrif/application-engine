@@ -75,6 +75,7 @@ public class EventService implements IEventService {
 
     @Override
     public List<EventOutcome> processDataEvents(Field<?> field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task, Field<?> newDataField, Map<String, String> params) {
+        // todo: release/8.0.0 actionType from schema is ignored
         LinkedList<Action> fieldActions = new LinkedList<>();
         if (field.getEvents() != null && field.getEvents().containsKey(actionTrigger)) {
             fieldActions.addAll(DataRef.getEventAction(field.getEvents().get(actionTrigger), phase));

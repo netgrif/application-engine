@@ -18,24 +18,24 @@ import java.util.Optional;
 @SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
-public class ActorServiceTest {
+public class AllActorServiceTest {
 
     @Autowired
-    private ActorService actorService;
+    private AllActorService allActorService;
 
     @Autowired
     private IUserService userService;
 
     @Test
     public void testFindById() {
-        assert actorService.findById(null).isEmpty();
-        assert actorService.findById(new ObjectId().toString()).isEmpty();
+        assert allActorService.findById(null).isEmpty();
+        assert allActorService.findById(new ObjectId().toString()).isEmpty();
 
         User user = userService.create(UserParams.with()
                 .email(new TextField("s@meemail.com"))
                 .build());
 
-        Optional<Actor> foundActorOpt = actorService.findById(user.getStringId());
+        Optional<Actor> foundActorOpt = allActorService.findById(user.getStringId());
         assert foundActorOpt.isPresent();
     }
 }

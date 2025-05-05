@@ -3,35 +3,35 @@ package com.netgrif.application.engine.authorization.service;
 import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
 import com.netgrif.application.engine.authorization.domain.params.UserParams;
+import com.netgrif.application.engine.authorization.service.interfaces.IGroupService;
 import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
-import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
+import com.netgrif.application.engine.startup.DefaultGroupRunner;
 import com.netgrif.application.engine.workflow.domain.CaseParams;
-import com.netgrif.application.engine.workflow.domain.QCase;
-import com.netgrif.application.engine.workflow.domain.SystemCase;
-import com.netgrif.application.engine.workflow.service.CrudSystemCaseService;
 import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class UserService extends CrudSystemCaseService<User> implements IUserService {
+public class UserService extends ActorService<User> implements IUserService {
+
+    private final IGroupService groupService;
 
     public UserService(@Lazy IDataService dataService, ISessionManagerService sessionManagerService,
                        @Lazy IElasticCaseSearchService elasticCaseSearchService, @Lazy IWorkflowService workflowService,
-                       SystemCaseFactoryRegistry systemCaseFactoryRegistry) {
-        super(sessionManagerService, dataService, workflowService, systemCaseFactoryRegistry, elasticCaseSearchService);
+                       SystemCaseFactoryRegistry systemCaseFactoryRegistry, IGroupService groupService,
+                       DefaultGroupRunner defaultGroupRunner) {
+        super(sessionManagerService, dataService, workflowService, systemCaseFactoryRegistry, elasticCaseSearchService,
+                defaultGroupRunner);
+        this.groupService = groupService;
     }
 
     /**
@@ -62,7 +62,7 @@ public class UserService extends CrudSystemCaseService<User> implements IUserSer
     }
 
     @Override
-    protected void validateCreateParams(CaseParams params) throws IllegalArgumentException {
+    protected void validateAndFixCreateParams(CaseParams params) throws IllegalArgumentException {
         if (params == null) {
             throw new IllegalArgumentException("Please provide input values for user");
         }
@@ -70,10 +70,14 @@ public class UserService extends CrudSystemCaseService<User> implements IUserSer
         if (isTextFieldOrValueEmpty(typedParams.getEmail())) {
             throw new IllegalArgumentException("User must have an email!");
         }
+
+        if (isCaseFieldOrValueEmpty(typedParams.getGroupIds())) {
+            typedParams.setGroupIds(CaseField.withValue(List.of(groupService.getDefaultGroup().getStringId())));
+        }
     }
 
     @Override
-    protected void validateUpdateParams(CaseParams params) throws IllegalArgumentException {
+    protected void validateAndFixUpdateParams(CaseParams params) throws IllegalArgumentException {
         if (params == null) {
             throw new IllegalArgumentException("Please provide input values for user");
         }
@@ -81,10 +85,10 @@ public class UserService extends CrudSystemCaseService<User> implements IUserSer
         if (typedParams.getEmail() != null && isTextFieldValueEmpty(typedParams.getEmail())) {
             throw new IllegalArgumentException("User must have an email!");
         }
-    }
 
-    @Override
-    protected void postUpdateActions(SystemCase systemCase) {
-        // none
+        if (!isCaseFieldOrValueEmpty(typedParams.getGroupIds())
+                && typedParams.getGroupIds().getRawValue().size() > 1) {
+            typedParams.getGroupIds().getRawValue().remove(getDefaultGroup().getStringId());
+        }
     }
 }

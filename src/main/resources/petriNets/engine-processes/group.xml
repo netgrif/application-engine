@@ -22,10 +22,9 @@
 		<title>Email</title>
 	</data>
 	<data type="caseRef">
-		<id>memberIds</id>
-		<title>Members</title>
+		<id>groupIds</id>
+		<title>Groups</title>
 		<allowedNets>
-			<allowedNet>user</allowedNet>
 			<allowedNet>group</allowedNet>
 		</allowedNets>
 	</data>

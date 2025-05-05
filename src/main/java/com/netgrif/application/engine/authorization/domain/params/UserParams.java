@@ -2,31 +2,27 @@ package com.netgrif.application.engine.authorization.domain.params;
 
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
+import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
-import com.netgrif.application.engine.workflow.domain.CaseParams;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder(builderMethodName = "with")
-public class UserParams implements CaseParams {
+public class UserParams extends ActorParams {
     protected TextField email;
     protected TextField firstname;
     protected TextField lastname;
 
-    @Override
-    public DataSet toDataSet() {
-        DataSet dataSet = new DataSet();
-
-        dataSet.put(UserConstants.EMAIL_FIELD_ID, this.email);
-        dataSet.put(UserConstants.FIRSTNAME_FIELD_ID, this.firstname);
-        dataSet.put(UserConstants.LASTNAME_FIELD_ID, this.lastname);
-
-        return dataSet;
+    @Builder(builderMethodName = "with")
+    private UserParams(CaseField groupIds, TextField email, TextField firstname, TextField lastname) {
+        super(groupIds);
+        this.email = email;
+        this.firstname = firstname;
+        this.lastname = lastname;
     }
 
-    /**S
+    /**
      * todo javadoc
      * */
     public static UserParams fromIdentityParams(IdentityParams identityParams) {
@@ -57,5 +53,14 @@ public class UserParams implements CaseParams {
             return "";
         }
         return String.join(" ", this.firstname.getRawValue(), this.lastname.getRawValue());
+    }
+
+    @Override
+    protected DataSet toDataSetInternal(DataSet dataSet) {
+        dataSet.put(UserConstants.EMAIL_FIELD_ID, this.email);
+        dataSet.put(UserConstants.FIRSTNAME_FIELD_ID, this.firstname);
+        dataSet.put(UserConstants.LASTNAME_FIELD_ID, this.lastname);
+
+        return dataSet;
     }
 }

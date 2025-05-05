@@ -3,11 +3,10 @@ package com.netgrif.application.engine.authorization.domain;
 import com.netgrif.application.engine.authorization.domain.constants.GroupConstants;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.SystemCase;
 
 import java.util.List;
 
-public class Group extends SystemCase implements Actor {
+public class Group extends Actor {
 
     public Group(Case groupCase) {
         super(groupCase);
@@ -22,10 +21,6 @@ public class Group extends SystemCase implements Actor {
     @Override
     public String getName() {
         return (String) getCase().getDataSet().get(GroupConstants.NAME_FIELD_ID).getRawValue();
-    }
-
-    public List<String> getMemberIds() {
-        return ((CaseField) getCase().getDataSet().get(GroupConstants.MEMBERS_FIELD_ID)).getRawValue();
     }
 
     public String getParentGroupId() {

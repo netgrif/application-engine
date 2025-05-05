@@ -7,10 +7,12 @@ import com.netgrif.application.engine.authentication.domain.params.IdentityParam
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
+@Slf4j
 @Component
 @CompileStatic
 @ConditionalOnProperty(value = "admin.create-system-identity", matchIfMissing = true)
@@ -31,12 +33,15 @@ class SystemIdentityRunner extends AbstractOrderedCommandLineRunner {
     }
 
     private Identity createSystemIdentityWithActor() {
-        return service.createWithDefaultUser(IdentityParams.with()
+        Identity systemIdentity = service.createWithDefaultUser(IdentityParams.with()
                 .username(new TextField(SystemIdentityConstants.USERNAME))
                 .firstname(new TextField(SystemIdentityConstants.FIRSTNAME))
                 .lastname(new TextField(SystemIdentityConstants.LASTNAME))
                 .password(new TextField("n/a"))
                 .build())
+
+        log.info("Created system identity [{}] with user [{}].", systemIdentity.stringId, systemIdentity.mainActorId)
+        return systemIdentity
     }
 
     LoggedIdentity getLoggedSystem() {

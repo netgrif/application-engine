@@ -29,6 +29,13 @@
 		<id>lastname</id>
 		<title>Last name</title>
 	</data>
+	<data type="caseRef">
+		<id>groupIds</id>
+		<title>Groups</title>
+		<allowedNets>
+			<allowedNet>group</allowedNet>
+		</allowedNets>
+	</data>
 <!--	todo preklady-->
 	<transition>
 		<id>t1</id>

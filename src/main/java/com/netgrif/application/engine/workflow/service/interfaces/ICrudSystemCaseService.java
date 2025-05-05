@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface ICrudSystemCaseService<T extends SystemCase> {
     T create(CaseParams params) throws IllegalArgumentException, IllegalStateException;
-    T update(SystemCase systemObject, CaseParams params) throws IllegalArgumentException, IllegalStateException;
+    T update(T systemObject, CaseParams params) throws IllegalArgumentException, IllegalStateException;
     Optional<T> findById(String id);
     boolean existsById(String id);
     List<T> findAll();

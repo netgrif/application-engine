@@ -14,6 +14,7 @@ class RunnerController {
             AllDataTransitionRunner,
             UriRunner,
             SystemProcessRunner,
+            DefaultGroupRunner,
             SystemIdentityRunner,
             FunctionsCacheRunner,
             FilterRunner,
