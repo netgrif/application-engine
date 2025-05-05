@@ -15,7 +15,11 @@ public class User {
 
     private String id;
 
+    private String username;
+
     private String email;
+
+    private String realmId;
 
     private String telNumber;
 
@@ -39,6 +43,8 @@ public class User {
     protected User(IUser user) {
         id = user.getStringId();
         email = user.getEmail();
+        username = user.getUsername();
+        realmId = user.getRealmId();
         avatar = user.getAvatar();
         name = user.getFirstName();
         surname = user.getLastName();
