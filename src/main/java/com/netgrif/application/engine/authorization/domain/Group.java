@@ -30,7 +30,7 @@ public class Group extends SystemCase implements Actor {
 
     public String getParentGroupId() {
         List<String> parentGroupIdAsList = ((CaseField) getCase().getDataSet().get(GroupConstants.PARENT_GROUP_FIELD_ID)).getRawValue();
-        if (!parentGroupIdAsList.isEmpty()) {
+        if (parentGroupIdAsList != null && !parentGroupIdAsList.isEmpty()) {
             return parentGroupIdAsList.get(0);
         }
         return null;

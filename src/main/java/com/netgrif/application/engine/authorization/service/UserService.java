@@ -57,12 +57,6 @@ public class UserService extends CrudSystemCaseService<User> implements IUserSer
     }
 
     @Override
-    public List<User> findAll() {
-        List<Case> result = workflowService.searchAll(QCase.case$.processIdentifier.eq(UserConstants.PROCESS_IDENTIFIER)).getContent();
-        return result.stream().map(User::new).collect(Collectors.toList());
-    }
-
-    @Override
     protected String getProcessIdentifier() {
         return UserConstants.PROCESS_IDENTIFIER;
     }

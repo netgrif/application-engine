@@ -32,6 +32,22 @@
 	<data type="caseRef">
 		<id>parentGroupId</id>
 		<title>Parent group id</title>
+		<event type="set">
+			<id>parentGroupId_set</id>
+			<actions phase="post">
+				<action type="value">
+					if (parentGroupId.value == null) {
+						return
+					}
+					if (parentGroupId.rawValue.size() &gt; 1) {
+						throw new IllegalArgumentException("Cannot have multiple references to parent group")
+					}
+					if (parentGroupId.rawValue[0] == useCase.stringId) {
+						throw new IllegalArgumentException("Cannot use self reference as parent group")
+					}
+				</action>
+			</actions>
+		</event>
 		<allowedNets>
 			<allowedNet>group</allowedNet>
 		</allowedNets>

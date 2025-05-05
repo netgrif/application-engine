@@ -148,16 +148,6 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
     }
 
     /**
-     * Finds all identities
-     *
-     * @return List of all identities. Cannot be null
-     * */
-    @Override
-    public List<Identity> findAll() {
-        return findAllByQuery(null).stream().map(Identity::new).collect(Collectors.toList());
-    }
-
-    /**
      * Creates identity based on params. Password is encoded. User is created from the identity parameters.
      *
      * @param identityParams Parameters, that are used to create the identity. At least username must be provided.

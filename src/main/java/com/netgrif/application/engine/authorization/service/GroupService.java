@@ -14,7 +14,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -60,16 +59,17 @@ public class GroupService extends CrudSystemCaseService<Group> implements IGroup
 
     @Override
     public Optional<Group> findByName(String name) {
-        return Optional.empty();
+        if (name == null) {
+            return Optional.empty();
+        }
+        return findOneByQuery(fulltextFieldQuery(GroupConstants.NAME_FIELD_ID, name));
     }
 
     @Override
     public boolean existsByName(String name) {
-        return false;
-    }
-
-    @Override
-    public List<Group> findAll() {
-        return List.of();
+        if (name == null) {
+            return false;
+        }
+        return countByQuery(fulltextFieldQuery(GroupConstants.NAME_FIELD_ID, name)) > 0;
     }
 }

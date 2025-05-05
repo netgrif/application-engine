@@ -56,7 +56,7 @@ public class Identity extends SystemCase {
      * */
     public String getMainActorId() {
         List<String> mainActorIdAsList = ((CaseField) getCase().getDataSet().get(IdentityConstants.MAIN_ACTOR_FIELD_ID)).getRawValue();
-        if (!mainActorIdAsList.isEmpty()) {
+        if (mainActorIdAsList != null && !mainActorIdAsList.isEmpty()) {
             return mainActorIdAsList.get(0);
         }
         return null;

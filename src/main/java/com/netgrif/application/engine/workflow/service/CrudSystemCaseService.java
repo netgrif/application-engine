@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 @Slf4j
@@ -126,6 +127,15 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
         // todo: release/8.0.0 edge case: can return true and findById will return empty optional
         return workflowService.count(QCase.case$.processIdentifier.eq(getProcessIdentifier())
                 .and(QCase.case$.id.eq(new ObjectId(id)))) > 0;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<T> findAll() {
+        List<Case> result = workflowService.searchAll(QCase.case$.processIdentifier.eq(getProcessIdentifier())).getContent();
+        return (List<T>) result.stream()
+                .map(systemCaseFactory::fromCase)
+                .collect(Collectors.toList());
     }
 
     // todo: release/8.0.0 also removal method?
