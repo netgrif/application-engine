@@ -1,7 +1,9 @@
 package com.netgrif.application.engine.petrinet.web;
 
 import com.netgrif.application.engine.AsyncRunner;
+import com.netgrif.application.engine.AsyncRunnerWrapper;
 import com.netgrif.application.engine.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.workspace.WorkspaceContextHolder;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetImportReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReferenceResources;
 import com.netgrif.application.engine.petrinet.web.responsebodies.ProcessRolesResource;
@@ -83,7 +85,7 @@ public class PetriNetController {
     private StringToVersionConverter converter;
 
     @Autowired
-    private AsyncRunner asyncRunner;
+    private AsyncRunnerWrapper asyncRunner;
 
     public static String decodeUrl(String s1) {
         try {
@@ -222,7 +224,7 @@ public class PetriNetController {
             return MessageResource.errorMessage("Deleting Petri net " + processId + " failed!");
         }
         LoggedUser user = (LoggedUser) auth.getPrincipal();
-        asyncRunner.execute(() -> this.service.deletePetriNet(decodedProcessId, user));
+        asyncRunner.execute(() -> this.service.deletePetriNet(decodedProcessId, user), user.getWorkspaceId());
         return MessageResource.successMessage("Petri net " + decodedProcessId + " is being deleted");
     }
 

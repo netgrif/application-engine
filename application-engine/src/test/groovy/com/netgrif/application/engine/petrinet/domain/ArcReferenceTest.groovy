@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain
 
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
+import com.netgrif.application.engine.objects.petrinet.domain.workspace.DefaultWorkspaceService
 import com.netgrif.application.engine.startup.ImportHelper
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -40,7 +41,7 @@ class ArcReferenceTest {
 
     @Test
     void testReference() {
-        def net = importer.importPetriNet(stream(NET_FILE)).get()
+        def net = importer.importPetriNet(stream(NET_FILE), DefaultWorkspaceService.DEFAULT_WORKSPACE_ID).get()
 
         assert net
     }
@@ -48,7 +49,7 @@ class ArcReferenceTest {
     @Test
     void testInvalidReference() {
         assertThrows(IllegalArgumentException.class, () -> {
-            importer.importPetriNet(stream(NET_INVALID_FILE)).get()
+            importer.importPetriNet(stream(NET_INVALID_FILE), DefaultWorkspaceService.DEFAULT_WORKSPACE_ID).get()
         });
     }
 }

@@ -127,9 +127,9 @@ public class Importer {
     private ILogicValidator logicValidator;
 
     @Transactional
-    public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
+    public Optional<PetriNet> importPetriNet(InputStream xml, String workspaceId) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
-            initialize();
+            initialize(workspaceId);
             unmarshallXml(xml);
             return createPetriNet();
         } catch (JAXBException e) {
@@ -139,16 +139,16 @@ public class Importer {
     }
 
     @Transactional
-    public Optional<PetriNet> importPetriNet(File xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
+    public Optional<PetriNet> importPetriNet(File xml, String workspaceId) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
-            return importPetriNet(new FileInputStream(xml));
+            return importPetriNet(new FileInputStream(xml), workspaceId);
         } catch (FileNotFoundException e) {
             log.error("Importing Petri net failed: ", e);
         }
         return Optional.empty();
     }
 
-    protected void initialize() {
+    protected void initialize(String workspaceId) {
         this.roles = new HashMap<>();
         this.transitions = new HashMap<>();
         this.places = new HashMap<>();

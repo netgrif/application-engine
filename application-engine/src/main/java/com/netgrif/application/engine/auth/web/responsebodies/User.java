@@ -34,6 +34,8 @@ public class User {
 
     private User impersonated;
 
+    private String workspaceId;
+
     protected User(IUser user) {
         id = user.getStringId();
         email = user.getEmail();
@@ -41,6 +43,7 @@ public class User {
         name = user.getFirstName();
         surname = user.getLastName();
         fullName = user.getFullName();
+        workspaceId = user.getWorkspaceId();
     }
 
     /**

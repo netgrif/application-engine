@@ -4,6 +4,8 @@ import com.netgrif.application.engine.objects.petrinet.domain.workspace.DefaultW
 import com.netgrif.application.engine.objects.petrinet.domain.workspace.Workspace;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 @Slf4j
 public class DefaultWorkspaceServiceImpl implements DefaultWorkspaceService {
 
@@ -18,5 +20,10 @@ public class DefaultWorkspaceServiceImpl implements DefaultWorkspaceService {
     @Override
     public Workspace getDefaultWorkspace() {
         return defaultWorkspace;
+    }
+
+    @Override
+    public List<Workspace> getAllWorkspaces() {
+        return List.of(defaultWorkspace);
     }
 }

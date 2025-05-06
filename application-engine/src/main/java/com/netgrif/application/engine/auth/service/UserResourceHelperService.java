@@ -35,6 +35,7 @@ public class UserResourceHelperService implements IUserResourceHelperService {
         User result = loggedUser.isImpersonating() ?
                 getLocalisedUser(user, getImpersonated(loggedUser, small), locale) :
                 getLocalisedUser(user, locale);
+        result.setWorkspaceId(loggedUser.getWorkspaceId());
         return new UserResource(result, "profile");
     }
 

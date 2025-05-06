@@ -3,6 +3,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 import com.netgrif.application.engine.business.IPostalCodeService
 import com.netgrif.application.engine.business.orsr.IOrsrService
 import com.netgrif.application.engine.importer.service.FieldFactory
+import com.netgrif.application.engine.petrinet.service.workspace.WorkspaceContextHolder
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import com.netgrif.application.engine.objects.petrinet.domain.Function
 import com.netgrif.application.engine.objects.workflow.domain.Case
@@ -48,6 +49,7 @@ abstract class FieldActionsRunner {
         log.debug("Action: $action")
         def code = getActionCode(action, functions)
         try {
+            WorkspaceContextHolder.setWorkspaceId(useCase.getWorkspaceId(), true);
             code.init(action, useCase, task, this, params)
             code()
         } catch (Exception e) {

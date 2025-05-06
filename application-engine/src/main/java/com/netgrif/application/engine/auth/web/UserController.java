@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.auth.web;
 
 import com.netgrif.application.engine.auth.web.responsebodies.*;
+import com.netgrif.application.engine.objects.petrinet.domain.workspace.DefaultWorkspaceService;
+import com.netgrif.application.engine.objects.petrinet.domain.workspace.Workspace;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAssembler;
 import com.netgrif.application.engine.objects.auth.domain.IUser;
@@ -28,6 +30,7 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
@@ -83,6 +86,9 @@ public class UserController {
     @Autowired
     private ISecurityContextService securityContextService;
 
+    @Autowired
+    private DefaultWorkspaceService workspaceService;
+
     protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
         UserResourceAssembler result = userResourceAssemblerFactory.getObject();
         result.initialize(locale, small, selfRel);
@@ -130,6 +136,7 @@ public class UserController {
             throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
         }
         IUser user = userService.findById(userId, null);
+        user.setWorkspaceId(actualUser.getWorkspaceId());
         return new UserResource(small ? userResponseFactory.getSmallUser(user) : userResponseFactory.getUser(user, locale), "profile");
     }
 
@@ -155,10 +162,21 @@ public class UserController {
         if (Objects.equals(loggedUser.getId(), userId)) {
             loggedUser.setFirstName(user.getFirstName());
             loggedUser.setLastName(user.getLastName());
+            if (updates.getWorkspaceId() != null) {
+                loggedUser.setWorkspaceId(updates.getWorkspaceId());
+            }
             securityContextService.reloadSecurityContext(loggedUser);
         }
         log.info("Updating user " + user.getEmail() + " with data " + updates.toString());
         return new UserResource(userResponseFactory.getUser(user, locale), "profile");
+    }
+
+    @Operation(summary = "Get all workspaces", security = {@SecurityRequirement(name = "BasicAuth")})
+    @GetMapping(value = "/workspaces", produces = MediaTypes.HAL_JSON_VALUE)
+    public List<WorkspaceResponse> getAllWorkspaces() {
+        List<Workspace> workspaces = workspaceService.getAllWorkspaces();
+
+        return workspaces.stream().map(w -> new WorkspaceResponse(w.getId(), w.isDefaultWorkspace())).collect(Collectors.toList());
     }
 
     @Operation(summary = "Get all users with specified roles", security = {@SecurityRequirement(name = "BasicAuth")})

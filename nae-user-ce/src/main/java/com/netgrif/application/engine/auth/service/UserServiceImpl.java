@@ -13,6 +13,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.petrinet.domain.workspace.DefaultWorkspaceService;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
+import com.netgrif.application.engine.petrinet.service.workspace.WorkspaceContextHolder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -105,6 +106,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public IUser saveUser(IUser user, String realmId) {
         log.debug("Saving user [{}] in DEFAULT realm", user.getUsername());
+        user.setWorkspaceId(null);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
         user = userRepository.saveUser((User) user, mongoTemplate, collectionName);
         log.trace("User [{}] saved in collection [{}]", user.getUsername(), collectionName);
@@ -235,7 +237,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Admin user with username [%s] cannot be found.".formatted(username));
         }
         IUser user = userOptional.get();
-        user.setProcessRoles(new HashSet<>(processRoleService.getAll()));
+        user.setProcessRoles(new HashSet<>(processRoleService.findAll()));
         saveUser(user, user.getRealmId());
     }
 
@@ -401,8 +403,9 @@ public class UserServiceImpl implements UserService {
         if (systemUser == null) {
             systemUser = createSystemUser();
         }
-        systemUser.setWorkspaceId(DefaultWorkspaceService.DEFAULT_WORKSPACE_ID);
-        systemUser.setProcessRoles(new HashSet<>(processRoleService.getAll()));
+        String workspaceId = WorkspaceContextHolder.getWorkspaceId() != null ? WorkspaceContextHolder.getWorkspaceId() : DefaultWorkspaceService.DEFAULT_WORKSPACE_ID;
+        systemUser.setWorkspaceId(workspaceId);
+        systemUser.setProcessRoles(new HashSet<>(processRoleService.findAllByWorkspaceId(workspaceId)));
         return systemUser;
     }
 

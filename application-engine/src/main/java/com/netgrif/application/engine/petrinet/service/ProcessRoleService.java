@@ -5,8 +5,11 @@ import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.event.events.user.UserRoleChangeEvent;
 import com.netgrif.application.engine.objects.importer.model.EventPhaseType;
+import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.application.engine.objects.petrinet.domain.roles.PredefinedProcessRole;
+import com.netgrif.application.engine.objects.petrinet.domain.workspace.DefaultWorkspaceService;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context.RoleContext;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.RoleActionsRunner;
 import com.netgrif.application.engine.objects.petrinet.domain.events.Event;
@@ -59,11 +62,6 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     @Override
     public ProcessRole save(ProcessRole processRole) {
         return processRoleRepository.save(processRole);
-    }
-
-    @Override
-    public List<ProcessRole> getAll() {
-        return processRoleRepository.findAll();
     }
 
     @Override
@@ -290,7 +288,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     @Override
     public List<ProcessRole> findAll() {
-        return processRoleRepository.findAllByWorkspaceId(userService.getLoggedOrSystem().getWorkspaceId());
+        return processRoleRepository.findAll();
     }
 
     @Override
@@ -339,6 +337,47 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
             anonymousRole = roles.stream().findFirst().orElse(null);
         }
         return anonymousRole;
+    }
+
+    public ProcessRole createDefaultOrAnonymousRole(PredefinedProcessRole predefinedRole, String workspaceId) {
+        log.info("Creating " + predefinedRole.getName() + " process role in workspace " + workspaceId);
+
+        Set<ProcessRole> role = processRoleRepository.findAllByImportIdAndWorkspaceId(predefinedRole.getName(), workspaceId);
+        if (role != null && !role.isEmpty()) {
+            log.info("Role already exists");
+            return role.stream().findFirst().orElse(null);
+        }
+
+        ProcessRole newRole = new com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.ProcessRole();
+        newRole.setImportId(predefinedRole.getName());
+        newRole.setName(new I18nString(predefinedRole.getName()));
+        newRole.setDescription(predefinedRole.getDescription());
+        newRole.setEvents(new LinkedHashMap<EventType, Event>());
+        newRole.setWorkspaceId(workspaceId);
+        newRole = processRoleRepository.save(newRole);
+
+        return newRole;
+    }
+
+    public void deleteDefaultOrAnonymousRole(PredefinedProcessRole predefinedRole, String workspaceId) {
+        log.info("Deleting " + predefinedRole.getName() + " process role in workspace " + workspaceId);
+
+        Set<ProcessResourceId> roleToDelete = processRoleRepository.findAllByImportIdAndWorkspaceId(predefinedRole.getName(), workspaceId).stream().map(ProcessRole::get_id).collect(Collectors.toSet());
+        Set<String> deletedRoleStringId = roleToDelete.stream().map(ProcessResourceId::toString).collect(Collectors.toSet());
+
+        List<IUser> usersWithRemovedRoles = this.userService.findAllByProcessRoles(new HashSet<>(roleToDelete), null);
+        for (IUser user : usersWithRemovedRoles) {
+            if (user.getProcessRoles().isEmpty())
+                continue;
+
+            Set<ProcessResourceId> newRoles = user.getProcessRoles().stream()
+                    .filter(role -> !deletedRoleStringId.contains(role.getStringId()))
+                    .map(ProcessRole::get_id)
+                    .collect(Collectors.toSet());
+            this.assignRolesToUser(user.getStringId(), newRoles, userService.getLoggedOrSystem().transformToLoggedUser());
+        }
+
+        this.processRoleRepository.deleteAllBy_idIn(roleToDelete);
     }
 
     /**
