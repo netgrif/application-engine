@@ -123,9 +123,9 @@ public class ElasticCaseSearchPermissionTest {
     private void createTestCase(String identifier) throws IOException, MissingPetriNetMetaDataException {
         Process process = petriNetService.importPetriNet(new FileInputStream(String.format("src/test/resources/petriNets/%s.xml", identifier)),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getNet();
-        testHelper.login(superCreator.getSuperIdentity());
+        TestHelper.login(superCreator.getSuperIdentity());
         testCase = importHelper.createCase("Case permissions", process);
-        testHelper.logout();
+        TestHelper.logout();
     }
 
     private void buildSearchRequest() {

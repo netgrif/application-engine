@@ -71,7 +71,7 @@ class ExportServiceTest {
         Optional<Process> optionalTestNet = importHelper.createNet("NAE-1290_Export_actions.xml", VersionType.MAJOR)
         assert optionalTestNet.isPresent()
         testNet = optionalTestNet.get()
-        testHelper.login(superCreator.superIdentity)
+        TestHelper.login(superCreator.superIdentity)
         mainCase = importHelper.createCase("export test main", testNet)
         9.times {
             importHelper.createCase("export test", testNet)

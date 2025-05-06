@@ -119,7 +119,7 @@ class PetriNetServiceTest {
         assert elasticTestNet != null && elasticTestNet.getUriNodeId() == uriService.getRoot().id.toString()
         assert testNet.getUriNodeId() == uriService.getRoot().id.toString()
         assert petriNetRepository.findById(testNet.stringId).get().uriNodeId != null
-        testHelper.login(superCreator.getSuperIdentity())
+        TestHelper.login(superCreator.getSuperIdentity())
         importHelper.createCase("Case 1", testNet)
 
         assert caseRepository.findAllByProcessIdentifier(testNet.getImportId()).size() == 1
@@ -243,7 +243,7 @@ class PetriNetServiceTest {
                 VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getNet()
         Case parentChildCase = importHelper.createCaseAsSuper("Child case", childNet)
 
-        testHelper.login(superCreator.getSuperIdentity())
+        TestHelper.login(superCreator.getSuperIdentity())
 
         petriNetService.deletePetriNet(parentNetMajor.stringId)
         assert petriNetRepository.findById(superParentNet.stringId).isPresent()

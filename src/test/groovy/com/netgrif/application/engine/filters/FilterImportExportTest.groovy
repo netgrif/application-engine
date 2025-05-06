@@ -108,7 +108,7 @@ class FilterImportExportTest {
     void setup() {
         this.testHelper.truncateDbs()
         this.defaultFiltersRunner.run()
-        testHelper.login(superCreator.superIdentity)
+        TestHelper.login(superCreator.superIdentity)
         createTestFilter()
         dummyIdentity = createDummyIdentity()
         userAuth = new UsernamePasswordAuthenticationToken(createDummyIdentity().toSession(), DUMMY_USER_PASSWORD)

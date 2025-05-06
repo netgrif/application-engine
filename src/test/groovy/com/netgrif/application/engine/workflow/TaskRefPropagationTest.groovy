@@ -60,7 +60,7 @@ class TaskRefPropagationTest {
         netParent = parent.getNet()
         netChild = child.getNet()
 
-        testHelper.login(superCreator.superIdentity)
+        TestHelper.login(superCreator.superIdentity)
     }
 
     public static final String PARENT_FIELD_TEXT_ID = "text"

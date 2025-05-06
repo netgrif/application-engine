@@ -2,6 +2,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.EngineTest
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.workflow.domain.Case
@@ -48,7 +49,7 @@ class ChangeBehaviorTest extends EngineTest {
                 sessionManagerService.getLoggedSystemIdentity().activeActorId).getNet()
         assert net != null
 
-        testHelper.login(superCreator.superIdentity)
+        TestHelper.login(superCreator.superIdentity)
     }
 
     @Test

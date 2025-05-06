@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.event
 
 import com.netgrif.application.engine.EngineTest
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.authorization.domain.ProcessRole
@@ -35,7 +36,7 @@ class GroovyShellFactoryTest extends EngineTest {
 
     @Test
     void caseFieldsExpressionTest() {
-        testHelper.login(superCreator.superIdentity)
+        TestHelper.login(superCreator.superIdentity)
         def _case = importHelper.createCase("case", net)
         assert _case.dataSet.get("newVariable_1").rawValue == "value"
     }
@@ -59,7 +60,7 @@ class GroovyShellFactoryTest extends EngineTest {
 
     @Test
     void fieldActionsTest() {
-        testHelper.login(superCreator.superIdentity)
+        TestHelper.login(superCreator.superIdentity)
         def _case = importHelper.createCase("case", net)
         importHelper.assignTaskToSuper("task", _case.getStringId())
         def task = taskService.searchOne(QTask.task.transitionId.eq("t1") & QTask.task.caseId.eq(_case.stringId))

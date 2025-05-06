@@ -89,7 +89,7 @@ class TaskAuthorizationServiceTest {
         Process testProcessWithDefault = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/task_authorization_default_test.xml"),
                 VersionType.MAJOR, sessionManagerService.getLoggedSystemIdentity().getActiveActorId()).getNet();
 
-        testHelper.login(testIdentity);
+        TestHelper.login(testIdentity);
 
         testCase = importHelper.createCase("test", testProcess);
         testCaseWithDefault = importHelper.createCase("test with default role", testProcessWithDefault);
@@ -129,7 +129,7 @@ class TaskAuthorizationServiceTest {
         assignAppRole(adminAppRole);
         assert authorizationService.canCallAssign(taskId);
 
-        testHelper.logout();
+        TestHelper.logout();
         assert !authorizationService.canCallAssign(taskId);
     }
 
@@ -172,7 +172,7 @@ class TaskAuthorizationServiceTest {
         assignAppRole(adminAppRole);
         assert authorizationService.canCallCancel(taskId);
 
-        testHelper.logout();
+        TestHelper.logout();
         assert !authorizationService.canCallCancel(taskId);
     }
 
@@ -212,7 +212,7 @@ class TaskAuthorizationServiceTest {
         assignAppRole(adminAppRole);
         assert authorizationService.canCallReassign(taskId);
 
-        testHelper.logout();
+        TestHelper.logout();
         assert !authorizationService.canCallReassign(taskId);
     }
 
@@ -255,7 +255,7 @@ class TaskAuthorizationServiceTest {
         assignAppRole(adminAppRole);
         assert authorizationService.canCallFinish(taskId);
 
-        testHelper.logout();
+        TestHelper.logout();
         assert !authorizationService.canCallFinish(taskId);
     }
 
@@ -280,7 +280,7 @@ class TaskAuthorizationServiceTest {
         assert authorizationService.canCallSetData(taskId);
 
         updateAssigneeOfTask(taskId, sessionManagerService.getActiveActorId());
-        testHelper.logout();
+        TestHelper.logout();
         assert !authorizationService.canCallSetData(taskId);
     }
 
@@ -338,7 +338,7 @@ class TaskAuthorizationServiceTest {
         assignAppRole(adminAppRole);
         assert authorizationService.canCallGetData(taskId);
 
-        testHelper.logout();
+        TestHelper.logout();
         assert !authorizationService.canCallGetData(taskId);
     }
 

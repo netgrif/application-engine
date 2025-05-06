@@ -119,7 +119,7 @@ class DataSearchRequestTest {
         def testActor2 = actors[1]
 
         LocalDate date = LocalDate.of(2020, 7, 25)
-        testHelper.login(superCreator.superIdentity)
+        TestHelper.login(superCreator.superIdentity)
         Case _case = importHelper.createCase("correct", net.getNet())
         _case.dataSet.get("number").rawValue = 7.0 as Double
         _case.dataSet.get("boolean").rawValue = true

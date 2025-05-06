@@ -67,7 +67,7 @@ class TaskApiTest {
             testHelper.truncateDbs()
             initialised = true
         }
-        testHelper.login(superCreator.superIdentity)
+        TestHelper.login(superCreator.superIdentity)
     }
 
     public static final String TASK_SEARCH_NET_FILE = "ipc_task_search.xml"

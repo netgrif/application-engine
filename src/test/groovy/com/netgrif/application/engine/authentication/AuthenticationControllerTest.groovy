@@ -79,7 +79,7 @@ class AuthenticationControllerTest {
     @Test
 //    @WithMockUser(roles = "ADMIN")
     void inviteTest() {
-        testHelper.login(superCreator.superIdentity)
+        TestHelper.login(superCreator.superIdentity)
         controller.invite(new NewIdentityRequest(email: EMAIL, groups: [] as Set, roles: [] as Set), null)
 
         MimeMessage[] messages = smtpServer.getReceivedMessages()

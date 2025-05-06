@@ -368,7 +368,7 @@ public class IdentityServiceTest {
 
         assert caseRepository.count() == countBefore;
 
-        testHelper.login(superCreator.getSuperIdentity());
+        TestHelper.login(superCreator.getSuperIdentity());
         List<Identity> removedIdentities = identityService.removeAllByStateAndExpirationDateBefore(IdentityState.BLOCKED,
                 LocalDateTime.now());
 

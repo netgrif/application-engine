@@ -39,7 +39,7 @@ class ConcurrencyTest {
 
     @Test
     void test() {
-        testHelper.login(superCreator.getSuperIdentity())
+        TestHelper.login(superCreator.getSuperIdentity())
         def mainNet = importHelper.createNet("action_delegate_concurrency_test.xml")
         assert mainNet.get() != null
 
@@ -52,7 +52,7 @@ class ConcurrencyTest {
         cases.each { it ->
             String caseId = it.stringId
             threads << new Thread({
-                testHelper.login(superCreator.getSuperIdentity())
+                TestHelper.login(superCreator.getSuperIdentity())
                 log.info("Running case $caseId")
                 importHelper.assignTaskToSuper("task", caseId)
             })

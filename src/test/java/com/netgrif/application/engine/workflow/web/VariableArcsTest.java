@@ -113,7 +113,7 @@ public class VariableArcsTest {
                 .username(new TextField("VariableArcsTest@test.com"))
                 .build(), new ArrayList<>());
 
-        testHelper.login(superCreator.getSuperIdentity());
+        TestHelper.login(superCreator.getSuperIdentity());
 
         finishCase = importHelper.createCase("finish case", loaded);
         cancelCase = importHelper.createCase("assign case", loaded);

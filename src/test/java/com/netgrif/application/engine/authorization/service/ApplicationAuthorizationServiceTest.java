@@ -50,7 +50,7 @@ public class ApplicationAuthorizationServiceTest {
                 .lastname(new TextField("lastname"))
                 .build());
 
-        testHelper.login(testIdentity);
+        TestHelper.login(testIdentity);
     }
 
     @Test
@@ -67,7 +67,7 @@ public class ApplicationAuthorizationServiceTest {
 
         assert authorizationService.hasApplicationRole(ApplicationRoleRunner.ADMIN_APP_ROLE);
 
-        testHelper.logout();
+        TestHelper.logout();
         assert !authorizationService.hasApplicationRole(ApplicationRoleRunner.ADMIN_APP_ROLE);
     }
 }

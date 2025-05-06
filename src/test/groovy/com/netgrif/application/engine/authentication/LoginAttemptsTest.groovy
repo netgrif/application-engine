@@ -79,7 +79,7 @@ class LoginAttemptsTest {
                 .build())
 
         Thread.sleep(2000)
-        testHelper.logout()
+        TestHelper.logout()
     }
 
 

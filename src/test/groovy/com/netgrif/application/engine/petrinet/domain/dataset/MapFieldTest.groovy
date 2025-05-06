@@ -41,7 +41,7 @@ class MapFieldTest {
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
-        testHelper.login(superCreator.superIdentity)
+        TestHelper.login(superCreator.superIdentity)
     }
 
     @Test

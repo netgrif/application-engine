@@ -186,9 +186,9 @@ public class ElasticTaskSearchPermissionTest {
     private Case createTestCase(String identifier) throws IOException, MissingPetriNetMetaDataException {
         Process process = petriNetService.importPetriNet(new FileInputStream(String.format("src/test/resources/petriNets/%s.xml", identifier)),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getNet();
-        testHelper.login(superCreator.getSuperIdentity());
+        TestHelper.login(superCreator.getSuperIdentity());
         Case testCase = importHelper.createCase("Task permissions", process);
-        testHelper.logout();
+        TestHelper.logout();
         return testCase;
     }
     private void buildSearchRequest(Case testCase, String transitionId) {

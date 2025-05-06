@@ -58,7 +58,7 @@ class ReindexTest {
         List<Case> savedCase = []
         for (int i in 1..2000) {
             threads << Thread.start {
-                testHelper.login(superCreator.superIdentity)
+                TestHelper.login(superCreator.superIdentity)
                 def useCase = workflowService.createCase(net.getNet().stringId, "Test", "color",
                         superCreator.getLoggedSuper().getActiveActorId()).getCase()
                 savedCase.add(useCase)
@@ -72,7 +72,7 @@ class ReindexTest {
         threads = []
         for (int i in 1..4000) {
             threads << Thread.start {
-                testHelper.login(superCreator.superIdentity)
+                TestHelper.login(superCreator.superIdentity)
                 def useCase = workflowService.createCase(net.getNet().stringId, "Test", "color",
                         superCreator.getLoggedSuper().getActiveActorId()).getCase()
                 savedCase.add(useCase)

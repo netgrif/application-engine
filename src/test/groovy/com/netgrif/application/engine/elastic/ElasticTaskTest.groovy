@@ -77,7 +77,7 @@ class ElasticTaskTest {
         assert optional.getNet() != null
 
         def net = optional.getNet()
-        testHelper.login(superCreator.superIdentity)
+        TestHelper.login(superCreator.superIdentity)
         10.times {
             helper.createCase("Case $it", net)
         }

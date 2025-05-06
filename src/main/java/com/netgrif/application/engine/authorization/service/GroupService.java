@@ -4,6 +4,7 @@ import com.netgrif.application.engine.authorization.domain.Group;
 import com.netgrif.application.engine.authorization.domain.constants.GroupConstants;
 import com.netgrif.application.engine.authorization.domain.params.GroupParams;
 import com.netgrif.application.engine.authorization.service.interfaces.IGroupService;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
@@ -19,18 +20,22 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
 public class GroupService extends ActorService<Group> implements IGroupService {
 
     private final DefaultGroupRunner defaultGroupRunner;
+    private final IRoleService roleService;
 
     public GroupService(ISessionManagerService sessionManagerService, IDataService dataService,
                         IWorkflowService workflowService, SystemCaseFactoryRegistry systemCaseFactory,
-                        IElasticCaseSearchService elasticCaseSearchService, @Lazy DefaultGroupRunner defaultGroupRunner) {
+                        IElasticCaseSearchService elasticCaseSearchService, @Lazy DefaultGroupRunner defaultGroupRunner,
+                        IRoleService roleService) {
         super(sessionManagerService, dataService, workflowService, systemCaseFactory, elasticCaseSearchService);
         this.defaultGroupRunner = defaultGroupRunner;
+        this.roleService = roleService;
     }
 
     @Override
@@ -59,6 +64,8 @@ public class GroupService extends ActorService<Group> implements IGroupService {
                     .build(), null);
             log.info("Default group with id [{}] was created.", defaultGroup.getStringId());
         }
+
+        roleService.assignRolesToActor(defaultGroup.getStringId(), Set.of(roleService.findDefaultRole().getStringId()));
 
         return defaultGroup;
     }

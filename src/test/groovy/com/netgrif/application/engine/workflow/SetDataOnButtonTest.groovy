@@ -72,7 +72,7 @@ class SetDataOnButtonTest {
                 superCreator.getLoggedSuper().activeActorId).getNet()
         assert net != null
 
-        testHelper.login(superCreator.superIdentity)
+        TestHelper.login(superCreator.superIdentity)
     }
 
     @Test

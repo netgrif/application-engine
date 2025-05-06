@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.importer;
 
 import com.netgrif.application.engine.EngineTest;
+import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
@@ -45,7 +46,7 @@ public class ImporterTest extends EngineTest {
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
         assert outcome.getNet() != null;
 
-        testHelper.login(superCreator.getSuperIdentity());
+        TestHelper.login(superCreator.getSuperIdentity());
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), outcome.getNet().getTitle().getDefaultValue(),
                 "color", superCreator.getLoggedSuper().getActiveActorId());
 

@@ -86,7 +86,7 @@ public class CaseAuthorizationServiceTest {
         testProcessWithDefault = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/case_authorization_default_test.xml"),
                 VersionType.MAJOR, sessionManagerService.getLoggedSystemIdentity().getActiveActorId()).getNet();
 
-        testHelper.login(testIdentity);
+        TestHelper.login(testIdentity);
     }
 
     @Test
@@ -105,7 +105,7 @@ public class CaseAuthorizationServiceTest {
         assignAppRole(applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE));
         assert authorizationService.canCallCreate(testProcess.getStringId());
 
-        testHelper.logout();
+        TestHelper.logout();
         assert !authorizationService.canCallCreate(testProcess.getStringId());
     }
 
@@ -135,7 +135,7 @@ public class CaseAuthorizationServiceTest {
         assignAppRole(applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE));
         assert authorizationService.canCallDelete(testCase.getStringId());
 
-        testHelper.logout();
+        TestHelper.logout();
         assert !authorizationService.canCallDelete(testCase.getStringId());
     }
 

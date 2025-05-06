@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.EngineTest
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import org.junit.Assert
 import org.junit.jupiter.api.Test
@@ -16,7 +17,7 @@ class InitValuesTest extends EngineTest {
 
     @Test
     void testInitValues() {
-        testHelper.login(superCreator.superIdentity)
+        TestHelper.login(superCreator.superIdentity)
 
         def importResult = importHelper.createNet("init_values_test.xml")
         assert importResult.isPresent()

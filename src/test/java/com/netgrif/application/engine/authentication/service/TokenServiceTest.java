@@ -55,7 +55,7 @@ public class TokenServiceTest {
 
     @Test
     public void removeExpired() throws InterruptedException {
-        testHelper.login(superCreator.getSuperIdentity());
+        TestHelper.login(superCreator.getSuperIdentity());
 
         Identity identity1 = importHelper.createIdentity(IdentityParams.with()
                         .username(new TextField("test@test.com"))

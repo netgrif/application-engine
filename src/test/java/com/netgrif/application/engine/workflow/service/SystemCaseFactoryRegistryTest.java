@@ -60,7 +60,7 @@ public class SystemCaseFactoryRegistryTest {
     public void testFromCase() throws IOException, MissingPetriNetMetaDataException {
         assert registry.fromCase(null) == null;
 
-        testHelper.login(superCreator.getSuperIdentity());
+        TestHelper.login(superCreator.getSuperIdentity());
 
         Process testProcess = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"),
                 VersionType.MAJOR, superCreator.getSuperIdentity().getMainActorId()).getNet();

@@ -103,7 +103,7 @@ class TaskControllerTest {
                 .password(new TextField("superAdminPassword"))
                 .build(), new ArrayList<Role>())
         importNet()
-        testHelper.login(superCreator.superIdentity)
+        TestHelper.login(superCreator.superIdentity)
     }
 
     @Test

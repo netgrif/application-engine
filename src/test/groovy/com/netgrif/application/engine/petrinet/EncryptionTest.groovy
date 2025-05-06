@@ -56,7 +56,7 @@ class EncryptionTest {
 
     @Test
     void testEncryption() {
-        testHelper.login(superCreator.superIdentity)
+        TestHelper.login(superCreator.superIdentity)
 
         String id = createCase()
 

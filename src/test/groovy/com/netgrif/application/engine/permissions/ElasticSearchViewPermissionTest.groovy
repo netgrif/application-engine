@@ -96,7 +96,7 @@ class ElasticSearchViewPermissionTest {
                 .password(new TextField("password"))
                 .build(), new ArrayList<Role>())
 
-        testHelper.login(testIdentity)
+        TestHelper.login(testIdentity)
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.EngineTest
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.utils.FullPageRequest
@@ -24,7 +25,7 @@ class DynamicEnumerationTest extends EngineTest {
 
     @Test
     void testDynamicEnum() {
-        testHelper.login(superCreator.superIdentity)
+        TestHelper.login(superCreator.superIdentity)
 
         ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/test_autocomplete_dynamic.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())

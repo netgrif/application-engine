@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.EngineTest
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.UriContentType
@@ -32,7 +33,7 @@ class MenuItemApiTest extends EngineTest {
     @BeforeEach
     void before() {
         super.before()
-        testHelper.login(superCreator.getSuperIdentity())
+        TestHelper.login(superCreator.getSuperIdentity())
         importHelper.createNet("filter_api_test.xml")
     }
 
