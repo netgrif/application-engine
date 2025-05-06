@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.netgrif.application.engine.auth.service.UserService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +43,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/users")
 @Tag(name = "UserController")
+@ConditionalOnProperty(
+        value = "nae.user.web.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
 @RequiredArgsConstructor
 public class UserController {
 

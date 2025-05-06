@@ -5,7 +5,6 @@ import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.auth.service.InvalidUserTokenException;
-import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.requestbodies.ChangePasswordRequest;
@@ -18,8 +17,6 @@ import com.netgrif.application.engine.mail.interfaces.IMailService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import freemarker.template.TemplateException;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
@@ -31,7 +28,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +35,6 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
