@@ -7,4 +7,5 @@ import java.util.Optional;
 public interface IGroupService extends IActorService<Group> {
     Optional<Group> findByName(String name);
     boolean existsByName(String name);
+    Group getDefaultGroup();
 }

@@ -8,7 +8,6 @@ import com.netgrif.application.engine.authorization.service.interfaces.IUserServ
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
-import com.netgrif.application.engine.startup.DefaultGroupRunner;
 import com.netgrif.application.engine.workflow.domain.CaseParams;
 import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -27,10 +26,8 @@ public class UserService extends ActorService<User> implements IUserService {
 
     public UserService(@Lazy IDataService dataService, ISessionManagerService sessionManagerService,
                        @Lazy IElasticCaseSearchService elasticCaseSearchService, @Lazy IWorkflowService workflowService,
-                       SystemCaseFactoryRegistry systemCaseFactoryRegistry, IGroupService groupService,
-                       DefaultGroupRunner defaultGroupRunner) {
-        super(sessionManagerService, dataService, workflowService, systemCaseFactoryRegistry, elasticCaseSearchService,
-                defaultGroupRunner);
+                       SystemCaseFactoryRegistry systemCaseFactoryRegistry, IGroupService groupService) {
+        super(sessionManagerService, dataService, workflowService, systemCaseFactoryRegistry, elasticCaseSearchService);
         this.groupService = groupService;
     }
 
@@ -73,8 +70,6 @@ public class UserService extends ActorService<User> implements IUserService {
 
         if (isCaseFieldOrValueEmpty(typedParams.getGroupIds())) {
             typedParams.setGroupIds(CaseField.withValue(List.of(groupService.getDefaultGroup().getStringId())));
-        } else if (typedParams.getGroupIds().getRawValue().size() > 1) {
-            removeDefaultGroupFromCaseRef(typedParams.getGroupIds());
         }
     }
 
@@ -86,18 +81,6 @@ public class UserService extends ActorService<User> implements IUserService {
         UserParams typedParams = (UserParams) params;
         if (typedParams.getEmail() != null && isTextFieldValueEmpty(typedParams.getEmail())) {
             throw new IllegalArgumentException("User must have an email!");
-        }
-
-        if (!isCaseFieldOrValueEmpty(typedParams.getGroupIds())
-                && typedParams.getGroupIds().getRawValue().size() > 1) {
-            removeDefaultGroupFromCaseRef(typedParams.getGroupIds());
-        }
-    }
-
-    private void removeDefaultGroupFromCaseRef(CaseField caseField) {
-        boolean isRemoved = caseField.getRawValue().remove(getDefaultGroup().getStringId());
-        if (isRemoved) {
-            log.warn("Default group was removed from the collection. Groups to be assigned: {}.", caseField.getRawValue());
         }
     }
 }

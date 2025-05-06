@@ -23,7 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -156,7 +156,7 @@ public class GroupServiceTest {
         Group parentGroup = createGroup("parent group name");
         Group group = createGroup(name);
         assert group.getName().equals(name);
-        assert group.getGroupIds() == null;
+        assert group.getGroupIds() == null || group.getGroupIds().isEmpty();
         assert group.getParentGroupId() != null;
         assert group.getParentGroupId().equals(defaultGroupRunner.getDefaultGroup().getStringId());
 
@@ -184,7 +184,8 @@ public class GroupServiceTest {
                 // self reference should be forbidden
                 .groupIds(CaseField.withValue(List.of(group.getStringId())))
                 .build()));
-        assert ((Group) systemCaseFactoryRegistry.fromCase(workflowService.findOne(group.getStringId()))).getGroupIds() == null;
+        assert ((Group) systemCaseFactoryRegistry.fromCase(workflowService.findOne(group.getStringId())))
+                .getGroupIds() == null || group.getGroupIds().isEmpty();
 
         String newName = "new group name";
         Group updatedGroup = groupService.update(group, GroupParams.with()
@@ -202,11 +203,124 @@ public class GroupServiceTest {
         assert updatedGroup.getParentGroupId().equals(parentGroup.getStringId());
     }
 
+    @Test
+    void testGetDefaultGroup() {
+        Process process = petriNetService.getNewestVersionByIdentifier(GroupConstants.PROCESS_IDENTIFIER);
+        caseRepository.deleteAllByPetriNetObjectId(process.getObjectId());
+        defaultGroupRunner.clearCache();
+
+        assert caseRepository.findAllByProcessIdentifier(GroupConstants.PROCESS_IDENTIFIER).isEmpty();
+
+        Group defaultGroup = groupService.getDefaultGroup();
+
+        assert defaultGroup != null;
+        assert defaultGroup.getName().equals(GroupConstants.DEFAULT_GROUP_NAME);
+        assert defaultGroup.getParentGroupId() == null;
+        assert caseRepository.findAllByProcessIdentifier(GroupConstants.PROCESS_IDENTIFIER).size() == 1;
+        Optional<Case> groupCaseOpt = caseRepository.findById(defaultGroup.getStringId());
+        assert groupCaseOpt.isPresent();
+        assert groupCaseOpt.get().getStringId().equals(defaultGroup.getStringId());
+    }
+
+    @Test
+    void testAddGroup() {
+        Group group = createGroup("test group");
+        Group memberGroup = createGroup("member group");
+        assert memberGroup.getGroupIds() == null;
+
+        assertThrows(IllegalArgumentException.class, () -> groupService.addGroup(null, group.getStringId()));
+        final Group finalGroup = memberGroup;
+        assertThrows(IllegalArgumentException.class, () -> groupService.addGroup(finalGroup, null));
+        assertThrows(IllegalArgumentException.class, () -> groupService.addGroup(finalGroup, finalGroup.getStringId()));
+        assert ((Group) systemCaseFactoryRegistry.fromCase(workflowService.findOne(finalGroup.getStringId()))).getGroupIds() == null;
+
+        memberGroup = groupService.addGroup(memberGroup, group.getStringId());
+        assert memberGroup.getGroupIds() != null;
+        assert memberGroup.getGroupIds().size() == 1;
+        assert memberGroup.getGroupIds().get(0).equals(group.getStringId());
+    }
+
+    @Test
+    void testAddGroups() {
+        Group group1 = createGroup("test group 1");
+        Group group2 = createGroup("test group 2");
+        Group memberGroup = createGroup("member group");
+        assert memberGroup.getGroupIds() == null;
+
+        assertThrows(IllegalArgumentException.class, () -> groupService.addGroups(null, Set.of(group1.getStringId(),
+                group2.getStringId())));
+        final Group finalGroup = memberGroup;
+        assertThrows(IllegalArgumentException.class, () -> groupService.addGroups(finalGroup, null));
+        assertThrows(IllegalArgumentException.class, () -> groupService.addGroups(finalGroup, Set.of(group1.getStringId(),
+                group2.getStringId(), finalGroup.getStringId())));
+        assert ((Group) systemCaseFactoryRegistry.fromCase(workflowService.findOne(finalGroup.getStringId()))).getGroupIds() == null;
+
+        Set<String> groupIdsToAdd = new HashSet<>(List.of(group1.getStringId(), group2.getStringId(),
+                defaultGroupRunner.getDefaultGroup().getStringId()));
+        groupIdsToAdd.add(null);
+
+        memberGroup = groupService.addGroups(memberGroup, groupIdsToAdd);
+        assert memberGroup.getGroupIds() != null;
+        assert memberGroup.getGroupIds().size() == 3;
+        assert memberGroup.getGroupIds().contains(defaultGroupRunner.getDefaultGroup().getStringId());
+        assert memberGroup.getGroupIds().contains(group1.getStringId());
+        assert memberGroup.getGroupIds().contains(group2.getStringId());
+    }
+
+    @Test
+    void testRemoveGroup() {
+        Group group = createGroup("test group");
+        Group memberGroup = createGroup("member group", List.of(group.getStringId()));
+        assert memberGroup.getGroupIds() != null;
+        assert memberGroup.getGroupIds().size() == 1;
+
+        assertThrows(IllegalArgumentException.class, () -> groupService.removeGroup(null, group.getStringId()));
+        final Group finalGroup = memberGroup;
+        assertThrows(IllegalArgumentException.class, () -> groupService.removeGroup(finalGroup, null));
+
+        memberGroup = groupService.removeGroup(memberGroup, defaultGroupRunner.getDefaultGroup().getStringId());
+        assert memberGroup.getGroupIds() != null;
+        assert memberGroup.getGroupIds().size() == 1;
+
+        memberGroup = groupService.removeGroup(memberGroup, group.getStringId());
+        assert memberGroup.getGroupIds() == null || memberGroup.getGroupIds().isEmpty();
+
+        assert groupService.removeGroup(memberGroup, group.getStringId()) != null;
+    }
+
+    @Test
+    void testRemoveGroups() {
+        Group group1 = createGroup("test group 1");
+        Group group2 = createGroup("test group 2");
+        Group memberGroup = createGroup("member group", List.of(group1.getStringId(), group2.getStringId()));
+        assert memberGroup.getGroupIds() != null;
+        assert memberGroup.getGroupIds().size() == 2;
+
+        assertThrows(IllegalArgumentException.class, () -> groupService.removeGroups(null, Set.of(group1.getStringId())));
+        final Group finalGroup = memberGroup;
+        assertThrows(IllegalArgumentException.class, () -> groupService.removeGroups(finalGroup, null));
+
+        Set<String> groupIdsToRemove = new HashSet<>(Set.of(group1.getStringId(), group2.getStringId(),
+                defaultGroupRunner.getDefaultGroup().getStringId()));
+        groupIdsToRemove.add(null);
+
+        memberGroup = groupService.removeGroups(memberGroup, groupIdsToRemove);
+        assert memberGroup.getGroupIds() == null || memberGroup.getGroupIds().isEmpty();
+    }
+
     private Group createGroup(String name) {
+        return createGroup(name, new ArrayList<>());
+    }
+
+    /**
+     * @param groupIds Ids of groups to be member of
+     * */
+    private Group createGroup(String name, List<String> groupIds) {
         Case groupCase = workflowService.createCaseByIdentifier(GroupConstants.PROCESS_IDENTIFIER, name, "", null).getCase();
         return new Group(dataService.setData(groupCase, GroupParams.with()
                 .name(new TextField(name))
                 .parentGroupId(CaseField.withValue(List.of(defaultGroupRunner.getDefaultGroup().getStringId())))
+                .groupIds(CaseField.withValue(groupIds))
                 .build()
                 .toDataSet(), null).getCase());
     }

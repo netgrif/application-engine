@@ -25,7 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.netgrif.application.engine.petrinet.domain.Process;
 
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -158,6 +158,19 @@ public class UserServiceTest {
         assert user.getGroupIds().size() == 1;
         assert user.getGroupIds().get(0).equals(defaultGroupRunner.getDefaultGroup().getStringId());
 
+        assertThrows(IllegalArgumentException.class, () -> userService.update(user, UserParams.with()
+                .email(new TextField(null))
+                .firstname(new TextField("firstname"))
+                .lastname(new TextField("lastname"))
+                .build()));
+
+        assertThrows(IllegalArgumentException.class, () -> userService.update(user, null));
+        assertThrows(IllegalArgumentException.class, () -> userService.update(null, UserParams.with()
+                .email(new TextField("email"))
+                .firstname(new TextField("firstname"))
+                .lastname(new TextField("lastname"))
+                .build()));
+
         String newFirstname = "newFirstname";
         String newLastname = "newLastname";
         Group testGroup = createGroup("test group");
@@ -175,26 +188,104 @@ public class UserServiceTest {
         assert updatedUser.getGroupIds() != null;
         assert updatedUser.getGroupIds().size() == 1;
         assert updatedUser.getGroupIds().get(0).equals(testGroup.getStringId());
+    }
 
-        assertThrows(IllegalArgumentException.class, () -> userService.update(user, UserParams.with()
-                .email(new TextField(null))
-                .firstname(new TextField("firstname"))
-                .lastname(new TextField("lastname"))
-                .build()));
+    @Test
+    void testAddGroup() {
+        Group group = createGroup("test group");
+        User user = createUser("test@user.com");
+        assert user.getGroupIds() != null;
+        assert user.getGroupIds().size() == 1;
 
-        assertThrows(IllegalArgumentException.class, () -> userService.update(user, null));
-        assertThrows(IllegalArgumentException.class, () -> userService.update(null, UserParams.with()
-                .email(new TextField("email"))
-                .firstname(new TextField("firstname"))
-                .lastname(new TextField("lastname"))
-                .build()));
+        assertThrows(IllegalArgumentException.class, () -> userService.addGroup(null, group.getStringId()));
+        final User finalUser = user;
+        assertThrows(IllegalArgumentException.class, () -> userService.addGroup(finalUser, null));
+
+        user = userService.addGroup(user, group.getStringId());
+        assert user.getGroupIds() != null;
+        assert user.getGroupIds().size() == 2;
+        assert user.getGroupIds().contains(defaultGroupRunner.getDefaultGroup().getStringId());
+        assert user.getGroupIds().contains(group.getStringId());
+    }
+
+    @Test
+    void testAddGroups() {
+        Group group1 = createGroup("test group 1");
+        Group group2 = createGroup("test group 2");
+        User user = createUser("test@user.com");
+        assert user.getGroupIds() != null;
+        assert user.getGroupIds().size() == 1;
+
+        assertThrows(IllegalArgumentException.class, () -> userService.addGroups(null, Set.of(group1.getStringId(),
+                group2.getStringId())));
+        final User finalUser = user;
+        assertThrows(IllegalArgumentException.class, () -> userService.addGroups(finalUser, null));
+
+        Set<String> groupIdsToAdd = new HashSet<>();
+        groupIdsToAdd.add(group1.getStringId());
+        groupIdsToAdd.add(group2.getStringId());
+        groupIdsToAdd.add(defaultGroupRunner.getDefaultGroup().getStringId());
+        groupIdsToAdd.add(null);
+
+        user = userService.addGroups(user, groupIdsToAdd);
+        assert user.getGroupIds() != null;
+        assert user.getGroupIds().size() == 3;
+        assert user.getGroupIds().contains(defaultGroupRunner.getDefaultGroup().getStringId());
+        assert user.getGroupIds().contains(group1.getStringId());
+        assert user.getGroupIds().contains(group2.getStringId());
+    }
+
+    @Test
+    void testRemoveGroup() {
+        Group group = createGroup("test group");
+        User user = createUser("test@user.com", List.of(group.getStringId()));
+        assert user.getGroupIds() != null;
+        assert user.getGroupIds().size() == 2;
+
+        assertThrows(IllegalArgumentException.class, () -> userService.removeGroup(null, group.getStringId()));
+        final User finalUser = user;
+        assertThrows(IllegalArgumentException.class, () -> userService.removeGroup(finalUser, null));
+
+        user = userService.removeGroup(user, group.getStringId());
+        assert user.getGroupIds() != null;
+        assert user.getGroupIds().size() == 1;
+        assert user.getGroupIds().get(0).equals(defaultGroupRunner.getDefaultGroup().getStringId());
+
+        user = userService.removeGroup(user, defaultGroupRunner.getDefaultGroup().getStringId());
+        assert user.getGroupIds() == null || user.getGroupIds().isEmpty();
+    }
+
+    @Test
+    void testRemoveGroups() {
+        Group group1 = createGroup("test group 1");
+        Group group2 = createGroup("test group 2");
+        User user = createUser("test@user.com", List.of(group1.getStringId(), group2.getStringId()));
+        assert user.getGroupIds() != null;
+        assert user.getGroupIds().size() == 3;
+
+        assertThrows(IllegalArgumentException.class, () -> userService.removeGroups(null, Set.of(group1.getStringId())));
+        final User finalUser = user;
+        assertThrows(IllegalArgumentException.class, () -> userService.removeGroups(finalUser, null));
+
+        Set<String> groupIdsToRemove = new HashSet<>(Set.of(group1.getStringId(), group2.getStringId(),
+                defaultGroupRunner.getDefaultGroup().getStringId()));
+        groupIdsToRemove.add(null);
+
+        user = userService.removeGroups(user, groupIdsToRemove);
+        assert user.getGroupIds() == null || user.getGroupIds().isEmpty();
     }
 
     private User createUser(String email) {
+        return createUser(email, new ArrayList<>());
+    }
+
+    private User createUser(String email, List<String> additionalGroupIds) {
         Case userCase = workflowService.createCaseByIdentifier(UserConstants.PROCESS_IDENTIFIER, email, "", null).getCase();
+        List<String> groupIds = new ArrayList<>(additionalGroupIds);
+        groupIds.add(defaultGroupRunner.getDefaultGroup().getStringId());
         return new User(dataService.setData(userCase, UserParams.with()
                 .email(new TextField(email))
-                .groupIds(CaseField.withValue(List.of(defaultGroupRunner.getDefaultGroup().getStringId())))
+                .groupIds(CaseField.withValue(groupIds))
                 .build()
                 .toDataSet(), null).getCase());
     }

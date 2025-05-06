@@ -7,25 +7,30 @@ import com.netgrif.application.engine.authorization.service.interfaces.IGroupSer
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.startup.DefaultGroupRunner;
 import com.netgrif.application.engine.workflow.domain.CaseParams;
 import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class GroupService extends ActorService<Group> implements IGroupService {
+
+    private final DefaultGroupRunner defaultGroupRunner;
 
     public GroupService(ISessionManagerService sessionManagerService, IDataService dataService,
                         IWorkflowService workflowService, SystemCaseFactoryRegistry systemCaseFactory,
                         IElasticCaseSearchService elasticCaseSearchService, @Lazy DefaultGroupRunner defaultGroupRunner) {
-        super(sessionManagerService, dataService, workflowService, systemCaseFactory, elasticCaseSearchService,
-                defaultGroupRunner);
+        super(sessionManagerService, dataService, workflowService, systemCaseFactory, elasticCaseSearchService);
+        this.defaultGroupRunner = defaultGroupRunner;
     }
 
     @Override
@@ -42,6 +47,20 @@ public class GroupService extends ActorService<Group> implements IGroupService {
             return false;
         }
         return countByQuery(fulltextFieldQuery(GroupConstants.NAME_FIELD_ID, name)) > 0;
+    }
+
+    @Override
+    public Group getDefaultGroup() {
+        Group defaultGroup = defaultGroupRunner.getDefaultGroup();
+
+        if (defaultGroup == null) {
+            defaultGroup = doCreate(GroupParams.with()
+                    .name(new TextField(GroupConstants.DEFAULT_GROUP_NAME))
+                    .build(), null);
+            log.info("Default group with id [{}] was created.", defaultGroup.getStringId());
+        }
+
+        return defaultGroup;
     }
 
     @Override

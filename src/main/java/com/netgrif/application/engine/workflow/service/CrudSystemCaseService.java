@@ -61,8 +61,6 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
 
         postCreationActions(systemObject);
 
-        log.debug("System case [{}][{}] was created by actor [{}].", systemObject.getCase(), getProcessIdentifier(),
-                activeActorId);
         return systemObject;
     }
 
@@ -77,6 +75,8 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
             throw new IllegalStateException(String.format("Unexpected: No wrapper class factory is registered for process [%s]",
                     getProcessIdentifier()));
         }
+        log.debug("System case [{}][{}] was created by actor [{}].", systemObject.getCase(), getProcessIdentifier(),
+                activeActorId);
         return systemObject;
     }
 
@@ -94,7 +94,6 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
 
         postUpdateActions(systemObject);
 
-        log.debug("System case [{}][{}] was updated by actor [{}].", systemObject, getProcessIdentifier(), activeActorId);
         return systemObject;
     }
 
@@ -107,6 +106,7 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
             throw new IllegalStateException(String.format("Unexpected: No wrapper class factory is registered for process [%s]",
                     getProcessIdentifier()));
         }
+        log.debug("System case [{}][{}] was updated by actor [{}].", systemObject, getProcessIdentifier(), activeActorId);
         return (T) systemObject;
     }
 
