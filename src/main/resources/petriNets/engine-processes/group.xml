@@ -24,6 +24,19 @@
 	<data type="caseRef">
 		<id>groupIds</id>
 		<title>Groups</title>
+		<event type="set">
+			<id>groupIds_set</id>
+			<actions phase="post">
+				<action type="value">
+					if (groupIds.value == null) {
+						return
+					}
+					if (groupIds.rawValue.contains(useCase.stringId)) {
+						throw new IllegalArgumentException("Cannot add self as member of the group.")
+					}
+				</action>
+			</actions>
+		</event>
 		<allowedNets>
 			<allowedNet>group</allowedNet>
 		</allowedNets>
@@ -83,9 +96,9 @@
 			</item>
 			<item>
 				<dataRef>
-					<id>memberIds</id>
+					<id>groupIds</id>
 					<logic>
-						<behavior>editable</behavior>
+						<behavior>visible</behavior>
 					</logic>
 				</dataRef>
 			</item>

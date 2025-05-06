@@ -12,6 +12,7 @@ import com.netgrif.application.engine.workflow.domain.CaseParams;
 import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class GroupService extends ActorService<Group> implements IGroupService {
 
     public GroupService(ISessionManagerService sessionManagerService, IDataService dataService,
                         IWorkflowService workflowService, SystemCaseFactoryRegistry systemCaseFactory,
-                        IElasticCaseSearchService elasticCaseSearchService, DefaultGroupRunner defaultGroupRunner) {
+                        IElasticCaseSearchService elasticCaseSearchService, @Lazy DefaultGroupRunner defaultGroupRunner) {
         super(sessionManagerService, dataService, workflowService, systemCaseFactory, elasticCaseSearchService,
                 defaultGroupRunner);
     }

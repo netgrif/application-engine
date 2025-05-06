@@ -54,6 +54,8 @@ class TestHelper {
     private IPetriNetService petriNetService
     @Autowired
     private ValidationRunner validationRunner
+    @Autowired
+    private DefaultGroupRunner defaultGroupRunner
 
     void truncateDbs() {
         template.db.drop()
@@ -71,6 +73,7 @@ class TestHelper {
         uriRunner.run()
         systemProcessRunner.run()
         applicationRoleRunner.run()
+        defaultGroupRunner.run()
         systemIdentityRunner.run()
         filterRunner.run()
         superCreator.run()
@@ -78,15 +81,15 @@ class TestHelper {
         finisherRunner.run()
     }
 
-    void login(Identity identity) {
-        LoggedIdentity loggedTest = identity.toSession();
+    static void login(Identity identity) {
+        LoggedIdentity loggedTest = identity.toSession()
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedTest,
-                loggedTest.getPassword(), loggedTest.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(token);
+                loggedTest.getPassword(), loggedTest.getAuthorities())
+        SecurityContextHolder.getContext().setAuthentication(token)
     }
 
-    void logout() {
-        SecurityContextHolder.getContext().setAuthentication(null);
+    static void logout() {
+        SecurityContextHolder.getContext().setAuthentication(null)
     }
 
     static InputStream stream(String resource) {

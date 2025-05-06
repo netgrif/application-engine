@@ -2,22 +2,27 @@ package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.authorization.domain.Group;
+import com.netgrif.application.engine.authorization.domain.constants.GroupConstants;
 import com.netgrif.application.engine.authorization.domain.params.ActorParams;
+import com.netgrif.application.engine.authorization.domain.params.GroupParams;
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.startup.DefaultGroupRunner;
 import com.netgrif.application.engine.workflow.service.CrudSystemCaseService;
 import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 public abstract class ActorService<T extends Actor> extends CrudSystemCaseService<T> implements IActorService<T> {
 
     private final DefaultGroupRunner defaultGroupRunner;
@@ -83,7 +88,16 @@ public abstract class ActorService<T extends Actor> extends CrudSystemCaseServic
 
     @Override
     public Group getDefaultGroup() {
-        return defaultGroupRunner.getDefaultGroup();
+        Group defaultGroup = defaultGroupRunner.getDefaultGroup();
+
+        if (defaultGroup == null) {
+            defaultGroup = (Group) doCreate(GroupParams.with()
+                    .name(new TextField(GroupConstants.DEFAULT_GROUP_NAME))
+                    .build(), null);
+            log.info("Default group with id [{}] was created.", defaultGroup.getStringId());
+        }
+
+        return defaultGroup;
     }
 
     /**

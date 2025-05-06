@@ -73,6 +73,8 @@ public class UserService extends ActorService<User> implements IUserService {
 
         if (isCaseFieldOrValueEmpty(typedParams.getGroupIds())) {
             typedParams.setGroupIds(CaseField.withValue(List.of(groupService.getDefaultGroup().getStringId())));
+        } else if (typedParams.getGroupIds().getRawValue().size() > 1) {
+            removeDefaultGroupFromCaseRef(typedParams.getGroupIds());
         }
     }
 
@@ -88,7 +90,14 @@ public class UserService extends ActorService<User> implements IUserService {
 
         if (!isCaseFieldOrValueEmpty(typedParams.getGroupIds())
                 && typedParams.getGroupIds().getRawValue().size() > 1) {
-            typedParams.getGroupIds().getRawValue().remove(getDefaultGroup().getStringId());
+            removeDefaultGroupFromCaseRef(typedParams.getGroupIds());
+        }
+    }
+
+    private void removeDefaultGroupFromCaseRef(CaseField caseField) {
+        boolean isRemoved = caseField.getRawValue().remove(getDefaultGroup().getStringId());
+        if (isRemoved) {
+            log.warn("Default group was removed from the collection. Groups to be assigned: {}.", caseField.getRawValue());
         }
     }
 }

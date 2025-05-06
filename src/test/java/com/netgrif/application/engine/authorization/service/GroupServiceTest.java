@@ -8,9 +8,10 @@ import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.startup.SuperCreator;
+import com.netgrif.application.engine.startup.DefaultGroupRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
+import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.bson.types.ObjectId;
@@ -50,7 +51,10 @@ public class GroupServiceTest {
     private GroupService groupService;
 
     @Autowired
-    private SuperCreator superCreator;
+    private DefaultGroupRunner defaultGroupRunner;
+
+    @Autowired
+    private SystemCaseFactoryRegistry systemCaseFactoryRegistry;
 
     @BeforeEach
     void before() {
@@ -123,16 +127,17 @@ public class GroupServiceTest {
         Group parentGroup = createGroup("parent group name");
         Group group = groupService.create(GroupParams.with()
                 .name(new TextField(name))
-                .memberIds(CaseField.withValue(List.of(superCreator.getSuperIdentity().getMainActorId())))
+                .groupIds(CaseField.withValue(List.of(defaultGroupRunner.getDefaultGroup().getStringId())))
                 .parentGroupId(CaseField.withValue(List.of(parentGroup.getStringId())))
                 .build());
 
         assert group != null && group.getCase() != null;
         assert group.getName().equals(name);
-        assert group.getMemberIds().size() == 1;
-        assert group.getMemberIds().contains(superCreator.getSuperIdentity().getMainActorId());
         assert group.getParentGroupId() != null;
         assert group.getParentGroupId().equals(parentGroup.getStringId());
+        assert group.getGroupIds() != null;
+        assert group.getGroupIds().size() == 1;
+        assert group.getGroupIds().contains(defaultGroupRunner.getDefaultGroup().getStringId());
 
         assertThrows(IllegalArgumentException.class, () -> groupService.create(null));
         assertThrows(IllegalArgumentException.class, () -> groupService.create(GroupParams.with().build()));
@@ -151,36 +156,48 @@ public class GroupServiceTest {
         Group parentGroup = createGroup("parent group name");
         Group group = createGroup(name);
         assert group.getName().equals(name);
-        assert group.getMemberIds() == null;
-        assert group.getParentGroupId() == null; // todo 2058 default group
+        assert group.getGroupIds() == null;
+        assert group.getParentGroupId() != null;
+        assert group.getParentGroupId().equals(defaultGroupRunner.getDefaultGroup().getStringId());
 
         assertThrows(IllegalArgumentException.class, () -> groupService.update(group, null));
         assertThrows(IllegalArgumentException.class, () -> groupService.update(null, GroupParams.with()
                 .name(new TextField("some name"))
-                .memberIds(CaseField.withValue(List.of(superCreator.getSuperIdentity().getMainActorId())))
+                .parentGroupId(CaseField.withValue(List.of(parentGroup.getStringId())))
                 .parentGroupId(CaseField.withValue(List.of(parentGroup.getStringId())))
                 .build()));
+
         // todo: release/8.0.0 allowed nets validation is not working
 //        assertThrows(IllegalArgumentException.class, () -> groupService.update(group, GroupParams.with()
 //                // wrong process identifier
 //                .memberIds(CaseField.withValue(List.of(superCreator.getSuperIdentity().getStringId())))
 //                .build()));
+
         assertThrows(IllegalArgumentException.class, () -> groupService.update(group, GroupParams.with()
                 // self reference should be forbidden
                 .parentGroupId(CaseField.withValue(List.of(group.getStringId())))
                 .build()));
+        assert ((Group) systemCaseFactoryRegistry.fromCase(workflowService.findOne(group.getStringId())))
+                .getParentGroupId().equals(defaultGroupRunner.getDefaultGroup().getStringId());
+
+        assertThrows(IllegalArgumentException.class, () -> groupService.update(group, GroupParams.with()
+                // self reference should be forbidden
+                .groupIds(CaseField.withValue(List.of(group.getStringId())))
+                .build()));
+        assert ((Group) systemCaseFactoryRegistry.fromCase(workflowService.findOne(group.getStringId()))).getGroupIds() == null;
 
         String newName = "new group name";
         Group updatedGroup = groupService.update(group, GroupParams.with()
                 .name(new TextField(newName))
-                .memberIds(CaseField.withValue(List.of(superCreator.getSuperIdentity().getMainActorId())))
+                .groupIds(CaseField.withValue(List.of(defaultGroupRunner.getDefaultGroup().getStringId())))
                 .parentGroupId(CaseField.withValue(List.of(parentGroup.getStringId())))
                 .build());
 
         assert group.getStringId().equals(updatedGroup.getStringId());
         assert updatedGroup.getName().equals(newName);
-        assert updatedGroup.getMemberIds().size() == 1;
-        assert updatedGroup.getMemberIds().contains(superCreator.getSuperIdentity().getMainActorId());
+        assert updatedGroup.getGroupIds() != null;
+        assert updatedGroup.getGroupIds().size() == 1;
+        assert updatedGroup.getGroupIds().contains(defaultGroupRunner.getDefaultGroup().getStringId());
         assert updatedGroup.getParentGroupId() != null;
         assert updatedGroup.getParentGroupId().equals(parentGroup.getStringId());
     }
@@ -189,6 +206,7 @@ public class GroupServiceTest {
         Case groupCase = workflowService.createCaseByIdentifier(GroupConstants.PROCESS_IDENTIFIER, name, "", null).getCase();
         return new Group(dataService.setData(groupCase, GroupParams.with()
                 .name(new TextField(name))
+                .parentGroupId(CaseField.withValue(List.of(defaultGroupRunner.getDefaultGroup().getStringId())))
                 .build()
                 .toDataSet(), null).getCase());
     }

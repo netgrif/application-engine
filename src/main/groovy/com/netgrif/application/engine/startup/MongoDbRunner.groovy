@@ -7,10 +7,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.data.mapping.context.MappingContext
 import org.springframework.data.mongodb.core.MongoTemplate
-import org.springframework.data.mongodb.core.index.IndexOperations
 import org.springframework.data.mongodb.core.index.IndexResolver
 import org.springframework.data.mongodb.core.index.MongoPersistentEntityIndexResolver
-import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.MongoPersistentEntity
 import org.springframework.data.mongodb.core.mapping.MongoPersistentProperty
 import org.springframework.stereotype.Component

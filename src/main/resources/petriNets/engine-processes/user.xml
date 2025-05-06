@@ -74,6 +74,14 @@
 					</logic>
 				</dataRef>
 			</item>
+			<item>
+				<dataRef>
+					<id>groupIds</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+			</item>
 		</flex>
 	</transition>
 	<place>

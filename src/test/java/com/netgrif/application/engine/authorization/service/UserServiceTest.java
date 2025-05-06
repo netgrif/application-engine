@@ -1,11 +1,16 @@
 package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.authorization.domain.Group;
 import com.netgrif.application.engine.authorization.domain.User;
+import com.netgrif.application.engine.authorization.domain.constants.GroupConstants;
 import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
+import com.netgrif.application.engine.authorization.domain.params.GroupParams;
 import com.netgrif.application.engine.authorization.domain.params.UserParams;
+import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.startup.DefaultGroupRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -19,6 +24,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.netgrif.application.engine.petrinet.domain.Process;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -44,6 +51,9 @@ public class UserServiceTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private DefaultGroupRunner defaultGroupRunner;
 
     @BeforeEach
     void before() {
@@ -125,6 +135,9 @@ public class UserServiceTest {
         assert user.getEmail().equals(email);
         assert user.getFirstname().equals(firstname);
         assert user.getLastname().equals(lastname);
+        assert user.getGroupIds() != null;
+        assert user.getGroupIds().size() == 1;
+        assert user.getGroupIds().get(0).equals(defaultGroupRunner.getDefaultGroup().getStringId());
 
         assertThrows(IllegalArgumentException.class, () -> userService.create(UserParams.with()
                 .firstname(new TextField(firstname))
@@ -141,19 +154,27 @@ public class UserServiceTest {
         assert user.getEmail().equals(email);
         assert user.getFirstname() == null;
         assert user.getLastname() == null;
+        assert user.getGroupIds() != null;
+        assert user.getGroupIds().size() == 1;
+        assert user.getGroupIds().get(0).equals(defaultGroupRunner.getDefaultGroup().getStringId());
 
         String newFirstname = "newFirstname";
         String newLastname = "newLastname";
+        Group testGroup = createGroup("test group");
         User updatedUser = userService.update(user, UserParams.with()
                 .email(new TextField(email))
                 .firstname(new TextField(newFirstname))
                 .lastname(new TextField(newLastname))
+                .groupIds(CaseField.withValue(List.of(testGroup.getStringId())))
                 .build());
 
         assert user.getStringId().equals(updatedUser.getStringId());
         assert updatedUser.getEmail().equals(email);
         assert updatedUser.getFirstname().equals(newFirstname);
         assert updatedUser.getLastname().equals(newLastname);
+        assert updatedUser.getGroupIds() != null;
+        assert updatedUser.getGroupIds().size() == 1;
+        assert updatedUser.getGroupIds().get(0).equals(testGroup.getStringId());
 
         assertThrows(IllegalArgumentException.class, () -> userService.update(user, UserParams.with()
                 .email(new TextField(null))
@@ -173,6 +194,15 @@ public class UserServiceTest {
         Case userCase = workflowService.createCaseByIdentifier(UserConstants.PROCESS_IDENTIFIER, email, "", null).getCase();
         return new User(dataService.setData(userCase, UserParams.with()
                 .email(new TextField(email))
+                .groupIds(CaseField.withValue(List.of(defaultGroupRunner.getDefaultGroup().getStringId())))
+                .build()
+                .toDataSet(), null).getCase());
+    }
+
+    private Group createGroup(String name) {
+        Case groupCase = workflowService.createCaseByIdentifier(GroupConstants.PROCESS_IDENTIFIER, name, "", null).getCase();
+        return new Group(dataService.setData(groupCase, GroupParams.with()
+                .name(new TextField(name))
                 .build()
                 .toDataSet(), null).getCase());
     }
