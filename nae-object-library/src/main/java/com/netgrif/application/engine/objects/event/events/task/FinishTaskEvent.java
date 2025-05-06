@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.objects.event.events.task;
 
-import com.netgrif.application.engine.objects.auth.domain.IUser;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome;
@@ -11,11 +11,11 @@ public class FinishTaskEvent extends TaskEvent {
         super(eventOutcome, eventPhase);
     }
 
-    public FinishTaskEvent(FinishTaskEventOutcome eventOutcome, IUser user) {
+    public FinishTaskEvent(FinishTaskEventOutcome eventOutcome, AbstractUser user) {
         super(eventOutcome, user);
     }
 
-    public FinishTaskEvent(FinishTaskEventOutcome eventOutcome, EventPhase eventPhase, IUser user) {
+    public FinishTaskEvent(FinishTaskEventOutcome eventOutcome, EventPhase eventPhase, AbstractUser user) {
         super(eventOutcome, eventPhase, user);
     }
 

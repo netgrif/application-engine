@@ -2,7 +2,6 @@ package com.netgrif.application.engine.integration.plugins.service;
 
 import com.netgrif.application.engine.configuration.ApplicationContextProvider;
 import com.netgrif.application.engine.integration.plugins.exceptions.PluginDoesNotExistException;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
@@ -30,10 +29,8 @@ import com.netgrif.plugin.core.service.PluginService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;

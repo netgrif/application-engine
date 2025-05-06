@@ -4,8 +4,6 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.IUser;
-import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.auth.service.UserService

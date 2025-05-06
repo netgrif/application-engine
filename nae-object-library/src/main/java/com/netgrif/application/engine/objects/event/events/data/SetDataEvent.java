@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.objects.event.events.data;
 
-import com.netgrif.application.engine.objects.auth.domain.IUser;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import lombok.Getter;
@@ -15,12 +15,12 @@ public class SetDataEvent extends DataEvent {
         this.eventOutcome = eventOutcome;
     }
 
-    public SetDataEvent(SetDataEventOutcome eventOutcome, IUser user) {
+    public SetDataEvent(SetDataEventOutcome eventOutcome, AbstractUser user) {
         super(eventOutcome, user);
         this.eventOutcome = eventOutcome;
     }
 
-    public SetDataEvent(SetDataEventOutcome eventOutcome, EventPhase eventPhase, IUser user) {
+    public SetDataEvent(SetDataEventOutcome eventOutcome, EventPhase eventPhase, AbstractUser user) {
         super(eventOutcome, eventPhase, user);
         this.eventOutcome = eventOutcome;
     }

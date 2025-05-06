@@ -1,10 +1,9 @@
 package com.netgrif.application.engine.auth
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.objects.auth.domain.IUser
+
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.objects.auth.domain.PasswordCredential
-import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet

@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.petrinet.service;
 
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.event.events.user.UserRoleChangeEvent;
@@ -30,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;

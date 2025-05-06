@@ -1,81 +1,46 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
-import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.querydsl.core.annotations.QueryEntity;
 import lombok.Getter;
 import lombok.Setter;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
 
-import java.util.*;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
+@Getter
 @QueryEntity
-public class Group implements Actor {
+public class Group extends AbstractActor implements Serializable {
 
-    public static final String GROUP = "_group";
-
-    @Getter
-    private ObjectId id;
-
-    @Getter
-    @Setter
-    private String realmId;
-
-    @Getter
     @Setter
     private String identifier;
 
     @Setter
-    @Getter
+    private String displayName;
+
+    @Setter
     private String ownerId;
 
     @Setter
-    @Getter
     private String ownerUsername;
 
     @Setter
-    @Getter
-    private String displayName;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Getter
     @Setter
-    private Set<String> memberIds;
+    private LocalDateTime modifiedAt = LocalDateTime.now();
 
-    @Getter
-    @Setter
-    private Set<IUser> members;
+    private Set<String> memberIds = new HashSet<>();
 
-    @Getter
-    @Setter
-    protected Set<Authority> authorities;
-
-    @Getter
-    @Setter
-    protected Set<ProcessRole> processRoles;
-
-    @Getter
-    @Setter
-    protected Set<String> groupIds;
-
-    @Getter
-    @Setter
-    @BsonIgnore
-    protected Set<Group> groups;
-
-    private Map<String, Attribute<?>> attributes;
+    private Set<String> subgroupIds = new HashSet<>();
 
     protected Group() {
-        id = new ObjectId();
-        authorities = new HashSet<Authority>();
-        processRoles = new HashSet<>();
-        groupIds = new HashSet<>();
-        groups = new HashSet<>();
-        memberIds = new HashSet<>();
-        members = new HashSet<>();
+        this.id = new ObjectId();
     }
 
     public Group(ObjectId id) {
-        this();
         this.id = id;
     }
 
@@ -86,81 +51,45 @@ public class Group implements Actor {
     }
 
     @Override
-    public String getStringId() {
-        return id.toString();
-    }
-
-    @Override
-    public void addGroupId(String groupId) {
-        if (groupIds.stream().anyMatch(it -> it.equals(groupId))) {
-            return;
-        }
-        groupIds.add(groupId);
-    }
-
-    @Override
-    public void removeGroupId(String groupId) {
-        groupIds.remove(groupId);
-    }
-
-    @Override
-    public void addAuthority(Authority authority) {
-        if (authorities.stream().anyMatch(it -> it.getStringId().equals(authority.getStringId()))) {
-            return;
-        }
-        authorities.add(authority);
-    }
-
-    @Override
-    public void removeAuthority(Authority authority) {
-        authorities.remove(authority);
-    }
-
-    @Override
-    public void addProcessRole(ProcessRole role) {
-        if (processRoles.stream().anyMatch(it -> it.getStringId().equals(role.getStringId()))) {
-            return;
-        }
-        processRoles.add(role);
-    }
-
-    @Override
-    public void removeProcessRole(ProcessRole role) {
-        processRoles.remove(role);
-    }
-
-    @Override
-    public void setAttribute(String key, Object value, boolean required) {
-        this.attributes.put(key, new Attribute<>(value, required));
-    }
-
-    @Override
-    public Object getAttributeValue(String key) {
-        Attribute<?> attribute = this.attributes.get(key);
-        return attribute != null ? attribute.getValue() : null;
-    }
-
-    @Override
-    public void removeAttribute(String key) {
-        this.attributes.remove(key);
-    }
-
-    @Override
-    public boolean isAttributeSet(String key) {
-        Attribute<?> attribute = this.attributes.get(key);
-        return attribute != null && attribute.getValue() != null;
-    }
-
-    @Override
-    public Attribute<?> getAttribute(String key) {
-        return this.attributes.get(key);
+    public String getName() {
+        return this.displayName;
     }
 
     public void addMemberId(String userId) {
-        memberIds.add(userId);
+        if (this.memberIds == null) {
+            this.memberIds = new HashSet<>();
+        }
+        this.memberIds.add(userId);
     }
 
     public void removeMemberId(String userId) {
-        memberIds.remove(userId);
+        if (this.memberIds == null) {
+            this.memberIds = new HashSet<>();
+        } else {
+            this.memberIds.remove(userId);
+        }
+    }
+
+    public void setMemberIds(Set<String> memberIds) {
+        this.memberIds = memberIds == null ? new HashSet<>() : new HashSet<>(memberIds);
+    }
+
+    public void addSubGroupId(String groupId) {
+        if (this.subgroupIds == null) {
+            this.subgroupIds = new HashSet<>();
+        }
+        this.subgroupIds.add(groupId);
+    }
+
+    public void removeSubgroupId(String groupId) {
+        if (this.subgroupIds == null) {
+            this.subgroupIds = new HashSet<>();
+        } else {
+            this.subgroupIds.remove(groupId);
+        }
+    }
+
+    public void setSubgroupIds(Set<String> subgroupIds) {
+        this.subgroupIds = subgroupIds == null ? new HashSet<>() : new HashSet<>(subgroupIds);
     }
 }

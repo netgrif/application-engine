@@ -2,7 +2,6 @@ package com.netgrif.application.engine.auth.web.responsebodies;
 
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.Group;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import lombok.Data;
 
 import java.util.Set;

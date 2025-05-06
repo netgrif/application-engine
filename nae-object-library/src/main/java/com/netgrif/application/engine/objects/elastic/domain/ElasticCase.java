@@ -10,6 +10,7 @@ import com.netgrif.application.engine.objects.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -53,13 +54,14 @@ public abstract class ElasticCase implements Serializable {
 
     private Long creationDateSortable;
 
+    // TODO JOFO: author realm?
     private String author;
 
     private String mongoId;
 
     private String authorName;
 
-    private String authorEmail;
+    private String authorUsername;
 
     private Map<String, DataField> dataSet;
 
@@ -95,7 +97,7 @@ public abstract class ElasticCase implements Serializable {
         creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
         author = useCase.getAuthor().getId();
         authorName = useCase.getAuthor().getFullName();
-        authorEmail = useCase.getAuthor().getEmail();
+        authorUsername = useCase.getAuthor().getUsername();
         taskIds = useCase.getTasks().stream().map(TaskPair::getTransition).collect(Collectors.toSet());
         taskMongoIds = useCase.getTasks().stream().map(TaskPair::getTask).collect(Collectors.toSet());
         enabledRoles = new HashSet<>(useCase.getEnabledRoles());

@@ -13,7 +13,7 @@ import com.netgrif.application.engine.startup.runner.ImpersonationRunner
 import com.netgrif.application.engine.workflow.service.interfaces.*
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
 import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.IUser
+
 import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString

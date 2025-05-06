@@ -7,8 +7,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.files.StorageResolverService;
@@ -130,7 +130,7 @@ public class DataService implements IDataService {
     @Override
     public GetDataEventOutcome getData(Task task, Case useCase, Map<String, String> params) {
         log.info("[" + useCase.getStringId() + "]: Getting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
-        IUser user = userService.getLoggedOrSystem();
+        AbstractUser user = userService.getLoggedOrSystem();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
         Set<String> fieldsIds = transition.getDataSet().keySet();
@@ -223,7 +223,7 @@ public class DataService implements IDataService {
     @Override
     public SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params) {
         Case useCase = workflowService.findOne(task.getCaseId());
-        IUser user = userService.getLoggedOrSystem();
+        AbstractUser user = userService.getLoggedOrSystem();
 
         log.info("[" + useCase.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
 
@@ -751,7 +751,7 @@ public class DataService implements IDataService {
 
     @Override
     public UserFieldValue makeUserFieldValue(String id) {
-        IUser user = userService.findById(id, null);
+        AbstractUser user = userService.findById(id, null);
         return new UserFieldValue(user);
     }
 

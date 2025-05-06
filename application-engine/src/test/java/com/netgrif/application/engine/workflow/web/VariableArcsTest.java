@@ -3,9 +3,7 @@ package com.netgrif.application.engine.workflow.web;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.MockService;
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.objects.auth.domain.Authority;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
-import com.netgrif.application.engine.objects.auth.domain.User;
+import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
@@ -37,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -93,9 +92,12 @@ public class VariableArcsTest {
     @Autowired
     private TestHelper testHelper;
 
+    @Autowired
+    protected BCryptPasswordEncoder bCryptPasswordEncoder;
+
     private PetriNet loaded;
 
-    private IUser testUser;
+    private AbstractUser testUser;
 
     private Case finishCase;
 
@@ -113,10 +115,12 @@ public class VariableArcsTest {
         assert outcome.getNet() != null;
         PetriNet net = outcome.getNet();
         this.loaded = service.getPetriNet(net.getStringId());
-        User user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
+        User user = new User();
         user.setFirstName("Test");
         user.setLastName("Test");
-        user.setPassword("password");
+
+        PasswordCredential passwordCredential = new PasswordCredential(bCryptPasswordEncoder.encode("password"), 0, true);
+        user.setCredential("password", passwordCredential);
         user.setState(UserState.ACTIVE);
         user.setEmail("VariableArcsTest@test.com");
         testUser = importHelper.createUser(user,
@@ -262,7 +266,7 @@ public class VariableArcsTest {
             if (task.getTitle().getDefaultValue().contains("ref")) {
                 QTask qTask = new QTask("task");
                 Task addTokensTask = taskService.searchOne(qTask.transitionId.eq("add_tokens").and(qTask.caseId.eq(cancelCase.getStringId())));
-                taskService.assignTask(userService.transformToLoggedUser(testUser), addTokensTask.getStringId());
+                taskService.assignTask(ActorTransformer.toLoggedUser(testUser), addTokensTask.getStringId());
                 taskService.finishTask(addTokensTask, testUser);
             }
             int tokensAfterCancel = 0;
@@ -286,7 +290,7 @@ public class VariableArcsTest {
             if (task.getTitle().getDefaultValue().contains("ref")) {
                 QTask qTask = new QTask("task");
                 Task removeTokensTask = taskService.searchOne(qTask.transitionId.eq("remove_tokens").and(qTask.caseId.eq(cancelCase.getStringId())));
-                taskService.assignTask(userService.transformToLoggedUser(testUser), removeTokensTask.getStringId());
+                taskService.assignTask(ActorTransformer.toLoggedUser(testUser), removeTokensTask.getStringId());
                 taskService.finishTask(removeTokensTask, testUser);
                 tasksAfterPlaceRefReset = taskService.findAllByCase(cancelCase.getStringId(), LocaleContextHolder.getLocale());
             }

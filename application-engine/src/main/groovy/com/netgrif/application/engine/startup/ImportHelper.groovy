@@ -3,6 +3,7 @@ package com.netgrif.application.engine.startup
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
@@ -15,7 +16,7 @@ import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.IUser
+
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
@@ -172,7 +173,7 @@ class ImportHelper {
         return map
     }
 
-    IUser createUser(User user, Authority[] authorities, ProcessRole[] roles) {
+    AbstractUser createUser(User user, Authority[] authorities, ProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }
         user.state = UserState.ACTIVE

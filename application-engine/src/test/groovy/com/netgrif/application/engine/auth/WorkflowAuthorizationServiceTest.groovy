@@ -1,14 +1,11 @@
 package com.netgrif.application.engine.auth
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.objects.auth.domain.Authority;
-import com.netgrif.application.engine.objects.auth.domain.IUser
-import com.netgrif.application.engine.objects.auth.domain.User
+import com.netgrif.application.engine.objects.auth.domain.Authority
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper

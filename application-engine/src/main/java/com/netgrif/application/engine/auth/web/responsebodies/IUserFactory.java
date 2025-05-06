@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.auth.web.responsebodies;
 
-import com.netgrif.application.engine.objects.auth.domain.IUser;
-
 import java.util.Locale;
 
 public interface IUserFactory {

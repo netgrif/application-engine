@@ -7,11 +7,10 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.IUser
+
 import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
-import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

@@ -1,9 +1,6 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
-import com.netgrif.application.engine.objects.auth.domain.Author;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
-import com.netgrif.application.engine.objects.auth.domain.User;
+import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
@@ -14,95 +11,108 @@ import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 public interface UserService {
 
-    IUser saveUser(IUser user, String realmId);
+    AbstractUser saveUser(AbstractUser user, String realmId);
 
-    List<User> saveUsers(List<IUser> users);
+    AbstractUser saveUser(AbstractUser user);
+
+    Set<User> saveUsers(Set<AbstractUser> users);
 
     void deleteAllUsers(Collection<String> realmIds);
 
-    Optional<IUser> findUserByUsername(String username, String realmName);
+    Optional<AbstractUser> findUserByUsername(String username, String realmName);
 
-    List<IUser> findAllUsers(String realmName);
+    Page<AbstractUser> findAllUsers(String realmName, Pageable pageable);
 
-    IUser createUser(String username, String email, String firstName, String lastName, String password, String realmName);
+    AbstractUser createUser(String username, String email, String firstName, String lastName, String password, String realmName);
 
-    IUser createUser(IUser user, String realmId);
+    AbstractUser createUser(AbstractUser user, String realmId);
 
-    IUser createUserFromThirdParty(String username, String email, String firstName, String lastName, String realmId, String authMethod);
+    AbstractUser createUserFromThirdParty(String username, String email, String firstName, String lastName, String realmId, String authMethod);
 
-    void addDefaultRole(IUser user);
+    void addDefaultRole(AbstractUser user);
 
-    void addAnonymousAuthorities(IUser user);
+    void addAnonymousAuthorities(AbstractUser user);
 
     void addAllRolesToAdminByUsername(String username);
 
-    void addAnonymousRole(IUser user);
+    void addAnonymousRole(AbstractUser user);
 
-    IUser findById(String id, String realmId);
+    AbstractUser findById(String id, String realmId);
 
-    void deleteUser(IUser user);
+    void deleteUser(AbstractUser user);
 
-    IUser findByAuth(Authentication auth, String realmId);
+    AbstractUser findByAuth(Authentication auth, String realmId);
 
-    IUser update(IUser user, IUser updatedUser);
+    AbstractUser update(AbstractUser user, AbstractUser updatedUser);
 
-    IUser findByEmail(String email, String realmId);
+    AbstractUser findByEmail(String email, String realmId);
 
-    Page<IUser> findAllCoMembers(com.netgrif.application.engine.objects.auth.domain.LoggedUser loggedUser, Pageable pageable);
+    Page<AbstractUser> findAllCoMembers(LoggedUser loggedUser, Pageable pageable);
 
-    List<IUser> findAllByIds(Collection<String> ids, String realmId);
+    Set<AbstractUser> findAllByIds(Collection<String> ids, String realmId);
 
-    Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable, Collection<String> realmIds);
+    Page<AbstractUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable);
 
-    List<IUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, Collection<String> realmIds);
+    Page<AbstractUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable, Collection<String> realmIds);
 
-    void addDefaultAuthorities(IUser user);
+    Set<AbstractUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, Collection<String> realmIds);
 
-    IUser assignAuthority(String userId, String realmId, String authorityId);
+    void addDefaultAuthorities(AbstractUser user);
 
-    IUser getLoggedOrSystem();
+    AbstractUser assignAuthority(String userId, String realmId, String authorityId);
 
-    IUser getLoggedUser();
+    AbstractUser getLoggedOrSystem();
 
-    IUser getSystem();
+    AbstractUser getLoggedUser();
 
-    com.netgrif.application.engine.objects.auth.domain.LoggedUser getLoggedUserFromContext();
+    AbstractUser getSystem();
 
-    IUser addRole(IUser user, ProcessResourceId id);
+    LoggedUser getLoggedUserFromContext();
 
-    IUser addRole(IUser user, String roleStringId);
+    AbstractUser addRole(AbstractUser user, ProcessResourceId id);
 
-    Page<IUser> searchAllCoMembers(String query, com.netgrif.application.engine.objects.auth.domain.LoggedUser principal, Pageable pageable);
+    AbstractUser addRole(AbstractUser user, String roleStringId);
 
-    Page<IUser> searchAllCoMembers(String query, List<ProcessResourceId> roleIds, List<ProcessResourceId> negateRoleIds, com.netgrif.application.engine.objects.auth.domain.LoggedUser loggedUser, Pageable pageable);
+    AbstractUser addNegativeProcessRole(AbstractUser user, ProcessResourceId id);
 
-    IUser removeRole(IUser user, ProcessRole role);
+    AbstractUser addNegativeProcessRole(AbstractUser user, String roleStringId);
 
-    IUser removeRole(IUser user, ProcessResourceId roleId);
+    Page<AbstractUser> searchAllCoMembers(String query, LoggedUser principal, Pageable pageable);
 
-    IUser removeRole(IUser user, String roleId);
+    Page<AbstractUser> searchAllCoMembers(String query, Set<ProcessResourceId> roleIds, Set<ProcessResourceId> negateRoleIds,LoggedUser loggedUser, Pageable pageable);
+
+    AbstractUser removeRolesById(AbstractUser user, Set<ProcessResourceId> processRolesIds);
+
+    AbstractUser removeRoles(AbstractUser user, Set<ProcessRole> processRoles);
+
+    AbstractUser removeRole(AbstractUser user, ProcessRole role);
+
+    AbstractUser removeRole(AbstractUser user, ProcessResourceId roleId);
+
+    AbstractUser removeRole(AbstractUser user, String roleId);
+
+    AbstractUser removeNegativeProcessRole(AbstractUser user, ProcessRole role);
+
+    AbstractUser removeNegativeProcessRole(AbstractUser user, ProcessResourceId roleId);
+
+    AbstractUser removeNegativeProcessRole(AbstractUser user, String roleId);
 
     void removeRoleOfDeletedPetriNet(PetriNet process, Collection<String> realmIds);
 
-    IUser createSystemUser();
+    AbstractUser createSystemUser();
 
-    IUser transformToUser(LoggedUserImpl loggedUser);
+    AbstractUser transformToUser(ActorRef author);
 
-    LoggedUserImpl transformToLoggedUser(IUser user);
+    AbstractUser transformToUser(LoggedUser loggedUser);
 
-   void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
+    void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
 
-    List<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
+    Set<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
 
-    IUser transformToUser(Author author);
-
-    Author transformToAuthor(IUser user);
-
-    void populateGroups(IUser user);
+    Set<Group> getUserGroups(AbstractActor actor);
 }

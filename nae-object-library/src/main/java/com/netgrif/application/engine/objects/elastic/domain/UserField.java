@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public abstract class UserField extends DataField {
 
+    // TODO JOFO: can group be put into userfield? don't we need realmIds?
+    
     private String[] emailValue;
 
     private String[] fullNameValue;

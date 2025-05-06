@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.adapter.spring.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netgrif.application.engine.objects.auth.domain.Author;
+import com.netgrif.application.engine.objects.auth.domain.ActorRef;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.objects.workflow.domain.DataField;
@@ -100,7 +100,7 @@ public class Case extends com.netgrif.application.engine.objects.workflow.domain
     }
 
     @Override
-    public Author getAuthor() {
+    public ActorRef getAuthor() {
         return super.getAuthor();
     }
 }

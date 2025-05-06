@@ -77,8 +77,8 @@ public class ElasticCase extends com.netgrif.application.engine.objects.elastic.
     }
 
     @Field(type = Keyword)
-    public String getAuthorEmail() {
-        return super.getAuthorEmail();
+    public String getAuthorUsername() {
+        return super.getAuthorUsername();
     }
 
     @Field(type = Keyword)

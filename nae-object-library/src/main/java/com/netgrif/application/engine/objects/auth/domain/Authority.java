@@ -3,15 +3,15 @@ package com.netgrif.application.engine.objects.auth.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
+@NoArgsConstructor
 public abstract class Authority implements Serializable {
 
     @Serial
@@ -22,20 +22,12 @@ public abstract class Authority implements Serializable {
     public static final String user = "USER";
     public static final String anonymous = "ANONYMOUS_USER";
 
-
     private ObjectId _id;
 
     @NotNull
     @JsonIgnore
     @Setter
     private String name;
-
-    @JsonIgnore
-    @Setter
-    private Set<String> users;
-
-    public Authority() {
-    }
 
     public Authority(String name) {
         this.name = name;
@@ -44,14 +36,6 @@ public abstract class Authority implements Serializable {
     public Authority(Authority authority) {
         this._id = authority.get_id();
         this.name = authority.getName();
-        this.users = new HashSet<>(authority.getUsers());
-    }
-
-    public void addUser(IUser user) {
-        if (users == null) {
-            users = new HashSet<>();
-        }
-        users.add(user.getStringId());
     }
 
     public String getStringId() {

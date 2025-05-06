@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.auth.service.interfaces;
 
-import com.netgrif.application.engine.objects.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.auth.service.InvalidUserTokenException;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;

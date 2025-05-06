@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action.delegate
 
-import com.netgrif.application.engine.objects.auth.domain.IUser
 
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet

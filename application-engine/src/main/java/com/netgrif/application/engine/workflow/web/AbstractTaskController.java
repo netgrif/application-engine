@@ -101,7 +101,7 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> assign(LoggedUser loggedUser, String taskId, Locale locale) {
         try {
-            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName(),
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getName(),
                     LocalisedEventOutcomeFactory.from(taskService.assignTask(loggedUser, taskId), locale));
         } catch (TransitionNotExecutableException e) {
             log.error("Assigning task [" + taskId + "] failed: ", e);

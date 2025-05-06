@@ -2,7 +2,6 @@ package com.netgrif.application.engine.configuration.authentication.providers.ba
 
 
 import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-
-import java.util.Optional;
 
 @Slf4j
 @Component

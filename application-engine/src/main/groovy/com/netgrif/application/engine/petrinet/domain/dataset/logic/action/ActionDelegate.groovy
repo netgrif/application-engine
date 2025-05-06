@@ -35,8 +35,7 @@ import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
-import com.netgrif.application.engine.objects.auth.domain.Author
-import com.netgrif.application.engine.objects.auth.domain.IUser
+
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.objects.petrinet.domain.*
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*
@@ -62,7 +61,6 @@ import com.netgrif.application.engine.objects.workflow.service.InitValueExpressi
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
-import groovy.time.TimeCategory
 import groovy.transform.NamedVariant
 import org.bson.types.ObjectId
 import org.quartz.Scheduler

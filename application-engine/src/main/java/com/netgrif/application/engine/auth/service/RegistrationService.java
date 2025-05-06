@@ -1,15 +1,11 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.objects.auth.domain.IUser;
-import com.netgrif.application.engine.objects.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
-import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
-import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

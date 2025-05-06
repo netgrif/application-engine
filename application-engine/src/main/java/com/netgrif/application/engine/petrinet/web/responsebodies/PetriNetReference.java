@@ -1,8 +1,6 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
 
-import com.netgrif.application.engine.objects.auth.domain.Author;
-import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldReference;
 import lombok.Data;

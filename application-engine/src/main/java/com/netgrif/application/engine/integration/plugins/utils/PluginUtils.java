@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.integration.plugins.utils;
 
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
@@ -177,7 +177,7 @@ public class PluginUtils {
             if (aTask == null) {
                 throw maybeRethrow;
             }
-            IUser user = userService.getLoggedOrSystem();
+            AbstractUser user = userService.getLoggedOrSystem();
             aTask = taskService.cancelTask(aTask, user).getTask();
             return taskService.assignTask(aTask, user);
         }

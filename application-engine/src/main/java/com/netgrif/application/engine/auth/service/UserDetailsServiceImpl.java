@@ -1,9 +1,6 @@
 package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
-import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.auth.service.interfaces.ILoginAttemptService;
@@ -18,8 +15,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {

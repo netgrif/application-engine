@@ -28,6 +28,8 @@ public abstract class Credential<T> implements Comparable<Credential<T>>, Serial
 
     protected Map<String, Object> properties = new HashMap<>();
 
+    // TODO: constructor with no value required
+
     public Credential(String type, T value, int order, boolean enabled) {
         if (type == null || type.isEmpty()) {
             throw new IllegalArgumentException("Credential type cannot be null or empty");
@@ -53,6 +55,7 @@ public abstract class Credential<T> implements Comparable<Credential<T>>, Serial
 
     /**
      * Updates the credential value and refreshes the lastUpdated timestamp.
+     *
      * @param newValue The new value for the credential.
      */
     public Credential<T> updateValue(T newValue) {

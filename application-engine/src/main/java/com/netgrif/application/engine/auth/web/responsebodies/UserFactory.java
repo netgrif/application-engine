@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.auth.web.responsebodies;
 
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 

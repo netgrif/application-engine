@@ -2,7 +2,6 @@ package com.netgrif.application.engine.impersonation.service;
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;

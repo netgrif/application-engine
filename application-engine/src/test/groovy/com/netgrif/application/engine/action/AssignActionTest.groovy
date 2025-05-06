@@ -4,8 +4,6 @@ import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.IUser;
-import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
@@ -27,7 +25,6 @@ import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
 import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles

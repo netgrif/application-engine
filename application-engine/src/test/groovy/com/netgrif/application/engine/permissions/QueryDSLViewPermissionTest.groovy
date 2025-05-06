@@ -10,8 +10,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.IUser
-import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType

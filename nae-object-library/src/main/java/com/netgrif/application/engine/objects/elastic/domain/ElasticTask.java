@@ -45,6 +45,7 @@ public abstract class ElasticTask {
 
     private int priority;
 
+    // TODO JOFO: maybe user realm too?
     private String userId;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)

@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.mail;
 
-import com.netgrif.application.engine.objects.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.mail.domain.MailDraft;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -68,12 +68,13 @@ public class MailService implements IMailService {
     private ServerAuthProperties serverAuthProperties;
 
     @Override
-    public void sendRegistrationEmail(RegisteredUser user) throws IOException, TemplateException, MessagingException {
+    public void sendRegistrationEmail(AbstractUser user) throws IOException, TemplateException, MessagingException {
         List<String> recipients = new LinkedList<>();
         Map<String, Object> model = new HashMap<>();
 
         recipients.add(user.getEmail());
-        model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
+        // TODO JOFO: registration TOKEN?
+//        model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         model.put(VALIDITY, "" + serverAuthProperties.getTokenValidityPeriod());
         model.put(EXPIRATION, registrationService.generateExpirationDate().format(formatter));
@@ -88,11 +89,12 @@ public class MailService implements IMailService {
     }
 
     @Override
-    public void sendPasswordResetEmail(RegisteredUser user) throws IOException, TemplateException, MessagingException {
+    public void sendPasswordResetEmail(AbstractUser user) throws IOException, TemplateException, MessagingException {
         Map<String, Object> model = new HashMap<>();
 
         model.put(NAME, user.getFirstName());
-        model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
+        // TODO JOFO: registration TOKEN?
+//        model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
         model.put(VALIDITY, "" + serverAuthProperties.getTokenValidityPeriod());
         model.put(EXPIRATION, registrationService.generateExpirationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         model.put(SERVER, getServerURL());

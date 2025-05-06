@@ -1,93 +1,36 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
-import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
-import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-
-@Setter
-@Getter
-public abstract class AbstractUser implements IUser, Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 341922197277508726L;
+@Data
+@Slf4j
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public abstract class AbstractUser extends AbstractActor {
 
     @NotNull
-    protected UserState state;
+    protected String username;
 
-    protected Set<Authority> authorities;
+    @NotNull
+    protected String firstName;
 
-    protected Set<ProcessRole> processRoles;
+    protected String middleName;
 
-    protected Set<String> groupIds;
+    @NotNull
+    protected String lastName;
 
-    @BsonIgnore
-    protected Set<Group> groups;
-
-    @BsonIgnore
-    protected IUser impersonated;
-
-    public AbstractUser() {
-        authorities = new HashSet<>();
-        groupIds = new HashSet<>();
-        groups = new HashSet<>();
-        processRoles = new HashSet<>();
-    }
-
-    public void addAuthority(Authority authority) {
-        if (authorities.stream().anyMatch(it -> it.get_id().equals(authority.get_id())))
-            return;
-        authorities.add(authority);
-    }
+    protected String email;
 
     @Override
-    public void removeAuthority(Authority authority) {
-        authorities.remove(authority);
-    }
-
-    public void addProcessRole(ProcessRole role) {
-        if (processRoles.stream().anyMatch(it -> it.getStringId().equals(role.getStringId())))
-            return;
-        processRoles.add(role);
-    }
-
-    public void removeProcessRole(ProcessRole role) {
-        processRoles.remove(role);
-    }
-
-    public void addGroup(Group group) {
-        this.groupIds.add(group.getStringId());
-        this.groups.add(group);
-    }
-
-    @Override
-    public void removeGroupId(String groupId) {
-        this.groupIds.remove(groupId);
-    }
-
-    public void removeGroup(Group group) {
-        this.groupIds.remove(group.getStringId());
-        this.groups.remove(group);
-    }
-
-    public boolean isActive() {
-        return UserState.ACTIVE.equals(state) || UserState.BLOCKED.equals(state);
-    }
-
-    @Override
-    public boolean isImpersonating() {
-        return this.impersonated != null;
-    }
-
-    @Override
-    public IUser getSelfOrImpersonated() {
-        return isImpersonating() ? this.impersonated : this;
+    public String getName() {
+        return String.join(" ", firstName,
+                middleName != null && !middleName.isEmpty() ? middleName : "",
+                lastName).trim();
     }
 }

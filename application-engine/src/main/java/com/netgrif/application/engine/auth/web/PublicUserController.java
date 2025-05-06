@@ -1,9 +1,7 @@
 package com.netgrif.application.engine.auth.web;
 
-import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAssembler;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.application.engine.auth.web.responsebodies.IUserFactory;

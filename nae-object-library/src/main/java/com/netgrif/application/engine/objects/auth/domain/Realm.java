@@ -4,9 +4,9 @@ import com.netgrif.application.engine.objects.auth.provider.AuthMethodConfig;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.time.Duration;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

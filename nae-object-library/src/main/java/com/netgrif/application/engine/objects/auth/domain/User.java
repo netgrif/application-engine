@@ -1,341 +1,117 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
-import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.objects.utils.DateUtils;
+import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.querydsl.core.annotations.QueryEntity;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-@Getter
+@Data
 @Slf4j
 @QueryEntity
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public abstract class User extends AbstractUser implements RegisteredUser, Serializable {
+public class User extends AbstractUser implements Serializable {
 
-    private ObjectId id;
-
-    @Setter
-    private String realmId;
-
-    @Setter
-    private String username;
-
-    @Setter
-    private String email;
-
-    @Setter
     private boolean emailVerified;
 
-    @Setter
-    @NotNull
-    private String firstName;
-
-    @Setter
-    private String middleName;
-
-    @Setter
-    @NotNull
-    private String lastName;
-
-    @Setter
     private String avatar;
 
-    @Setter
-    private boolean enabled;
+    private UserState state;
 
-    @Setter
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Setter
-    private Map<String, Attribute<?>> attributes;
+    private LocalDateTime modifiedAt = LocalDateTime.now();
 
-    @Setter
-    private Map<String, Credential<?>> credentials;
+    private Map<String, Credential<?>> credentials = new HashMap<>();
 
-    @Setter
-    private Set<String> authMethods;
-
-    public User() {
-        this.id = new ObjectId();
-        this.attributes = new HashMap<>();
-        this.credentials = new HashMap<>();
-        this.authMethods = new HashSet<>();
+    /**
+     * @param credentials
+     */
+    public void setCredentials(Map<String, Credential<?>> credentials) {
+        this.credentials = credentials == null ? new HashMap<>() : new HashMap<>(credentials);
     }
 
-    public User(ObjectId id) {
-        this();
-        this.id = id;
+    /**
+     * @param key
+     * @param credential
+     */
+    public void setCredential(String key, Credential<?> credential) {
+        if (this.credentials == null) {
+            this.credentials = new HashMap<>();
+        }
+        this.credentials.put(key, credential);
     }
 
-    @Override
-    public String getStringId() {
-        return this.id.toString();
-    }
-
-    @Override
-    public String getFullName() {
-        return String.join(" ", firstName, middleName, lastName);
-    }
-
-    @Override
-    public String getName() {
-        return String.join(" ", firstName, lastName);
-    }
-
-    @Override
-    public String getToken() {
-        Credential<?> tokenCredential = this.credentials.get("token");
-        return tokenCredential != null ? tokenCredential.getValue().toString() : null;
-    }
-
-    @Override
-    public void setToken(String token) {
-        TokenCredential tokenCredential = new TokenCredential(token, 1, true);
-        this.credentials.put(tokenCredential.getType(), tokenCredential);
-    }
-
-    @Override
-    public String getPassword() {
-        Credential<?> passCred = this.credentials.get("password");
-        if (passCred == null) {
+    /**
+     * @param key
+     * @return
+     */
+    public Object getCredentialValue(String key) {
+        if (this.credentials == null) {
             return null;
         }
-        return String.valueOf(passCred.getValue());
-    }
-
-    @Override
-    public void setPassword(String password) {
-        PasswordCredential passwordCredential = new PasswordCredential(password, 0, true);
-        this.credentials.put("password", passwordCredential);
-    }
-
-    @Override
-    public void setExpirationDate(LocalDateTime expirationDate) {
-        Credential<?> tokenCredential = this.credentials.get("token");
-        if (tokenCredential != null) {
-            tokenCredential.addProperty("expirationDate", expirationDate);
-        } else {
-            Credential<?> newTokenCredential = new TokenCredential("", 1, true);
-            newTokenCredential.addProperty("expirationDate", expirationDate);
-            this.credentials.put("token", newTokenCredential);
-        }
-    }
-
-    @Override
-    public LocalDateTime getExpirationDate() {
-        Credential<?> tokenCredential = this.credentials.get("token");
-        if (tokenCredential != null) {
-            Object obj = tokenCredential.getProperty("expirationDate");
-            if (obj instanceof LocalDateTime) {
-                return (LocalDateTime) obj;
-            }
-            return DateUtils.dateToLocalDateTime((Date) obj);
-        }
-        return null;
-    }
-
-    @Override
-    public boolean isMFAEnabled(String type) {
-        Credential<?> credential = this.getCredential(type);
-        return credential != null && credential.isEnabled();
-    }
-
-    @Override
-    public Set<String> getEnabledMFAMethods() {
-        return this.credentials.entrySet().stream()
-                .filter(entry -> {
-                    Credential<?> credential = entry.getValue();
-                    return credential != null
-                            && credential.getType() != null
-                            && credential.getType().toUpperCase().startsWith("MFA")
-                            && credential.isEnabled();
-                })
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toSet());
-    }
-
-    @Override
-    public void enableMFA(String type, String value, int order) {
-        this.setCredential(type, value, order, true);
-    }
-
-    @Override
-    public void disableMFA(String type) {
-        if (this.credentials.containsKey(type)) {
-            this.credentials.get(type).setEnabled(false);
-        }
-    }
-
-    @Override
-    public void activateMFA(String type, String secret) {
-        this.activateMFA(type, secret, true);
-    }
-
-    @Override
-    public void activateMFA(String type, String secret, boolean activate) {
-        if (type == null || type.isEmpty()) {
-            throw new IllegalArgumentException("MFA type cannot be null or empty");
-        }
-        if (secret == null || secret.isEmpty()) {
-            throw new IllegalArgumentException("MFA secret cannot be null or empty");
-        }
-        MFAStringCredential mfaCred = new MFAStringCredential(type, secret, 1, activate);
-        this.credentials.put("MFA-" + type, mfaCred);
-    }
-
-    @Override
-    public Object getAttributeValue(String key) {
-        Attribute<?> attribute = this.attributes.get(key);
-        return attribute != null ? attribute.getValue() : null;
-    }
-
-    @Override
-    public void setAttribute(String key, Object value, boolean required) {
-        Attribute<?> attribute = new Attribute<>(value, required);
-        this.attributes.put(key, attribute);
-    }
-
-    @Override
-    public void removeAttribute(String key) {
-        this.attributes.remove(key);
-    }
-
-    @Override
-    public boolean isAttributeSet(String key) {
-        Attribute<?> attribute = this.attributes.get(key);
-        return attribute != null && attribute.getValue() != null;
-    }
-
-    @Override
-    public Attribute<?> getAttribute(String key) {
-        return this.attributes.get(key);
-    }
-
-    @Override
-    public void addGroupId(String groupId) {
-        this.groupIds.add(groupId);
-    }
-
-    @Override
-    public <T> Object getCredentialValue(String type) {
-        Credential<?> credential = this.credentials.get(type);
+        Credential<?> credential = this.credentials.get(key);
         return credential != null ? credential.getValue() : null;
     }
 
-    @Override
-    public void addCredential(Credential<?> credential) {
-        this.credentials.put(credential.type, credential);
-    }
-
-
-    @Override
-    public void setCredential(String type, String value, int order, boolean enabled) {
-        StringCredential credential = new StringCredential(type, value, order, enabled);
-        this.credentials.put(type, credential);
-    }
-
-    @Override
-    public void setCredentialProperty(String type, String key, Object value) {
-        Credential<?> credential = this.credentials.get(type);
-        if (credential == null) {
-            log.warn("Credential [{}] not found, cannot set property [{}]", type, key);
-            return;
-        }
-        if (value instanceof Serializable serialVal) {
-            credential.addProperty(key, serialVal);
-            log.debug("Set credential property [{}:{}] for type [{}]", key, serialVal, type);
+    /**
+     * @param key
+     */
+    public void removeCredential(String key) {
+        if (this.credentials == null) {
+            this.credentials = new HashMap<>();
         } else {
-            log.warn("Value for key [{}] is not serializable. Skipping.", key);
+            this.credentials.remove(key);
         }
-    }
-
-    @Override
-    public Object getCredentialProperty(String type, String key) {
-        Credential<?> credential = this.credentials.get(type);
-        return credential != null ? credential.getProperty(key) : null;
-    }
-
-    @Override
-    public void removeCredential(String type) {
-        this.credentials.remove(type);
-    }
-
-    @Override
-    public boolean hasCredential(String type) {
-        return this.credentials.containsKey(type);
-    }
-
-    @Override
-    public Credential<?> getCredential(String type) {
-        return this.credentials.get(type);
     }
 
     /**
-     * Add an authentication method to the user.
-     *
-     * @param authMethod the authentication method to add.
+     * @param key
+     * @return
      */
-    public void addAuthMethod(String authMethod) {
-        this.authMethods.add(authMethod);
+    public boolean isCredentialSet(String key) {
+        if (this.credentials == null) {
+            return false;
+        }
+        Credential<?> credential = this.credentials.get(key);
+        return credential != null && credential.getValue() != null;
     }
 
     /**
-     * Check if the user supports a specific authentication method.
-     *
-     * @param authMethod the authentication method to check.
-     * @return true if the user supports the authentication method, false otherwise.
+     * @param key
+     * @return
      */
-    public boolean supportsAuthMethod(String authMethod) {
-        return this.authMethods.contains(authMethod);
-    }
-
-    @Override
-    public void addAuthority(Authority authority) {
-        this.authorities.add(authority);
-    }
-
-    @Override
-    public void addProcessRole(ProcessRole role) {
-        this.processRoles.add(role);
-    }
-
-    @Override
-    public void removeProcessRole(ProcessRole role) {
-        this.processRoles.remove(role);
-    }
-
-
-    @Override
-    public boolean validateRequiredAttributes() {
-        for (Map.Entry<String, Attribute<?>> entry : attributes.entrySet()) {
-            if (entry.getValue().isRequired() && entry.getValue().getValue() == null) {
-                return false;
-            }
+    public Credential<?> getCredentials(String key) {
+        if (this.credentials == null) {
+            return null;
         }
-        return true;
+        return this.credentials.get(key);
     }
 
-    @Override
-    public String getTelNumber() {
-        if (attributes.containsKey("tel")) {
-            return (String) attributes.get("tel").getValue();
+    /**
+     * @return
+     */
+    public Set<String> getCredentialsKeys() {
+        if (this.credentials == null) {
+            return Set.of();
         }
-        return null;
+        return this.credentials.keySet();
     }
 
-    @Override
-    public void setTelNumber(String telNumber) {
-        if (attributes.containsKey("tel")) {
-            ((Attribute<String>) attributes.get("tel")).setValue(telNumber);
-        }
-        attributes.put("tel", new Attribute<>(telNumber, false));
+    /**
+     * @return
+     */
+    public boolean isEnabled() {
+        return this.state.equals(UserState.ACTIVE);
     }
 }

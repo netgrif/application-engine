@@ -4,7 +4,7 @@ import com.icegreen.greenmail.configuration.GreenMailConfiguration
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.objects.auth.domain.IUser
+
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.PublicViewProperties

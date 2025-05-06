@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.impersonation.service.interfaces;
 
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
 import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserHasSessionException;

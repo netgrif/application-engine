@@ -4,16 +4,20 @@ import com.netgrif.application.engine.adapter.spring.utils.PageableUtils;
 import com.netgrif.application.engine.auth.service.RealmService;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.MissingResourceException;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
 public class CollectionNameProvider {
 
     private RealmService realmService;
+
+    private final String userMongoCollectionPrefix = "users_";
 
     @Autowired
     public void setRealmService(RealmService realmService) {
@@ -24,7 +28,7 @@ public class CollectionNameProvider {
         if (realmId == null || realmId.isEmpty()) {
             return getDefaultRealmCollection();
         }
-        return "users_" + realmId;
+        return userMongoCollectionPrefix + realmId;
     }
 
     public String getAdminRealmCollection() {
@@ -32,18 +36,18 @@ public class CollectionNameProvider {
         if (defaultRealmOptional.isEmpty()) {
             throw new MissingResourceException("Admin realm is not specified.", Realm.class.getName(), "defaultRealm");
         }
-        return "users_" + defaultRealmOptional.get().getId();
+        return this.userMongoCollectionPrefix + defaultRealmOptional.get().getId();
     }
 
     public Set<String> getCollectionNamesForRealms(Collection<String> realmIds) {
         if (realmIds == null || realmIds.isEmpty()) {
             return getCollectionNamesForAllRealm();
         }
-        return realmIds.stream().map(realmId -> "users_" + realmId).collect(Collectors.toSet());
+        return realmIds.stream().map(realmId -> userMongoCollectionPrefix + realmId).collect(Collectors.toSet());
     }
 
     public Set<String> getCollectionNamesForAllRealm() {
-        return realmService.getAllRealm(PageableUtils.fullPageRequest()).getContent().stream().map(realm -> "user_" + realm.getId()).collect(Collectors.toSet());
+        return realmService.getAllRealm(PageableUtils.fullPageRequest()).getContent().stream().map(realm -> userMongoCollectionPrefix + realm.getId()).collect(Collectors.toSet());
     }
 
     public String getDefaultRealmCollection() {
@@ -51,6 +55,6 @@ public class CollectionNameProvider {
         if (defaultRealmOptional.isEmpty()) {
             throw new MissingResourceException("Default realm is not specified.", Realm.class.getName(), "defaultRealm");
         }
-        return "users_" + defaultRealmOptional.get().getId();
+        return userMongoCollectionPrefix + defaultRealmOptional.get().getId();
     }
 }
