@@ -2,9 +2,7 @@ package com.netgrif.application.engine.auth.web;
 
 import com.netgrif.application.engine.adapter.spring.common.web.responsebodies.ResponseMessage;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-import com.netgrif.application.engine.auth.service.AuthorityService;
-import com.netgrif.application.engine.auth.service.PreferencesService;
-import com.netgrif.application.engine.auth.service.RealmService;
+import com.netgrif.application.engine.auth.service.*;
 import com.netgrif.application.engine.auth.web.requestbodies.PreferencesRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserCreateRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
@@ -23,7 +21,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.netgrif.application.engine.auth.service.UserService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -56,6 +53,7 @@ public class UserController {
     private final PreferencesService preferencesService;
     private final AuthorityService authorityService;
     private final RealmService realmService;
+    private final UserFactory userFactory;
 
     @Operation(summary = "Create a new user", description = "Creates a new user in the realm specified by id.")
     @ApiResponses(value = {
@@ -98,13 +96,13 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{realmId}/all")
-    public ResponseEntity<Page<User>> getAllUsers(@PathVariable String realmId, Pageable pageable) {
+    public ResponseEntity<Page<User>> getAllUsers(@PathVariable String realmId, Pageable pageable, Locale locale) {
         if (!realmExists(realmId)) {
             log.error("Realm with id [{}] not found", realmId);
             return ResponseEntity.badRequest().build();
         }
         Page<IUser> users = userService.findAllUsers(realmId, pageable);
-        return ResponseEntity.ok(changeToResponse(users, pageable));
+        return ResponseEntity.ok(changeToResponse(users, pageable, locale));
     }
 
     @Operation(summary = "Get logged user", description = "Retrieves information of currently logged user")
@@ -138,14 +136,14 @@ public class UserController {
     })
     @Operation(summary = "Generic user search", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<User>> search(@RequestBody UserSearchRequestBody query, Pageable pageable, Authentication auth) {
+    public ResponseEntity<Page<User>> search(@RequestBody UserSearchRequestBody query, Pageable pageable, Authentication auth, Locale locale) {
         List<ProcessResourceId> roles = query.getRoles() == null ? null : query.getRoles().stream().map(ProcessResourceId::new).toList();
         List<ProcessResourceId> negativeRoles = query.getNegativeRoles() == null ? null : query.getNegativeRoles().stream().map(ProcessResourceId::new).toList();
         Page<IUser> users = userService.searchAllCoMembers(query.getFulltext(),
                 roles,
                 negativeRoles,
                 (LoggedUser) auth.getPrincipal(), pageable);
-        return ResponseEntity.ok(changeToResponse(users, pageable));
+        return ResponseEntity.ok(changeToResponse(users, pageable, locale));
     }
 
     @Operation(summary = "Get user by id", description = "Retrieves information of user defined by given id")
@@ -325,12 +323,12 @@ public class UserController {
         }
     }
 
-    private Page<User> changeToResponse(Page<IUser> users, Pageable pageable) {
-        return new PageImpl<>(changeType(users.getContent()), pageable, users.getTotalElements());
+    private Page<User> changeToResponse(Page<IUser> users, Pageable pageable, Locale locale) {
+        return new PageImpl<>(changeType(users.getContent(), locale), pageable, users.getTotalElements());
     }
 
-    public List<User> changeType(List<IUser> users) {
-        return users.stream().map(User::createUser).toList();
+    public List<User> changeType(List<IUser> users, Locale locale) {
+        return users.stream().map(u -> userFactory.getUser(u, locale)).toList();
     }
 
     private boolean realmExists(String realmId) {

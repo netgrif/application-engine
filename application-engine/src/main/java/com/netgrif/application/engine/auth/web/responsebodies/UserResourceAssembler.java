@@ -34,6 +34,6 @@ public class UserResourceAssembler implements RepresentationModelAssembler<IUser
             throw new IllegalStateException("You must initialize the UserResourceAssembler before calling the toResource method! To initialize the assembler call the initialize method.");
         }
 
-        return new UserResource(small ? userFactory.getSmallUser(entity) : userFactory.getUser(entity, locale), selfRel);
+        return new UserResource(userFactory.getUser(entity, locale), selfRel);
     }
 }
