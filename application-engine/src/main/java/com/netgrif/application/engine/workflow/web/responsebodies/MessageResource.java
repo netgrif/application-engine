@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
 
+import com.netgrif.application.engine.adapter.spring.common.web.responsebodies.ResponseMessage;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 

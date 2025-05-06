@@ -1,18 +1,19 @@
 package com.netgrif.application.engine.auth.web;
 
+import com.netgrif.application.engine.adapter.spring.common.web.responsebodies.ResponseMessage;
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.PreferencesService;
 import com.netgrif.application.engine.auth.service.RealmService;
 import com.netgrif.application.engine.auth.web.requestbodies.PreferencesRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserCreateRequest;
-import com.netgrif.application.engine.auth.web.responsebodies.*;
+import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
+import com.netgrif.application.engine.auth.web.responsebodies.PreferencesResource;
+import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
-import com.netgrif.application.engine.objects.auth.domain.Realm;
 import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.AuthorityService;
-import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.objects.auth.domain.Realm;
 import com.netgrif.application.engine.objects.preferences.Preferences;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,7 +23,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import com.netgrif.application.engine.auth.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -36,16 +37,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 @Slf4j
 @RestController
+@RequestMapping("api/users")
+@Tag(name = "UserController")
 @RequiredArgsConstructor
-@RequestMapping("/api/user")
-@ConditionalOnProperty(
-        value = "nae.user.web.enabled",
-        havingValue = "true",
-        matchIfMissing = true
-)
-@Tag(name = "User")
 public class UserController {
 
     private final UserService userService;
@@ -206,7 +203,6 @@ public class UserController {
 //        Page<IUser> page = userService.findAllActiveByProcessRoles(roleResourceIds, pageable);
 //        return ResponseEntity.ok();
 //    }
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Assign roles to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @PutMapping(value = "/{realmId}/{id}/roles", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
@@ -215,16 +211,16 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<String> assignRolesToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
+    public ResponseEntity<ResponseMessage> assignRolesToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
         try {
             IUser user = userService.findById(userId, realmId);
             processRoleService.assignRolesToUser(user, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()), (LoggedUser) auth.getPrincipal());
             log.info("Process roles {} assigned to user with id [{}]", roleIds, userId);
-            return ResponseEntity.ok("Selected roles assigned to user " + userId);
+            return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Selected roles assigned to user " + userId));
         } catch (IllegalArgumentException e) {
             String message = "Assigning roles to user [" + userId + "] has failed!";
             log.error(message, e);
-            return ResponseEntity.badRequest().body(message);
+            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Assigning roles to user " + userId + " has failed!"));
         }
     }
 
@@ -237,15 +233,15 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<String> assignNegativeRolesToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
+    public ResponseEntity<ResponseMessage> assignNegativeRolesToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
         try {
             IUser user = userService.findById(userId, realmId);
             processRoleService.assignNegativeRolesToUser(user, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()), (LoggedUser) auth.getPrincipal());
             log.info("Negative process roles {} assigned to user [{}]", roleIds, userId);
-            return ResponseEntity.ok("Selected negative roles assigned to user " + userId);
+            return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Selected negative roles assigned to user " + userId));
         } catch (IllegalArgumentException e) {
             log.error("Assigning negative roles to user with id [{}] has failed!", userId, e);
-            return ResponseEntity.badRequest().body("Assigning negative roles to user " + userId + " has failed!");
+            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Assigning negative roles to user " + userId + " has failed!"));
         }
     }
 
@@ -274,14 +270,14 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping(value = "/{realmId}/{id}/authority", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> assignAuthorityToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, @RequestBody String authorityId) {
+    public ResponseEntity<ResponseMessage> assignAuthorityToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, @RequestBody String authorityId) {
         try {
             userService.assignAuthority(userId, realmId, authorityId);
         } catch (IllegalArgumentException e) {
             log.error("Assigning authority to user [{}] has failed!", userId, e);
-            return ResponseEntity.badRequest().body("Assigning authority to user " + userId + " has failed!");
+            return ResponseEntity.badRequest().body(ResponseMessage.createSuccessMessage("Assigning authority to user " + userId + " has failed!"));
         }
-        return ResponseEntity.ok("Authority was assigned to user successfully");
+        return ResponseEntity.ok(ResponseMessage.createErrorMessage("Authority was assigned to user successfully"));
     }
 
     @Operation(summary = "Get logged user's preferences", security = {@SecurityRequirement(name = "X-Auth-Token")})
@@ -311,15 +307,15 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> savePreferences(@RequestBody PreferencesRequest preferences, Authentication auth) {
+    public ResponseEntity<ResponseMessage> savePreferences(@RequestBody PreferencesRequest preferences, Authentication auth) {
         try {
             String userId = ((LoggedUser) auth.getPrincipal()).getId();
             preferences.setUserId(userId);
             preferencesService.save(preferences.toPreferences());
-            return ResponseEntity.ok("User preferences saved");
+            return ResponseEntity.ok(ResponseMessage.createSuccessMessage("User preferences saved"));
         } catch (Exception e) {
             log.error("Saving user preferences failed", e);
-            return ResponseEntity.badRequest().body("Saving user preferences failed");
+            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Saving user preferences failed"));
         }
     }
 
