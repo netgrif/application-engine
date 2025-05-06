@@ -338,7 +338,7 @@ public class PetriNetService implements IPetriNetService {
         );
         AggregationResults<?> groupResults = mongoTemplate.aggregate(
                 agg,
-                PetriNet.class,
+                com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class,
                 TypeFactory.defaultInstance().constructType(new TypeReference<Map<String, String>>() {
                 }).getRawClass()
         );
@@ -371,10 +371,10 @@ public class PetriNetService implements IPetriNetService {
         if (title == null || title.length() == 0) {
             Query query = Query.query(Criteria.where("_id").is(new ObjectId(netId)));
             query.fields().include("_id").include("title");
-            List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
+            List<com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet> nets = mongoTemplate.find(query, com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class);
             if (nets.isEmpty())
                 return null;
-            title = nets.get(0).getTitle().getDefaultValue();
+            title = nets.getFirst().getTitle().getDefaultValue();
         }
         return new FileSystemResource(fileStorageConfiguration.getStorageArchived() + netId + "-" + title + Importer.FILE_EXTENSION);
     }
@@ -415,7 +415,7 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public List<PetriNetReference> getReferencesByUsersProcessRoles(LoggedUser user, Locale locale) {
         Query query = Query.query(getProcessRolesCriteria(user));
-        return mongoTemplate.find(query, PetriNet.class).stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
+        return mongoTemplate.find(query, com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class).stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
     }
 
     @Override
@@ -509,8 +509,8 @@ public class PetriNetService implements IPetriNetService {
         }
 
         query.with(pageable);
-        List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
-        return new PageImpl<>(nets.stream().map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()), pageable, mongoTemplate.count(queryTotal, PetriNet.class));
+        List<com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet> nets = mongoTemplate.find(query, com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class);
+        return new PageImpl<>(nets.stream().map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()), pageable, mongoTemplate.count(queryTotal, com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class));
     }
 
     private void addValueCriteria(Query query, Query queryTotal, Criteria criteria) {
