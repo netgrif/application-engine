@@ -24,6 +24,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -105,9 +107,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public IUser saveUser(IUser user, String realmId) {
+        user.setRealmId(realmId);
+        return saveUser(user);
+    }
+
+    @Override
+    public IUser saveUser(IUser user) {
         log.debug("Saving user [{}] in DEFAULT realm", user.getUsername());
         user.setWorkspaceId(null);
-        String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
+        String collectionName = collectionNameProvider.getCollectionNameForRealm(user.getRealmId());
         user = userRepository.saveUser((User) user, mongoTemplate, collectionName);
         log.trace("User [{}] saved in collection [{}]", user.getUsername(), collectionName);
         return user;
@@ -132,12 +140,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<IUser> findAllUsers(String realmId) {
-        log.trace("Retrieving all users in realm [{}]", realmId);
-        String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
-        List<IUser> users = mongoTemplate.findAll(IUser.class, collectionName);
-        log.debug("Found [{}] users in realm [{}]", users.size(), realmId);
-        return users;
+    public Page<IUser> findAllUsers(String realmName, Pageable pageable) {
+        log.trace("Retrieving all users in realm [{}]", realmName);
+        String collectionName = collectionNameProvider.getCollectionNameForRealm(realmName);
+        Page<IUser> page = PageableExecutionUtils.getPage(
+                mongoTemplate.findAll(IUser.class, collectionName),
+                pageable,
+                () -> mongoTemplate.count(new Query().with(pageable), IUser.class, collectionName)
+        );
+        log.debug("Found [{}] users in realm [{}]", page.getContent().size(), realmName);
+        return page;
     }
 
     @Override
@@ -339,6 +351,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable) {
+        return this.findAllActiveByProcessRoles(roleIds, pageable, List.of(getLoggedUser().getRealmId()));
+    }
+
+    @Override
     public Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable, Collection<String> realmIds) {
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
         Page<User> users = userRepository.findDistinctByStateAndProcessRoles__idIn(
@@ -354,6 +371,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<IUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, Collection<String> realmIds) {
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
+        return searchUsersByRoleIds(roleIds, collectionNames);
+    }
+
+    @Override
+    public List<IUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds) {
+        Set<String> collectionNames = collectionNameProvider.getCollectionNamesForAllRealm();
+        return searchUsersByRoleIds(roleIds, collectionNames);
+    }
+
+    protected List<IUser> searchUsersByRoleIds(Set<ProcessResourceId> roleIds, Set<String> collectionNames) {
         List<User> users = userRepository.findAllByProcessRoles__idIn(
                 new ArrayList<>(roleIds),
                 mongoTemplate,
@@ -444,6 +471,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public IUser addNegativeProcessRole(IUser user, ProcessResourceId id) {
+        ProcessRole role = processRoleService.findById(id);
+        user.addNegativeProcessRole(role);
+        return saveUser(user, user.getRealmId());
+    }
+
+    @Override
+    public IUser addNegativeProcessRole(IUser user, String roleStringId) {
+        return this.addNegativeProcessRole(user, new ProcessResourceId(roleStringId));
+    }
+
+    @Override
+    public IUser removeNegativeProcessRole(IUser user, ProcessRole role) {
+        user.removeNegativeProcessRole(role);
+        return saveUser(user, user.getRealmId());
+    }
+
+    @Override
+    public IUser removeNegativeProcessRole(IUser user, ProcessResourceId roleId) {
+        ProcessRole role = processRoleService.findById(roleId);
+        return removeNegativeProcessRole(user, role);
+    }
+
+    @Override
+    public IUser removeNegativeProcessRole(IUser user, String roleId) {
+        return this.removeNegativeProcessRole(user, new ProcessResourceId(roleId));
+    }
+
+    @Override
     public void removeRoleOfDeletedPetriNet(PetriNet petriNet, Collection<String> realmIds) {
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
         List<IUser> users = findAllByProcessRoles(petriNet.getRoles().values().stream().map(ProcessRole::get_id).collect(Collectors.toSet()), collectionNames);
@@ -505,7 +561,8 @@ public class UserServiceImpl implements UserService {
                 user.getUsername(),
                 password,
                 user.getAuthorities(),
-                user.getProcessRoles()
+                user.getProcessRoles(),
+                user.getNegativeProcessRoles()
         );
         loggedUser.setEmail(user.getEmail());
         loggedUser.setFirstName(user.getFirstName());

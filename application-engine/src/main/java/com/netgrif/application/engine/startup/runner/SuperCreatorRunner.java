@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -86,7 +87,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     }
 
     public void setAllGroups() {
-        groupService.findAll().forEach(g -> groupService.addUser(getSuperUser(), g));
+        groupService.findAll(Pageable.unpaged()).forEach(g -> groupService.addUser(getSuperUser(), g));
     }
 
     public void setAllProcessRoles() {

@@ -36,4 +36,15 @@ public class AuthBeansConfiguration {
         return new UserServiceImpl();
     }
 
+    @Bean
+    @ConditionalOnMissingBean(PreferencesService.class)
+    public PreferencesService preferencesService() {
+        return new PreferencesServiceImpl();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(UserFactory.class)
+    public UserFactory userFactory() {
+        return new UserFactoryImpl();
+    }
 }

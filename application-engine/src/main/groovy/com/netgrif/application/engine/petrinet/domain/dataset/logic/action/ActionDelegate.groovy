@@ -1,5 +1,10 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
+import com.netgrif.application.engine.auth.service.GroupService
+import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.integration.modules.ModuleHolder
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.AsyncRunner
 import com.netgrif.application.engine.AsyncRunnerWrapper
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
@@ -20,8 +25,6 @@ import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.importer.service.FieldFactory
-import com.netgrif.application.engine.integration.plugin.injector.PluginHolder
-import com.netgrif.application.engine.integration.plugin.injector.PluginInjector
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
 import com.netgrif.application.engine.mail.interfaces.IMailService
@@ -192,12 +195,9 @@ class ActionDelegate {
     @Autowired
     PublicViewProperties publicViewProperties
 
-    @Autowired
-    PluginInjector pluginInjector
-
     FrontendActionOutcome Frontend
 
-    PluginHolder Plugin
+    ModuleHolder Module
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -220,7 +220,7 @@ class ActionDelegate {
         this.initTransitionsMap(action.transitionIds)
         this.outcomes = new ArrayList<>()
         this.Frontend = new FrontendActionOutcome(this.useCase, this.task, this.outcomes)
-        this.Plugin = new PluginHolder()
+        this.Module = new ModuleHolder()
     }
 
     def initFieldsMap(Map<String, String> fieldIds) {

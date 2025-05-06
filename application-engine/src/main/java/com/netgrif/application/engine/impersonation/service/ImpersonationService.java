@@ -6,6 +6,7 @@ import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
+import com.netgrif.application.engine.objects.event.RunPhase;
 import com.netgrif.application.engine.objects.event.events.user.ImpersonationEvent;
 import com.netgrif.application.engine.objects.event.events.user.ImpersonationPhase;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
@@ -90,7 +91,7 @@ public class ImpersonationService implements IImpersonationService {
         securityContextService.saveToken(loggedUser.getId());
         securityContextService.reloadSecurityContext(loggedUser);
         log.info(loggedUser.getFullName() + " has just impersonated user " + impersonatedLogged.getFullName());
-        publisher.publishEvent(new ImpersonationEvent(loggedUser, impersonatedLogged, ImpersonationPhase.START));
+        publisher.publishEvent(new ImpersonationEvent(loggedUser, impersonatedLogged, RunPhase.START));
         return loggedUser;
     }
 
@@ -122,7 +123,7 @@ public class ImpersonationService implements IImpersonationService {
         log.info(impersonator.getFullName() + " has stopped impersonating user " + impersonated.getFullName());
         securityContextService.saveToken(impersonator.getId());
         securityContextService.reloadSecurityContext(impersonator);
-        publisher.publishEvent(new ImpersonationEvent(impersonator, impersonated, ImpersonationPhase.STOP));
+        publisher.publishEvent(new ImpersonationEvent(impersonator, impersonated, RunPhase.STOP));
         return impersonator;
     }
 
@@ -130,7 +131,7 @@ public class ImpersonationService implements IImpersonationService {
     public void onSessionDestroy(LoggedUser impersonator) {
         removeImpersonator(impersonator.getId());
         log.info(impersonator.getFullName() + " has logged out and stopped impersonating user " + impersonator.getImpersonated().getFullName());
-        publisher.publishEvent(new ImpersonationEvent(impersonator, impersonator.getImpersonated(), ImpersonationPhase.STOP));
+        publisher.publishEvent(new ImpersonationEvent(impersonator, impersonator.getImpersonated(), RunPhase.STOP));
     }
 
     @Override

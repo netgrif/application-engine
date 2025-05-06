@@ -26,9 +26,13 @@ public interface GroupService {
 
     Group findById(String id);
 
-    Set<Group> findAllByIds(Set<String> ids);
+    List<Group> findByIds(Collection<String> ids);
 
-    Set<Group> findAll();
+    Page<Group> findAllByIds(Set<String> ids, Pageable pageable);
+
+    Page<Group> findAll(Pageable pageable);
+
+    Page<Group> findAllFromRealm(String realmId, Pageable pageable);
 
     Group getDefaultSystemGroup();
 
@@ -47,4 +51,10 @@ public interface GroupService {
     Set<String> getAllCoMembers(IUser user);
 
     Page<Group> findByPredicate(Predicate predicate, Pageable pageable);
+
+    Group assignAuthority(String groupId, String authorityId);
+
+    Collection<String> getGroupsOwnerEmails(Collection<String> groupIds);
+
+    String getGroupOwnerEmail(String groupId);
 }

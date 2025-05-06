@@ -2,6 +2,7 @@ package com.netgrif.application.engine.adapter.spring.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.objects.auth.domain.IUser;
+import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
@@ -41,6 +42,12 @@ public class Task extends com.netgrif.application.engine.objects.workflow.domain
     @Override
     public List<Field<?>> getImmediateData() {
         return super.getImmediateData();
+    }
+
+    @Transient
+    @Override
+    public IUser getUser() {
+        return super.getUser();
     }
 
     @JsonIgnore

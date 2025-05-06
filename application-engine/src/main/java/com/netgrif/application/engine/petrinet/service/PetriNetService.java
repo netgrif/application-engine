@@ -493,11 +493,9 @@ public class PetriNetService implements IPetriNetService {
         }
         if (criteriaClass.getGroup() != null) {
             if (criteriaClass.getGroup().size() == 1) {
-                IUser owner = userService.findById(this.groupService.findById(criteriaClass.getGroup().getFirst()).getOwnerId(), null);
-                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(owner.getEmail()));
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(groupService.getGroupOwnerEmail(criteriaClass.getGroup().get(0))));
             } else {
-                List<IUser> owners = userService.findAllByIds(this.groupService.findAllByIds(new HashSet<>(criteriaClass.getGroup())).stream().map(Group::getOwnerId).collect(Collectors.toSet()), null);
-                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(owners.stream().map(IUser::getEmail).collect(Collectors.toSet())));
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(groupService.getGroupsOwnerEmails(criteriaClass.getGroup())));
             }
         }
         if (criteriaClass.getVersion() != null) {

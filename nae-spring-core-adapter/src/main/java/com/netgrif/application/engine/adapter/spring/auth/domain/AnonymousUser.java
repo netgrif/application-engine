@@ -7,6 +7,7 @@ import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import lombok.Data;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Data
@@ -236,6 +237,21 @@ public class AnonymousUser extends AbstractUser implements IUser {
     @Override
     public Author transformToAuthor() {
         return UserAuthorMapper.toAuthor(this);
+    }
+
+    @Override
+    public LocalDateTime getCreatedAt() {
+        return null;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Override
+    public boolean isEmailVerified() {
+        return false;
     }
 
     @Override

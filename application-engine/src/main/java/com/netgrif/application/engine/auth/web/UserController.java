@@ -1,55 +1,49 @@
 package com.netgrif.application.engine.auth.web;
 
+import com.netgrif.application.engine.auth.service.PreferencesService;
+import com.netgrif.application.engine.auth.service.RealmService;
+import com.netgrif.application.engine.auth.web.requestbodies.PreferencesRequest;
+import com.netgrif.application.engine.auth.web.requestbodies.UserCreateRequest;
 import com.netgrif.application.engine.auth.web.responsebodies.*;
 import com.netgrif.application.engine.objects.petrinet.domain.workspace.DefaultWorkspaceService;
 import com.netgrif.application.engine.objects.petrinet.domain.workspace.Workspace;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAssembler;
+import com.netgrif.application.engine.objects.auth.domain.Authority;
+import com.netgrif.application.engine.objects.auth.domain.Realm;
 import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.application.engine.auth.service.AuthorityService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserResourceHelperService;
 import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
-import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-import com.netgrif.application.engine.security.service.ISecurityContextService;
-import com.netgrif.application.engine.settings.domain.Preferences;
-import com.netgrif.application.engine.settings.service.IPreferencesService;
-import com.netgrif.application.engine.settings.web.PreferencesResource;
+import com.netgrif.application.engine.objects.preferences.Preferences;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/user")
 @ConditionalOnProperty(
         value = "nae.user.web.enabled",
@@ -59,105 +53,143 @@ import java.util.stream.Collectors;
 @Tag(name = "User")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final ProcessRoleService processRoleService;
+    private final PreferencesService preferencesService;
+    private final AuthorityService authorityService;
+    private final RealmService realmService;
+    private final DefaultWorkspaceService workspaceService;
 
-    @Autowired
-    private IUserResourceHelperService userResourceHelperService;
-
-    @Autowired
-    private ProcessRoleService processRoleService;
-
-    @Autowired
-    private AuthorityService authorityService;
-
-    @Autowired
-    private IPreferencesService preferencesService;
-
-    @Autowired
-    private ServerAuthProperties serverAuthProperties;
-
-    @Autowired
-    private IUserFactory userResponseFactory;
-
-    @Autowired
-    private ObjectFactory<UserResourceAssembler> userResourceAssemblerFactory;
-
-    @Autowired
-    private ISecurityContextService securityContextService;
-
-    @Autowired
-    private DefaultWorkspaceService workspaceService;
-
-    protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
-        UserResourceAssembler result = userResourceAssemblerFactory.getObject();
-        result.initialize(locale, small, selfRel);
-        return result;
+    @Operation(summary = "Create a new user", description = "Creates a new user in the realm specified by id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User successfully created"),
+            @ApiResponse(responseCode = "400", description = "Invalid user data"),
+            @ApiResponse(responseCode = "409", description = "Conflict – user already exists"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/{realmId}")
+    public ResponseEntity<User> createUser(@PathVariable String realmId, @RequestBody UserCreateRequest request) {
+        try {
+            if (!realmExists(realmId)) {
+                log.error("Realm with id [{}] not found", realmId);
+                return ResponseEntity.badRequest().build();
+            }
+            if (userService.findUserByUsername(request.getUsername(), realmId).isPresent()) {
+                log.error("User with username [{}] already exists in realm [{}]", request.getUsername(), realmId);
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            IUser user = userService.createUser(
+                    request.getUsername(),
+                    request.getEmail(),
+                    request.getFirstName(),
+                    request.getLastName(),
+                    request.getPassword(),
+                    realmId
+            );
+            log.info("New user with username [{}] has been created in realm [{}]", request.getUsername(), realmId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(User.createUser(user));
+        } catch (Exception e) {
+            log.error("Failed to create user", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    @Operation(summary = "Get all users", security = {@SecurityRequirement(name = "BasicAuth")})
-    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
-        small = small != null && small;
-        Page<IUser> page = userService.findAllCoMembers((LoggedUser) auth.getPrincipal(), pageable);
-        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
-                .getAll(small, pageable, assembler, auth, locale)).withRel("all");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "all"), selfLink);
-        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
-        return resources;
+    @Operation(summary = "Get page of users from realm", description = "Retrieves page of users from defined realm")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid user data"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping("/{realmId}/all")
+    public ResponseEntity<Page<User>> getAllUsers(@PathVariable String realmId, Pageable pageable) {
+        if (!realmExists(realmId)) {
+            log.error("Realm with id [{}] not found", realmId);
+            return ResponseEntity.badRequest().build();
+        }
+        Page<IUser> users = userService.findAllUsers(realmId, pageable);
+        return ResponseEntity.ok(changeToResponse(users, pageable));
     }
 
+    @Operation(summary = "Get logged user", description = "Retrieves information of currently logged user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid user data"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<User> getLoggedUser(Authentication auth) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        IUser user;
+        try {
+            user = userService.findById(loggedUser.getId(), loggedUser.getRealmId());
+            if (user == null) {
+                return ResponseEntity
+                        .status(HttpStatus.UNAUTHORIZED).build();
+            }
+        } catch (IllegalArgumentException e) {
+            log.error("Could not find user with id [{}]", loggedUser.getId(), e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
 
-    @Operation(summary = "Generic user search", security = {@SecurityRequirement(name = "BasicAuth")})
-    @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<UserResource> search(@RequestParam(value = "small", required = false) Boolean small, @RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
-        small = small == null ? false : small;
-        List<ProcessResourceId> roles = query.getRoles() == null ? null : query.getRoles().stream().map(ProcessResourceId::new).collect(Collectors.toList());
-        List<ProcessResourceId> negativeRoles = query.getNegativeRoles() == null ? null : query.getNegativeRoles().stream().map(ProcessResourceId::new).collect(Collectors.toList());
-        Page<IUser> page = userService.searchAllCoMembers(query.getFulltext(),
+        return ResponseEntity.ok(User.createUser(user));
+    }
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid user data"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @Operation(summary = "Generic user search", security = {@SecurityRequirement(name = "X-Auth-Token")})
+    @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Page<User>> search(@RequestBody UserSearchRequestBody query, Pageable pageable, Authentication auth) {
+        List<ProcessResourceId> roles = query.getRoles() == null ? null : query.getRoles().stream().map(ProcessResourceId::new).toList();
+        List<ProcessResourceId> negativeRoles = query.getNegativeRoles() == null ? null : query.getNegativeRoles().stream().map(ProcessResourceId::new).toList();
+        Page<IUser> users = userService.searchAllCoMembers(query.getFulltext(),
                 roles,
                 negativeRoles,
                 (LoggedUser) auth.getPrincipal(), pageable);
-        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
-                .search(small, query, pageable, assembler, auth, locale)).withRel("search");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "search"), selfLink);
-        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
-        return resources;
+        return ResponseEntity.ok(changeToResponse(users, pageable));
     }
 
-    @Operation(summary = "Get user by id", security = {@SecurityRequirement(name = "BasicAuth")})
-    @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public UserResource getUser(@PathVariable("id") String userId, @RequestParam(value = "small", required = false) Boolean small, Locale locale) {
-        small = small != null && small;
+    @Operation(summary = "Get user by id", description = "Retrieves information of user defined by given id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "User with given id does not exist in given realm"),
+            @ApiResponse(responseCode = "401", description = "User trying to retrieved information is not admin"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping(value = "/{realmId}/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<User> getUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, Locale locale) {
         LoggedUser actualUser = userService.getLoggedUserFromContext();
         LoggedUser loggedUser = actualUser.getSelfOrImpersonated();
         if (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)) {
-            log.info("User " + actualUser.getUsername() + " trying to get another user with ID " + userId);
-            throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
+            log.info("User [{}] trying to get another user with ID [{}]", actualUser.getUsername(), userId);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        IUser user = userService.findById(userId, null);
+        IUser user;
+        try {
+            user = userService.findById(userId, realmId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
         user.setWorkspaceId(actualUser.getWorkspaceId());
-        return new UserResource(small ? userResponseFactory.getSmallUser(user) : userResponseFactory.getUser(user, locale), "profile");
-    }
-
-    @Operation(summary = "Get logged user", security = {@SecurityRequirement(name = "BasicAuth")})
-    @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
-    public UserResource getLoggedUser(@RequestParam(value = "small", required = false) Boolean small, Authentication auth, Locale locale) {
-        small = small != null && small;
-        return userResourceHelperService.getResource((LoggedUser) auth.getPrincipal(), locale, small);
+        return ResponseEntity.ok(User.createUser(user));
     }
 
     @Operation(summary = "Update user", security = {@SecurityRequirement(name = "BasicAuth")})
-    @PostMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public UserResource updateUser(@PathVariable("id") String userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) throws UnauthorisedRequestException {
+    @PostMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<User> updateUser( @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) throws UnauthorisedRequestException {
         if (!serverAuthProperties.isEnableProfileEdit()) return null;
-
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        IUser user = userService.findById(userId, null);
-        if (user == null || (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to modify profile of " + userService.transformToLoggedUser(user).getUsername());
-
-        user = userService.update(user, updates);
+        String userId = updates.getStringId();
+        IUser user;
+        try {
+            user = userService.findById(userId, updatedUser.getRealmId());
+        } catch (IllegalArgumentException e) {
+            log.error("Could not find user with id [{}]", userId, e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        user = userService.update(user, updates.getUpdatedUser());
         securityContextService.saveToken(userId);
         if (Objects.equals(loggedUser.getId(), userId)) {
             loggedUser.setFirstName(user.getFirstName());
@@ -167,8 +199,8 @@ public class UserController {
             }
             securityContextService.reloadSecurityContext(loggedUser);
         }
-        log.info("Updating user " + user.getEmail() + " with data " + updates.toString());
-        return new UserResource(userResponseFactory.getUser(user, locale), "profile");
+        log.info("Updating user " + user.getEmail() + " with data " + updatedUser);
+        return ResponseEntity.ok(User.createUser(user));
     }
 
     @Operation(summary = "Get all workspaces", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -179,88 +211,128 @@ public class UserController {
         return workspaces.stream().map(w -> new WorkspaceResponse(w.getId(), w.isDefaultWorkspace())).collect(Collectors.toList());
     }
 
-    @Operation(summary = "Get all users with specified roles", security = {@SecurityRequirement(name = "BasicAuth")})
-    @PostMapping(value = "/role", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<UserResource> getAllWithRole(@RequestBody Set<String> roleIds, @RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
-        small = small == null ? false : small;
-        Set<ProcessResourceId> roleResourceIds = roleIds == null ? null : roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet());
-        Page<IUser> page = userService.findAllActiveByProcessRoles(roleResourceIds, pageable, null);
-        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
-                .getAllWithRole(roleIds, small, pageable, assembler, locale)).withRel("role");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "role"), selfLink);
-        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
-        return resources;
+//    todo not used on front, is it needed?
+//    @Operation(summary = "Get all users with specified roles", security = {@SecurityRequirement(name = "X-Auth-Token")})
+//    @PostMapping(value = "/role", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<Page<IUser>> getAllWithRole(@RequestBody Set<String> roleIds, Pageable pageable, Locale locale) {
+//        Set<ProcessResourceId> roleResourceIds = roleIds == null ? null : roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet());
+//        Page<IUser> page = userService.findAllActiveByProcessRoles(roleResourceIds, pageable);
+//        return ResponseEntity.ok();
+//    }
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Operation(summary = "Assign roles to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "X-Auth-Token")})
+    @PutMapping(value = "/{realmId}/{id}/roles", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Selected roles assigned successfully"),
+            @ApiResponse(responseCode = "400", description = "Requested roles or user with defined id does not exist"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<String> assignRolesToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
+        try {
+            IUser user = userService.findById(userId, realmId);
+            processRoleService.assignRolesToUser(user, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()), (LoggedUser) auth.getPrincipal());
+            log.info("Process roles {} assigned to user with id [{}]", roleIds, userId);
+            return ResponseEntity.ok("Selected roles assigned to user " + userId);
+        } catch (IllegalArgumentException e) {
+            String message = "Assigning roles to user [" + userId + "] has failed!";
+            log.error(message, e);
+            return ResponseEntity.badRequest().body(message);
+        }
     }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
-    @Operation(summary = "Assign role to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "BasicAuth")})
-    @PostMapping(value = "/{id}/role/assign", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @Operation(summary = "Assign negative roles to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "X-Auth-Token")})
+    @PutMapping(value = "/{realmId}/{id}/negativeRole", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "200", description = "Selected negative roles assigned successfully"),
+            @ApiResponse(responseCode = "400", description = "Requested roles or user with defined id does not exist"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public MessageResource assignRolesToUser(@PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
+    public ResponseEntity<String> assignNegativeRolesToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
         try {
-            processRoleService.assignRolesToUser(userId, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()), (LoggedUser) auth.getPrincipal());
-            log.info("Process roles " + roleIds + " assigned to user " + userId);
-            return MessageResource.successMessage("Selected roles assigned to user " + userId);
+            IUser user = userService.findById(userId, realmId);
+            processRoleService.assignNegativeRolesToUser(user, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()), (LoggedUser) auth.getPrincipal());
+            log.info("Negative process roles {} assigned to user [{}]", roleIds, userId);
+            return ResponseEntity.ok("Selected negative roles assigned to user " + userId);
         } catch (IllegalArgumentException e) {
-            log.error(e.getMessage());
-            return MessageResource.errorMessage("Assigning roles to user " + userId + " has failed!");
+            log.error("Assigning negative roles to user with id [{}] has failed!", userId, e);
+            return ResponseEntity.badRequest().body("Assigning negative roles to user " + userId + " has failed!");
         }
     }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Get all authorities of the system",
             description = "Caller must have the ADMIN role",
-            security = {@SecurityRequirement(name = "BasicAuth")})
-    @GetMapping(value = "/authority", produces = MediaTypes.HAL_JSON_VALUE)
+            security = {@SecurityRequirement(name = "X-Auth-Token")})
+    @GetMapping(value = "/authority", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public AuthoritiesResources getAllAuthorities(Authentication auth) {
-        return new AuthoritiesResources(authorityService.findAll());
+    public ResponseEntity<List<Authority>> getAllAuthorities() {
+        return ResponseEntity.ok(authorityService.findAll());
     }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Assign authority to the user",
             description = "Caller must have the ADMIN role",
-            security = {@SecurityRequirement(name = "BasicAuth")})
-    @PostMapping(value = "/{id}/authority/assign", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+            security = {@SecurityRequirement(name = "X-Auth-Token")})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "200", description = "Authority was assigned to user successfully"),
+            @ApiResponse(responseCode = "400", description = "Authority with given id or user with given id does not exist"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public MessageResource assignAuthorityToUser(@PathVariable("id") String userId, @RequestBody String authorityId) {
-        userService.assignAuthority(userId, null, authorityId);
-        return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
+    @PostMapping(value = "/{realmId}/{id}/authority", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> assignAuthorityToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, @RequestBody String authorityId) {
+        try {
+            userService.assignAuthority(userId, realmId, authorityId);
+        } catch (IllegalArgumentException e) {
+            log.error("Assigning authority to user [{}] has failed!", userId, e);
+            return ResponseEntity.badRequest().body("Assigning authority to user " + userId + " has failed!");
+        }
+        return ResponseEntity.ok("Authority was assigned to user successfully");
     }
 
-    @Operation(summary = "Get user's preferences", security = {@SecurityRequirement(name = "BasicAuth")})
-    @GetMapping(value = "/preferences", produces = MediaTypes.HAL_JSON_VALUE)
-    public PreferencesResource preferences(Authentication auth) {
+    @Operation(summary = "Get logged user's preferences", security = {@SecurityRequirement(name = "X-Auth-Token")})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns preferences of logged user"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping(value = "/preferences", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PreferencesResource> preferences(Authentication auth) {
         String userId = ((LoggedUser) auth.getPrincipal()).getId();
         Preferences preferences = preferencesService.get(userId);
 
         if (preferences == null) {
-            preferences = new Preferences(userId);
+            preferences = new com.netgrif.application.engine.adapter.spring.preferences.Preferences(userId);
         }
+        PreferencesResource preferencesResource = PreferencesResource.withPreferences(preferences);
 
-        return new PreferencesResource(preferences);
+        return ResponseEntity.ok(preferencesResource);
     }
 
-    @Operation(summary = "Set user's preferences", security = {@SecurityRequirement(name = "BasicAuth")})
-    @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource savePreferences(@RequestBody Preferences preferences, Authentication auth) {
+    @Operation(summary = "Set preferences of logged user", security = {@SecurityRequirement(name = "X-Auth-Token")})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Saves preferences of logged user"),
+            @ApiResponse(responseCode = "400", description = "Preferences data are invalid"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> savePreferences(@RequestBody PreferencesRequest preferences, Authentication auth) {
         try {
             String userId = ((LoggedUser) auth.getPrincipal()).getId();
             preferences.setUserId(userId);
-            preferencesService.save(preferences);
-            return MessageResource.successMessage("User preferences saved");
+            preferencesService.save(preferences.toPreferences());
+            return ResponseEntity.ok("User preferences saved");
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return MessageResource.errorMessage("Saving user preferences failed");
+            log.error("Saving user preferences failed", e);
+            return ResponseEntity.badRequest().body("Saving user preferences failed");
         }
     }
 
@@ -279,4 +351,16 @@ public class UserController {
         }
     }
 
+    private Page<User> changeToResponse(Page<IUser> users, Pageable pageable) {
+        return new PageImpl<>(changeType(users.getContent()), pageable, users.getTotalElements());
+    }
+
+    public List<User> changeType(List<IUser> users) {
+        return users.stream().map(User::createUser).toList();
+    }
+
+    private boolean realmExists(String realmId) {
+        Optional<Realm> realm = realmService.getRealmById(realmId);
+        return realm.isPresent();
+    }
 }
