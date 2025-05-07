@@ -68,16 +68,8 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     }
 
     void setAllToSuperUser() {
-        setAllGroups()
         setAllRoles()
         log.info("Super identity updated")
-    }
-
-    void setAllGroups() {
-        // todo 2058 groups
-//        groupService.findAllGroups().each {
-//            groupService.addUser(superIdentity, it)
-//        }
     }
 
     void setAllRoles() {

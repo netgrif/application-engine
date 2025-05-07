@@ -4,8 +4,6 @@ import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import lombok.Data;
 
-import java.util.Set;
-
 @Data
 public class IdentityDTO {
 
@@ -20,9 +18,6 @@ public class IdentityDTO {
     private String fullName;
 
     private String activeActorId;
-
-    // todo 2058 groups
-    private Set<String> nextGroups;
 
     public IdentityDTO(Identity identity, String activeActorId) {
         this.id = identity.getStringId();

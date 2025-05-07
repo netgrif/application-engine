@@ -91,12 +91,14 @@ public class RegistrationService implements IRegistrationService {
             roleService.assignRolesToActor(identity.getMainActorId(), Set.of(defaultAppRole.getStringId(),
                     defaultProcessRole.getStringId()));
 
-            // todo 2058 groups
-//            if (newUser.groups != null && !newUser.groups.isEmpty()) {
-//                for (String group : newUser.groups) {
-//                    groupService.addUser(user, group);
-//                }
-//            }
+            if (request.groups != null && !request.groups.isEmpty()) {
+                Optional<User> userOpt = userService.findById(identity.getMainActorId());
+                if (userOpt.isEmpty()) {
+                    throw new IllegalStateException(String.format("Cannot find user with id [%s], that was just created.",
+                            identity.getMainActorId()));
+                }
+                userService.addGroups(userOpt.get(), request.groups);
+            }
 
             publisher.publishEvent(new IdentityRegistrationEvent(identity));
         }
