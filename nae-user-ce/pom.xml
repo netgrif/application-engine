@@ -170,12 +170,6 @@
     </dependencies>
 
     <build>
-        <extensions>
-            <extension>
-                <groupId>kr.motd.maven</groupId>
-                <artifactId>os-maven-plugin</artifactId>
-            </extension>
-        </extensions>
         <plugins>
             <plugin>
                 <groupId>com.netgrif</groupId>
@@ -207,6 +201,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
+                    <compilerArgument>-parameters</compilerArgument>
                     <source>21</source>
                     <target>21</target>
                     <annotationProcessorPaths>

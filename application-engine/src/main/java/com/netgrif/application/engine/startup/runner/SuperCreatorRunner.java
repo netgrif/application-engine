@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.startup.runner;
 
 import com.netgrif.application.engine.auth.service.AuthorityService;
-import com.netgrif.application.engine.objects.auth.constants.SearchConstants;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.auth.service.GroupService;
@@ -91,7 +90,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     }
 
     public void setAllGroups() {
-        groupService.findAll(Pageable.ofSize(SearchConstants.MAX_PAGE_SIZE)).forEach(g -> groupService.addUser(getSuperUser(), g));
+        groupService.findAll(Pageable.unpaged()).forEach(g -> groupService.addUser(getSuperUser(), g));
     }
 
     public void setAllProcessRoles() {

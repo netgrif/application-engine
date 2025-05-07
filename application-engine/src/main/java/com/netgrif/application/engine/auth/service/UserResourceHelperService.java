@@ -22,7 +22,7 @@ public class UserResourceHelperService implements IUserResourceHelperService {
     private UserService userService;
 
     @Autowired
-    private IUserFactory userFactory;
+    private UserFactory userFactory;
 
     @Autowired
     private IImpersonationService impersonationService;

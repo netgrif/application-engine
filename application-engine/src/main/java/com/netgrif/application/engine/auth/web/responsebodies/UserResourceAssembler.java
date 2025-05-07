@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.auth.web.responsebodies;
 
+import com.netgrif.application.engine.auth.service.UserFactory;
+import com.netgrif.application.engine.objects.auth.domain.IUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 
@@ -8,7 +10,7 @@ import java.util.Locale;
 public class UserResourceAssembler implements RepresentationModelAssembler<IUser, UserResource> {
 
     @Autowired
-    private IUserFactory userFactory;
+    private UserFactory userFactory;
 
     private Locale locale;
     private String selfRel;
@@ -32,6 +34,6 @@ public class UserResourceAssembler implements RepresentationModelAssembler<IUser
             throw new IllegalStateException("You must initialize the UserResourceAssembler before calling the toResource method! To initialize the assembler call the initialize method.");
         }
 
-        return new UserResource(small ? userFactory.getSmallUser(entity) : userFactory.getUser(entity, locale), selfRel);
+        return new UserResource(userFactory.getUser(entity, locale), selfRel);
     }
 }

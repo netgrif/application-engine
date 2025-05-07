@@ -1,5 +1,8 @@
 package com.netgrif.application.engine.petrinet.service;
 
+import com.netgrif.application.engine.auth.service.GroupService;
+import com.netgrif.application.engine.objects.auth.domain.Group;
+import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.event.events.user.UserRoleChangeEvent;
@@ -45,6 +48,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     private final RoleActionsRunner roleActionsRunner;
     private final IPetriNetService petriNetService;
     private final ISecurityContextService securityContextService;
+    private final GroupService groupService;
 
     private ProcessRole defaultRole;
     private ProcessRole anonymousRole;
@@ -52,7 +56,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     public ProcessRoleService(ProcessRoleRepository processRoleRepository,
                               PetriNetRepository netRepository,
                               ApplicationEventPublisher publisher, RoleActionsRunner roleActionsRunner,
-                              @Lazy IPetriNetService petriNetService, @Lazy UserService userService, ISecurityContextService securityContextService) {
+                              @Lazy IPetriNetService petriNetService, @Lazy UserService userService, ISecurityContextService securityContextService, @Lazy GroupService groupService) {
         this.processRoleRepository = processRoleRepository;
         this.netRepository = netRepository;
         this.publisher = publisher;
@@ -60,6 +64,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         this.petriNetService = petriNetService;
         this.userService = userService;
         this.securityContextService = securityContextService;
+        this.groupService = groupService;
     }
 
     @Override
@@ -84,6 +89,111 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         processRoleRepository.deleteAll();
     }
 
+
+    @Override
+    public void assignRolesToUser(IUser user, Set<ProcessResourceId> set, LoggedUser loggedUser) {
+        assignRolesToUser(user, set, loggedUser, new HashMap<>());
+    }
+
+    @Override
+    public void assignRolesToUser(IUser user, Set<ProcessResourceId> requestedRolesIds, LoggedUser loggedUser, Map<String, String> map) {
+        assignRolesToActor(user.getProcessRoles(), requestedRolesIds);
+        saveUserAndReloadContext(user, loggedUser);
+    }
+
+    @Override
+    public void assignRolesToGroup(Group group, Set<ProcessResourceId> requestedRolesIds) {
+        assignRolesToActor(group.getProcessRoles(), requestedRolesIds);
+        groupService.save(group);
+    }
+
+    @Override
+    public void assignNegativeRolesToUser(IUser user, Set<ProcessResourceId> roleIds, LoggedUser loggedUser) {
+        this.assignNegativeRolesToUser(user, roleIds, loggedUser, new HashMap<>());
+    }
+
+    @Override
+    public void assignNegativeRolesToUser(IUser user, Set<ProcessResourceId> roleIds, LoggedUser loggedUser, Map<String, String> params) {
+        assignRolesToActor(user.getNegativeProcessRoles(), roleIds);
+        saveUserAndReloadContext(user, loggedUser);
+    }
+
+    @Override
+    public void assignNegativeRolesToGroup(Group group, Set<ProcessResourceId> requestedRolesIds) {
+        assignRolesToActor(group.getNegativeProcessRoles(), requestedRolesIds);
+        groupService.save(group);
+    }
+
+    protected void assignRolesToActor(Set<ProcessRole> oldActorRoles, Set<ProcessResourceId> requestedRolesIds) {
+        Set<ProcessRole> requestedRoles = this.findByIds(requestedRolesIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet()));
+        if (requestedRoles.isEmpty() && !requestedRolesIds.isEmpty())
+            throw new IllegalArgumentException("No process roles found.");
+        if (requestedRoles.size() != requestedRolesIds.size())
+            throw new IllegalArgumentException("Not all process roles were found!");
+
+        Set<ProcessRole> userOldRoles = new HashSet<>(oldActorRoles);
+        Set<ProcessRole> rolesNewToUser = getRolesNewToActor(userOldRoles, requestedRoles);
+        Set<ProcessRole> rolesRemovedFromUser = getRolesRemovedFromActor(userOldRoles, requestedRoles);
+
+        String idOfPetriNetContainingRole = getProcessIdRoleBelongsTo(rolesNewToUser, rolesRemovedFromUser);
+        if (!isGlobalFromFirstRole(rolesNewToUser) && !isGlobalFromFirstRole(rolesRemovedFromUser) && idOfPetriNetContainingRole == null) {
+            return;
+        }
+
+        oldActorRoles.clear();
+        oldActorRoles.addAll(updateRequestedRoles(userOldRoles, rolesNewToUser, rolesRemovedFromUser));
+    }
+
+    protected void saveUserAndReloadContext(IUser user, LoggedUser loggedUser) {
+        userService.saveUser(user);
+
+        String userId = user.getStringId();
+        securityContextService.saveToken(userId);
+        if (Objects.equals(userId, loggedUser.getId())) {
+            loggedUser.getProcessRoles().clear();
+            loggedUser.setProcessRoles(user.getProcessRoles());
+            securityContextService.reloadSecurityContext(loggedUser);
+        }
+    }
+
+    protected Set<ProcessRole> getRolesNewToActor(Set<ProcessRole> userOldRoles, Set<ProcessRole> newRequestedRoles) {
+        Set<ProcessRole> rolesNewToUser = new HashSet<>(newRequestedRoles);
+        rolesNewToUser.removeAll(userOldRoles);
+
+        return rolesNewToUser;
+    }
+
+    protected Set<ProcessRole> getRolesRemovedFromActor(Set<ProcessRole> userOldRoles, Set<ProcessRole> newRequestedRoles) {
+        Set<ProcessRole> rolesRemovedFromUser = new HashSet<>(userOldRoles);
+        rolesRemovedFromUser.removeAll(newRequestedRoles);
+
+        return rolesRemovedFromUser;
+    }
+
+    protected Set<ProcessRole> updateRequestedRoles(Set<ProcessRole> userRolesAfterPreActions, Set<ProcessRole> rolesNewToUser, Set<ProcessRole> rolesRemovedFromUser) {
+        userRolesAfterPreActions.addAll(rolesNewToUser);
+        userRolesAfterPreActions.removeAll(rolesRemovedFromUser);
+
+        return new HashSet<>(userRolesAfterPreActions);
+    }
+
+    protected String getProcessIdRoleBelongsTo(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles) {
+
+        if (!newRoles.isEmpty()) {
+            return getProcessIdFromFirstRole(newRoles);
+        }
+
+        if (!removedRoles.isEmpty()) {
+            return getProcessIdFromFirstRole(removedRoles);
+        }
+
+        return null;
+    }
+
+    protected String getProcessIdFromFirstRole(Set<ProcessRole> newRoles) {
+        return newRoles.iterator().next().getProcessId();
+    }
+
     @Override
     public ProcessRole getDefaultRole() {
         return processRoleRepository.findAllByImportId(ProcessRole.DEFAULT_ROLE).stream().findFirst().orElse(null);
@@ -104,75 +214,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         }).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
-    @Override
-    public void assignRolesToUser(AbstractUser user, Set<ProcessResourceId> requestedRolesIds, LoggedUser loggedUser) {
-        assignRolesToUser(user, requestedRolesIds, loggedUser, new HashMap<>());
-    }
-
-    @Override
-    public void assignRolesToUser(AbstractUser user, Set<ProcessResourceId> requestedRolesIds, LoggedUser loggedUser, Map<String, String> params) {
-        Set<ProcessRole> requestedRoles = this.findByIds(requestedRolesIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet()));
-        if (requestedRoles.isEmpty() && !requestedRolesIds.isEmpty())
-            throw new IllegalArgumentException("No process roles found.");
-        if (requestedRoles.size() != requestedRolesIds.size())
-            throw new IllegalArgumentException("Not all process roles were found!");
-
-        Set<ProcessRole> userOldRoles = user.getProcessRoles();
-
-        Set<ProcessRole> rolesNewToUser = getRolesNewToUser(userOldRoles, requestedRoles);
-        Set<ProcessRole> rolesRemovedFromUser = getRolesRemovedFromUser(userOldRoles, requestedRoles);
-
-        String idOfPetriNetContainingRole = getPetriNetIdRoleBelongsTo(rolesNewToUser, rolesRemovedFromUser);
-        if (!isGlobalFromFirstRole(rolesNewToUser) && !isGlobalFromFirstRole(rolesRemovedFromUser) && idOfPetriNetContainingRole == null) {
-            return;
-        }
-        PetriNet petriNet = null;
-        if (idOfPetriNetContainingRole != null) {
-            petriNet = petriNetService.getPetriNet(idOfPetriNetContainingRole);
-        }
-        Set<String> rolesNewToUserIds = mapUserRolesToIds(rolesNewToUser);
-        Set<String> rolesRemovedFromUserIds = mapUserRolesToIds(rolesRemovedFromUser);
-
-        Set<ProcessRole> newRoles = this.findByIds(rolesNewToUserIds);
-        Set<ProcessRole> removedRoles = this.findByIds(rolesRemovedFromUserIds);
-        if (petriNet != null) {
-            runAllPreActions(newRoles, removedRoles, user, petriNet, params);
-        }
-        requestedRoles = updateRequestedRoles(user, rolesNewToUser, rolesRemovedFromUser);
-
-        replaceUserRolesAndPublishEvent(requestedRolesIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet()), user, requestedRoles);
-        if (petriNet != null) {
-            runAllPostActions(newRoles, removedRoles, user, petriNet, params);
-        }
-        securityContextService.saveToken(user.getStringId());
-        if (Objects.equals(user.getStringId(), loggedUser.getStringId())) {
-            loggedUser.getProcessRoles().clear();
-            loggedUser.setProcessRoles(user.getProcessRoles());
-            securityContextService.reloadSecurityContext(loggedUser);
-        }
-    }
-
-    @Override
-    public void assignRolesToGroup(Group group, Set<ProcessResourceId> requestedRolesIds) {
-
-    }
-
-    @Override
-    public void assignNegativeRolesToUser(AbstractUser user, Set<ProcessResourceId> roleIds, LoggedUser loggedUser) {
-
-    }
-
-    @Override
-    public void assignNegativeRolesToUser(AbstractUser user, Set<ProcessResourceId> roleIds, LoggedUser loggedUser, Map<String, String> params) {
-
-    }
-
-    @Override
-    public void assignNegativeRolesToGroup(Group group, Set<ProcessResourceId> requestedRolesIds) {
-
-    }
-
-    private Set<ProcessRole> updateRequestedRoles(AbstractUser user, Set<ProcessRole> rolesNewToUser, Set<ProcessRole> rolesRemovedFromUser) {
+    private Set<ProcessRole> updateRequestedRoles(IUser user, Set<ProcessRole> rolesNewToUser, Set<ProcessRole> rolesRemovedFromUser) {
         Set<ProcessRole> userRolesAfterPreActions = user.getProcessRoles();
         userRolesAfterPreActions.addAll(rolesNewToUser);
         userRolesAfterPreActions.removeAll(rolesRemovedFromUser);
@@ -373,8 +415,9 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         for (AbstractUser user : usersWithRemovedRoles) {
             log.info("[" + net.getStringId() + "]: Removing deleted roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString() + " from user " + user.getName() + " with id " + user.getStringId());
 
-            if (user.getProcessRoles().isEmpty())
+            if (user.getProcessRoles().isEmpty()) {
                 continue;
+            }
 
             Set<ProcessResourceId> newRoles = user.getProcessRoles().stream()
                     .filter(role -> !deletedRoleStringIds.contains(role.getStringId()))

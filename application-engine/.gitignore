@@ -143,3 +143,5 @@ log/
 /src/main/resources/certificates/private.der
 /src/main/resources/certificates/public.crt
 /modules/
+!src/main/java/**/modules
+!src/main/groovy/**/modules

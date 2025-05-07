@@ -62,6 +62,8 @@ public interface UserService {
 
     Set<AbstractUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, Collection<String> realmIds);
 
+    Set<AbstractUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds);
+
     void addDefaultAuthorities(AbstractUser user);
 
     AbstractUser assignAuthority(String userId, String realmId, String authorityId);

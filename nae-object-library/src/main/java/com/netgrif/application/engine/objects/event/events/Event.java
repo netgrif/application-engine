@@ -25,6 +25,7 @@ public abstract class Event extends EventObject {
     public Event(Object source, EventPhase eventPhase) {
         super(source);
         this.eventPhase = eventPhase;
+        this.time = LocalDateTime.now();
     }
 
     public abstract String getMessage();

@@ -3,14 +3,12 @@ package com.netgrif.application.engine.auth.web;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.InvalidUserTokenException;
-import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.requestbodies.ChangePasswordRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
-import com.netgrif.application.engine.auth.web.responsebodies.IUserFactory;
-import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
+import com.netgrif.application.engine.auth.service.UserFactory;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
@@ -24,16 +22,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -50,9 +49,6 @@ public class AuthenticationController {
     private IRegistrationService registrationService;
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
     private IMailService mailService;
 
     @Autowired
@@ -65,7 +61,7 @@ public class AuthenticationController {
     private ServerAuthProperties serverAuthProperties;
 
     @Autowired
-    private IUserFactory userResponseFactory;
+    private UserFactory userResponseFactory;
 
     @Autowired
     private ISecurityContextService securityContextService;
@@ -139,8 +135,17 @@ public class AuthenticationController {
 
     @Operation(summary = "Login to the system", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/login", produces = MediaTypes.HAL_JSON_VALUE)
-    public UserResource login(Authentication auth, Locale locale) {
-        return new UserResource(userResponseFactory.getUser(userService.findByAuth(auth, null), locale), "profile");
+    public ResponseEntity<?> login(Authentication auth, Locale locale) {
+        log.info("login");
+        log.debug("locale: {}", locale);
+        log.debug("auth: {}", auth);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        LoggedUser loggedUser = (LoggedUser) authentication.getPrincipal();
+        return ResponseEntity.ok(userResponseFactory.getUser(userService.findById(loggedUser.getId(), null), locale));
     }
 
     @Operation(summary = "Reset password")

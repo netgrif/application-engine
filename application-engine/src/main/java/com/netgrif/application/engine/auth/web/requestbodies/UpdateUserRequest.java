@@ -8,6 +8,8 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 
 @Setter
@@ -110,6 +112,26 @@ public class UpdateUserRequest implements IUser, Serializable {
 
     @Override
     public boolean isImpersonating() {
+        return false;
+    }
+
+    @Override
+    public LocalDateTime getCreatedAt() {
+        return null;
+    }
+
+    @Override
+    public Map<String, Attribute<?>> getAttributes() {
+        return Map.of();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean isEmailVerified() {
         return false;
     }
 
@@ -224,6 +246,16 @@ public class UpdateUserRequest implements IUser, Serializable {
     }
 
     @Override
+    public Set<ProcessRole> getNegativeProcessRoles() {
+        return Set.of();
+    }
+
+    @Override
+    public void setNegativeProcessRoles(Set<ProcessRole> processRoles) {
+
+    }
+
+    @Override
     public void setProcessRoles(Set<ProcessRole> set) {
 
     }
@@ -270,6 +302,16 @@ public class UpdateUserRequest implements IUser, Serializable {
 
     @Override
     public void removeProcessRole(ProcessRole processRole) {
+
+    }
+
+    @Override
+    public void addNegativeProcessRole(ProcessRole role) {
+
+    }
+
+    @Override
+    public void removeNegativeProcessRole(ProcessRole role) {
 
     }
 

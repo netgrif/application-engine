@@ -4,6 +4,7 @@ import com.netgrif.application.engine.auth.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
 import com.netgrif.application.engine.auth.repository.GroupRepository;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundException;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundExceptionCode;
@@ -17,6 +18,8 @@ import org.springframework.data.util.Pair;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -141,6 +144,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group create(AbstractUser user) {
+        log.info("Creating default group for user: [{}]", user.getStringId());
         Optional<Group> groupOptional = groupRepository.findByOwnerId(user.getStringId());
         if (groupOptional.isPresent()) {
             throw new IllegalArgumentException("Default group for user [%s] already exists.".formatted(user.getUsername()));
@@ -175,8 +179,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group addUser(String userId, String groupId, String realmId) {
-        AbstractUser user = userService.findById(userId, realmId);
-        return addUser(user, groupId);
+        return addUser(userService.findById(userId, realmId), groupId);
     }
 
     @Override
@@ -236,10 +239,14 @@ public class GroupServiceImpl implements GroupService {
                 .collect(Collectors.toSet());
     }
 
-
     @Override
     public Page<Group> findByPredicate(Predicate predicate, Pageable pageable) {
         return groupRepository.findAll(predicate, pageable);
+    }
+
+    @Override
+    public List<Group> findByIds(Collection<String> ids) {
+        return groupRepository.findAllById(ids);
     }
 
     @Override
@@ -326,5 +333,19 @@ public class GroupServiceImpl implements GroupService {
             return new HashSet<>();
         }
         return this.findAllByIds(group.getSubgroupIds(), Pageable.ofSize(MAX_PAGE_SIZE)).toSet();
+    }
+
+    @Override
+    public Collection<String> getGroupsOwnerEmails(Collection<String> groupIds) {
+        return this.findByIds(groupIds).stream().map(this::getGroupOwnerEmail).toList();
+    }
+
+    @Override
+    public String getGroupOwnerEmail(String groupId) {
+        return this.getGroupOwnerEmail(findById(groupId));
+    }
+
+    protected String getGroupOwnerEmail(Group groupCase) {
+        return userService.findById(groupCase.getOwnerId(), groupCase.getRealmId()).getEmail();
     }
 }

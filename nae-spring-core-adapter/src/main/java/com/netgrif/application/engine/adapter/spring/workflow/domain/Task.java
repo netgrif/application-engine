@@ -44,6 +44,12 @@ public class Task extends com.netgrif.application.engine.objects.workflow.domain
         return super.getImmediateData();
     }
 
+    @Transient
+    @Override
+    public IUser getUser() {
+        return super.getUser();
+    }
+
     @JsonIgnore
     @Override
     public I18nString getTitle() {

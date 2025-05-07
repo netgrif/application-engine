@@ -2,12 +2,15 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.integration.modules.ModuleHolder
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.AsyncRunner
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
-import com.netgrif.application.engine.AsyncRunner
+import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
+import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
@@ -21,7 +24,6 @@ import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.importer.service.FieldFactory
-import com.netgrif.application.engine.integration.plugin.injector.PluginInjector
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
 import com.netgrif.application.engine.mail.interfaces.IMailService
@@ -46,7 +48,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.vali
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.objects.petrinet.domain.version.Version
-
 import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome
@@ -58,6 +59,17 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.task
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemConstants
 import com.netgrif.application.engine.objects.workflow.service.InitValueExpressionEvaluator
+import com.netgrif.application.engine.pdf.generator.config.PdfResource
+import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
+import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
+import com.netgrif.application.engine.startup.runner.FilterRunner
+import com.netgrif.application.engine.utils.FullPageRequest
+import com.netgrif.application.engine.workflow.service.FileFieldInputStream
+import com.netgrif.application.engine.workflow.service.TaskService
+import com.netgrif.application.engine.workflow.service.interfaces.*
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
@@ -74,11 +86,11 @@ import org.springframework.core.io.FileSystemResource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import com.netgrif.application.engine.integration.plugin.injector.PluginHolder
 
 import java.text.Normalizer
 import java.time.ZoneId
 import java.util.stream.Collectors
+
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -191,13 +203,10 @@ class ActionDelegate {
     @Autowired
     PublicViewProperties publicViewProperties
 
-    @Autowired
-    PluginInjector pluginInjector
-
     FrontendActionOutcome Frontend
 
-    PluginHolder Plugin
-
+    ModuleHolder Module
+  
     /**
      * Reference of case and task in which current action is taking place.
      */
@@ -219,7 +228,7 @@ class ActionDelegate {
         this.initTransitionsMap(action.transitionIds)
         this.outcomes = new ArrayList<>()
         this.Frontend = new FrontendActionOutcome(this.useCase, this.task, this.outcomes)
-        this.Plugin = new PluginHolder()
+        this.Module = new ModuleHolder()
     }
 
     def initFieldsMap(Map<String, String> fieldIds) {

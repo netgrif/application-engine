@@ -31,8 +31,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.netgrif.application.engine.objects.auth.constants.SearchConstants.MAX_PAGE_SIZE;
-
 @Slf4j
 @Getter
 public class UserServiceImpl implements UserService {
@@ -164,6 +162,8 @@ public class UserServiceImpl implements UserService {
         log.info("Creating user [{}] in realm [{}]", user.getUsername(), realmId);
         addDefaultAuthorities(user);
         addDefaultRole(user);
+        ((User) user).addAuthMethod("basic");
+        setPassword(((User) user), ((User) user).getPassword());
 
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
         user = userRepository.saveUser(((User) user), mongoTemplate, collectionName);
@@ -189,6 +189,7 @@ public class UserServiceImpl implements UserService {
         addDefaultAuthorities(user);
         addDefaultRole(user);
         setDisablePassword(user);
+        user.addAuthMethod(authMethod);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
         userRepository.saveUser(user, mongoTemplate, collectionName);
         log.info("User [{}] from third-party [{}] successfully created in realm [{}]", username, authMethod, realmId);
@@ -322,6 +323,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<AbstractUser> findAllCoMembers(LoggedUser loggedUser, Pageable pageable) {
+        // TODO: impersonation
         Set<String> members = groupService.getAllCoMembers(loggedUser);
         members.add(loggedUser.getStringId());
         Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());
@@ -331,6 +333,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<AbstractUser> searchAllCoMembers(String query, LoggedUser loggedUser, Pageable pageable) {
+        // TODO: impersonation
         Set<String> members = groupService.getAllCoMembers(loggedUser);
         members.add(loggedUser.getStringId());
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForAllRealm();
@@ -347,6 +350,7 @@ public class UserServiceImpl implements UserService {
         if (negateRoleIds == null) {
             negateRoleIds = new HashSet<>();
         }
+        // TODO: impersonation
         Set<String> members = groupService.getAllCoMembers(loggedUser);
         members.add(loggedUser.getStringId());
         BooleanExpression predicate = buildPredicate(members.stream().map(ObjectId::new).collect(Collectors.toSet()), query);
@@ -373,6 +377,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable) {
+        return this.findAllActiveByProcessRoles(roleIds, pageable, List.of(getLoggedUser().getRealmId()));
+    }
+
+    @Override
     public Page<AbstractUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable, Collection<String> realmIds) {
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
         Page<User> users = userRepository.findDistinctByStateAndProcessRoles__idIn(
@@ -388,7 +397,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public Set<AbstractUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, Collection<String> realmIds) {
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
-        Set<User> users = userRepository.findAllByProcessRoles__idIn(
+        return searchUsersByRoleIds(roleIds, collectionNames);
+    }
+
+    @Override
+    public Set<AbstractUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds) {
+        Set<String> collectionNames = collectionNameProvider.getCollectionNamesForAllRealm();
+        return searchUsersByRoleIds(roleIds, collectionNames);
+    }
+
+    protected Set<AbstractUser> searchUsersByRoleIds(Set<ProcessResourceId> roleIds, Set<String> collectionNames) {
+        List<User> users = userRepository.findAllByProcessRoles__idIn(
                 new ArrayList<>(roleIds),
                 mongoTemplate,
                 collectionNames
@@ -421,6 +440,7 @@ public class UserServiceImpl implements UserService {
         LoggedUser loggedUser = getLoggedUserFromContext();
         Optional<AbstractUser> userOptional = findUserByUsername(loggedUser.getUsername(), loggedUser.getRealmId());
         AbstractUser user = userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] in realm [%s] is not present in the system.".formatted(loggedUser.getUsername(), loggedUser.getRealmId())));
+        // TODO: impersonation
 //        if (loggedUser.isImpersonating()) {
 //            IUser impersonated = transformToUser((LoggedUserImpl) loggedUser.getImpersonated());
 //            Collection<ProcessResourceId> resourceIds = loggedUser.getImpersonated().getProcessRoles().stream().map(ProcessRole::get_id).toList();
@@ -531,6 +551,7 @@ public class UserServiceImpl implements UserService {
             system = new User();
             system.setUsername(UserConstants.SYSTEM_USER_EMAIL);
             system.setEmail(UserConstants.SYSTEM_USER_EMAIL);
+            system.setPassword("n/a");
             system.setFirstName(UserConstants.SYSTEM_USER_NAME);
             system.setLastName(UserConstants.SYSTEM_USER_SURNAME);
             system.setState(UserState.ACTIVE);
@@ -567,12 +588,12 @@ public class UserServiceImpl implements UserService {
     protected void setPassword(User user, String password) {
         log.trace("Setting password for user [{}]", user.getUsername());
         String hashedPassword = passwordEncoder.encode(password);
-        user.setCredential("password", new PasswordCredential(hashedPassword, 0, true));
+        user.setPassword(hashedPassword);
         log.debug("Password set for user [{}]", user.getUsername());
     }
 
     protected void setDisablePassword(User user) {
-        user.setCredential("password", new PasswordCredential("N/A", 0, false));
+        user.setPassword("N/A");
         log.debug("Password N/A set for user [{}]", user.getUsername());
     }
 

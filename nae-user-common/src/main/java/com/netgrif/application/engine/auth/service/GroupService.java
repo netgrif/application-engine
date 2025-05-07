@@ -28,6 +28,8 @@ public interface GroupService {
 
     Group findById(String id);
 
+    List<Group> findByIds(Collection<String> ids);
+
     Page<Group> findAllByIds(Set<String> ids, Pageable pageable);
 
     Page<Group> findAll(Pageable pageable);
@@ -77,4 +79,8 @@ public interface GroupService {
     Set<AbstractUser> getGroupMembersById(String groupId);
 
     Set<AbstractUser> getGroupMembers(Group group);
+
+    Collection<String> getGroupsOwnerEmails(Collection<String> groupIds);
+
+    String getGroupOwnerEmail(String groupId);
 }

@@ -29,6 +29,15 @@ NAE provides additional components to make integration to your project/environme
 
 * License: [NETGRIF Community License](https://netgrif.com/license)
 
+##  Loading nae-user-ce as symlink to modules
+
+```bash
+ln -s nae-user-ce/target/nae-user-ce-*-SNAPSHOT.jar application-engine/modules/.
+```
+
+Build with DEV profile
+
+
 ## Repository Content
 
 | Name                    | Description | Dependencies |
