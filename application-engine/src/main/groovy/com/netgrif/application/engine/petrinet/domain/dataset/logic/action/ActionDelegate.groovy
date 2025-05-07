@@ -1,9 +1,5 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
-import com.netgrif.application.engine.auth.service.GroupService
-import com.netgrif.application.engine.auth.service.UserService
-import com.netgrif.application.engine.integration.modules.ModuleHolder
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.AsyncRunner
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
@@ -24,20 +20,10 @@ import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.importer.service.FieldFactory
+import com.netgrif.application.engine.integration.modules.ModuleHolder
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
 import com.netgrif.application.engine.mail.interfaces.IMailService
-import com.netgrif.application.engine.pdf.generator.config.PdfResource
-import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
-import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
-import com.netgrif.application.engine.startup.runner.FilterRunner
-import com.netgrif.application.engine.utils.FullPageRequest
-import com.netgrif.application.engine.workflow.service.FileFieldInputStream
-import com.netgrif.application.engine.workflow.service.TaskService
-import com.netgrif.application.engine.workflow.service.interfaces.*
-
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.objects.petrinet.domain.*
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*
@@ -993,7 +979,7 @@ class ActionDelegate {
     }
 
     Task findTask(String mongoId) {
-        return taskService.searchOne(QTask.task._id.eq(new ObjectId(mongoId)))
+        return taskService.findById(mongoId)
     }
 
     String getTaskId(String transitionId, Case aCase = useCase) {
@@ -1056,9 +1042,8 @@ class ActionDelegate {
     }
 
     SetDataEventOutcome setData(String transitionId, Case useCase, Map dataSet, Map<String, String> params = [:]) {
-        def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
-        def task = taskService.searchOne(predicate)
-        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet), params))
+        def taskId = useCase.tasks.find { it.transition == transitionId }?.task
+        return addSetDataOutcomeToOutcomes(dataService.setData(taskId, ImportHelper.populateDataset(dataSet), params))
     }
 
     @Deprecated
@@ -1112,11 +1097,10 @@ class ActionDelegate {
     }
 
     Map<String, Field> getData(String transitionId, Case useCase, Map<String, String> params = [:]) {
-        def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
-        def task = taskService.searchOne(predicate)
-        if (!task)
+        def taskId = useCase.tasks.find { it.transition == transitionId }.task
+        if (!taskId)
             return new HashMap<String, Field>()
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, params)))
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(taskId, useCase, params)))
     }
 
     private List<Field> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome) {

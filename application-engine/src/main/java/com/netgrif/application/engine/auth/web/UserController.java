@@ -62,7 +62,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/{realmId}")
-    public ResponseEntity<User> createUser(@PathVariable String realmId, @RequestBody UserCreateRequest request) {
+    public ResponseEntity<User> createUser(@PathVariable String realmId, @RequestBody UserCreateRequest request, Locale locale) {
         try {
             if (!realmExists(realmId)) {
                 log.error("Realm with id [{}] not found", realmId);
@@ -81,7 +81,7 @@ public class UserController {
                     realmId
             );
             log.info("New user with username [{}] has been created in realm [{}]", request.getUsername(), realmId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(User.createUser(user));
+            return ResponseEntity.status(HttpStatus.CREATED).body(userFactory.getUser(user, locale));
         } catch (Exception e) {
             log.error("Failed to create user", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -111,7 +111,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> getLoggedUser(Authentication auth) {
+    public ResponseEntity<User> getLoggedUser(Authentication auth, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         IUser user;
         try {
@@ -125,7 +125,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        return ResponseEntity.ok(User.createUser(user));
+        return ResponseEntity.ok(userFactory.getUser(user, locale));
     }
 
     @ApiResponses(value = {
@@ -166,7 +166,7 @@ public class UserController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        return ResponseEntity.ok(User.createUser(user));
+        return ResponseEntity.ok(userFactory.getUser(user, locale));
     }
 
 //    todo step 2, only used in test on frontend
