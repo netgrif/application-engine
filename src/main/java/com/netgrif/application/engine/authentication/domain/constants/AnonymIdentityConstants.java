@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.authentication.domain.constants;
 
 public class AnonymIdentityConstants {
+    public static final String DEFAULT_USERNAME_PREFIX = "anonymous";
     public static final String USERNAME_TEMPLATE = "%s@netgrif.com";
     public static final String FIRSTNAME = "Anonymous";
     public static final String LASTNAME = "Identity";
@@ -10,5 +11,12 @@ public class AnonymIdentityConstants {
      */
     public static String usernameOf(String usernamePrefix) {
         return String.format(USERNAME_TEMPLATE, usernamePrefix);
+    }
+
+    /**
+     * todo javadoc
+     */
+    public static String defaultUsername() {
+        return usernameOf(DEFAULT_USERNAME_PREFIX);
     }
 }

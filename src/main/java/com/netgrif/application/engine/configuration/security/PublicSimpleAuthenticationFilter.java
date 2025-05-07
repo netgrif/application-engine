@@ -26,7 +26,6 @@ import java.util.Set;
  */
 @Slf4j
 public class PublicSimpleAuthenticationFilter extends PublicAuthenticationFilter  {
-    private static final String USERNAME = "anonymous";
 
     public PublicSimpleAuthenticationFilter(IIdentityService identityService, IRoleService roleService, ProviderManager authenticationManager,
                                             AnonymousAuthenticationProvider provider, ApplicationRole anonymousAppRole,
@@ -54,8 +53,8 @@ public class PublicSimpleAuthenticationFilter extends PublicAuthenticationFilter
      */
     @Override
     protected Identity createAnonymousIdentityWithUser() {
-        String username = AnonymIdentityConstants.usernameOf(USERNAME);
-        Optional<Identity> anonymIdentityOpt = identityService.findByUsername(AnonymIdentityConstants.usernameOf(USERNAME));
+        String username = AnonymIdentityConstants.defaultUsername();
+        Optional<Identity> anonymIdentityOpt = identityService.findByUsername(username);
         if (anonymIdentityOpt.isPresent()) {
             return anonymIdentityOpt.get();
         }

@@ -148,6 +148,16 @@ public class GroupServiceTest {
 //                .parentGroupId(CaseField.withValue(List.of(parentGroup.getStringId())))
 //                .build()));
     }
+    @Test
+    void testCreateDefaultParent() {
+        String name = "group name";
+        Group group = groupService.create(GroupParams.with()
+                .name(new TextField(name))
+                .build());
+
+        assert group.getParentGroupId() != null;
+        assert group.getParentGroupId().equals(defaultGroupRunner.getDefaultGroup().getStringId());
+    }
 
     @Test
     void testUpdate() {

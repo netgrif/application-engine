@@ -5,6 +5,7 @@ import com.netgrif.application.engine.authentication.domain.LoggedIdentity
 import com.netgrif.application.engine.authentication.domain.constants.SystemIdentityConstants
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -19,12 +20,14 @@ import org.springframework.stereotype.Component
 class SystemIdentityRunner extends AbstractOrderedCommandLineRunner {
 
     @Autowired
-    private IIdentityService service
+    private IIdentityService identityService
+    @Autowired
+    private IUserService userService
     private Identity systemIdentity
 
     @Override
     void run(String... strings) throws Exception {
-        Optional<Identity> systemOpt = service.findByUsername(SystemIdentityConstants.USERNAME)
+        Optional<Identity> systemOpt = identityService.findByUsername(SystemIdentityConstants.USERNAME)
         if (systemOpt.isPresent()) {
             this.systemIdentity = systemOpt.get()
             return
@@ -33,13 +36,15 @@ class SystemIdentityRunner extends AbstractOrderedCommandLineRunner {
     }
 
     private Identity createSystemIdentityWithActor() {
-        Identity systemIdentity = service.createWithDefaultUser(IdentityParams.with()
+        Identity systemIdentity = identityService.createWithDefaultUser(IdentityParams.with()
                 .username(new TextField(SystemIdentityConstants.USERNAME))
                 .firstname(new TextField(SystemIdentityConstants.FIRSTNAME))
                 .lastname(new TextField(SystemIdentityConstants.LASTNAME))
                 .password(new TextField("n/a"))
                 .build())
 
+        identityService.registerForbiddenKeywords(Set.of(SystemIdentityConstants.USERNAME))
+        userService.registerForbiddenKeywords(Set.of(SystemIdentityConstants.USERNAME))
         log.info("Created system identity [{}] with user [{}].", systemIdentity.stringId, systemIdentity.mainActorId)
         return systemIdentity
     }

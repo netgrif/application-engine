@@ -12,7 +12,6 @@ import com.netgrif.application.engine.workflow.domain.SystemCase;
 import com.netgrif.application.engine.workflow.service.interfaces.ICrudSystemCaseService;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
@@ -20,11 +19,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 @Slf4j
-@RequiredArgsConstructor
 public abstract class CrudSystemCaseService<T extends SystemCase> implements ICrudSystemCaseService<T> {
 
     protected final ISessionManagerService sessionManagerService;
@@ -32,6 +31,21 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
     protected final IWorkflowService workflowService;
     protected final SystemCaseFactoryRegistry systemCaseFactory;
     protected final IElasticCaseSearchService elasticCaseSearchService;
+    /**
+     * todo javadoc
+     * */
+    protected final Set<String> forbiddenKeywords;
+
+    protected CrudSystemCaseService(ISessionManagerService sessionManagerService, IDataService dataService,
+                                    IWorkflowService workflowService, SystemCaseFactoryRegistry systemCaseFactory,
+                                    IElasticCaseSearchService elasticCaseSearchService) {
+        this.sessionManagerService = sessionManagerService;
+        this.dataService = dataService;
+        this.workflowService = workflowService;
+        this.systemCaseFactory = systemCaseFactory;
+        this.elasticCaseSearchService = elasticCaseSearchService;
+        this.forbiddenKeywords = ConcurrentHashMap.newKeySet();
+    }
 
     // todo javadoc on abstract methods
     protected abstract String getProcessIdentifier();
@@ -40,6 +54,30 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
 
     protected void postCreationActions(T systemCase) {}
     protected void postUpdateActions(T systemCase) {}
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public void registerForbiddenKeywords(Set<String> keywords) {
+        // todo 2058 authorisation
+        if (keywords == null) {
+            return;
+        }
+        this.forbiddenKeywords.addAll(keywords);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public void removeFromForbiddenKeywords(Set<String> keywords) {
+        // todo 2058 authorisation
+        if (keywords == null) {
+            return;
+        }
+        this.forbiddenKeywords.removeAll(keywords);
+    }
 
     /**
      * todo javadoc
@@ -155,6 +193,10 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
     }
 
     // todo: release/8.0.0 also removal method?
+
+    protected boolean isForbidden(String keyword) {
+        return this.forbiddenKeywords.contains(keyword);
+    }
 
     protected boolean isTextFieldOrValueEmpty(TextField field) {
         return field == null || isTextFieldValueEmpty(field);

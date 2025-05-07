@@ -27,7 +27,6 @@ import java.util.Set;
  */
 @Slf4j
 public class PublicBasicAuthenticationFilter extends PublicJwtAuthenticationFilter  {
-    private static final String USERNAME = "anonymous";
 
     private final IUserService userService;
 
@@ -52,9 +51,9 @@ public class PublicBasicAuthenticationFilter extends PublicJwtAuthenticationFilt
             return anonymIdentityOpt.get();
         }
 
-        Optional<User> anonymUserOpt = userService.findByEmail(AnonymIdentityConstants.usernameOf(USERNAME));
+        Optional<User> anonymUserOpt = userService.findByEmail(AnonymIdentityConstants.defaultUsername());
         User anonymUser = anonymUserOpt.orElseGet(() -> userService.create(UserParams.with()
-                .email(new TextField(AnonymIdentityConstants.usernameOf(USERNAME)))
+                .email(new TextField(AnonymIdentityConstants.defaultUsername()))
                 .firstname(new TextField(AnonymIdentityConstants.FIRSTNAME))
                 .lastname(new TextField(AnonymIdentityConstants.LASTNAME))
                 .build()));

@@ -84,13 +84,12 @@ public class GroupService extends ActorService<Group> implements IGroupService {
         if (isTextFieldOrValueEmpty(typedParams.getName())) {
             throw new IllegalArgumentException("Group must have a name");
         }
-        if (typedParams.getName().getRawValue().equals(GroupConstants.DEFAULT_GROUP_NAME)) {
+        if (isForbidden(typedParams.getName().getRawValue())) {
             throw new IllegalArgumentException(String.format("Group name [%s] is reserved by system.",
-                    GroupConstants.DEFAULT_GROUP_NAME));
+                    typedParams.getName().getRawValue()));
         }
 
-        if (isDefaultGroupByName(typedParams.getName().getRawValue())
-                && isCaseFieldOrValueEmpty(typedParams.getParentGroupId())) {
+        if (isCaseFieldOrValueEmpty(typedParams.getParentGroupId())) {
             typedParams.setParentGroupId(CaseField.withValue(List.of(getDefaultGroup().getStringId())));
         }
     }
@@ -101,15 +100,15 @@ public class GroupService extends ActorService<Group> implements IGroupService {
             throw new IllegalArgumentException("Please provide input values for group");
         }
         GroupParams typedParams = (GroupParams) params;
-        if (typedParams.getName() != null && isTextFieldValueEmpty(typedParams.getName())) {
+        if (typedParams.getName() == null) {
+            return;
+        }
+        if (isTextFieldValueEmpty(typedParams.getName())) {
             throw new IllegalArgumentException();
         }
-    }
-
-    private boolean isDefaultGroupByName(String name) {
-        if (name == null) {
-            return false;
+        if (isForbidden(typedParams.getName().getRawValue())) {
+            throw new IllegalArgumentException(String.format("Group name [%s] is reserved by system.",
+                    typedParams.getName().getRawValue()));
         }
-        return name.equals(GroupConstants.DEFAULT_GROUP_NAME);
     }
 }

@@ -7,6 +7,7 @@ import com.netgrif.application.engine.authentication.domain.params.IdentityParam
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.authorization.domain.Role
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import groovy.transform.CompileStatic
@@ -28,6 +29,9 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     @Autowired
     private IIdentityService identityService
+
+    @Autowired
+    private IUserService userService
 
     @Autowired
     private IRoleService roleService
@@ -56,6 +60,9 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                 .lastname(new TextField(configuration.surname))
                 .password(new TextField(configuration.password))
                 .build())
+
+        identityService.registerForbiddenKeywords(Set.of(configuration.email))
+        userService.registerForbiddenKeywords(Set.of(configuration.email))
 
         Set<String> allRoleIds = roleService.findAll().stream().map { it.stringId }.collect(Collectors.toSet())
         Role adminAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE)

@@ -21,6 +21,7 @@ class DefaultGroupRunner extends AbstractOrderedCommandLineRunner {
     @Override
     void run(String... args) throws Exception {
         Optional<Group> groupOpt = service.findByName(GroupConstants.DEFAULT_GROUP_NAME)
+        service.registerForbiddenKeywords(Set.of(GroupConstants.DEFAULT_GROUP_NAME))
         if (groupOpt.isPresent()) {
             log.info("Found default group with id [{}]", groupOpt.get().stringId)
             this.defaultGroup = groupOpt.get()

@@ -259,6 +259,10 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
         if (isTextFieldOrValueEmpty(typedParams.getUsername())) {
             throw new IllegalArgumentException("Identity must have an username!");
         }
+        if (isForbidden(typedParams.getUsername().getRawValue())) {
+            throw new IllegalArgumentException(String.format("Identity username [%s] is reserved by system.",
+                    typedParams.getUsername().getRawValue()));
+        }
     }
 
     @Override
@@ -267,8 +271,15 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
             throw new IllegalArgumentException("Please provide input values for identity");
         }
         IdentityParams typedParams = (IdentityParams) params;
-        if (typedParams.getUsername() != null && isTextFieldValueEmpty(typedParams.getUsername())) {
+        if (typedParams.getUsername() == null) {
+            return;
+        }
+        if (isTextFieldValueEmpty(typedParams.getUsername())) {
             throw new IllegalArgumentException("Identity must have an username!");
+        }
+        if (isForbidden(typedParams.getUsername().getRawValue())) {
+            throw new IllegalArgumentException(String.format("Identity username [%s] is reserved by system.",
+                    typedParams.getUsername().getRawValue()));
         }
     }
 

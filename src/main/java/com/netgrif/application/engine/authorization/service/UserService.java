@@ -67,6 +67,10 @@ public class UserService extends ActorService<User> implements IUserService {
         if (isTextFieldOrValueEmpty(typedParams.getEmail())) {
             throw new IllegalArgumentException("User must have an email!");
         }
+        if (isForbidden(typedParams.getEmail().getRawValue())) {
+            throw new IllegalArgumentException(String.format("User email [%s] is reserved by system.",
+                    typedParams.getEmail().getRawValue()));
+        }
 
         if (isCaseFieldOrValueEmpty(typedParams.getGroupIds())) {
             typedParams.setGroupIds(CaseField.withValue(List.of(groupService.getDefaultGroup().getStringId())));
@@ -79,8 +83,15 @@ public class UserService extends ActorService<User> implements IUserService {
             throw new IllegalArgumentException("Please provide input values for user");
         }
         UserParams typedParams = (UserParams) params;
-        if (typedParams.getEmail() != null && isTextFieldValueEmpty(typedParams.getEmail())) {
+        if (typedParams.getEmail() == null) {
+            return;
+        }
+        if (isTextFieldValueEmpty(typedParams.getEmail())) {
             throw new IllegalArgumentException("User must have an email!");
+        }
+        if (isForbidden(typedParams.getEmail().getRawValue())) {
+            throw new IllegalArgumentException(String.format("User email [%s] is reserved by system.",
+                    typedParams.getEmail().getRawValue()));
         }
     }
 }
