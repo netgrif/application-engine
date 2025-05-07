@@ -45,9 +45,9 @@ public class RoleService implements IRoleService {
     private final ProcessRoleRepository processRoleRepository;
     private final ApplicationRoleRepository applicationRoleRepository;
     private final CaseRoleRepository caseRoleRepository;
-    private final IRoleAssignmentService roleAssignmentService;
     private final ActionRunner actionRunner;
     private final ApplicationEventPublisher eventPublisher;
+    private IRoleAssignmentService roleAssignmentService;
     private IAllActorService actorService;
     private ITaskService taskService;
     private IWorkflowService workflowService;
@@ -71,6 +71,12 @@ public class RoleService implements IRoleService {
     @Autowired
     public void setActorService(IAllActorService actorService) {
         this.actorService = actorService;
+    }
+
+    @Lazy
+    @Autowired
+    public void setRoleAssignmentService(IRoleAssignmentService roleAssignmentService) {
+        this.roleAssignmentService = roleAssignmentService;
     }
 
     /**

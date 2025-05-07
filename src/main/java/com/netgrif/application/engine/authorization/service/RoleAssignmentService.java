@@ -1,17 +1,18 @@
 package com.netgrif.application.engine.authorization.service;
 
-import com.netgrif.application.engine.authorization.domain.ApplicationRoleAssignment;
-import com.netgrif.application.engine.authorization.domain.CaseRoleAssignment;
-import com.netgrif.application.engine.authorization.domain.Role;
-import com.netgrif.application.engine.authorization.domain.RoleAssignment;
+import com.netgrif.application.engine.authorization.domain.*;
 import com.netgrif.application.engine.authorization.domain.repositories.ApplicationRoleAssignmentRepository;
 import com.netgrif.application.engine.authorization.domain.repositories.CaseRoleAssignmentRepository;
 import com.netgrif.application.engine.authorization.domain.repositories.RoleAssignmentRepository;
 import com.netgrif.application.engine.authorization.service.factory.RoleAssignmentFactory;
+import com.netgrif.application.engine.authorization.service.interfaces.IAllActorService;
+import com.netgrif.application.engine.authorization.service.interfaces.IGroupService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -26,6 +27,20 @@ public class RoleAssignmentService implements IRoleAssignmentService {
     private final CaseRoleAssignmentRepository caseRoleAssignmentRepository;
     private final ApplicationRoleAssignmentRepository applicationRoleAssignmentRepository;
     private final ApplicationContext applicationContext;
+    private IAllActorService allActorService;
+    private IGroupService groupService;
+
+    @Lazy
+    @Autowired
+    public void setAllActorService(IAllActorService allActorService) {
+        this.allActorService = allActorService;
+    }
+
+    @Lazy
+    @Autowired
+    public void setGroupService(IGroupService groupService) {
+        this.groupService = groupService;
+    }
 
     /**
      * todo javadoc
@@ -70,6 +85,19 @@ public class RoleAssignmentService implements IRoleAssignmentService {
         }
         List<RoleAssignment> result = (List<RoleAssignment>) repository.findAllByActorId(actorId);
         return result.stream().map(RoleAssignment::getRoleId).collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<String> findAllRoleIdsByActorAndGroups(String actorId) {
+        Optional<Actor> actorOpt = allActorService.findById(actorId);
+        if (actorOpt.isEmpty()) {
+            throw new IllegalStateException(String.format("Actor with id [%s] doesn't exist.", actorId));
+        }
+
+        Set<String> roleIds = findAllRoleIdsByActorId(actorId);
+        roleIds.addAll(findRoleIdsByGroups(actorOpt.get().getGroupIds()));
+
+        return roleIds;
     }
 
     /**
@@ -172,6 +200,37 @@ public class RoleAssignmentService implements IRoleAssignmentService {
             return new ArrayList<>();
         }
         return (List<CaseRoleAssignment>) caseRoleAssignmentRepository.removeAllByCaseId(caseId);
+    }
+
+    private Set<String> findRoleIdsByGroups(List<String> groupIds) {
+        if (groupIds == null || groupIds.isEmpty()) {
+            return new HashSet<>();
+        }
+        Set<String> alreadyProcessedGroupIds = new HashSet<>();
+        Set<String> roleIds = new HashSet<>();
+        for (String groupId : groupIds) {
+            roleIds.addAll(findRoleIdsByGroupRecursive(groupId, alreadyProcessedGroupIds));
+            alreadyProcessedGroupIds.add(groupId);
+        }
+        return roleIds;
+    }
+
+    private Set<String> findRoleIdsByGroupRecursive(String groupId, Set<String> alreadyProcessedGroupIds) {
+        if (alreadyProcessedGroupIds.contains(groupId)) {
+            return new HashSet<>();
+        }
+        Optional<Group> groupOpt = groupService.findById(groupId);
+        if (groupOpt.isEmpty()) {
+            throw new IllegalStateException(String.format("Group with id [%s] doesn't exist.", groupId));
+        }
+
+        Set<String> roleIds = findAllRoleIdsByActorId(groupId);
+        alreadyProcessedGroupIds.add(groupId);
+        if (groupOpt.get().getParentGroupId() != null) {
+            roleIds.addAll(findRoleIdsByGroupRecursive(groupOpt.get().getParentGroupId(), alreadyProcessedGroupIds));
+        }
+
+        return roleIds;
     }
 
     private List<RoleAssignment> doCreateAssignments(String actorId, List<Role> roles) {

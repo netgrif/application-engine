@@ -16,9 +16,8 @@ public class TaskAuthorizationService extends AuthorizationService implements IT
     private final ITaskService taskService;
 
     public TaskAuthorizationService(ISessionManagerService sessionManagerService, IRoleAssignmentService roleAssignmentService,
-                                    ApplicationRoleRunner applicationRoleRunner, ITaskService taskService,
-                                    IAllActorService allActorService, IGroupService groupService) {
-        super(sessionManagerService, applicationRoleRunner, roleAssignmentService, allActorService, groupService);
+                                    ApplicationRoleRunner applicationRoleRunner, ITaskService taskService) {
+        super(sessionManagerService, applicationRoleRunner, roleAssignmentService);
         this.taskService = taskService;
     }
 

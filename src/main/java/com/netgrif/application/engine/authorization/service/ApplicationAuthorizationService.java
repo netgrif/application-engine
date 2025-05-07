@@ -2,9 +2,7 @@ package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.authorization.domain.ApplicationRole;
-import com.netgrif.application.engine.authorization.service.interfaces.IAllActorService;
 import com.netgrif.application.engine.authorization.service.interfaces.IApplicationAuthorizationService;
-import com.netgrif.application.engine.authorization.service.interfaces.IGroupService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.startup.ApplicationRoleRunner;
@@ -17,9 +15,8 @@ public class ApplicationAuthorizationService extends AuthorizationService implem
 
 
     public ApplicationAuthorizationService(ISessionManagerService sessionManagerService, IRoleAssignmentService roleAssignmentService,
-                                           ApplicationRoleRunner applicationRoleRunner, IAllActorService allActorService,
-                                           IGroupService groupService) {
-        super(sessionManagerService, applicationRoleRunner, roleAssignmentService, allActorService, groupService);
+                                           ApplicationRoleRunner applicationRoleRunner) {
+        super(sessionManagerService, applicationRoleRunner, roleAssignmentService);
     }
 
     /**
@@ -41,7 +38,7 @@ public class ApplicationAuthorizationService extends AuthorizationService implem
             return false;
         }
 
-        Set<String> roleIds = findRoleIdsByActorAndGroups(loggedIdentity.getActiveActorId());
+        Set<String> roleIds = roleAssignmentService.findAllRoleIdsByActorAndGroups(loggedIdentity.getActiveActorId());
 
         return roleIds.contains(appRole.getStringId());
     }

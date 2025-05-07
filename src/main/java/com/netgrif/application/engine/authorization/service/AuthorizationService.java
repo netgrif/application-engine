@@ -1,12 +1,8 @@
 package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
-import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.authorization.domain.ApplicationRole;
-import com.netgrif.application.engine.authorization.domain.Group;
 import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
-import com.netgrif.application.engine.authorization.service.interfaces.IAllActorService;
-import com.netgrif.application.engine.authorization.service.interfaces.IGroupService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.startup.ApplicationRoleRunner;
@@ -19,9 +15,7 @@ public abstract class AuthorizationService {
 
     protected final ISessionManagerService sessionManagerService;
     protected final ApplicationRoleRunner applicationRoleRunner;
-    private final IRoleAssignmentService roleAssignmentService;
-    private final IAllActorService allActorService;
-    private final IGroupService groupService;
+    protected final IRoleAssignmentService roleAssignmentService;
 
     /**
      * todo javadoc
@@ -34,7 +28,7 @@ public abstract class AuthorizationService {
             return false;
         }
 
-        Set<String> roleIds = findRoleIdsByActorAndGroups(loggedIdentity.getActiveActorId());
+        Set<String> roleIds = roleAssignmentService.findAllRoleIdsByActorAndGroups(loggedIdentity.getActiveActorId());
 
         if (isAdmin(roleIds)) {
             return true;
@@ -55,55 +49,12 @@ public abstract class AuthorizationService {
         if (loggedIdentity == null || loggedIdentity.getActiveActorId() == null) {
             return false;
         }
-        return isAdmin(findRoleIdsByActorAndGroups(loggedIdentity.getActiveActorId()));
+        return isAdmin(roleAssignmentService.findAllRoleIdsByActorAndGroups(loggedIdentity.getActiveActorId()));
     }
 
     private boolean isAdmin(Set<String> roleIds) {
         ApplicationRole adminAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE);
         return roleIds.contains(adminAppRole.getStringId());
-    }
-
-    protected Set<String> findRoleIdsByActorAndGroups(String actorId) {
-        Optional<Actor> actorOpt = allActorService.findById(actorId);
-        if (actorOpt.isEmpty()) {
-            throw new IllegalStateException(String.format("Actor with id [%s] doesn't exist.", actorId));
-        }
-
-        Set<String> roleIds = roleAssignmentService.findAllRoleIdsByActorId(actorId);
-        roleIds.addAll(findRoleIdsByGroups(actorOpt.get().getGroupIds()));
-
-        return roleIds;
-    }
-
-    private Set<String> findRoleIdsByGroups(List<String> groupIds) {
-        if (groupIds == null || groupIds.isEmpty()) {
-            return new HashSet<>();
-        }
-        Set<String> alreadyProcessedGroupIds = new HashSet<>();
-        Set<String> roleIds = new HashSet<>();
-        for (String groupId : groupIds) {
-            roleIds.addAll(findRoleIdsByGroupRecursive(groupId, alreadyProcessedGroupIds));
-            alreadyProcessedGroupIds.add(groupId);
-        }
-        return roleIds;
-    }
-
-    private Set<String> findRoleIdsByGroupRecursive(String groupId, Set<String> alreadyProcessedGroupIds) {
-        if (alreadyProcessedGroupIds.contains(groupId)) {
-            return new HashSet<>();
-        }
-        Optional<Group> groupOpt = groupService.findById(groupId);
-        if (groupOpt.isEmpty()) {
-            throw new IllegalStateException(String.format("Group with id [%s] doesn't exist.", groupId));
-        }
-
-        Set<String> roleIds = roleAssignmentService.findAllRoleIdsByActorId(groupId);
-        alreadyProcessedGroupIds.add(groupId);
-        if (groupOpt.get().getParentGroupId() != null) {
-            roleIds.addAll(findRoleIdsByGroupRecursive(groupOpt.get().getParentGroupId(), alreadyProcessedGroupIds));
-        }
-
-        return roleIds;
     }
 
     /**

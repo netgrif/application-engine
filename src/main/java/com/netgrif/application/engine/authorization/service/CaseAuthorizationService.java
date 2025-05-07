@@ -19,8 +19,8 @@ public class CaseAuthorizationService extends AuthorizationService implements IC
 
     public CaseAuthorizationService(ISessionManagerService sessionManagerService, IRoleAssignmentService roleAssignmentService,
                                     ApplicationRoleRunner applicationRoleRunner, IWorkflowService workflowService,
-                                    IPetriNetService processService, IAllActorService allActorService, IGroupService groupService) {
-        super(sessionManagerService, applicationRoleRunner, roleAssignmentService, allActorService, groupService);
+                                    IPetriNetService processService) {
+        super(sessionManagerService, applicationRoleRunner, roleAssignmentService);
         this.workflowService = workflowService;
         this.processService = processService;
     }

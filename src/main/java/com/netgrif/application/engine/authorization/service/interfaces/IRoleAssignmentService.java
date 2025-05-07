@@ -14,6 +14,7 @@ public interface IRoleAssignmentService {
     List<RoleAssignment> findAllByRoleIdIn(Set<String> roleIds);
     List<RoleAssignment> findAllByActorId(String actorId);
     Set<String> findAllRoleIdsByActorId(String actorId);
+    Set<String> findAllRoleIdsByActorAndGroups(String actorId);
     boolean existsByActorAndRole(String actorId, String roleId);
 
     List<ApplicationRoleAssignment> findApplicationAssignmentsByActor(String actorId);
