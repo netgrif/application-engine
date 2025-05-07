@@ -32,7 +32,7 @@ NAE provides additional components to make integration to your project/environme
 ##  Loading nae-user-ce as symlink to modules
 
 ```bash
-bash -c 'jar_path=$(find nae-user-ce/target/ -maxdepth 1 -type f -name "nae-user-ce-*.jar" ! -name "*-javadoc.jar" ! -name "*-sources.jar" | head -n1) && [[ -n "$jar_path" ]] && ln -sf "$jar_path" application-engine/modules/nae-user-ce.jar && echo "✅ Create a Symlink → application-engine/modules/nae-user-ce.jar" || echo "❌ JAR file not found!"'
+bash -c 'jar_path=$(find nae-user-ce/target/ -maxdepth 1 -type f -name "nae-user-ce-*.jar" ! -name "*-javadoc.jar" ! -name "*-sources.jar" | head -n1) && [[ -n "$jar_path" ]] && cd application-engine/modules && ln -sf ../../"$jar_path" nae-user-ce.jar && echo "✅ Create a Symlink → application-engine/modules/nae-user-ce.jar" || echo "❌ JAR file not found!"'
 ```
 
 Build with DEV profile
