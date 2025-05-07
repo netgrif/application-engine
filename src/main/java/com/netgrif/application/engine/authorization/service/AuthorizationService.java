@@ -18,8 +18,8 @@ import java.util.*;
 public abstract class AuthorizationService {
 
     protected final ISessionManagerService sessionManagerService;
+    protected final ApplicationRoleRunner applicationRoleRunner;
     private final IRoleAssignmentService roleAssignmentService;
-    private final ApplicationRoleRunner applicationRoleRunner;
     private final IAllActorService allActorService;
     private final IGroupService groupService;
 
@@ -55,7 +55,7 @@ public abstract class AuthorizationService {
         if (loggedIdentity == null || loggedIdentity.getActiveActorId() == null) {
             return false;
         }
-        return isAdmin(roleAssignmentService.findAllRoleIdsByActorId(loggedIdentity.getActiveActorId()));
+        return isAdmin(findRoleIdsByActorAndGroups(loggedIdentity.getActiveActorId()));
     }
 
     private boolean isAdmin(Set<String> roleIds) {
@@ -63,7 +63,7 @@ public abstract class AuthorizationService {
         return roleIds.contains(adminAppRole.getStringId());
     }
 
-    private Set<String> findRoleIdsByActorAndGroups(String actorId) {
+    protected Set<String> findRoleIdsByActorAndGroups(String actorId) {
         Optional<Actor> actorOpt = allActorService.findById(actorId);
         if (actorOpt.isEmpty()) {
             throw new IllegalStateException(String.format("Actor with id [%s] doesn't exist.", actorId));
@@ -98,10 +98,10 @@ public abstract class AuthorizationService {
         }
 
         Set<String> roleIds = roleAssignmentService.findAllRoleIdsByActorId(groupId);
+        alreadyProcessedGroupIds.add(groupId);
         if (groupOpt.get().getParentGroupId() != null) {
             roleIds.addAll(findRoleIdsByGroupRecursive(groupOpt.get().getParentGroupId(), alreadyProcessedGroupIds));
         }
-        alreadyProcessedGroupIds.add(groupId);
 
         return roleIds;
     }

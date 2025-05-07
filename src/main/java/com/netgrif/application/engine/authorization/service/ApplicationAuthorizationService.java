@@ -2,20 +2,25 @@ package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.authorization.domain.ApplicationRole;
+import com.netgrif.application.engine.authorization.service.interfaces.IAllActorService;
 import com.netgrif.application.engine.authorization.service.interfaces.IApplicationAuthorizationService;
+import com.netgrif.application.engine.authorization.service.interfaces.IGroupService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.startup.ApplicationRoleRunner;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@Service
-@RequiredArgsConstructor
-public class ApplicationAuthorizationService implements IApplicationAuthorizationService {
+import java.util.Set;
 
-    private final ApplicationRoleRunner applicationRoleRunner;
-    private final ISessionManagerService sessionManagerService;
-    private final IRoleAssignmentService roleAssignmentService;
+@Service
+public class ApplicationAuthorizationService extends AuthorizationService implements IApplicationAuthorizationService {
+
+
+    public ApplicationAuthorizationService(ISessionManagerService sessionManagerService, IRoleAssignmentService roleAssignmentService,
+                                           ApplicationRoleRunner applicationRoleRunner, IAllActorService allActorService,
+                                           IGroupService groupService) {
+        super(sessionManagerService, applicationRoleRunner, roleAssignmentService, allActorService, groupService);
+    }
 
     /**
      * todo javadoc
@@ -36,6 +41,8 @@ public class ApplicationAuthorizationService implements IApplicationAuthorizatio
             return false;
         }
 
-        return roleAssignmentService.existsByActorAndRole(loggedIdentity.getActiveActorId(), appRole.getStringId());
+        Set<String> roleIds = findRoleIdsByActorAndGroups(loggedIdentity.getActiveActorId());
+
+        return roleIds.contains(appRole.getStringId());
     }
 }
