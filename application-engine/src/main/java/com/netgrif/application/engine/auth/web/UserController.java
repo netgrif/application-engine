@@ -3,10 +3,13 @@ package com.netgrif.application.engine.auth.web;
 import com.netgrif.application.engine.auth.service.PreferencesService;
 import com.netgrif.application.engine.auth.service.RealmService;
 import com.netgrif.application.engine.auth.web.requestbodies.PreferencesRequest;
+import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserCreateRequest;
 import com.netgrif.application.engine.auth.web.responsebodies.*;
+import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.objects.petrinet.domain.workspace.DefaultWorkspaceService;
 import com.netgrif.application.engine.objects.petrinet.domain.workspace.Workspace;
+import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAssembler;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
@@ -59,6 +62,8 @@ public class UserController {
     private final AuthorityService authorityService;
     private final RealmService realmService;
     private final DefaultWorkspaceService workspaceService;
+    private final ServerAuthProperties serverAuthProperties;
+    private final ISecurityContextService securityContextService;
 
     @Operation(summary = "Create a new user", description = "Creates a new user in the realm specified by id.")
     @ApiResponses(value = {
@@ -178,18 +183,18 @@ public class UserController {
 
     @Operation(summary = "Update user", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> updateUser( @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) throws UnauthorisedRequestException {
+    public ResponseEntity<User> updateUser(@RequestBody UpdateUserRequest updates, Authentication auth, Locale locale)  {
         if (!serverAuthProperties.isEnableProfileEdit()) return null;
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         String userId = updates.getStringId();
         IUser user;
         try {
-            user = userService.findById(userId, updatedUser.getRealmId());
+            user = userService.findById(userId, updates.getRealmId());
         } catch (IllegalArgumentException e) {
             log.error("Could not find user with id [{}]", userId, e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        user = userService.update(user, updates.getUpdatedUser());
+        user = userService.update(user, updates);
         securityContextService.saveToken(userId);
         if (Objects.equals(loggedUser.getId(), userId)) {
             loggedUser.setFirstName(user.getFirstName());
@@ -199,7 +204,8 @@ public class UserController {
             }
             securityContextService.reloadSecurityContext(loggedUser);
         }
-        log.info("Updating user " + user.getEmail() + " with data " + updatedUser);
+        log.info("Updating user " + user.getEmail() + " with data " + updates);
+        user.setWorkspaceId(updates.getWorkspaceId());
         return ResponseEntity.ok(User.createUser(user));
     }
 

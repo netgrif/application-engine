@@ -434,7 +434,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
                     .filter(role -> !deletedRoleStringId.contains(role.getStringId()))
                     .map(ProcessRole::get_id)
                     .collect(Collectors.toSet());
-            this.assignRolesToUser(user.getStringId(), newRoles, userService.getLoggedOrSystem().transformToLoggedUser());
+            this.assignRolesToUser(user, newRoles, userService.getLoggedOrSystem().transformToLoggedUser());
         }
 
         this.processRoleRepository.deleteAllBy_idIn(roleToDelete);
