@@ -7,7 +7,7 @@
                     converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
     <conversionRule conversionWord="wEx"
                     converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
-    <conversionRule conversionWord="logLevel" converterClass="com.netgrif.application.engine.configuration.CustomLevelColorConverter"/>
+    <conversionRule conversionWord="logLevel" converterClass="com.netgrif.application.engine.adapter.spring.configuration.CustomLevelColorConverter"/>
 
     <property name="CONSOLE_LOG_PATTERN"
               value="%clr(time=){faint}%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){cyan}  %clr(level=){faint}%logLevel  %clr(pid=){faint}%clr(${PID:- }){magenta}  %clr(thread=){faint}%clr(%-15.15t){yellow}  %clr(logger=){faint}%clr(%-40.40logger{39}){blue}  %clr(msg=){faint}%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>

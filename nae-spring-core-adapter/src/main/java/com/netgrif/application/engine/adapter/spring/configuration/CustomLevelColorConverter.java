@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.configuration;
+package com.netgrif.application.engine.adapter.spring.configuration;
 
 import ch.qos.logback.classic.pattern.ClassicConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
