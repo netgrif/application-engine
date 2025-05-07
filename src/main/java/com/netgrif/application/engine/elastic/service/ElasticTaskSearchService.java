@@ -6,7 +6,6 @@ import com.netgrif.application.engine.elastic.domain.*;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskSearchService;
 import com.netgrif.application.engine.elastic.service.query.ElasticTaskQueryBuilder;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -42,9 +41,8 @@ public class ElasticTaskSearchService extends ElasticSearchService implements IE
 
     @Autowired
     public ElasticTaskSearchService(@Lazy ITaskService taskService, ElasticsearchRestTemplate template,
-                                    ElasticsearchProperties properties, ElasticsearchRestTemplate elasticsearchTemplate,
-                                    IPetriNetService petriNetService) {
-        super(new ElasticTaskQueryBuilder(petriNetService));
+                                    ElasticsearchProperties properties, ElasticsearchRestTemplate elasticsearchTemplate) {
+        super(new ElasticTaskQueryBuilder());
         this.taskService = taskService;
         this.template = template;
         this.properties = properties;

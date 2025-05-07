@@ -7,7 +7,6 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePri
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
 import com.netgrif.application.engine.elastic.service.query.ElasticCaseQueryBuilder;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -38,9 +37,8 @@ public class ElasticCaseSearchService extends ElasticSearchService implements IE
     private final ElasticsearchProperties properties;
 
     public ElasticCaseSearchService(@Lazy IWorkflowService workflowService, ElasticsearchRestTemplate template,
-                                    ElasticsearchProperties properties, IPetriNetService petriNetService,
-                                    IElasticCasePrioritySearch elasticCasePrioritySearch) {
-        super(new ElasticCaseQueryBuilder(petriNetService, elasticCasePrioritySearch));
+                                    ElasticsearchProperties properties, IElasticCasePrioritySearch elasticCasePrioritySearch) {
+        super(new ElasticCaseQueryBuilder(elasticCasePrioritySearch));
         this.workflowService = workflowService;
         this.template = template;
         this.properties = properties;
