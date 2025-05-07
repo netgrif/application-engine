@@ -14,10 +14,4 @@ public interface UserFactory {
      * @return a full version of the user response object, that has all of its attributes set
      */
     User getUser(IUser user, Locale locale);
-
-    /**
-     * @param user the domain User object we want to send to frontend
-     * @return a small version of the user response object, that has its large attributes (roles, groups, authorities...) cleared
-     */
-    User getSmallUser(IUser user);
 }

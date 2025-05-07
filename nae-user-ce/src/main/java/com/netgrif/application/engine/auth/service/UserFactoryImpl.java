@@ -5,7 +5,6 @@ import com.netgrif.application.engine.adapter.spring.petrinet.web.responsebodies
 import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.objects.auth.domain.IUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -35,11 +34,6 @@ public class UserFactoryImpl implements UserFactory {
         }).collect(Collectors.toSet()));
 
         return result;
-    }
-
-    @Override
-    public User getSmallUser(IUser user) {
-        return User.createSmallUser(user);
     }
 
     protected User getUser(IUser user) {
