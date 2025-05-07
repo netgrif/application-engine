@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.authentication.domain.constants.AnonymIdentityConstants
+
 import org.springframework.stereotype.Component
 
 @Component
@@ -17,7 +17,7 @@ class RunnerController {
             SystemProcessRunner,
             DefaultGroupRunner,
             SystemIdentityRunner,
-            AnonymIdentityConstants,
+            AnonymousIdentityRunner,
             FunctionsCacheRunner,
             FilterRunner,
             DefaultFiltersRunner,

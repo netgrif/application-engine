@@ -76,6 +76,12 @@ public class GroupService extends ActorService<Group> implements IGroupService {
     }
 
     @Override
+    protected String isUniqueQuery(CaseParams params) {
+        GroupParams typedParams = (GroupParams) params;
+        return fulltextFieldQuery(GroupConstants.NAME_FIELD_ID, typedParams.getName().getRawValue());
+    }
+
+    @Override
     protected void validateAndFixCreateParams(CaseParams params) throws IllegalArgumentException {
         if (params == null) {
             throw new IllegalArgumentException("Please provide input values for group");

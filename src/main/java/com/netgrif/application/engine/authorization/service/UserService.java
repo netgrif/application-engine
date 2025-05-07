@@ -59,6 +59,12 @@ public class UserService extends ActorService<User> implements IUserService {
     }
 
     @Override
+    protected String isUniqueQuery(CaseParams params) {
+        UserParams typedParams = (UserParams) params;
+        return fulltextFieldQuery(UserConstants.EMAIL_FIELD_ID, typedParams.getEmail().getRawValue());
+    }
+
+    @Override
     protected void validateAndFixCreateParams(CaseParams params) throws IllegalArgumentException {
         if (params == null) {
             throw new IllegalArgumentException("Please provide input values for user");

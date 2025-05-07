@@ -251,6 +251,12 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
     }
 
     @Override
+    protected String isUniqueQuery(CaseParams params) {
+        IdentityParams typedParams = (IdentityParams) params;
+        return fulltextFieldQuery(IdentityConstants.USERNAME_FIELD_ID, typedParams.getUsername().getRawValue());
+    }
+
+    @Override
     protected void validateAndFixCreateParams(CaseParams params) throws IllegalArgumentException {
         if (params == null) {
             throw new IllegalArgumentException("Please provide input values for identity");

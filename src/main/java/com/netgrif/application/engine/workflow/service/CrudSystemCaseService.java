@@ -49,6 +49,7 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
 
     // todo javadoc on abstract methods
     protected abstract String getProcessIdentifier();
+    protected abstract String isUniqueQuery(CaseParams params);
     protected abstract void validateAndFixCreateParams(CaseParams params) throws IllegalArgumentException;
     protected abstract void validateAndFixUpdateParams(CaseParams params) throws IllegalArgumentException;
 
@@ -93,6 +94,13 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
     @Transactional
     public T create(CaseParams params) throws IllegalArgumentException, IllegalStateException {
         validateAndFixCreateParams(params);
+
+        Optional<T> existingCaseOpt = findOneByQuery(isUniqueQuery(params));
+        if (existingCaseOpt.isPresent()) {
+            log.warn("New instance of process [{}] wasn't created. Such instance with id [{}] already exists.",
+                    getProcessIdentifier(), existingCaseOpt.get().getStringId());
+            return existingCaseOpt.get();
+        }
 
         final String activeActorId = sessionManagerService.getActiveActorId();
         T systemObject = doCreate(params, activeActorId);
@@ -236,6 +244,9 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
 
     @SuppressWarnings("unchecked")
     protected Optional<T> findOneByQuery(String query) {
+        if (query == null) {
+            return Optional.empty();
+        }
         CaseSearchRequest request = CaseSearchRequest.builder()
                 .query(buildQuery(Set.of(query)))
                 .build();
