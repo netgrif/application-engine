@@ -1,10 +1,8 @@
 package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.TestHelper
-
 import com.netgrif.application.engine.petrinet.domain.UriContentType
 import com.netgrif.application.engine.petrinet.domain.dataset.*
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
@@ -66,22 +64,15 @@ class FilterApiTest {
         Case item = getMenuItem(caze)
         Case filter = getFilter(caze)
 
-        // todo 2058
-//        Case defGroup = nextGroupService.findDefaultGroup()
-
         assert item.uriNodeId == uriService.findByUri("netgrif/test").id
         assert item.dataSet.get("icon_name").rawValue == "device_hub"
         assert item.dataSet.get("entry_name").rawValue.toString() == "FILTER"
         assert item.dataSet.get("menu_item_identifier").rawValue.toString() == "new_menu_item"
-//        assert item.dataSet.get("parentId").rawValue.toString() == defGroup.stringId
 
         assert ((FilterField) filter.dataSet.get("filter")).filterMetadata["filterType"] == "Case"
         assert ((FilterField) filter.dataSet.get("filter")).rawValue == "processIdentifier:filter OR processIdentifier:preference_filter_item"
         assert ((FilterField) filter.dataSet.get("filter")).allowedNets == ["filter", "preference_filter_item"]
         assert filter.dataSet.get("filter_type").rawValue == "Case"
-
-//        List<String> taskIds = (defGroup.dataSet.get("filter_tasks").rawValue ?: []) as List
-//        assert taskIds.contains(item.getTaskStringId("view"))
     }
 
     @Test
@@ -124,9 +115,6 @@ class FilterApiTest {
         ] as Map<String, Field<?>>)
         dataService.setData(caze.getTaskStringId("t1"), dataSet, superCreator.getLoggedSuper().getActiveActorId())
         workflowService.findOne(caze.stringId)
-//        Case defGroup = nextGroupService.findDefaultGroup()
-//        List<String> taskIds = (defGroup.dataSet.get(ActionDelegate.ORG_GROUP_FIELD_FILTER_TASKS).value.value ?: []) as List
-//        assert !taskIds
 
         Thread.sleep(2000)
 

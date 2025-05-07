@@ -4,10 +4,6 @@ import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
-import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
-import com.netgrif.application.engine.utils.FullPageRequest;
 import lombok.RequiredArgsConstructor;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -30,7 +26,6 @@ import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 @RequiredArgsConstructor
 public class ElasticCaseQueryBuilder implements ElasticQueryBuilder {
 
-    private final IPetriNetService petriNetService;
     private final IElasticCasePrioritySearch elasticCasePrioritySearch;
 
     /**
@@ -52,15 +47,12 @@ public class ElasticCaseQueryBuilder implements ElasticQueryBuilder {
         buildCaseIdQuery(typedRequest, query);
         buildUriNodeIdQuery(typedRequest, query);
         buildTagsQuery(typedRequest, query);
-        boolean resultAlwaysEmpty = buildGroupQuery(typedRequest, locale, query);
-
-        // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
 
         if (permissionQuery != null) {
             query.filter(permissionQuery);
         }
 
-        return resultAlwaysEmpty ? null : query;
+        return query;
     }
 
     public Pageable resolveUnmappedSortAttributes(Pageable pageable) {
@@ -300,43 +292,5 @@ public class ElasticCaseQueryBuilder implements ElasticQueryBuilder {
         BoolQueryBuilder caseIdQuery = boolQuery();
         caseIdQuery.should(termQuery("uriNodeId", request.uriNodeId));
         query.filter(caseIdQuery);
-    }
-
-    /**
-     * Cases that are instances of processes of group "5cb07b6ff05be15f0b972c36"
-     * <pre>
-     * {
-     *     "group": "5cb07b6ff05be15f0b972c36"
-     * }
-     * </pre>
-     * <p>
-     * Cases that are instances of processes of group "5cb07b6ff05be15f0b972c36" OR "5cb07b6ff05be15f0b972c31"
-     * <pre>
-     * {
-     *     "group" [
-     *         "5cb07b6ff05be15f0b972c36",
-     *         "5cb07b6ff05be15f0b972c31"
-     *     ]
-     * }
-     * </pre>
-     */
-    private boolean buildGroupQuery(CaseSearchRequest request, Locale locale, BoolQueryBuilder query) {
-        if (request.group == null || request.group.isEmpty()) {
-            return false;
-        }
-
-        PetriNetSearch processQuery = new PetriNetSearch();
-        processQuery.setGroup(request.group);
-        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, new FullPageRequest(), locale)
-                .getContent();
-        if (groupProcesses.isEmpty())
-            return true;
-
-        BoolQueryBuilder groupQuery = boolQuery();
-        groupProcesses.stream().map(PetriNetReference::getIdentifier)
-                .map(netIdentifier -> termQuery("processIdentifier", netIdentifier))
-                .forEach(groupQuery::should);
-        query.filter(groupQuery);
-        return false;
     }
 }

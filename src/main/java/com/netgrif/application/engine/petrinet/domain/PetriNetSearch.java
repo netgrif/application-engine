@@ -22,8 +22,6 @@ public class PetriNetSearch {
 
     private String initials;
 
-    private List<String> group;
-
     private Version version;
 
     private Actor author;

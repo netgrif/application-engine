@@ -4,14 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
-import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
-import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
-import lombok.RequiredArgsConstructor;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -23,10 +17,7 @@ import java.util.*;
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
 @Service
-@RequiredArgsConstructor
 public class ElasticTaskQueryBuilder implements ElasticQueryBuilder {
-
-    private final IPetriNetService petriNetService;
 
     private final Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 1f,
@@ -58,13 +49,12 @@ public class ElasticTaskQueryBuilder implements ElasticQueryBuilder {
         buildTransitionQuery(typedRequest, query);
         buildTagsQuery(typedRequest, query);
         buildStringQuery(typedRequest, query, identity);
-        boolean resultAlwaysEmpty = buildGroupQuery(typedRequest, locale, query);
 
         if (permissionQuery != null) {
             query.filter(permissionQuery);
         }
 
-        return resultAlwaysEmpty ? null : query;
+        return query;
     }
 
     /**
@@ -277,38 +267,5 @@ public class ElasticTaskQueryBuilder implements ElasticQueryBuilder {
         }
 
         query.must(queryStringQuery(populatedQuery));
-    }
-
-    /**
-     * Tasks of cases of group with id "5cb07b6ff05be15f0b972c4d"
-     * {
-     * "group": "5cb07b6ff05be15f0b972c4d"
-     * }
-     * <p>
-     * Tasks of cases of group with id "5cb07b6ff05be15f0b972c4d" OR "5cb07b6ff05be15f0b972c4e"
-     * {
-     * "transitionId": [
-     * "5cb07b6ff05be15f0b972c4d",
-     * "5cb07b6ff05be15f0b972c4e",
-     * ]
-     * }
-     */
-    public boolean buildGroupQuery(TaskSearchRequest request, Locale locale, BoolQueryBuilder query) {
-        if (request.group == null || request.group.isEmpty())
-            return false;
-
-        PetriNetSearch processQuery = new PetriNetSearch();
-        processQuery.setGroup(request.group);
-        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, new FullPageRequest(), locale).getContent();
-        if (groupProcesses.isEmpty())
-            return true;
-
-        BoolQueryBuilder groupProcessQuery = boolQuery();
-        for (PetriNetReference process : groupProcesses) {
-            groupProcessQuery.should(termQuery("processId", process.getStringId()));
-        }
-
-        query.filter(groupProcessQuery);
-        return false;
     }
 }

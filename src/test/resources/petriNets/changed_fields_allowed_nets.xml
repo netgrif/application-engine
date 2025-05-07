@@ -17,7 +17,7 @@
         <id>caseRef2</id>
         <title/>
         <allowedNets>
-            <allowedNet>org_group</allowedNet>
+            <allowedNet>all_data</allowedNet>
         </allowedNets>
     </data>
     <data type="text">

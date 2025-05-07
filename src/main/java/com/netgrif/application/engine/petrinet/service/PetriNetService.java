@@ -478,14 +478,6 @@ public class PetriNetService implements IPetriNetService {
         if (criteriaClass.getDefaultCaseName() != null) {
             this.addValueCriteria(query, queryTotal, Criteria.where("defaultCaseName.defaultValue").regex(criteriaClass.getDefaultCaseName(), "i"));
         }
-        if (criteriaClass.getGroup() != null) {
-            // todo 2058
-            if (criteriaClass.getGroup().size() == 1) {
-//                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(this.groupService.getGroupOwnerEmail(criteriaClass.getGroup().get(0))));
-            } else {
-//                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(this.groupService.getGroupsOwnerEmails(criteriaClass.getGroup())));
-            }
-        }
         if (criteriaClass.getVersion() != null) {
             this.addValueCriteria(query, queryTotal, Criteria.where("version").is(criteriaClass.getVersion()));
         }

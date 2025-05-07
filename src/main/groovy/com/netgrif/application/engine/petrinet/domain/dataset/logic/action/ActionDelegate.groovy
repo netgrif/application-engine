@@ -84,7 +84,6 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     public static final String PREFERENCE_ITEM_FIELD_APPEND_MENU_ITEM = "append_menu_item_stringId"
     public static final String PREFERENCE_ITEM_FIELD_ALLOWED_ROLES = "allowed_roles"
     public static final String PREFERENCE_ITEM_FIELD_BANNED_ROLES = "banned_roles"
-    public static final String ORG_GROUP_FIELD_FILTER_TASKS = "filter_tasks"
 
     static final String TRANSITIONS = "transitions"
 
