@@ -83,7 +83,7 @@ class SecurityContextTest {
         SecurityContextHolder.getContext().setAuthentication(token)
 
         // situation 1
-        processRoleService.assignRolesToUser(user.getStringId(), roleIds, superCreator.getLoggedSuper())
+        processRoleService.assignRolesToUser(user, roleIds, superCreator.getLoggedSuper())
         def updatedUser = userService.findById(user.getStringId(), null)
         assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles().collect {it.stringId} != updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
 
@@ -91,7 +91,7 @@ class SecurityContextTest {
         assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles().collect {it.stringId} as Set == updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
 
         // situation 2
-        processRoleService.assignRolesToUser(user.getStringId(), Collections.singleton(roleIds.getAt(0)), superCreator.getLoggedSuper())
+        processRoleService.assignRolesToUser(user, Collections.singleton(roleIds.getAt(0)), superCreator.getLoggedSuper())
         updatedUser = userService.findById(user.getStringId(), null)
         assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles().collect {it.stringId} as Set  != updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
 

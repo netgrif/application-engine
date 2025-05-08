@@ -14,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -102,8 +99,8 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group create(IUser user) {
         log.info("Creating default group for user: [{}]", user.getStringId());
-        Optional<Group> groupOptional = groupRepository.findByOwnerId(user.getStringId());
-        if (groupOptional.isPresent()) {
+        Set<Group> userGroups = groupRepository.findByOwnerId(user.getStringId());
+        if (!userGroups.isEmpty() && !Objects.equals(user.getStringId(), userService.getSystem().getStringId())) {
             throw new IllegalArgumentException("Default group for user [%s] already exists.".formatted(user.getUsername()));
         }
         return create(user.getUsername(), user.getName(), user);
@@ -125,8 +122,12 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group getDefaultUserGroup(IUser user) {
-        Optional<Group> groupOptional = groupRepository.findByOwnerId(user.getStringId());
-        return groupOptional.orElseThrow(() ->  new ResourceNotFoundException(ResourceNotFoundExceptionCode.DEFAULT_USER_GROUP_NOT_FOUND, "Default user group for user [" + user.getStringId() + "] does not exist"));
+        Set<Group> userGroup = groupRepository.findByOwnerId(user.getStringId());
+        String errorMessage = "Default user group for user [%s] does not exist.".formatted(user.getUsername());
+        if (userGroup.isEmpty()) {
+            throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.DEFAULT_USER_GROUP_NOT_FOUND, errorMessage);
+        }
+        return userGroup.stream().filter(g -> g.getIdentifier().equals(user.getUsername())).findFirst().orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.DEFAULT_USER_GROUP_NOT_FOUND, errorMessage));
     }
 
     @Override

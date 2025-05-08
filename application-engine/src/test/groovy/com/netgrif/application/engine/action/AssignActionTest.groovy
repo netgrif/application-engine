@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
+import com.netgrif.application.engine.auth.service.RealmService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.objects.auth.domain.Authority
@@ -50,7 +51,7 @@ class AssignActionTest {
     public static final String USER_EMAIL = "test@mail.sk"
     public static final String USER_PASSWORD = "password"
 
-    public static final String ROLE_API = "/api/user/{}/role/assign"
+    public static final String ROLE_API = "/api/users/%s/%s/roles"
 
     @Autowired
     private Importer importer
@@ -135,10 +136,10 @@ class AssignActionTest {
         def content = JsonOutput.toJson([roleIdInMainNet, roleIdInSecondaryNetNet])
         String userId = user.getStringId()
 
-        def result = mvc.perform(MockMvcRequestBuilders.post(ROLE_API.replace("{}", userId))
-                .accept(MediaTypes.HAL_JSON_VALUE)
+        def result = mvc.perform(MockMvcRequestBuilders.put(ROLE_API.formatted(user.getRealmId(),userId))
+                .accept(MediaType.APPLICATION_JSON)
                 .content(content)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
                 .with(authentication(authentication)))
                 .andExpect(MockMvcResultMatchers.status().isOk())

@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.web.context.WebApplicationContext
@@ -98,7 +99,7 @@ class DataSearchRequestTest {
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
 
-        def users = userService.findAllUsers(null)
+        def users = userService.findAllUsers(null, Pageable.ofSize(100))
         assert users.size() >= 2
         def testUser1 = users[0]
         def testUser2 = users[1]

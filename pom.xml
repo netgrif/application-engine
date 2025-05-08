@@ -21,6 +21,14 @@
         <module>application-engine</module>
     </modules>
 
+    <licenses>
+        <license>
+            <name>NETGRIF Community License</name>
+            <url>https://netgrif.com/license</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <organization>
         <name>NETGRIF, s.r.o.</name>
         <url>https://netgrif.com</url>
@@ -56,7 +64,8 @@
         <lombok.version>1.18.36</lombok.version>
         <jakarta.validation.version>3.0.2</jakarta.validation.version>
         <jakarta.annotation.version>2.1.1</jakarta.annotation.version>
-        <junit-jupiter.version>5.10.0</junit-jupiter.version>
+        <jakarta.bind.version>4.0.2</jakarta.bind.version>
+        <junit-jupiter.version>5.11.4</junit-jupiter.version>
         <bson.version>5.2.1</bson.version>
         <spring.boot.version>3.4.4</spring.boot.version>
         <jackson.version>2.17.1</jackson.version>
@@ -109,8 +118,8 @@
                 <version>3.11.0</version>
                 <configuration>
                     <compilerArgument>-parameters</compilerArgument>
-                    <source>21</source>
-                    <target>21</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
 
@@ -144,7 +153,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <source>21</source>
+                    <source>${java.version}</source>
                     <doclint>none</doclint>
                     <detectJavaApiLink>false</detectJavaApiLink>
                     <failOnWarnings>false</failOnWarnings>

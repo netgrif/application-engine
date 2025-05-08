@@ -68,12 +68,6 @@
         <!-- Netgrif -->
         <dependency>
             <groupId>com.netgrif</groupId>
-            <artifactId>application-engine</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.netgrif</groupId>
             <artifactId>nae-user-common</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
@@ -138,26 +132,8 @@
         <!-- QueryDSL -->
         <dependency>
             <groupId>com.querydsl</groupId>
-            <artifactId>querydsl-apt</artifactId>
-            <version>${querydsl.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.querydsl</groupId>
-            <artifactId>querydsl-mongodb</artifactId>
-            <version>${querydsl.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.querydsl</groupId>
             <artifactId>querydsl-core</artifactId>
             <version>${querydsl.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- HATEOAS -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-hateoas</artifactId>
             <scope>provided</scope>
         </dependency>
         <!-- JavaX annotations -->
@@ -174,13 +150,13 @@
             <plugin>
                 <groupId>com.netgrif</groupId>
                 <artifactId>nae-module-maven-plugin</artifactId>
-                <version>1.0.0</version>
+                <version>1.0.1</version>
                 <configuration>
-                    <hostApp>
-                        <groupId>com.netgrif</groupId>
-                        <artifactId>application-engine</artifactId>
-                        <version>${project.version}</version>
-                    </hostApp>
+<!--                    <hostApp>-->
+<!--                        <groupId>com.netgrif</groupId>-->
+<!--                        <artifactId>application-engine</artifactId>-->
+<!--                        <version>${project.version}</version>-->
+<!--                    </hostApp>-->
                     <singleOutput>true</singleOutput>
                     <excludes>
                         <exclude>*log4j</exclude>

@@ -25,6 +25,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 
 import java.time.LocalDateTime
 
+import static org.junit.jupiter.api.Assertions.assertNull
 import static org.junit.jupiter.api.Assertions.assertThrows
 
 @ExtendWith(SpringExtension.class)
@@ -91,9 +92,7 @@ class UserServiceTest {
         userService.saveUser(user, null)
 
         userService.removeAllByStateAndExpirationDateBefore(UserState.INACTIVE, LocalDateTime.now(), null)
-        assertThrows(IllegalArgumentException.class, () -> {
-            userService.findById(user.stringId, null)
-        })
+        assertNull(userService.findById(user.stringId, null))
     }
 
     @Test
