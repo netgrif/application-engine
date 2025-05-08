@@ -193,7 +193,7 @@ jobs:
       - name: Push Version ${{ steps.getVersion.outputs.version }}
         uses: docker/build-push-action@v6
         with:
-          context: "{{defaultContext}}"
+#          context: "{{defaultContext}}"
           push: true
           tags: netgrif/application-engine:${{ steps.getVersion.outputs.version }}
 
@@ -201,7 +201,7 @@ jobs:
         if:  ${{ !contains(steps.getVersion.outputs.version, '-SNAPSHOT') }}
         uses: docker/build-push-action@v6
         with:
-          context: "{{defaultContext}}"
+#          context: "{{defaultContext}}"
           push: true
           tags: netgrif/application-engine:latest
 
