@@ -36,7 +36,7 @@ jobs:
     timeout-minutes: 90
     services:
       mongo:
-        image: mongo:7.0.9
+        image: mongo:8.0.3
         ports:
           - 27017:27017
 
@@ -46,7 +46,7 @@ jobs:
           - 6379:6379
 
       elasticsearch:
-        image: elasticsearch:8.10.4
+        image: elasticsearch:8.15.3
         ports:
           - 9200:9200
           - 9300:9300

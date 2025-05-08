@@ -47,7 +47,7 @@ jobs:
     needs: build
     services:
       mongo:
-        image: mongo:7.0.9
+        image: mongo:8.0.3
         ports:
           - 27017:27017
 
@@ -57,7 +57,7 @@ jobs:
           - 6379:6379
 
       elasticsearch:
-        image: elasticsearch:8.10.4
+        image: elasticsearch:8.15.3
         ports:
           - 9200:9200
           - 9300:9300
@@ -193,7 +193,7 @@ jobs:
       - name: Push Version ${{ steps.getVersion.outputs.version }}
         uses: docker/build-push-action@v6
         with:
-          context: "{{defaultContext}}:application-engine"
+          context: "{{defaultContext}}"
           push: true
           tags: netgrif/application-engine:${{ steps.getVersion.outputs.version }}
 
@@ -201,7 +201,7 @@ jobs:
         if:  ${{ !contains(steps.getVersion.outputs.version, '-SNAPSHOT') }}
         uses: docker/build-push-action@v6
         with:
-          context: "{{defaultContext}}:application-engine"
+          context: "{{defaultContext}}"
           push: true
           tags: netgrif/application-engine:latest
 
