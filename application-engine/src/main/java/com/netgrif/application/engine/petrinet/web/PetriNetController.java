@@ -2,7 +2,6 @@ package com.netgrif.application.engine.petrinet.web;
 
 import com.netgrif.application.engine.AsyncRunner;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetImportReference;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReferenceResources;
 import com.netgrif.application.engine.petrinet.web.responsebodies.ProcessRolesResource;
 import com.netgrif.application.engine.petrinet.web.responsebodies.TransitionReferencesResource;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
@@ -34,14 +33,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -126,16 +124,16 @@ public class PetriNetController {
 
     @Operation(summary = "Get all processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
-    public PetriNetReferenceResources getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Authentication auth, Locale locale) {
+    public ResponseEntity<Page<PetriNetReference>> getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Pageable pageable, Authentication auth, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         if (identifier != null && version == null) {
-            return new PetriNetReferenceResources(service.getReferencesByIdentifier(identifier, user, locale));
+            return ResponseEntity.ok(new PageImpl<>(service.getReferencesByIdentifier(identifier, user, locale), pageable, 0));
         } else if (identifier == null && version != null) {
-            return new PetriNetReferenceResources(service.getReferencesByVersion(converter.convert(version), user, locale));
-        } else if (identifier != null && version != null) {
-            return new PetriNetReferenceResources(Collections.singletonList(service.getReference(identifier, converter.convert(version), user, locale)));
+            return ResponseEntity.ok(new PageImpl<>(service.getReferencesByVersion(converter.convert(version), user, locale), pageable, 0));
+        } else if (identifier != null) {
+            return ResponseEntity.ok(new PageImpl<>(Collections.singletonList(service.getReference(identifier, converter.convert(version), user, locale)), pageable, 0));
         } else {
-            return new PetriNetReferenceResources(service.getReferences(user, locale));
+            return ResponseEntity.ok(new PageImpl<>(service.getReferences(user, locale), pageable, 0));
         }
     }
 
@@ -194,14 +192,10 @@ public class PetriNetController {
     @Operation(summary = "Search processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search", produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
-    PagedModel<PetriNetReferenceResource> searchPetriNets(@RequestBody PetriNetSearch criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
+    ResponseEntity<Page<PetriNetReferenceResource>> searchPetriNets(@RequestBody PetriNetSearch criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         Page<PetriNetReference> nets = service.search(criteria, user, pageable, locale);
-        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
-                .searchPetriNets(criteria, auth, pageable, assembler, locale)).withRel("search");
-        PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);
-        PetriNetReferenceResourceAssembler.buildLinks(resources);
-        return PagedModel.of(nets.stream().map(PetriNetReferenceResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), nets.getTotalElements()));
+        return ResponseEntity.ok(new PageImpl<>(nets.stream().map(PetriNetReferenceResource::new).toList(), pageable, nets.getTotalElements()));
     }
 
     @PreAuthorize("@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId)")

@@ -3,6 +3,9 @@ package com.netgrif.application.engine.auth.provider;
 import com.netgrif.application.engine.adapter.spring.utils.PageableUtils;
 import com.netgrif.application.engine.auth.service.RealmService;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
+import jakarta.validation.constraints.Null;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.ivy.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +18,7 @@ public class CollectionNameProvider {
     private RealmService realmService;
 
     private static final String USER_MONGO_COLLECTION_PREFIX = "users_";
+    private static final String NULL = "null";
 
     @Autowired
     public void setRealmService(RealmService realmService) {
@@ -22,7 +26,7 @@ public class CollectionNameProvider {
     }
 
     public String getCollectionNameForRealm(String realmId) {
-        if (realmId == null || realmId.isEmpty()) {
+        if (realmId == null || realmId.isEmpty() || realmId.equals(NULL)) {
             return getDefaultRealmCollection();
         }
         return USER_MONGO_COLLECTION_PREFIX + realmId;

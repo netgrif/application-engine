@@ -201,6 +201,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
+                    <compilerArgument>-parameters</compilerArgument>
                     <source>21</source>
                     <target>21</target>
                     <annotationProcessorPaths>

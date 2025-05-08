@@ -196,6 +196,9 @@ public abstract class User extends AbstractUser implements RegisteredUser, Seria
 
     @Override
     public Object getAttributeValue(String key) {
+        if (attributes == null) {
+            return null;
+        }
         Attribute<?> attribute = this.attributes.get(key);
         return attribute != null ? attribute.getValue() : null;
     }

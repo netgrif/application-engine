@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.startup.runner;
 
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.events.Event;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
@@ -23,12 +24,12 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class DefaultRoleRunner implements ApplicationEngineStartupRunner {
 
-    private final ProcessRoleRepository repository;
+    private final ProcessRoleService processRoleService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("Creating default process role");
-        Set<ProcessRole> role = repository.findAllByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
+        Set<ProcessRole> role = (Set<ProcessRole>) processRoleService.findAllByDefaultName(ProcessRole.DEFAULT_ROLE);
         if (role != null && !role.isEmpty()) {
             log.info("Default role already exists");
             return;
@@ -39,7 +40,7 @@ public class DefaultRoleRunner implements ApplicationEngineStartupRunner {
         defaultRole.setName(new I18nString(ProcessRole.DEFAULT_ROLE));
         defaultRole.setDescription("Default system process role");
         defaultRole.setEvents(new LinkedHashMap<EventType, Event>());
-        defaultRole = repository.save(defaultRole);
+        defaultRole = processRoleService.save(defaultRole);
 
         if (defaultRole == null) {
             log.error("Error saving default process role");

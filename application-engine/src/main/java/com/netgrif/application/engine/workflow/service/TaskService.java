@@ -881,6 +881,8 @@ public class TaskService implements ITaskService {
                     task.setUser(userService.findById(task.getUserId(), null));
                     users.put(task.getUserId(), task.getUser());
                 }
+            } else {
+                task.setUser(null);
             }
         });
 

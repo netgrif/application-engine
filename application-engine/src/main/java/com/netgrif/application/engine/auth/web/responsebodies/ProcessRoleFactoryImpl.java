@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.auth.web.responsebodies;
 
+import com.netgrif.application.engine.adapter.spring.petrinet.web.responsebodies.ProcessRole;
+import com.netgrif.application.engine.auth.service.ProcessRoleFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import org.bson.types.ObjectId;
@@ -9,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Locale;
 
 @Service
-public class ProcessRoleFactory implements IProcessRoleFactory {
+public class ProcessRoleFactoryImpl implements ProcessRoleFactory {
 
     @Autowired
     private IPetriNetService petriNetService;
