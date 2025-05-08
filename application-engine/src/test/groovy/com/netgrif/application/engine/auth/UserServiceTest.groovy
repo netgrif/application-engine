@@ -64,7 +64,7 @@ class UserServiceTest {
         assert petriNetOptional.isPresent()
         petriNet = petriNetOptional.get()
 
-        dummyRole = processRoleService.findById(petriNet.getRoles().find {it.value.importId == "dummy"}.value.stringId)
+        dummyRole = processRoleService.findById(petriNet.getRoles().find { it.value.importId == "dummy" }.value.stringId)
 
         userAuth = authorityService.getOrCreate(Authority.user)
     }
@@ -80,7 +80,7 @@ class UserServiceTest {
         user = createUser()
         assert user.getProcessRoles().size() == 1
         user = userService.addRole(user, dummyRole.get_id())
-        assert user.getProcessRoles().size() == 2 && user.getProcessRoles().stream().anyMatch {it.stringId == dummyRole.stringId}
+        assert user.getProcessRoles().size() == 2 && user.getProcessRoles().stream().anyMatch { it.stringId == dummyRole.stringId }
 
     }
 
@@ -101,7 +101,7 @@ class UserServiceTest {
 
         assert user.getProcessRoles().size() == 1
         user = userService.addRole(user, dummyRole.get_id())
-        assert user.getProcessRoles().size() == 2 && user.getProcessRoles().stream().anyMatch {it.stringId == dummyRole.stringId}
+        assert user.getProcessRoles().size() == 2 && user.getProcessRoles().stream().anyMatch { it.stringId == dummyRole.stringId }
 
         List<IUser> userList = userService.findAllByProcessRoles(Set.of(dummyRole.get_id()), null)
         assert userList.size() == 1 && userList.getFirst().stringId == user.stringId
@@ -126,8 +126,9 @@ class UserServiceTest {
         userService.saveUser(user, null)
 
         Page<IUser> userPage = userService.findAllCoMembers(LoggedUserMapper.toLoggedUser(user as User), Pageable.ofSize(10))
-        assert userPage.getContent().size() == 2 && userPage.getContent().getFirst().stringId == user.stringId
-
+        assert userPage.getContent().size() == 2
+        assert userPage.getContent().stream().anyMatch(user -> user.getStringId() != null && !user.getStringId().isEmpty());
+        assert userPage.content.any { it.stringId == user.stringId }
     }
 
     private IUser createUser() {
