@@ -3,8 +3,6 @@ package com.netgrif.application.engine.configuration.security;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
-import com.netgrif.application.engine.authorization.domain.ApplicationRole;
-import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -30,11 +28,10 @@ public abstract class PublicJwtAuthenticationFilter extends PublicAuthentication
 
     protected final IJwtService jwtService;
 
-    public PublicJwtAuthenticationFilter(IIdentityService identityService, IRoleService roleService, ProviderManager authenticationManager,
-                                         AnonymousAuthenticationProvider provider, ApplicationRole anonymousAppRole,
-                                         ProcessRole anonymousProcessRole, String[] urls, String[] exceptions,
-                                         IJwtService jwtService) {
-        super(identityService, roleService, authenticationManager, provider, anonymousAppRole, anonymousProcessRole, urls, exceptions);
+    public PublicJwtAuthenticationFilter(IIdentityService identityService, ProviderManager authenticationManager,
+                                         AnonymousAuthenticationProvider provider, String[] urls, String[] exceptions,
+                                         IJwtService jwtService, IRoleService roleService) {
+        super(authenticationManager, provider, urls, exceptions, identityService, roleService);
         this.jwtService = jwtService;
     }
 
@@ -89,7 +86,7 @@ public abstract class PublicJwtAuthenticationFilter extends PublicAuthentication
             identityOpt = identityService.findByUsername((String) ((LinkedHashMap<?, ?>) claims.get("identity")).get("username"));
         }
 
-        Identity identity = identityOpt.orElseGet(this::createAnonymousIdentityWithUser);
+        Identity identity = identityOpt.orElseGet(this::getAnonymousIdentityWithUser);
 
         LoggedIdentity loggedIdentity = identity.toSession();
         loggedIdentity.eraseCredentials();

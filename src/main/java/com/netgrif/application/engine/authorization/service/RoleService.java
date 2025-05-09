@@ -22,6 +22,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.FieldWithAllowedRo
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.RoleEvent;
+import com.netgrif.application.engine.startup.ApplicationRoleRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -51,6 +52,7 @@ public class RoleService implements IRoleService {
     private IAllActorService actorService;
     private ITaskService taskService;
     private IWorkflowService workflowService;
+    private ApplicationRoleRunner applicationRoleRunner;
 
     private ProcessRole defaultProcessRole;
     private ProcessRole anonymousProcessRole;
@@ -77,6 +79,12 @@ public class RoleService implements IRoleService {
     @Autowired
     public void setRoleAssignmentService(IRoleAssignmentService roleAssignmentService) {
         this.roleAssignmentService = roleAssignmentService;
+    }
+
+    @Lazy
+    @Autowired
+    public void setApplicationRoleRunner(ApplicationRoleRunner applicationRoleRunner) {
+        this.applicationRoleRunner = applicationRoleRunner;
     }
 
     /**
@@ -165,7 +173,11 @@ public class RoleService implements IRoleService {
      * */
     @Override
     public ApplicationRole findApplicationRoleByImportId(String importId) {
-        return applicationRoleRepository.findByImportId(importId);
+        ApplicationRole appRole = applicationRoleRunner.getAppRole(importId);
+        if (appRole == null) {
+            return applicationRoleRepository.findByImportId(importId);
+        }
+        return appRole;
     }
 
     /**
@@ -238,7 +250,6 @@ public class RoleService implements IRoleService {
         if (role == null) {
             return null;
         }
-        log.info("saving: {}", role);
         return repository.save(role);
     }
 

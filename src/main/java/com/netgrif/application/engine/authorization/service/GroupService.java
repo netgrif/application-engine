@@ -88,7 +88,7 @@ public class GroupService extends ActorService<Group> implements IGroupService {
             throw new IllegalArgumentException("Group must have a name");
         }
         if (isForbidden(typedParams.getName().getRawValue())) {
-            throw new IllegalArgumentException(String.format("Group name [%s] is reserved by system.",
+            throw new IllegalArgumentException(String.format("Group name [%s] is reserved by the system.",
                     typedParams.getName().getRawValue()));
         }
 
@@ -107,7 +107,7 @@ public class GroupService extends ActorService<Group> implements IGroupService {
             throw new IllegalArgumentException();
         }
         if (isForbidden(typedParams.getName().getRawValue())) {
-            throw new IllegalArgumentException(String.format("Group name [%s] is reserved by system.",
+            throw new IllegalArgumentException(String.format("Group name [%s] is reserved by the system.",
                     typedParams.getName().getRawValue()));
         }
     }

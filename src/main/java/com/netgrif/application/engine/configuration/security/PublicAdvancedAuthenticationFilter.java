@@ -4,11 +4,10 @@ import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.constants.AnonymIdentityConstants;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
-import com.netgrif.application.engine.authorization.domain.ApplicationRole;
-import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import com.netgrif.application.engine.startup.ApplicationRoleRunner;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
@@ -23,19 +22,17 @@ import java.util.Set;
 @Slf4j
 public class PublicAdvancedAuthenticationFilter extends PublicJwtAuthenticationFilter {
 
-    public PublicAdvancedAuthenticationFilter(IIdentityService identityService, IRoleService roleService, ProviderManager authenticationManager,
-                                              AnonymousAuthenticationProvider provider, ApplicationRole anonymousAppRole,
-                                              ProcessRole anonymousProcessRole, String[] urls, String[] exceptions,
-                                              IJwtService jwtService) {
-        super(identityService, roleService, authenticationManager, provider, anonymousAppRole, anonymousProcessRole, urls,
-                exceptions, jwtService);
+    public PublicAdvancedAuthenticationFilter(IIdentityService identityService, ProviderManager authenticationManager,
+                                              AnonymousAuthenticationProvider provider, String[] urls, String[] exceptions,
+                                              IJwtService jwtService, IRoleService roleService) {
+        super(identityService, authenticationManager, provider, urls, exceptions, jwtService, roleService);
     }
 
     /**
      * todo javadoc
      */
     @Override
-    protected Identity createAnonymousIdentityWithUser() {
+    protected Identity getAnonymousIdentityWithUser() {
         String hash = new ObjectId().toString();
 
         Optional<Identity> anonymIdentityOpt = identityService.findByUsername(AnonymIdentityConstants.usernameOf(hash));
@@ -50,7 +47,8 @@ public class PublicAdvancedAuthenticationFilter extends PublicJwtAuthenticationF
                 .password(new TextField("n/a"))
                 .build());
 
-        Set<String> roleIds = Set.of(anonymousAppRole.getStringId(), anonymousProcessRole.getStringId());
+        Set<String> roleIds = Set.of(roleService.findApplicationRoleByImportId(ApplicationRoleRunner.ANONYMOUS_APP_ROLE).getStringId(),
+                roleService.findAnonymousRole().getStringId());
         roleService.assignRolesToActor(identity.getMainActorId(), roleIds);
 
         return identity;

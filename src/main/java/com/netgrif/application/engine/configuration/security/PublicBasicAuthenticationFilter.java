@@ -5,11 +5,8 @@ import com.netgrif.application.engine.authentication.domain.constants.AnonymIden
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.domain.User;
-import com.netgrif.application.engine.authorization.domain.ApplicationRole;
-import com.netgrif.application.engine.authorization.domain.ProcessRole;
-import com.netgrif.application.engine.authorization.domain.params.UserParams;
-import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
@@ -20,7 +17,6 @@ import org.springframework.security.authentication.ProviderManager;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * todo javadoc
@@ -30,12 +26,10 @@ public class PublicBasicAuthenticationFilter extends PublicJwtAuthenticationFilt
 
     private final IUserService userService;
 
-    public PublicBasicAuthenticationFilter(IIdentityService identityService, IRoleService roleService, ProviderManager authenticationManager,
-                                           AnonymousAuthenticationProvider provider, ApplicationRole anonymousAppRole,
-                                           ProcessRole anonymousProcessRole, String[] urls, String[] exceptions,
-                                           IJwtService jwtService, IUserService userService) {
-        super(identityService, roleService, authenticationManager, provider, anonymousAppRole, anonymousProcessRole, urls,
-                exceptions, jwtService);
+    public PublicBasicAuthenticationFilter(IIdentityService identityService, ProviderManager authenticationManager,
+                                           AnonymousAuthenticationProvider provider, String[] urls, String[] exceptions,
+                                           IJwtService jwtService, IUserService userService, IRoleService roleService) {
+        super(identityService, authenticationManager, provider, urls, exceptions, jwtService, roleService);
         this.userService = userService;
     }
 
@@ -43,7 +37,7 @@ public class PublicBasicAuthenticationFilter extends PublicJwtAuthenticationFilt
      * todo javadoc
      */
     @Override
-    protected Identity createAnonymousIdentityWithUser() {
+    protected Identity getAnonymousIdentityWithUser() {
         String hash = new ObjectId().toString();
 
         Optional<Identity> anonymIdentityOpt = identityService.findByUsername(AnonymIdentityConstants.usernameOf(hash));
@@ -52,14 +46,8 @@ public class PublicBasicAuthenticationFilter extends PublicJwtAuthenticationFilt
         }
 
         Optional<User> anonymUserOpt = userService.findByEmail(AnonymIdentityConstants.defaultUsername());
-        User anonymUser = anonymUserOpt.orElseGet(() -> userService.create(UserParams.with()
-                .email(new TextField(AnonymIdentityConstants.defaultUsername()))
-                .firstname(new TextField(AnonymIdentityConstants.FIRSTNAME))
-                .lastname(new TextField(AnonymIdentityConstants.LASTNAME))
-                .build()));
-
-        Set<String> roleIds = Set.of(anonymousAppRole.getStringId(), anonymousProcessRole.getStringId());
-        roleService.assignRolesToActor(anonymUser.getStringId(), roleIds);
+        User anonymUser = anonymUserOpt.orElseThrow(() -> new IllegalStateException(String.format(
+                "Default anonymous user with email [%s] doesn't exist", AnonymIdentityConstants.defaultUsername())));
 
         return identityService.encodePasswordAndCreate(IdentityParams.with()
                 .username(new TextField(AnonymIdentityConstants.usernameOf(hash)))

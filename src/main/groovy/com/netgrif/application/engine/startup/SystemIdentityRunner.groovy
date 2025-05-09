@@ -36,10 +36,10 @@ class SystemIdentityRunner extends AbstractOrderedCommandLineRunner {
             this.systemIdentity = systemOpt.get()
             return
         }
-        this.systemIdentity = createSystemIdentityWithActor()
+        this.systemIdentity = createSystemIdentityWithUser()
     }
 
-    private Identity createSystemIdentityWithActor() {
+    private Identity createSystemIdentityWithUser() {
         Identity systemIdentity = identityService.createWithDefaultUser(IdentityParams.with()
                 .username(new TextField(SystemIdentityConstants.USERNAME))
                 .firstname(new TextField(SystemIdentityConstants.FIRSTNAME))

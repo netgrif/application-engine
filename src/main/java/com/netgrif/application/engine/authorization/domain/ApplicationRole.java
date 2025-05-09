@@ -6,13 +6,14 @@ import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.HashMap;
 
 @Data
 @Document(collection = "role")
 @EqualsAndHashCode(callSuper = true)
-public class ApplicationRole extends Role {
+public class ApplicationRole extends Role implements GrantedAuthority {
 
     @Indexed
     private String applicationId;
@@ -46,5 +47,10 @@ public class ApplicationRole extends Role {
     @Override
     public String toString() {
         return getTitleAsString();
+    }
+
+    @Override
+    public String getAuthority() {
+        return importId;
     }
 }

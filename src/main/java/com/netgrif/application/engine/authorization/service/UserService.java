@@ -71,7 +71,7 @@ public class UserService extends ActorService<User> implements IUserService {
             throw new IllegalArgumentException("User must have an email!");
         }
         if (isForbidden(typedParams.getEmail().getRawValue())) {
-            throw new IllegalArgumentException(String.format("User email [%s] is reserved by system.",
+            throw new IllegalArgumentException(String.format("User email [%s] is reserved by the system.",
                     typedParams.getEmail().getRawValue()));
         }
 
@@ -90,7 +90,7 @@ public class UserService extends ActorService<User> implements IUserService {
             throw new IllegalArgumentException("User must have an email!");
         }
         if (isForbidden(typedParams.getEmail().getRawValue())) {
-            throw new IllegalArgumentException(String.format("User email [%s] is reserved by system.",
+            throw new IllegalArgumentException(String.format("User email [%s] is reserved by the system.",
                     typedParams.getEmail().getRawValue()));
         }
     }
