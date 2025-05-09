@@ -258,9 +258,6 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
 
     @Override
     protected void validateAndFixCreateParams(CaseParams params) throws IllegalArgumentException {
-        if (params == null) {
-            throw new IllegalArgumentException("Please provide input values for identity");
-        }
         IdentityParams typedParams = (IdentityParams) params;
         if (isTextFieldOrValueEmpty(typedParams.getUsername())) {
             throw new IllegalArgumentException("Identity must have an username!");
@@ -273,9 +270,6 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
 
     @Override
     protected void validateAndFixUpdateParams(CaseParams params) throws IllegalArgumentException {
-        if (params == null) {
-            throw new IllegalArgumentException("Please provide input values for identity");
-        }
         IdentityParams typedParams = (IdentityParams) params;
         if (typedParams.getUsername() == null) {
             return;

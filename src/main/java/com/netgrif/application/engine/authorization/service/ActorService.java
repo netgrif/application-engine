@@ -101,5 +101,10 @@ public abstract class ActorService<T extends Actor> extends CrudSystemCaseServic
         protected ActorGroupParams(CaseField groupIds) {
             super(groupIds);
         }
+
+        @Override
+        public String targetProcessIdentifier() {
+            return "";
+        }
     }
 }

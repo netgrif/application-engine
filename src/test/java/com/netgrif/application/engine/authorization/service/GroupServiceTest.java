@@ -4,6 +4,7 @@ import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authorization.domain.Group;
 import com.netgrif.application.engine.authorization.domain.constants.GroupConstants;
 import com.netgrif.application.engine.authorization.domain.params.GroupParams;
+import com.netgrif.application.engine.authorization.domain.params.UserParams;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
@@ -122,9 +123,9 @@ public class GroupServiceTest {
     }
 
     @Test
-    void testCreate() {
+    void testCreate() throws InterruptedException {
         String name = "group name";
-        Group parentGroup = createGroup("parent group name");
+        Group parentGroup = createGroup("parent group");
         Group group = groupService.create(GroupParams.with()
                 .name(new TextField(name))
                 .groupIds(CaseField.withValue(List.of(defaultGroupRunner.getDefaultGroup().getStringId())))
@@ -141,6 +142,12 @@ public class GroupServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> groupService.create(null));
         assertThrows(IllegalArgumentException.class, () -> groupService.create(GroupParams.with().build()));
+        assertThrows(IllegalArgumentException.class, () -> groupService.create(GroupParams.with()
+                .name(new TextField(GroupConstants.DEFAULT_GROUP_NAME))
+                .build()));
+        assertThrows(IllegalArgumentException.class, () -> groupService.create(UserParams.with()
+                .email(new TextField("wrong type of params"))
+                .build()));
         // todo: release/8.0.0 allowed nets validation is not working
 //        assertThrows(IllegalArgumentException.class, () -> groupService.create(GroupParams.with()
 //                .name(new TextField(name))
@@ -236,13 +243,14 @@ public class GroupServiceTest {
     void testAddGroup() {
         Group group = createGroup("test group");
         Group memberGroup = createGroup("member group");
-        assert memberGroup.getGroupIds() == null;
+        assert memberGroup.getGroupIds() == null || memberGroup.getGroupIds().isEmpty();
 
         assertThrows(IllegalArgumentException.class, () -> groupService.addGroup(null, group.getStringId()));
         final Group finalGroup = memberGroup;
         assertThrows(IllegalArgumentException.class, () -> groupService.addGroup(finalGroup, null));
         assertThrows(IllegalArgumentException.class, () -> groupService.addGroup(finalGroup, finalGroup.getStringId()));
-        assert ((Group) systemCaseFactoryRegistry.fromCase(workflowService.findOne(finalGroup.getStringId()))).getGroupIds() == null;
+        Group actualMemberGroup = (Group) systemCaseFactoryRegistry.fromCase(workflowService.findOne(finalGroup.getStringId()));
+        assert actualMemberGroup.getGroupIds() == null || actualMemberGroup.getGroupIds().isEmpty();
 
         memberGroup = groupService.addGroup(memberGroup, group.getStringId());
         assert memberGroup.getGroupIds() != null;
@@ -255,7 +263,7 @@ public class GroupServiceTest {
         Group group1 = createGroup("test group 1");
         Group group2 = createGroup("test group 2");
         Group memberGroup = createGroup("member group");
-        assert memberGroup.getGroupIds() == null;
+        assert memberGroup.getGroupIds() == null || memberGroup.getGroupIds().isEmpty();
 
         assertThrows(IllegalArgumentException.class, () -> groupService.addGroups(null, Set.of(group1.getStringId(),
                 group2.getStringId())));
@@ -263,7 +271,8 @@ public class GroupServiceTest {
         assertThrows(IllegalArgumentException.class, () -> groupService.addGroups(finalGroup, null));
         assertThrows(IllegalArgumentException.class, () -> groupService.addGroups(finalGroup, Set.of(group1.getStringId(),
                 group2.getStringId(), finalGroup.getStringId())));
-        assert ((Group) systemCaseFactoryRegistry.fromCase(workflowService.findOne(finalGroup.getStringId()))).getGroupIds() == null;
+        Group actualMemberGroup = (Group) systemCaseFactoryRegistry.fromCase(workflowService.findOne(finalGroup.getStringId()));
+        assert actualMemberGroup.getGroupIds() == null || actualMemberGroup.getGroupIds().isEmpty();
 
         Set<String> groupIdsToAdd = new HashSet<>(List.of(group1.getStringId(), group2.getStringId(),
                 defaultGroupRunner.getDefaultGroup().getStringId()));
@@ -316,6 +325,48 @@ public class GroupServiceTest {
 
         memberGroup = groupService.removeGroups(memberGroup, groupIdsToRemove);
         assert memberGroup.getGroupIds() == null || memberGroup.getGroupIds().isEmpty();
+    }
+
+    @Test
+    void testForbiddenKeywords() {
+        assert !groupService.registerForbiddenKeywords(null);
+        assert !groupService.registerForbiddenKeywords(Set.of());
+
+        assert !groupService.removeForbiddenKeywords(null);
+        assert !groupService.removeForbiddenKeywords(Set.of());
+
+        Set<String> keywords = Set.of("keyword1", "keyword2", "keyword3");
+        assert !groupService.removeForbiddenKeywords(keywords);
+        assert groupService.registerForbiddenKeywords(keywords);
+
+        assertThrows(IllegalArgumentException.class, () -> groupService.create(GroupParams.with()
+                .name(new TextField("keyword1"))
+                .build()));
+
+        assertThrows(IllegalArgumentException.class, () -> groupService.create(GroupParams.with()
+                .name(new TextField("keyword2"))
+                .build()));
+
+        assertThrows(IllegalArgumentException.class, () -> groupService.create(GroupParams.with()
+                .name(new TextField("keyword3"))
+                .build()));
+
+        assert groupService.removeForbiddenKeywords(Set.of("keyword1", "keyword2"));
+
+        Group group = groupService.create(GroupParams.with().name(new TextField("keyword1")).build());
+        assert group != null;
+
+        group = groupService.create(GroupParams.with().name(new TextField("keyword2")).build());
+        assert group != null;
+
+        assertThrows(IllegalArgumentException.class, () -> groupService.create(UserParams.with()
+                .email(new TextField("keyword3"))
+                .build()));
+
+        groupService.clearForbiddenKeywords();
+
+        group = groupService.create(GroupParams.with().name(new TextField("keyword3")).build());
+        assert group != null;
     }
 
     private Group createGroup(String name) {

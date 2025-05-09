@@ -14,6 +14,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 
 import java.util.stream.Collectors
@@ -30,6 +31,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IIdentityService identityService
 
+    @Lazy
     @Autowired
     private IUserService userService
 

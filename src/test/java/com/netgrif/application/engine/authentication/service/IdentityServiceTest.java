@@ -4,8 +4,10 @@ import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.IdentityState;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
+import com.netgrif.application.engine.authentication.domain.constants.SystemIdentityConstants;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
+import com.netgrif.application.engine.authorization.domain.params.UserParams;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
@@ -172,6 +174,12 @@ public class IdentityServiceTest {
     @Test
     void testCreate() {
         assertThrows(IllegalArgumentException.class, () -> identityService.create(null));
+        assertThrows(IllegalArgumentException.class, () -> identityService.create(IdentityParams.with()
+                .username(new TextField(SystemIdentityConstants.USERNAME))
+                .build()));
+        assertThrows(IllegalArgumentException.class, () -> identityService.create(UserParams.with()
+                .email(new TextField("wrong type of parameters"))
+                .build()));
         assertThrows(IllegalArgumentException.class, () -> identityService.create(IdentityParams.with().build()));
 
         String username = "username";
@@ -375,6 +383,65 @@ public class IdentityServiceTest {
         assert removedIdentities.size() == 1;
         assert removedIdentities.get(0).getStringId().equals(identity.getStringId());
         assertThrows(IllegalArgumentException.class, () -> workflowService.findOne(identity.getStringId()));
+    }
+
+    @Test
+    void testForbiddenKeywords() {
+        assert !identityService.registerForbiddenKeywords(null);
+        assert !identityService.registerForbiddenKeywords(Set.of());
+
+        assert !identityService.removeForbiddenKeywords(null);
+        assert !identityService.removeForbiddenKeywords(Set.of());
+
+        Set<String> keywords = Set.of("keyword1", "keyword2", "keyword3");
+        assert !identityService.removeForbiddenKeywords(keywords);
+        assert identityService.registerForbiddenKeywords(keywords);
+
+        assertThrows(IllegalArgumentException.class, () -> identityService.create(IdentityParams.with()
+                .username(new TextField("keyword1"))
+                .build()));
+
+        assertThrows(IllegalArgumentException.class, () -> identityService.create(IdentityParams.with()
+                .username(new TextField("keyword2"))
+                .build()));
+
+        assertThrows(IllegalArgumentException.class, () -> identityService.create(IdentityParams.with()
+                .username(new TextField("keyword3"))
+                .build()));
+
+        assert identityService.removeForbiddenKeywords(Set.of("keyword1", "keyword2"));
+
+        Identity identity = identityService.create(IdentityParams.with().username(new TextField("keyword1")).build());
+        assert identity != null;
+
+        identity = identityService.create(IdentityParams.with().username(new TextField("keyword2")).build());
+        assert identity != null;
+
+        assertThrows(IllegalArgumentException.class, () -> identityService.create(IdentityParams.with()
+                .username(new TextField("keyword3"))
+                .build()));
+
+        identityService.clearForbiddenKeywords();
+
+        identity = identityService.create(IdentityParams.with().username(new TextField("keyword3")).build());
+        assert identity != null;
+    }
+
+    @Test
+    void testRemoveForbiddenKeywords() {
+        assert !identityService.removeForbiddenKeywords(null);
+        assert !identityService.removeForbiddenKeywords(Set.of());
+
+        Set<String> keywords = Set.of("keyword1", "keyword2");
+        assert identityService.registerForbiddenKeywords(keywords);
+
+        assertThrows(IllegalArgumentException.class, () -> identityService.create(IdentityParams.with()
+                .username(new TextField("keyword1"))
+                .build()));
+
+        assertThrows(IllegalArgumentException.class, () -> identityService.create(IdentityParams.with()
+                .username(new TextField("keyword2"))
+                .build()));
     }
 
     private Identity createIdentity(String username) {

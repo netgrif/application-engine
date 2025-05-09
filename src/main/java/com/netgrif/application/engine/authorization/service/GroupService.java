@@ -83,9 +83,6 @@ public class GroupService extends ActorService<Group> implements IGroupService {
 
     @Override
     protected void validateAndFixCreateParams(CaseParams params) throws IllegalArgumentException {
-        if (params == null) {
-            throw new IllegalArgumentException("Please provide input values for group");
-        }
         GroupParams typedParams = (GroupParams) params;
         if (isTextFieldOrValueEmpty(typedParams.getName())) {
             throw new IllegalArgumentException("Group must have a name");
@@ -102,9 +99,6 @@ public class GroupService extends ActorService<Group> implements IGroupService {
 
     @Override
     protected void validateAndFixUpdateParams(CaseParams params) throws IllegalArgumentException {
-        if (params == null) {
-            throw new IllegalArgumentException("Please provide input values for group");
-        }
         GroupParams typedParams = (GroupParams) params;
         if (typedParams.getName() == null) {
             return;

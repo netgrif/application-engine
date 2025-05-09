@@ -66,9 +66,6 @@ public class UserService extends ActorService<User> implements IUserService {
 
     @Override
     protected void validateAndFixCreateParams(CaseParams params) throws IllegalArgumentException {
-        if (params == null) {
-            throw new IllegalArgumentException("Please provide input values for user");
-        }
         UserParams typedParams = (UserParams) params;
         if (isTextFieldOrValueEmpty(typedParams.getEmail())) {
             throw new IllegalArgumentException("User must have an email!");
@@ -85,9 +82,6 @@ public class UserService extends ActorService<User> implements IUserService {
 
     @Override
     protected void validateAndFixUpdateParams(CaseParams params) throws IllegalArgumentException {
-        if (params == null) {
-            throw new IllegalArgumentException("Please provide input values for user");
-        }
         UserParams typedParams = (UserParams) params;
         if (typedParams.getEmail() == null) {
             return;

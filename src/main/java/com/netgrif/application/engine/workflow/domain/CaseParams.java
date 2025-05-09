@@ -7,4 +7,6 @@ public interface CaseParams {
      * todo javadoc
      * */
     DataSet toDataSet();
+
+    String targetProcessIdentifier();
 }

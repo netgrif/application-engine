@@ -63,4 +63,9 @@ public class UserParams extends ActorParams {
 
         return dataSet;
     }
+
+    @Override
+    public String targetProcessIdentifier() {
+        return UserConstants.PROCESS_IDENTIFIER;
+    }
 }

@@ -31,4 +31,9 @@ public class GroupParams extends ActorParams {
 
         return dataSet;
     }
+
+    @Override
+    public String targetProcessIdentifier() {
+        return GroupConstants.PROCESS_IDENTIFIER;
+    }
 }

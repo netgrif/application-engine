@@ -8,8 +8,9 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface ICrudSystemCaseService<T extends SystemCase> {
-    void registerForbiddenKeywords(Set<String> keywords);
-    void removeFromForbiddenKeywords(Set<String> keywords);
+    boolean registerForbiddenKeywords(Set<String> keywords);
+    boolean removeForbiddenKeywords(Set<String> keywords);
+    void clearForbiddenKeywords();
     T create(CaseParams params) throws IllegalArgumentException, IllegalStateException;
     T update(T systemObject, CaseParams params) throws IllegalArgumentException, IllegalStateException;
     Optional<T> findById(String id);

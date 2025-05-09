@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.authentication.domain.constants.SystemIdentityConstants;
 import com.netgrif.application.engine.authorization.domain.Group;
 import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.constants.GroupConstants;
@@ -144,6 +145,14 @@ public class UserServiceTest {
                 .lastname(new TextField(lastname))
                 .build()));
 
+        assertThrows(IllegalArgumentException.class, () -> userService.create(UserParams.with()
+                .email(new TextField(SystemIdentityConstants.USERNAME))
+                .build()));
+
+        assertThrows(IllegalArgumentException.class, () -> userService.create(GroupParams.with()
+                .name(new TextField("wrong type of parameters"))
+                .build()));
+
         assertThrows(IllegalArgumentException.class, () -> userService.create(null));
     }
 
@@ -273,6 +282,48 @@ public class UserServiceTest {
 
         user = userService.removeGroups(user, groupIdsToRemove);
         assert user.getGroupIds() == null || user.getGroupIds().isEmpty();
+    }
+
+    @Test
+    void testForbiddenKeywords() {
+        assert !userService.registerForbiddenKeywords(null);
+        assert !userService.registerForbiddenKeywords(Set.of());
+
+        assert !userService.removeForbiddenKeywords(null);
+        assert !userService.removeForbiddenKeywords(Set.of());
+
+        Set<String> keywords = Set.of("keyword1", "keyword2", "keyword3");
+        assert !userService.removeForbiddenKeywords(keywords);
+        assert userService.registerForbiddenKeywords(keywords);
+
+        assertThrows(IllegalArgumentException.class, () -> userService.create(UserParams.with()
+                .email(new TextField("keyword1"))
+                .build()));
+
+        assertThrows(IllegalArgumentException.class, () -> userService.create(UserParams.with()
+                .email(new TextField("keyword2"))
+                .build()));
+
+        assertThrows(IllegalArgumentException.class, () -> userService.create(UserParams.with()
+                .email(new TextField("keyword3"))
+                .build()));
+
+        assert userService.removeForbiddenKeywords(Set.of("keyword1", "keyword2"));
+
+        User user = userService.create(UserParams.with().email(new TextField("keyword1")).build());
+        assert user != null;
+
+        user = userService.create(UserParams.with().email(new TextField("keyword2")).build());
+        assert user != null;
+
+        assertThrows(IllegalArgumentException.class, () -> userService.create(UserParams.with()
+                .email(new TextField("keyword3"))
+                .build()));
+
+        userService.clearForbiddenKeywords();
+
+        user = userService.create(UserParams.with().email(new TextField("keyword3")).build());
+        assert user != null;
     }
 
     private User createUser(String email) {

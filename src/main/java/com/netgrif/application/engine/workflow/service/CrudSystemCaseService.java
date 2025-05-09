@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -49,9 +50,9 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
 
     // todo javadoc on abstract methods
     protected abstract String getProcessIdentifier();
-    protected abstract String isUniqueQuery(CaseParams params);
-    protected abstract void validateAndFixCreateParams(CaseParams params) throws IllegalArgumentException;
-    protected abstract void validateAndFixUpdateParams(CaseParams params) throws IllegalArgumentException;
+    protected abstract String isUniqueQuery(@NotNull CaseParams params);
+    protected abstract void validateAndFixCreateParams(@NotNull CaseParams params) throws IllegalArgumentException;
+    protected abstract void validateAndFixUpdateParams(@NotNull CaseParams params) throws IllegalArgumentException;
 
     protected void postCreationActions(T systemCase) {}
     protected void postUpdateActions(T systemCase) {}
@@ -60,24 +61,29 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
      * todo javadoc
      * */
     @Override
-    public void registerForbiddenKeywords(Set<String> keywords) {
+    public boolean registerForbiddenKeywords(Set<String> keywords) {
         // todo 2058 authorisation
         if (keywords == null) {
-            return;
+            return false;
         }
-        this.forbiddenKeywords.addAll(keywords);
+        return this.forbiddenKeywords.addAll(keywords);
     }
 
     /**
      * todo javadoc
      * */
     @Override
-    public void removeFromForbiddenKeywords(Set<String> keywords) {
+    public boolean removeForbiddenKeywords(Set<String> keywords) {
         // todo 2058 authorisation
         if (keywords == null) {
-            return;
+            return false;
         }
-        this.forbiddenKeywords.removeAll(keywords);
+        return this.forbiddenKeywords.removeAll(keywords);
+    }
+
+    @Override
+    public void clearForbiddenKeywords() {
+        this.forbiddenKeywords.clear();
     }
 
     /**
@@ -93,6 +99,12 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
     @Override
     @Transactional
     public T create(CaseParams params) throws IllegalArgumentException, IllegalStateException {
+        if (params == null) {
+            throw new IllegalArgumentException("Please provide input parameters.");
+        }
+        if (!params.targetProcessIdentifier().equals(getProcessIdentifier())) {
+            throw new IllegalArgumentException("Wrong type of parameters was provided.");
+        }
         validateAndFixCreateParams(params);
 
         Optional<T> existingCaseOpt = findOneByQuery(isUniqueQuery(params));
@@ -131,6 +143,12 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
     public T update(T systemObject, CaseParams params) throws IllegalArgumentException, IllegalStateException {
         if (systemObject == null) {
             throw new IllegalArgumentException("Please provide case to be updated");
+        }
+        if (params == null) {
+            throw new IllegalArgumentException("Please provide input parameters.");
+        }
+        if (!params.targetProcessIdentifier().equals(getProcessIdentifier())) {
+            throw new IllegalArgumentException("Wrong type of parameters was provided.");
         }
 
         validateAndFixUpdateParams(params);

@@ -45,6 +45,11 @@ public class IdentityParams implements CaseParams {
         return dataSet;
     }
 
+    @Override
+    public String targetProcessIdentifier() {
+        return IdentityConstants.PROCESS_IDENTIFIER;
+    }
+
     /**
      * todo javadoc
      * */

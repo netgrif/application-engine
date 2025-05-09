@@ -2,9 +2,12 @@ package com.netgrif.application.engine
 
 import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.authorization.domain.repositories.RoleAssignmentRepository
 import com.netgrif.application.engine.authorization.domain.repositories.RoleRepository
 import com.netgrif.application.engine.authorization.service.RoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IGroupService
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticTaskRepository
 import com.netgrif.application.engine.petrinet.domain.repositories.UriNodeRepository
@@ -56,6 +59,12 @@ class TestHelper {
     private ValidationRunner validationRunner
     @Autowired
     private DefaultGroupRunner defaultGroupRunner
+    @Autowired
+    private IUserService userService
+    @Autowired
+    private IGroupService groupService
+    @Autowired
+    private IIdentityService identityService;
 
     void truncateDbs() {
         template.db.drop()
@@ -69,6 +78,9 @@ class TestHelper {
         actionsCacheService.clearFunctionCache()
         actionsCacheService.clearNamespaceFunctionCache()
         petriNetService.evictAllCaches()
+        userService.clearForbiddenKeywords()
+        groupService.clearForbiddenKeywords()
+        identityService.clearForbiddenKeywords()
 
         uriRunner.run()
         systemProcessRunner.run()
