@@ -11,7 +11,7 @@
         User.class,
         Actor.class
 })
-package com.netgrif.application.engine.adapter.spring;
+package com.netgrif.application.engine.auth;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.ProcessRole;
