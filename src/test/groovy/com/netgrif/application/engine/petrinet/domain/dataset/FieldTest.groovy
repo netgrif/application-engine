@@ -6,7 +6,7 @@ import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.startup.SuperCreator
-import com.netgrif.application.engine.startup.SystemIdentityRunner
+import com.netgrif.application.engine.startup.SystemUserRunner
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -32,7 +32,7 @@ class FieldTest {
     private MongoTemplate template
 
     @Autowired
-    private SystemIdentityRunner systemIdentityRunner
+    private SystemUserRunner systemIdentityRunner
 
     @Autowired
     private TestHelper testHelper

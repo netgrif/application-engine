@@ -148,7 +148,7 @@ public class MenuImportExportService implements IMenuImportExportService {
             Case caseToRemove = workflowService.findOne(id);
             QTask qTask = new QTask("task");
             Task task = taskService.searchOne(qTask.transitionId.eq("view").and(qTask.caseId.eq(caseToRemove.getStringId())));
-            dataService.setData(task, caseToRemoveData, sessionManagerService.getLoggedIdentity().getActiveActorId());
+            dataService.setData(task, caseToRemoveData, sessionManagerService.getActiveActorId());
         });
 
         //Import filters
@@ -170,7 +170,7 @@ public class MenuImportExportService implements IMenuImportExportService {
 //            DataField groupImportResultMessage = new DataField();
 //            groupImportResultMessage.setValue(resultMessage.toString());
 //            groupData.getFields().put("import_results", groupImportResultMessage);
-            dataService.setData(task, groupData, sessionManagerService.getLoggedIdentity().getActiveActorId());
+            dataService.setData(task, groupData, sessionManagerService.getActiveActorId());
         });
 
         importedFilterTaskIds.values().forEach(taskId -> {
@@ -250,13 +250,13 @@ public class MenuImportExportService implements IMenuImportExportService {
                 petriNetService.getNewestVersionByIdentifier("preference_filter_item").getStringId(),
                 item.getEntryName() + "_" + menuIdentifier,
                 "",
-                sessionManagerService.getLoggedIdentity().getActiveActorId()
+                sessionManagerService.getActiveActorId()
         ).getCase();
 
         QTask qTask = new QTask("task");
         Task task = taskService.searchOne(qTask.transitionId.eq("init").and(qTask.caseId.eq(menuItemCase.getStringId())));
         try {
-            taskService.assignTask(task, sessionManagerService.getLoggedIdentity().getActiveActorId());
+            taskService.assignTask(task, sessionManagerService.getActiveActorId());
 //            TODO: release/8.0.0
 //            menuItemCase.getDataSet().get(MENU_IDENTIFIER).setValue(menuIdentifier);
 //            menuItemCase.getDataSet().get(PARENT_ID).setValue(parentId);

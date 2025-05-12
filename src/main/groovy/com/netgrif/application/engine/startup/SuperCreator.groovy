@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.startup
 
-
 import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams
@@ -16,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
-
-import java.util.stream.Collectors
 
 @Slf4j
 @Component
@@ -66,24 +63,12 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
         identityService.registerForbiddenKeywords(Set.of(configuration.email))
         userService.registerForbiddenKeywords(Set.of(configuration.email))
 
-        Set<String> allRoleIds = roleService.findAll().stream().map { it.stringId }.collect(Collectors.toSet())
         Role adminAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE)
         Role systemAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.SYSTEM_ADMIN_APP_ROLE)
-        allRoleIds.add(adminAppRole.getStringId())
-        allRoleIds.add(systemAppRole.getStringId())
-        roleService.assignRolesToActor(this.superIdentity.toSession().activeActorId, allRoleIds)
+        roleService.assignRolesToActor(this.superIdentity.toSession().activeActorId,
+                [adminAppRole.stringId, systemAppRole.stringId] as Set)
 
         log.info("Super identity created with actor")
-    }
-
-    void setAllToSuperUser() {
-        setAllRoles()
-        log.info("Super identity updated")
-    }
-
-    void setAllRoles() {
-        Set<String> allRoleIds = roleService.findAll().stream().map { it.stringId }.collect(Collectors.toSet())
-        roleService.assignRolesToActor(this.superIdentity.toSession().activeActorId, allRoleIds)
     }
 
     Identity getSuperIdentity() {

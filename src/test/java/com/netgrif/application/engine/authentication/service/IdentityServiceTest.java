@@ -4,7 +4,7 @@ import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.IdentityState;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
-import com.netgrif.application.engine.authentication.domain.constants.SystemIdentityConstants;
+import com.netgrif.application.engine.authentication.domain.constants.SystemUserConstants;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
 import com.netgrif.application.engine.authorization.domain.params.UserParams;
@@ -175,7 +175,7 @@ public class IdentityServiceTest {
     void testCreate() {
         assertThrows(IllegalArgumentException.class, () -> identityService.create(null));
         assertThrows(IllegalArgumentException.class, () -> identityService.create(IdentityParams.with()
-                .username(new TextField(SystemIdentityConstants.USERNAME))
+                .username(new TextField(SystemUserConstants.EMAIL))
                 .build()));
         assertThrows(IllegalArgumentException.class, () -> identityService.create(UserParams.with()
                 .email(new TextField("wrong type of parameters"))

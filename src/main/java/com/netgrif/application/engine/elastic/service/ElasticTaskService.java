@@ -59,16 +59,16 @@ public class ElasticTaskService implements IElasticTaskService {
     }
 
     @Override
-    public Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedIdentity identity, Pageable pageable,
+    public Page<Task> search(List<ElasticTaskSearchRequest> requests, String actorId, Pageable pageable,
                              Locale locale, Boolean isIntersection) {
-        BoolQueryBuilder permissionQuery = permissionQueryBuilder.buildSingleQuery(identity.getActiveActorId());
-        return searchService.search(requests, identity, pageable, locale, isIntersection, permissionQuery);
+        BoolQueryBuilder permissionQuery = permissionQueryBuilder.buildSingleQuery(actorId);
+        return searchService.search(requests, actorId, pageable, locale, isIntersection, permissionQuery);
     }
 
     @Override
-    public long count(List<ElasticTaskSearchRequest> requests, LoggedIdentity identity, Locale locale, Boolean isIntersection) {
-        BoolQueryBuilder permissionQuery = permissionQueryBuilder.buildSingleQuery(identity.getActiveActorId());
-        return searchService.count(requests, identity, locale, isIntersection, permissionQuery);
+    public long count(List<ElasticTaskSearchRequest> requests, String actorId, Locale locale, Boolean isIntersection) {
+        BoolQueryBuilder permissionQuery = permissionQueryBuilder.buildSingleQuery(actorId);
+        return searchService.count(requests, actorId, locale, isIntersection, permissionQuery);
     }
 
     @Override

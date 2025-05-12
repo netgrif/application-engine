@@ -34,7 +34,7 @@ class TestHelper {
     @Autowired
     private RoleService roleService
     @Autowired
-    private SystemIdentityRunner systemIdentityRunner
+    private SystemUserRunner systemIdentityRunner
     @Autowired
     private SystemProcessRunner systemProcessRunner
     @Autowired

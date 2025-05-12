@@ -8,8 +8,6 @@ public interface ISessionManagerService {
 
     LoggedIdentity getLoggedIdentity();
 
-    LoggedIdentity getLoggedSystemIdentity();
-
     String getActiveActorId();
 
     Collection<LoggedIdentity> getAllLoggedIdentities();

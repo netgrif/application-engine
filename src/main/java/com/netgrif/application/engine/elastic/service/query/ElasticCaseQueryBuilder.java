@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.elastic.service.query;
 
-import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
@@ -32,7 +31,7 @@ public class ElasticCaseQueryBuilder implements ElasticQueryBuilder {
      * todo javadoc
      * */
     @Override
-    public <T> BoolQueryBuilder buildSingleQuery(T request, Locale locale, @Nullable LoggedIdentity identity,
+    public <T> BoolQueryBuilder buildSingleQuery(T request, Locale locale, @Nullable String actorId,
                                                  @Nullable BoolQueryBuilder permissionQuery) {
         CaseSearchRequest typedRequest = (CaseSearchRequest) request;
         BoolQueryBuilder query = boolQuery();
@@ -43,7 +42,7 @@ public class ElasticCaseQueryBuilder implements ElasticQueryBuilder {
         buildRoleQuery(typedRequest, query);
         buildDataQuery(typedRequest, query);
         buildFullTextQuery(typedRequest, query);
-        buildStringQuery(typedRequest, query, identity);
+        buildStringQuery(typedRequest, query, actorId);
         buildCaseIdQuery(typedRequest, query);
         buildUriNodeIdQuery(typedRequest, query);
         buildTagsQuery(typedRequest, query);
@@ -243,14 +242,14 @@ public class ElasticCaseQueryBuilder implements ElasticQueryBuilder {
     /**
      * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a>
      */
-    private void buildStringQuery(CaseSearchRequest request, BoolQueryBuilder query, @Nullable LoggedIdentity identity) {
+    private void buildStringQuery(CaseSearchRequest request, BoolQueryBuilder query, @Nullable String actorId) {
         if (request.query == null || request.query.isEmpty()) {
             return;
         }
 
         String populatedQuery = request.query;
-        if (identity != null) {
-            populatedQuery = populatedQuery.replaceAll(ElasticQueryConstants.ACTOR_ID_TEMPLATE, identity.getActiveActorId());
+        if (actorId != null) {
+            populatedQuery = populatedQuery.replaceAll(ElasticQueryConstants.ACTOR_ID_TEMPLATE, actorId);
         }
 
         query.must(queryStringQuery(populatedQuery).allowLeadingWildcard(true).analyzeWildcard(true));

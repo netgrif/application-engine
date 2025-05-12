@@ -259,7 +259,7 @@ public class ElasticTaskSearchPermissionTest {
     }
 
     private Page<Task> doSearch() {
-        return elasticTaskService.search(List.of(request), testIdentity.toSession(), PageRequest.of(0, 2),
+        return elasticTaskService.search(List.of(request), testIdentity.toSession().getActiveActorId(), PageRequest.of(0, 2),
                 Locale.getDefault(), false);
     }
 

@@ -2,9 +2,7 @@ package com.netgrif.application.engine.manager;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
-import com.netgrif.application.engine.authentication.domain.constants.SystemIdentityConstants;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,19 +43,6 @@ class SessionManagerServiceTest {
         assert receivedLoggedIdentity.getFullName().equals(loggedIdentity.getFullName());
         assert receivedLoggedIdentity.getIdentityId().equals(loggedIdentity.getIdentityId());
         assert receivedLoggedIdentity.getActiveActorId().equals(loggedIdentity.getActiveActorId());
-    }
-
-    @Test
-    void getLoggedSystemIdentity() {
-        LoggedIdentity receivedLoggedIdentity = managerService.getLoggedSystemIdentity();
-
-        assert receivedLoggedIdentity != null;
-        assert receivedLoggedIdentity.getUsername().equals(SystemIdentityConstants.USERNAME);
-        assert receivedLoggedIdentity.getFullName().equals(String.join(" ", SystemIdentityConstants.FIRSTNAME,
-                SystemIdentityConstants.LASTNAME));
-        assert ObjectId.isValid(receivedLoggedIdentity.getIdentityId());
-        assert ObjectId.isValid(receivedLoggedIdentity.getActiveActorId());
-        assert !receivedLoggedIdentity.getIdentityId().equals(receivedLoggedIdentity.getActiveActorId());
     }
 
     @Test

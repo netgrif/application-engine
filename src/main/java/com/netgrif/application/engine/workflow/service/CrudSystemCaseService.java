@@ -260,11 +260,11 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
 
         List<Case> result = new ArrayList<>();
 
-        long identityCount = elasticCaseSearchService.count(List.of(request),sessionManagerService.getLoggedIdentity(),
+        long identityCount = elasticCaseSearchService.count(List.of(request), sessionManagerService.getActiveActorId(),
                 Locale.getDefault(), false, null);
         long pageCount = (identityCount / 100) + 1;
         LongStream.range(0, pageCount).forEach(pageIdx -> {
-            Page<Case> pageResult = elasticCaseSearchService.search(List.of(request), sessionManagerService.getLoggedIdentity(),
+            Page<Case> pageResult = elasticCaseSearchService.search(List.of(request), sessionManagerService.getActiveActorId(),
                     PageRequest.of((int) pageIdx, 100), Locale.getDefault(), false, null);
             result.addAll(pageResult.getContent());
         });
@@ -280,7 +280,7 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
         CaseSearchRequest request = CaseSearchRequest.builder()
                 .query(buildQuery(Set.of(query)))
                 .build();
-        Page<Case> resultAsPage = elasticCaseSearchService.search(List.of(request), sessionManagerService.getLoggedIdentity(),
+        Page<Case> resultAsPage = elasticCaseSearchService.search(List.of(request), sessionManagerService.getActiveActorId(),
                 PageRequest.of(0, 1), Locale.getDefault(), false, null);
         if (resultAsPage.hasContent()) {
             return (Optional<T>) Optional.ofNullable(systemCaseFactory.fromCase(resultAsPage.getContent().get(0)));
@@ -292,8 +292,8 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
         CaseSearchRequest request = CaseSearchRequest.builder()
                 .query(buildQuery(Set.of(query)))
                 .build();
-        return elasticCaseSearchService.count(List.of(request), sessionManagerService.getLoggedIdentity(), Locale.getDefault(),
-                false, null);
+        return elasticCaseSearchService.count(List.of(request), sessionManagerService.getActiveActorId(),
+                Locale.getDefault(), false, null);
     }
 
     protected String buildQuery(Set<String> andQueries) {

@@ -107,10 +107,10 @@ public class CaseAuthorizationServiceTest {
                 .build());
 
         testProcess = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/case_authorization_test.xml"),
-                VersionType.MAJOR, sessionManagerService.getLoggedSystemIdentity().getActiveActorId()).getNet();
+                VersionType.MAJOR, userService.getSystemUser().getStringId()).getNet();
 
         testProcessWithDefault = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/case_authorization_default_test.xml"),
-                VersionType.MAJOR, sessionManagerService.getLoggedSystemIdentity().getActiveActorId()).getNet();
+                VersionType.MAJOR, userService.getSystemUser().getStringId()).getNet();
 
         TestHelper.login(testIdentity);
     }

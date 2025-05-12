@@ -46,7 +46,7 @@ class ChangeBehaviorTest extends EngineTest {
     void before() {
         super.before()
         net = petriNetService.importPetriNet(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR,
-                sessionManagerService.getLoggedSystemIdentity().activeActorId).getNet()
+                userService.getSystemUser().stringId).getNet()
         assert net != null
 
         TestHelper.login(superCreator.superIdentity)

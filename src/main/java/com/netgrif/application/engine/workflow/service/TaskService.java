@@ -137,7 +137,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public AssignTaskEventOutcome assignTask(String taskId, Map<String, String> params) throws TransitionNotExecutableException {
-        String actorId = sessionManagerService.getLoggedIdentity().getActiveActorId();
+        String actorId = sessionManagerService.getActiveActorId();
         return assignTask(actorId, taskId, params);
     }
 
@@ -224,7 +224,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public FinishTaskEventOutcome finishTask(String taskId, Map<String, String> params) throws IllegalArgumentException, TransitionNotExecutableException {
-        String actorId = sessionManagerService.getLoggedIdentity().getActiveActorId();
+        String actorId = sessionManagerService.getActiveActorId();
         return finishTask(actorId, taskId, params);
     }
 
@@ -542,7 +542,7 @@ public class TaskService implements ITaskService {
             log.info("assignTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
             outcomes.add(assignTask(task.getStringId()));
             log.info("getData [{}] in case [{}]", task.getTitle(), useCase.getTitle());
-            outcomes.add(dataService.getData(task.getStringId(), sessionManagerService.getLoggedSystemIdentity().getActiveActorId()));
+            outcomes.add(dataService.getData(task.getStringId(), userService.getSystemUser().getStringId()));
             log.info("finishTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
             outcomes.add(finishTask(task.getStringId()));
         } catch (TransitionNotExecutableException e) {
@@ -750,7 +750,7 @@ public class TaskService implements ITaskService {
                 TimeTrigger timeTrigger = (TimeTrigger) taskTrigger;
                 scheduleTaskExecution(task, timeTrigger.getStartDate(), useCase);
             } else if (taskTrigger instanceof AutoTrigger) {
-                task.setAssigneeId(sessionManagerService.getLoggedSystemIdentity().getActiveActorId());
+                task.setAssigneeId(userService.getSystemUser().getStringId());
             }
         }
         task.setProcessRolePermissions(new AccessPermissions<>(transition.getProcessRolePermissions()));

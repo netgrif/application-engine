@@ -8,6 +8,7 @@ import com.netgrif.application.engine.authorization.service.interfaces.IUserServ
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
+import com.netgrif.application.engine.startup.SystemUserRunner;
 import com.netgrif.application.engine.workflow.domain.CaseParams;
 import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -23,12 +24,14 @@ import java.util.*;
 public class UserService extends ActorService<User> implements IUserService {
 
     private final IGroupService groupService;
+    private final SystemUserRunner systemUserRunner;
 
     public UserService(@Lazy IDataService dataService, ISessionManagerService sessionManagerService,
                        @Lazy IElasticCaseSearchService elasticCaseSearchService, @Lazy IWorkflowService workflowService,
-                       SystemCaseFactoryRegistry systemCaseFactoryRegistry, IGroupService groupService) {
+                       SystemCaseFactoryRegistry systemCaseFactoryRegistry, IGroupService groupService, SystemUserRunner systemUserRunner) {
         super(sessionManagerService, dataService, workflowService, systemCaseFactoryRegistry, elasticCaseSearchService);
         this.groupService = groupService;
+        this.systemUserRunner = systemUserRunner;
     }
 
     /**
@@ -51,6 +54,11 @@ public class UserService extends ActorService<User> implements IUserService {
             return false;
         }
         return countByQuery(fulltextFieldQuery(UserConstants.EMAIL_FIELD_ID, email)) > 0;
+    }
+
+    @Override
+    public User getSystemUser() {
+        return systemUserRunner.getSystemUser();
     }
 
     @Override

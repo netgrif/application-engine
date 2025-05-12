@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.elastic.service;
 
-import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
@@ -62,16 +61,16 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     @Override
-    public Page<Case> search(List<CaseSearchRequest> requests, LoggedIdentity identity, Pageable pageable, Locale locale,
+    public Page<Case> search(List<CaseSearchRequest> requests, String actorId, Pageable pageable, Locale locale,
                              Boolean isIntersection) {
-        BoolQueryBuilder permissionQuery = permissionQueryBuilder.buildSingleQuery(identity.getActiveActorId());
-        return searchService.search(requests, identity, pageable, locale, isIntersection, permissionQuery);
+        BoolQueryBuilder permissionQuery = permissionQueryBuilder.buildSingleQuery(actorId);
+        return searchService.search(requests, actorId, pageable, locale, isIntersection, permissionQuery);
     }
 
     @Override
-    public long count(List<CaseSearchRequest> requests, LoggedIdentity identity, Locale locale, Boolean isIntersection) {
-        BoolQueryBuilder permissionQuery = permissionQueryBuilder.buildSingleQuery(identity.getActiveActorId());
-        return searchService.count(requests, identity, locale, isIntersection, permissionQuery);
+    public long count(List<CaseSearchRequest> requests, String actorId, Locale locale, Boolean isIntersection) {
+        BoolQueryBuilder permissionQuery = permissionQueryBuilder.buildSingleQuery(actorId);
+        return searchService.count(requests, actorId, locale, isIntersection, permissionQuery);
     }
 
     @Override

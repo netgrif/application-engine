@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.elastic.service;
 
-import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.domain.*;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskSearchService;
@@ -50,9 +49,9 @@ public class ElasticTaskSearchService extends ElasticSearchService implements IE
     }
 
     @Override
-    public Page<Task> search(List<ElasticTaskSearchRequest> requests, @Nullable LoggedIdentity identity, Pageable pageable,
+    public Page<Task> search(List<ElasticTaskSearchRequest> requests, @Nullable String actorId, Pageable pageable,
                              Locale locale, Boolean isIntersection, @Nullable BoolQueryBuilder permissionQuery) {
-        NativeSearchQuery query = buildQuery(requests, identity, pageable, locale, isIntersection, permissionQuery);
+        NativeSearchQuery query = buildQuery(requests, actorId, pageable, locale, isIntersection, permissionQuery);
         List<Task> taskPage;
         long total;
         if (query != null) {
@@ -69,9 +68,9 @@ public class ElasticTaskSearchService extends ElasticSearchService implements IE
     }
 
     @Override
-    public long count(List<ElasticTaskSearchRequest> requests, @Nullable LoggedIdentity identity, Locale locale,
+    public long count(List<ElasticTaskSearchRequest> requests, @Nullable String actorId, Locale locale,
                       Boolean isIntersection, @Nullable BoolQueryBuilder permissionQuery) {
-        NativeSearchQuery query = buildQuery(requests, identity, new FullPageRequest(), locale, isIntersection, permissionQuery);
+        NativeSearchQuery query = buildQuery(requests, actorId, new FullPageRequest(), locale, isIntersection, permissionQuery);
 
         return query != null ? template.count(query, ElasticTask.class) : 0;
     }

@@ -9,4 +9,5 @@ public interface IUserService extends IActorService<User> {
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
     List<User> findAll();
+    User getSystemUser();
 }

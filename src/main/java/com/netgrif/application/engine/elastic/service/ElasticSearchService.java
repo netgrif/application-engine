@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.elastic.service;
 
-import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.elastic.service.query.ElasticQueryBuilder;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.springframework.data.domain.Pageable;
@@ -22,10 +21,10 @@ public abstract class ElasticSearchService {
         this.queryBuilder = queryBuilder;
     }
 
-    protected <T> NativeSearchQuery buildQuery(List<T> requests, @Nullable LoggedIdentity identity, Pageable pageable,
+    protected <T> NativeSearchQuery buildQuery(List<T> requests, @Nullable String actorId, Pageable pageable,
                                          Locale locale, Boolean isIntersection, @Nullable BoolQueryBuilder permissionQuery) {
         List<BoolQueryBuilder> singleQueries = requests.stream()
-                .map(request -> queryBuilder.buildSingleQuery(request, locale, identity, permissionQuery))
+                .map(request -> queryBuilder.buildSingleQuery(request, locale, actorId, permissionQuery))
                 .collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {

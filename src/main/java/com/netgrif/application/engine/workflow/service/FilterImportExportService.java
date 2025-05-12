@@ -239,7 +239,7 @@ public class FilterImportExportService implements IFilterImportExportService {
             workflowService.save(filterCase.get());
         });
         taskService.assignTasks(taskService.findAllById(new ArrayList<>(importedFilterTaskIds.values())),
-                sessionManagerService.getLoggedIdentity().getActiveActorId());
+                sessionManagerService.getActiveActorId());
         changeFilterField(importedFilterTaskIds.values());
         return importedFilterTaskIds;
     }
@@ -293,7 +293,7 @@ public class FilterImportExportService implements IFilterImportExportService {
     protected FilterImportExportList loadFromXML() throws IOException, IllegalFilterFileException {
         Case exportCase = workflowService.searchOne(
                 QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER)
-                        .and(QCase.case$.authorId.eq(sessionManagerService.getLoggedIdentity().getActiveActorId()))
+                        .and(QCase.case$.authorId.eq(sessionManagerService.getActiveActorId()))
         );
 
         FileFieldValue ffv = ((FileField) exportCase.getDataSet().get(UPLOAD_FILE_FIELD)).getValue().getValue();
@@ -311,7 +311,7 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Transactional
     protected FileFieldValue createXML(FilterImportExportList filters) throws IOException {
-        String filePath = fileStorageConfiguration.getStoragePath() + "/filterExport/" + sessionManagerService.getLoggedIdentity().getActiveActorId() + "/" + filterProperties.getFileName();
+        String filePath = fileStorageConfiguration.getStoragePath() + "/filterExport/" + sessionManagerService.getActiveActorId() + "/" + filterProperties.getFileName();
         File f = new File(filePath);
         f.getParentFile().mkdirs();
 

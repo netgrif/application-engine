@@ -3,7 +3,7 @@ package com.netgrif.application.engine.manager.service;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.security.service.SecurityContextService;
-import com.netgrif.application.engine.startup.SystemIdentityRunner;
+import com.netgrif.application.engine.startup.SystemUserRunner;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisOperations;
@@ -26,17 +26,17 @@ public class SessionManagerService implements ISessionManagerService {
     protected final RedisIndexedSessionRepository repository;
     protected final SessionRegistry sessionRegistry;
     protected final SecurityContextService securityContextService;
-    protected final SystemIdentityRunner systemIdentityRunner;
+    protected final SystemUserRunner systemUserRunner;
 
     protected final String redisUsernameKey;
 
     public SessionManagerService(RedisIndexedSessionRepository repository, SessionRegistry sessionRegistry,
-                                 SecurityContextService securityContextService, SystemIdentityRunner systemIdentityRunner,
+                                 SecurityContextService securityContextService, SystemUserRunner systemUserRunner,
                                  @Value("${spring.session.redis.namespace}") String redisNamespace) {
         this.repository = repository;
         this.sessionRegistry = sessionRegistry;
         this.securityContextService = securityContextService;
-        this.systemIdentityRunner = systemIdentityRunner;
+        this.systemUserRunner = systemUserRunner;
         this.redisUsernameKey = RedisIndexedSessionRepository.DEFAULT_NAMESPACE + ":" + redisNamespace
                 + ":index:org.springframework.session.FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME:";
     }
@@ -52,16 +52,6 @@ public class SessionManagerService implements ISessionManagerService {
             return (LoggedIdentity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         }
         return null;
-    }
-
-    /**
-     * Gets logged system identity. However, this identity is not managed by session manager.
-     *
-     * @return Logged system identity. Cannot be null.
-     */
-    @Override
-    public LoggedIdentity getLoggedSystemIdentity() {
-        return systemIdentityRunner.getLoggedSystem();
     }
 
     /**

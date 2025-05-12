@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.elastic.service;
 
-import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
@@ -45,14 +44,14 @@ public class ElasticCaseSearchService extends ElasticSearchService implements IE
     }
 
     @Override
-    public Page<Case> search(List<CaseSearchRequest> requests, @Nullable LoggedIdentity identity, Pageable pageable,
+    public Page<Case> search(List<CaseSearchRequest> requests, @Nullable String actorId, Pageable pageable,
                              Locale locale, Boolean isIntersection, @Nullable BoolQueryBuilder permissionQuery) {
         if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
         pageable = ((ElasticCaseQueryBuilder) queryBuilder).resolveUnmappedSortAttributes(pageable);
-        NativeSearchQuery query = buildQuery(requests, identity, pageable, locale, isIntersection, permissionQuery);
+        NativeSearchQuery query = buildQuery(requests, actorId, pageable, locale, isIntersection, permissionQuery);
         List<Case> casePage;
         long total;
         if (query != null) {
@@ -71,13 +70,13 @@ public class ElasticCaseSearchService extends ElasticSearchService implements IE
     }
 
     @Override
-    public long count(List<CaseSearchRequest> requests, @Nullable LoggedIdentity identity, Locale locale,
+    public long count(List<CaseSearchRequest> requests, @Nullable String actorId, Locale locale,
                       Boolean isIntersection, @Nullable BoolQueryBuilder permissionQuery) {
         if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        NativeSearchQuery query = buildQuery(requests, identity, new FullPageRequest(), locale, isIntersection, permissionQuery);
+        NativeSearchQuery query = buildQuery(requests, actorId, new FullPageRequest(), locale, isIntersection, permissionQuery);
 
         return query != null ? template.count(query, ElasticCase.class) : 0;
     }

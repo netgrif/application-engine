@@ -176,7 +176,8 @@ public abstract class AbstractTaskController {
     }
 
     public PagedModel<TaskResource> searchElastic(Authentication auth, Pageable pageable, SingleElasticTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        Page<Task> tasks = searchService.search(searchBody.getList(), (LoggedIdentity) auth.getPrincipal(), pageable, locale, operation == MergeFilterOperation.AND);
+        LoggedIdentity identity = (LoggedIdentity) auth.getPrincipal();
+        Page<Task> tasks = searchService.search(searchBody.getList(), identity.getActiveActorId(), pageable, locale, operation == MergeFilterOperation.AND);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .searchElastic(auth, pageable, searchBody, operation, assembler, locale)).withRel("search_es");
         PagedModel<TaskResource> resources = assembler.toModel(tasks, new TaskResourceAssembler(), selfLink);
@@ -185,7 +186,8 @@ public abstract class AbstractTaskController {
     }
 
     public CountResponse count(SingleElasticTaskSearchRequestAsList query, MergeFilterOperation operation, Authentication auth, Locale locale) {
-        long count = searchService.count(query.getList(), (LoggedIdentity) auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);
+        LoggedIdentity identity = (LoggedIdentity) auth.getPrincipal();
+        long count = searchService.count(query.getList(), identity.getActiveActorId(), locale, operation == MergeFilterOperation.AND);
         return CountResponse.taskCount(count);
     }
 

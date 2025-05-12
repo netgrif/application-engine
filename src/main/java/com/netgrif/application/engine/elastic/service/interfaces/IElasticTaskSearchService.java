@@ -13,9 +13,9 @@ import java.util.Locale;
 
 public interface IElasticTaskSearchService {
 
-    Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedIdentity identity, Pageable pageable, Locale locale,
+    Page<Task> search(List<ElasticTaskSearchRequest> requests, String actorId, Pageable pageable, Locale locale,
                       Boolean isIntersection, @Nullable BoolQueryBuilder permissionQuery);
 
-    long count(List<ElasticTaskSearchRequest> requests, LoggedIdentity identity, Locale locale, Boolean isIntersection,
+    long count(List<ElasticTaskSearchRequest> requests, String actorId, Locale locale, Boolean isIntersection,
                @Nullable BoolQueryBuilder permissionQuery);
 }

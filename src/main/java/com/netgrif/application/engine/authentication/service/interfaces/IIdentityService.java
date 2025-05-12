@@ -13,7 +13,6 @@ import java.util.Set;
 
 public interface IIdentityService extends ICrudSystemCaseService<Identity> {
     LoggedIdentity getLoggedIdentity();
-    LoggedIdentity getLoggedSystemIdentity();
 
     Optional<Identity> findByUsername(String username);
     Optional<Identity> findByLoggedIdentity(LoggedIdentity loggedIdentity);

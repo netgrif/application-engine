@@ -323,7 +323,7 @@ public class WorkflowService implements IWorkflowService {
         DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getProcess().getPreDeleteActions(), useCase, Optional.empty(), params));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
         log.info("[{}]: Actor [{}] is deleting case {}", useCase.getStringId(),
-                sessionManagerService.getLoggedIdentity().getActiveActorId(), useCase.getTitle());
+                sessionManagerService.getActiveActorId(), useCase.getTitle());
 
         roleService.removeAllByCase(useCase.getStringId());
         taskService.deleteTasksByCase(useCase.getStringId());
@@ -343,23 +343,23 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public void deleteInstancesOfPetriNet(Process net) {
         log.info("[{}]: Actor {} is deleting all cases and tasks of Petri net {} version {}", net.getStringId(),
-                sessionManagerService.getLoggedIdentity().getActiveActorId(), net.getIdentifier(), net.getVersion().toString());
+                sessionManagerService.getActiveActorId(), net.getIdentifier(), net.getVersion().toString());
 
         taskService.deleteTasksByPetriNetId(net.getStringId());
         CaseSearchRequest request = new CaseSearchRequest();
         CaseSearchRequest.PetriNet netRequest = new CaseSearchRequest.PetriNet();
         netRequest.processId = net.getStringId();
         request.process = Collections.singletonList(netRequest);
-        long countCases = elasticCaseService.count(Collections.singletonList(request), sessionManagerService.getLoggedIdentity(),
+        long countCases = elasticCaseService.count(Collections.singletonList(request), sessionManagerService.getActiveActorId(),
                 Locale.getDefault(), false);
         log.info("[{}]: Actor [{}] is deleting {} cases of Petri net {} version {}", net.getStringId(),
-                sessionManagerService.getLoggedIdentity().getActiveActorId(), countCases, net.getIdentifier(),
+                sessionManagerService.getActiveActorId(), countCases, net.getIdentifier(),
                 net.getVersion().toString());
         long pageCount = (countCases / 100) + 1;
         LongStream.range(0, pageCount)
                 .forEach(i -> elasticCaseService.search(
                                 Collections.singletonList(request),
-                                sessionManagerService.getLoggedIdentity(),
+                                sessionManagerService.getActiveActorId(),
                                 PageRequest.of((int) i, 100),
                                 Locale.getDefault(),
                                 false)

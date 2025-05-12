@@ -110,9 +110,9 @@ class TaskAuthorizationServiceTest {
                 .build(), new ArrayList<>());
 
         Process testProcess = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/task_authorization_test.xml"),
-                VersionType.MAJOR, sessionManagerService.getLoggedSystemIdentity().getActiveActorId()).getNet();
+                VersionType.MAJOR, userService.getSystemUser().getStringId()).getNet();
         Process testProcessWithDefault = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/task_authorization_default_test.xml"),
-                VersionType.MAJOR, sessionManagerService.getLoggedSystemIdentity().getActiveActorId()).getNet();
+                VersionType.MAJOR, userService.getSystemUser().getStringId()).getNet();
 
         TestHelper.login(testIdentity);
 

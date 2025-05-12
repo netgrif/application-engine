@@ -16,7 +16,7 @@ class RunnerController {
             UriRunner,
             SystemProcessRunner,
             DefaultGroupRunner,
-            SystemIdentityRunner,
+            SystemUserRunner,
             AnonymousIdentityRunner,
             FunctionsCacheRunner,
             FilterRunner,
@@ -28,7 +28,6 @@ class RunnerController {
             DemoRunner,
             QuartzSchedulerRunner,
             ValidationRunner,
-            FinisherRunnerSuperCreator,
             FinisherRunner,
     ]
 

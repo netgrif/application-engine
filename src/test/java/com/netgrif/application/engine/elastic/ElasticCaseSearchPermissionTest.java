@@ -253,7 +253,7 @@ public class ElasticCaseSearchPermissionTest {
     }
 
     private Page<Case> doSearch() {
-        return elasticCaseService.search(List.of(request), testIdentity.toSession(), PageRequest.of(0, 2),
+        return elasticCaseService.search(List.of(request), testIdentity.toSession().getActiveActorId(), PageRequest.of(0, 2),
                 Locale.getDefault(), false);
     }
 

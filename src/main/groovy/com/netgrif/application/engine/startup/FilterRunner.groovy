@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.startup
 
-
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -21,7 +21,7 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
     private ImportHelper helper
 
     @Autowired
-    private SystemIdentityRunner systemCreator
+    private IUserService userService
 
     private static final String FILTER_FILE_NAME = "engine-processes/filter.xml"
     public static final String FILTER_PETRI_NET_IDENTIFIER = "filter"
@@ -66,7 +66,7 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
             return Optional.of(filter)
         }
 
-        Optional<Process> filterNet = helper.createNet(netFileName, VersionType.MAJOR, systemCreator.loggedSystem)
+        Optional<Process> filterNet = helper.createNet(netFileName, VersionType.MAJOR, userService.getSystemUser().stringId)
 
         if (!filterNet.isPresent()) {
             log.error("Import of ${message} failed!")

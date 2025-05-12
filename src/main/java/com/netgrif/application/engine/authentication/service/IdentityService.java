@@ -54,11 +54,6 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
         return sessionManagerService.getLoggedIdentity();
     }
 
-    @Override
-    public LoggedIdentity getLoggedSystemIdentity() {
-        return sessionManagerService.getLoggedSystemIdentity();
-    }
-
     /**
      * Finds identity by username data field.
      *

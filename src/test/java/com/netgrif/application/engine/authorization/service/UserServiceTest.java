@@ -1,7 +1,8 @@
 package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.authentication.domain.constants.SystemIdentityConstants;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
+import com.netgrif.application.engine.authentication.domain.constants.SystemUserConstants;
 import com.netgrif.application.engine.authorization.domain.Group;
 import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.constants.GroupConstants;
@@ -122,6 +123,20 @@ public class UserServiceTest {
     }
 
     @Test
+    void getSystemUser() {
+        User systemUser = userService.getSystemUser();
+
+        assert systemUser != null;
+        assert systemUser.getEmail().equals(SystemUserConstants.EMAIL);
+        assert systemUser.getFirstname().equals(SystemUserConstants.FIRSTNAME);
+        assert systemUser.getLastname().equals(SystemUserConstants.LASTNAME);
+        assert systemUser.getEmail().equals(SystemUserConstants.EMAIL);
+        assert systemUser.getFullName().equals(String.join(" ", SystemUserConstants.FIRSTNAME,
+                SystemUserConstants.LASTNAME));
+        assert ObjectId.isValid(systemUser.getStringId());
+    }
+
+    @Test
     void testCreate() {
         String email = "some@email.com";
         String firstname = "firstname";
@@ -146,7 +161,7 @@ public class UserServiceTest {
                 .build()));
 
         assertThrows(IllegalArgumentException.class, () -> userService.create(UserParams.with()
-                .email(new TextField(SystemIdentityConstants.USERNAME))
+                .email(new TextField(SystemUserConstants.EMAIL))
                 .build()));
 
         assertThrows(IllegalArgumentException.class, () -> userService.create(GroupParams.with()

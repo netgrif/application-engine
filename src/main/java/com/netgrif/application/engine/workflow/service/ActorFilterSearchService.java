@@ -37,7 +37,7 @@ public class ActorFilterSearchService implements IActorFilterSearchService {
                                 .transition(Collections.singletonList("view_filter"))
                                 .build()
                 ),
-                sessionManagerService.getLoggedIdentity(),
+                sessionManagerService.getActiveActorId(),
                 PageRequest.of(0, 100),
                 LocaleContextHolder.getLocale(),
                 true);

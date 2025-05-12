@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.elastic.service.interfaces;
 
-import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
 import org.springframework.data.domain.Page;
@@ -21,8 +20,8 @@ public interface IElasticCaseService {
 
     void removeByPetriNetId(String processId);
 
-    Page<Case> search(List<CaseSearchRequest> requests, LoggedIdentity identity, Pageable pageable, Locale locale,
+    Page<Case> search(List<CaseSearchRequest> requests, String actorId, Pageable pageable, Locale locale,
                       Boolean isIntersection);
 
-    long count(List<CaseSearchRequest> requests, LoggedIdentity identity, Locale locale, Boolean isIntersection);
+    long count(List<CaseSearchRequest> requests, String actorId, Locale locale, Boolean isIntersection);
 }
