@@ -46,7 +46,7 @@ public class Task extends com.netgrif.application.engine.objects.workflow.domain
 
     @Transient
     @Override
-    public IUser getUser() {
+    public AbstractUser getUser() {
         return super.getUser();
     }
 

@@ -1,54 +1,39 @@
 package com.netgrif.application.engine.adapter.spring.auth.domain;
 
-import com.netgrif.application.engine.adapter.spring.auth.domain.mapper.LoggedUserMapper;
-import com.netgrif.application.engine.adapter.spring.auth.domain.mapper.UserAuthorMapper;
-import com.netgrif.application.engine.objects.auth.domain.*;
-import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.Attribute;
+import com.netgrif.application.engine.objects.auth.domain.Authority;
 import lombok.Data;
+import org.bson.types.ObjectId;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 @Data
-public class AnonymousUser extends AbstractUser implements IUser {
-
-    private final String id;
-    private final String username;
-    private final String realmId;
-
-    private String email;
-    private String firstName;
-    private String lastName;
+public class AnonymousUser extends AbstractUser {
 
     private transient Duration sessionTimeout = Duration.ofHours(2);
 
     private final Map<String, Attribute<?>> attributes = new HashMap<>();
 
     public AnonymousUser(AnonymousUserRef ref, Authority anonymousAuthority) {
-        this.id = UUID.randomUUID().toString();
+        this.id = new ObjectId();
         this.realmId = ref.getRealmId();
         this.username = "anonymous@" + this.realmId;
-        this.state = ref.getState() != null ? ref.getState() : UserState.ACTIVE;
         this.firstName = ref.getDisplayName();
         this.lastName = "";
 
-        this.authorities = new HashSet<>();
+        this.authoritySet = new HashSet<>();
         if (ref.getAuthorities() != null && !ref.getAuthorities().isEmpty()) {
-            this.authorities.addAll(ref.getAuthorities());
+            this.authoritySet.addAll(ref.getAuthorities());
         } else {
-            this.authorities.add(anonymousAuthority);
+            this.authoritySet.add(anonymousAuthority);
         }
 
         this.processRoles = ref.getProcessRoles() != null ? new HashSet<>(ref.getProcessRoles()) : new HashSet<>();
         this.groupIds = ref.getGroupIds() != null ? new HashSet<>(ref.getGroupIds()) : new HashSet<>();
-        this.groups = ref.getGroups() != null ? new HashSet<>(ref.getGroups()) : new HashSet<>();
-    }
-
-
-    @Override
-    public String getStringId() {
-        return id;
     }
 
     @Override
@@ -100,11 +85,6 @@ public class AnonymousUser extends AbstractUser implements IUser {
     }
 
     @Override
-    public String getFullName() {
-        return firstName;
-    }
-
-    @Override
     public String getName() {
         return firstName;
     }
@@ -119,17 +99,6 @@ public class AnonymousUser extends AbstractUser implements IUser {
     }
 
     @Override
-    public String getTelNumber() {
-        Attribute<?> tel = attributes.get("tel");
-        return tel != null ? String.valueOf(tel.getValue()) : null;
-    }
-
-    @Override
-    public void setTelNumber(String telNumber) {
-        this.attributes.put("tel", new Attribute<>(telNumber, false));
-    }
-
-    @Override
     public void addGroupId(String groupId) {
         this.groupIds.add(groupId);
     }
@@ -137,69 +106,6 @@ public class AnonymousUser extends AbstractUser implements IUser {
     @Override
     public boolean validateRequiredAttributes() {
         return attributes.values().stream().noneMatch(attr -> attr.isRequired() && attr.getValue() == null);
-    }
-
-    @Override
-    public void enableMFA(String type, String value, int order) {
-    }
-
-    @Override
-    public void disableMFA(String type) {
-    }
-
-    @Override
-    public boolean isMFAEnabled(String type) {
-        return false;
-    }
-
-    @Override
-    public void activateMFA(String type, String secret) {
-    }
-
-    @Override
-    public void activateMFA(String type, String secret, boolean activate) {
-    }
-
-    @Override
-    public Set<String> getEnabledMFAMethods() {
-        return Collections.emptySet();
-    }
-
-    @Override
-    public Credential<?> getCredential(String type) {
-        return null;
-    }
-
-    @Override
-    public <T> Object getCredentialValue(String type) {
-        return null;
-    }
-
-    @Override
-    public void setCredential(String type, String value, int order, boolean enabled) {
-    }
-
-    @Override
-    public void addCredential(Credential<?> credential) {
-    }
-
-    @Override
-    public void setCredentialProperty(String type, String key, Object value) {
-
-    }
-
-    @Override
-    public Object getCredentialProperty(String type, String key) {
-        return null;
-    }
-
-    @Override
-    public void removeCredential(String type) {
-    }
-
-    @Override
-    public boolean hasCredential(String type) {
-        return false;
     }
 
     @Override
@@ -229,32 +135,16 @@ public class AnonymousUser extends AbstractUser implements IUser {
     }
 
     @Override
-    public LoggedUser transformToLoggedUser() {
-        return LoggedUserMapper.toLoggedUser(this);
+    public String toString() {
+        return "[AnonymousUser id=%s username=%s realm=%s]".formatted(id, username, realmId);
     }
 
     @Override
-    public Author transformToAuthor() {
-        return UserAuthorMapper.toAuthor(this);
-    }
-
-    @Override
-    public LocalDateTime getCreatedAt() {
+    public String getPassword() {
         return null;
     }
 
     @Override
-    public boolean isEnabled() {
-        return true;
-    }
-
-    @Override
-    public boolean isEmailVerified() {
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return "[AnonymousUser id=%s username=%s realm=%s]".formatted(id, username, realmId);
+    public void setPassword(String password) {
     }
 }

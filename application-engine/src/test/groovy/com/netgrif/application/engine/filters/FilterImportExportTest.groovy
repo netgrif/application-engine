@@ -2,7 +2,7 @@ package com.netgrif.application.engine.filters
 
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.workflow.domain.IllegalFilterFileException
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
@@ -107,7 +107,7 @@ class FilterImportExportTest {
         this.defaultFiltersRunner.run()
         createTestFilter()
         dummyUser = createDummyUser()
-        userAuth = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(dummyUser), DUMMY_USER_PASSWORD)
+        userAuth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(dummyUser), DUMMY_USER_PASSWORD)
         SecurityContextHolder.getContext().setAuthentication(userAuth)
 
         Optional<PetriNet> importNet = this.filterRunner.createImportFiltersNet()
@@ -116,10 +116,10 @@ class FilterImportExportTest {
         assert exportNet.isPresent()
 
         importCase = this.workflowService.searchOne(
-                QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER) & QCase.case$.author.email.eq(DUMMY_USER_MAIL)
+                QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER) & QCase.case$.author.username.eq(DUMMY_USER_MAIL)
         )
         exportCase = this.workflowService.searchOne(
-                QCase.case$.processIdentifier.eq(EXPORT_NET_IDENTIFIER) & QCase.case$.author.email.eq(DUMMY_USER_MAIL)
+                QCase.case$.processIdentifier.eq(EXPORT_NET_IDENTIFIER) & QCase.case$.author.username.eq(DUMMY_USER_MAIL)
         )
         assert importCase != null
         assert exportCase != null
@@ -305,7 +305,7 @@ class FilterImportExportTest {
 
     private User createDummyUser() {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        return importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Dummy", lastName: "User", email: DUMMY_USER_MAIL, username: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
+        return importHelper.createUser(new User(firstName: "Dummy", lastName: "User", email: DUMMY_USER_MAIL, username: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
     }

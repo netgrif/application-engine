@@ -1,18 +1,21 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
+import com.netgrif.application.engine.objects.utils.DateUtils;
 import com.querydsl.core.annotations.QueryEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @Slf4j
@@ -23,8 +26,6 @@ public class User extends AbstractUser implements Serializable {
 
     private boolean emailVerified;
 
-    private String avatar;
-
     private UserState state;
 
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -33,14 +34,10 @@ public class User extends AbstractUser implements Serializable {
 
     private Map<String, Credential<?>> credentials = new HashMap<>();
 
-    @Setter
-    private Set<String> authMethods;
-
     public User() {
         this.id = new ObjectId();
         this.attributes = new HashMap<>();
         this.credentials = new HashMap<>();
-        this.authMethods = new HashSet<>();
     }
 
     public User(ObjectId id) {
@@ -48,23 +45,21 @@ public class User extends AbstractUser implements Serializable {
         this.id = id;
     }
 
-    @Override
-    public String getFullName() {
-        return String.join(" ", firstName, middleName != null ? middleName : "", lastName);
-    }
-
-    @Override
     public String getToken() {
         Credential<?> tokenCredential = this.credentials.get("token");
         return tokenCredential != null ? tokenCredential.getValue().toString() : null;
     }
 
-    @Override
     public void setToken(String token) {
         TokenCredential tokenCredential = new TokenCredential(token, 1, true);
         this.credentials.put(tokenCredential.getType(), tokenCredential);
     }
 
+    /**
+     * Returns password from credentials encoded via PasswordEncoder
+     *
+     * @return encoded password as string
+     */
     @Override
     public String getPassword() {
         Credential<?> passCred = this.credentials.get("password");
@@ -74,13 +69,17 @@ public class User extends AbstractUser implements Serializable {
         return String.valueOf(passCred.getValue());
     }
 
+    /**
+     * Saves password encoded via PasswordEncoder into password credential
+     *
+     * @param password encoded password as string
+     */
     @Override
     public void setPassword(String password) {
         PasswordCredential passwordCredential = new PasswordCredential(password, 0, true);
         this.credentials.put("password", passwordCredential);
     }
 
-    @Override
     public void setExpirationDate(LocalDateTime expirationDate) {
         Credential<?> tokenCredential = this.credentials.get("token");
         if (tokenCredential != null) {
@@ -92,7 +91,6 @@ public class User extends AbstractUser implements Serializable {
         }
     }
 
-    @Override
     public LocalDateTime getExpirationDate() {
         Credential<?> tokenCredential = this.credentials.get("token");
         if (tokenCredential != null) {
@@ -105,13 +103,11 @@ public class User extends AbstractUser implements Serializable {
         return null;
     }
 
-    @Override
-    public boolean isMFAEnabled(String type) {
+    public boolean isCredentialEnabled(String type) {
         Credential<?> credential = this.getCredential(type);
         return credential != null && credential.isEnabled();
     }
 
-    @Override
     public Set<String> getEnabledMFAMethods() {
         return this.credentials.entrySet().stream()
                 .filter(entry -> {
@@ -125,36 +121,23 @@ public class User extends AbstractUser implements Serializable {
                 .collect(Collectors.toSet());
     }
 
-    @Override
-    public void enableMFA(String type, String value, int order) {
-        this.setCredential(type, value, order, true);
-    }
-
-    @Override
-    public void disableMFA(String type) {
+    public void disableCredential(String type) {
         if (this.credentials.containsKey(type)) {
             this.credentials.get(type).setEnabled(false);
         }
     }
 
-    @Override
     public void activateMFA(String type, String secret) {
-        this.activateMFA(type, secret, true);
-    }
-
-    @Override
-    public void activateMFA(String type, String secret, boolean activate) {
         if (type == null || type.isEmpty()) {
             throw new IllegalArgumentException("MFA type cannot be null or empty");
         }
         if (secret == null || secret.isEmpty()) {
             throw new IllegalArgumentException("MFA secret cannot be null or empty");
         }
-        MFAStringCredential mfaCred = new MFAStringCredential(type, secret, 1, activate);
-        this.credentials.put("MFA-" + type, mfaCred);
+        MFAStringCredential mfaCred = new MFAStringCredential(type, secret, 1, true);
+        this.setCredential("MFA-" + type, mfaCred);
     }
 
-    @Override
     public void setCredentialProperty(String type, String key, Object value) {
         Credential<?> credential = this.credentials.get(type);
         if (credential == null) {
@@ -169,54 +152,17 @@ public class User extends AbstractUser implements Serializable {
         }
     }
 
-    @Override
     public Object getCredentialProperty(String type, String key) {
         Credential<?> credential = this.credentials.get(type);
         return credential != null ? credential.getProperty(key) : null;
     }
 
-    @Override
-    public void removeCredential(String type) {
-        this.credentials.remove(type);
-    }
-
-    @Override
     public boolean hasCredential(String type) {
         return this.credentials.containsKey(type);
     }
 
-    @Override
     public Credential<?> getCredential(String type) {
         return this.credentials.get(type);
-    }
-
-    /**
-     * Add an authentication method to the user.
-     *
-     * @param authMethod the authentication method to add.
-     */
-    public void addAuthMethod(String authMethod) {
-        this.authMethods.add(authMethod);
-    }
-
-    /**
-     * Check if the user supports a specific authentication method.
-     *
-     * @param authMethod the authentication method to check.
-     * @return true if the user supports the authentication method, false otherwise.
-     */
-    public boolean supportsAuthMethod(String authMethod) {
-        return this.authMethods.contains(authMethod);
-    }
-
-    @Override
-    public boolean validateRequiredAttributes() {
-        for (Map.Entry<String, Attribute<?>> entry : attributes.entrySet()) {
-            if (entry.getValue().isRequired() && entry.getValue().getValue() == null) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -273,17 +219,6 @@ public class User extends AbstractUser implements Serializable {
     }
 
     /**
-     * @param key
-     * @return
-     */
-    public Credential<?> getCredentials(String key) {
-        if (this.credentials == null) {
-            return null;
-        }
-        return this.credentials.get(key);
-    }
-
-    /**
      * @return
      */
     public Set<String> getCredentialsKeys() {
@@ -296,7 +231,7 @@ public class User extends AbstractUser implements Serializable {
     /**
      * @return
      */
-    public boolean isEnabled() {
+    public boolean isActive() {
         return this.state.equals(UserState.ACTIVE);
     }
 }

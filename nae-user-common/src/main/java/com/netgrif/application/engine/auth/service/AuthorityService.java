@@ -2,6 +2,7 @@ package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface AuthorityService {
@@ -20,5 +21,5 @@ public interface AuthorityService {
 
     Authority getOne(String id);
 
-    List<Authority> findAllByIds(List<String> ids);
+    List<Authority> findAllByIds(Collection<String> ids);
 }

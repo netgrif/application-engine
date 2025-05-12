@@ -1,9 +1,11 @@
 package com.netgrif.application.engine.configuration.authentication.providers.basic;
 
 
+import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.MessageSourceAccessor;
@@ -43,7 +45,7 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
         String name = authentication.getName();
-        IUser user = userService.findByEmail(name, null);
+        AbstractUser user = userService.findByEmail(name, null);
         if (user == null) {
             log.debug("User not found");
             loginAttemptService.loginFailed(key);
@@ -51,14 +53,14 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
         String presentedPassword = authentication.getCredentials().toString();
-        if (!this.passwordEncoder.matches(presentedPassword, ((User) user).getPassword())) {
+        if (!this.passwordEncoder.matches(presentedPassword, user.getPassword())) {
             log.debug("Failed to authenticate since password does not match stored value");
             loginAttemptService.loginFailed(key);
             throw new BadCredentialsException(this.messages
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
 
-        UserDetails userDetails = userService.transformToLoggedUser(user);
+        UserDetails userDetails = (LoggedUserImpl) ActorTransformer.toLoggedUser(user);
 
         UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(userDetails, presentedPassword, userDetails.getAuthorities());
         result.setDetails(authentication.getDetails());

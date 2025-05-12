@@ -104,7 +104,7 @@ public class AuthenticationService implements IAuthenticationService, Applicatio
     protected void resolveImpersonatorOnLogin(Object principal) {
         try {
             if (principal instanceof LoggedUser) {
-                impersonationService.removeImpersonator(((LoggedUser) principal).getId());
+                impersonationService.removeImpersonator(((LoggedUser) principal).getStringId());
             }
         } catch (Exception e) {
             log.warn("Failed to resolve impersonator " + principal, e);
@@ -113,9 +113,10 @@ public class AuthenticationService implements IAuthenticationService, Applicatio
 
     protected void resolveImpersonatorOnLogout(Object principal) {
         try {
-            if (principal instanceof LoggedUser && ((LoggedUser) principal).isImpersonating()) {
-                impersonationService.onSessionDestroy((LoggedUser) principal);
-            }
+            // TODO: impersonation
+//            if (principal instanceof LoggedUser && ((LoggedUser) principal).isImpersonating()) {
+//                impersonationService.onSessionDestroy((LoggedUser) principal);
+//            }
         } catch (Exception e) {
             log.warn("Failed to resolve impersonator " + principal, e);
         }

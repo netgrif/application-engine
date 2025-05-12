@@ -14,15 +14,15 @@ import java.util.stream.Collectors;
 @Repository
 public interface ProcessRoleRepository extends MongoRepository<ProcessRole, String>, QuerydslPredicateExecutor<ProcessRole> {
 
-    Set<ProcessRole> findAllByProcessId(String netId);
+    List<ProcessRole> findAllByProcessId(String netId);
 
-    Set<ProcessRole> findAllByImportIdIn(Set<String> importIds);
+    List<ProcessRole> findAllByImportIdIn(Set<String> importIds);
 
-    Set<ProcessRole> findAllByName_DefaultValue(String name);
+    List<ProcessRole> findAllByName_DefaultValue(String name);
 
-    Set<ProcessRole> findAllByImportId(String importId);
+    List<ProcessRole> findAllByImportId(String importId);
 
-    Set<ProcessRole> findAllByGlobalIsTrue();
+    List<ProcessRole> findAllByGlobalIsTrue();
 
     @Query("{ '_id.objectId': ?0 }")
     Optional<ProcessRole> findByIdObjectId(ObjectId objectId);
@@ -31,11 +31,11 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
 
 
         //TODO: It goes one at a time... make bulk
-    default Set<ProcessRole> findAllById(Set<String> ids) {
+    default List<ProcessRole> findAllById(Collection<String> ids) {
         return ids.stream()
                 .map(this::findByCompositeId)
                 .flatMap(Optional::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     default Optional<ProcessRole> findByCompositeId(String compositeId) {

@@ -70,7 +70,7 @@ class LoginAttemptsTest {
                 .build()
 
         auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
+        importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
                 [] as ProcessRole[])
     }

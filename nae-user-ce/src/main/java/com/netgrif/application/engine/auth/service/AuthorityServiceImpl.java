@@ -8,6 +8,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -64,7 +65,7 @@ public class AuthorityServiceImpl implements AuthorityService {
     }
 
     @Override
-    public List<Authority> findAllByIds(List<String> ids) {
+    public List<Authority> findAllByIds(Collection<String> ids) {
         return authorityRepository.findAllBy_idIn(ids.stream().map(ObjectId::new).collect(Collectors.toList()));
     }
 }

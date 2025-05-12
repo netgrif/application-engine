@@ -8,8 +8,8 @@ import com.netgrif.application.engine.auth.web.requestbodies.UserCreateRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.application.engine.auth.web.responsebodies.PreferencesResource;
 import com.netgrif.application.engine.auth.web.responsebodies.User;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
 import com.netgrif.application.engine.objects.preferences.Preferences;
@@ -72,7 +72,7 @@ public class UserController {
                 log.error("User with username [{}] already exists in realm [{}]", request.getUsername(), realmId);
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            IUser user = userService.createUser(
+            AbstractUser user = userService.createUser(
                     request.getUsername(),
                     request.getEmail(),
                     request.getFirstName(),
@@ -100,7 +100,7 @@ public class UserController {
             log.error("Realm with id [{}] not found", realmId);
             return ResponseEntity.badRequest().build();
         }
-        Page<IUser> users = userService.findAllUsers(realmId, pageable);
+        Page<AbstractUser> users = userService.findAllUsers(realmId, pageable);
         return ResponseEntity.ok(changeToResponse(users, pageable, locale));
     }
 
@@ -113,9 +113,9 @@ public class UserController {
     @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getLoggedUser(Authentication auth, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        IUser user;
+        AbstractUser user;
         try {
-            user = userService.findById(loggedUser.getId(), loggedUser.getRealmId());
+            user = userService.findById(loggedUser.getStringId(), loggedUser.getRealmId());
             if (user == null) {
                 return ResponseEntity
                         .status(HttpStatus.UNAUTHORIZED).build();
@@ -138,7 +138,7 @@ public class UserController {
     public ResponseEntity<Page<User>> search(@RequestBody UserSearchRequestBody query, Pageable pageable, Authentication auth, Locale locale) {
         List<ProcessResourceId> roles = query.getRoles() == null ? null : query.getRoles().stream().map(ProcessResourceId::new).toList();
         List<ProcessResourceId> negativeRoles = query.getNegativeRoles() == null ? null : query.getNegativeRoles().stream().map(ProcessResourceId::new).toList();
-        Page<IUser> users = userService.searchAllCoMembers(query.getFulltext(),
+        Page<AbstractUser> users = userService.searchAllCoMembers(query.getFulltext(),
                 roles,
                 negativeRoles,
                 (LoggedUser) auth.getPrincipal(), pageable);
@@ -155,12 +155,14 @@ public class UserController {
     @GetMapping(value = "/{realmId}/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, Locale locale) {
         LoggedUser actualUser = userService.getLoggedUserFromContext();
-        LoggedUser loggedUser = actualUser.getSelfOrImpersonated();
+        // TODO: impersonation
+//        LoggedUser loggedUser = actualUser.getSelfOrImpersonated();
+        LoggedUser loggedUser = actualUser;
         if (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)) {
             log.info("User [{}] trying to get another user with ID [{}]", actualUser.getUsername(), userId);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        IUser user;
+        AbstractUser user;
         try {
             user = userService.findById(userId, realmId);
         } catch (IllegalArgumentException e) {
@@ -216,7 +218,7 @@ public class UserController {
     })
     public ResponseEntity<ResponseMessage> assignRolesToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
         try {
-            IUser user = userService.findById(userId, realmId);
+            AbstractUser user = userService.findById(userId, realmId);
             processRoleService.assignRolesToUser(user, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()), (LoggedUser) auth.getPrincipal());
             log.info("Process roles {} assigned to user with id [{}]", roleIds, userId);
             return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Selected roles assigned to user " + userId));
@@ -227,27 +229,28 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
-    @Operation(summary = "Assign negative roles to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "X-Auth-Token")})
-    @PutMapping(value = "/{realmId}/{id}/negativeRole", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Selected negative roles assigned successfully"),
-            @ApiResponse(responseCode = "400", description = "Requested roles or user with defined id does not exist"),
-            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    public ResponseEntity<ResponseMessage> assignNegativeRolesToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
-        try {
-            IUser user = userService.findById(userId, realmId);
-            processRoleService.assignNegativeRolesToUser(user, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()), (LoggedUser) auth.getPrincipal());
-            log.info("Negative process roles {} assigned to user [{}]", roleIds, userId);
-            return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Selected negative roles assigned to user " + userId));
-        } catch (IllegalArgumentException e) {
-            log.error("Assigning negative roles to user with id [{}] has failed!", userId, e);
-            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Assigning negative roles to user " + userId + " has failed!"));
-        }
-    }
-
+//
+//    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+//    @Operation(summary = "Assign negative roles to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "X-Auth-Token")})
+//    @PutMapping(value = "/{realmId}/{id}/negativeRole", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Selected negative roles assigned successfully"),
+//            @ApiResponse(responseCode = "400", description = "Requested roles or user with defined id does not exist"),
+//            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
+//            @ApiResponse(responseCode = "500", description = "Internal server error")
+//    })
+//    public ResponseEntity<ResponseMessage> assignNegativeRolesToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
+//        try {
+//            AbstractUser user = userService.findById(userId, realmId);
+//            processRoleService.assignNegativeRolesToUser(user, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()), (LoggedUser) auth.getPrincipal());
+//            log.info("Negative process roles {} assigned to user [{}]", roleIds, userId);
+//            return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Selected negative roles assigned to user " + userId));
+//        } catch (IllegalArgumentException e) {
+//            log.error("Assigning negative roles to user with id [{}] has failed!", userId, e);
+//            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Assigning negative roles to user " + userId + " has failed!"));
+//        }
+//    }
+//
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Get all authorities of the system",
             description = "Caller must have the ADMIN role",
@@ -291,7 +294,7 @@ public class UserController {
     })
     @GetMapping(value = "/preferences", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PreferencesResource> preferences(Authentication auth) {
-        String userId = ((LoggedUser) auth.getPrincipal()).getId();
+        String userId = ((LoggedUser) auth.getPrincipal()).getStringId();
         Preferences preferences = preferencesService.get(userId);
 
         if (preferences == null) {
@@ -312,7 +315,7 @@ public class UserController {
     @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseMessage> savePreferences(@RequestBody PreferencesRequest preferences, Authentication auth) {
         try {
-            String userId = ((LoggedUser) auth.getPrincipal()).getId();
+            String userId = ((LoggedUser) auth.getPrincipal()).getStringId();
             preferences.setUserId(userId);
             preferencesService.save(preferences.toPreferences());
             return ResponseEntity.ok(ResponseMessage.createSuccessMessage("User preferences saved"));
@@ -322,11 +325,11 @@ public class UserController {
         }
     }
 
-    private Page<User> changeToResponse(Page<IUser> users, Pageable pageable, Locale locale) {
+    private Page<User> changeToResponse(Page<AbstractUser> users, Pageable pageable, Locale locale) {
         return new PageImpl<>(changeType(users.getContent(), locale), pageable, users.getTotalElements());
     }
 
-    public List<User> changeType(List<IUser> users, Locale locale) {
+    public List<User> changeType(List<AbstractUser> users, Locale locale) {
         return users.stream().map(u -> userFactory.getUser(u, locale)).toList();
     }
 

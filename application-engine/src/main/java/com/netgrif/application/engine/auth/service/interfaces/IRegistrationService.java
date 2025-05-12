@@ -3,6 +3,7 @@ package com.netgrif.application.engine.auth.service.interfaces;
 import com.netgrif.application.engine.auth.service.InvalidUserTokenException;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 
 import java.time.LocalDateTime;
 
@@ -12,21 +13,21 @@ public interface IRegistrationService {
 
     void resetExpiredToken();
 
-    void changePassword(RegisteredUser user, String newPassword);
+    void changePassword(AbstractUser user, String newPassword);
 
-    void encodeUserPassword(RegisteredUser user);
+    void encodeUserPassword(AbstractUser user);
 
-    boolean stringMatchesUserPassword(RegisteredUser user, String passwordToCompare);
+    boolean stringMatchesUserPassword(AbstractUser user, String passwordToCompare);
 
     boolean verifyToken(String token);
 
-    RegisteredUser createNewUser(NewUserRequest newUser);
+    AbstractUser createNewUser(NewUserRequest newUser);
 
-    RegisteredUser registerUser(RegistrationRequest registrationRequest) throws InvalidUserTokenException;
+    AbstractUser registerUser(RegistrationRequest registrationRequest) throws InvalidUserTokenException;
 
-    RegisteredUser resetPassword(String email);
+    AbstractUser resetPassword(String email);
 
-    RegisteredUser recover(String email, String newPassword);
+    AbstractUser recover(String email, String newPassword);
 
     String generateTokenKey();
 

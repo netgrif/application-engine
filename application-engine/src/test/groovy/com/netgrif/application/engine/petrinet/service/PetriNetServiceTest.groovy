@@ -1,8 +1,10 @@
 package com.netgrif.application.engine.petrinet.service
 
 import com.netgrif.application.engine.TestHelper
-
+import com.netgrif.application.engine.objects.auth.domain.ActorRef
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
+import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.elastic.domain.ElasticPetriNet
@@ -95,7 +97,7 @@ class PetriNetServiceTest {
     void setup() {
         testHelper.truncateDbs()
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Customer", lastName: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new User(firstName: "Customer", lastName: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
     }
@@ -113,8 +115,8 @@ class PetriNetServiceTest {
         PetriNet testNet = testNetOptional.getNet()
         Thread.sleep(5000)
         ElasticPetriNet elasticTestNet = elasticPetriNetRepository.findByStringId(testNet.stringId)
-        assert elasticTestNet != null && elasticTestNet.getUriNodeId() == uriService.getRoot().id
-        assert testNet.getUriNodeId() == uriService.getRoot().id
+        assert elasticTestNet != null && elasticTestNet.getUriNodeId() == uriService.getRoot().stringId
+        assert testNet.getUriNodeId() == uriService.getRoot().stringId
         assert petriNetRepository.findById(testNet.stringId).get().uriNodeId == null
         importHelper.createCase("Case 1", testNet)
 
@@ -123,13 +125,13 @@ class PetriNetServiceTest {
         assert processRoleRepository.count() == processRoleCount + 2
 
         def user = userService.findUserByUsername(CUSTOMER_USER_MAIL, null)
-        assert user != null
-        assert user.processRoles.size() == 1
+        assert user != null && user.isPresent()
+        assert user.get().processRoles.size() == 1
 
-        userService.addRole(user, testNet.roles.values().collect().get(0).stringId)
+        userService.addRole(user.get(), testNet.roles.values().collect().get(0).stringId)
         user = userService.findUserByUsername(CUSTOMER_USER_MAIL, null)
-        assert user != null
-        assert user.processRoles.size() == 2
+        assert user != null && user.isPresent()
+        assert user.get().processRoles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
 
         petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
@@ -140,8 +142,8 @@ class PetriNetServiceTest {
         assert taskRepository.count() == taskCount
         assert processRoleRepository.count() == processRoleCount
         user = userService.findUserByUsername(CUSTOMER_USER_MAIL, null)
-        assert user != null
-        assert user.processRoles.size() == 1
+        assert user != null && user.isPresent()
+        assert user.get().processRoles.size() == 1
 
         boolean exceptionThrown = false
         try {
@@ -161,7 +163,7 @@ class PetriNetServiceTest {
 
         Thread.sleep(2000)
 
-        List<PetriNet> petriNets = petriNetService.findAllByUriNodeId(myNode.id)
+        List<PetriNet> petriNets = petriNetService.findAllByUriNodeId(myNode.stringId)
         assert petriNets.size() == 2
     }
 
@@ -171,9 +173,9 @@ class PetriNetServiceTest {
 
 
         def user = userService.findUserByUsername(CUSTOMER_USER_MAIL, null)
-        assert user != null
+        assert user != null && user.isPresent()
         petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        petriNetService.importPetriNet(stream(NET_SEARCH_FILE), VersionType.MAJOR, userService.transformToLoggedUser(user))
+        petriNetService.importPetriNet(stream(NET_SEARCH_FILE), VersionType.MAJOR, ActorTransformer.toLoggedUser(user.get()))
 
         assert petriNetRepository.count() == processCount + 2
 
@@ -198,8 +200,8 @@ class PetriNetServiceTest {
 
 
         PetriNetSearch search5 = new PetriNetSearch();
-        Author author = new Author();
-        author.setEmail(user.getEmail());
+        ActorRef author = new ActorRef();
+        author.setIdentifier(user.get().getUsername());
         search5.setAuthor(author);
         assert petriNetService.search(search5, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
 

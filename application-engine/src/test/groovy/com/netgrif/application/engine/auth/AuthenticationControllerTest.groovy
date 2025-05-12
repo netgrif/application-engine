@@ -6,6 +6,7 @@ import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.Authority
 import com.netgrif.application.engine.auth.web.AuthenticationController
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
@@ -103,7 +104,7 @@ class AuthenticationControllerTest {
 
         controller.signup(new RegistrationRequest(token: token, name: NAME, lastName: SURNAME, password: PASSWORD))
 
-        IUser user = userService.findByEmail(EMAIL, null)
+        AbstractUser user = userService.findByEmail(EMAIL, null)
         assert user
     }
 

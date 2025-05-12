@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -93,7 +93,7 @@ public class VariableArcsTest {
     private TestHelper testHelper;
 
     @Autowired
-    protected BCryptPasswordEncoder bCryptPasswordEncoder;
+    protected PasswordEncoder passwordEncoder;
 
     private PetriNet loaded;
 
@@ -119,7 +119,7 @@ public class VariableArcsTest {
         user.setFirstName("Test");
         user.setLastName("Test");
 
-        PasswordCredential passwordCredential = new PasswordCredential(bCryptPasswordEncoder.encode("password"), 0, true);
+        PasswordCredential passwordCredential = new PasswordCredential(passwordEncoder.encode("password"), 0, true);
         user.setCredential("password", passwordCredential);
         user.setState(UserState.ACTIVE);
         user.setEmail("VariableArcsTest@test.com");

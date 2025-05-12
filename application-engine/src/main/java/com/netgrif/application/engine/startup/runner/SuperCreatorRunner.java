@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -45,7 +45,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     private AbstractUser superUser;
 
     @Autowired
-    protected BCryptPasswordEncoder bCryptPasswordEncoder;
+    protected PasswordEncoder passwordEncoder;
 
     @Override
     public void run(ApplicationArguments strings) {
@@ -67,11 +67,11 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
             user.setLastName("Netgrif");
             user.setUsername(SUPER_ADMIN_EMAIL);
             user.setEmail(SUPER_ADMIN_EMAIL);
-            PasswordCredential passwordCredential = new PasswordCredential(bCryptPasswordEncoder.encode(superAdminPassword), 0, true);
+            PasswordCredential passwordCredential = new PasswordCredential(passwordEncoder.encode(superAdminPassword), 0, true);
             user.setCredential("password", passwordCredential);
             user.setState(UserState.ACTIVE);
             user.setAuthoritySet(authorities);
-            user.setProcessRoles(new HashSet<>(processRoleService.findAll(Pageable.ofSize(SearchConstants.MAX_PAGE_SIZE))));
+            user.setProcessRoles(new HashSet<>(processRoleService.findAll(Pageable.unpaged())));
             this.superUser = userService.createUser(user, null);
             log.info("Super user created");
         } else {
@@ -94,7 +94,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     }
 
     public void setAllProcessRoles() {
-        superUser.setProcessRoles(Set.copyOf(processRoleService.findAll(Pageable.ofSize(SearchConstants.MAX_PAGE_SIZE))));
+        superUser.setProcessRoles(Set.copyOf(processRoleService.findAll(Pageable.unpaged())));
         superUser = userService.saveUser(superUser, null);
     }
 

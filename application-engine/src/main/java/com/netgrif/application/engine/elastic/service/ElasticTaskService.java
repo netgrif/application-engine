@@ -138,7 +138,9 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
 
     @Override
     public Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
-        NativeQuery query = buildQuery(requests, user.getSelfOrImpersonated(), pageable, locale, isIntersection);
+        // TODO: impersonation
+//        NativeQuery query = buildQuery(requests, user.getSelfOrImpersonated(), pageable, locale, isIntersection);
+        NativeQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
         List<Task> taskPage;
         long total;
         if (query != null) {
@@ -156,7 +158,9 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
 
     @Override
     public long count(List<ElasticTaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
-        NativeQuery query = buildQuery(requests, user.getSelfOrImpersonated(), new FullPageRequest(), locale, isIntersection);
+        // TODO: impersonation
+//        NativeQuery query = buildQuery(requests, user.getSelfOrImpersonated(), new FullPageRequest(), locale, isIntersection);
+        NativeQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, ElasticTask.class);
         } else {
@@ -417,7 +421,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
             return;
         }
 
-        String populatedQuery = request.query.replaceAll(ElasticQueryConstants.USER_ID_TEMPLATE, user.getId());
+        String populatedQuery = request.query.replaceAll(ElasticQueryConstants.USER_ID_TEMPLATE, user.getStringId());
 
         query.must(QueryStringQuery.of(builder -> builder.query(populatedQuery))._toQuery());
     }

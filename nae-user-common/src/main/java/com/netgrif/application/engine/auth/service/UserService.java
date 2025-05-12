@@ -11,8 +11,8 @@ import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public interface UserService {
 
@@ -20,9 +20,11 @@ public interface UserService {
 
     AbstractUser saveUser(AbstractUser user);
 
-    Set<User> saveUsers(Set<AbstractUser> users);
+    List<User> saveUsers(Collection<AbstractUser> users);
 
     void deleteAllUsers(Collection<String> realmIds);
+
+    void deleteAllUsers();
 
     Optional<AbstractUser> findUserByUsername(String username, String realmName);
 
@@ -54,15 +56,15 @@ public interface UserService {
 
     Page<AbstractUser> findAllCoMembers(LoggedUser loggedUser, Pageable pageable);
 
-    Set<AbstractUser> findAllByIds(Collection<String> ids, String realmId);
+    List<AbstractUser> findAllByIds(Collection<String> ids, String realmId);
 
-    Page<AbstractUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable);
+    Page<AbstractUser> findAllActiveByProcessRoles(Collection<ProcessResourceId> roleIds, Pageable pageable);
 
-    Page<AbstractUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable, Collection<String> realmIds);
+    Page<AbstractUser> findAllActiveByProcessRoles(Collection<ProcessResourceId> roleIds, Pageable pageable, Collection<String> realmIds);
 
-    Set<AbstractUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, Collection<String> realmIds);
+    List<AbstractUser> findAllByProcessRoles(Collection<ProcessResourceId> roleIds, Collection<String> realmIds);
 
-    Set<AbstractUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds);
+    List<AbstractUser> findAllByProcessRoles(Collection<ProcessResourceId> roleIds);
 
     void addDefaultAuthorities(AbstractUser user);
 
@@ -80,29 +82,19 @@ public interface UserService {
 
     AbstractUser addRole(AbstractUser user, String roleStringId);
 
-    AbstractUser addNegativeProcessRole(AbstractUser user, ProcessResourceId id);
-
-    AbstractUser addNegativeProcessRole(AbstractUser user, String roleStringId);
-
     Page<AbstractUser> searchAllCoMembers(String query, LoggedUser principal, Pageable pageable);
 
-    Page<AbstractUser> searchAllCoMembers(String query, Set<ProcessResourceId> roleIds, Set<ProcessResourceId> negateRoleIds,LoggedUser loggedUser, Pageable pageable);
+    Page<AbstractUser> searchAllCoMembers(String query, Collection<ProcessResourceId> roleIds, Collection<ProcessResourceId> negateRoleIds, LoggedUser loggedUser, Pageable pageable);
 
-    AbstractUser removeRolesById(AbstractUser user, Set<ProcessResourceId> processRolesIds);
+    AbstractUser removeRolesById(AbstractUser user, Collection<ProcessResourceId> processRolesIds);
 
-    AbstractUser removeRoles(AbstractUser user, Set<ProcessRole> processRoles);
+    AbstractUser removeRoles(AbstractUser user, Collection<ProcessRole> processRoles);
 
     AbstractUser removeRole(AbstractUser user, ProcessRole role);
 
     AbstractUser removeRole(AbstractUser user, ProcessResourceId roleId);
 
     AbstractUser removeRole(AbstractUser user, String roleId);
-
-    AbstractUser removeNegativeProcessRole(AbstractUser user, ProcessRole role);
-
-    AbstractUser removeNegativeProcessRole(AbstractUser user, ProcessResourceId roleId);
-
-    AbstractUser removeNegativeProcessRole(AbstractUser user, String roleId);
 
     void removeRoleOfDeletedPetriNet(PetriNet process, Collection<String> realmIds);
 
@@ -114,7 +106,7 @@ public interface UserService {
 
     void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
 
-    Set<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
+    List<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
 
-    Set<Group> getUserGroups(AbstractActor actor);
+    List<Group> getUserGroups(AbstractActor actor);
 }

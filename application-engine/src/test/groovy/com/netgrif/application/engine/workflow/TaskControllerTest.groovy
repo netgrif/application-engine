@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.workflow
 
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
+import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.TestHelper
@@ -95,14 +97,14 @@ class TaskControllerTest {
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
-        userService.saveUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(
+        userService.saveUser(new User(
                 firstName: "Dummy",
                 lastName: "Netgrif",
                 username: DUMMY_USER_MAIL,
                 email: DUMMY_USER_MAIL,
                 password: "superAdminPassword",
                 state: UserState.ACTIVE,
-                authorities: [authorityService.getOrCreate(Authority.user)] as Set<Authority>,
+                authoritySet: [authorityService.getOrCreate(Authority.user)] as Set<Authority>,
                 processRoles: [] as Set<ProcessRole>), null)
         importNet()
     }
@@ -201,20 +203,20 @@ class TaskControllerTest {
     }
 
     void setUserRole() {
-        List<ProcessRole> roles = processRoleService.findAll(net.stringId)
+        List<ProcessRole> roles = processRoleService.findAllByNetIdentifier(net.stringId)
 
         for (ProcessRole role : roles) {
             if (role.importId == "process_role") {
                 this.role = role
             }
         }
-        processRoleService.assignRolesToUser(userService.findUserByUsername(DUMMY_USER_MAIL, null).get().getStringId(), [role._id] as Set, userService.transformToLoggedUser(userService.getLoggedOrSystem()))
+        processRoleService.assignRolesToUser(userService.findUserByUsername(DUMMY_USER_MAIL, null).get(), [role._id] as Set, ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
     }
 
     Page<Task> findTasksByMongo() {
         List<TaskSearchRequest> taskSearchRequestList = new ArrayList<>()
         taskSearchRequestList.add(new TaskSearchRequest())
-        Page<Task> tasks = taskService.search(taskSearchRequestList, new FullPageRequest(), userService.transformToLoggedUser(userService.findUserByUsername(DUMMY_USER_MAIL, null).get()), Locale.ENGLISH, false)
+        Page<Task> tasks = taskService.search(taskSearchRequestList, new FullPageRequest(), ActorTransformer.toLoggedUser(userService.findUserByUsername(DUMMY_USER_MAIL, null).get()), Locale.ENGLISH, false)
         return tasks
     }
 }

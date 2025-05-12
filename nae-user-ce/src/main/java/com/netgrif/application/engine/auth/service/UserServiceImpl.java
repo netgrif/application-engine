@@ -121,8 +121,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<User> saveUsers(Set<AbstractUser> users) {
-        return users.stream().map(u -> (User) this.saveUser(u)).collect(Collectors.toSet());
+    public List<User> saveUsers(Collection<AbstractUser> users) {
+        return users.stream().map(u -> (User) this.saveUser(u)).collect(Collectors.toList());
     }
 
     @Override
@@ -162,8 +162,7 @@ public class UserServiceImpl implements UserService {
         log.info("Creating user [{}] in realm [{}]", user.getUsername(), realmId);
         addDefaultAuthorities(user);
         addDefaultRole(user);
-        ((User) user).addAuthMethod("basic");
-        setPassword(((User) user), ((User) user).getPassword());
+        setPassword(user, user.getPassword());
 
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
         user = userRepository.saveUser(((User) user), mongoTemplate, collectionName);
@@ -182,6 +181,7 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    // TODO JOFO: auth methods no longer exists ... use credentials?
     @Override
     public User createUserFromThirdParty(String username, String email, String firstName, String lastName, String realmId, String authMethod) {
         log.info("Creating user [{}] from third-party auth [{}] in realm [{}] without password", username, authMethod, realmId);
@@ -189,10 +189,9 @@ public class UserServiceImpl implements UserService {
         addDefaultAuthorities(user);
         addDefaultRole(user);
         setDisablePassword(user);
-        user.addAuthMethod(authMethod);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
         userRepository.saveUser(user, mongoTemplate, collectionName);
-        log.info("User [{}] from third-party [{}] successfully created in realm [{}]", username, authMethod, realmId);
+        log.info("User [{}] from third-party [{}] successfully created in realm [{}]", username, realmId);
         return user;
     }
 
@@ -203,7 +202,7 @@ public class UserServiceImpl implements UserService {
         Set<String> userIds = userRepository.findAllByStateAndExpirationDateBefore(state, expirationDate, mongoTemplate, collectionNames)
                 .stream().map(AbstractActor::getStringId).collect(Collectors.toSet());
         realmIds.forEach(realmId -> {
-            groupService.findAllFromRealm(realmId, Pageable.ofSize(MAX_PAGE_SIZE)).forEach(group -> {
+            groupService.findAllFromRealm(realmId, Pageable.unpaged()).forEach(group -> {
                 group.getMemberIds().removeAll(userIds);
                 groupService.save(group);
             });
@@ -212,14 +211,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds) {
+    public List<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds) {
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
         return userRepository.findAllByStateAndExpirationDateBefore(state, expirationDate, mongoTemplate, collectionNames);
     }
 
     @Override
-    public Set<Group> getUserGroups(AbstractActor actor) {
-        return groupService.findAllByIds(actor.getGroupIds(), Pageable.ofSize(MAX_PAGE_SIZE)).toSet();
+    public List<Group> getUserGroups(AbstractActor actor) {
+        return groupService.findByIds(actor.getGroupIds(), Pageable.unpaged()).stream().toList();
     }
 
     @Override
@@ -264,7 +263,7 @@ public class UserServiceImpl implements UserService {
         }
         AbstractUser user = userOptional.get();
         // TODO: fix - loop through all pages
-        user.setProcessRoles(processRoleService.findAll(Pageable.ofSize(MAX_PAGE_SIZE)));
+        user.setProcessRoles(new HashSet<>(processRoleService.findAll(Pageable.unpaged())));
         saveUser(user);
     }
 
@@ -286,7 +285,7 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(AbstractUser user) {
         log.warn("Deleting user [{}]", user.getUsername());
         String collectionName = collectionNameProvider.getCollectionNameForRealm(user.getRealmId());
-        groupService.findAllByIds(user.getGroupIds(), Pageable.ofSize(MAX_PAGE_SIZE)).forEach(group -> {
+        groupService.findByIds(user.getGroupIds(), Pageable.unpaged()).forEach(group -> {
             group.removeMemberId(user.getStringId());
             groupService.save(group);
         });
@@ -297,8 +296,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteAllUsers(Collection<String> realmIds) {
         log.debug("Deleting all users in realms [{}]", realmIds);
-        groupService.removeAllByRealmIdInSet(new HashSet<>(realmIds));
+        groupService.removeAllByRealmIdIn(new HashSet<>(realmIds));
         userRepository.deleteAll(mongoTemplate, collectionNameProvider.getCollectionNamesForRealms(realmIds));
+    }
+
+    @Override
+    public void deleteAllUsers() {
+        log.debug("Deleting all users from all realms");
+        groupService.removeAllGroups();
+        userRepository.deleteAll(mongoTemplate, collectionNameProvider.getCollectionNamesForAllRealm());
     }
 
     @Override
@@ -324,7 +330,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<AbstractUser> findAllCoMembers(LoggedUser loggedUser, Pageable pageable) {
         // TODO: impersonation
-        Set<String> members = groupService.getAllCoMembers(loggedUser);
+        List<String> members = groupService.getAllCoMembers(loggedUser);
         members.add(loggedUser.getStringId());
         Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForAllRealm();
@@ -334,7 +340,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<AbstractUser> searchAllCoMembers(String query, LoggedUser loggedUser, Pageable pageable) {
         // TODO: impersonation
-        Set<String> members = groupService.getAllCoMembers(loggedUser);
+        List<String> members = groupService.getAllCoMembers(loggedUser);
         members.add(loggedUser.getStringId());
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForAllRealm();
         return changeType(userRepository.findAll(buildPredicate(members.stream().map(ObjectId::new)
@@ -343,7 +349,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<AbstractUser> searchAllCoMembers(String query, Set<ProcessResourceId> roleIds, Set<ProcessResourceId> negateRoleIds, LoggedUser loggedUser, Pageable pageable) {
+    public Page<AbstractUser> searchAllCoMembers(String query, Collection<ProcessResourceId> roleIds, Collection<ProcessResourceId> negateRoleIds, LoggedUser loggedUser, Pageable pageable) {
         if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty()))
             return searchAllCoMembers(query, loggedUser, pageable);
 
@@ -351,7 +357,7 @@ public class UserServiceImpl implements UserService {
             negateRoleIds = new HashSet<>();
         }
         // TODO: impersonation
-        Set<String> members = groupService.getAllCoMembers(loggedUser);
+        List<String> members = groupService.getAllCoMembers(loggedUser);
         members.add(loggedUser.getStringId());
         BooleanExpression predicate = buildPredicate(members.stream().map(ObjectId::new).collect(Collectors.toSet()), query);
         if (!(roleIds == null || roleIds.isEmpty())) {
@@ -365,24 +371,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<AbstractUser> findAllByIds(Collection<String> ids, String realmId) {
+    public List<AbstractUser> findAllByIds(Collection<String> ids, String realmId) {
         log.debug("Finding users by collection of IDs [{}]", ids);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
-        return userRepository.findAllByIds(ids.stream().map(ObjectId::new).collect(Collectors.toSet()), mongoTemplate, collectionName).stream().map(user -> user).collect(Collectors.toSet());
+        return userRepository.findAllByIds(ids.stream().map(ObjectId::new).collect(Collectors.toSet()), mongoTemplate, collectionName).stream().map(user -> user).collect(Collectors.toList());
     }
 
     @Override
-    public Page<AbstractUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable) {
+    public Page<AbstractUser> findAllActiveByProcessRoles(Collection<ProcessResourceId> roleIds, Pageable pageable) {
         return this.findAllActiveByProcessRoles(roleIds, pageable, List.of(getLoggedUser().getRealmId()));
     }
 
     @Override
-    public Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable) {
-        return this.findAllActiveByProcessRoles(roleIds, pageable, List.of(getLoggedUser().getRealmId()));
-    }
-
-    @Override
-    public Page<AbstractUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable, Collection<String> realmIds) {
+    public Page<AbstractUser> findAllActiveByProcessRoles(Collection<ProcessResourceId> roleIds, Pageable pageable, Collection<String> realmIds) {
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
         Page<User> users = userRepository.findDistinctByStateAndProcessRoles__idIn(
                 UserState.ACTIVE,
@@ -395,24 +396,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<AbstractUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, Collection<String> realmIds) {
+    public List<AbstractUser> findAllByProcessRoles(Collection<ProcessResourceId> roleIds, Collection<String> realmIds) {
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
         return searchUsersByRoleIds(roleIds, collectionNames);
     }
 
     @Override
-    public Set<AbstractUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds) {
+    public List<AbstractUser> findAllByProcessRoles(Collection<ProcessResourceId> roleIds) {
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForAllRealm();
         return searchUsersByRoleIds(roleIds, collectionNames);
     }
 
-    protected Set<AbstractUser> searchUsersByRoleIds(Set<ProcessResourceId> roleIds, Set<String> collectionNames) {
+    protected List<AbstractUser> searchUsersByRoleIds(Collection<ProcessResourceId> roleIds, Collection<String> collectionNames) {
         List<User> users = userRepository.findAllByProcessRoles__idIn(
                 new ArrayList<>(roleIds),
                 mongoTemplate,
                 collectionNames
         );
-        return new HashSet<>(changeType(users));
+        return changeType(users);
     }
 
     @Override
@@ -456,7 +457,7 @@ public class UserServiceImpl implements UserService {
             systemUser = createSystemUser();
         }
         // TODO: fix - loop through all pages
-        systemUser.setProcessRoles(processRoleService.findAll(Pageable.ofSize(MAX_PAGE_SIZE)));
+        systemUser.setProcessRoles(new HashSet<>(processRoleService.findAll(Pageable.unpaged())));
         return systemUser;
     }
 
@@ -478,13 +479,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AbstractUser removeRolesById(AbstractUser user, Set<ProcessResourceId> processRolesIds) {
+    public AbstractUser removeRolesById(AbstractUser user, Collection<ProcessResourceId> processRolesIds) {
         Set<ProcessRole> processRoles = new HashSet<>(processRoleService.findAllByIds(processRolesIds));
         return removeRoles(user, processRoles);
     }
 
     @Override
-    public AbstractUser removeRoles(AbstractUser user, Set<ProcessRole> processRoles) {
+    public AbstractUser removeRoles(AbstractUser user, Collection<ProcessRole> processRoles) {
         processRoles.forEach(user::removeProcessRole);
         return saveUser(user);
     }
@@ -507,38 +508,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AbstractUser addNegativeProcessRole(AbstractUser user, ProcessResourceId id) {
-        ProcessRole role = processRoleService.findById(id);
-        user.addNegativeProcessRole(role);
-        return saveUser(user, user.getRealmId());
-    }
-
-    @Override
-    public AbstractUser addNegativeProcessRole(AbstractUser user, String roleStringId) {
-        return this.addNegativeProcessRole(user, new ProcessResourceId(roleStringId));
-    }
-
-    @Override
-    public AbstractUser removeNegativeProcessRole(AbstractUser user, ProcessRole role) {
-        user.removeNegativeProcessRole(role);
-        return saveUser(user, user.getRealmId());
-    }
-
-    @Override
-    public AbstractUser removeNegativeProcessRole(AbstractUser user, ProcessResourceId roleId) {
-        ProcessRole role = processRoleService.findById(roleId);
-        return removeNegativeProcessRole(user, role);
-    }
-
-    @Override
-    public AbstractUser removeNegativeProcessRole(AbstractUser user, String roleId) {
-        return this.removeNegativeProcessRole(user, new ProcessResourceId(roleId));
-    }
-
-    @Override
     public void removeRoleOfDeletedPetriNet(PetriNet petriNet, Collection<String> realmIds) {
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
-        Set<AbstractUser> users = findAllByProcessRoles(petriNet.getRoles().values().stream().map(ProcessRole::get_id).collect(Collectors.toSet()), collectionNames);
+        List<AbstractUser> users = findAllByProcessRoles(petriNet.getRoles().values().stream().map(ProcessRole::get_id).collect(Collectors.toSet()), collectionNames);
         users.forEach(u -> {
             removeRolesById(u, petriNet.getRoles().values().stream().map(ProcessRole::get_id).collect(Collectors.toSet()));
         });
@@ -585,14 +557,14 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    protected void setPassword(User user, String password) {
+    protected void setPassword(AbstractUser user, String password) {
         log.trace("Setting password for user [{}]", user.getUsername());
         String hashedPassword = passwordEncoder.encode(password);
         user.setPassword(hashedPassword);
         log.debug("Password set for user [{}]", user.getUsername());
     }
 
-    protected void setDisablePassword(User user) {
+    protected void setDisablePassword(AbstractUser user) {
         user.setPassword("N/A");
         log.debug("Password N/A set for user [{}]", user.getUsername());
     }
@@ -601,7 +573,7 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(changeType(new HashSet<>(users.getContent())), pageable, users.getTotalElements());
     }
 
-    private <T> List<AbstractUser> changeType(Set<T> users) {
+    private <T> List<AbstractUser> changeType(Collection<T> users) {
         return users.stream().map(AbstractUser.class::cast).toList();
     }
 

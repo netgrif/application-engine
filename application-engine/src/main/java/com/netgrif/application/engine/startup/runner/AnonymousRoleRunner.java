@@ -14,6 +14,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -27,7 +28,7 @@ public class AnonymousRoleRunner implements ApplicationEngineStartupRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("Creating anonymous process role");
-        Set<ProcessRole> role = processRoleService.findAllByImportId(ProcessRole.ANONYMOUS_ROLE);
+        List<ProcessRole> role = processRoleService.findAllByImportId(ProcessRole.ANONYMOUS_ROLE);
         if (role != null && !role.isEmpty()) {
             log.info("Anonymous role already exists");
             return;

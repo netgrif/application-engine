@@ -28,7 +28,6 @@ public abstract class AbstractActor implements Serializable {
     protected Map<String, Attribute<?>> attributes = new HashMap<>();
     protected Set<Authority> authoritySet = new HashSet<>();
     protected Set<ProcessRole> processRoles = new HashSet<>();
-    protected Set<ProcessRole> negativeProcessRoles = new HashSet<>();
     protected Set<String> groupIds = new HashSet<>();
 
     /**
@@ -153,6 +152,15 @@ public abstract class AbstractActor implements Serializable {
         return this.attributes.keySet();
     }
 
+    public boolean validateRequiredAttributes() {
+        for (Map.Entry<String, Attribute<?>> entry : attributes.entrySet()) {
+            if (entry.getValue().isRequired() && entry.getValue().getValue() == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Sets {@link Authority} objects to this authorizing object
      *
@@ -240,51 +248,6 @@ public abstract class AbstractActor implements Serializable {
             this.processRoles = new HashSet<>();
         } else {
             this.processRoles.removeIf(it -> it.getStringId().equals(id));
-        }
-    }
-
-    /**
-     * Sets {@link ProcessRole} objects to this authorizing object
-     *
-     * @param processRoles set of {@link ProcessRole}
-     */
-    public void setNegativeProcessRoles(Set<ProcessRole> processRoles) {
-        this.processRoles = processRoles == null ? new HashSet<>() : new HashSet<>(processRoles);
-    }
-
-    /**
-     * Adds {@link ProcessRole} object to this authorizing object
-     *
-     * @param role {@link ProcessRole} object to be added
-     */
-    public void addNegativeProcessRole(ProcessRole role) {
-        if (this.negativeProcessRoles == null) {
-            this.negativeProcessRoles = new HashSet<>();
-        }
-        this.negativeProcessRoles.add(role);
-    }
-
-    /**
-     * Adds {@link ProcessRole} object to this authorizing object
-     *
-     * @param role {@link ProcessRole} object to be added
-     */
-    public void removeNegativeProcessRole(ProcessRole role) {
-        if (this.negativeProcessRoles == null) {
-            this.negativeProcessRoles = new HashSet<>();
-        } else if (!this.negativeProcessRoles.remove(role)) {
-            this.negativeProcessRoles.removeIf(it -> it.getStringId().equals(role.getStringId()));
-        }
-    }
-
-    /**
-     * @param id
-     */
-    public void removeNegativeProcessRoleByIf(String id) {
-        if (this.negativeProcessRoles == null) {
-            this.negativeProcessRoles = new HashSet<>();
-        } else {
-            this.negativeProcessRoles.removeIf(it -> it.getStringId().equals(id));
         }
     }
 

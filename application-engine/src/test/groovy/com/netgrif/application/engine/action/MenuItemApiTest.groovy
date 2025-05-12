@@ -6,9 +6,11 @@ import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.UriContentType
 import com.netgrif.application.engine.objects.petrinet.domain.UriNode
+import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemConstants
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.runner.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
@@ -17,7 +19,6 @@ import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -282,7 +283,7 @@ class MenuItemApiTest {
     List<Case> findCasesElastic(String query, Pageable pageable) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
-        List<Case> result = elasticCaseService.search([request], userService.system.transformToLoggedUser(), pageable, LocaleContextHolder.locale, false).content
+        List<Case> result = elasticCaseService.search([request], ActorTransformer.toLoggedUser(userService.system), pageable, LocaleContextHolder.locale, false).content
         return result
     }
 

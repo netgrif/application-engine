@@ -50,7 +50,7 @@ public class RegistrationServiceTest {
         NewUserRequest request = new NewUserRequest();
         request.email = "test@test.com";
 
-        RegisteredUser user = service.createNewUser(request);
+        User user = (User) service.createNewUser(request);
 
         RegistrationRequest registrationRequest = new RegistrationRequest();
         registrationRequest.token = service.encodeToken(user.getEmail(), user.getToken());

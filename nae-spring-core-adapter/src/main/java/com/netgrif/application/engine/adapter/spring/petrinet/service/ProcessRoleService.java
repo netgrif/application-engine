@@ -8,36 +8,30 @@ import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public interface ProcessRoleService {
     ProcessRole save(ProcessRole processRole);
-    Set<ProcessRole> saveAll(Iterable<ProcessRole> processRoles);
+    List<ProcessRole> saveAll(Iterable<ProcessRole> processRoles);
     void delete(String id);
     void deleteAll(Collection<String> ids);
     void deleteAll();
-    void assignRolesToUser(AbstractUser user, Set<ProcessResourceId> roleIds, LoggedUser loggedUser);
-    void assignRolesToUser(AbstractUser user, Set<ProcessResourceId> roleIds, LoggedUser loggedUser, Map<String, String> params);
-    void assignRolesToGroup(Group group, Set<ProcessResourceId> requestedRolesIds);
-    void assignNegativeRolesToUser(AbstractUser user, Set<ProcessResourceId> roleIds, LoggedUser loggedUser);
-    void assignNegativeRolesToUser(AbstractUser user, Set<ProcessResourceId> roleIds, LoggedUser loggedUser, Map<String, String> params);
-    void assignNegativeRolesToGroup(Group group, Set<ProcessResourceId> requestedRolesIds);
+    void assignRolesToUser(AbstractUser user, Collection<ProcessResourceId> roleIds, LoggedUser loggedUser);
+    void assignRolesToUser(AbstractUser user, Collection<ProcessResourceId> roleIds, LoggedUser loggedUser, Map<String, String> params);
+    void assignRolesToGroup(Group group, Collection<ProcessResourceId> requestedRolesIds);
     ProcessRole getDefaultRole();
     ProcessRole getAnonymousRole();
 
-    Set<ProcessRole> findAll(Pageable pageable);
-    Set<ProcessRole> findAllByNetStringId(String netStringId);
-    Set<ProcessRole> findAllByNetIdentifier(String identifier);
+    List<ProcessRole> findAll(Pageable pageable);
+    List<ProcessRole> findAllByNetStringId(String netStringId);
+    List<ProcessRole> findAllByNetIdentifier(String identifier);
     Collection<ProcessRole> findAllByIds(Collection<ProcessResourceId> roleIds);
     ProcessRole findById(ProcessResourceId id);
     Collection<ProcessRole> findAllByDefaultName(String name);
-    Set<ProcessRole> findAllByImportId(String importId);
+    List<ProcessRole> findAllByImportId(String importId);
     ProcessRole findById(String id);
-    Set<ProcessRole> findByIds(Set<String> ids);
-    Set<ProcessRole> findAllGlobalRoles();
+    List<ProcessRole> findByIds(Collection<String> ids);
+    List<ProcessRole> findAllGlobalRoles();
 
     ProcessRole defaultRole();
     ProcessRole anonymousRole();

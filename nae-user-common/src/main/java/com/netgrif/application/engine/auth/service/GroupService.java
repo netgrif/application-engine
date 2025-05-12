@@ -7,8 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 
+import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
+import java.util.List;
 
 public interface GroupService {
 
@@ -28,17 +29,19 @@ public interface GroupService {
 
     Group findById(String id);
 
-    List<Group> findByIds(Collection<String> ids);
+    List<Group> findAllByIds(Collection<String> ids);
 
-    Page<Group> findAllByIds(Set<String> ids, Pageable pageable);
+    Page<Group> findByIds(Collection<String> ids, Pageable pageable);
 
     Page<Group> findAll(Pageable pageable);
 
     Page<Group> findAllFromRealm(String realmId, Pageable pageable);
 
+    void removeAllGroups();
+
     void removeAllByRealmId(String realmId);
 
-    void removeAllByRealmIdInSet(Set<String> realmIds);
+    void removeAllByRealmIdIn(Collection<String> realmIds);
 
     Group getDefaultSystemGroup();
 
@@ -54,7 +57,7 @@ public interface GroupService {
 
     Group removeUser(AbstractUser user, Group group);
 
-    Set<String> getAllCoMembers(AbstractUser user);
+    List<String> getAllCoMembers(AbstractUser user);
 
     Page<Group> findByPredicate(Predicate predicate, Pageable pageable);
 
@@ -68,17 +71,17 @@ public interface GroupService {
 
     Pair<Group, Group> addSubgroup(Group parentGroup, Group childGroup);
 
-    Set<Group> getGroupParentGroupsById(String groupId);
+    List<Group> getGroupParentGroupsById(String groupId);
 
-    Set<Group> getGroupParentGroups(Group group);
+    List<Group> getGroupParentGroups(Group group);
 
-    Set<Group> getGroupSubgroupsById(String groupId);
+    List<Group> getGroupSubgroupsById(String groupId);
 
-    Set<Group> getGroupSubgroups(Group group);
+    List<Group> getGroupSubgroups(Group group);
 
-    Set<AbstractUser> getGroupMembersById(String groupId);
+    List<AbstractUser> getGroupMembersById(String groupId);
 
-    Set<AbstractUser> getGroupMembers(Group group);
+    List<AbstractUser> getGroupMembers(Group group);
 
     Collection<String> getGroupsOwnerEmails(Collection<String> groupIds);
 

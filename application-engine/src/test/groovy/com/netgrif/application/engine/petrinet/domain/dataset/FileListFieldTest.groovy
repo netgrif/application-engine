@@ -6,6 +6,8 @@ import com.netgrif.application.engine.TestHelper
 
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -146,10 +148,10 @@ class FileListFieldTest {
     void getFileByCaseAndName() {
         Case useCase = uploadTestFile()
 
-        IUser user = userService.findUserByUsername(USER_EMAIL, null).get()
+        AbstractUser user = userService.findUserByUsername(USER_EMAIL, null).get()
         assert user != null
 
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), userService.transformToLoggedUser(user))
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), ActorTransformer.toLoggedUser(user))
 
         mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/named")
                 .param("fieldId", FIELD_ID)
@@ -170,10 +172,10 @@ class FileListFieldTest {
 
     private Case uploadTestFile() {
         PetriNet net = getNet()
-        IUser user = userService.findUserByUsername(USER_EMAIL, null).get()
+        AbstractUser user = userService.findUserByUsername(USER_EMAIL, null).get()
         assert user != null
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", userService.transformToLoggedUser(user)).getCase()
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), userService.transformToLoggedUser(user))
+        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", ActorTransformer.toLoggedUser(user)).getCase()
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), ActorTransformer.toLoggedUser(user))
 
         MockMultipartFile file
                 = new MockMultipartFile(

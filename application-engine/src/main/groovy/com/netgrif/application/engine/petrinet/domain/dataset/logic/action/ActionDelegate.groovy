@@ -24,6 +24,7 @@ import com.netgrif.application.engine.integration.modules.ModuleHolder
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
 import com.netgrif.application.engine.mail.interfaces.IMailService
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.objects.petrinet.domain.*
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*
@@ -905,41 +906,41 @@ class ActionDelegate {
         return workflowService.searchOne(predicate(qCase))
     }
 
-    Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
+    Case createCase(String identifier, String title = null, String color = "", AbstractUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
         return workflowService.createCaseByIdentifier(identifier, title, color, userService.transformToLoggedUser(author), locale, params).getCase()
     }
 
-    Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
+    Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", AbstractUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
         CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, userService.transformToLoggedUser(author), params)
         this.outcomes.add(outcome)
         return outcome.getCase()
     }
 
-    Task assignTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    Task assignTask(String transitionId, Case aCase = useCase, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
         AssignTaskEventOutcome outcome = taskService.assignTask(userService.transformToLoggedUser(user), taskId, params)
         this.outcomes.add(outcome)
         return outcome.getTask()
     }
 
-    Task assignTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    Task assignTask(Task task, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         return addTaskOutcomeAndReturnTask(taskService.assignTask(task, user, params))
     }
 
-    void assignTasks(List<Task> tasks, IUser assignee = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    void assignTasks(List<Task> tasks, AbstractUser assignee = userService.loggedOrSystem, Map<String, String> params = [:]) {
         this.outcomes.addAll(taskService.assignTasks(tasks, assignee, params))
     }
 
-    Task cancelTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    Task cancelTask(String transitionId, Case aCase = useCase, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
         return addTaskOutcomeAndReturnTask(taskService.cancelTask(userService.transformToLoggedUser(user), taskId, params))
     }
 
-    Task cancelTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    Task cancelTask(Task task, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, user, params))
     }
 
-    void cancelTasks(List<Task> tasks, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    void cancelTasks(List<Task> tasks, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         this.outcomes.addAll(taskService.cancelTasks(tasks, user, params))
     }
 
@@ -948,16 +949,16 @@ class ActionDelegate {
         return outcome.getTask()
     }
 
-    void finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    void finishTask(String transitionId, Case aCase = useCase, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
         addTaskOutcomeAndReturnTask(taskService.finishTask(userService.transformToLoggedUser(user), taskId, params))
     }
 
-    void finishTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    void finishTask(Task task, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         addTaskOutcomeAndReturnTask(taskService.finishTask(task, user, params))
     }
 
-    void finishTasks(List<Task> tasks, IUser finisher = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    void finishTasks(List<Task> tasks, AbstractUser finisher = userService.loggedOrSystem, Map<String, String> params = [:]) {
         this.outcomes.addAll(taskService.finishTasks(tasks, finisher, params))
     }
 
@@ -987,44 +988,44 @@ class ActionDelegate {
         refs.find { it.transitionId == transitionId }.stringId
     }
 
-    IUser assignRole(String roleMongoId, IUser user = userService.loggedUser) {
-        IUser actualUser = userService.addRole(user, roleMongoId)
+    AbstractUser assignRole(String roleMongoId, AbstractUser user = userService.loggedUser) {
+        AbstractUser actualUser = userService.addRole(user, roleMongoId)
         return actualUser
     }
 
-    IUser assignRole(String roleId, String netId, IUser user = userService.loggedUser) {
+    AbstractUser assignRole(String roleId, String netId, AbstractUser user = userService.loggedUser) {
         List<PetriNet> nets = petriNetService.getByIdentifier(netId)
         nets.forEach({ net -> user = assignRole(roleId, net, user) })
         return user
     }
 
-    IUser assignRole(String roleId, PetriNet net, IUser user = userService.loggedUser) {
-        IUser actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
+    AbstractUser assignRole(String roleId, PetriNet net, AbstractUser user = userService.loggedUser) {
+        AbstractUser actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         return actualUser
     }
 
-    IUser assignRole(String roleId, String netId, Version version, IUser user = userService.loggedUser) {
+    AbstractUser assignRole(String roleId, String netId, Version version, AbstractUser user = userService.loggedUser) {
         PetriNet net = petriNetService.getPetriNet(netId, version)
         return assignRole(roleId, net, user)
     }
 
-    IUser removeRole(String roleMongoId, IUser user = userService.loggedUser) {
-        IUser actualUser = userService.removeRole(user, roleMongoId)
+    AbstractUser removeRole(String roleMongoId, AbstractUser user = userService.loggedUser) {
+        AbstractUser actualUser = userService.removeRole(user, roleMongoId)
         return actualUser
     }
 
-    IUser removeRole(String roleId, String netId, IUser user = userService.loggedUser) {
+    AbstractUser removeRole(String roleId, String netId, AbstractUser user = userService.loggedUser) {
         List<PetriNet> nets = petriNetService.getByIdentifier(netId)
         nets.forEach({ net -> user = removeRole(roleId, net, user) })
         return user
     }
 
-    IUser removeRole(String roleId, PetriNet net, IUser user = userService.loggedUser) {
-        IUser actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
+    AbstractUser removeRole(String roleId, PetriNet net, AbstractUser user = userService.loggedUser) {
+        AbstractUser actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         return actualUser
     }
 
-    IUser removeRole(String roleId, String netId, Version version, IUser user = userService.loggedUser) {
+    AbstractUser removeRole(String roleId, String netId, Version version, AbstractUser user = userService.loggedUser) {
         PetriNet net = petriNetService.getPetriNet(netId, version)
         return removeRole(roleId, net, user)
     }
@@ -1114,7 +1115,7 @@ class ActionDelegate {
         }
     }
 
-    IUser loggedUser() {
+    AbstractUser loggedUser() {
         return userService.loggedUser
     }
 
@@ -1271,7 +1272,7 @@ class ActionDelegate {
         ]
     }
 
-    def changeUser(IUser user) {
+    def changeUser(AbstractUser user) {
         [email  : { cl ->
             changeUser(user, "email", cl)
         },
@@ -1288,16 +1289,16 @@ class ActionDelegate {
     }
 
     def changeUserByEmail(String email, String attribute, def cl) {
-        IUser user = userService.findUserByUsername(email, null)
+        AbstractUser user = userService.findUserByUsername(email, null)
         changeUser(user, attribute, cl)
     }
 
     def changeUser(String id, String attribute, def cl) {
-        IUser user = userService.findById(id, null)
+        AbstractUser user = userService.findById(id, null)
         changeUser(user, attribute, cl)
     }
 
-    def changeUser(IUser user, String attribute, def cl) {
+    def changeUser(AbstractUser user, String attribute, def cl) {
         if (user == null) {
             log.error("Cannot find user.")
             return
@@ -1321,7 +1322,7 @@ class ActionDelegate {
     }
 
     MessageResource inviteUser(NewUserRequest newUserRequest) {
-        IUser user = registrationService.createNewUser(newUserRequest)
+        AbstractUser user = registrationService.createNewUser(newUserRequest)
         if (user == null)
             return MessageResource.successMessage("Done")
         mailService.sendRegistrationEmail(user)
@@ -1331,13 +1332,13 @@ class ActionDelegate {
     }
 
     void deleteUser(String email) {
-        IUser user = userService.findByEmail(email, null)
+        AbstractUser user = userService.findByEmail(email, null)
         if (user == null)
             log.error("Cannot find user with email [" + email + "]")
         deleteUser(user)
     }
 
-    void deleteUser(IUser user) {
+    void deleteUser(AbstractUser user) {
         List<Task> tasks = taskService.findByUser(new FullPageRequest(), user).toList()
         if (tasks != null && tasks.size() > 0)
             taskService.cancelTasks(tasks, user)
@@ -1350,8 +1351,8 @@ class ActionDelegate {
         userService.deleteUser(user)
     }
 
-    IUser findUserByEmail(String email) {
-        IUser user = userService.findUserByUsername(email, null)
+    AbstractUser findUserByEmail(String email) {
+        AbstractUser user = userService.findUserByUsername(email, null)
         if (user == null) {
             log.error("Cannot find user with email [" + email + "]")
             return null
@@ -1360,8 +1361,8 @@ class ActionDelegate {
         }
     }
 
-    IUser findUserById(String id) {
-        IUser user = userService.findById(id, null)
+    AbstractUser findUserById(String id) {
+        AbstractUser user = userService.findById(id, null)
         if (user == null) {
             log.error("Cannot find user with id [" + id + "]")
             return null

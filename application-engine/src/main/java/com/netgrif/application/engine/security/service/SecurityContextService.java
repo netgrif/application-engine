@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.security.service;
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,12 @@ public class SecurityContextService implements ISecurityContextService {
 
     protected SecurityContextService() {
         this.cachedTokens = ConcurrentHashMap.newKeySet();
+    }
+
+    @Autowired
+    @Lazy
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
     /**
@@ -66,11 +73,11 @@ public class SecurityContextService implements ISecurityContextService {
     private void reloadSecurityContext(LoggedUser loggedUser, boolean forceRefresh) {
         if (isUserLogged(loggedUser) && cachedTokens.contains(loggedUser.getId())) {
             if (forceRefresh) {
-                loggedUser = (LoggedUser) userService.transformToLoggedUser(userService.findById(loggedUser.getId(), null));
+                loggedUser = ActorTransformer.toLoggedUser(userService.findById(loggedUser.getStringId(), null));
             }
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), ((LoggedUserImpl) loggedUser).getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(token);
-            clearToken(loggedUser.getId());
+            clearToken(loggedUser.getStringId());
         }
     }
 
@@ -105,11 +112,5 @@ public class SecurityContextService implements ISecurityContextService {
             return ((LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId().equals(loggedUser.getId());
         else
             return false;
-    }
-
-    @Autowired
-    @Lazy
-    public void setUserService(UserService userService) {
-        this.userService = userService;
     }
 }

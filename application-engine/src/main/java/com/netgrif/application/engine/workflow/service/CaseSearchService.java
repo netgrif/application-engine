@@ -41,10 +41,14 @@ public class CaseSearchService extends MongoSearchService<Case> {
     public static final String PETRINET_IDENTIFIER = "identifier";
     public static final String PETRINET_ID = "id";
     public static final String PETRINET = "petriNet";
+
     public static final String AUTHOR = "author";
     public static final String AUTHOR_ID = "id";
-    public static final String AUTHOR_EMAIL = "email";
+    public static final String AUTHOR_DISPLAYNAME = "displayName";
+    public static final String AUTHOR_IDENTIFIER = "identifier";
+    public static final String AUTHOR_REALM = "realmId";
     public static final String AUTHOR_NAME = "name";
+
     public static final String TRANSITION = "transition";
     public static final String FULLTEXT = "fullText";
     public static final String CASE_ID = "stringId";
@@ -172,15 +176,19 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     private static BooleanExpression authorObject(HashMap<String, Object> query) {
-        if (query.containsKey(AUTHOR_EMAIL))
-            return QCase.case$.author.email.equalsIgnoreCase((String) query.get(AUTHOR_EMAIL));
-        else if (query.containsKey(AUTHOR_NAME))
+        if (query.containsKey(AUTHOR_NAME)) {
             return QCase.case$.author.fullName.equalsIgnoreCase((String) query.get(AUTHOR_NAME));
-        else if (query.containsKey(AUTHOR_ID)) {
+        } else if (query.containsKey(AUTHOR_ID)) {
             String searchValue = "";
             if (query.get(AUTHOR_ID) instanceof String)
                 searchValue = (String) query.get(AUTHOR_ID);
             return QCase.case$.author.id.eq(searchValue);
+        } else if (query.containsKey(AUTHOR_DISPLAYNAME)) {
+            return QCase.case$.author.displayName.equalsIgnoreCase((String) query.get(AUTHOR_DISPLAYNAME));
+        } else if (query.containsKey(AUTHOR_IDENTIFIER)) {
+            return QCase.case$.author.identifier.equalsIgnoreCase((String) query.get(AUTHOR_IDENTIFIER));
+        } else if (query.containsKey(AUTHOR_REALM)) {
+            return QCase.case$.author.realmId.equalsIgnoreCase((String) query.get(AUTHOR_REALM));
         }
         return null;
     }
@@ -278,7 +286,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         predicates.add(QCase.case$.visualId.startsWithIgnoreCase(searchPhrase));
         predicates.add(QCase.case$.title.containsIgnoreCase(searchPhrase));
         predicates.add(QCase.case$.author.fullName.containsIgnoreCase(searchPhrase));
-        predicates.add(QCase.case$.author.email.containsIgnoreCase(searchPhrase));
+        predicates.add(QCase.case$.author.identifier.containsIgnoreCase(searchPhrase));
 
         try {
             LocalDateTime creation = FieldFactory.parseDateTime(searchPhrase);

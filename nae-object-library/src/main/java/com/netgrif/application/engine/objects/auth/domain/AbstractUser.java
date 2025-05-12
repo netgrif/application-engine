@@ -27,6 +27,12 @@ public abstract class AbstractUser extends AbstractActor {
 
     protected String email;
 
+    protected String avatar;
+
+    public abstract String getPassword();
+
+    public abstract void setPassword(String password);
+
     @Override
     public String getName() {
         return String.join(" ", firstName,

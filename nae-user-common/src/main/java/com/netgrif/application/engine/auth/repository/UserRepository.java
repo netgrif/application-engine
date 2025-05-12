@@ -56,8 +56,8 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         );
     }
 
-    default Set<User> findAllByIds(Set<ObjectId> objectIds, MongoTemplate mongoTemplate, String collectionName) {
-        return new HashSet<>(mongoTemplate.find(Query.query(Criteria.where("id").in(objectIds)), User.class, collectionName));
+    default List<User> findAllByIds(Collection<ObjectId> objectIds, MongoTemplate mongoTemplate, String collectionName) {
+        return mongoTemplate.find(Query.query(Criteria.where("id").in(objectIds)), User.class, collectionName);
     }
 
     default Optional<User> findByUsername(String username, MongoTemplate mongoTemplate, String collectionName) {
@@ -76,7 +76,7 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         return mongoTemplate.save(user, collectionName);
     }
 
-    default void deleteAllByIdFromCollection(MongoTemplate mongoTemplate, Set<ObjectId> userIds, String collection) {
+    default void deleteAllByIdFromCollection(MongoTemplate mongoTemplate, Collection<ObjectId> userIds, String collection) {
         mongoTemplate.remove(
                 new Query(Criteria.where("id").in(userIds)),
                 User.class,
@@ -92,7 +92,7 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         collectionName.forEach(collection -> mongoTemplate.remove(new Query(), collection));
     }
 
-    default Page<User> findDistinctByStateAndProcessRoles__idIn(UserState state, List<ProcessResourceId> roleId, Pageable pageable, MongoTemplate mongoTemplate, Set<String> collectionNames) {
+    default Page<User> findDistinctByStateAndProcessRoles__idIn(UserState state, Collection<ProcessResourceId> roleId, Pageable pageable, MongoTemplate mongoTemplate, Collection<String> collectionNames) {
         Set<User> resultUserSet = collectionNames.stream().map(collectionName ->
                 mongoTemplate.find(
                         Query.query(
@@ -105,25 +105,25 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         return new PageImpl<>(resultUserSet.stream().toList(), pageable, resultUserSet.size());
     }
 
-    default Set<User> findAllByProcessRoles__idIn(List<ProcessResourceId> rolesId, MongoTemplate mongoTemplate, Set<String> collectionNames) {
+    default List<User> findAllByProcessRoles__idIn(Collection<ProcessResourceId> rolesId, MongoTemplate mongoTemplate, Collection<String> collectionNames) {
         return collectionNames.stream().map(collectionName ->
                 mongoTemplate.find(Query.query(Criteria.where("processRoles._id").in(rolesId)), User.class, collectionName)
-        ).flatMap(List::stream).map(User.class::cast).collect(Collectors.toSet());
+        ).flatMap(List::stream).map(User.class::cast).collect(Collectors.toList());
     }
 
-    default void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime, MongoTemplate mongoTemplate, Set<String> collectionNames) {
+    default void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime, MongoTemplate mongoTemplate, Collection<String> collectionNames) {
         collectionNames.forEach(collectionName ->
                 mongoTemplate.remove(Query.query(Criteria.where("state").is(state).and("credentials.token.properties.expirationDate").lt(dateTime)), User.class, collectionName)
         );
     }
 
-    default Set<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime, MongoTemplate mongoTemplate, Set<String> collectionNames) {
+    default List<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime, MongoTemplate mongoTemplate, Collection<String> collectionNames) {
         return collectionNames.stream().map(collectionName ->
                 mongoTemplate.find(Query.query(Criteria.where("state").is(state).and("credentials.token.properties.expirationDate").lt(dateTime)), User.class, collectionName)
-        ).flatMap(List::stream).map(User.class::cast).collect(Collectors.toSet());
+        ).flatMap(List::stream).map(User.class::cast).collect(Collectors.toList());
     }
 
-    default Page<User> findAllByIdInAndState(Set<ObjectId> ids, UserState state, Pageable pageable, MongoTemplate mongoTemplate, Set<String> collectionNames) {
+    default Page<User> findAllByIdInAndState(Collection<ObjectId> ids, UserState state, Pageable pageable, MongoTemplate mongoTemplate, Collection<String> collectionNames) {
         Set<User> resultUserSet = collectionNames.stream().map(collectionName ->
                 mongoTemplate.find(
                         Query.query(

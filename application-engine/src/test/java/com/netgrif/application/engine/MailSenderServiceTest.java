@@ -45,7 +45,7 @@ public class MailSenderServiceTest {
 
     @Test
     public void testSend() throws Exception {
-        User user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
+        User user = new User();
         user.setUsername(RECIPIENT);
         user.setEmail(RECIPIENT);
         user.setPassword("");

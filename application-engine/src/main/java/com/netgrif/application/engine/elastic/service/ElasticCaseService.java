@@ -130,7 +130,9 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             throw new IllegalArgumentException("Request can not be null!");
         }
         log.debug("Searching for query with logged user [{}]", user.getId());
-        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        // TODO: impersonation
+//        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        LoggedUser loggedOrImpersonated = user;
         pageable = resolveUnmappedSortAttributes(pageable);
         NativeQuery query = buildQuery(requests, loggedOrImpersonated, pageable, locale, isIntersection);
         List<Case> casePage;
@@ -155,7 +157,9 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        // TODO: impersonation
+//        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        LoggedUser loggedOrImpersonated = user;
         NativeQuery query = buildQuery(requests, loggedOrImpersonated, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase.class);

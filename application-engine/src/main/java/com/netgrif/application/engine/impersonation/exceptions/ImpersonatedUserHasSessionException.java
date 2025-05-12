@@ -9,7 +9,7 @@ public class ImpersonatedUserHasSessionException extends Exception {
     private final boolean isImpersonated;
 
     public ImpersonatedUserHasSessionException(LoggedUser impersonatedLogged, boolean isImpersonated) {
-        super(impersonatedLogged.getFullName() + " has an existing session!");
+        super(impersonatedLogged.getName() + " has an existing session!");
         this.isImpersonated = isImpersonated;
     }
 }

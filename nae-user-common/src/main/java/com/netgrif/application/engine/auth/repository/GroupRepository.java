@@ -8,8 +8,8 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 public interface GroupRepository extends MongoRepository<Group, String>, QuerydslPredicateExecutor<Group> {
@@ -17,9 +17,9 @@ public interface GroupRepository extends MongoRepository<Group, String>, Queryds
 
     Optional<Group> findByIdentifier(String identifier);
 
-    Set<Group> findAllByMemberIdsContains(String memberId);
+    List<Group> findAllByMemberIdsContains(String memberId);
 
-    Page<Group> findAllByIdIn(Set<String> ids, Pageable pageable);
+    Page<Group> findAllByIdIn(Collection<String> ids, Pageable pageable);
 
     Page<Group> findAllByRealmId(String realmId, Pageable pageable);
 

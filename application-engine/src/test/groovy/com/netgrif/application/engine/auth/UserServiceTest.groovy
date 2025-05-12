@@ -1,8 +1,9 @@
 package com.netgrif.application.engine.auth
 
-import com.netgrif.application.engine.adapter.spring.auth.domain.mapper.LoggedUserMapper
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.auth.service.UserService
@@ -52,7 +53,7 @@ class UserServiceTest {
 
     private Authority userAuth
 
-    private IUser user
+    private AbstractUser user
 
     @BeforeEach
     void init() {
@@ -103,7 +104,7 @@ class UserServiceTest {
         user = userService.addRole(user, dummyRole.get_id())
         assert user.getProcessRoles().size() == 2 && user.getProcessRoles().stream().anyMatch {it.stringId == dummyRole.stringId}
 
-        List<IUser> userList = userService.findAllByProcessRoles(Set.of(dummyRole.get_id()), null)
+        List<AbstractUser> userList = userService.findAllByProcessRoles(Set.of(dummyRole.get_id()), null)
         assert userList.size() == 1 && userList.getFirst().stringId == user.stringId
     }
 
@@ -114,7 +115,7 @@ class UserServiceTest {
         ((User) user).setExpirationDate(LocalDateTime.now())
         userService.saveUser(user, null)
 
-        List<IUser> userList = userService.findAllByStateAndExpirationDateBefore(UserState.INACTIVE, LocalDateTime.now(), null)
+        List<AbstractUser> userList = userService.findAllByStateAndExpirationDateBefore(UserState.INACTIVE, LocalDateTime.now(), null)
         assert userList.size() == 1 && userList.getFirst().stringId == user.stringId
     }
 
@@ -125,23 +126,23 @@ class UserServiceTest {
         ((User) user).setExpirationDate(LocalDateTime.now())
         userService.saveUser(user, null)
 
-        Page<IUser> userPage = userService.findAllCoMembers(LoggedUserMapper.toLoggedUser(user as User), Pageable.ofSize(10))
+        Page<AbstractUser> userPage = userService.findAllCoMembers(ActorTransformer.toLoggedUser(user), Pageable.ofSize(10))
         assert userPage.getContent().size() == 2 && userPage.getContent().getFirst().stringId == user.stringId
 
     }
 
-    private IUser createUser() {
-        Optional<IUser> userOptional = userService.findUserByUsername("dummy@netgrif.com", null)
+    private User createUser() {
+        Optional<AbstractUser> userOptional = userService.findUserByUsername("dummy@netgrif.com", null)
         User user = null
         if (userOptional.isEmpty()) {
-            user = new com.netgrif.application.engine.adapter.spring.auth.domain.User()
+            user = new User()
             user.setFirstName("Dummy")
             user.setLastName("User")
             user.setUsername("dummy@netgrif.com")
             user.setEmail("dummy@netgrif.com")
             user.setPassword("password")
             user.setState(UserState.ACTIVE)
-            user.setAuthorities([userAuth] as Set)
+            user.setAuthoritySet([userAuth] as Set)
             user = (User) userService.createUser(user, null)
         }
         return user
