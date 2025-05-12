@@ -10,5 +10,6 @@ RUN mkdir -p /opt/netgrif/engine
 COPY application-engine/target/app-exec.jar /opt/netgrif/engine/app.jar
 COPY application-engine/src/main/resources /opt/netgrif/engine/src/main/resources
 
+WORKDIR /opt/netgrif/engine
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","-Dfile.encoding=UTF-8","/opt/netgrif/engine/app.jar"]
+ENTRYPOINT ["java","-jar","-Dfile.encoding=UTF-8","app.jar"]
