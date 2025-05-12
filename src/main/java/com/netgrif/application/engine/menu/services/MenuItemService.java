@@ -351,7 +351,7 @@ public class MenuItemService implements IMenuItemService {
         dataSet.put(MenuItemConstants.FIELD_DUPLICATE_TITLE, Map.of("type", FieldType.I18N.getName(), "value",
                 new I18nString("")));
         dataSet.put(MenuItemConstants.FIELD_DUPLICATE_IDENTIFIER, Map.of("type", FieldType.TEXT.getName(),
-                "value",""));
+                "value", ""));
         dataSet.put(MenuItemConstants.FIELD_MENU_NAME, Map.of("type", FieldType.I18N.getName(),
                 "value", newTitle));
         dataSet.put(MenuItemConstants.FIELD_TAB_NAME, Map.of("type", FieldType.I18N.getName(),
@@ -520,7 +520,7 @@ public class MenuItemService implements IMenuItemService {
     protected Case handleFilter(Case filterCase, FilterBody body) throws TransitionNotExecutableException {
         if (mustCreateFilter(filterCase, body)) {
             return createFilter(body);
-        } else if (mustUpdateFilter(filterCase, body)){
+        } else if (mustUpdateFilter(filterCase, body)) {
             return updateFilter(filterCase, body);
         } else {
             return filterCase;
@@ -600,6 +600,7 @@ public class MenuItemService implements IMenuItemService {
     protected Case getOrCreateFolderRecursive(UriNode node, MenuItemBody body) throws TransitionNotExecutableException {
         return getOrCreateFolderRecursive(node, body, null);
     }
+
     protected Case getOrCreateFolderRecursive(UriNode node, MenuItemBody body, Case childFolderCase) throws TransitionNotExecutableException {
         IUser loggedUser = userService.getLoggedOrSystem();
         Case folderCase = findFolderCase(node);
@@ -636,15 +637,15 @@ public class MenuItemService implements IMenuItemService {
     protected void appendChildCaseIdInDataSet(Case folderCase, String childItemCaseId, Map<String, Map<String, Object>> dataSet) {
         List<String> childIds = MenuItemUtils.getCaseIdsFromCaseRef(folderCase, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
         if (childIds == null || childIds.isEmpty()) {
-            dataSet.put(MenuItemConstants.FIELD_CHILD_ITEM_IDS, Map.of("type", FieldType.CASE_REF.getName(),
-                    "value", List.of(childItemCaseId)));
+            childIds = List.of(childItemCaseId);
         } else {
             childIds.add(childItemCaseId);
-            dataSet.put(MenuItemConstants.FIELD_CHILD_ITEM_IDS, Map.of("type", FieldType.CASE_REF.getName(),
-                    "value", childIds));
         }
+
+        dataSet.put(MenuItemConstants.FIELD_CHILD_ITEM_IDS, Map.of("type", FieldType.CASE_REF.getName(),
+                "value", childIds));
         dataSet.put(MenuItemConstants.FIELD_HAS_CHILDREN, Map.of("type", FieldType.BOOLEAN.getName(),
-                "value", MenuItemUtils.hasFolderChildren(folderCase)));
+                "value", !childIds.isEmpty()));
     }
 
     protected void appendChildCaseIdInMemory(Case folderCase, String childItemCaseId) {
@@ -673,7 +674,7 @@ public class MenuItemService implements IMenuItemService {
     }
 
     protected Case createCase(String identifier, String title, LoggedUser loggedUser) {
-        return workflowService.createCaseByIdentifier(identifier, title, "",loggedUser).getCase();
+        return workflowService.createCaseByIdentifier(identifier, title, "", loggedUser).getCase();
     }
 
     protected Case setData(Case useCase, String transId, Map<String, Map<String, Object>> dataSet) {
