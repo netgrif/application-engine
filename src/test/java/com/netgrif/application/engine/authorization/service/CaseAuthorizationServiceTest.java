@@ -13,7 +13,6 @@ import com.netgrif.application.engine.authorization.domain.repositories.ProcessR
 import com.netgrif.application.engine.authorization.domain.repositories.RoleAssignmentRepository;
 import com.netgrif.application.engine.authorization.service.interfaces.IGroupService;
 import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
-import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
@@ -47,9 +46,6 @@ public class CaseAuthorizationServiceTest {
 
     @Autowired
     private CaseAuthorizationService authorizationService;
-
-    @Autowired
-    private ISessionManagerService sessionManagerService;
 
     @Autowired
     private IIdentityService identityService;

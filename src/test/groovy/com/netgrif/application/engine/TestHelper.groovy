@@ -15,6 +15,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.*
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
@@ -35,10 +36,14 @@ class TestHelper {
     private RoleService roleService
     @Autowired
     private SystemUserRunner systemIdentityRunner
+    @Lazy
     @Autowired
     private SystemProcessRunner systemProcessRunner
     @Autowired
     private ApplicationRoleRunner applicationRoleRunner
+    @Lazy
+    @Autowired
+    private AnonymousIdentityRunner anonymousIdentityRunner
     @Autowired
     private ElasticTaskRepository elasticTaskRepository
     @Autowired
@@ -87,6 +92,7 @@ class TestHelper {
         applicationRoleRunner.run()
         defaultGroupRunner.run()
         systemIdentityRunner.run()
+        anonymousIdentityRunner.run()
         filterRunner.run()
         superCreator.run()
         validationRunner.run()

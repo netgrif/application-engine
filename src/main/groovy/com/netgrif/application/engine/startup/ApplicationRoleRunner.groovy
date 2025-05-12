@@ -27,10 +27,10 @@ class ApplicationRoleRunner extends AbstractOrderedCommandLineRunner {
     void run(String... strings) throws Exception {
         Map<String, ApplicationRole> appRoles = new HashMap<>()
 
-        appRoles.put(DEFAULT_APP_ROLE, createAndSaveApplicationRole(APPLICATION_ID, DEFAULT_APP_ROLE))
-        appRoles.put(ADMIN_APP_ROLE, createAndSaveApplicationRole(APPLICATION_ID, ADMIN_APP_ROLE))
-        appRoles.put(SYSTEM_ADMIN_APP_ROLE, createAndSaveApplicationRole(APPLICATION_ID, SYSTEM_ADMIN_APP_ROLE))
-        appRoles.put(ANONYMOUS_APP_ROLE, createAndSaveApplicationRole(APPLICATION_ID, ANONYMOUS_APP_ROLE))
+        appRoles.put(DEFAULT_APP_ROLE, createAppRole(APPLICATION_ID, DEFAULT_APP_ROLE))
+        appRoles.put(ADMIN_APP_ROLE, createAppRole(APPLICATION_ID, ADMIN_APP_ROLE))
+        appRoles.put(SYSTEM_ADMIN_APP_ROLE, createAppRole(APPLICATION_ID, SYSTEM_ADMIN_APP_ROLE))
+        appRoles.put(ANONYMOUS_APP_ROLE, createAppRole(APPLICATION_ID, ANONYMOUS_APP_ROLE))
 
         this.applicationRoles = Collections.unmodifiableMap(appRoles)
     }
@@ -39,13 +39,10 @@ class ApplicationRoleRunner extends AbstractOrderedCommandLineRunner {
      * todo javadoc
      * */
     ApplicationRole getAppRole(String roleName) {
-        if (roleName == null) {
+        if (roleName == null || applicationRoles == null) {
             return null
         }
-        if (applicationRoles && applicationRoles.containsKey(roleName)) {
-            return applicationRoles.get(roleName)
-        }
-        return createAndSaveApplicationRole(APPLICATION_ID, roleName)
+        return applicationRoles.get(roleName)
     }
 
     /**
@@ -55,7 +52,7 @@ class ApplicationRoleRunner extends AbstractOrderedCommandLineRunner {
         return applicationRoles.values()
     }
 
-    private ApplicationRole createAndSaveApplicationRole(String applicationId, String importId) {
+    private ApplicationRole createAppRole(String applicationId, String importId) {
         if (!service.existsApplicationRoleByImportId(importId)) {
             return (ApplicationRole) service.save(new ApplicationRole(importId, applicationId))
         }
