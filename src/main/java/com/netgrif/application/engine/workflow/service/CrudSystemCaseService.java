@@ -66,7 +66,11 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
         if (keywords == null) {
             return false;
         }
-        return this.forbiddenKeywords.addAll(keywords);
+        boolean areRegistered = this.forbiddenKeywords.addAll(keywords);
+        if (areRegistered) {
+           log.debug("New forbidden keywords for process [{}] were registered: {}", getProcessIdentifier(), keywords);
+        }
+        return areRegistered;
     }
 
     /**
@@ -78,12 +82,20 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
         if (keywords == null) {
             return false;
         }
-        return this.forbiddenKeywords.removeAll(keywords);
+        boolean areRemoved = this.forbiddenKeywords.removeAll(keywords);
+        if (areRemoved) {
+            log.debug("Some forbidden keywords for process [{}] were removed: {}", getProcessIdentifier(), keywords);
+        }
+        return areRemoved;
     }
 
     @Override
     public void clearForbiddenKeywords() {
+        int countBefore = this.forbiddenKeywords.size();
         this.forbiddenKeywords.clear();
+        if (countBefore > 0) {
+            log.debug("All ({}) forbidden keywords for process [{}] were removed", countBefore, getProcessIdentifier());
+        }
     }
 
     /**
