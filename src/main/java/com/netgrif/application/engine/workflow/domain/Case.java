@@ -73,7 +73,6 @@ public class Case implements Serializable {
     private Map<String, Integer> consumedTokens = new HashMap<>();
     @Indexed
     private Map<String, TaskPair> tasks = new HashMap<>();
-    @JsonIgnore
     private AccessPermissions<CasePermission> processRolePermissions = new AccessPermissions<>();
     private AccessPermissions<CasePermission> caseRolePermissions = new AccessPermissions<>();
     private Map<String, String> properties = new HashMap<>();
@@ -161,7 +160,7 @@ public class Case implements Serializable {
     public void updateTask(Task task) {
         TaskPair taskPair = tasks.get(task.getTransitionId());
         taskPair.setState(task.getState());
-        taskPair.setUserId(task.getAssigneeId());
+        taskPair.setAssigneeId(task.getAssigneeId());
     }
 
     public String getPetriNetId() {

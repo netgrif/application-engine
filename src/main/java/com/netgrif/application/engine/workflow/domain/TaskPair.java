@@ -15,14 +15,14 @@ public class TaskPair implements Serializable {
     private ObjectId taskId;
     private String transitionId;
     private State state;
-    private String userId;
+    private String assigneeId;
 
     public TaskPair(Task task) {
         this.taskId = task.getId();
         this.transitionId = task.getTransitionId();
         this.state = task.getState();
         // TODO: release/8.0.0
-        this.userId = task.getAssigneeId();
+        this.assigneeId = task.getAssigneeId();
     }
 
     public String getTaskStringId() {
