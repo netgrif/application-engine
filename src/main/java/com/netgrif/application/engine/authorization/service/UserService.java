@@ -35,8 +35,10 @@ public class UserService extends ActorService<User> implements IUserService {
     }
 
     /**
-     * todo javadoc
-     * */
+     * Finds user by their email address
+     * @param email the email address to search for
+     * @return Optional containing User if found, empty Optional if email is null or user not found
+     */
     @Override
     public Optional<User> findByEmail(String email) {
         if (email == null) {
@@ -46,8 +48,10 @@ public class UserService extends ActorService<User> implements IUserService {
     }
 
     /**
-     * todo javadoc
-     * */
+     * Checks whether user with given email exists
+     * @param email the email address to check
+     * @return true if user exists, false if email is null or user not found
+     */
     @Override
     public boolean existsByEmail(String email) {
         if (email == null) {
@@ -56,6 +60,11 @@ public class UserService extends ActorService<User> implements IUserService {
         return countByQuery(fulltextFieldQuery(UserConstants.EMAIL_FIELD_ID, email)) > 0;
     }
 
+    /**
+     * Retrieves the system user account
+     *
+     * @return User representing the system user
+     */
     @Override
     public User getSystemUser() {
         return systemUserRunner.getSystemUser();

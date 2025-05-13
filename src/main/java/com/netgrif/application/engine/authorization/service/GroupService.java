@@ -38,6 +38,12 @@ public class GroupService extends ActorService<Group> implements IGroupService {
         this.roleService = roleService;
     }
 
+    /**
+     * Searches for a group by its name
+     *
+     * @param name name of the group to find
+     * @return Optional containing the group if found, empty Optional if name is null or group not found
+     */
     @Override
     public Optional<Group> findByName(String name) {
         if (name == null) {
@@ -46,6 +52,12 @@ public class GroupService extends ActorService<Group> implements IGroupService {
         return findOneByQuery(fulltextFieldQuery(GroupConstants.NAME_FIELD_ID, name));
     }
 
+    /**
+     * Checks whether a group with given name exists
+     *
+     * @param name name to check
+     * @return true if group exists, false if name is null or no such group exists
+     */
     @Override
     public boolean existsByName(String name) {
         if (name == null) {
@@ -54,6 +66,11 @@ public class GroupService extends ActorService<Group> implements IGroupService {
         return countByQuery(fulltextFieldQuery(GroupConstants.NAME_FIELD_ID, name)) > 0;
     }
 
+    /**
+     * Gets or creates the default group and ensures it has the default role
+     *
+     * @return default group instance, creates new one if it doesn't exist
+     */
     @Override
     public Group getDefaultGroup() {
         Group defaultGroup = defaultGroupRunner.getDefaultGroup();

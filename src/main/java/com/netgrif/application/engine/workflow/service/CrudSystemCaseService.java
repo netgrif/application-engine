@@ -48,13 +48,49 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
         this.forbiddenKeywords = ConcurrentHashMap.newKeySet();
     }
 
-    // todo javadoc on abstract methods
+    /**
+     * Returns the unique process identifier for this system case service.
+     *
+     * @return Process identifier string
+     */
     protected abstract String getProcessIdentifier();
+
+    /**
+     * Generates a search query to find existing cases with the same unique properties.
+     *
+     * @param params Parameters containing the unique properties to search for
+     * @return Search query string
+     */
     protected abstract String isUniqueQuery(@NotNull CaseParams params);
+
+    /**
+     * Validates and fixes parameters for case creation.
+     *
+     * @param params Parameters to validate
+     * @throws IllegalArgumentException if parameters are invalid
+     */
     protected abstract void validateAndFixCreateParams(@NotNull CaseParams params) throws IllegalArgumentException;
+
+    /**
+     * Validates and fixes parameters for case update.
+     *
+     * @param params Parameters to validate
+     * @throws IllegalArgumentException if parameters are invalid
+     */
     protected abstract void validateAndFixUpdateParams(@NotNull CaseParams params) throws IllegalArgumentException;
 
+    /**
+     * Performs any necessary actions after system case creation.
+     *
+     * @param systemCase The newly created system case
+     */
     protected void postCreationActions(T systemCase) {}
+
+    /**
+     * Performs any necessary actions after system case update.
+     *
+     * @param systemCase The updated system case
+     */
     protected void postUpdateActions(T systemCase) {}
 
     /**

@@ -49,6 +49,11 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
         this.userService = userService;
     }
 
+    /**
+     * Returns the currently logged identity from the session manager.
+     *
+     * @return Currently logged identity. Can be null if no identity is logged in.
+     */
     @Override
     public LoggedIdentity getLoggedIdentity() {
         return sessionManagerService.getLoggedIdentity();
@@ -161,7 +166,11 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
     }
 
     /**
-     * todo javadoc
+     * Creates new identity with encoded password from provided parameters.
+     *
+     * @param params Parameters for creating identity. Password will be encoded before creation.
+     * @return Created identity with encoded password
+     * @throws IllegalArgumentException if parameters validation fails
      * */
     @Override
     @Transactional
@@ -171,7 +180,12 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
     }
 
     /**
-     * todo javadoc
+     * Updates existing identity with provided parameters and encodes new password.
+     *
+     * @param identity Identity to be updated
+     * @param params Parameters containing updates. Password will be encoded before update.
+     * @return Updated identity with newly encoded password
+     * @throws IllegalArgumentException if identity or parameters validation fails
      * */
     @Override
     @Transactional
@@ -181,7 +195,12 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
     }
 
     /**
-     * todo javadoc
+     * Adds a single additional actor to the identity.
+     *
+     * @param identity Identity to which the actor will be added
+     * @param actorId ID of the actor to be added as additional actor
+     * @return Updated identity with new additional actor
+     * @throws IllegalArgumentException if identity or actorId is null
      * */
     @Override
     @Transactional
@@ -197,7 +216,12 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
     }
 
     /**
-     * todo javadoc
+     * Adds multiple additional actors to the identity.
+     *
+     * @param identity Identity to which the actors will be added
+     * @param actorIds Set of actor IDs to be added as additional actors
+     * @return Updated identity with new additional actors
+     * @throws IllegalArgumentException if identity is null or actorIds is null or empty
      * */
     @Override
     @Transactional
@@ -223,7 +247,12 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
     }
 
     /**
-     * todo javadoc
+     * Removes all identities in given state that expired before specified date.
+     *
+     * @param state State of identities to be removed
+     * @param dateTime Date threshold - identities expired before this date will be removed
+     * @return List of all removed identities
+     * @throws IllegalArgumentException if state or dateTime is null
      * */
     @Override
     @Transactional
