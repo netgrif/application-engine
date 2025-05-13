@@ -10,7 +10,10 @@ import com.netgrif.application.engine.configuration.properties.SecurityLimitsPro
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.startup.ImportHelper
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.MethodOrderer
+import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestMethodOrder
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -35,12 +38,13 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class LoginAttemptsTest {
 
     public static final String USER_EMAIL = "test@mail.sk"
     public static final String USER_PASSWORD = "password"
     public static final String USER_BAD_PASSWORD = "totok"
-    public static final String LOGIN_URL = "/api/user/me"
+    public static final String LOGIN_URL = "/api/users/me"
 
     private MockMvc mvc
 
@@ -77,10 +81,11 @@ class LoginAttemptsTest {
 
 
     @Test
+    @Order(1)
     void loginOK() {
         def result = mvc.perform(MockMvcRequestBuilders.get(LOGIN_URL)
-                .accept(MediaTypes.HAL_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
                 .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_PASSWORD)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -89,35 +94,36 @@ class LoginAttemptsTest {
     }
 
     @Test
+    @Order(2)
     void loginBadNewIP() {
 
         def result = mvc.perform(MockMvcRequestBuilders.get(LOGIN_URL)
-                .accept(MediaTypes.HAL_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
                 .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_BAD_PASSWORD)))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andReturn()
         assert result
         result = mvc.perform(MockMvcRequestBuilders.get(LOGIN_URL)
-                .accept(MediaTypes.HAL_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
                 .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_BAD_PASSWORD)))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andReturn()
         assert result
         result = mvc.perform(MockMvcRequestBuilders.get(LOGIN_URL)
-                .accept(MediaTypes.HAL_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
                 .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_BAD_PASSWORD)))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andReturn()
         assert result
         result = mvc.perform(MockMvcRequestBuilders.get(LOGIN_URL)
-                .accept(MediaTypes.HAL_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
                 .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_BAD_PASSWORD)))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
@@ -125,16 +131,16 @@ class LoginAttemptsTest {
         assert result
         //BLOCK user
         result = mvc.perform(MockMvcRequestBuilders.get(LOGIN_URL)
-                .accept(MediaTypes.HAL_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
                 .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_PASSWORD)))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andReturn()
         assert result
         result = mvc.perform(MockMvcRequestBuilders.get(LOGIN_URL)
-                .accept(MediaTypes.HAL_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
                 .with { it.remoteAddress("fakeIp")}
                 .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_PASSWORD)))
@@ -144,35 +150,36 @@ class LoginAttemptsTest {
     }
 
     @Test
+    @Order(3)
     void loginBad() {
 
         def result = mvc.perform(MockMvcRequestBuilders.get(LOGIN_URL)
-                .accept(MediaTypes.HAL_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
                 .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_BAD_PASSWORD)))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andReturn()
         assert result
         result = mvc.perform(MockMvcRequestBuilders.get(LOGIN_URL)
-                .accept(MediaTypes.HAL_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
                 .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_BAD_PASSWORD)))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andReturn()
         assert result
         result = mvc.perform(MockMvcRequestBuilders.get(LOGIN_URL)
-                .accept(MediaTypes.HAL_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
                 .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_BAD_PASSWORD)))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andReturn()
         assert result
         result = mvc.perform(MockMvcRequestBuilders.get(LOGIN_URL)
-                .accept(MediaTypes.HAL_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
                 .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_BAD_PASSWORD)))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
@@ -180,8 +187,8 @@ class LoginAttemptsTest {
         assert result
         //BLOCK user
         result = mvc.perform(MockMvcRequestBuilders.get(LOGIN_URL)
-                .accept(MediaTypes.HAL_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
                 .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_PASSWORD)))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
@@ -190,8 +197,8 @@ class LoginAttemptsTest {
         sleep(securityLimitsProperties.getLoginTimeoutUnit().toMillis(securityLimitsProperties.getLoginTimeout())+2000) //Wait
         //UNBLOCK user
         result = mvc.perform(MockMvcRequestBuilders.get(LOGIN_URL)
-                .accept(MediaTypes.HAL_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
                 .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_PASSWORD)))
                 .andExpect(MockMvcResultMatchers.status().isOk())

@@ -40,6 +40,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @ExtendWith(SpringExtension.class)
@@ -51,7 +52,7 @@ class RemoveActionTest {
     public static final String USER_EMAIL = "test@mail.sk"
     public static final String USER_PASSWORD = "password"
 
-    public static final String ROLE_API = "/api/user/{}/role/assign"
+    public static final String ROLE_API = "/api/users/%s/%s/roles"
 
     @Autowired
     private WebApplicationContext wac
@@ -123,10 +124,10 @@ class RemoveActionTest {
         def content = JsonOutput.toJson([adminRoleId])
         String userId = user.getStringId()
 
-        mvc.perform(post(ROLE_API.replace("{}", userId))
+        mvc.perform(put(ROLE_API.formatted(user.getRealmId(),userId))
                 .accept(MediaTypes.HAL_JSON_VALUE)
                 .content(content)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
                 .andExpect(status().isOk())
@@ -144,7 +145,7 @@ class RemoveActionTest {
         //only manager role came, and as part of admin action, this one should get removed inside action
         content = JsonOutput.toJson([managerRoleId])
 
-        mvc.perform(post(ROLE_API.replace("{}", userId))
+        mvc.perform(put(ROLE_API.formatted(user.getRealmId(), userId))
                 .accept(MediaTypes.HAL_JSON_VALUE)
                 .content(content)
                 .contentType(MediaType.APPLICATION_JSON)

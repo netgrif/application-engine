@@ -144,7 +144,7 @@ class InsuranceTest {
                 [auths.get("user"), auths.get("admin")] as Authority[],
                 [processRoles.get("agent"), processRoles.get("company")] as ProcessRole[])
         List<ProcessRole> roles = processRoleService.findAll(netId)
-        processRoleService.assignRolesToUser(userService.findUserByUsername(USER_EMAIL, null).get(), roles.findAll { it.importId in ["1", "2"] }.collect { it._id } as Set, ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+        processRoleService.assignRolesToUser(userService.findUserByUsername(USER_EMAIL, null).orElse(null), roles.findAll { it.importId in ["1", "2"] }.collect { it._id } as Set, userService.transformToLoggedUser(userService.getLoggedOrSystem()))
 
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
         auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));

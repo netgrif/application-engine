@@ -76,9 +76,9 @@ class GroovyShellFactoryTest {
         def roles = roleService.findAll(net.getStringId())
         assert roles.size() == 1
         roleService.assignRolesToUser(
-                user.get().stringId,
+                user.get(),
                 new HashSet<ProcessResourceId>(roles.collect { it._id } + user.get().processRoles.collect { it._id }),
-                new LoggedUserImpl("", "a", "", [] as Set, [] as Set)
+                new LoggedUserImpl("", "a", "", [] as Set, [] as Set, [] as Set)
         )
         user = userService.findUserByUsername(userService.getSystem().getEmail(), null)
         assert user.get().processRoles.size() == processRoleCount + 1

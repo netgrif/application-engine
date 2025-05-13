@@ -2,6 +2,7 @@ package com.netgrif.application.engine.objects.preferences;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -20,6 +21,8 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 public abstract class Preferences implements Serializable {
+
+    private ObjectId _id;
 
     private String userId;
 
@@ -43,6 +46,7 @@ public abstract class Preferences implements Serializable {
     private Map<String, List<String>> headers = new HashMap<>();
 
     public Preferences(String userId) {
+        this._id = new ObjectId(userId);
         this.userId = userId;
         this.drawerWidth = 200;
     }

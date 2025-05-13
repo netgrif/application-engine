@@ -29,14 +29,29 @@ NAE provides additional components to make integration to your project/environme
 
 * License: [NETGRIF Community License](https://netgrif.com/license)
 
-##  Loading nae-user-ce as symlink to modules
+## DEV quick-start
+
+1. **Build everything once**
+
+Compiles the entire multi-module project and pulls down every dependency.
 
 ```bash
-ln -s nae-user-ce/target/nae-user-ce-*-SNAPSHOT.jar application-engine/modules/.
+mvn clean install
 ```
 
-Build with DEV profile
+2. **Loading nae-user-ce as symlink to modules**
 
+```bash
+bash -c 'jar_path=$(find nae-user-ce/target/ -maxdepth 1 -type f -name "nae-user-ce-*.jar" ! -name "*-javadoc.jar" ! -name "*-sources.jar" | head -n1) && [[ -n "$jar_path" ]] && cd application-engine/modules && ln -sf ../../"$jar_path" nae-user-ce.jar && echo "✅ Create a Symlink → application-engine/modules/nae-user-ce.jar" || echo "❌ JAR file not found!"'
+```
+3. **Rebuild only the engine**
+
+```bash
+mvn -pl application-engine -Pdev clean install
+```
+4. **Run the app**
+
+In IntelliJ choose “ApplicationEngine DEV with modules” and press Run (main class org.springframework.boot.loader.launch.PropertiesLauncher, profile dev). The launcher loads every JAR in application-engine/modules/, including the symlinked nae-user-ce.jar.
 
 ## Repository Content
 

@@ -144,7 +144,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         List<Task> taskPage;
         long total;
         if (query != null) {
-            SearchHits<ElasticTask> hits = elasticsearchTemplate.search(query, ElasticTask.class, IndexCoordinates.of(taskIndex));
+            SearchHits<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask> hits = elasticsearchTemplate.search(query, com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask.class, IndexCoordinates.of(taskIndex));
             Page<ElasticTask> indexedTasks = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getStringId).collect(Collectors.toList()));
             total = indexedTasks.getTotalElements();
@@ -162,7 +162,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
 //        NativeQuery query = buildQuery(requests, user.getSelfOrImpersonated(), new FullPageRequest(), locale, isIntersection);
         NativeQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
-            return template.count(query, ElasticTask.class);
+            return template.count(query, com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask.class);
         } else {
             return 0;
         }

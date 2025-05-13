@@ -3,13 +3,13 @@ package com.netgrif.application.engine.auth.provider;
 import com.netgrif.application.engine.adapter.spring.utils.PageableUtils;
 import com.netgrif.application.engine.auth.service.RealmService;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
-import jakarta.validation.constraints.Null;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.ivy.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.MissingResourceException;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component

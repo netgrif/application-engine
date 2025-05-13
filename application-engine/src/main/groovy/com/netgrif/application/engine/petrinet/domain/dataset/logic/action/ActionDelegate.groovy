@@ -193,7 +193,7 @@ class ActionDelegate {
     FrontendActionOutcome Frontend
 
     ModuleHolder Module
-  
+
     /**
      * Reference of case and task in which current action is taking place.
      */
@@ -1101,7 +1101,8 @@ class ActionDelegate {
         def taskId = useCase.tasks.find { it.transition == transitionId }.task
         if (!taskId)
             return new HashMap<String, Field>()
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(taskId, useCase, params)))
+        Task task = taskService.findById(taskId)
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, params)))
     }
 
     private List<Field> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome) {
