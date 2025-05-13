@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface GroupRepository extends MongoRepository<Group, String>, QuerydslPredicateExecutor<Group> {
-    Set<Group> findByOwnerId(String id);
+    List<Group> findByOwnerId(String id);
 
     Optional<Group> findByIdentifier(String identifier);
 

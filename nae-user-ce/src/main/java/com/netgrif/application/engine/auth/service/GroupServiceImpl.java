@@ -142,7 +142,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group create(AbstractUser user) {
         log.info("Creating default group for user: [{}]", user.getStringId());
-        Set<Group> userGroups = groupRepository.findByOwnerId(user.getStringId());
+        List<Group> userGroups = groupRepository.findByOwnerId(user.getStringId());
         if (!userGroups.isEmpty() && !Objects.equals(user.getStringId(), userService.getSystem().getStringId())) {
             throw new IllegalArgumentException("Default group for user [%s] already exists.".formatted(user.getUsername()));
         }
@@ -163,8 +163,8 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group getDefaultUserGroup(IUser user) {
-        Set<Group> userGroup = groupRepository.findByOwnerId(user.getStringId());
+    public Group getDefaultUserGroup(AbstractUser user) {
+        List<Group> userGroup = groupRepository.findByOwnerId(user.getStringId());
         String errorMessage = "Default user group for user [%s] does not exist.".formatted(user.getUsername());
         if (userGroup.isEmpty()) {
             throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.DEFAULT_USER_GROUP_NOT_FOUND, errorMessage);
