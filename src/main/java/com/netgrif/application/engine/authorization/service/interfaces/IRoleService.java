@@ -18,6 +18,7 @@ import java.util.Set;
 public interface IRoleService {
     List<Role> findAll();
     List<Role> findAllById(Set<String> roleIds);
+    Set<String> findAllRoleIdsByActorAndGroups(String actorId);
     Role findDefaultRole();
     Role findAnonymousRole();
 

@@ -89,6 +89,7 @@ public class RoleAssignmentService implements IRoleAssignmentService {
 
     @Override
     public Set<String> findAllRoleIdsByActorAndGroups(String actorId) {
+        // todo 2058 implement test
         Optional<Actor> actorOpt = allActorService.findById(actorId);
         if (actorOpt.isEmpty()) {
             throw new IllegalStateException(String.format("Actor with id [%s] doesn't exist.", actorId));

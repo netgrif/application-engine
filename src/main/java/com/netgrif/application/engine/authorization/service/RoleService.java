@@ -106,6 +106,11 @@ public class RoleService implements IRoleService {
         return (List<Role>) repository.findAllById(roleIds);
     }
 
+    @Override
+    public Set<String> findAllRoleIdsByActorAndGroups(String actorId) {
+        return roleAssignmentService.findAllRoleIdsByActorAndGroups(actorId);
+    }
+
     /**
      * todo javadoc
      * */
@@ -350,6 +355,7 @@ public class RoleService implements IRoleService {
         runAllSuitableActionsOnRoles(roles, RoleEventType.ASSIGN, EventPhaseType.PRE, params);
         List<RoleAssignment> newRoleAssignments = roleAssignmentService.createAssignments(actorId, roles);
         if (roles.size() > newRoleAssignments.size()) {
+            // todo: release/8.0.0 keep this exception?
             throw new NotAllRolesAssignedException(roles.size() - newRoleAssignments.size());
         }
         eventPublisher.publishEvent(new ActorAssignRoleEvent(actorOpt.get(), roles));

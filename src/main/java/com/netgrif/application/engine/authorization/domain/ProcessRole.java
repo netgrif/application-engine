@@ -23,7 +23,6 @@ public class ProcessRole extends Role {
 
     private I18nString title;
     private I18nString description;
-    private UniqueKeyMap<String, String> properties;
 
     public ProcessRole(ObjectId id, String importId) {
         super(id);
@@ -63,38 +62,6 @@ public class ProcessRole extends Role {
             return null;
         }
         return title.getTranslation(locale);
-    }
-
-    public List<Action> getPreAssignActions() {
-        return getPreActions(EventType.ASSIGN);
-    }
-
-    public List<Action> getPostAssignActions() {
-        return getPostActions(EventType.ASSIGN);
-    }
-
-    public List<Action> getPreCancelActions() {
-        return getPreActions(EventType.CANCEL);
-    }
-
-    public List<Action> getPostCancelActions() {
-        return getPostActions(EventType.CANCEL);
-    }
-
-    private List<Action> getPreActions(EventType type) {
-        if (events != null && events.containsKey(type))
-            return events.get(type).getPreActions();
-        return new LinkedList<>();
-    }
-
-    private List<Action> getPostActions(EventType type) {
-        if (events != null && events.containsKey(type))
-            return events.get(type).getPostActions();
-        return new LinkedList<>();
-    }
-
-    public void addEvent(RoleEvent event) {
-        this.events.put(event.getType(), event);
     }
 
     @Override

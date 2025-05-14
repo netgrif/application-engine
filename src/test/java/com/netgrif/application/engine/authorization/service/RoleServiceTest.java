@@ -3,13 +3,11 @@ package com.netgrif.application.engine.authorization.service;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
-import com.netgrif.application.engine.authorization.domain.ApplicationRole;
-import com.netgrif.application.engine.authorization.domain.CaseRole;
-import com.netgrif.application.engine.authorization.domain.ProcessRole;
-import com.netgrif.application.engine.authorization.domain.Role;
+import com.netgrif.application.engine.authorization.domain.*;
 import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
 import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import com.netgrif.application.engine.authorization.domain.permissions.TaskPermission;
+import com.netgrif.application.engine.authorization.domain.repositories.RoleAssignmentRepository;
 import com.netgrif.application.engine.authorization.domain.repositories.RoleRepository;
 import com.netgrif.application.engine.history.domain.baseevent.EventLog;
 import com.netgrif.application.engine.history.domain.baseevent.repository.EventLogRepository;
@@ -49,6 +47,9 @@ public class RoleServiceTest {
 
     @Autowired
     private RoleRepository repository;
+
+    @Autowired
+    private RoleAssignmentRepository assignmentRepository;
 
     @Autowired
     private EventLogRepository eventLogRepository;
@@ -91,6 +92,29 @@ public class RoleServiceTest {
         assert foundRoleIds.contains(caseRole.getStringId());
 
         assert roleService.findAllById(Set.of()).isEmpty();
+    }
+
+    @Test
+    public void testFindAllRoleIdsByActorAndGroups() {
+        Set<String> emptySet = roleService.findAllRoleIdsByActorAndGroups(null);
+        assert emptySet != null && emptySet.isEmpty();
+
+        String actorId = "actor_id";
+        String processRoleId = "role1";
+        String caseRoleId = "role3";
+        RoleAssignment processRoleAssignment = new ProcessRoleAssignment();
+        processRoleAssignment.setActorId(actorId);
+        processRoleAssignment.setRoleId(processRoleId);
+        CaseRoleAssignment caseRoleAssignment = new CaseRoleAssignment();
+        caseRoleAssignment.setActorId(actorId);
+        caseRoleAssignment.setRoleId(caseRoleId);
+        assignmentRepository.saveAll(List.of(processRoleAssignment, caseRoleAssignment));
+
+        Set<String> roleIds = roleService.findAllRoleIdsByActorAndGroups(actorId);
+        assert roleIds != null;
+        assert roleIds.size() == 2;
+        assert roleIds.contains(processRoleId);
+        assert roleIds.contains(caseRoleId);
     }
 
     @Test

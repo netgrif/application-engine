@@ -11,10 +11,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Set;
@@ -40,15 +43,19 @@ public class RBACController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public MessageResource assignRolesToActor(@PathVariable("actorId") String actorId, @RequestBody Set<String> roleIds) {
+    public CollectionModel<Role> assignRolesToActor(@PathVariable("actorId") String actorId, @RequestBody Set<String> roleIds) {
         try {
             List<Role> assignedRoles = roleService.assignRolesToActor(actorId, roleIds);
             Set<String> assignedRoleIds = assignedRoles.stream().map(Role::getStringId).collect(Collectors.toSet());
             log.info("Roles [{}] assigned to actor [{}]", assignedRoleIds, actorId);
-            return MessageResource.successMessage(String.format("Selected roles assigned to actor [%s]", actorId));
+            return CollectionModel.of(assignedRoles);
+        } catch (IllegalArgumentException e) {
+            log.error(e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Roles weren't assigned: %s", e.getMessage()));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return MessageResource.errorMessage(String.format("Assigning roles to actor [%s] has failed!", actorId));
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    String.format("Something went wrong while assigning roles to actor [%s]", actorId));
         }
     }
 
@@ -59,15 +66,34 @@ public class RBACController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public MessageResource removeRolesFromActor(@PathVariable("actorId") String actorId, @RequestBody Set<String> roleIds) {
+    public CollectionModel<Role> removeRolesFromActor(@PathVariable("actorId") String actorId, @RequestBody Set<String> roleIds) {
         try {
             List<Role> removedRoles = roleService.removeRolesFromActor(actorId, roleIds);
             Set<String> removedRoleIds = removedRoles.stream().map(Role::getStringId).collect(Collectors.toSet());
             log.info("Roles [{}] removed from actor [{}]", removedRoleIds, actorId);
-            return MessageResource.successMessage(String.format("Selected roles removed from actor [%s]", actorId));
+            return CollectionModel.of(removedRoles);
+        } catch (IllegalArgumentException e) {
+            log.error(e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Roles weren't removed: %s", e.getMessage()));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return MessageResource.errorMessage(String.format("Removing roles from actor [%s] has failed!", actorId));
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    String.format("Something went wrong while removing roles from actor [%s]", actorId));
+        }
+    }
+
+    @Operation(summary = "Finds role ids assigned to provided actor", security = {@SecurityRequirement(name = "BasicAuth")})
+    @GetMapping(value = "/{actorId}/roles", produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
+    })
+    public Set<String> findRoleIdsByActorAndGroups(@PathVariable("actorId") String actorId) {
+        try {
+            return roleService.findAllRoleIdsByActorAndGroups(actorId);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something unexpected happened");
         }
     }
 }
