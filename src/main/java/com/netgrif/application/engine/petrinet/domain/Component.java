@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain;
 
-import com.netgrif.application.engine.utils.UniqueKeyMap;
+import com.netgrif.application.engine.utils.UniqueKeyMapWrapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -13,10 +13,10 @@ public class Component implements Serializable {
     private static final long serialVersionUID = 5852012111111766631L;
 
     private String id;
-    private UniqueKeyMap<String, String> properties;
+    private UniqueKeyMapWrapper<String> properties;
 
     public Component() {
-        this.properties = new UniqueKeyMap<>();
+        this.properties = new UniqueKeyMapWrapper<>();
     }
 
     public Component(String id) {
@@ -26,6 +26,6 @@ public class Component implements Serializable {
 
     @Override
     public Component clone() {
-        return new Component(this.id, new UniqueKeyMap<>(this.properties));
+        return new Component(this.id, new UniqueKeyMapWrapper<>(this.properties));
     }
 }

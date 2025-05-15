@@ -13,7 +13,7 @@ import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
 import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
-import com.netgrif.application.engine.utils.UniqueKeyMap;
+import com.netgrif.application.engine.utils.UniqueKeyMapWrapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
@@ -43,11 +43,11 @@ public class Process extends ProcessObject {
     private Map<ProcessEventType, ProcessEvent> processEvents;
     private Map<CaseEventType, CaseEvent> caseEvents;
     private List<Function> functions;
-    private UniqueKeyMap<String, Field<?>> dataSet;
-    private UniqueKeyMap<String, Transition> transitions;
-    private UniqueKeyMap<String, Place> places;
-    private UniqueKeyMap<String, ArcCollection> arcs;//todo: import id
-    private UniqueKeyMap<String, String> properties;
+    private UniqueKeyMapWrapper<Field<?>> dataSet;
+    private UniqueKeyMapWrapper<Transition> transitions;
+    private UniqueKeyMapWrapper<Place> places;
+    private UniqueKeyMapWrapper<ArcCollection> arcs;//todo: import id
+    private UniqueKeyMapWrapper<String> properties;
 
     // TODO: 18. 3. 2017 replace with Spring auditing
     private LocalDateTime creationDate;
@@ -64,16 +64,16 @@ public class Process extends ProcessObject {
         defaultCaseName = new I18nExpression("");
         parentIdentifiers = new ArrayList<>();
         creationDate = LocalDateTime.now();
-        places = new UniqueKeyMap<>();
-        transitions = new UniqueKeyMap<>();
-        arcs = new UniqueKeyMap<>();
-        dataSet = new UniqueKeyMap<>();
+        places = new UniqueKeyMapWrapper<>();
+        transitions = new UniqueKeyMapWrapper<>();
+        arcs = new UniqueKeyMapWrapper<>();
+        dataSet = new UniqueKeyMapWrapper<>();
         processEvents = new HashMap<>();
         caseEvents = new HashMap<>();
         processRolePermissions = new AccessPermissions<>();
         caseRolePermissions = new AccessPermissions<>();
         functions = new LinkedList<>();
-        properties = new UniqueKeyMap<>();
+        properties = new UniqueKeyMapWrapper<>();
     }
 
     public void addParentIdentifier(PetriNetIdentifier identifier) {
@@ -291,28 +291,19 @@ public class Process extends ProcessObject {
         clone.setIcon(this.icon);
         clone.setCreationDate(this.creationDate);
         clone.setVersion(this.version == null ? null : this.version.clone());
-        clone.setTransitions(this.transitions == null ? null : this.transitions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, UniqueKeyMap::new)));
+        clone.setTransitions(this.transitions == null ? null : new UniqueKeyMapWrapper<>(this.transitions));
         clone.setImportXmlPath(this.importXmlPath);
         clone.setImportId(this.importId);
-        clone.setDataSet(this.dataSet.entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x, y) -> y, UniqueKeyMap::new))
-        );
-        clone.setPlaces(this.places.entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x, y) -> y, UniqueKeyMap::new))
-        );
-        clone.setArcs(this.arcs.entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x, y) -> y, UniqueKeyMap::new))
-        );
+        clone.setDataSet(new UniqueKeyMapWrapper<>(this.dataSet));
+        clone.setPlaces(new UniqueKeyMapWrapper<>(this.places));
+        clone.setArcs(new UniqueKeyMapWrapper<>(this.arcs));
         clone.initializeArcs();
         clone.setCaseEvents(this.caseEvents == null ? null : this.caseEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
         clone.setProcessEvents(this.processEvents == null ? null : this.processEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
         clone.setProcessRolePermissions(new AccessPermissions<>(this.processRolePermissions));
         clone.setCaseRolePermissions(new AccessPermissions<>(this.caseRolePermissions));
         this.getFunctions().forEach(clone::addFunction);
-        clone.setProperties(new UniqueKeyMap<>(this.properties));
+        clone.setProperties(new UniqueKeyMapWrapper<>(this.properties));
         return clone;
     }
 }

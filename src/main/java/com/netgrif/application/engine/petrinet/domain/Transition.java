@@ -11,7 +11,7 @@ import com.netgrif.application.engine.petrinet.domain.layout.LayoutContainer;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.application.engine.authorization.domain.permissions.TaskPermission;
-import com.netgrif.application.engine.utils.UniqueKeyMap;
+import com.netgrif.application.engine.utils.UniqueKeyMapWrapper;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
@@ -187,7 +187,7 @@ public class Transition extends Node {
         clone.setIcon(icon);
         clone.setFinishPolicy(finishPolicy);
         clone.setEvents(this.events == null ? null : events.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
-        clone.setProperties(new UniqueKeyMap<>(this.getProperties()));
+        clone.setProperties(new UniqueKeyMapWrapper<>(this.getProperties()));
         clone.setLayoutContainer(this.layoutContainer == null ? null : this.layoutContainer.clone());
         clone.setProcessRolePermissions(new AccessPermissions<>(this.processRolePermissions));
         clone.setCaseRolePermissions(new AccessPermissions<>(this.caseRolePermissions));

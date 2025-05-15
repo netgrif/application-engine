@@ -1,15 +1,13 @@
 package com.netgrif.application.engine.petrinet.domain.arcs;
 
 import com.netgrif.application.engine.petrinet.domain.*;
-import com.netgrif.application.engine.utils.UniqueKeyMap;
+import com.netgrif.application.engine.utils.UniqueKeyMapWrapper;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Data
 public abstract class Arc<S extends Node, D extends Node> extends ProcessObject {
@@ -22,12 +20,12 @@ public abstract class Arc<S extends Node, D extends Node> extends ProcessObject 
     protected String destinationId;
     protected Multiplicity multiplicityExpression;
     protected List<Position> breakpoints;
-    protected UniqueKeyMap<String, String> properties;
+    protected UniqueKeyMapWrapper<String> properties;
 
     public Arc() {
         this.setObjectId(new ObjectId());
         this.breakpoints = new ArrayList<>();
-        this.properties = new UniqueKeyMap<>();
+        this.properties = new UniqueKeyMapWrapper<>();
     }
 
     public Arc(S source, D destination, int multiplicity) {

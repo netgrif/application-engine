@@ -32,7 +32,7 @@ import com.netgrif.application.engine.petrinet.domain.layout.LayoutObjectType;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.utils.UniqueKeyMap;
+import com.netgrif.application.engine.utils.UniqueKeyMapWrapper;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -675,7 +675,7 @@ public class Importer {
         return com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy.valueOf(policy.value().toUpperCase());
     }
 
-    protected void createProperties(com.netgrif.application.engine.importer.model.Properties propertiesXml, UniqueKeyMap<String, String> properties) {
+    protected void createProperties(com.netgrif.application.engine.importer.model.Properties propertiesXml, UniqueKeyMapWrapper<String> properties) {
         if (propertiesXml == null) {
             return;
         }

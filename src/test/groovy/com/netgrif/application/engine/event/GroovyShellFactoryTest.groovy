@@ -5,7 +5,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.authorization.domain.ProcessRole
-import com.netgrif.application.engine.utils.UniqueKeyMap
+import com.netgrif.application.engine.utils.UniqueKeyMapWrapper
 import com.netgrif.application.engine.workflow.domain.QTask
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,7 +22,7 @@ class GroovyShellFactoryTest extends EngineTest {
     public static final String FILE_NAME = "groovy_shell_test.xml"
 
     private Process net
-    private UniqueKeyMap<String, ProcessRole> roles
+    private UniqueKeyMapWrapper<ProcessRole> roles
 
     @BeforeEach
     @Override

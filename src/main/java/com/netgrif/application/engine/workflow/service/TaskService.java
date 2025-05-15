@@ -733,7 +733,7 @@ public class TaskService implements ITaskService {
                 .processId(useCase.getPetriNetId())
                 .caseId(useCase.getId().toString())
                 .transitionId(transition.getImportId())
-                .properties(transition.getProperties())
+                .properties(transition.getProperties().getMap())
                 .icon(transition.getIcon() == null ? useCase.getIcon() : transition.getIcon())
                 .immediateDataFields(transition.getImmediateData())
                 .assignPolicy(transition.getAssignPolicy())

@@ -1,8 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain;
 
-import com.netgrif.application.engine.utils.UniqueKeyMap;
+import com.netgrif.application.engine.utils.UniqueKeyMapWrapper;
 import lombok.*;
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @EqualsAndHashCode(callSuper = true)
@@ -12,10 +11,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public abstract class Node extends ProcessObject {
 
     private I18nString title;
-    private UniqueKeyMap<String, String> properties;
+    private UniqueKeyMapWrapper<String> properties;
 
     public Node() {
         super();
-        this.properties = new UniqueKeyMap<>();
+        this.properties = new UniqueKeyMapWrapper<>();
     }
 }

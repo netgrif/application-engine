@@ -6,7 +6,7 @@ import com.netgrif.application.engine.importer.model.RoleEventType;
 import com.netgrif.application.engine.petrinet.domain.Imported;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.RoleEvent;
-import com.netgrif.application.engine.utils.UniqueKeyMap;
+import com.netgrif.application.engine.utils.UniqueKeyMapWrapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
@@ -26,7 +26,7 @@ public abstract class Role extends Imported {
     protected ObjectId id;
     @JsonIgnore
     protected Map<RoleEventType, RoleEvent> events;
-    protected UniqueKeyMap<String, String> properties;
+    protected UniqueKeyMapWrapper<String> properties;
 
     /**
      * todo javadoc

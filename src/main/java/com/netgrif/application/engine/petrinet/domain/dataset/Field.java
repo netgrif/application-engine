@@ -12,7 +12,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavio
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.utils.FieldUtils;
-import com.netgrif.application.engine.utils.UniqueKeyMap;
+import com.netgrif.application.engine.utils.UniqueKeyMapWrapper;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehaviors;
 import com.netgrif.application.engine.workflow.domain.DataFieldValue;
@@ -84,7 +84,7 @@ public abstract class Field<T> extends Imported {
     @JsonIgnore
     private Long version = 0L;
     // TODO: release/8.0.0 6.2.5: parentTaskId, parentCaseId
-    private UniqueKeyMap<String, String> properties;
+    private UniqueKeyMapWrapper<String> properties;
 
     public Field() {
         // TODO: release/8.0.0 no collection can be initialised
