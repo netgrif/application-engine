@@ -106,13 +106,17 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = userService.transformToLoggedUser(userService.getSystem()), String uriNodeId = uriService.getDefault().stringId, String workspaceId = userService.getLoggedOrSystem().getWorkspaceId()) {
-        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author, uriNodeId, workspaceId)
+    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = userService.transformToLoggedUser(userService.getSystem()), String uriNodeId = uriService.getDefault().stringId) {
+        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author, uriNodeId)
     }
 
-    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.transformToLoggedUser(userService.getSystem()), String uriNodeId = uriService.getDefault().stringId, String workspaceId = userService.getLoggedOrSystem().getWorkspaceId()) {
+    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.transformToLoggedUser(userService.getSystem()), String uriNodeId = uriService.getDefault().stringId) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        PetriNet petriNet = petriNetService.importPetriNet(netStream, release, author, uriNodeId, workspaceId).getNet()
+        return createNet(netStream, release, author, uriNodeId)
+    }
+
+    Optional<PetriNet> createNet(InputStream netStream, VersionType release = VersionType.MAJOR, LoggedUser author = userService.transformToLoggedUser(userService.getSystem()), String uriNodeId = uriService.getDefault().stringId) {
+        PetriNet petriNet = petriNetService.importPetriNet(netStream, release, author, uriNodeId, author.getWorkspaceId()).getNet()
         log.info("Imported '${petriNet?.title?.defaultValue}' ['${petriNet?.identifier}', ${petriNet?.stringId}]")
         return Optional.of(petriNet)
     }

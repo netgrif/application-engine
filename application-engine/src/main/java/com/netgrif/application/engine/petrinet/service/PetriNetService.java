@@ -2,6 +2,8 @@ package com.netgrif.application.engine.petrinet.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.netgrif.application.engine.AsyncRunnerWrapper;
+import com.netgrif.application.engine.petrinet.config.DefaultProcessResource;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.ArcImportReference;
 import com.netgrif.application.engine.objects.auth.domain.Group;
@@ -131,6 +133,12 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     protected IUriService uriService;
 
+    @Autowired
+    protected DefaultProcessResource defaultProcessResource;
+
+    @Autowired
+    protected AsyncRunnerWrapper asyncRunner;
+
     protected ApplicationEventPublisher publisher;
 
     protected IElasticPetriNetService elasticPetriNetService;
@@ -250,6 +258,42 @@ public class PetriNetService implements IPetriNetService {
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
         outcome.setNet(imported.get());
         return outcome;
+    }
+
+    @Override
+    public List<PetriNet> importDefaultProcesses(String workspaceId) {
+        List<PetriNet> nets = new ArrayList<>();
+        for (org.springframework.core.io.Resource resource : defaultProcessResource.getDefaultProcesses()) {
+            try {
+                InputStream netStream = resource.getInputStream();
+                String identifier = resource.getFilename().split("\\.")[0];
+                List<PetriNet> existingNets = repository.findByIdentifierAndWorkspaceId(identifier, workspaceId, PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
+                if (!existingNets.isEmpty()) {
+                    log.info("{} has already been imported.", identifier);
+                    nets.add(existingNets.getFirst());
+                } else {
+                    VersionType release = VersionType.MAJOR;
+                    LoggedUser author = userService.getLoggedOrSystem().transformToLoggedUser();
+                    String uriNodeId = uriService.getDefault().getStringId();
+                    nets.add(importPetriNet(netStream, release, author, uriNodeId, workspaceId).getNet());
+                }
+            } catch (IOException e) {
+                log.info("Default Petri net import failed, file {} doesn't exists", resource.getFilename());
+            } catch (MissingPetriNetMetaDataException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return nets;
+    }
+
+    @Override
+    public void deleteDefaultProcesses(String workspaceId) {
+        for (org.springframework.core.io.Resource resource : defaultProcessResource.getDefaultProcesses()) {
+            List<PetriNet> nets = repository.findAllByIdentifierAndWorkspaceId(resource.getFilename().split(".")[0], workspaceId);
+            nets.forEach(petriNet -> {
+                asyncRunner.execute(() -> deletePetriNet(petriNet.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser()), workspaceId);
+            });
+        }
     }
 
     private ImportPetriNetEventOutcome addMessageToOutcome(PetriNet net, ProcessEventType type, ImportPetriNetEventOutcome outcome) {

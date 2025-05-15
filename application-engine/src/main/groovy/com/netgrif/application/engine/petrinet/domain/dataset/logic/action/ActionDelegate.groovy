@@ -64,6 +64,7 @@ import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
+import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Predicate
 import groovy.transform.NamedVariant
 import org.bson.types.ObjectId
@@ -617,7 +618,7 @@ class ActionDelegate {
     List<String> searchCases(Closure<Predicate> predicates) {
         QCase qCase = new QCase("case")
         def expression = predicates(qCase)
-        Page<Case> page = workflowService.searchAll(expression)
+        Page<Case> page = workflowService.searchAll(new BooleanBuilder(expression).and(qCase.workspaceId.eq(userService.loggedOrSystem.getWorkspaceId())))
 
         return page.content.collect { it.stringId }
     }
@@ -896,19 +897,19 @@ class ActionDelegate {
 
     List<Case> findCases(Closure<Predicate> predicate) {
         QCase qCase = new QCase("case")
-        Page<Case> result = workflowService.searchAll(predicate(qCase))
+        Page<Case> result = workflowService.searchAll(new BooleanBuilder(predicate(qCase)).and(qCase.workspaceId.eq(userService.loggedOrSystem.getWorkspaceId())))
         return result.content
     }
 
     List<Case> findCases(Closure<Predicate> predicate, Pageable pageable) {
         QCase qCase = new QCase("case")
-        Page<Case> result = workflowService.search(predicate(qCase), pageable)
+        Page<Case> result = workflowService.search(new BooleanBuilder(predicate(qCase)).and(qCase.workspaceId.eq(userService.loggedOrSystem.getWorkspaceId())), pageable)
         return result.content
     }
 
     Case findCase(Closure<Predicate> predicate) {
         QCase qCase = new QCase("case")
-        return workflowService.searchOne(predicate(qCase))
+        return workflowService.searchOne(new BooleanBuilder(predicate(qCase)).and(qCase.workspaceId.eq(userService.loggedOrSystem.getWorkspaceId())))
     }
 
     Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
@@ -969,19 +970,19 @@ class ActionDelegate {
 
     List<Task> findTasks(Closure<Predicate> predicate) {
         QTask qTask = new QTask("task")
-        Page<Task> result = taskService.searchAll(predicate(qTask))
+        Page<Task> result = taskService.searchAll(new BooleanBuilder(predicate(qTask)).and(qTask.workspaceId.eq(userService.loggedOrSystem.getWorkspaceId())))
         return result.content
     }
 
     List<Task> findTasks(Closure<Predicate> predicate, Pageable pageable) {
         QTask qTask = new QTask("task")
-        Page<Task> result = taskService.search(predicate(qTask), pageable)
+        Page<Task> result = taskService.search(new BooleanBuilder(predicate(qTask)).and(qTask.workspaceId.eq(userService.loggedOrSystem.getWorkspaceId())), pageable)
         return result.content
     }
 
     Task findTask(Closure<Predicate> predicate) {
         QTask qTask = new QTask("task")
-        return taskService.searchOne(predicate(qTask))
+        return taskService.searchOne(new BooleanBuilder(predicate(qTask)).and(qTask.workspaceId.eq(userService.loggedOrSystem.getWorkspaceId())))
     }
 
     Task findTask(String mongoId) {
@@ -1551,7 +1552,7 @@ class ActionDelegate {
         if (!createDefaultFilters) {
             return []
         }
-        return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.id.eq(userService.system.stringId)) })
+        return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.id.eq(userService.system.stringId)).and(it.workspaceId.eq(userService.system.workspaceId)) })
     }
 
     /**

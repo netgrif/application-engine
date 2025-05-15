@@ -24,10 +24,11 @@ import org.springframework.stereotype.Component;
 public class DefaultRoleRunner implements ApplicationEngineStartupRunner {
 
     private final ProcessRoleService processRoleService;
+    private final DefaultWorkspaceService defaultWorkspaceService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        processRoleService.createDefaultOrAnonymousRole(PredefinedProcessRole.DEFAULT_ROLE, DefaultWorkspaceService.DEFAULT_WORKSPACE_ID);
+        processRoleService.createDefaultOrAnonymousRole(PredefinedProcessRole.DEFAULT_ROLE, defaultWorkspaceService.getDefaultWorkspace().getId());
     }
 
 }

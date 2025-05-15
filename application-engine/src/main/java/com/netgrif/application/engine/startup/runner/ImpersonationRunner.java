@@ -30,7 +30,7 @@ public class ImpersonationRunner implements ApplicationEngineStartupRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        createConfigNets();
+//        createConfigNets();
     }
 
     public void createConfigNets() {

@@ -58,6 +58,8 @@ public class UserServiceImpl implements UserService {
 
     private IUser systemUser;
 
+    private DefaultWorkspaceService defaultWorkspaceService;
+
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -103,6 +105,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public void setGroupService(GroupService groupService) {
         this.groupService = groupService;
+    }
+
+    @Autowired
+    public void setDefaultWorkspaceService(DefaultWorkspaceService defaultWorkspaceService) {
+        this.defaultWorkspaceService = defaultWorkspaceService;
     }
 
     @Override
@@ -430,7 +437,7 @@ public class UserServiceImpl implements UserService {
         if (systemUser == null) {
             systemUser = createSystemUser();
         }
-        String workspaceId = WorkspaceContextHolder.getWorkspaceId() != null ? WorkspaceContextHolder.getWorkspaceId() : DefaultWorkspaceService.DEFAULT_WORKSPACE_ID;
+        String workspaceId = WorkspaceContextHolder.getWorkspaceId() != null ? WorkspaceContextHolder.getWorkspaceId() : defaultWorkspaceService.getDefaultWorkspace().getId();
         systemUser.setWorkspaceId(workspaceId);
         systemUser.setProcessRoles(new HashSet<>(processRoleService.findAllByWorkspaceId(workspaceId)));
         return systemUser;

@@ -32,8 +32,8 @@ public class DashboardRunner implements ApplicationEngineStartupRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        createDashboardNet();
-        createDashboardTileNet();
+//        createDashboardNet();
+//        createDashboardTileNet();
     }
 
     public Optional<PetriNet> createDashboardNet() {

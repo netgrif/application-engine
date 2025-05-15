@@ -25,11 +25,12 @@ import java.util.Set;
 public class AnonymousRoleRunner implements ApplicationEngineStartupRunner {
 
     private final ProcessRoleService processRoleService;
+    private final DefaultWorkspaceService defaultWorkspaceService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("Creating anonymous process role");
-        processRoleService.createDefaultOrAnonymousRole(PredefinedProcessRole.ANONYMOUS_ROLE, DefaultWorkspaceService.DEFAULT_WORKSPACE_ID);
+        processRoleService.createDefaultOrAnonymousRole(PredefinedProcessRole.ANONYMOUS_ROLE, defaultWorkspaceService.getDefaultWorkspace().getId());
     }
 
 }

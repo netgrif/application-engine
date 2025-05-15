@@ -35,10 +35,10 @@ public class FilterRunner implements ApplicationEngineStartupRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        createFilterNet();
-        createPreferenceItemNet();
-        createImportFiltersNet();
-        createExportFiltersNet();
+//        createFilterNet();
+//        createPreferenceItemNet();
+//        createImportFiltersNet();
+//        createExportFiltersNet();
     }
 
     public Optional<PetriNet> createFilterNet() {

@@ -55,6 +55,10 @@ public interface IPetriNetService {
 
     ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user, String uriNodeId, String workspaceId, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
+    List<PetriNet> importDefaultProcesses(String workspaceId);
+
+    void deleteDefaultProcesses(String workspaceId);
+
     Optional<PetriNet> save(PetriNet petriNet);
 
     PetriNet getPetriNet(String id);

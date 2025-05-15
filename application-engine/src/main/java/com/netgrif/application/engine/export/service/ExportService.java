@@ -12,11 +12,14 @@ import com.netgrif.application.engine.export.service.interfaces.IExportService;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
+import com.netgrif.application.engine.objects.workflow.domain.QCase;
+import com.netgrif.application.engine.objects.workflow.domain.QTask;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -91,10 +94,11 @@ public class ExportService implements IExportService {
 
     @Override
     public OutputStream fillCsvCaseData(Predicate predicate, File outFile, ExportDataConfig config, int pageSize) throws FileNotFoundException {
-        int numOfPages = (int) (((caseRepository.count(predicate)) / pageSize) + 1);
+        Predicate newPredicate = new BooleanBuilder(predicate).and(QCase.case$.workspaceId.eq(userService.getLoggedOrSystem().getWorkspaceId()));
+        int numOfPages = (int) (((caseRepository.count(newPredicate)) / pageSize) + 1);
         List<Case> exportCases = new ArrayList<>();
         for (int i = 0; i < numOfPages; i++) {
-            exportCases.addAll(workflowService.search(predicate, PageRequest.of(i, pageSize)).getContent());
+            exportCases.addAll(workflowService.search(newPredicate, PageRequest.of(i, pageSize)).getContent());
         }
         return buildCaseCsv(exportCases, config, outFile);
     }
@@ -208,10 +212,11 @@ public class ExportService implements IExportService {
 
     @Override
     public OutputStream fillCsvTaskData(Predicate predicate, File outFile, ExportDataConfig config, int pageSize) throws FileNotFoundException {
-        int numberOfTasks = (int) taskRepository.count(predicate);
+        Predicate newPredicate = new BooleanBuilder(predicate).and(QTask.task.workspaceId.eq(userService.getLoggedOrSystem().getWorkspaceId()));
+        int numberOfTasks = (int) taskRepository.count(newPredicate);
         List<Task> exportTasks = new ArrayList<>();
         for (int i = 0; i < numberOfTasks; i++) {
-            exportTasks.addAll(taskService.search(predicate, PageRequest.of(i, pageSize)).getContent());
+            exportTasks.addAll(taskService.search(newPredicate, PageRequest.of(i, pageSize)).getContent());
         }
         return buildTaskCsv(exportTasks, config, outFile);
     }
