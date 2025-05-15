@@ -6,17 +6,15 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserResourceHelpe
 import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
 
+@Slf4j
 @Service
 public class UserResourceHelperService implements IUserResourceHelperService {
-
-    public static final Logger log = LoggerFactory.getLogger(UserResourceHelperService.class);
 
     @Autowired
     private UserService userService;

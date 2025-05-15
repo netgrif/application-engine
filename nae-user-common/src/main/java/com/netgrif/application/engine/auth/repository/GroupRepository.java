@@ -12,7 +12,7 @@ import java.util.Set;
 
 @Repository
 public interface GroupRepository extends MongoRepository<Group, String>, QuerydslPredicateExecutor<Group> {
-    Optional<Group> findByOwnerId(String id);
+    Set<Group> findByOwnerId(String id);
 
     Optional<Group> findByIdentifier(String identifier);
 

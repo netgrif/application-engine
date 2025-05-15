@@ -1,9 +1,5 @@
 package com.netgrif.application.engine.auth.config;
 
-import com.netgrif.application.engine.auth.service.AuthorityServiceImpl;
-import com.netgrif.application.engine.auth.service.GroupServiceImpl;
-import com.netgrif.application.engine.auth.service.RealmServiceImpl;
-import com.netgrif.application.engine.auth.service.UserServiceImpl;
 import com.netgrif.application.engine.auth.service.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;

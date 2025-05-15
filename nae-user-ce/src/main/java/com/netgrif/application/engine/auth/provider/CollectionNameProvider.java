@@ -6,7 +6,10 @@ import com.netgrif.application.engine.objects.auth.domain.Realm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.MissingResourceException;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -15,6 +18,7 @@ public class CollectionNameProvider {
     private RealmService realmService;
 
     private static final String USER_MONGO_COLLECTION_PREFIX = "users_";
+    private static final String NULL = "null";
 
     @Autowired
     public void setRealmService(RealmService realmService) {
@@ -22,7 +26,7 @@ public class CollectionNameProvider {
     }
 
     public String getCollectionNameForRealm(String realmId) {
-        if (realmId == null || realmId.isEmpty()) {
+        if (realmId == null || realmId.isEmpty() || realmId.equals(NULL)) {
             return getDefaultRealmCollection();
         }
         return USER_MONGO_COLLECTION_PREFIX + realmId;

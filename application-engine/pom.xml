@@ -54,7 +54,39 @@
         <drools-version>9.44.0.Final</drools-version>
         <kie-spring.version>7.74.1.Final</kie-spring.version>
         <jwt.version>0.11.5</jwt.version>
+        <bouncycastle.version>1.78.1</bouncycastle.version>
+        <minio.version>8.5.12</minio.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>oss.snapshots</id>
+            <name>OSSRH SNAPSHOT</name>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>mvnrepository1</id>
+            <url>https://maven.imagej.net/content/repositories/public/</url>
+        </repository>
+        <repository>
+            <id>mvnrepository2</id>
+            <url>https://repo.spring.io/plugins-release/</url>
+        </repository>
+        <repository>
+            <id>mulesoft</id>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 
     <dependencyManagement>
         <dependencies>
@@ -100,7 +132,7 @@
         <!-- NAE Modules -->
         <dependency>
             <groupId>com.netgrif</groupId>
-            <artifactId>nae-user-common</artifactId>
+            <artifactId>nae-user-ce</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -177,13 +209,13 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcmail-jdk18on</artifactId>
-            <version>1.78.1</version>
+            <version>${bouncycastle.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
-            <version>1.78.1</version>
+            <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -224,13 +256,13 @@
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>4.0.2</version>
+            <version>${jakarta.bind.version}</version>
         </dependency>
         <!-- JAXB Implementation -->
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>4.0.2</version>
+            <version>${jakarta.bind.version}</version>
             <scope>runtime</scope>
         </dependency>
         <!-- Test -->
@@ -242,19 +274,19 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.10.0</version>
+            <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.10.0</version>
+            <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.10.0</version>
+            <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- Groovy -->
@@ -262,7 +294,7 @@
         <dependency>
             <groupId>org.apache.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>4.0.21</version>
+            <version>${groovy.version}</version>
             <type>pom</type>
         </dependency>
 
@@ -481,7 +513,6 @@
             <version>32.0.0-jre</version>
         </dependency>
 
-
         <!-- For Configuration Properties -->
         <dependency>
             <groupId>org.hibernate.validator</groupId>
@@ -527,7 +558,7 @@
         <dependency>
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
-            <version>8.5.12</version>
+            <version>${minio.version}</version>
         </dependency>
     </dependencies>
 
@@ -703,18 +734,6 @@
                     <threadCount>1</threadCount>
                     <perCoreThreadCount>false</perCoreThreadCount>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.junit.platform</groupId>
-                        <artifactId>junit-platform-surefire-provider</artifactId>
-                        <version>1.3.2</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.junit.jupiter</groupId>
-                        <artifactId>junit-jupiter-engine</artifactId>
-                        <version>5.10.0</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -791,17 +810,6 @@
                     <plugin>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>repackage</id>
-                                <goals>
-                                    <goal>repackage</goal>
-                                </goals>
-                                <configuration>
-                                    <classifier>exec</classifier>
-                                </configuration>
-                            </execution>
-                        </executions>
                         <configuration>
                             <finalName>app</finalName>
                             <layout>ZIP</layout>
@@ -814,6 +822,17 @@
                                 </exclude>
                             </excludes>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <id>repackage</id>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>exec</classifier>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

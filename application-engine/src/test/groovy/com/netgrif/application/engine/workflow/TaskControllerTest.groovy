@@ -210,7 +210,7 @@ class TaskControllerTest {
                 this.role = role
             }
         }
-        processRoleService.assignRolesToUser(userService.findUserByUsername(DUMMY_USER_MAIL, null).get().getStringId(), [role._id] as Set, userService.transformToLoggedUser(userService.getLoggedOrSystem()))
+        processRoleService.assignRolesToUser(userService.findUserByUsername(DUMMY_USER_MAIL, null).get(), [role._id] as Set, userService.transformToLoggedUser(userService.getLoggedOrSystem()))
     }
 
     Page<Task> findTasksByMongo() {

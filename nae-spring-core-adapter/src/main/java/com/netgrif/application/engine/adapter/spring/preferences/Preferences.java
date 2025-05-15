@@ -9,10 +9,4 @@ public class Preferences extends com.netgrif.application.engine.objects.preferen
     public Preferences(String userId) {
         super(userId);
     }
-
-    @Id
-    @Override
-    public String getUserId() {
-        return super.getUserId();
-    }
 }

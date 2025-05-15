@@ -1,10 +1,8 @@
-package com.netgrif.application.engine.adapter.spring.auth.service;
+package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.AnonymousUserRef;
 
 import java.util.Optional;
-
-//TODO: presun totok!
 
 public interface AnonymousUserRefService {
 

@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.adapter.spring.auth.service;
+package com.netgrif.application.engine.auth.repository;
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.AnonymousUserRef;
 import org.springframework.data.mongodb.repository.MongoRepository;
