@@ -54,8 +54,10 @@ public class RoleAssignmentService implements IRoleAssignmentService {
     }
 
     /**
-     * todo javadoc
-     * */
+     * Finds all role assignments for given set of role IDs
+     * @param roleIds Set of role IDs to find assignments for
+     * @return List of matching role assignments, empty list if no matches found or invalid input
+     */
     @Override
     public List<RoleAssignment> findAllByRoleIdIn(Set<String> roleIds) {
         if (roleIds == null || roleIds.isEmpty()) {
@@ -65,8 +67,10 @@ public class RoleAssignmentService implements IRoleAssignmentService {
     }
 
     /**
-     * todo javadoc
-     * */
+     * Finds all role assignments for given actor ID
+     * @param actorId ID of the actor to find assignments for
+     * @return List of all role assignments for the actor, empty list if no matches found or invalid input
+     */
     @Override
     public List<RoleAssignment> findAllByActorId(String actorId) {
         if (actorId == null) {
@@ -76,8 +80,10 @@ public class RoleAssignmentService implements IRoleAssignmentService {
     }
 
     /**
-     * todo javadoc
-     * */
+     * Finds all role IDs assigned to given actor
+     * @param actorId ID of the actor to find role IDs for
+     * @return Set of role IDs assigned to the actor, empty set if no matches found or invalid input
+     */
     @Override
     public Set<String> findAllRoleIdsByActorId(String actorId) {
         if (actorId == null) {
@@ -102,24 +108,32 @@ public class RoleAssignmentService implements IRoleAssignmentService {
     }
 
     /**
-     * todo javadoc
-     * */
+     * Checks if a role assignment exists for given actor and role
+     * @param actorId ID of the actor to check
+     * @param roleId ID of the role to check
+     * @return true if assignment exists, false otherwise
+     */
     @Override
     public boolean existsByActorAndRole(String actorId, String roleId) {
         return repository.existsByActorIdAndRoleId(actorId, roleId);
     }
 
     /**
-     * todo javadoc
-     * */
+     * Finds all application role assignments for given actor
+     * @param actorId ID of the actor to find application assignments for
+     * @return List of application role assignments for the actor
+     */
     @Override
     public List<ApplicationRoleAssignment> findApplicationAssignmentsByActor(String actorId) {
         return applicationRoleAssignmentRepository.findAllByActor(actorId);
     }
 
     /**
-     * todo javadoc
-     * */
+     * Creates new role assignments for given actor and roles
+     * @param actorId ID of the actor to create assignments for
+     * @param roles List of roles to assign
+     * @return List of created role assignments, empty list if invalid input
+     */
     @Override
     public List<RoleAssignment> createAssignments(String actorId, List<Role> roles) {
         if (actorId == null || roles == null || roles.isEmpty()) {
@@ -130,16 +144,22 @@ public class RoleAssignmentService implements IRoleAssignmentService {
     }
 
     /**
-     * todo javadoc
-     * */
+     * Creates new role assignment for given actor and role
+     * @param actorId ID of the actor to create assignment for
+     * @param role Role to assign
+     * @return Created role assignment or null if creation failed
+     */
     @Override
     public RoleAssignment createAssignment(String actorId, Role role) {
         return createAssignments(actorId, List.of(role)).stream().findFirst().orElse(null);
     }
 
     /**
-     * todo javadoc
-     * */
+     * Removes multiple role assignments for given actor and role IDs
+     * @param actorId ID of the actor to remove assignments from
+     * @param roleIds Set of role IDs to remove
+     * @return List of removed role assignments, empty list if no matches found or invalid input
+     */
     @Override
     public List<RoleAssignment> removeAssignments(String actorId, Set<String> roleIds) {
         if (actorId == null || roleIds == null || roleIds.isEmpty()) {
@@ -149,8 +169,11 @@ public class RoleAssignmentService implements IRoleAssignmentService {
     }
 
     /**
-     * todo javadoc
-     * */
+     * Removes single role assignment for given actor and role ID
+     * @param actorId ID of the actor to remove assignment from
+     * @param roleId ID of the role to remove
+     * @return Removed role assignment or null if not found or invalid input
+     */
     @Override
     public RoleAssignment removeAssignment(String actorId, String roleId) {
         if (actorId == null || roleId == null) {
@@ -160,8 +183,10 @@ public class RoleAssignmentService implements IRoleAssignmentService {
     }
 
     /**
-     * todo javadoc
-     * */
+     * Removes all role assignments for given actor
+     * @param actorId ID of the actor to remove assignments for
+     * @return List of removed role assignments, empty list if no matches found or invalid input
+     */
     @Override
     public List<RoleAssignment> removeAssignmentsByActor(String actorId) {
         if (actorId == null) {
@@ -171,8 +196,10 @@ public class RoleAssignmentService implements IRoleAssignmentService {
     }
 
     /**
-     * todo javadoc
-     * */
+     * Removes all role assignments for given role
+     * @param roleId ID of the role to remove assignments for
+     * @return List of removed role assignments, empty list if no matches found or invalid input
+     */
     @Override
     public List<RoleAssignment> removeAssignmentsByRole(String roleId) {
         if (roleId == null) {
@@ -182,8 +209,10 @@ public class RoleAssignmentService implements IRoleAssignmentService {
     }
 
     /**
-     * todo javadoc
-     * */
+     * Removes all role assignments for given set of roles
+     * @param roleIds Set of role IDs to remove assignments for
+     * @return List of removed role assignments, empty list if no matches found or invalid input
+     */
     @Override
     public List<RoleAssignment> removeAssignmentsByRoles(Set<String> roleIds) {
         if (roleIds == null || roleIds.isEmpty()) {
@@ -193,8 +222,10 @@ public class RoleAssignmentService implements IRoleAssignmentService {
     }
 
     /**
-     * todo javadoc
-     * */
+     * Removes all case role assignments for given case
+     * @param caseId ID of the case to remove assignments for
+     * @return List of removed case role assignments, empty list if no matches found or invalid input
+     */
     @Override
     public List<CaseRoleAssignment> removeAssignmentsByCase(String caseId) {
         if (caseId == null) {

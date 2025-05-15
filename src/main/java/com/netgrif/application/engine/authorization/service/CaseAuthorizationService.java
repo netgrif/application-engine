@@ -26,8 +26,10 @@ public class CaseAuthorizationService extends AuthorizationService implements IC
     }
 
     /**
-     * todo javadoc
-     * */
+     * Checks if the current actor has permission to create a case for a given process.
+     * @param processId identifier of the process to check create permissions for
+     * @return true if an actor has permission to create case, false otherwise
+     */
     @Override
     public boolean canCallCreate(String processId) {
         if (processId == null) {
@@ -39,8 +41,10 @@ public class CaseAuthorizationService extends AuthorizationService implements IC
     }
 
     /**
-     * todo javadoc
-     * */
+     * Checks if the current actor has permission to delete a specified case.
+     * @param caseId identifier of the case to check delete permissions for
+     * @return true if an actor has permission to delete case, false otherwise
+     */
     @Override
     public boolean canCallDelete(String caseId) {
         if (caseId == null) {
@@ -49,5 +53,21 @@ public class CaseAuthorizationService extends AuthorizationService implements IC
 
         Case targetCase = workflowService.findOne(caseId);
         return canCallEvent(targetCase.getProcessRolePermissions(), targetCase.getCaseRolePermissions(), CasePermission.DELETE);
+    }
+
+    /**
+     * Checks if the current actor has permission to view a specified case.
+     * @param caseId identifier of the case to check view permissions for
+     * @return true if an actor has permission to view case, false otherwise
+     */
+    @Override
+    public boolean canView(String caseId) {
+        // todo 2058 unit test
+        if (caseId == null) {
+            return false;
+        }
+
+        Case targetCase = workflowService.findOne(caseId);
+        return canCallEvent(targetCase.getProcessRolePermissions(), targetCase.getCaseRolePermissions(), CasePermission.VIEW);
     }
 }

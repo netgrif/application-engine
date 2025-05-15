@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.authorization.web;
 
+import com.netgrif.application.engine.authorization.domain.ApplicationRole;
 import com.netgrif.application.engine.authorization.domain.Role;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
-import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -91,6 +91,21 @@ public class RBACController {
     public Set<String> findRoleIdsByActorAndGroups(@PathVariable("actorId") String actorId) {
         try {
             return roleService.findAllRoleIdsByActorAndGroups(actorId);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something unexpected happened");
+        }
+    }
+
+    @Operation(summary = "Finds application role id by import id", security = {@SecurityRequirement(name = "BasicAuth")})
+    @GetMapping(value = "/appRole/{importId}", produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
+    })
+    public ApplicationRole findApplicationRole(@PathVariable("importId") String importId) {
+        try {
+            return roleService.findApplicationRoleByImportId(importId);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something unexpected happened");

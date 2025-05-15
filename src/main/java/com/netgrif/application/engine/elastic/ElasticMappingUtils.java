@@ -25,7 +25,7 @@ public class ElasticMappingUtils {
     }
 
     protected static <T> Set<String> filterRoleIds(AccessPermissions<T> permissions, Predicate<Map.Entry<String, Map<T, Boolean>>> predicate) {
-        return permissions.entrySet().stream()
+        return permissions.getPermissions().entrySet().stream()
                 .filter(predicate)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());

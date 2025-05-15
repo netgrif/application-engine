@@ -498,7 +498,8 @@ public class Importer {
 
     protected void addPredefinedRolesWithDefaultPermissions() {
         // only if no positive role associations and no positive user ref associations
-        if (process.getProcessRolePermissions().values().stream().anyMatch(perms -> perms.containsValue(true))) {
+        if (process.getProcessRolePermissions().getPermissions().values().stream()
+                .anyMatch(perms -> perms.containsValue(true))) {
             return;
         }
         addDefaultRole();

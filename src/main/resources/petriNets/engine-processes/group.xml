@@ -5,6 +5,7 @@
 	<icon>groups</icon>
 	<defaultRole>false</defaultRole>
 	<anonymousRole>false</anonymousRole>
+	<caseName>Group</caseName>
 	<roleRef>
 		<id>admin</id>
 		<permission>

@@ -68,7 +68,7 @@ public abstract class AuthorizationService {
             return isPermittedOpt;
         }
 
-        for (Map.Entry<String, Map<T, Boolean>> entry : resourcePermissions.entrySet()) {
+        for (Map.Entry<String, Map<T, Boolean>> entry : resourcePermissions.getPermissions().entrySet()) {
             if (!roleIds.contains(entry.getKey())) {
                 continue;
             }

@@ -538,7 +538,7 @@ class TaskAuthorizationServiceTest {
     @Test
     public void canCallGetData() {
         // order of assertions is important!
-        assert !authorizationService.canCallGetData(null);
+        assert !authorizationService.canCallGetData((String) null);
 
         String taskId = testCase.getTaskStringId("t_getdata");
         String taskIdWithDefault = testCaseWithDefault.getTaskStringId("t_getdata");
@@ -599,7 +599,7 @@ class TaskAuthorizationServiceTest {
         User testUser = initializeTestUserWithGroup();
         assert !roleAssignmentRepository.findAllByActorId(testUser.getStringId()).iterator().hasNext();
 
-        assert !authorizationService.canCallGetData(null);
+        assert !authorizationService.canCallGetData((String) null);
 
         String taskId = testCase.getTaskStringId("t_getdata");
         String taskIdWithDefault = testCaseWithDefault.getTaskStringId("t_getdata");

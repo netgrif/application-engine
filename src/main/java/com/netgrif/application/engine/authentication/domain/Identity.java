@@ -73,11 +73,20 @@ public class Identity extends SystemCase {
      * todo javadoc
      * */
     public Set<String> getAllActors() {
+        List<String> additionalActorIds = getAdditionalActorIds();
+        Set<String> allActorIds;
+        if (additionalActorIds == null) {
+            allActorIds = new HashSet<>();
+        } else {
+            allActorIds = new HashSet<>(getAdditionalActorIds());
+        }
+
         String mainActorId = getMainActorId();
+        if (mainActorId == null) {
+            return allActorIds;
+        }
 
-        Set<String> allActorIds = new HashSet<>(getAdditionalActorIds());
         allActorIds.add(mainActorId);
-
         return allActorIds;
     }
 

@@ -1,16 +1,19 @@
 package com.netgrif.application.engine.authorization.domain.permissions;
 
-import com.netgrif.application.engine.utils.UniqueKeyMap;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-@NoArgsConstructor
-public class AccessPermissions<T> extends UniqueKeyMap<String, Map<T, Boolean>> {
+@Data
+public class AccessPermissions<T> {
+
+    private Map<String, Map<T, Boolean>> permissions;
+
+    public AccessPermissions() {
+        this.permissions = new HashMap<>();
+    }
 
     /**
      * todo javadoc
@@ -34,6 +37,26 @@ public class AccessPermissions<T> extends UniqueKeyMap<String, Map<T, Boolean>> 
             }
             this.addPermissions(roleId, clonedPermissionValues);
         });
+    }
+
+    public void forEach(BiConsumer<String, Map<T, Boolean>> action) {
+        this.permissions.forEach(action);
+    }
+
+    public boolean containsKey(String roleId) {
+        return this.permissions.containsKey(roleId);
+    }
+
+    public Map<T, Boolean> get(String roleId) {
+        return this.permissions.get(roleId);
+    }
+
+    public void put(String roleId, Map<T, Boolean> permissions) {
+        this.permissions.put(roleId, permissions);
+    }
+
+    public boolean isEmpty() {
+        return this.permissions.isEmpty();
     }
 
     /**

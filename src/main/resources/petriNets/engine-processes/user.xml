@@ -5,6 +5,7 @@
 	<icon>person</icon>
 	<defaultRole>false</defaultRole>
 	<anonymousRole>false</anonymousRole>
+	<caseName>User</caseName>
 	<roleRef>
 		<id>admin</id>
 		<permission>

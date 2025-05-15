@@ -91,7 +91,16 @@ public class TaskAuthorizationService extends AuthorizationService implements IT
             return false;
         }
 
-        Task task = taskService.findById(taskId);
+        return canCallGetData(taskService.findById(taskId));
+    }
+
+    @Override
+    public boolean canCallGetData(Task task) {
+        // todo 2058 unit test
+        if (task == null) {
+            return false;
+        }
+
         TaskPermission permission = task.getState().equals(State.ENABLED) ? TaskPermission.VIEW : TaskPermission.VIEW_DISABLED;
 
         return canCallEvent(task.getProcessRolePermissions(), task.getCaseRolePermissions(), permission);

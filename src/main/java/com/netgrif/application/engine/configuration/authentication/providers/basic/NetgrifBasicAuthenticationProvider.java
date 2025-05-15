@@ -52,6 +52,12 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
         Identity identity = identityOpt.get();
+        if (identity.getAllActors().isEmpty()) {
+            log.debug("Identity has no available actors");
+            loginAttemptService.loginFailed(key);
+            throw new BadCredentialsException(this.messages
+                    .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
+        }
         String presentedPassword = authentication.getCredentials().toString();
         if (!this.passwordEncoder.matches(presentedPassword, identity.getPassword())) {
             log.debug("Failed to authenticate since password does not match stored value");
