@@ -128,13 +128,17 @@ public class User extends AbstractUser implements Serializable {
     }
 
     public void activateMFA(String type, String secret) {
+        this.activateMFA(type, secret, true);
+    }
+
+    public void activateMFA(String type, String secret, boolean enabled) {
         if (type == null || type.isEmpty()) {
             throw new IllegalArgumentException("MFA type cannot be null or empty");
         }
         if (secret == null || secret.isEmpty()) {
             throw new IllegalArgumentException("MFA secret cannot be null or empty");
         }
-        MFAStringCredential mfaCred = new MFAStringCredential(type, secret, 1, true);
+        MFAStringCredential mfaCred = new MFAStringCredential(type, secret, 1, enabled);
         this.setCredential("MFA-" + type, mfaCred);
     }
 
@@ -170,6 +174,11 @@ public class User extends AbstractUser implements Serializable {
      */
     public void setCredentials(Map<String, Credential<?>> credentials) {
         this.credentials = credentials == null ? new HashMap<>() : new HashMap<>(credentials);
+    }
+
+    public void setCredential(String type, String value, int order, boolean enabled) {
+        StringCredential credential = new StringCredential(type, value, order, enabled);
+        this.setCredential(type, credential);
     }
 
     /**

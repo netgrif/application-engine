@@ -1,16 +1,10 @@
 package com.netgrif.application.engine.auth.web.requestbodies;
 
-import com.netgrif.application.engine.objects.auth.domain.*;
-import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
-import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Set;
 
 @Setter
 @Getter
