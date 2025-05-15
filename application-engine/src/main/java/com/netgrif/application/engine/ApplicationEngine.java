@@ -4,7 +4,6 @@ import com.netgrif.application.engine.configuration.ApplicationContextProvider;
 import com.netgrif.application.engine.configuration.JsonRootRelProvider;
 import com.netgrif.application.engine.configuration.groovy.converter.GStringToStringConverter;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
-import com.netgrif.application.engine.petrinet.service.workspace.WorkspaceContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.boot.SpringApplication;

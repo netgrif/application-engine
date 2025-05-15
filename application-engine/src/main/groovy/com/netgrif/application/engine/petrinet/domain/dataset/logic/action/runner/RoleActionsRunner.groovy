@@ -1,12 +1,10 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner
 
-
+import com.netgrif.application.engine.auth.config.WorkspaceContextHolder
 import com.netgrif.application.engine.event.IGroovyShellFactory
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context.RoleContext
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.delegate.RoleActionDelegate
-import com.netgrif.application.engine.petrinet.service.workspace.WorkspaceContextHolder
-import org.codehaus.groovy.control.CompilerConfiguration
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired

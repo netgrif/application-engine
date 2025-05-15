@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner
 
+import com.netgrif.application.engine.auth.config.WorkspaceContextHolder
 import com.netgrif.application.engine.event.IGroovyShellFactory
 import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.objects.workflow.domain.Case
-import com.netgrif.application.engine.petrinet.service.workspace.WorkspaceContextHolder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired

@@ -1,9 +1,8 @@
 package com.netgrif.application.engine;
 
-import com.netgrif.application.engine.petrinet.service.workspace.WorkspaceContextHolder;
+import com.netgrif.application.engine.auth.config.WorkspaceContextHolder;
 import groovy.lang.Closure;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service

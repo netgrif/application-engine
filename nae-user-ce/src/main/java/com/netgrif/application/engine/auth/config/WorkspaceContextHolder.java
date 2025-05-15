@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.petrinet.service.workspace;
+package com.netgrif.application.engine.auth.config;
 
 import org.springframework.core.NamedInheritableThreadLocal;
 import org.springframework.core.NamedThreadLocal;

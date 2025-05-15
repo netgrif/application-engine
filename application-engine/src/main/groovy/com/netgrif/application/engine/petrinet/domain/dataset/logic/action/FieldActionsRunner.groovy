@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
+import com.netgrif.application.engine.auth.config.WorkspaceContextHolder
 import com.netgrif.application.engine.business.IPostalCodeService
 import com.netgrif.application.engine.business.orsr.IOrsrService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.objects.event.events.event.ActionStartEvent
 import com.netgrif.application.engine.objects.event.events.event.ActionStopEvent
-import com.netgrif.application.engine.petrinet.service.workspace.WorkspaceContextHolder
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import com.netgrif.application.engine.objects.petrinet.domain.Function
 import com.netgrif.application.engine.objects.workflow.domain.Case
