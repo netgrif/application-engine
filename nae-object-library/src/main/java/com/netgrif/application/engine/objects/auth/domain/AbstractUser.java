@@ -43,6 +43,8 @@ public abstract class AbstractUser extends AbstractActor {
 
     public void activateMFA(String type, String secret) {}
 
+    public void activateMFA(String type, String secret, boolean enabled) {}
+
     public boolean isCredentialEnabled(String type) {
         return false;
     }

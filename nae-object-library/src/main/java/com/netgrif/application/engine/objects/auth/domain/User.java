@@ -134,6 +134,7 @@ public class User extends AbstractUser implements Serializable {
         this.activateMFA(type, secret, true);
     }
 
+    @Override
     public void activateMFA(String type, String secret, boolean enabled) {
         if (type == null || type.isEmpty()) {
             throw new IllegalArgumentException("MFA type cannot be null or empty");
