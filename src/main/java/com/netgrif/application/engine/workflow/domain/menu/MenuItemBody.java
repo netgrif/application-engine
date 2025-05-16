@@ -50,6 +50,7 @@ public class MenuItemBody {
     private List<String> caseDefaultHeaders;
     private boolean caseIsHeaderModeChangeable = true;
     private boolean caseUseDefaultHeaders = true;
+    private boolean caseAllowExport = false;
 
     // task view attributes
     private Case additionalFilter;
@@ -232,6 +233,8 @@ public class MenuItemBody {
                 this.caseIsHeaderModeChangeable);
         putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_USE_CASE_DEFAULT_HEADERS, FieldType.BOOLEAN,
                 this.caseUseDefaultHeaders);
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_ALLOW_EXPORT, FieldType.BOOLEAN,
+                this.caseAllowExport);
 
         // TASK
         ArrayList<String> additionalFilterIdCaseRefValue = new ArrayList<>();
