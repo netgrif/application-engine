@@ -2,7 +2,6 @@ package com.netgrif.application.engine.export.service;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
@@ -48,15 +47,9 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class XlsExportService implements IXlsExportService {
 
-    @Autowired
-    private IWorkflowService workflowService;
-
-    @Autowired
-    private IElasticIndexService elasticIndexService;
-
-    @Autowired
-    private ElasticsearchRestTemplate elasticsearchTemplate;
-
+    private final IWorkflowService workflowService;
+    private final IElasticIndexService elasticIndexService;
+    private final ElasticsearchRestTemplate elasticsearchTemplate;
     private final IElasticCaseService elasticCaseService;
     private final IPetriNetService petriNetService;
     private final XlsExportProperties exportProperties;
@@ -74,9 +67,7 @@ public class XlsExportService implements IXlsExportService {
     @Override
     public File getExportFilteredCasesFile(FilteredCasesRequest request, LoggedUser user, Locale locale) throws Exception {
         List<ExportedField> fieldsToExport = ExportedField.convert(request.getSelectedDataFieldIds(), request.getSelectedDataFieldNames());
-        if (exportProperties.isExportAllImmediateFields()) {
-            fieldsToExport = insertPredefinedFields(fieldsToExport, getProcessIdentifierFromFilteredRequest(request));
-        }
+        fieldsToExport = insertPredefinedFields(fieldsToExport, getProcessIdentifierFromFilteredRequest(request));
         return getCasesToExcel(request.getQuery(), fieldsToExport, user, locale, request.getIsIntersection());
     }
 
@@ -100,6 +91,10 @@ public class XlsExportService implements IXlsExportService {
             replaceInSet(fields, ExportedField.CREATION_DATE);
         }
 
+        if (!exportProperties.isExportAllImmediateFields()) {
+            return new ArrayList<>(fields);
+        }
+
         if (processIdentifier == null || processIdentifier.isBlank()) {
             return new ArrayList<>(fields);
         }
@@ -121,15 +116,15 @@ public class XlsExportService implements IXlsExportService {
     }
 
     private File getCasesToExcel(List<CaseSearchRequest> requests, List<ExportedField> fields, LoggedUser user, Locale locale, Boolean isIntersection) throws Exception {
-        log.info("Exporting cases to xlsx file. Query: {}", requests);
+        log.info("Exporting cases to xlsx file. Query: {}", requests.stream().map(request -> request.query).collect(Collectors.joining(", ")));
         long caseCount = elasticCaseService.count(requests, user, locale, isIntersection);
         boolean isResultTrimmed = false;
         if (exportProperties.getMaxRows() > 0) {
             if (caseCount > exportProperties.getMaxRows()) {
-                log.warn("Requested case export could resulted in {} rows. Trimming result to {} row as configured in sse.export.max-rows", caseCount, exportProperties.getMaxRows());
+                log.warn("Requested case export could resulted in {} rows. Trimming result to {} row as configured in nae.xls.export.max-rows", caseCount, exportProperties.getMaxRows());
                 isResultTrimmed = true;
+                caseCount = exportProperties.getMaxRows();
             }
-            caseCount = Math.min(caseCount, exportProperties.getMaxRows());
         }
         long numberOfPagesNeeded = caseCount % exportProperties.getPageSize() == 0 ? (caseCount / exportProperties.getPageSize()) : (caseCount / exportProperties.getPageSize()) + 1;
 
@@ -137,8 +132,8 @@ public class XlsExportService implements IXlsExportService {
         Sheet sheet = workbook.createSheet(exportProperties.getSheetName());
         insertHeader(fields, sheet);
 
-        long sizeOfProcessedRows = 0;
-        long counter = 0;
+        int sizeOfProcessedRows = 0;
+        int counter = 0;
         List<String> scrollIdsToClear = new ArrayList<>();
         NativeSearchQuery query = elasticCaseService.buildQuery(requests, user, PageRequest.of(0, exportProperties.getPageSize()), Locale.ENGLISH, true);
         SearchScrollHits<?> scroll = elasticIndexService.scrollFirst(query, ElasticCase.class);
@@ -181,7 +176,7 @@ public class XlsExportService implements IXlsExportService {
         });
     }
 
-    private long processPage(Page<Case> page, Sheet sheet, List<ExportedField> fieldsToExport, long numberOfProcessedItems) {
+    private int processPage(Page<Case> page, Sheet sheet, List<ExportedField> fieldsToExport, int numberOfProcessedItems) {
         int rowIndex = Math.toIntExact(numberOfProcessedItems == 0 ? ((long) page.getNumber() * exportProperties.getPageSize()) + 1 : numberOfProcessedItems);
         for (Case caze : page.getContent()) {
             Row row = processCase(caze, sheet, rowIndex, fieldsToExport);

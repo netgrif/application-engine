@@ -28,7 +28,7 @@ import java.util.Locale;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/export")
+@RequestMapping("/api/export")
 public class ExportController {
 
     private final IXlsExportService exportService;

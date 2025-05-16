@@ -42,7 +42,7 @@ public class XlsExportDateUtils {
             }
         }
 
-        log.info("Date " + date + " could not be parsed using patterns " + patterns);
+        log.error("Date {} could not be parsed using patterns: {}.", date, patterns);
         return null;
     }
 
@@ -65,7 +65,7 @@ public class XlsExportDateUtils {
             }
         }
 
-        log.info("Date " + date + " could not be parsed using patterns " + patterns);
+        log.error("Date {} could not be parsed using patterns: {}.", date, patterns);
         return null;
     }
 

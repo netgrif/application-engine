@@ -21,10 +21,7 @@ public class ExportedField extends Imported {
     private boolean meta;
 
     public ExportedField(String id, String name) {
-        super();
-        this.setImportId(id);
-        this.name = name;
-        this.meta = false;
+        this(id, name, false);
     }
 
     public ExportedField(String id, String name, boolean meta) {
