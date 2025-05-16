@@ -14,6 +14,8 @@ import java.util.Map;
 @AllArgsConstructor
 public class TaskSearchRequest {
 
+    // todo 2058 update
+
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> role;
 
@@ -36,10 +38,7 @@ public class TaskSearchRequest {
     public String fullText;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    public List<String> group;
-
-    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> stringId;
 
-    public Map<String, String> tags;
+    public Map<String, String> properties;
 }

@@ -240,12 +240,12 @@ public class ElasticTaskQueryBuilder implements ElasticQueryBuilder {
     }
 
     private void buildTagsQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
-        if (request.tags == null || request.tags.isEmpty()) {
+        if (request.properties == null || request.properties.isEmpty()) {
             return;
         }
 
         BoolQueryBuilder tagsQuery = boolQuery();
-        for (Map.Entry<String, String> field : request.tags.entrySet()) {
+        for (Map.Entry<String, String> field : request.properties.entrySet()) {
             tagsQuery.must(termQuery("tags." + field.getKey(), field.getValue()));
         }
 

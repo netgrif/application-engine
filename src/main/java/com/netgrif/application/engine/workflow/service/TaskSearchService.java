@@ -1,14 +1,15 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.authorization.domain.permissions.TaskPermission;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
+import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -37,8 +38,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
         BooleanBuilder builder = constructPredicateTree(singleQueries, isIntersection ? BooleanBuilder::and : BooleanBuilder::or);
 
-        final Set<String> assignedRoleIds = roleAssignmentService.findAllRoleIdsByActorAndGroups(actorId);
-
+//        final Set<String> assignedRoleIds = roleAssignmentService.findAllRoleIdsByActorAndGroups(actorId);
 //        BooleanBuilder constraints = new BooleanBuilder(buildProcessRolesQueryConstraint(assignedRoleIds));
 //        constraints.or(buildCaseRolesQueryConstraint(assignedRoleIds));
 //        builder.and(constraints);
@@ -104,34 +104,30 @@ public class TaskSearchService extends MongoSearchService<Task> {
     private Predicate buildSingleQuery(TaskSearchRequest request, String actorId, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
 
-//        buildStringIdQuery(request, builder);
+        buildStringIdQuery(request, builder);
 //        buildRoleQuery(request, builder);
-//        buildCaseQuery(request, builder);
-//        buildTitleQuery(request, builder);
-//        buildUserQuery(request, builder);
-//        buildProcessQuery(request, builder);
-//        buildFullTextQuery(request, builder);
-//        buildTransitionQuery(request, builder);
-//        buildTagsQuery(request, builder);
-//        boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, builder);
-//
-//        if (resultAlwaysEmpty)
-//            return null;
-//        else
-            return builder;
+        buildCaseQuery(request, builder);
+        buildTitleQuery(request, builder);
+        buildAssigneeQuery(request, builder);
+        buildProcessQuery(request, builder);
+        buildFullTextQuery(request, builder);
+        buildTransitionQuery(request, builder);
+        buildPropertiesQuery(request, builder);
+
+        return builder;
     }
 
-//    private void buildStringIdQuery(TaskSearchRequest request, BooleanBuilder query) {
-//        if (request.stringId == null || request.stringId.isEmpty()) {
-//            return;
-//        }
-//
-//        query.and(
-//                constructPredicateTree(
-//                        request.stringId.stream().map(this::stringIdQuery).collect(Collectors.toList()),
-//                        BooleanBuilder::or)
-//        );
-//    }
+    private void buildStringIdQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.stringId == null || request.stringId.isEmpty()) {
+            return;
+        }
+
+        query.and(
+                constructPredicateTree(
+                        request.stringId.stream().map(this::stringIdQuery).collect(Collectors.toList()),
+                        BooleanBuilder::or)
+        );
+    }
 //
 //    private void buildRoleQuery(TaskSearchRequest request, BooleanBuilder query) {
 //        if (request.role == null || request.role.isEmpty()) {
@@ -153,154 +149,135 @@ public class TaskSearchService extends MongoSearchService<Task> {
 //        return QTask.task.caseRolePermissions.permissions.containsKey(roleId);
 //    }
 //
-//    public Predicate stringIdQuery(String id) {
-//        return QTask.task.id.eq(new ObjectId(id));
-//    }
+    public Predicate stringIdQuery(String id) {
+        return QTask.task.id.eq(new ObjectId(id));
+    }
 
-//    private void buildCaseQuery(TaskSearchRequest request, BooleanBuilder query) {
-//        if (request.useCase == null || request.useCase.isEmpty()) {
-//            return;
-//        }
-//
-//        query.and(
-//                constructPredicateTree(
-//                        request.useCase.stream().map(this::caseRequestQuery).filter(Objects::nonNull).collect(Collectors.toList()),
-//                        BooleanBuilder::or)
-//        );
-//    }
+    private void buildCaseQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.useCase == null || request.useCase.isEmpty()) {
+            return;
+        }
+
+        query.and(
+                constructPredicateTree(
+                        request.useCase.stream().map(this::caseRequestQuery).filter(Objects::nonNull).collect(Collectors.toList()),
+                        BooleanBuilder::or)
+        );
+    }
 
     /**
      * @return Predicate for ID if only ID is present. Predicate for title if only title is present.
      * If both are present an ID predicate is returned. If neither are present null is returned.
      */
-//    private Predicate caseRequestQuery(TaskSearchCaseRequest caseRequest) {
-//        if (caseRequest.id != null) {
-//            return caseIdQuery(caseRequest.id);
-//        } else if (caseRequest.title != null) {
-//            return caseTitleQuery(caseRequest.title);
-//        }
-//        return null;
-//    }
-//
-//    public Predicate caseIdQuery(String caseId) {
-//        return QTask.task.caseId.eq(caseId);
-//    }
-//
+    private Predicate caseRequestQuery(TaskSearchCaseRequest caseRequest) {
+        if (caseRequest.id != null) {
+            return caseIdQuery(caseRequest.id);
+        } /*else if (caseRequest.title != null) {
+            return caseTitleQuery(caseRequest.title);
+        }*/
+        return null;
+    }
+
+    public Predicate caseIdQuery(String caseId) {
+        return QTask.task.caseId.eq(caseId);
+    }
+
 //    public Predicate caseTitleQuery(String caseTitle) {
-//        return QTask.task.caseTitle.containsIgnoreCase(caseTitle);
+//        return QTask.task.containsIgnoreCase(caseTitle);
 //    }
-//
-//    private void buildTitleQuery(TaskSearchRequest request, BooleanBuilder query) {
-//        if (request.title == null || request.title.isEmpty()) {
-//            return;
-//        }
-//
-//        query.and(
-//                constructPredicateTree(
-//                        request.title.stream().map(this::titleQuery).collect(Collectors.toList()),
-//                        BooleanBuilder::or)
-//        );
-//    }
-//
-//    public Predicate titleQuery(String query) {
-//        return QTask.task.title.defaultValue.containsIgnoreCase(query);
-//    }
-//
-//    private void buildUserQuery(TaskSearchRequest request, BooleanBuilder query) {
-//        if (request.user == null || request.user.isEmpty()) {
-//            return;
-//        }
-//
-//        query.and(
-//                constructPredicateTree(
-//                        request.user.stream().map(this::userQuery).collect(Collectors.toList()),
-//                        BooleanBuilder::or)
-//        );
-//    }
-//
-//    public Predicate userQuery(String userId) {
-//        return QTask.task.userId.eq(userId);
-//    }
-//
-//    private void buildProcessQuery(TaskSearchRequest request, BooleanBuilder query) {
-//        if (request.process == null || request.process.isEmpty()) {
-//            return;
-//        }
-//
-//        query.and(
-//                constructPredicateTree(
-//                        request.process.stream().map(p -> processQuery(p.identifier)).collect(Collectors.toList()),
-//                        BooleanBuilder::or)
-//        );
-//    }
-//
-//    public Predicate processQuery(String processId) {
-//        return QTask.task.processId.eq(processId);
-//    }
-//
-//    private void buildFullTextQuery(TaskSearchRequest request, BooleanBuilder query) {
-//        if (request.fullText == null || request.fullText.isEmpty()) {
-//            return;
-//        }
-//
-//        query.and(fullTextQuery(request.fullText));
-//    }
-//
-//    public Predicate fullTextQuery(String searchedText) {
-//        BooleanBuilder builder = new BooleanBuilder();
-//        builder.or(QTask.task.title.defaultValue.containsIgnoreCase(searchedText));
+
+    private void buildTitleQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.title == null || request.title.isEmpty()) {
+            return;
+        }
+
+        query.and(
+                constructPredicateTree(
+                        request.title.stream().map(this::titleQuery).collect(Collectors.toList()),
+                        BooleanBuilder::or)
+        );
+    }
+
+    public Predicate titleQuery(String query) {
+        return QTask.task.title.defaultValue.containsIgnoreCase(query);
+    }
+
+    private void buildAssigneeQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.assigneeId == null || request.assigneeId.isEmpty()) {
+            return;
+        }
+
+        query.and(
+                constructPredicateTree(
+                        request.assigneeId.stream().map(this::assigneeQuery).collect(Collectors.toList()),
+                        BooleanBuilder::or)
+        );
+    }
+
+    public Predicate assigneeQuery(String assigneeId) {
+        return QTask.task.assigneeId.eq(assigneeId);
+    }
+
+    private void buildProcessQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.process == null || request.process.isEmpty()) {
+            return;
+        }
+
+        query.and(
+                constructPredicateTree(
+                        request.process.stream().map(p -> processQuery(p.identifier)).collect(Collectors.toList()),
+                        BooleanBuilder::or)
+        );
+    }
+
+    public Predicate processQuery(String processId) {
+        return QTask.task.processId.eq(processId);
+    }
+
+    private void buildFullTextQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.fullText == null || request.fullText.isEmpty()) {
+            return;
+        }
+
+        query.and(fullTextQuery(request.fullText));
+    }
+
+    public Predicate fullTextQuery(String searchedText) {
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.or(QTask.task.title.defaultValue.containsIgnoreCase(searchedText));
 //        builder.or(QTask.task.caseTitle.containsIgnoreCase(searchedText));
-//        return builder;
-//    }
-//
-//    private void buildTransitionQuery(TaskSearchRequest request, BooleanBuilder query) {
-//        if (request.transitionId == null || request.transitionId.isEmpty()) {
-//            return;
-//        }
-//
-//        query.and(
-//                constructPredicateTree(
-//                        request.transitionId.stream().map(this::transitionQuery).collect(Collectors.toList()),
-//                        BooleanBuilder::or)
-//        );
-//    }
-//
-//    public Predicate transitionQuery(String transitionId) {
-//        return QTask.task.transitionId.eq(transitionId);
-//    }
-//
-//    public boolean buildGroupQuery(TaskSearchRequest request, LoggedUser user, Locale locale, BooleanBuilder query) {
-//        if (request.group == null || request.group.isEmpty())
-//            return false;
-//
-//        PetriNetSearch processQuery = new PetriNetSearch();
-//        processQuery.setGroup(request.group);
-//        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
-//        if (groupProcesses.size() == 0)
-//            return true;
-//
-//        query.and(
-//                constructPredicateTree(
-//                        groupProcesses.stream().map(PetriNetReference::getStringId).map(QTask.task.processId::eq).collect(Collectors.toList()),
-//                        BooleanBuilder::or
-//                )
-//        );
-//        return false;
-//    }
-//
-//    private void buildTagsQuery(TaskSearchRequest request, BooleanBuilder query) {
-//        if (request.tags == null || request.tags.isEmpty()) {
-//            return;
-//        }
-//
-//        query.and(
-//                constructPredicateTree(
-//                        request.tags.entrySet().stream().map(entry -> this.tagQuery(entry.getKey(), entry.getValue())).collect(Collectors.toList()),
-//                        BooleanBuilder::and)
-//        );
-//    }
-//
-//    public Predicate tagQuery(String key, String value) {
-//        return QTask.task.tags.get(key).eq(value);
-//    }
+        return builder;
+    }
+
+    private void buildTransitionQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.transitionId == null || request.transitionId.isEmpty()) {
+            return;
+        }
+
+        query.and(
+                constructPredicateTree(
+                        request.transitionId.stream().map(this::transitionQuery).collect(Collectors.toList()),
+                        BooleanBuilder::or)
+        );
+    }
+
+    public Predicate transitionQuery(String transitionId) {
+        return QTask.task.transitionId.eq(transitionId);
+    }
+
+    private void buildPropertiesQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.properties == null || request.properties.isEmpty()) {
+            return;
+        }
+
+        query.and(
+                constructPredicateTree(
+                        request.properties.entrySet().stream().map(entry -> this.tagQuery(entry.getKey(), entry.getValue())).collect(Collectors.toList()),
+                        BooleanBuilder::and)
+        );
+    }
+
+    public Predicate tagQuery(String key, String value) {
+        return QTask.task.properties.get(key).eq(value);
+    }
 }

@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.utils;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -15,8 +16,9 @@ import java.util.function.BiConsumer;
  */
 public class UniqueKeyMapWrapper<V> {
 
+    @Setter
     @Getter
-    private final LinkedHashMap<String, V> map;
+    private LinkedHashMap<String, V> map;
 
     public UniqueKeyMapWrapper() {
         this.map = new LinkedHashMap<>();

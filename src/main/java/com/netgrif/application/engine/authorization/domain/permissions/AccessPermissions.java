@@ -26,6 +26,7 @@ public class AccessPermissions<T> {
      * todo javadoc
      * */
     public AccessPermissions(AccessPermissions<T> accessPermissions, Set<T> ignoreTypes) {
+        this();
         accessPermissions.forEach((roleId, permissionValues) -> {
             Map<T, Boolean> clonedPermissionValues;
             if (ignoreTypes.isEmpty()) {

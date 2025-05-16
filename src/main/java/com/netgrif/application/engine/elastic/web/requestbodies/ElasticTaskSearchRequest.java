@@ -47,9 +47,6 @@ public class ElasticTaskSearchRequest extends TaskSearchRequest {
         if (request.containsKey("fullText") && request.get("fullText") instanceof String) {
             this.fullText = (String) request.get("fullText");
         }
-        if (request.containsKey("group") && request.get("group") instanceof List) {
-            this.group = (List<String>) request.get("group");
-        }
         if (request.containsKey("query") && request.get("query") instanceof String) {
             this.query = (String) request.get("query");
         }
