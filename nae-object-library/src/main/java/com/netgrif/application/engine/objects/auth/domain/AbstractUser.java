@@ -7,6 +7,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 @Data
 @Slf4j
 @NoArgsConstructor
@@ -32,6 +36,28 @@ public abstract class AbstractUser extends AbstractActor {
     public abstract String getPassword();
 
     public abstract void setPassword(String password);
+
+    public void setCredential(String key, Credential<?> credential) {}
+
+    public void setCredential(String type, String value, int order, boolean enabled) {}
+
+    public void activateMFA(String type, String secret) {}
+
+    public boolean isCredentialEnabled(String type) {
+        return false;
+    }
+
+    public Credential<?> getCredential(String type) {
+        return null;
+    }
+
+    public void disableCredential(String type) {}
+
+    public void setCredentialProperty(String type, String key, Object value) {}
+
+    public Object getCredentialProperty(String type, String key) {
+        return null;
+    }
 
     @Override
     public String getName() {

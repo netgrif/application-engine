@@ -103,6 +103,7 @@ public class User extends AbstractUser implements Serializable {
         return null;
     }
 
+    @Override
     public boolean isCredentialEnabled(String type) {
         Credential<?> credential = this.getCredential(type);
         return credential != null && credential.isEnabled();
@@ -121,12 +122,14 @@ public class User extends AbstractUser implements Serializable {
                 .collect(Collectors.toSet());
     }
 
+    @Override
     public void disableCredential(String type) {
         if (this.credentials.containsKey(type)) {
             this.credentials.get(type).setEnabled(false);
         }
     }
 
+    @Override
     public void activateMFA(String type, String secret) {
         this.activateMFA(type, secret, true);
     }
@@ -142,6 +145,7 @@ public class User extends AbstractUser implements Serializable {
         this.setCredential("MFA-" + type, mfaCred);
     }
 
+    @Override
     public void setCredentialProperty(String type, String key, Object value) {
         Credential<?> credential = this.credentials.get(type);
         if (credential == null) {
@@ -156,6 +160,7 @@ public class User extends AbstractUser implements Serializable {
         }
     }
 
+    @Override
     public Object getCredentialProperty(String type, String key) {
         Credential<?> credential = this.credentials.get(type);
         return credential != null ? credential.getProperty(key) : null;
@@ -165,33 +170,28 @@ public class User extends AbstractUser implements Serializable {
         return this.credentials.containsKey(type);
     }
 
+    @Override
     public Credential<?> getCredential(String type) {
         return this.credentials.get(type);
     }
 
-    /**
-     * @param credentials
-     */
     public void setCredentials(Map<String, Credential<?>> credentials) {
         this.credentials = credentials == null ? new HashMap<>() : new HashMap<>(credentials);
     }
 
+    @Override
     public void setCredential(String type, String value, int order, boolean enabled) {
         StringCredential credential = new StringCredential(type, value, order, enabled);
         this.setCredential(type, credential);
     }
 
-    /**
-     * @param key
-     * @param credential
-     */
+    @Override
     public void setCredential(String key, Credential<?> credential) {
         if (this.credentials == null) {
             this.credentials = new HashMap<>();
         }
         this.credentials.put(key, credential);
     }
-
     /**
      * @param key
      * @return
