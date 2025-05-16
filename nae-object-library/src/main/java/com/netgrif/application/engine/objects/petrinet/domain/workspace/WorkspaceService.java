@@ -13,8 +13,6 @@ public interface WorkspaceService {
 
     List<Workspace> getAll();
 
-    Workspace createDefaultWorkspace();
-
     Workspace createWorkspace(WorkspaceRequest createRequest, LoggedUser loggedUser);
 
     Workspace setDefaultWorkspace(String workspaceId);
