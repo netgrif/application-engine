@@ -56,8 +56,9 @@ public class ElasticPetriNet {
         this.uriNodeId = net.getUriNodeId();
         this.stringId = net.getStringId();
         this.title = net.getTitle();
-        // TODO: release/8.0.0
-//        this.initials = net.getInitials();
+        if (net.getProperties() != null) {
+            this.initials = net.getProperties().get("initials");
+        }
         this.creationDate = net.getCreationDate();
     }
 

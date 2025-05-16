@@ -217,7 +217,9 @@ public class PetriNetService implements IPetriNetService {
             return outcome;
         }
         Process net = imported.getProcess();
-        net.setUriNodeId(uriNodeId);
+        if (ObjectId.isValid(uriNodeId)) {
+            net.setUriNodeId(uriNodeId);
+        }
 
         // TODO: release/8.0.0 fix cacheable
         Process existingNet = getNewestVersionByIdentifier(net.getIdentifier());
