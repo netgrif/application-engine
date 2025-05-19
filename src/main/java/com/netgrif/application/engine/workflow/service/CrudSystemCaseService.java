@@ -16,13 +16,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 @Slf4j
 public abstract class CrudSystemCaseService<T extends SystemCase> implements ICrudSystemCaseService<T> {
@@ -294,18 +294,10 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
                 .query(buildQuery(singletonQuerySet))
                 .build();
 
-        List<Case> result = new ArrayList<>();
+        Page<Case> pageResult = elasticCaseSearchService.search(List.of(request), sessionManagerService.getActiveActorId(),
+                Pageable.unpaged(), Locale.getDefault(), false, null);
 
-        long identityCount = elasticCaseSearchService.count(List.of(request), sessionManagerService.getActiveActorId(),
-                Locale.getDefault(), false, null);
-        long pageCount = (identityCount / 100) + 1;
-        LongStream.range(0, pageCount).forEach(pageIdx -> {
-            Page<Case> pageResult = elasticCaseSearchService.search(List.of(request), sessionManagerService.getActiveActorId(),
-                    PageRequest.of((int) pageIdx, 100), Locale.getDefault(), false, null);
-            result.addAll(pageResult.getContent());
-        });
-
-        return result;
+        return pageResult.getContent();
     }
 
     @SuppressWarnings("unchecked")

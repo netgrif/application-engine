@@ -4,6 +4,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +22,7 @@ import java.util.Map;
 import static org.elasticsearch.index.query.QueryBuilders.*;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ElasticCaseQueryBuilder implements ElasticQueryBuilder {
@@ -55,9 +57,15 @@ public class ElasticCaseQueryBuilder implements ElasticQueryBuilder {
     }
 
     public Pageable resolveUnmappedSortAttributes(Pageable pageable) {
+        if (pageable.isUnpaged()) {
+            log.warn("Provided pageable is unpaged. Skipping sorting...");
+            return pageable;
+        }
+
         List<Sort.Order> modifiedOrders = new ArrayList<>();
         pageable.getSort().iterator().forEachRemaining(order -> modifiedOrders.add(new Order(order.getDirection(),
                 order.getProperty()).withUnmappedType("keyword")));
+
         return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()).withSort(Sort.by(modifiedOrders));
     }
 
