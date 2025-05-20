@@ -10,12 +10,14 @@ import com.netgrif.application.engine.authorization.service.interfaces.IUserServ
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import com.netgrif.application.engine.startup.AnonymousIdentityRunner;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -55,6 +57,7 @@ public class PublicBasicAuthenticationFilter extends PublicJwtAuthenticationFilt
                 .lastname(new TextField(AnonymIdentityConstants.LASTNAME))
                 .password(new TextField("n/a"))
                 .mainActor(CaseField.withValue(List.of(anonymUser.getStringId())))
+                .properties(Map.of(AnonymousIdentityRunner.getAnonymousFlag(), "true"))
                 .build());
     }
 }

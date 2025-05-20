@@ -125,11 +125,14 @@ public class GroupServiceTest {
     @Test
     void testCreate() throws InterruptedException {
         String name = "group name";
+        String propertyKey = "property";
+        String propertyValue = "isActive";
         Group parentGroup = createGroup("parent group");
         Group group = groupService.create(GroupParams.with()
                 .name(new TextField(name))
                 .groupIds(CaseField.withValue(List.of(defaultGroupRunner.getDefaultGroup().getStringId())))
                 .parentGroupId(CaseField.withValue(List.of(parentGroup.getStringId())))
+                .properties(Map.of(propertyKey, propertyValue))
                 .build());
 
         assert group != null && group.getCase() != null;
@@ -139,6 +142,10 @@ public class GroupServiceTest {
         assert group.getGroupIds() != null;
         assert group.getGroupIds().size() == 1;
         assert group.getGroupIds().contains(defaultGroupRunner.getDefaultGroup().getStringId());
+        assert group.getCase().getProperties() != null;
+        assert group.getCase().getProperties().size() == 1;
+        assert group.getCase().getProperties().containsKey(propertyKey);
+        assert group.getCase().getProperties().get(propertyKey).equals(propertyValue);
 
         assertThrows(IllegalArgumentException.class, () -> groupService.create(null));
         assertThrows(IllegalArgumentException.class, () -> groupService.create(GroupParams.with().build()));
@@ -176,6 +183,7 @@ public class GroupServiceTest {
         assert group.getGroupIds() == null || group.getGroupIds().isEmpty();
         assert group.getParentGroupId() != null;
         assert group.getParentGroupId().equals(defaultGroupRunner.getDefaultGroup().getStringId());
+        assert group.getCase().getProperties() == null || group.getCase().getProperties().isEmpty();
 
         assertThrows(IllegalArgumentException.class, () -> groupService.update(group, null));
         assertThrows(IllegalArgumentException.class, () -> groupService.update(null, GroupParams.with()
@@ -205,10 +213,13 @@ public class GroupServiceTest {
                 .getGroupIds() == null || group.getGroupIds().isEmpty();
 
         String newName = "new group name";
+        String propertyKey = "property";
+        String propertyValue = "isActive";
         Group updatedGroup = groupService.update(group, GroupParams.with()
                 .name(new TextField(newName))
                 .groupIds(CaseField.withValue(List.of(defaultGroupRunner.getDefaultGroup().getStringId())))
                 .parentGroupId(CaseField.withValue(List.of(parentGroup.getStringId())))
+                .properties(Map.of(propertyKey, propertyValue))
                 .build());
 
         assert group.getStringId().equals(updatedGroup.getStringId());
@@ -218,6 +229,10 @@ public class GroupServiceTest {
         assert updatedGroup.getGroupIds().contains(defaultGroupRunner.getDefaultGroup().getStringId());
         assert updatedGroup.getParentGroupId() != null;
         assert updatedGroup.getParentGroupId().equals(parentGroup.getStringId());
+        assert updatedGroup.getCase().getProperties() != null;
+        assert updatedGroup.getCase().getProperties().size() == 1;
+        assert updatedGroup.getCase().getProperties().containsKey(propertyKey);
+        assert updatedGroup.getCase().getProperties().get(propertyKey).equals(propertyValue);
     }
 
     @Test

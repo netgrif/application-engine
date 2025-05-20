@@ -130,6 +130,7 @@ public class Identity extends SystemCase {
                 .fullName(this.getFullName())
                 .identityId(this.getStringId())
                 .activeActorId(this.getMainActorId())
+                .properties(this.getProperties())
                 .build();
     }
 }

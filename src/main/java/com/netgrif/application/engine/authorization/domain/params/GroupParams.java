@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 @Getter
 public class GroupParams extends ActorParams {
@@ -17,8 +18,8 @@ public class GroupParams extends ActorParams {
     protected CaseField parentGroupId;
 
     @Builder(builderMethodName = "with")
-    private GroupParams(CaseField groupIds, TextField name, CaseField parentGroupId) {
-        super(groupIds);
+    private GroupParams(CaseField groupIds, Map<String, String> properties, TextField name, CaseField parentGroupId) {
+        super(groupIds, properties);
         this.name = name;
         this.parentGroupId = parentGroupId;
     }

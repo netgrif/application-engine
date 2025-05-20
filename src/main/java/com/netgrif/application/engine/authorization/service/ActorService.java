@@ -99,7 +99,7 @@ public abstract class ActorService<T extends Actor> extends CrudSystemCaseServic
      * */
     protected static class ActorGroupParams extends ActorParams {
         protected ActorGroupParams(CaseField groupIds) {
-            super(groupIds);
+            super(groupIds, null);
         }
 
         @Override

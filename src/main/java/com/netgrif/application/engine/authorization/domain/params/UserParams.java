@@ -8,6 +8,8 @@ import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.Map;
+
 @Getter
 public class UserParams extends ActorParams {
     protected TextField email;
@@ -15,8 +17,8 @@ public class UserParams extends ActorParams {
     protected TextField lastname;
 
     @Builder(builderMethodName = "with")
-    private UserParams(CaseField groupIds, TextField email, TextField firstname, TextField lastname) {
-        super(groupIds);
+    private UserParams(CaseField groupIds, Map<String, String> properties, TextField email, TextField firstname, TextField lastname) {
+        super(groupIds, properties);
         this.email = email;
         this.firstname = firstname;
         this.lastname = lastname;

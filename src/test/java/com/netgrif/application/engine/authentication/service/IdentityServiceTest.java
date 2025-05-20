@@ -30,6 +30,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -190,6 +191,8 @@ public class IdentityServiceTest {
         String registrationToken = "token";
         String mainActorId = new ObjectId().toString();
         String additionalActorId = new ObjectId().toString();
+        String propertyKey = "property";
+        String propertyValue = "isActive";
 
         Identity identity = identityService.create(IdentityParams.with()
                 .username(new TextField(username))
@@ -200,6 +203,7 @@ public class IdentityServiceTest {
                 .registrationToken(new TextField(registrationToken))
                 .mainActor(CaseField.withValue(List.of(mainActorId)))
                 .additionalActors(CaseField.withValue(List.of(additionalActorId)))
+                .properties(Map.of(propertyKey, propertyValue))
                 .build());
 
         assert identity != null;
@@ -214,6 +218,10 @@ public class IdentityServiceTest {
         assert identity.getAdditionalActorIds().size() == 1;
         assert identity.getAdditionalActorIds().get(0).equals(additionalActorId);
         assert identity.isActive();
+        assert identity.getCase().getProperties() != null;
+        assert identity.getCase().getProperties().size() == 1;
+        assert identity.getCase().getProperties().containsKey(propertyKey);
+        assert identity.getCase().getProperties().get(propertyKey).equals(propertyValue);
     }
 
     @Test
@@ -256,6 +264,7 @@ public class IdentityServiceTest {
         assert identity.getUsername().equals(username);
         assert identity.getFirstname() == null;
         assert identity.getLastname() == null;
+        assert identity.getCase().getProperties() == null || identity.getCase().getProperties().isEmpty();
 
         assertThrows(IllegalArgumentException.class, () -> identityService.update(identity, null));
         assertThrows(IllegalArgumentException.class, () -> identityService.update(identity, IdentityParams.with()
@@ -264,16 +273,23 @@ public class IdentityServiceTest {
 
         String firstname = "firstname";
         String lastname = "lastname";
+        String propertyKey = "property";
+        String propertyValue = "isActive";
         Identity updatedIdentity = identityService.update(identity, IdentityParams.with()
                 .username(new TextField("username"))
                 .firstname(new TextField(firstname))
                 .lastname(new TextField(lastname))
+                .properties(Map.of(propertyKey, propertyValue))
                 .build());
 
         assert updatedIdentity.getStringId().equals(identity.getStringId());
         assert updatedIdentity.getUsername().equals(username);
         assert updatedIdentity.getFirstname().equals(firstname);
         assert updatedIdentity.getLastname().equals(lastname);
+        assert updatedIdentity.getCase().getProperties() != null;
+        assert updatedIdentity.getCase().getProperties().size() == 1;
+        assert updatedIdentity.getCase().getProperties().containsKey(propertyKey);
+        assert updatedIdentity.getCase().getProperties().get(propertyKey).equals(propertyValue);
     }
 
     @Test

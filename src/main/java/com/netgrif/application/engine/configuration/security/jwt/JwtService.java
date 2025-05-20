@@ -57,6 +57,7 @@ public class JwtService implements IJwtService {
                 .password("n/a")
                 .fullName(loggedIdentityMap.get("fullName").toString())
                 .activeActorId(loggedIdentityMap.get("activeActorId").toString())
+                .properties((Map<String, String>) loggedIdentityMap.get("properties"))
                 .build();
     }
 

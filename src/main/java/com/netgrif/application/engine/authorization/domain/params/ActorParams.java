@@ -8,14 +8,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 @Getter
 @Setter
-public abstract class ActorParams implements CaseParams {
+public abstract class ActorParams extends CaseParams {
 
     protected CaseField groupIds;
 
-    protected ActorParams(CaseField groupIds) {
+    protected ActorParams(CaseField groupIds, Map<String, String> properties) {
+        super(properties);
         this.groupIds = groupIds;
     }
 

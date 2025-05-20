@@ -7,10 +7,13 @@ import com.netgrif.application.engine.workflow.domain.CaseParams;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.util.Map;
 
 @Data
-@Builder(builderMethodName = "with")
-public class IdentityParams implements CaseParams {
+@EqualsAndHashCode(callSuper = true)
+public class IdentityParams extends CaseParams {
     protected TextField username;
     protected TextField firstname;
     protected TextField lastname;
@@ -20,6 +23,22 @@ public class IdentityParams implements CaseParams {
     protected TextField registrationToken;
     protected CaseField mainActor;
     protected CaseField additionalActors;
+
+    @Builder(builderMethodName = "with")
+    public IdentityParams(Map<String, String> properties, TextField username, TextField firstname, TextField lastname,
+                          TextField password, EnumerationMapField state, DateTimeField expirationDateTime,
+                          TextField registrationToken, CaseField mainActor, CaseField additionalActors) {
+        super(properties);
+        this.username = username;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.password = password;
+        this.state = state;
+        this.expirationDateTime = expirationDateTime;
+        this.registrationToken = registrationToken;
+        this.mainActor = mainActor;
+        this.additionalActors = additionalActors;
+    }
 
     @Override
     public DataSet toDataSet() {

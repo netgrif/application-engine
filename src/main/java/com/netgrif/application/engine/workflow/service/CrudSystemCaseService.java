@@ -174,8 +174,13 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
     protected T doCreate(CaseParams params, String activeActorId) {
         Case systemCase = workflowService.createCaseByIdentifier(getProcessIdentifier(), null, "",
                 activeActorId).getCase();
-        T systemObject = (T) systemCaseFactory.fromCase(dataService.setData(systemCase, params.toDataSet(),
-                activeActorId).getCase());
+        systemCase = dataService.setData(systemCase, params.toDataSet(),
+                activeActorId).getCase();
+        if (params.getProperties() != null) {
+            systemCase.setProperties(params.getProperties());
+            systemCase = workflowService.save(systemCase);
+        }
+        T systemObject = (T) systemCaseFactory.fromCase(systemCase);
 
         if (systemObject == null) {
             throw new IllegalStateException(String.format("Unexpected: No wrapper class factory is registered for process [%s]",
@@ -211,8 +216,15 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
 
     @SuppressWarnings("unchecked")
     protected T doUpdate(SystemCase systemObject, CaseParams params, String activeActorId) {
-        systemObject = systemCaseFactory.fromCase(dataService.setData(systemObject.getCase(), params.toDataSet(),
-                activeActorId).getCase());
+        Case systemCase = dataService.setData(systemObject.getCase(), params.toDataSet(),
+                activeActorId).getCase();
+
+        if (params.getProperties() != null) {
+            systemCase.setProperties(params.getProperties());
+            systemCase = workflowService.save(systemCase);
+        }
+
+        systemObject = systemCaseFactory.fromCase(systemCase);
 
         if (systemObject == null) {
             throw new IllegalStateException(String.format("Unexpected: No wrapper class factory is registered for process [%s]",

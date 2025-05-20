@@ -28,7 +28,7 @@ public class LdapLoggedIdentity extends LoggedIdentity {
     public LdapLoggedIdentity(String id, String username, String password, String dn, String commonName,
                               Set<String> memberOf, String uid, String homeDirectory) {
         // todo 2058 ldap
-        super(null, id, null, username, password);
+        super(null, id, null, username, password, null);
         this.dn = dn;
         this.commonName = commonName;
         this.memberOf = memberOf;

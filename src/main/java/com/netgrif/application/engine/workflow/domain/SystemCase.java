@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.domain;
 
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 public abstract class SystemCase {
 
@@ -29,6 +30,10 @@ public abstract class SystemCase {
 
     public String getStringId() {
         return this.getCase().getStringId();
+    }
+
+    public Map<String, String> getProperties() {
+        return this.getCase().getProperties();
     }
 
     protected static class CanInitializeOutcome {

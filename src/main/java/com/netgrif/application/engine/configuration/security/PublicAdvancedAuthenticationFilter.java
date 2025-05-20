@@ -7,12 +7,14 @@ import com.netgrif.application.engine.authentication.service.interfaces.IIdentit
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import com.netgrif.application.engine.startup.AnonymousIdentityRunner;
 import com.netgrif.application.engine.startup.ApplicationRoleRunner;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -45,6 +47,7 @@ public class PublicAdvancedAuthenticationFilter extends PublicJwtAuthenticationF
                 .firstname(new TextField(AnonymIdentityConstants.FIRSTNAME))
                 .lastname(new TextField(AnonymIdentityConstants.LASTNAME))
                 .password(new TextField("n/a"))
+                .properties(Map.of(AnonymousIdentityRunner.getAnonymousFlag(), "true"))
                 .build());
 
         Set<String> roleIds = Set.of(roleService.findApplicationRoleByImportId(ApplicationRoleRunner.ANONYMOUS_APP_ROLE).getStringId(),

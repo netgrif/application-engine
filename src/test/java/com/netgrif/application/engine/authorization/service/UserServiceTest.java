@@ -141,10 +141,13 @@ public class UserServiceTest {
         String email = "some@email.com";
         String firstname = "firstname";
         String lastname = "lastname";
+        String propertyKey = "property";
+        String propertyValue = "isActive";
         User user = userService.create(UserParams.with()
                 .email(new TextField(email))
                 .firstname(new TextField(firstname))
                 .lastname(new TextField(lastname))
+                .properties(Map.of(propertyKey, propertyValue))
                 .build());
 
         assert user != null && user.getCase() != null;
@@ -154,6 +157,10 @@ public class UserServiceTest {
         assert user.getGroupIds() != null;
         assert user.getGroupIds().size() == 1;
         assert user.getGroupIds().get(0).equals(defaultGroupRunner.getDefaultGroup().getStringId());
+        assert user.getCase().getProperties() != null;
+        assert user.getCase().getProperties().size() == 1;
+        assert user.getCase().getProperties().containsKey(propertyKey);
+        assert user.getCase().getProperties().get(propertyKey).equals(propertyValue);
 
         assertThrows(IllegalArgumentException.class, () -> userService.create(UserParams.with()
                 .firstname(new TextField(firstname))
@@ -181,6 +188,7 @@ public class UserServiceTest {
         assert user.getGroupIds() != null;
         assert user.getGroupIds().size() == 1;
         assert user.getGroupIds().get(0).equals(defaultGroupRunner.getDefaultGroup().getStringId());
+        assert user.getCase().getProperties() == null || user.getCase().getProperties().isEmpty();
 
         assertThrows(IllegalArgumentException.class, () -> userService.update(user, UserParams.with()
                 .email(new TextField(null))
@@ -197,12 +205,15 @@ public class UserServiceTest {
 
         String newFirstname = "newFirstname";
         String newLastname = "newLastname";
+        String propertyKey = "property";
+        String propertyValue = "isActive";
         Group testGroup = createGroup("test group");
         User updatedUser = userService.update(user, UserParams.with()
                 .email(new TextField(email))
                 .firstname(new TextField(newFirstname))
                 .lastname(new TextField(newLastname))
                 .groupIds(CaseField.withValue(List.of(testGroup.getStringId())))
+                .properties(Map.of(propertyKey, propertyValue))
                 .build());
 
         assert user.getStringId().equals(updatedUser.getStringId());
@@ -212,6 +223,10 @@ public class UserServiceTest {
         assert updatedUser.getGroupIds() != null;
         assert updatedUser.getGroupIds().size() == 1;
         assert updatedUser.getGroupIds().get(0).equals(testGroup.getStringId());
+        assert updatedUser.getCase().getProperties() != null;
+        assert updatedUser.getCase().getProperties().size() == 1;
+        assert updatedUser.getCase().getProperties().containsKey(propertyKey);
+        assert updatedUser.getCase().getProperties().get(propertyKey).equals(propertyValue);
     }
 
     @Test

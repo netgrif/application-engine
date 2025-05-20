@@ -26,6 +26,8 @@ class AnonymousIdentityRunner extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IRoleService roleService
 
+    static final String anonymousFlag = "anonymous"
+
     @Override
     void run(String... args) throws Exception {
         Optional<Identity> anonymOpt = identityService.findByUsername(AnonymIdentityConstants.defaultUsername())
@@ -41,6 +43,7 @@ class AnonymousIdentityRunner extends AbstractOrderedCommandLineRunner {
                 .password(new TextField("n/a"))
                 .firstname(new TextField(AnonymIdentityConstants.FIRSTNAME))
                 .lastname(new TextField(AnonymIdentityConstants.LASTNAME))
+                .properties(Map.of(anonymousFlag, "true"))
                 .build())
 
         Set<String> roleIds = Set.of(roleService.findApplicationRoleByImportId(ApplicationRoleRunner.ANONYMOUS_APP_ROLE).getStringId(),
