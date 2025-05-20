@@ -303,7 +303,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     @Override
     public List<ProcessRole> findAll(Pageable pageable) {
-        return processRoleRepository.findAll(pageable).toList();
+        return processRoleRepository.findAll(pageable).stream().collect(Collectors.toList());
     }
 
     @Override
