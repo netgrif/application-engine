@@ -7,12 +7,16 @@ import com.netgrif.application.engine.petrinet.domain.version.StringToVersionCon
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
@@ -28,9 +32,10 @@ import java.util.List;
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
 @EnableMethodSecurity
 @EnableAspectJAutoProxy
-@SpringBootApplication(
-        exclude = {DataSourceAutoConfiguration.class},
-        scanBasePackages = {"com.netgrif"})
+@SpringBootConfiguration
+@ComponentScan(basePackages = "com.netgrif",
+        includeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = ".\\.nae\\.modules\\..*"))
+@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
 @EnableMongoAuditing
 @EnableMongoRepositories("com.netgrif")
 @ConfigurationPropertiesScan
