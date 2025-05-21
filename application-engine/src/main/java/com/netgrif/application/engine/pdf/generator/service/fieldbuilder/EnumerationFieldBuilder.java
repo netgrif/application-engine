@@ -5,7 +5,7 @@ import com.netgrif.application.engine.pdf.generator.domain.PdfEnumerationField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfSelectionField;
 import com.netgrif.application.engine.objects.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedEnumerationField;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedEnumerationField;
 
 import java.util.ArrayList;
 import java.util.List;
