@@ -19,6 +19,7 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.netgrif.application.engine.workflow.service.throwable.CaseAlreadyExistsException;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -173,7 +174,7 @@ public class IdentityServiceTest {
 
 
     @Test
-    void testCreate() {
+    void testCreate() throws InterruptedException {
         assertThrows(IllegalArgumentException.class, () -> identityService.create(null));
         assertThrows(IllegalArgumentException.class, () -> identityService.create(IdentityParams.with()
                 .username(new TextField(AnonymIdentityConstants.defaultUsername()))
@@ -222,6 +223,11 @@ public class IdentityServiceTest {
         assert identity.getCase().getProperties().size() == 1;
         assert identity.getCase().getProperties().containsKey(propertyKey);
         assert identity.getCase().getProperties().get(propertyKey).equals(propertyValue);
+
+        Thread.sleep(2000);
+        assertThrows(CaseAlreadyExistsException.class, () -> identityService.create(IdentityParams.with()
+                .username(new TextField(username))
+                .build()));
     }
 
     @Test

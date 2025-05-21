@@ -15,6 +15,7 @@ import com.netgrif.application.engine.workflow.domain.repositories.CaseRepositor
 import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.netgrif.application.engine.workflow.service.throwable.CaseAlreadyExistsException;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -161,6 +162,11 @@ public class GroupServiceTest {
 //                .memberIds(CaseField.withValue(List.of(superCreator.getSuperIdentity().getStringId()))) // wrong process identifier
 //                .parentGroupId(CaseField.withValue(List.of(parentGroup.getStringId())))
 //                .build()));
+
+        Thread.sleep(2000);
+        assertThrows(CaseAlreadyExistsException.class, () -> groupService.create(GroupParams.with()
+                .name(new TextField(name))
+                .build()));
     }
     @Test
     void testCreateDefaultParent() {

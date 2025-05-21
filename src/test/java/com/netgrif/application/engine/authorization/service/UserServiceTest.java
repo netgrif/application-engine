@@ -3,6 +3,7 @@ package com.netgrif.application.engine.authorization.service;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.authentication.domain.constants.SystemUserConstants;
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authorization.domain.Group;
 import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.constants.GroupConstants;
@@ -17,6 +18,7 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.netgrif.application.engine.workflow.service.throwable.CaseAlreadyExistsException;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -137,7 +139,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void testCreate() {
+    void testCreate() throws InterruptedException {
         String email = "some@email.com";
         String firstname = "firstname";
         String lastname = "lastname";
@@ -176,6 +178,11 @@ public class UserServiceTest {
                 .build()));
 
         assertThrows(IllegalArgumentException.class, () -> userService.create(null));
+
+        Thread.sleep(2000);
+        assertThrows(CaseAlreadyExistsException.class, () -> userService.create(UserParams.with()
+                .email(new TextField(email))
+                .build()));
     }
 
     @Test

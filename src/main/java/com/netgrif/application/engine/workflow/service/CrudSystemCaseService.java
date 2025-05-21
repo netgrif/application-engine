@@ -12,6 +12,7 @@ import com.netgrif.application.engine.workflow.domain.SystemCase;
 import com.netgrif.application.engine.workflow.service.interfaces.ICrudSystemCaseService;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.netgrif.application.engine.workflow.service.throwable.CaseAlreadyExistsException;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
@@ -146,7 +147,7 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
      * */
     @Override
     @Transactional
-    public T create(CaseParams params) throws IllegalArgumentException, IllegalStateException {
+    public T create(CaseParams params) throws IllegalArgumentException, IllegalStateException, CaseAlreadyExistsException {
         if (params == null) {
             throw new IllegalArgumentException("Please provide input parameters.");
         }
@@ -157,9 +158,8 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
 
         Optional<T> existingCaseOpt = findOneByQuery(isUniqueQuery(params));
         if (existingCaseOpt.isPresent()) {
-            log.warn("New instance of process [{}] wasn't created. Such instance with id [{}] already exists.",
-                    getProcessIdentifier(), existingCaseOpt.get().getStringId());
-            return existingCaseOpt.get();
+            throw new CaseAlreadyExistsException(String.format("Such instance with id [%s] of process [%s] already exists.",
+                    existingCaseOpt.get().getStringId(), getProcessIdentifier()));
         }
 
         final String activeActorId = sessionManagerService.getActiveActorId();
