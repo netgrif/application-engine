@@ -183,34 +183,6 @@ public class UserController {
         return ResponseEntity.ok(userFactory.getUser(user, locale));
     }
 
-    @Operation(summary = "Update user", security = {@SecurityRequirement(name = "BasicAuth")})
-    @PostMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> updateUser(@RequestBody UpdateUserRequest updates, Authentication auth, Locale locale)  {
-        if (!serverAuthProperties.isEnableProfileEdit()) return null;
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        String userId = updates.getStringId();
-        IUser user;
-        try {
-            user = userService.findById(userId, updates.getRealmId());
-        } catch (IllegalArgumentException e) {
-            log.error("Could not find user with id [{}]", userId, e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-        user = userService.update(user, updates);
-        securityContextService.saveToken(userId);
-        if (Objects.equals(loggedUser.getId(), userId)) {
-            loggedUser.setFirstName(user.getFirstName());
-            loggedUser.setLastName(user.getLastName());
-            if (updates.getWorkspaceId() != null) {
-                loggedUser.setWorkspaceId(updates.getWorkspaceId());
-            }
-            securityContextService.reloadSecurityContext(loggedUser);
-        }
-        log.info("Updating user " + user.getEmail() + " with data " + updates);
-        user.setWorkspaceId(updates.getWorkspaceId());
-        return ResponseEntity.ok(User.createUser(user));
-    }
-
     @Operation(summary = "Get all workspaces", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/workspaces", produces = MediaTypes.HAL_JSON_VALUE)
     public List<WorkspaceResponse> getAllWorkspaces() {
@@ -340,21 +312,6 @@ public class UserController {
         } catch (Exception e) {
             log.error("Saving user preferences failed", e);
             return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Saving user preferences failed"));
-        }
-    }
-
-    @Operation(summary = "Change Workspace", security = {@SecurityRequirement(name = "BasicAuth")})
-    @PostMapping(value = "/workspace/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource changeWorkspace(@PathVariable("id") String workspaceId, Authentication auth, Locale locale) {
-        try {
-            LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-            loggedUser.setWorkspaceId(workspaceId);
-            securityContextService.forceReloadSecurityContext(loggedUser);
-            log.info("Changing active workspace for user " + loggedUser.getEmail());
-            return MessageResource.successMessage("User workspace changed");
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return MessageResource.errorMessage("Changing user workspace failed");
         }
     }
 

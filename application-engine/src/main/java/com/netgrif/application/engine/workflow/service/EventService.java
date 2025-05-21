@@ -37,22 +37,22 @@ public class EventService implements IEventService {
     @Override
     public List<EventOutcome> runActions(List<Action> actions, Case useCase, Task task, Transition transition, Map<String, String> params) {
         log.info("[" + useCase.getStringId() + "]: Running actions of transition " + transition.getStringId());
-        return runActions(actions, useCase, Optional.of(task), params);
+        return runActions(actions, useCase, Optional.of(task), params, useCase.getWorkspaceId());
     }
 
     @Override
-    public List<EventOutcome> runActions(List<Action> actions, Map<String, String> params) {
-        return runActions(actions, null, Optional.empty(), params);
+    public List<EventOutcome> runActions(List<Action> actions, Map<String, String> params, String workspaceId) {
+        return runActions(actions, null, Optional.empty(), params, workspaceId);
     }
 
     @Override
-    public List<EventOutcome> runActions(List<Action> actions, Case useCase, Optional<Task> task, Map<String, String> params) {
+    public List<EventOutcome> runActions(List<Action> actions, Case useCase, Optional<Task> task, Map<String, String> params, String workspaceId) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
         if (actions.isEmpty()) {
             return allOutcomes;
         }
         actions.forEach(action -> {
-            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, params, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
+            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, params, useCase == null ? workspaceId : useCase.getWorkspaceId(), useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
                         if (((SetDataEventOutcome) outcome).getChangedFields().isEmpty()) return;
@@ -67,13 +67,13 @@ public class EventService implements IEventService {
     }
 
     @Override
-    public List<EventOutcome> runEventActions(Case useCase, Task task, List<Action> actions, DataEventType trigger, Map<String, String> params) {
+    public List<EventOutcome> runEventActions(Case useCase, Task task, List<Action> actions, DataEventType trigger, Map<String, String> params, String workspaceId) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
         if (actions.isEmpty()) {
             return allOutcomes;
         }
         actions.forEach(action -> {
-            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), params, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
+            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), params, useCase == null ? workspaceId : useCase.getWorkspaceId(), useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
                         if (((SetDataEventOutcome) outcome).getChangedFields().isEmpty()) return;
@@ -101,7 +101,7 @@ public class EventService implements IEventService {
             return Collections.emptyList();
         }
 
-        return runEventActions(useCase, task, fieldActions, actionTrigger, params);
+        return runEventActions(useCase, task, fieldActions, actionTrigger, params, useCase.getWorkspaceId());
     }
 
     @Override

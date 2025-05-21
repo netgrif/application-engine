@@ -235,7 +235,7 @@ public class PetriNetService implements IPetriNetService {
             throw new MissingPetriNetMetaDataException(Arrays.asList("WorkspaceId"));
         }
         net.setWorkspaceId(workspaceId);
-        net.setUri(workspaceId + "/" + uriNodeId);
+        net.setUri("/" + workspaceId + uriNodeId);
 
         PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
         if (existingNet != null) {
@@ -251,10 +251,10 @@ public class PetriNetService implements IPetriNetService {
         xmlCopy.close();
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully and saved in a folder: " + savedPath.toString());
 
-        outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
+        outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params, net.getWorkspaceId()));
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.PRE));
         save(net);
-        outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params));
+        outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params, net.getWorkspaceId()));
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
         outcome.setNet(imported.get());
         return outcome;
@@ -605,7 +605,7 @@ public class PetriNetService implements IPetriNetService {
         log.info("Running actions of net [" + petriNet.getStringId() + "]");
 
         actions.forEach(action -> {
-            actionsRunner.run(action, null, new HashMap<>(), petriNet.getFunctions());
+            actionsRunner.run(action, null, new HashMap<>(), petriNet.getWorkspaceId(), petriNet.getFunctions());
         });
     }
 

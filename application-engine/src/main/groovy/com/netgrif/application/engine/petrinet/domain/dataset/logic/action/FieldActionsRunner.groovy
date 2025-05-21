@@ -44,11 +44,11 @@ abstract class FieldActionsRunner {
 
     private Map<String, Object> actionsCache = new HashMap<>()
 
-    List<EventOutcome> run(com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action action, Case useCase, Map<String, String> params, List<Function> functions = []) {
-        return run(action, useCase, Optional.empty(), params, functions)
+    List<EventOutcome> run(com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action action, Case useCase, Map<String, String> params, String workspaceId, List<Function> functions = []) {
+        return run(action, useCase, Optional.empty(), params, workspaceId, functions)
     }
 
-    List<EventOutcome> run(com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action action, Case useCase, Optional<Task> task, Map<String, String> params, List<Function> functions = []) {
+    List<EventOutcome> run(com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action action, Case useCase, Optional<Task> task, Map<String, String> params, String workspaceId, List<Function> functions = []) {
         if (!actionsCache)
             actionsCache = new HashMap<>()
 
@@ -57,7 +57,7 @@ abstract class FieldActionsRunner {
         final ActionStartEvent actionStart = new ActionStartEvent(action)
         try {
             publisher.publishEvent(actionStart)
-            WorkspaceContextHolder.setWorkspaceId(useCase.getWorkspaceId(), true);
+            WorkspaceContextHolder.setWorkspaceId(useCase != null ? useCase.getWorkspaceId() : workspaceId, true);
             code.init(action, useCase, task, this, params)
             code()
             publisher.publishEvent(new ActionStopEvent(action, actionStart, true))

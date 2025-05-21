@@ -520,8 +520,8 @@ public class DataService implements IDataService {
     private void runGetActionsFromFileField(Map<DataEventType, DataEvent> events, Case useCase, Map<String, String> params) {
         if (events != null && !events.isEmpty() && events.containsKey(DataEventType.GET)) {
             DataEvent event = events.get(DataEventType.GET);
-            event.getPreActions().forEach(action -> actionsRunner.run(action, useCase, params));
-            event.getPostActions().forEach(action -> actionsRunner.run(action, useCase, params));
+            event.getPreActions().forEach(action -> actionsRunner.run(action, useCase, params, useCase.getWorkspaceId()));
+            event.getPostActions().forEach(action -> actionsRunner.run(action, useCase, params, useCase.getWorkspaceId()));
         }
     }
 

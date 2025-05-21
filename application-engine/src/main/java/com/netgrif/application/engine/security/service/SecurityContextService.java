@@ -3,6 +3,7 @@ package com.netgrif.application.engine.security.service;
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.objects.petrinet.domain.workspace.DefaultWorkspaceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -28,6 +29,8 @@ public class SecurityContextService implements ISecurityContextService {
     private final Set<String> cachedTokens;
 
     protected UserService userService;
+
+    protected DefaultWorkspaceService defaultWorkspaceService;
 
     protected SecurityContextService() {
         this.cachedTokens = ConcurrentHashMap.newKeySet();
@@ -65,6 +68,9 @@ public class SecurityContextService implements ISecurityContextService {
 
     private void reloadSecurityContext(LoggedUser loggedUser, boolean forceRefresh) {
         if (isUserLogged(loggedUser) && cachedTokens.contains(loggedUser.getId())) {
+            if (loggedUser.getWorkspaceId() == null) {
+                loggedUser.setWorkspaceId(defaultWorkspaceService.getDefaultWorkspace().getId());
+            }
             if (forceRefresh) {
                 String workspaceId = loggedUser.getWorkspaceId();
                 loggedUser = (LoggedUser) userService.transformToLoggedUser(userService.findById(loggedUser.getId(), null));
@@ -113,5 +119,10 @@ public class SecurityContextService implements ISecurityContextService {
     @Lazy
     public void setUserService(UserService userService) {
         this.userService = userService;
+    }
+
+    @Autowired
+    public void setDefaultWorkspaceService(DefaultWorkspaceService defaultWorkspaceService) {
+        this.defaultWorkspaceService = defaultWorkspaceService;
     }
 }

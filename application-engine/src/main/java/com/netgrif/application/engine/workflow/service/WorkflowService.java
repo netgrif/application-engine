@@ -339,7 +339,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.setUriNodeId(petriNet.getUriNodeId());
 
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
-        outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty(), params));
+        outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty(), params, petriNet.getWorkspaceId()));
         //evaluateRules(new CreateCaseEvent(new CreateCaseEventOutcome(null, outcome.getOutcomes()), EventPhase.PRE));
 
         publisher.publishEvent(new CreateCaseEvent(outcome, EventPhase.PRE));
@@ -351,7 +351,7 @@ public class WorkflowService implements IWorkflowService {
         resolveTaskRefs(useCase);
 
         useCase = findOne(useCase.getStringId());
-        outcome.addOutcomes(eventService.runActions(petriNet.getPostCreateActions(), useCase, Optional.empty(), params));
+        outcome.addOutcomes(eventService.runActions(petriNet.getPostCreateActions(), useCase, Optional.empty(), params, useCase.getWorkspaceId()));
         useCase = findOne(useCase.getStringId());
         useCase = evaluateRules(new CreateCaseEvent(new CreateCaseEventOutcome(useCase, outcome.getOutcomes()), EventPhase.POST));
 //        rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
@@ -400,7 +400,7 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params) {
 
-        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty(), params));
+        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty(), params, useCase.getPetriNet().getWorkspaceId()));
         publisher.publishEvent(new DeleteCaseEvent(outcome, EventPhase.PRE));
         useCase = ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("default")).apply(new DeleteCaseEvent(outcome, EventPhase.PRE));;
         log.info("[" + useCase.getStringId() + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
@@ -408,7 +408,7 @@ public class WorkflowService implements IWorkflowService {
         taskService.deleteTasksByCase(useCase.getStringId());
         repository.delete(useCase);
 
-        outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty(), params));
+        outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty(), params, useCase.getPetriNet().getWorkspaceId()));
         addMessageToOutcome(useCase.getPetriNet(), CaseEventType.DELETE, outcome);
         ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("noContext")).apply(new DeleteCaseEvent(outcome, EventPhase.POST));
         publisher.publishEvent(new DeleteCaseEvent(outcome, EventPhase.POST));

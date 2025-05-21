@@ -1,10 +1,12 @@
 package com.netgrif.application.engine.configuration.authentication.providers.basic;
 
 
+import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
+import com.netgrif.application.engine.objects.petrinet.domain.workspace.DefaultWorkspaceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.MessageSourceAccessor;
@@ -27,6 +29,9 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
 
     @Autowired
     protected UserService userService;
+
+    @Autowired
+    protected DefaultWorkspaceService defaultWorkspaceService;
 
     protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
 
@@ -61,8 +66,8 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
 
-        UserDetails userDetails = userService.transformToLoggedUser(user);
-
+        LoggedUserImpl userDetails = userService.transformToLoggedUser(user);
+        userDetails.setWorkspaceId(defaultWorkspaceService.getDefaultWorkspace().getId());
         UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(userDetails, presentedPassword, userDetails.getAuthorities());
         result.setDetails(authentication.getDetails());
         loginAttemptService.loginSucceeded(user.getStringId());

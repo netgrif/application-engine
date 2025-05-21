@@ -1,9 +1,12 @@
 package com.netgrif.application.engine.configuration.authentication.providers.ldap;
 
 
+import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
+import com.netgrif.application.engine.objects.petrinet.domain.workspace.DefaultWorkspaceService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.ldap.NamingException;
 import org.springframework.ldap.core.DirContextOperations;
@@ -37,6 +40,9 @@ import java.util.Collection;
 @Component
 @ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class NetgrifLdapAuthenticationProvider extends NetgrifAuthenticationProvider {
+
+    @Autowired
+    protected DefaultWorkspaceService defaultWorkspaceService;
 
     protected NaeLdapProperties ldapProperties;
 
@@ -160,8 +166,9 @@ public class NetgrifLdapAuthenticationProvider extends NetgrifAuthenticationProv
 
             Collection<GrantedAuthority> extraAuthorities = loadUserAuthorities(userData, username, password);
 
-            UserDetails user = userDetailsContextMapper.mapUserFromContext(userData, username, extraAuthorities);
+            LoggedUserImpl user = (LoggedUserImpl) userDetailsContextMapper.mapUserFromContext(userData, username, extraAuthorities);
             loginAttemptService.loginSucceeded(key);
+            user.setWorkspaceId(defaultWorkspaceService.getDefaultWorkspace().getId());
             return createSuccessfulAuthentication(userToken, user);
         } catch (PasswordPolicyException ppe) {
             log.error(ppe.getStatus().getErrorCode() + ": " + ppe.getStatus().getDefaultMessage());
