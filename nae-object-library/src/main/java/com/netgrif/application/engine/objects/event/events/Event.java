@@ -15,8 +15,6 @@ public abstract class Event extends EventObject {
     @Getter
     protected LocalDateTime time;
 
-    // TODO JOFO: add user -> AbstractActor/ActorRef?
-
     public Event(Object source) {
         super(source);
         this.time = LocalDateTime.now();

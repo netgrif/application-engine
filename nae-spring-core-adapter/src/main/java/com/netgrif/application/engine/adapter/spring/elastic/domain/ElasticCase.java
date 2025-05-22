@@ -67,6 +67,11 @@ public class ElasticCase extends com.netgrif.application.engine.objects.elastic.
     }
 
     @Field(type = Keyword)
+    public String getAuthorRealm() {
+        return super.getAuthorRealm();
+    }
+
+    @Field(type = Keyword)
     public String getMongoId() {
         return super.getMongoId();
     }

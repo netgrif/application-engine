@@ -527,7 +527,7 @@ public class UserServiceImpl implements UserService {
             system.setFirstName(UserConstants.SYSTEM_USER_NAME);
             system.setLastName(UserConstants.SYSTEM_USER_SURNAME);
             system.setState(UserState.ACTIVE);
-            saveUser(system, system.getRealmId());
+            saveUser(system);
         }
         return system;
     }

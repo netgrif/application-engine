@@ -54,8 +54,9 @@ public abstract class ElasticCase implements Serializable {
 
     private Long creationDateSortable;
 
-    // TODO JOFO: author realm?
     private String author;
+
+    private String authorRealm;
 
     private String mongoId;
 
@@ -96,6 +97,7 @@ public abstract class ElasticCase implements Serializable {
         creationDate = useCase.getCreationDate();
         creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
         author = useCase.getAuthor().getId();
+        authorRealm = useCase.getAuthor().getRealmId();
         authorName = useCase.getAuthor().getFullName();
         authorUsername = useCase.getAuthor().getUsername();
         taskIds = useCase.getTasks().stream().map(TaskPair::getTransition).collect(Collectors.toSet());

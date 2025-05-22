@@ -65,9 +65,11 @@ public abstract class Task implements Serializable {
     @Setter
     private String userId;
 
+    @Setter
+    private String userRealm;
+
     @Getter
     @Setter
-    // TODO JOFO: only actorref? can group be assigned to task?
     private AbstractUser user;
 
     @Setter
@@ -272,6 +274,11 @@ public abstract class Task implements Serializable {
     @JsonIgnore
     public String getUserId() {
         return userId;
+    }
+
+    @JsonIgnore
+    public String getUserRealm() {
+        return userRealm;
     }
 
     public String getTranslatedEventTitle(EventType assign, Locale locale) {

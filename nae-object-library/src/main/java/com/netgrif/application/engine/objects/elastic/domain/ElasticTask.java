@@ -45,8 +45,9 @@ public abstract class ElasticTask {
 
     private int priority;
 
-    // TODO JOFO: maybe user realm too?
     private String userId;
+
+    private String userRealm;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -89,6 +90,7 @@ public abstract class ElasticTask {
         if (task.getPriority() != null)
             this.priority = task.getPriority();
         this.userId = task.getUserId();
+        this.userRealm = task.getUserRealm();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles().keySet();
         this.viewRoles = new HashSet<>(task.getViewRoles());
@@ -106,6 +108,7 @@ public abstract class ElasticTask {
         this.caseTitleSortable = this.caseTitle;
         this.priority = task.getPriority();
         this.userId = task.getUserId();
+        this.userRealm = task.getUserRealm();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles();
         this.viewRoles = task.getViewRoles();

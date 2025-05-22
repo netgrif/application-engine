@@ -67,4 +67,13 @@ public class ActorTransformer {
                 group.getName()
         );
     }
+
+    public static ActorRef anonymizedActorRef() {
+        return new ActorRef(
+                "",
+                "",
+                "***",
+                "***"
+        );
+    }
 }

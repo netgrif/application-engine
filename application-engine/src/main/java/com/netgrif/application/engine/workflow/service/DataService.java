@@ -136,7 +136,7 @@ public class DataService implements IDataService {
         Set<String> fieldsIds = transition.getDataSet().keySet();
         List<Field<?>> dataSetFields = new ArrayList<>();
         if (task.getUserId() != null) {
-            task.setUser(userService.findById(task.getUserId(), null));
+            task.setUser(userService.findById(task.getUserId(), task.getUserRealm()));
         }
         GetDataEventOutcome outcome = new GetDataEventOutcome(useCase, task);
         fieldsIds.forEach(fieldId -> {
@@ -228,7 +228,7 @@ public class DataService implements IDataService {
         log.info("[" + useCase.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
 
         if (task.getUserId() != null) {
-            task.setUser(userService.findById(task.getUserId(), null));
+            task.setUser(userService.findById(task.getUserId(), task.getUserRealm()));
         }
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
         values.fields().forEachRemaining(entry -> {

@@ -32,8 +32,6 @@ public abstract class ElasticPetriNet {
 
     private String initials;
 
-    // TODO JOFO: do we want author in elastic?
-
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime creationDate;
