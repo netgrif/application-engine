@@ -4,15 +4,23 @@ import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.petrinet.domain.workspace.DefaultWorkspaceService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,8 +40,11 @@ public class SecurityContextService implements ISecurityContextService {
 
     protected DefaultWorkspaceService defaultWorkspaceService;
 
+    private final SecurityContextRepository securityContextRepository;
+
     protected SecurityContextService() {
         this.cachedTokens = ConcurrentHashMap.newKeySet();
+        this.securityContextRepository = new HttpSessionSecurityContextRepository();
     }
 
     /**
@@ -73,13 +84,31 @@ public class SecurityContextService implements ISecurityContextService {
             }
             if (forceRefresh) {
                 String workspaceId = loggedUser.getWorkspaceId();
-                loggedUser = (LoggedUser) userService.transformToLoggedUser(userService.findById(loggedUser.getId(), null));
+                loggedUser = userService.transformToLoggedUser(userService.findById(loggedUser.getId(), null));
                 loggedUser.setWorkspaceId(workspaceId);
             }
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), ((LoggedUserImpl) loggedUser).getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(token);
+            SecurityContext context = getSecurityContext(loggedUser);
+            securityContextRepository.saveContext(context, getServletRequest(), getServletResponse());
             clearToken(loggedUser.getId());
         }
+    }
+
+    @NotNull
+    private SecurityContext getSecurityContext(LoggedUser loggedUser) {
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), ((LoggedUserImpl) loggedUser).getAuthorities());
+        SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
+        SecurityContext context = securityContextHolderStrategy.createEmptyContext();
+        context.setAuthentication(authentication);
+        securityContextHolderStrategy.setContext(context);
+        return context;
+    }
+
+    private HttpServletRequest getServletRequest() {
+        return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
+    }
+
+    private HttpServletResponse getServletResponse() {
+        return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getResponse();
     }
 
     /**
