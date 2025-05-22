@@ -13,6 +13,8 @@ import com.netgrif.application.engine.authentication.web.requestbodies.NewIdenti
 import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.authorization.domain.Role
 import com.netgrif.application.engine.authorization.domain.User
+import com.netgrif.application.engine.authorization.service.interfaces.IAllActorService
+import com.netgrif.application.engine.authorization.service.interfaces.IGroupService
 import com.netgrif.application.engine.authorization.service.interfaces.IUserService
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.configuration.PublicViewProperties
@@ -176,6 +178,12 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     @Autowired
     IRoleService roleService
+
+    @Autowired
+    IGroupService groupService
+
+    @Autowired
+    IAllActorService allActorService
 
     FrontendActionOutcome Frontend
 

@@ -14,6 +14,32 @@
 			<view>true</view>
 		</permission>
 	</roleRef>
+	<caseEvents>
+		<event type="delete">
+			<id>group_removal</id>
+			<actions phase="pre">
+				<action id="action_1">
+				def actors = allActorService.findAll()
+				actors.each { actor ->
+					if (actor.stringId == useCase.stringId) {
+						return
+					}
+					actor = userService.removeGroup(actor, useCase.stringId)
+					if (actor.case.processIdentifier != com.netgrif.application.engine.authorization.domain.constants.GroupConstants.PROCESS_IDENTIFIER) {
+						return
+					}
+					def typedActor = (com.netgrif.application.engine.authorization.domain.Group) actor
+					if (typedActor.parentGroupId != useCase.stringId) {
+						return
+					}
+					groupService.update(actor, com.netgrif.application.engine.authorization.domain.params.GroupParams.with()
+							.parentGroupId(com.netgrif.application.engine.petrinet.domain.dataset.CaseField.withValue([]))
+							.build())
+				}
+				</action>
+			</actions>
+		</event>
+	</caseEvents>
 	<role>
 		<id>admin</id>
 		<title>Admin</title>

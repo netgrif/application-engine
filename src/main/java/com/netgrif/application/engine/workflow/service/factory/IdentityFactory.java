@@ -4,14 +4,14 @@ import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.constants.IdentityConstants;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class IdentityFactory extends SystemCaseFactory<Identity> {
 
-    private final SystemCaseFactoryRegistry factoryRegistry;
+    public IdentityFactory(SystemCaseFactoryRegistry factoryRegistry) {
+        super(factoryRegistry);
+    }
 
     @Override
     public Identity createObject(Case identityCase) {

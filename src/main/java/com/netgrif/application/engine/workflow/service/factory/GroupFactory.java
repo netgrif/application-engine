@@ -2,16 +2,17 @@ package com.netgrif.application.engine.workflow.service.factory;
 
 import com.netgrif.application.engine.authorization.domain.Group;
 import com.netgrif.application.engine.authorization.domain.constants.GroupConstants;
+import com.netgrif.application.engine.authorization.service.ActorTypeRegistry;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
-public class GroupFactory extends SystemCaseFactory<Group> {
+public class GroupFactory extends ActorFactory<Group> {
 
-    private final SystemCaseFactoryRegistry factoryRegistry;
+    public GroupFactory(SystemCaseFactoryRegistry factoryRegistry, ActorTypeRegistry actorTypeRegistry) {
+        super(factoryRegistry, actorTypeRegistry);
+    }
 
     @Override
     public Group createObject(Case groupCase) {
@@ -21,5 +22,10 @@ public class GroupFactory extends SystemCaseFactory<Group> {
     @Override
     protected void registerFactory() {
         factoryRegistry.registerFactory(GroupConstants.PROCESS_IDENTIFIER, this);
+    }
+
+    @Override
+    protected void registerType() {
+        actorTypeRegistry.registerActorType(GroupConstants.PROCESS_IDENTIFIER, Group.class);
     }
 }

@@ -13,6 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class SystemCaseFactoryRegistry {
 
+    /**
+     * Key is a process identifier and value is a factory
+     * */
     private final Map<String, SystemCaseFactory<?>> factories;
 
     public SystemCaseFactoryRegistry() {

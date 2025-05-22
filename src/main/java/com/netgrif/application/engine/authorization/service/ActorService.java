@@ -88,7 +88,11 @@ public abstract class ActorService<T extends Actor> extends CrudSystemCaseServic
         }
 
         List<String> groupIds = new ArrayList<>(actor.getGroupIds());
-        groupIds.removeAll(groupIdsToRemove);
+        boolean isAnyRemoved = groupIds.removeAll(groupIdsToRemove);
+
+        if (!isAnyRemoved) {
+            return actor;
+        }
 
         final String activeActorId = sessionManagerService.getActiveActorId();
         return doUpdate(actor, new ActorGroupParams(CaseField.withValue(groupIds)), activeActorId);

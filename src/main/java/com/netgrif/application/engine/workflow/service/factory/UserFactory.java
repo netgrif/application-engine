@@ -2,16 +2,17 @@ package com.netgrif.application.engine.workflow.service.factory;
 
 import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
+import com.netgrif.application.engine.authorization.service.ActorTypeRegistry;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
-public class UserFactory extends SystemCaseFactory<User> {
+public class UserFactory extends ActorFactory<User> {
 
-    private final SystemCaseFactoryRegistry factoryRegistry;
+    public UserFactory(SystemCaseFactoryRegistry factoryRegistry, ActorTypeRegistry actorTypeRegistry) {
+        super(factoryRegistry, actorTypeRegistry);
+    }
 
     @Override
     public User createObject(Case userCase) {
@@ -19,7 +20,12 @@ public class UserFactory extends SystemCaseFactory<User> {
     }
 
     @Override
-    public void registerFactory() {
+    protected void registerFactory() {
         factoryRegistry.registerFactory(UserConstants.PROCESS_IDENTIFIER, this);
+    }
+
+    @Override
+    protected void registerType() {
+        actorTypeRegistry.registerActorType(UserConstants.PROCESS_IDENTIFIER, User.class);
     }
 }
