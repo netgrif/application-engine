@@ -16,7 +16,7 @@ public class ElasticTaskSearchRequest extends TaskSearchRequest {
     public String query;
     
     public ElasticTaskSearchRequest(Map<String, Object> request) {
-        // todo 2058
+        // todo: release/8.0.0
         if (request.containsKey("role") && request.get("role") instanceof List) {
             this.role = (List<String>) request.get("role");
         }

@@ -14,7 +14,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class TaskSearchRequest {
 
-    // todo 2058 update
+    // todo: release/8.0.0 update
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> role;

@@ -4,7 +4,7 @@ import com.netgrif.application.engine.authentication.domain.Identity;
 
 public class IdentityLoginEvent extends IdentityEvent {
 
-    // todo 2058 needed? Spring security publishes AuthenticationSuccessEvent
+    // todo: release/8.0.0 needed? Spring security publishes AuthenticationSuccessEvent
 
     public IdentityLoginEvent(Identity identity) {
         super(identity);

@@ -15,7 +15,7 @@ public class CancelTaskEventLog extends TaskEventLog {
     }
 
     public CancelTaskEventLog(Task task, Case useCase, EventPhase eventPhase, String actorId) {
-        // todo 2058 impersonating
+        // todo: release/8.0.0 impersonating
         super(task, useCase, eventPhase, actorId, null);
     }
 }

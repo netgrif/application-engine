@@ -118,11 +118,9 @@ public class LdapGroupRefService implements ILdapGroupRefService {
         if (ldapGroup == null) {
             LdapGroup newLdapGroup = new LdapGroup();
             newLdapGroup.setDn(groupDn);
-            // todo 2058
 //            newLdapGroup.setProcessesProcessRoles(requestedProcessRoles);
             ldapGroupRoleRepository.save(newLdapGroup);
         } else {
-            // todo 2058
 //            ldapGroup.setProcessesProcessRoles(requestedProcessRoles);
             ldapGroupRoleRepository.save(ldapGroup);
         }

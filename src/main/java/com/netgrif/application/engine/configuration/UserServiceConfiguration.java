@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 @Configuration
 public class UserServiceConfiguration {
 
-    // todo 2058 needed?
+    // todo: release/8.0.0 needed?
 
 //    @Bean
 //    @ConditionalOnMissingBean

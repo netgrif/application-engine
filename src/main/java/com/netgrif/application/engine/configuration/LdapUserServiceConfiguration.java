@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 @ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapUserServiceConfiguration {
 
-    // todo 2058 ldap
 //    @Bean
 //    public IUserService userService() {
 //        return new LdapUserService();

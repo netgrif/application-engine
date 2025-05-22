@@ -58,7 +58,18 @@ public abstract class AuthorizationService {
     }
 
     /**
-     * todo javadoc
+     * Finds permission value by provided permissions and role ids
+     *
+     * @param roleIds role ids assigned to some actor
+     * @param resourcePermissions permission collection of some resource
+     * @param permission permission type to search for
+     *
+     * @return Optional boolean value, which is:
+     * <ol>
+     *     <li>Empty optional: if the permission value was not found by provided role ids</li>
+     *     <li>Optional of true: if the positive permission was found by provided role ids (there must be no negative permission found)</li>
+     *     <li>Optional of false: if the negative permission was found by provided role ids</li>
+     * </ol>
      * */
     private <T> Optional<Boolean> isPermitted(Set<String> roleIds, AccessPermissions<T> resourcePermissions, T permission) {
         // private on purpose
@@ -73,7 +84,7 @@ public abstract class AuthorizationService {
                 continue;
             }
             Map<T, Boolean> permissions = entry.getValue();
-            isPermittedOpt = Optional.ofNullable(permissions.get(permission));
+            isPermittedOpt = resolveNextPermissionValue(isPermittedOpt.orElse(null), permissions.get(permission));
             if (isPermittedOpt.isPresent() && !isPermittedOpt.get()) {
                 // permission is prohibited, no need of continuing
                 return isPermittedOpt;
@@ -81,5 +92,28 @@ public abstract class AuthorizationService {
         }
 
         return isPermittedOpt;
+    }
+
+    /**
+     * Resolves next permission value between previous iteration result and current iteration result
+     *
+     * @param previousPermissionValue isPermitted value of previous iteration of for loop in {@link #isPermitted}
+     * @param currentPermissionValue isPermitted value of current iteration of for loop in {@link #isPermitted}
+     *
+     * @return Optional isPermitted value. Scenarios:
+     * <ol>
+     *     <li>Empty optional: if the previous value was null (permission not found) and the current permission is also not found</li>
+     *     <li>Optional of true: if the previous value was true or null, and the current value is true</li>
+     *     <li>Optional of false: if the previous value was false, or the current value is false</li>
+     * </ol>
+     * */
+    private Optional<Boolean> resolveNextPermissionValue(Boolean previousPermissionValue, Boolean currentPermissionValue) {
+        if (previousPermissionValue == null) {
+            return Optional.ofNullable(currentPermissionValue);
+        }
+        if (previousPermissionValue && currentPermissionValue != null) {
+            return Optional.of(currentPermissionValue);
+        }
+        return Optional.of(previousPermissionValue);
     }
 }

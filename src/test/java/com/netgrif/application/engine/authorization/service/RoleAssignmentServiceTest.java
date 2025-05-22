@@ -2,7 +2,18 @@ package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authorization.domain.*;
+import com.netgrif.application.engine.authorization.domain.constants.GroupConstants;
+import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
+import com.netgrif.application.engine.authorization.domain.params.GroupParams;
+import com.netgrif.application.engine.authorization.domain.params.UserParams;
 import com.netgrif.application.engine.authorization.domain.repositories.RoleAssignmentRepository;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
+import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import com.netgrif.application.engine.startup.DefaultGroupRunner;
+import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +34,18 @@ public class RoleAssignmentServiceTest {
     private RoleAssignmentService roleAssignmentService;
 
     @Autowired
+    private IWorkflowService workflowService;
+
+    @Autowired
+    private IDataService dataService;
+
+    @Autowired
+    private IRoleService roleService;
+
+    @Autowired
+    private DefaultGroupRunner defaultGroupRunner;
+
+    @Autowired
     private RoleAssignmentRepository repository;
 
     @Autowired
@@ -40,16 +63,9 @@ public class RoleAssignmentServiceTest {
         String roleId1 = "roleId1";
         String roleId2 = "roleId2";
         String roleId3 = "roleId3";
-        RoleAssignment assignment1 = new ProcessRoleAssignment();
-        assignment1.setActorId(actorId);
-        assignment1.setRoleId(roleId1);
-        RoleAssignment assignment2 = new ProcessRoleAssignment();
-        assignment2.setActorId(actorId);
-        assignment2.setRoleId(roleId2);
-        RoleAssignment assignment3 = new ProcessRoleAssignment();
-        assignment3.setActorId(actorId);
-        assignment3.setRoleId(roleId3);
-        repository.saveAll(List.of(assignment1, assignment2, assignment3));
+        assignProcessRole(actorId, roleId1);
+        assignProcessRole(actorId, roleId2);
+        RoleAssignment assignment3 = assignProcessRole(actorId, roleId3);
 
         List<RoleAssignment> assignments = roleAssignmentService.findAllByActorIdAndRoleIdIn(actorId, Set.of(roleId1, roleId2));
 
@@ -63,16 +79,9 @@ public class RoleAssignmentServiceTest {
         String roleId1 = "roleId1";
         String roleId2 = "roleId2";
         String roleId3 = "roleId3";
-        RoleAssignment assignment1 = new ProcessRoleAssignment();
-        assignment1.setActorId(actorId);
-        assignment1.setRoleId(roleId1);
-        RoleAssignment assignment2 = new ProcessRoleAssignment();
-        assignment2.setActorId(actorId);
-        assignment2.setRoleId(roleId2);
-        RoleAssignment assignment3 = new ProcessRoleAssignment();
-        assignment3.setActorId(actorId);
-        assignment3.setRoleId(roleId3);
-        repository.saveAll(List.of(assignment1, assignment2, assignment3));
+        assignProcessRole(actorId, roleId1);
+        assignProcessRole(actorId, roleId2);
+        RoleAssignment assignment3 = assignProcessRole(actorId, roleId3);
 
         List<RoleAssignment> assignments = roleAssignmentService.findAllByRoleIdIn(Set.of(roleId1, roleId2));
 
@@ -85,13 +94,8 @@ public class RoleAssignmentServiceTest {
         String actorId = "actorId";
         String roleId1 = "roleId1";
         String roleId2 = "roleId2";
-        RoleAssignment assignment1 = new ProcessRoleAssignment();
-        assignment1.setActorId(actorId);
-        assignment1.setRoleId(roleId1);
-        RoleAssignment assignment2 = new ProcessRoleAssignment();
-        assignment2.setActorId(actorId);
-        assignment2.setRoleId(roleId2);
-        repository.saveAll(List.of(assignment1, assignment2));
+        assignProcessRole(actorId, roleId1);
+        assignProcessRole(actorId, roleId2);
 
         assert roleAssignmentService.findAllByActorId(actorId).size() == 2;
     }
@@ -101,28 +105,48 @@ public class RoleAssignmentServiceTest {
         String actorId = "actorId";
         String roleId1 = "roleId1";
         String roleId2 = "roleId2";
-        RoleAssignment assignment1 = new ProcessRoleAssignment();
-        assignment1.setActorId(actorId);
-        assignment1.setRoleId(roleId1);
-        RoleAssignment assignment2 = new ProcessRoleAssignment();
-        assignment2.setActorId(actorId);
-        assignment2.setRoleId(roleId2);
-        RoleAssignment assignment3 = new ProcessRoleAssignment();
-        assignment3.setActorId("otherActorId");
-        assignment3.setRoleId("role3");
-        repository.saveAll(List.of(assignment1, assignment2, assignment3));
+        assignProcessRole(actorId, roleId1);
+        assignProcessRole(actorId, roleId2);
+        assignProcessRole("otherActorId", "role3");
 
         assert roleAssignmentService.findAllRoleIdsByActorId(actorId).size() == 2;
+    }
+
+    @Test
+    public void testFindAllRoleIdsByActorAndGroups() {
+        assert roleAssignmentService.findAllRoleIdsByActorAndGroups(null).isEmpty();
+
+        Group childGroup = createGroup("child group");
+        Group parentGroup = createGroup("parent group");
+        childGroup = updateGroupWithParent(childGroup, parentGroup.getStringId());
+        Actor actor = createUser("actor@test.com", List.of(childGroup.getStringId()));
+
+        assert roleAssignmentService.findAllRoleIdsByActorAndGroups(actor.getStringId()).isEmpty();
+
+        updateGroupWithParent(parentGroup, defaultGroupRunner.getDefaultGroup().getStringId());
+        assignProcessRole(defaultGroupRunner.getDefaultGroup().getStringId(), roleService.findDefaultRole().getStringId());
+
+        Set<String> roleIds = roleAssignmentService.findAllRoleIdsByActorAndGroups(actor.getStringId());
+        assert roleIds.size() == 1;
+        assert roleIds.contains(roleService.findDefaultRole().getStringId());
+
+        String roleId1 = "roleId1";
+        String roleId2 = "roleId2";
+        assignCaseRole(parentGroup.getStringId(), roleId1, "caseId");
+        assignAppRole(childGroup.getStringId(), roleId2, "appRole");
+
+        roleIds = roleAssignmentService.findAllRoleIdsByActorAndGroups(actor.getStringId());
+        assert roleIds.size() == 3;
+        assert roleIds.contains(roleService.findDefaultRole().getStringId());
+        assert roleIds.contains(roleId1);
+        assert roleIds.contains(roleId2);
     }
 
     @Test
     public void testExistsByActorAndRole() {
         String actorId = "actorId";
         String roleId1 = "roleId1";
-        RoleAssignment assignment1 = new ProcessRoleAssignment();
-        assignment1.setActorId(actorId);
-        assignment1.setRoleId(roleId1);
-        repository.saveAll(List.of(assignment1));
+        assignProcessRole(actorId, roleId1);
 
         assert !roleAssignmentService.existsByActorAndRole("wrongActor", "wrongRole");
         assert !roleAssignmentService.existsByActorAndRole("wrongActor", roleId1);
@@ -133,14 +157,8 @@ public class RoleAssignmentServiceTest {
     @Test
     public void testFindApplicationAssignmentsByActor() {
         String actorId = "actorId";
-        ApplicationRoleAssignment assignment1 = new ApplicationRoleAssignment();
-        assignment1.setApplicationId("appId");
-        assignment1.setActorId(actorId);
-        ApplicationRoleAssignment assignment2 = new ApplicationRoleAssignment();
-        assignment2.setApplicationId("appId");
-        assignment2.setActorId(actorId);
-
-        repository.saveAll(List.of(assignment1, assignment2));
+        assignAppRole(actorId, "some", "appId");
+        assignAppRole(actorId, "some", "appId");
 
         assert roleAssignmentService.findApplicationAssignmentsByActor("wrongActor").isEmpty();
         assert roleAssignmentService.findApplicationAssignmentsByActor(actorId).size() == 2;
@@ -212,10 +230,7 @@ public class RoleAssignmentServiceTest {
     public void testRemoveAssignment() {
         String actorId = "actor_id";
         String roleId = "role1";
-        RoleAssignment processRoleAssignment = new ProcessRoleAssignment();
-        processRoleAssignment.setActorId(actorId);
-        processRoleAssignment.setRoleId(roleId);
-        repository.save(processRoleAssignment);
+        assignProcessRole(actorId, roleId);
 
         assert repository.count() == 1;
         roleAssignmentService.removeAssignment(actorId, roleId);
@@ -228,16 +243,9 @@ public class RoleAssignmentServiceTest {
         String processRoleId = "role1";
         String processRoleId2 = "role2";
         String caseRoleId = "role3";
-        RoleAssignment processRoleAssignment = new ProcessRoleAssignment();
-        processRoleAssignment.setActorId(actorId);
-        processRoleAssignment.setRoleId(processRoleId);
-        RoleAssignment processRoleAssignment2 = new ProcessRoleAssignment();
-        processRoleAssignment2.setActorId("someOtherActorId");
-        processRoleAssignment2.setRoleId(processRoleId2);
-        CaseRoleAssignment caseRoleAssignment = new CaseRoleAssignment();
-        caseRoleAssignment.setActorId(actorId);
-        caseRoleAssignment.setRoleId(caseRoleId);
-        repository.saveAll(List.of(processRoleAssignment, processRoleAssignment2, caseRoleAssignment));
+        assignProcessRole(actorId, processRoleId);
+        RoleAssignment  processRoleAssignment2 = assignProcessRole("someOtherActorId", processRoleId2);
+        assignCaseRole(actorId, caseRoleId, "caseId");
 
         assert repository.count() == 3;
         List<RoleAssignment> removedAssignments = roleAssignmentService.removeAssignmentsByActor(actorId);
@@ -315,5 +323,52 @@ public class RoleAssignmentServiceTest {
         assert removedAssignments.size() == 1;
         assert removedAssignments.stream().noneMatch(removedAssignment ->
                 removedAssignment.getStringId().equals(processRoleAssignment.getStringId()));
+    }
+
+    private Group createGroup(String name) {
+        Case groupCase = workflowService.createCaseByIdentifier(GroupConstants.PROCESS_IDENTIFIER, name, "", null).getCase();
+        return new Group(dataService.setData(groupCase, GroupParams.with()
+                .name(new TextField(name))
+                .build()
+                .toDataSet(), null).getCase());
+    }
+
+    private Group updateGroupWithParent(Group group, String parentGroupId) {
+        return new Group(dataService.setData(group.getCase(), GroupParams.with()
+                .parentGroupId(CaseField.withValue(List.of(parentGroupId)))
+                .build()
+                .toDataSet(), null).getCase());
+    }
+
+    private User createUser(String email, List<String> additionalGroupIds) {
+        Case userCase = workflowService.createCaseByIdentifier(UserConstants.PROCESS_IDENTIFIER, email, "", null).getCase();
+        return new User(dataService.setData(userCase, UserParams.with()
+                .email(new TextField(email))
+                .groupIds(CaseField.withValue(additionalGroupIds))
+                .build()
+                .toDataSet(), null).getCase());
+    }
+
+    private RoleAssignment assignProcessRole(String actorId, String roleId) {
+        RoleAssignment assignment = new ProcessRoleAssignment();
+        assignment.setActorId(actorId);
+        assignment.setRoleId(roleId);
+        return repository.save(assignment);
+    }
+
+    private RoleAssignment assignCaseRole(String actorId, String roleId, String caseId) {
+        CaseRoleAssignment assignment = new CaseRoleAssignment();
+        assignment.setActorId(actorId);
+        assignment.setRoleId(roleId);
+        assignment.setCaseId(caseId);
+        return repository.save(assignment);
+    }
+
+    private RoleAssignment assignAppRole(String actorId, String roleId, String appId) {
+        ApplicationRoleAssignment assignment = new ApplicationRoleAssignment();
+        assignment.setActorId(actorId);
+        assignment.setRoleId(roleId);
+        assignment.setApplicationId(appId);
+        return repository.save(assignment);
     }
 }

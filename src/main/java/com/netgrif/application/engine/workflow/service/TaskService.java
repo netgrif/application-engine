@@ -576,7 +576,6 @@ public class TaskService implements ITaskService {
     public Page<Task> getAll(String actorId, Pageable pageable, Locale locale) {
         List<Task> tasks;
 
-        // todo 2058
 //        if (loggedOrImpersonated.getRoles().isEmpty()) {
 //            tasks = new ArrayList<>();
 //            return new PageImpl<>(tasks, pageable, 0L);

@@ -122,7 +122,7 @@ class FilterImportExportTest {
         importCase = this.workflowService.searchOne(
                 QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER) & QCase.case$.authorId.eq(dummyIdentity.mainActorId)
         )
-        assert importCase != null // todo 2058 fails because identityService doesnt create cases
+        assert importCase != null // todo: release/8.0.0 fails because identityService doesnt create cases
 
         exportCase = this.workflowService.searchOne(
                 QCase.case$.processIdentifier.eq(EXPORT_NET_IDENTIFIER) & QCase.case$.authorId.eq(dummyIdentity.mainActorId)

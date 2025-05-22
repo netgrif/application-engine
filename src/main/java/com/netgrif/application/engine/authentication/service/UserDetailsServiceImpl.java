@@ -41,7 +41,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     protected LoggedIdentity getLoggedUser(String email) throws UsernameNotFoundException {
-        // todo 2058
 //        User user = userRepository.findByEmail(email);
 //        if (user == null)
 //            throw new UsernameNotFoundException("No user was found for login: " + email);

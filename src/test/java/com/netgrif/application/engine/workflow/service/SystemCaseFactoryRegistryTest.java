@@ -1,8 +1,11 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.authorization.domain.Group;
 import com.netgrif.application.engine.authorization.domain.User;
+import com.netgrif.application.engine.authorization.domain.params.GroupParams;
 import com.netgrif.application.engine.authorization.domain.params.UserParams;
+import com.netgrif.application.engine.authorization.service.interfaces.IGroupService;
 import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
@@ -43,6 +46,9 @@ public class SystemCaseFactoryRegistryTest {
     private IUserService userService;
 
     @Autowired
+    private IGroupService groupService;
+
+    @Autowired
     private IPetriNetService petriNetService;
 
     @Autowired
@@ -77,6 +83,13 @@ public class SystemCaseFactoryRegistryTest {
         assert systemCase instanceof User;
         assert systemCase.getCase().getStringId().equals(user.getStringId());
 
-        // todo 2058 group case
+        Group group = groupService.create(GroupParams.with()
+                .name(new TextField("group name"))
+                .build());
+
+        systemCase = registry.fromCase(group.getCase());
+        assert systemCase != null;
+        assert systemCase instanceof Group;
+        assert systemCase.getCase().getStringId().equals(group.getStringId());
     }
 }

@@ -81,7 +81,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
 //    }
 //
 //    public Predicate positiveProcessRoleQuery(String roleId) {
-//        // todo 2058 view_disabled
+//        // todo: release/8.0.0 view_disabled
 //        return QTask.task.caseRolePermissions.permissions.isEmpty().and(QTask.task.processRolePermissions.permissions.isEmpty())
 //                .or(QTask.task.processRolePermissions.permissions.get(roleId).eq(Map.of(TaskPermission.VIEW, true)));
 //    }

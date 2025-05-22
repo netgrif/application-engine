@@ -55,7 +55,7 @@ public class UserDetailsContextMapperImpl implements UserDetailsContextMapper {
         assert identity != null;
         LoggedIdentity loggedIdentity = identity.toSession();
 //        if (user instanceof LdapUser && (!((LdapUser) user).getMemberOf().isEmpty())) {
-            // todo 2058
+            // todo: release/8.0.0
 //                loggedUser.addRoleAssignments(ldapGroupRefService.getRoleByLdapGroup(((LdapUser) user).getMemberOf()));
 //            }
         return loggedIdentity;

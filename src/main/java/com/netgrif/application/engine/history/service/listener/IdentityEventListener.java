@@ -17,12 +17,12 @@ public class IdentityEventListener {
 
     @EventListener
     public void onIdentityLoginEvent(IdentityLoginEvent event) {
-        // todo 2058
+        // todo: release/8.0.0
     }
 
     @EventListener
     public void onIdentityLogoutEvent(IdentityLogoutEvent event) {
-        // todo 2058
+        // todo: release/8.0.0
     }
 
     @EventListener

@@ -38,7 +38,6 @@ public class LdapUserRefService implements ILdapUserRefService {
     @Autowired
     private LdapUserRefRepository repository;
 
-    // todo 2058 ldap
 //    @Autowired
 //    private LdapUserService ldapUserService;
 
@@ -51,7 +50,6 @@ public class LdapUserRefService implements ILdapUserRefService {
     @Autowired
     private LdapConfiguration ldapUserConfiguration;
 
-    // todo 2058 ldap
 //    @Override
 //    public IUser createUser(LdapUserRef ldapUserRef) {
 //        LdapUser ldapUser = new LdapUser(ldapUserRef.getDn().toString(), ldapUserRef.getCn(), ldapUserRef.getUid(), ldapUserRef.getHomeDirectory(), ldapUserRef.getMail(), ldapUserRef.getFirstName(), ldapUserRef.getSurname(), ldapUserRef.getMemberOf(), ldapUserRef.getTelNumber());
@@ -119,7 +117,6 @@ public class LdapUserRefService implements ILdapUserRefService {
     }
 
 
-    // todo 2058 ldap
 //    @Override
 //    public IUser updateById(Name id, IUser savedUser) {
 //        DirContextOperations context = ldapUserConfiguration.ldapTemplate().lookupContext(id);

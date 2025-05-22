@@ -113,6 +113,9 @@ public class CaseAuthorizationServiceTest {
 
     @Test
     public void canCallCreate() {
+        assert !authorizationService.canCallCreate(null);
+        assert !authorizationService.canCallCreate("wrong id");
+
         // order of assertions is important!
         assert !authorizationService.canCallCreate(null);
         assert authorizationService.canCallCreate(testProcessWithDefault.getStringId());
@@ -161,6 +164,9 @@ public class CaseAuthorizationServiceTest {
 
     @Test
     public void canCallDelete() {
+        assert !authorizationService.canCallDelete(null);
+        assert !authorizationService.canCallDelete("wrong id");
+
         // order of assertions is important!
         Case testCase = importHelper.createCase("test", testProcess);
         Case testCaseWithDefault = importHelper.createCase("test with default role", testProcessWithDefault);
@@ -225,6 +231,75 @@ public class CaseAuthorizationServiceTest {
 
         TestHelper.logout();
         assert !authorizationService.canCallDelete(testCase.getStringId());
+    }
+
+    @Test
+    public void canCallView() {
+        // order of assertions is important!
+        assert !authorizationService.canView(null);
+        assert !authorizationService.canView("wrong id");
+
+        Case testCase = importHelper.createCase("test", testProcess);
+        Case testCaseWithDefault = importHelper.createCase("test with default role", testProcessWithDefault);
+
+        assert !authorizationService.canView(testCase.getStringId());
+        assert authorizationService.canView(testCaseWithDefault.getStringId());
+
+        assignProcessRole(testIdentity.getMainActorId(), processRoleRepository.findByImportId("pos_process_role"));
+        assert authorizationService.canView(testCase.getStringId());
+
+        assignProcessRole(testIdentity.getMainActorId(), processRoleRepository.findByImportId("neg_process_role"));
+        assert !authorizationService.canView(testCase.getStringId());
+
+        assignCaseRole(testIdentity.getMainActorId(), caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(),
+                "pos_case_role"), testCase);
+        assert authorizationService.canView(testCase.getStringId());
+
+        assignCaseRole(testIdentity.getMainActorId(), caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(),
+                "neg_case_role"), testCase);
+        assert !authorizationService.canView(testCase.getStringId());
+
+        assignAppRole(testIdentity.getMainActorId(), applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE));
+        assert authorizationService.canView(testCase.getStringId());
+
+        TestHelper.logout();
+        assert !authorizationService.canView(testCase.getStringId());
+    }
+
+    @Test
+    public void canCallViewByGroups() {
+        // order of assertions is important!
+        Case testCase = importHelper.createCase("test", testProcess);
+        Case testCaseWithDefault = importHelper.createCase("test with default role", testProcessWithDefault);
+
+        User testUser = initializeTestUserWithGroup();
+
+        assert !authorizationService.canView(testCase.getStringId());
+        assert !authorizationService.canView(testCaseWithDefault.getStringId());
+
+        testGroup = updateGroupWithParent(testGroup, groupService.getDefaultGroup().getStringId());
+        assert !authorizationService.canView(testCase.getStringId());
+        assert authorizationService.canView(testCaseWithDefault.getStringId());
+
+        assignProcessRole(testGroup.getStringId(), processRoleRepository.findByImportId("pos_process_role"));
+        assert authorizationService.canView(testCase.getStringId());
+
+        assignProcessRole(testGroup.getStringId(), processRoleRepository.findByImportId("neg_process_role"));
+        assert !authorizationService.canView(testCase.getStringId());
+
+        assignCaseRole(testGroup.getStringId(), caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(),
+                "pos_case_role"), testCase);
+        assert authorizationService.canView(testCase.getStringId());
+
+        assignCaseRole(testGroup.getStringId(), caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(),
+                "neg_case_role"), testCase);
+        assert !authorizationService.canView(testCase.getStringId());
+
+        assignAppRole(testGroup.getStringId(), applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE));
+        assert authorizationService.canView(testCase.getStringId());
+
+        TestHelper.logout();
+        assert !authorizationService.canView(testCase.getStringId());
     }
 
     @Test

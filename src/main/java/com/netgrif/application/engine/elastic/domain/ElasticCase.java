@@ -121,7 +121,7 @@ public class ElasticCase {
         creationDate = useCase.getCreationDate();
         creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
         authorId = useCase.getAuthorId();
-        // todo 2058
+        // todo: release/8.0.0
 //        authorEmail = useCase.getAuthorId().getEmail();
         taskIds = useCase.getTasks().keySet();
         taskMongoIds = useCase.getTasks().values().stream().map(TaskPair::getTaskStringId).collect(Collectors.toSet());

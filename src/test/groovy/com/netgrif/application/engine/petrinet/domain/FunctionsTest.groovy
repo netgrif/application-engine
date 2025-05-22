@@ -106,7 +106,7 @@ class FunctionsTest {
         Optional<Identity> identityOpt = identityService.findByUsername("test@test.com")
         assert identityOpt.isPresent()
 
-        // todo 2058 removal
+        // todo: release/8.0.0 removal
 //        userService.deleteUser(user)
         petriNetService.deletePetriNet(functionResNet.stringId)
         petriNetService.deletePetriNet(functionTestNet.stringId)

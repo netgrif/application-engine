@@ -33,7 +33,7 @@ public class Filter {
 
     private Integer visibility;
 
-    private User author; // todo 2058 Actor type leads to compilation error
+    private User author; // todo: release/8.0.0 Actor type leads to compilation error
 
     private LocalDateTime created;
 

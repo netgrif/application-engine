@@ -9,8 +9,6 @@ import javax.naming.Name;
 @ConditionalOnExpression("${nae.ldap.enabled:false}")
 public interface ILdapUserRefService {
 
-    // todo 2058 ldap
-
 //    IUser createUser(LdapUserRef ldapUser);
 
 //    IUser updateById(Name id, IUser savedUser);

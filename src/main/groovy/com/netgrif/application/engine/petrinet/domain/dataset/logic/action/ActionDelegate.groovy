@@ -979,9 +979,6 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         mailService.sendMail(mailDraft)
     }
 
-    // todo 2058 API methods for actor
-    // todo 2058 should AD have API for identity?
-
     Identity changeIdentityByEmail(String email, IdentityParams identityParams) {
         Optional<Identity> identityOpt = identityService.findByUsername(email)
         return changeIdentity(identityOpt, identityParams)

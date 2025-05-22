@@ -65,7 +65,6 @@ class SecurityContextTest {
     @Test
     void addRole() {
         // TODO: release/8.0.0 fix
-        // todo 2058
 //        Set<String> roleIds = net.getRoles().keySet()
 //        Set<String> roleIds = []
 //

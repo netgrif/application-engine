@@ -126,7 +126,7 @@ class PetriNetServiceTest {
         assert taskRepository.count() == taskCount + 3
         assert roleRepository.count() == roleCount + 2
 
-        // todo 2058
+        // todo: release/8.0.0
 //        assert user.roles.size() == 1
 
 //        userService.addRole(user, testNet.roles.values().collect().get(0).stringId)

@@ -115,7 +115,6 @@ class NetgrifLdapAuthenticationProviderTest {
 
         Optional<Identity> identityOpt = identityService.findByUsername(USER_EMAIL_Test2);
         assert identityOpt.isPresent();
-        // todo 2058 ldap
 //        assert ((LdapUser) identityOpt).getMemberOf().size() == 2;
 
     }
@@ -131,7 +130,6 @@ class NetgrifLdapAuthenticationProviderTest {
 
         Optional<Identity> identityOpt = identityService.findByUsername(USER_EMAIL_Test3);
         assert identityOpt.isPresent();
-        // todo 2058 ldap
 //        assert ((LdapUser) identityOpt).getMemberOf().size() == 2;
     }
 
@@ -276,7 +274,6 @@ class NetgrifLdapAuthenticationProviderTest {
 
     @Test
     void LdapUserTest() {
-        // todo 2058 ldap
 //        LdapUser user = new LdapUser("dn", "commonName", "uid", "homeDirectory", "email", "name", "surname", null, "telNumber");
 //        assert user.getDn().equals("dn");
 //        assert user.getUid().equals("uid");
@@ -323,7 +320,6 @@ class NetgrifLdapAuthenticationProviderTest {
 
     @Test
     void createLdapUserTest() {
-        // todo 2058 ldap
 //        LdapUser user = new LdapUser();
 //        assert user != null;
 //        User test = new User();

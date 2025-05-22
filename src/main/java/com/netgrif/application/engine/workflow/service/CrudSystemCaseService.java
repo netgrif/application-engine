@@ -99,7 +99,7 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
      * */
     @Override
     public boolean registerForbiddenKeywords(Set<String> keywords) {
-        // todo 2058 authorisation
+        // todo: release/8.0.0 authorisation
         if (keywords == null) {
             return false;
         }
@@ -115,7 +115,7 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
      * */
     @Override
     public boolean removeForbiddenKeywords(Set<String> keywords) {
-        // todo 2058 authorisation
+        // todo: release/8.0.0 authorisation
         if (keywords == null) {
             return false;
         }

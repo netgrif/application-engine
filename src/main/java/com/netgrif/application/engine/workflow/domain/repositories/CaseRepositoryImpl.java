@@ -27,7 +27,6 @@ public abstract class CaseRepositoryImpl implements CaseRepository {
 
     @Override
     public void customize(QuerydslBindings bindings, QCase qCase) {
-        // todo 2058
 //        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 //        List<PetriNetReference> nets = petriNetService.getReferencesByUsersRoles(((LoggedIdentity) auth.getPrincipal()).getSelfOrImpersonated(), null);
 //        Set<String> netIds = nets.stream().map(Reference::getStringId).collect(Collectors.toSet());

@@ -29,10 +29,13 @@ public class TaskAuthorizationService extends AuthorizationService implements IT
         if (taskId == null) {
             return false;
         }
-
-        Task task = taskService.findById(taskId);
-        return !isAssigned(task)
-                && canCallEvent(task.getProcessRolePermissions(), task.getCaseRolePermissions(), TaskPermission.ASSIGN);
+        try {
+            Task task = taskService.findById(taskId);
+            return !isAssigned(task)
+                    && canCallEvent(task.getProcessRolePermissions(), task.getCaseRolePermissions(), TaskPermission.ASSIGN);
+        } catch(IllegalArgumentException ignore) {
+            return false;
+        }
     }
 
     /**
@@ -43,10 +46,13 @@ public class TaskAuthorizationService extends AuthorizationService implements IT
         if (taskId == null) {
             return false;
         }
-
-        Task task = taskService.findById(taskId);
-        return isAssigned(task) && isAssignee(task)
-                && canCallEvent(task.getProcessRolePermissions(), task.getCaseRolePermissions(), TaskPermission.CANCEL);
+        try {
+            Task task = taskService.findById(taskId);
+            return isAssigned(task) && isAssignee(task)
+                    && canCallEvent(task.getProcessRolePermissions(), task.getCaseRolePermissions(), TaskPermission.CANCEL);
+        } catch(IllegalArgumentException ignore) {
+            return false;
+        }
     }
 
     @Override
@@ -54,10 +60,13 @@ public class TaskAuthorizationService extends AuthorizationService implements IT
         if (taskId == null) {
             return false;
         }
-
-        Task task = taskService.findById(taskId);
-        return isAssigned(task)
-                && canCallEvent(task.getProcessRolePermissions(), task.getCaseRolePermissions(), TaskPermission.REASSIGN);
+        try {
+            Task task = taskService.findById(taskId);
+            return isAssigned(task)
+                    && canCallEvent(task.getProcessRolePermissions(), task.getCaseRolePermissions(), TaskPermission.REASSIGN);
+        } catch(IllegalArgumentException ignore) {
+            return false;
+        }
     }
 
     /**
@@ -68,10 +77,13 @@ public class TaskAuthorizationService extends AuthorizationService implements IT
         if (taskId == null) {
             return false;
         }
-
-        Task task = taskService.findById(taskId);
-        return isAssigned(task) && isAssignee(task)
-                && canCallEvent(task.getProcessRolePermissions(), task.getCaseRolePermissions(), TaskPermission.FINISH);
+        try {
+            Task task = taskService.findById(taskId);
+            return isAssigned(task) && isAssignee(task)
+                    && canCallEvent(task.getProcessRolePermissions(), task.getCaseRolePermissions(), TaskPermission.FINISH);
+        } catch(IllegalArgumentException ignore) {
+            return false;
+        }
     }
 
     /**
@@ -90,13 +102,15 @@ public class TaskAuthorizationService extends AuthorizationService implements IT
         if (taskId == null) {
             return false;
         }
-
-        return canCallGetData(taskService.findById(taskId));
+        try {
+            return canCallGetData(taskService.findById(taskId));
+        } catch(IllegalArgumentException ignore) {
+            return false;
+        }
     }
 
     @Override
     public boolean canCallGetData(Task task) {
-        // todo 2058 unit test
         if (task == null) {
             return false;
         }

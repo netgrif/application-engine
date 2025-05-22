@@ -27,7 +27,6 @@ public class LdapLoggedIdentity extends LoggedIdentity {
 
     public LdapLoggedIdentity(String id, String username, String password, String dn, String commonName,
                               Set<String> memberOf, String uid, String homeDirectory) {
-        // todo 2058 ldap
         super(null, id, null, username, password, null);
         this.dn = dn;
         this.commonName = commonName;
@@ -50,7 +49,6 @@ public class LdapLoggedIdentity extends LoggedIdentity {
 //        user.setState(IdentityState.ACTIVE);
 //        user.setPassword("n/a");
 //        user.setAuthorities(getAuthorities().stream().map(a -> ((SessionRole) a)).collect(Collectors.toSet()));
-//        // todo 2058
 ////        user.setRoles(this.getRoles().stream().map(roleId -> {
 ////            Role role = new Role();
 ////            role.setStringId(roleId);

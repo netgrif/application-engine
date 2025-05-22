@@ -66,7 +66,7 @@ class AssignRemoveTest {
 
         assert netOptional.getNet() != null
         def net = netOptional.getNet()
-        // todo 2058
+        // todo: release/8.0.0
 //        def roleCount = userService.system.roles.size()
 //
 //        // create

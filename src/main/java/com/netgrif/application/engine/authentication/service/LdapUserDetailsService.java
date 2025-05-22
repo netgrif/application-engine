@@ -18,7 +18,6 @@ public class LdapUserDetailsService /*extends UserDetailsServiceImpl*/ {
 
 //    @Override
     protected Identity getLoggedUser(String email) throws UsernameNotFoundException {
-        // todo 2058
         return null;
 //        IUser user = userRepository.findByEmail(email);
 //        if (user == null) {

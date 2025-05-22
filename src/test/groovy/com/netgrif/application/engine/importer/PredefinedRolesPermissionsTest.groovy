@@ -480,7 +480,7 @@ class PredefinedRolesPermissionsTest {
         return new NetCaseTask(net, aCase, task)
     }
 
-    // todo 2058 method name
+    // todo: release/8.0.0 method name
     private Map<String, Map<CasePermission, Boolean>> transformProcessRolePermissionMap(Map<String, Map<CasePermission, Boolean>> input, String netRoleId) {
         return input.collectEntries { it ->
             [it.key == DEFAULT_ROLE_ID || it.key == ANONYMOUS_ROLE_ID ? it.key : netRoleId, it.value.collectEntries { ti -> [ti.key, ti.value] }]

@@ -158,7 +158,7 @@ class ElasticSearchTest {
                         ]),
                         "size": CASE_NUMBER
                 ],
-                // todo 2058 author email,name is not indexed
+                // todo: release/8.0.0 author email,name is not indexed
 //                "searchByAuthorName"        : [
 //                        "json": JsonOutput.toJson([
 //                                "author": [

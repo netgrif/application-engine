@@ -59,7 +59,6 @@ class ActionDelegateTest {
 
     @Test
     void deleteUser(){
-        // todo 2058 removal
 //        GreenMail smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
 //        smtpServer.start()
 //        String mail = "test@netgrif.com";

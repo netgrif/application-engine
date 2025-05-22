@@ -20,17 +20,14 @@ public class LdapUserService /*extends UserService*/ {
     private LdapGroupRefService ldapGroupRefService;
 
     public Identity findByDn(Name dn) {
-        // todo 2058 ldap
 //        return ldapUserRepository.findByDn(dn.toString());
         return null;
     }
 
-    // todo 2058 ldap
 //    @Override
 //    public IUser findByEmail(String email) {
 //        IUser user = userRepository.findByEmail(email);
 //        if (user instanceof LdapUser && (((LdapUser) user).getMemberOf() != null && !(((LdapUser) user).getMemberOf().isEmpty()))) {
-//            // todo 2058
 ////            ldapGroupRefService.getRoleByLdapGroup(((LdapUser) user).getMemberOf()).forEach(user::addRole);
 //        }
 //        return user;

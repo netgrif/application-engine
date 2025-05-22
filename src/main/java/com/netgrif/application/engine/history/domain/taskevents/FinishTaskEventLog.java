@@ -15,7 +15,7 @@ public class FinishTaskEventLog extends TaskEventLog {
     }
 
     public FinishTaskEventLog(Task task, Case useCase, EventPhase eventPhase, String actorId) {
-        // todo 2058 impersonating
+        // todo: release/8.0.0 impersonating
         super(task, useCase, eventPhase, actorId, null);
     }
 }

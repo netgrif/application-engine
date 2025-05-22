@@ -35,9 +35,12 @@ public class CaseAuthorizationService extends AuthorizationService implements IC
         if (processId == null) {
             return false;
         }
-
-        Process process = processService.getPetriNet(processId);
-        return canCallEvent(process.getProcessRolePermissions(), new AccessPermissions<>(), CasePermission.CREATE);
+        try {
+            Process process = processService.getPetriNet(processId);
+            return canCallEvent(process.getProcessRolePermissions(), new AccessPermissions<>(), CasePermission.CREATE);
+        } catch(IllegalArgumentException ignore) {
+            return false;
+        }
     }
 
     /**
@@ -50,9 +53,12 @@ public class CaseAuthorizationService extends AuthorizationService implements IC
         if (caseId == null) {
             return false;
         }
-
-        Case targetCase = workflowService.findOne(caseId);
-        return canCallEvent(targetCase.getProcessRolePermissions(), targetCase.getCaseRolePermissions(), CasePermission.DELETE);
+        try {
+            Case targetCase = workflowService.findOne(caseId);
+            return canCallEvent(targetCase.getProcessRolePermissions(), targetCase.getCaseRolePermissions(), CasePermission.DELETE);
+        } catch(IllegalArgumentException ignore) {
+            return false;
+        }
     }
 
     /**
@@ -62,12 +68,14 @@ public class CaseAuthorizationService extends AuthorizationService implements IC
      */
     @Override
     public boolean canView(String caseId) {
-        // todo 2058 unit test
         if (caseId == null) {
             return false;
         }
-
-        Case targetCase = workflowService.findOne(caseId);
-        return canCallEvent(targetCase.getProcessRolePermissions(), targetCase.getCaseRolePermissions(), CasePermission.VIEW);
+        try {
+            Case targetCase = workflowService.findOne(caseId);
+            return canCallEvent(targetCase.getProcessRolePermissions(), targetCase.getCaseRolePermissions(), CasePermission.VIEW);
+        } catch(IllegalArgumentException ignore) {
+            return false;
+        }
     }
 }
