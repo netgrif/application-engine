@@ -237,7 +237,7 @@ public class PetriNetService implements IPetriNetService {
         net.setWorkspaceId(workspaceId);
         net.setUri("/" + workspaceId + uriNodeId);
 
-        PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
+        PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier(), workspaceId);
         if (existingNet != null) {
             net.setVersion(existingNet.getVersion());
             net.incrementVersion(releaseType);
@@ -365,9 +365,14 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Cacheable(value = "petriNetNewest", unless = "#result == null")
     public PetriNet getNewestVersionByIdentifier(String identifier) {
-        List<PetriNet> nets = repository.findByIdentifierAndWorkspaceId(identifier, userService.getLoggedOrSystem().getWorkspaceId(), PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
+        return getNewestVersionByIdentifier(identifier, userService.getLoggedOrSystem().getWorkspaceId());
+    }
+
+    @Override
+    @Cacheable(value = "petriNetNewest", unless = "#result == null")
+    public PetriNet getNewestVersionByIdentifier(String identifier, String workspaceId) {
+        List<PetriNet> nets = repository.findByIdentifierAndWorkspaceId(identifier, workspaceId, PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
         if (nets.isEmpty()) {
             return null;
         }

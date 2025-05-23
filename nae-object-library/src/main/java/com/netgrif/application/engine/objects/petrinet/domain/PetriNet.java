@@ -200,6 +200,8 @@ public abstract class PetriNet extends PetriNetObject {
         this.defaultRoleEnabled = petriNet.isDefaultRoleEnabled();
         this.anonymousRoleEnabled = petriNet.isAnonymousRoleEnabled();
         this.author = petriNet.getAuthor();
+        this.workspaceId = petriNet.getWorkspaceId();
+        this.uri = petriNet.getUri();
         initializeArcs();
     }
 

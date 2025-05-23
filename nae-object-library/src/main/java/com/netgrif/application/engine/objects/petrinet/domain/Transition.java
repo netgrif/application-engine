@@ -274,5 +274,6 @@ public class Transition extends Node {
         this.setAssignedUserPolicy(new HashMap<>(transition.assignedUserPolicy));
         this.setTags(new HashMap<>(transition.tags));
         this.setDefaultRoleId(transition.defaultRoleId);
+        this.setWorkspaceId(transition.workspaceId);
     }
 }

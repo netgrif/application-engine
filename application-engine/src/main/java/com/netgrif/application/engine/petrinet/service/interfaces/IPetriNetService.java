@@ -73,6 +73,8 @@ public interface IPetriNetService {
 
     PetriNet getNewestVersionByIdentifier(String identifier);
 
+    PetriNet getNewestVersionByIdentifier(String identifier, String workspaceId);
+
     List<PetriNet> getAll();
 
     FileSystemResource getFile(String netId, String title);

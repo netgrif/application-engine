@@ -76,6 +76,8 @@ public class Task {
 
     private Map<String, String> tags;
 
+    private String workspaceId;
+
     public Task(com.netgrif.application.engine.objects.workflow.domain.Task task, Locale locale) {
         this._id = task.getObjectId();
         this.caseId = task.getCaseId();
@@ -104,6 +106,7 @@ public class Task {
         this.delegateTitle = task.getTranslatedEventTitle(EventType.DELEGATE, locale);
         this.assignedUserPolicy = task.getAssignedUserPolicy();
         this.tags = task.getTags();
+        this.workspaceId = task.getWorkspaceId();
     }
 
     public Task(ElasticTask entity) {
@@ -113,6 +116,7 @@ public class Task {
         title = entity.getTitle().getDefaultValue();
         caseTitle = entity.getCaseTitle();
         priority = entity.getPriority();
+        workspaceId = entity.getWorkspaceId();
     }
 
     public String getStringId() {

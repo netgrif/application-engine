@@ -65,6 +65,7 @@ public abstract class ProcessRole extends Imported {
         this.processId = processRole.processId;
         this.description = processRole.description;
         this.events = processRole.events;
+        this.workspaceId = processRole.workspaceId;
     }
 
     public ProcessRole(String id) {
