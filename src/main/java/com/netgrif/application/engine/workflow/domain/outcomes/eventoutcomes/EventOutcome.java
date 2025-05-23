@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.workflow.domain.eventoutcomes;
+package com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes;
 
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FrontAction;

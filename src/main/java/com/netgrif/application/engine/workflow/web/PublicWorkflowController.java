@@ -2,9 +2,9 @@ package com.netgrif.application.engine.workflow.web;
 
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessage;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateCaseBody;
 import io.swagger.v3.oas.annotations.Operation;

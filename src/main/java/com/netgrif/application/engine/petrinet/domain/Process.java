@@ -275,6 +275,10 @@ public class Process extends ProcessObject {
         return new LinkedList<>();
     }
 
+    public boolean hasDefaultCaseName() {
+        return defaultCaseName != null;
+    }
+
     @Override
     public String getStringId() {
         return id.toString();

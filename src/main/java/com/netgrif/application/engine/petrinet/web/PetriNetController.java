@@ -11,9 +11,9 @@ import com.netgrif.application.engine.petrinet.domain.version.StringToVersionCon
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessage;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

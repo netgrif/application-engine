@@ -8,9 +8,7 @@ import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventL
 import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.model.CaseEventType;
-import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
-import com.netgrif.application.engine.petrinet.domain.I18nExpression;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.Transition;
@@ -23,11 +21,16 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.security.service.EncryptionService;
+import com.netgrif.application.engine.transaction.NaeTransaction;
+import com.netgrif.application.engine.transaction.configuration.NaeTransactionProperties;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.*;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.CreateTasksOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.EventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.service.initializer.DataSetInitializer;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
@@ -35,16 +38,18 @@ import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpr
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
+import groovy.lang.Closure;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -72,9 +77,6 @@ public class WorkflowService implements IWorkflowService {
     protected EncryptionService encryptionService;
 
     @Autowired
-    protected FieldFactory fieldFactory;
-
-    @Autowired
     protected IRuleEngine ruleEngine;
 
     @Autowired
@@ -99,6 +101,12 @@ public class WorkflowService implements IWorkflowService {
     private ISessionManagerService sessionManagerService;
 
     @Autowired
+    private MongoTransactionManager transactionManager;
+
+    @Autowired
+    private NaeTransactionProperties transactionProperties;
+
+    @Autowired
     public void setElasticCaseService(IElasticCaseService elasticCaseService) {
         this.elasticCaseService = elasticCaseService;
     }
@@ -110,12 +118,7 @@ public class WorkflowService implements IWorkflowService {
         }
         encryptDataSet(useCase);
         useCase = repository.save(useCase);
-        try {
-            useCase.resolveImmediateDataFields();
-            elasticCaseService.indexNow(useCase);
-        } catch (Exception e) {
-            log.error("Indexing failed [{}]", useCase.getStringId(), e);
-        }
+
         return useCase;
     }
 
@@ -129,14 +132,10 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Case findOneNoNet(String caseId) {
         Optional<Case> caseOptional = repository.findById(caseId);
-        if (caseOptional.isEmpty()) {
-            throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
-        }
-        // TODO: release/8.0.0 get or throw?
-        return caseOptional.get();
+        return caseOptional.orElseThrow(() -> new IllegalArgumentException("Could not find Case with id [" + caseId + "]"));
     }
 
-    protected void initialize(Case useCase) {
+    private void initialize(Case useCase) {
         setPetriNet(useCase);
         decryptDataSet(useCase);
         useCase.resolveImmediateDataFields();
@@ -176,127 +175,150 @@ public class WorkflowService implements IWorkflowService {
         return page;
     }
 
+    /**
+     * Create {@link Case} object as {@link CreateCaseEventOutcome} by provided parameters as {@link CreateCaseParams}.
+     * Created object is saved into database along with the tasks. Any {@link Task}, that should be executed at the
+     * object creation is executed (auto-trigger tasks).
+     *
+     * @param createCaseParams parameters for {@link Case} creation
+     * <br>
+     * <b>Required parameters:</b>
+     * <ul>
+     *     <li>petriNet or petriNetIdentifier or petriNetId</li>
+     *     <li>loggedUser</li>
+     * </ul>
+     *
+     * @return outcome with up to date {@link} Case object containing sub-outcomes as result of triggered events
+     * */
     @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, String actorId, Locale locale, Map<String, String> params) {
-        if (locale == null) {
-            locale = LocaleContextHolder.getLocale();
+    public CreateCaseEventOutcome createCase(CreateCaseParams createCaseParams) {
+        fillMissingAttributes(createCaseParams);
+
+        if (createCaseParams.getIsTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
+            NaeTransaction transaction = NaeTransaction.builder()
+                    .transactionManager(transactionManager)
+                    .event(new Closure<CreateCaseEventOutcome>(null) {
+                        @Override
+                        public CreateCaseEventOutcome call() {
+                            return doCreateCase(createCaseParams);
+                        }
+                    })
+                    .build();
+            transaction.begin();
+            return (CreateCaseEventOutcome) transaction.getResultOfEvent();
+        } else {
+            return doCreateCase(createCaseParams);
         }
-        if (title == null) {
-            title = resolveDefaultCaseTitle(netId, locale, params);
-        }
-        return this.createCase(netId, title, color, actorId, params);
     }
 
-    @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, String actorId, Locale locale) {
-        return this.createCase(netId, title, color, actorId, locale, new HashMap<>());
-    }
+    private CreateCaseEventOutcome doCreateCase(CreateCaseParams createCaseParams) {
+        Case useCase = createCaseObject(createCaseParams);
+        CreateTasksOutcome createTasksOutcome = taskService.createAndSetTasksInCase(useCase);
 
-    @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, String actorId, Map<String, String> params) {
-        return createCase(netId, (u) -> title, color, actorId, params);
-    }
-
-    @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, String actorId) {
-        return this.createCase(netId, (u) -> title, color, actorId);
-    }
-
-    @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, String actorId, Locale locale, Map<String, String> params) {
-        Process net = petriNetService.getNewestVersionByIdentifier(identifier);
-        if (net == null) {
-            throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
-        }
-        return this.createCase(net.getStringId(), title != null && !title.isEmpty() ? title : net.getDefaultCaseName().getTranslation(locale), color, actorId, params);
-    }
-
-    @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, String actorId, Locale locale) {
-        return this.createCaseByIdentifier(identifier, title, color, actorId, locale, new HashMap<>());
-    }
-
-    @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, String actorId, Map<String, String> params) {
-        Process net = petriNetService.getNewestVersionByIdentifier(identifier);
-        if (net == null) {
-            throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
-        }
-        return this.createCase(net.getStringId(), title, color, actorId, params);
-    }
-
-    @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, String actorId) {
-        Process net = petriNetService.getNewestVersionByIdentifier(identifier);
-        if (net == null) {
-            throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
-        }
-        return this.createCase(net.getStringId(), title, color, actorId);
-    }
-
-    public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, String actorId) {
-        return this.createCase(netId, makeTitle, color, actorId, new HashMap<>());
-    }
-
-    // TODO: release/8.0.0 remove color
-    public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, String actorId, Map<String, String> params) {
-        Process petriNet = petriNetService.clone(new ObjectId(netId));
-        int rulesExecuted;
-        Case useCase = new Case(petriNet);
-        useCase.setAuthorId(actorId);
-        useCase.setCreationDate(LocalDateTime.now());
-        useCase.setTitle(makeTitle.apply(useCase));
-        CreateTasksOutcome createTasksOutcome = taskService.createTasks(useCase);
-        useCase = createTasksOutcome.getUseCase();
-        dataSetInitializer.populateDataSet(useCase, params);
+        Process process = createCaseParams.getProcess();
         roleService.resolveCaseRolesOnCase(useCase, useCase.getProcess().getCaseRolePermissions(), false);
         for (Task task : createTasksOutcome.getTasks()) {
-            Transition transition = petriNet.getTransition(task.getTransitionId());
+            Transition transition = process.getTransition(task.getTransitionId());
             roleService.resolveCaseRolesOnTask(useCase, task, transition.getCaseRolePermissions(), false, true);
         }
-        useCase = save(useCase);
-        // TODO: release/7.0.0 6.2.5
-        // TODO: release/8.0.0 useCase.setUriNodeId(petriNet.getUriNodeId());
-//        UriNode uriNode = uriService.getOrCreate(petriNet, UriContentType.CASE);
-//        useCase.setUriNodeId(uriNode.getId());
+        save(useCase); // must be after tasks creation for effectivity reasons
 
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
-        outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty(), params));
-        rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
+
+        // todo: release/8.0.0 pre actions should be run before the actual case creation? At this moment the case already exists in DB
+        outcome.addOutcomes(eventService.runActions(process.getPreCreateActions(), null, Optional.empty(),
+                createCaseParams.getParams()));
+
+        // todo: release/8.0.0 should ruleEngine have useCase at this stage of execution?
+        int rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         if (rulesExecuted > 0) {
             useCase = save(useCase);
         }
 
         historyService.save(new CreateCaseEventLog(useCase, EventPhase.PRE));
-        log.info("[{}]: Case {} created", useCase.getStringId(), useCase.getTitle());
-//TODO: release/8.0.0
-        resolveArcsWeight(useCase);
-        taskService.reloadTasks(useCase);
-        //TODO: release/8.0.0
-        useCase = findOne(useCase.getStringId());
-        outcome.addOutcomes(eventService.runActions(petriNet.getPostCreateActions(), useCase, Optional.empty(), params));
-        useCase = findOne(useCase.getStringId());
+
+        if (createTasksOutcome.getAutoTriggerTask() != null) {
+            taskService.executeTask(createTasksOutcome.getAutoTriggerTask(), useCase);
+            useCase = findOne(useCase.getStringId());
+        }
+
+        // TODO release/8.0.0 resolving init of taskRefs is going to be done differently
+        // resolveTaskRefs(useCase);
+
+        List<EventOutcome> eventPostOutcomes = eventService.runActions(process.getPostCreateActions(), useCase, Optional.empty(),
+                createCaseParams.getParams());
+        if (!eventPostOutcomes.isEmpty()) {
+            outcome.addOutcomes(eventPostOutcomes);
+            useCase = findOne(useCase.getStringId());
+        }
+
         rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
         if (rulesExecuted > 0) {
             useCase = save(useCase);
         }
 
         historyService.save(new CreateCaseEventLog(useCase, EventPhase.POST));
+
+        log.info("[{}]: Case {} was created by actor {}", useCase.getStringId(), useCase.getTitle(), createCaseParams.getAuthorId());
+
         outcome.setCase(useCase);
-        addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
+        addMessageToOutcome(process, CaseEventType.CREATE, outcome);
         return outcome;
     }
 
-    protected String resolveDefaultCaseTitle(String netId, Locale locale, Map<String, String> params) {
-        Process petriNet = petriNetService.clone(new ObjectId(netId));
-        I18nExpression caseTitle = petriNet.getDefaultCaseName();
-        String title;
-        if (caseTitle.isDynamic()) {
-            title = initValueExpressionEvaluator.evaluateTitle(petriNet.getDefaultCaseName().getExpression(locale), params);
-        } else {
-            title = caseTitle.getTranslation(locale);
+    /**
+     * Creates pure {@link Case} object without any {@link Task} object initialized.
+     *
+     * @param createCaseParams parameters for object creation
+     *
+     * @return created {@link Case} object
+     * */
+    private Case createCaseObject(CreateCaseParams createCaseParams) {
+        Case useCase = new Case(createCaseParams.getProcess());
+        dataSetInitializer.populateDataSet(useCase, createCaseParams.getParams());
+        useCase.setAuthorId(createCaseParams.getAuthorId());
+        useCase.setCreationDate(LocalDateTime.now());
+        useCase.setTitle(createCaseParams.getMakeTitle().apply(useCase));
+        useCase.setUriNodeId(createCaseParams.getProcess().getUriNodeId());
+
+        useCase.getProcess().initializeArcs();
+
+        return useCase;
+    }
+
+    private void fillMissingAttributes(CreateCaseParams createCaseParams) throws IllegalArgumentException {
+        if (createCaseParams.getIsTransactional() == null) {
+            createCaseParams.setIsTransactional(transactionProperties.isCreateCaseTransactional());
         }
-        return title;
+        if (createCaseParams.getProcess() == null) {
+            Process petriNet;
+            if (createCaseParams.getProcessId() != null) {
+                petriNet = petriNetService.get(new ObjectId(createCaseParams.getProcessId())).clone();
+            } else if (createCaseParams.getProcessIdentifier() != null) {
+                petriNet = petriNetService.getNewestVersionByIdentifier(createCaseParams.getProcessIdentifier()).clone();
+            } else {
+                throw new IllegalArgumentException("Could not find the PetriNet for the Case from provided inputs on case creation.");
+            }
+            createCaseParams.setProcess(petriNet);
+        }
+        if (createCaseParams.getMakeTitle() == null && createCaseParams.getProcess() != null) {
+            createCaseParams.setMakeTitle(resolveDefaultCaseTitle(createCaseParams));
+        }
+    }
+
+    private Function<Case, String> resolveDefaultCaseTitle(CreateCaseParams createCaseParams) {
+        Locale locale = createCaseParams.getLocale();
+        Process process = createCaseParams.getProcess();
+        Function<Case, String> makeTitle;
+        if (process.getDefaultCaseName().isDynamic()) {
+            makeTitle = (u) -> initValueExpressionEvaluator.evaluate(u, process.getDefaultCaseName().getExpression(locale),
+                    createCaseParams.getParams());
+        } else if (process.hasDefaultCaseName()) {
+            makeTitle = (u) -> process.getDefaultCaseName().getTranslation(locale);
+        } else {
+            makeTitle = (u) -> null;
+        }
+        return makeTitle;
     }
 
     @Override
@@ -307,37 +329,75 @@ public class WorkflowService implements IWorkflowService {
         return cases;
     }
 
+    /**
+     * Deletes the {@link Case} object from database by provided parameters as {@link DeleteCaseParams}
+     *
+     * @param deleteCaseParams parameters to determine the object to be deleted
+     * <br>
+     * <b>Required parameters</b>
+     * <ul>
+     *      <li>useCaseId or useCase</li>
+     * </ul>
+     *
+     * @return outcome with the removed {@link Case} object and sub-outcomes as result of triggered events
+     * */
     @Override
-    public DeleteCaseEventOutcome deleteCase(String caseId) {
-        return deleteCase(caseId, new HashMap<>());
+    public DeleteCaseEventOutcome deleteCase(DeleteCaseParams deleteCaseParams) {
+        fillMissingAttributes(deleteCaseParams);
+
+        if (deleteCaseParams.getIsTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
+            NaeTransaction transaction = NaeTransaction.builder()
+                    .transactionManager(transactionManager)
+                    .event(new Closure<DeleteCaseEventOutcome>(null) {
+                        @Override
+                        public DeleteCaseEventOutcome call() {
+                            return doDeleteCase(deleteCaseParams);
+                        }
+                    })
+                    .build();
+            transaction.begin();
+            return (DeleteCaseEventOutcome) transaction.getResultOfEvent();
+        } else {
+            return doDeleteCase(deleteCaseParams);
+        }
     }
 
-    @Override
-    public DeleteCaseEventOutcome deleteCase(String caseId, Map<String, String> params) {
-        Case useCase = findOne(caseId);
-        return deleteCase(useCase, params);
-    }
+    private DeleteCaseEventOutcome doDeleteCase(DeleteCaseParams deleteCaseParams) {
+        Case useCase = deleteCaseParams.getUseCase();
 
-    @Override
-    public DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params) {
-        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getProcess().getPreDeleteActions(), useCase, Optional.empty(), params));
+        List<EventOutcome> preEventOutcomes = eventService.runActions(useCase.getProcess().getPreDeleteActions(),
+                useCase, Optional.empty(), deleteCaseParams.getParams());
+
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
-        log.info("[{}]: Actor [{}] is deleting case {}", useCase.getStringId(),
-                sessionManagerService.getActiveActorId(), useCase.getTitle());
+
+        log.info("[{}]: Actor [{}] is deleting case {}", useCase.getStringId(), sessionManagerService.getActiveActorId(),
+                useCase.getTitle());
 
         roleService.removeAllByCase(useCase.getStringId());
         taskService.deleteTasksByCase(useCase.getStringId());
         repository.delete(useCase);
 
-        outcome.addOutcomes(eventService.runActions(useCase.getProcess().getPostDeleteActions(), null, Optional.empty(), params));
+        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, preEventOutcomes);
+        outcome.addOutcomes(eventService.runActions(useCase.getProcess().getPostDeleteActions(), null,
+                Optional.empty(), deleteCaseParams.getParams()));
         addMessageToOutcome(useCase.getProcess(), CaseEventType.DELETE, outcome);
+
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.POST));
+
         return outcome;
     }
 
-    @Override
-    public DeleteCaseEventOutcome deleteCase(Case useCase) {
-        return deleteCase(useCase, new HashMap<>());
+    private void fillMissingAttributes(DeleteCaseParams deleteCaseParams) throws IllegalArgumentException {
+        if (deleteCaseParams.getUseCase() == null) {
+            if (deleteCaseParams.getUseCaseId() != null) {
+                deleteCaseParams.setUseCase(findOne(deleteCaseParams.getUseCaseId()));
+            } else {
+                throw new IllegalArgumentException("At least case id must be provided on case removal.");
+            }
+        }
+        if (deleteCaseParams.getIsTransactional() == null) {
+            deleteCaseParams.setIsTransactional(transactionProperties.isDeleteCaseTransactional());
+        }
     }
 
     @Override
@@ -355,6 +415,7 @@ public class WorkflowService implements IWorkflowService {
         log.info("[{}]: Actor [{}] is deleting {} cases of Petri net {} version {}", net.getStringId(),
                 sessionManagerService.getActiveActorId(), countCases, net.getIdentifier(),
                 net.getVersion().toString());
+        // todo: release/8.0.0 page.unpaged?
         long pageCount = (countCases / 100) + 1;
         LongStream.range(0, pageCount)
                 .forEach(i -> elasticCaseService.search(
@@ -364,7 +425,7 @@ public class WorkflowService implements IWorkflowService {
                                 Locale.getDefault(),
                                 false)
                         .getContent()
-                        .forEach(this::deleteCase));
+                        .forEach(useCase -> deleteCase(new DeleteCaseParams(useCase))));
     }
 
     @Override
@@ -373,7 +434,7 @@ public class WorkflowService implements IWorkflowService {
         if (subtreeRoot.getImmediateDataFields().contains("treeChildCases")) {
             ((List<String>) subtreeRoot.getDataSet().get("treeChildCases").getValue()).forEach(this::deleteSubtreeRootedAt);
         }
-        return deleteCase(subtreeRootCaseId);
+        return deleteCase(new DeleteCaseParams(subtreeRoot));
     }
 
     @Override

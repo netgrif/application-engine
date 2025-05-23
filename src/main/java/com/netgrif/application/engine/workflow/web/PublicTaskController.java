@@ -3,7 +3,7 @@ package com.netgrif.application.engine.workflow.web;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest;

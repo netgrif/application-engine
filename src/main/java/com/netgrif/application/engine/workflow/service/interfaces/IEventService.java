@@ -7,8 +7,8 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.EventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 
 import java.util.List;
 import java.util.Map;
