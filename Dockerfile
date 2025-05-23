@@ -13,4 +13,5 @@ COPY application-engine/src/main/resources /opt/netgrif/engine/src/main/resource
 
 WORKDIR /opt/netgrif/engine
 EXPOSE 8080
+
 ENTRYPOINT ["java","-Dfile.encoding=UTF-8","-jar","app.jar"]
