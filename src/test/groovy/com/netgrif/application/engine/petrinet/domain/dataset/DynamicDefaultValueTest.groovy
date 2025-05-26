@@ -42,9 +42,9 @@ class DynamicDefaultValueTest {
 
     @Test
     void testInitValues() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_init.xml"),
+        ImportPetriNetEventOutcome optNet = petriNetService.importProcess(new FileInputStream("src/test/resources/petriNets/dynamic_init.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
-        Case useCase = importHelper.createCase("test", optNet.getNet())
+        Case useCase = importHelper.createCase("test", optNet.getProcess())
 
         assert useCase.dataSet.get("text").rawValue == superCreator.superIdentity.firstname
         assert useCase.dataSet.get("number").rawValue as Integer == superCreator.superIdentity.firstname.length()

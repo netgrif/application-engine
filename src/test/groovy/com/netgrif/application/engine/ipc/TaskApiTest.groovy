@@ -75,12 +75,12 @@ class TaskApiTest {
     @Test
     @Disabled("GroovyRuntime Could not find matching constructor")
     void testTaskSearch() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_SEARCH_NET_FILE),
+        def netOptional = petriNetService.importProcess(stream(TASK_SEARCH_NET_FILE),
                 VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
 
-        assert netOptional.getNet() != null
+        assert netOptional.getProcess() != null
 
-        Process net = netOptional.getNet()
+        Process net = netOptional.getProcess()
         5.times {
             helper.createCase(TASK_EVENTS_NET_TITLE, net)
         }
@@ -107,12 +107,12 @@ class TaskApiTest {
     @Test
     @Disabled()
     void testTaskEventActions() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_EVENTS_NET_FILE),
+        def netOptional = petriNetService.importProcess(stream(TASK_EVENTS_NET_FILE),
                 VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
 
-        assert netOptional.getNet() != null
+        assert netOptional.getProcess() != null
 
-        Process net = netOptional.getNet()
+        Process net = netOptional.getProcess()
         Case useCase = helper.createCase(TASK_EVENTS_NET_TITLE, net)
         helper.assignTaskToSuper(TASK_EVENTS_TASK, useCase.stringId)
         helper.finishTaskAsSuper(TASK_EVENTS_TASK, useCase.stringId)
@@ -141,14 +141,14 @@ class TaskApiTest {
     @Test
     @Disabled("spusta 2 krat")
     void testTaskExecution() {
-        def limitsNetOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
-        def leasingNetOptional = petriNetService.importPetriNet(stream(LEASING_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
+        def limitsNetOptional = petriNetService.importProcess(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
+        def leasingNetOptional = petriNetService.importProcess(stream(LEASING_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
 
-        assert limitsNetOptional.getNet() != null
-        assert leasingNetOptional.getNet() != null
+        assert limitsNetOptional.getProcess() != null
+        assert leasingNetOptional.getProcess() != null
 
-        Process limitsNet = limitsNetOptional.getNet()
-        Process leasingNet = leasingNetOptional.getNet()
+        Process limitsNet = limitsNetOptional.getProcess()
+        Process leasingNet = leasingNetOptional.getProcess()
 
         Case limits = helper.createCase("Limits BA", limitsNet)
         Case leasing1 = helper.createCase("Leasing 1", leasingNet)
@@ -217,11 +217,11 @@ class TaskApiTest {
 
     @Test
     void testTaskBulkActions() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_BULK_NET_FILE),
+        def netOptional = petriNetService.importProcess(stream(TASK_BULK_NET_FILE),
                 VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
 
-        assert netOptional.getNet() != null
-        Process net = netOptional.getNet()
+        assert netOptional.getProcess() != null
+        Process net = netOptional.getProcess()
 
         10.times {
             helper.createCase("Case $it", net)
@@ -243,11 +243,11 @@ class TaskApiTest {
 
     @Test
     void testGetData() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_GETTER_NET_FILE),
+        def netOptional = petriNetService.importProcess(stream(TASK_GETTER_NET_FILE),
                 VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
 
-        assert netOptional.getNet() != null
-        Process net = netOptional.getNet()
+        assert netOptional.getProcess() != null
+        Process net = netOptional.getProcess()
 
         def case1 = helper.createCase("Case 1", net)
         helper.setTaskData(TASK_GETTER_TASK, case1.stringId, new DataSet([
@@ -273,11 +273,11 @@ class TaskApiTest {
 
     @Test
     void testSetData() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_SETTER_NET_FILE),
+        def netOptional = petriNetService.importProcess(stream(TASK_SETTER_NET_FILE),
                 VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
 
-        assert netOptional.getNet() != null
-        Process net = netOptional.getNet()
+        assert netOptional.getProcess() != null
+        Process net = netOptional.getProcess()
 
         def control = helper.createCase("Control case", net)
         def case1 = helper.createCase("Case 1", net)

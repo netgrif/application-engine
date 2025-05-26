@@ -40,13 +40,13 @@ class DynamicCaseNameTest {
 
     @Test
     void testInitValues() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_case_name_test.xml"),
+        ImportPetriNetEventOutcome optNet = petriNetService.importProcess(new FileInputStream("src/test/resources/petriNets/dynamic_case_name_test.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
-        Case useCase = workflowService.createCase(optNet.getNet().stringId, null, "", superCreator.loggedSuper.activeActorId,
+        Case useCase = workflowService.createCase(optNet.getProcess().stringId, null, "", superCreator.loggedSuper.activeActorId,
                 Locale.forLanguageTag("sk-SK")).getCase()
         assert useCase.title == "SK text value 6"
 
-        Case useCase2 = workflowService.createCase(optNet.getNet().stringId, null, "", superCreator.loggedSuper.activeActorId,
+        Case useCase2 = workflowService.createCase(optNet.getProcess().stringId, null, "", superCreator.loggedSuper.activeActorId,
                 Locale.ENGLISH).getCase()
         assert useCase2.title == "EN text value 6"
     }

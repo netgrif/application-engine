@@ -71,10 +71,10 @@ class UserListTest {
     @Test
     void testUserList() throws MissingPetriNetMetaDataException, IOException {
         TestHelper.login(superCreator.superIdentity)
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/user_list.xml"),
+        ImportPetriNetEventOutcome net = petriNetService.importProcess(new FileInputStream("src/test/resources/user_list.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
 
-        assert net.getNet() != null;
+        assert net.getProcess() != null;
         Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("User List"));
 
         assert caseOpt.isPresent();

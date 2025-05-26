@@ -41,6 +41,6 @@ public abstract class CaseEventOutcome extends PetriNetEventOutcome {
 
     public void setCase(Case aCase) {
         this.aCase = aCase;
-        setNet(aCase.getProcess());
+        setProcess(aCase.getProcess());
     }
 }

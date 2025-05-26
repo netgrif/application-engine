@@ -93,15 +93,15 @@ class RuleEngineTest {
                 .build();
         ruleRepository.save(rule);
 
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"),
+        ImportPetriNetEventOutcome outcome = petriNetService.importProcess(new FileInputStream("src/test/resources/rule_engine_test.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
 
-        assert outcome.getNet() != null;
-        assert outcome.getNet().getTitle().getDefaultValue().equals(NET_TITLE_PRE);
-        assert outcome.getNet().getDataSet().containsKey(TEST_FIELD);
-        assert outcome.getNet().getDataSet().get(TEST_FIELD) != null;
+        assert outcome.getProcess() != null;
+        assert outcome.getProcess().getTitle().getDefaultValue().equals(NET_TITLE_PRE);
+        assert outcome.getProcess().getDataSet().containsKey(TEST_FIELD);
+        assert outcome.getProcess().getDataSet().get(TEST_FIELD) != null;
 
-        List<Fact> facts = factRepository.findAll(QNetImportedFact.netImportedFact.netId.eq(outcome.getNet().getStringId()), PageRequest.of(0, 100)).getContent();
+        List<Fact> facts = factRepository.findAll(QNetImportedFact.netImportedFact.netId.eq(outcome.getProcess().getStringId()), PageRequest.of(0, 100)).getContent();
         assert facts.size() == 1 && facts.get(0) instanceof NetImportedFact;
     }
 
@@ -131,13 +131,13 @@ class RuleEngineTest {
         // TODO: release/8.0.0 refresh stops rules from firing
         assert refreshableKieBase.shouldRefresh();
 
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"),
+        ImportPetriNetEventOutcome outcome = petriNetService.importProcess(new FileInputStream("src/test/resources/rule_engine_test.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
 
 //        assert !refreshableKieBase.shouldRefresh();
 
-        assert outcome.getNet() != null;
-        assert outcome.getNet().getTitle().getDefaultValue().equals(NET_TITLE_POST);
+        assert outcome.getProcess() != null;
+        assert outcome.getProcess().getTitle().getDefaultValue().equals(NET_TITLE_POST);
 //        TODO: release/8.0.0
 //        assert outcome.getNet().getInitials().equals(NEW_INITIALS);
 
@@ -154,7 +154,7 @@ class RuleEngineTest {
         final String NEW_CASE_TITLE_2 = "new case title 2";
         final String TEXT_VALUE = "TEXT FIELD VALUE";
 
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"),
+        ImportPetriNetEventOutcome outcome = petriNetService.importProcess(new FileInputStream("src/test/resources/rule_engine_test.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
         assert outcome != null;
 
@@ -195,7 +195,7 @@ class RuleEngineTest {
         ruleRepository.save(rule3);
         ruleRepository.save(rule4);
 
-        CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), "Original title",
+        CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getProcess().getStringId(), "Original title",
                 "original color", superCreator.getLoggedSuper().getActiveActorId());
         // TODO: release/8.0.0 AssertionError
         assert caseOutcome.getCase().getTitle().equals(NEW_CASE_TITLE);
@@ -371,9 +371,9 @@ class RuleEngineTest {
     }
 
     private Case newCase() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"),
+        ImportPetriNetEventOutcome outcome = petriNetService.importProcess(new FileInputStream("src/test/resources/rule_engine_test.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
-        return workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color",
+        return workflowService.createCase(outcome.getProcess().getStringId(), "Original title", "original color",
                 superCreator.getLoggedSuper().getActiveActorId()).getCase();
     }
 

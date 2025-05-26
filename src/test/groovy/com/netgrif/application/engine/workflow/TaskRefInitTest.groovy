@@ -48,10 +48,10 @@ class TaskRefInitTest {
     @BeforeEach
     void initNet() {
         testHelper.truncateDbs()
-        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskref_init.xml"), VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId).getNet()
-        autoTrigger = petriNetService.importPetriNet(new FileInputStream("src/test/resources/autotrigger_taskref.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getNet()
+        net = petriNetService.importProcess(new FileInputStream("src/test/resources/taskref_init.xml"), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId).getProcess()
+        autoTrigger = petriNetService.importProcess(new FileInputStream("src/test/resources/autotrigger_taskref.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getProcess()
         assert net != null
 
         TestHelper.login(superCreator.superIdentity)

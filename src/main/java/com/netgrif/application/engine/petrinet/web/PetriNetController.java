@@ -6,11 +6,12 @@ import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.petrinet.domain.params.DeleteProcessParams;
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
-import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessageResource;
@@ -61,9 +62,6 @@ import java.util.Objects;
 public class PetriNetController {
 
     @Autowired
-    private FileStorageConfiguration fileStorageConfiguration;
-
-    @Autowired
     private IPetriNetService service;
 
     @Autowired
@@ -89,8 +87,13 @@ public class PetriNetController {
             Authentication auth, Locale locale) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
             VersionType release = releaseType == null ? VersionType.MAJOR : VersionType.valueOf(releaseType.trim().toUpperCase());
-            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(multipartFile.getInputStream(), release,
-                    ((LoggedIdentity) auth.getPrincipal()).getActiveActorId(), uriNodeId);
+            ImportProcessParams importProcessParams = ImportProcessParams.with()
+                    .xmlFile(multipartFile.getInputStream())
+                    .releaseType(release)
+                    .authorId(((LoggedIdentity) auth.getPrincipal()).getActiveActorId())
+                    .uriNodeId(uriNodeId)
+                    .build();
+            ImportPetriNetEventOutcome importPetriNetOutcome = service.importProcess(importProcessParams);
             return EventOutcomeWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully", importPetriNetOutcome);
         } catch (IOException e) {
             log.error("Importing Petri net failed: ", e);
@@ -177,7 +180,7 @@ public class PetriNetController {
             log.error("Deleting Petri net [{}] failed: could not decode process ID from URL", processId);
             return MessageResource.errorMessage("Deleting Petri net " + processId + " failed!");
         }
-        asyncRunner.execute(() -> this.service.deletePetriNet(decodedProcessId));
+        asyncRunner.execute(() -> this.service.deleteProcess(new DeleteProcessParams(decodedProcessId)));
         return MessageResource.successMessage("Petri net " + decodedProcessId + " is being deleted");
     }
 

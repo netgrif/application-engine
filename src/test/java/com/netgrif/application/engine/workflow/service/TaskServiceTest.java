@@ -76,7 +76,7 @@ public class TaskServiceTest {
     public void setUp() throws Exception {
         testHelper.truncateDbs();
 
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR,
+        petriNetService.importProcess(new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR,
                 superCreator.getLoggedSuper().getActiveActorId());
         Process net = petriNetRepository.findAll().get(0);
         workflowService.createCase(net.getStringId(), "Storage Unit", "color", mockService.mockLoggedIdentity().getActiveActorId());
@@ -84,8 +84,8 @@ public class TaskServiceTest {
 
     @Test
     public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        Process net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getNet();
+        Process net = petriNetService.importProcess(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess();
         LoggedIdentity mockedLoggedIdentity = mockService.mockLoggedIdentity();
         CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color",
                 mockedLoggedIdentity.getActiveActorId());

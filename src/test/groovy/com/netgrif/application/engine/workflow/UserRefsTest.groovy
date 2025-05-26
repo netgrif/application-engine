@@ -71,8 +71,8 @@ class UserRefsTest {
         // todo release/8.0.0 userList is already tested in RoleServiceTest
         helper.truncateDbs()
         helper.login(superCreator.superIdentity)
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/userrefs_test.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getNet()
+        def net = petriNetService.importProcess(new FileInputStream("src/test/resources/userrefs_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getProcess()
         assert net
         netId = net.getStringId()
         def userEmails = [configuration.email, "engine@netgrif.com"]

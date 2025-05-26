@@ -18,6 +18,7 @@ public interface IElasticTaskService {
 
     Future<ElasticTask> scheduleTaskIndexing(ElasticTask task);
 
+    // todo: release/8.0.0 inconsistency with IElasticCaseService (type of input)
     @Async
     void index(ElasticTask task);
 

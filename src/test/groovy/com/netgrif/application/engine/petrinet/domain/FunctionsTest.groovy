@@ -90,10 +90,10 @@ class FunctionsTest {
     void testNamespaceFunction() {
         assert identityService.findByUsername("test@test.com").isEmpty()
 
-        def functionResNet = petriNetService.importPetriNet(functionResNetResource.inputStream, VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId).getNet()
-        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId).getNet()
+        def functionResNet = petriNetService.importProcess(functionResNetResource.inputStream, VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId).getProcess()
+        def functionTestNet = petriNetService.importProcess(functionTestNetResource.inputStream, VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId).getProcess()
 
         assert functionResNet
         assert functionTestNet
@@ -108,16 +108,16 @@ class FunctionsTest {
 
         // todo: release/8.0.0 removal
 //        userService.deleteUser(user)
-        petriNetService.deletePetriNet(functionResNet.stringId)
-        petriNetService.deletePetriNet(functionTestNet.stringId)
+        petriNetService.deleteProcess(functionResNet.stringId)
+        petriNetService.deleteProcess(functionTestNet.stringId)
     }
 
     @Test
     void testProcessFunctions() {
-        def functionResNet = petriNetService.importPetriNet(functionResNetResource.inputStream, VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId).getNet()
-        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId).getNet()
+        def functionResNet = petriNetService.importProcess(functionResNetResource.inputStream, VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId).getProcess()
+        def functionTestNet = petriNetService.importProcess(functionTestNetResource.inputStream, VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId).getProcess()
         assert functionResNet
         assert functionTestNet
 
@@ -131,25 +131,25 @@ class FunctionsTest {
         def fieldBehavior = field.behaviors
         assert fieldBehavior.get("t1").behavior == EDITABLE
 
-        petriNetService.deletePetriNet(functionTestNet.stringId)
+        petriNetService.deleteProcess(functionTestNet.stringId)
     }
 
     @Test
     void testNamespaceFunctionException() {
         assertThrows(NullPointerException.class, () -> {
-            def functionResNet = petriNetService.importPetriNet(functionResNetResource.inputStream, VersionType.MAJOR,
-                    superCreator.getLoggedSuper().activeActorId).getNet()
+            def functionResNet = petriNetService.importProcess(functionResNetResource.inputStream, VersionType.MAJOR,
+                    superCreator.getLoggedSuper().activeActorId).getProcess()
             assert functionResNet
 
             def nets = petriNetService.getByIdentifier(FUNCTION_RES_IDENTIFIER)
             if (nets) {
                 nets.each {
-                    petriNetService.deletePetriNet(it.getStringId())
+                    petriNetService.deleteProcess(it.getStringId())
                 }
             }
 
-            def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR,
-                    superCreator.getLoggedSuper().activeActorId).getNet()
+            def functionTestNet = petriNetService.importProcess(functionTestNetResource.inputStream, VersionType.MAJOR,
+                    superCreator.getLoggedSuper().activeActorId).getProcess()
             assert functionTestNet
 
             Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "",
@@ -165,12 +165,12 @@ class FunctionsTest {
             def nets = petriNetService.getByIdentifier(FUNCTION_TEST_IDENTIFIER)
             if (nets) {
                 nets.each {
-                    petriNetService.deletePetriNet(it.getStringId())
+                    petriNetService.deleteProcess(it.getStringId())
                 }
             }
 
-            def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR,
-                    superCreator.getLoggedSuper().activeActorId).getNet()
+            def functionTestNet = petriNetService.importProcess(functionTestNetResource.inputStream, VersionType.MAJOR,
+                    superCreator.getLoggedSuper().activeActorId).getProcess()
             assert functionTestNet
 
             Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "",
@@ -178,8 +178,8 @@ class FunctionsTest {
             dataService.setData(aCase.getTaskStringId("t1"), new DataSet((["text": new TextField(rawValue: "20")] as Map<String, Field<?>>)),
                     superCreator.getLoggedSuper().activeActorId)
 
-            functionTestNet = petriNetService.importPetriNet(functionTestNetResourceV2.inputStream, VersionType.MAJOR,
-                    superCreator.getLoggedSuper().activeActorId).getNet()
+            functionTestNet = petriNetService.importProcess(functionTestNetResourceV2.inputStream, VersionType.MAJOR,
+                    superCreator.getLoggedSuper().activeActorId).getProcess()
             assert functionTestNet
 
             dataService.setData(aCase.getTaskStringId("t1"), new DataSet((["text": new TextField(rawValue: "20")] as Map<String, Field<?>>)),
@@ -190,8 +190,8 @@ class FunctionsTest {
     @Test
     void testProcessFunctionException() {
         assertThrows(MissingMethodException.class, () -> {
-            def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR,
-                    superCreator.getLoggedSuper().activeActorId).getNet()
+            def functionTestNet = petriNetService.importProcess(functionTestNetResource.inputStream, VersionType.MAJOR,
+                    superCreator.getLoggedSuper().activeActorId).getProcess()
             assert functionTestNet
 
             Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "",
@@ -203,10 +203,10 @@ class FunctionsTest {
 
     @Test
     void testNewVersionOfNamespaceFunction() {
-        def functionResNet = petriNetService.importPetriNet(functionResNetResource.inputStream, VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId).getNet()
-        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId).getNet()
+        def functionResNet = petriNetService.importProcess(functionResNetResource.inputStream, VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId).getProcess()
+        def functionTestNet = petriNetService.importProcess(functionTestNetResource.inputStream, VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId).getProcess()
 
         assert functionResNet
         assert functionTestNet
@@ -219,8 +219,8 @@ class FunctionsTest {
 
         assert aCase.getDataSet().get("number2").rawValue == 20 + 20
 
-        functionResNet = petriNetService.importPetriNet(functionResNetResourceV2.inputStream, VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId).getNet()
+        functionResNet = petriNetService.importProcess(functionResNetResourceV2.inputStream, VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId).getProcess()
         assert functionResNet
 
         dataService.setData(aCase.getTaskStringId("t1"), new DataSet((["number": new NumberField(rawValue: 20d)] as Map<String, Field<?>>)),
@@ -233,17 +233,17 @@ class FunctionsTest {
     @Test
     void testNamespaceMethodOverloadingFail() {
         assertThrows(IllegalArgumentException.class, () -> {
-            petriNetService.importPetriNet(functionOverloadingFailNetResource.inputStream, VersionType.MAJOR,
+            petriNetService.importProcess(functionOverloadingFailNetResource.inputStream, VersionType.MAJOR,
                     superCreator.getLoggedSuper().activeActorId)
         })
     }
 
     @Test
     void testNamespaceUseCaseUpdate() {
-        def functionResV2Net = petriNetService.importPetriNet(functionResNetResourceV2.inputStream, VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId).getNet()
-        def functionTestV2Net = petriNetService.importPetriNet(functionTestNetResourceV2.inputStream, VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId).getNet()
+        def functionResV2Net = petriNetService.importProcess(functionResNetResourceV2.inputStream, VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId).getProcess()
+        def functionTestV2Net = petriNetService.importProcess(functionTestNetResourceV2.inputStream, VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId).getProcess()
 
         Case aCase = workflowService.createCase(functionTestV2Net.stringId, "Test", "", superCreator.getLoggedSuper().activeActorId).getCase()
         dataService.setData(aCase.getTaskStringId("t0"), new DataSet((["updateOtherField": new BooleanField(rawValue: true)] as Map<String, Field<?>>)),
@@ -262,7 +262,7 @@ class FunctionsTest {
     @Test
     void testProcessMethodOverloadingFail() {
         assertThrows(IllegalArgumentException.class, () -> {
-            petriNetService.importPetriNet(functionOverloadingFailNetResourceV2.inputStream, VersionType.MAJOR,
+            petriNetService.importProcess(functionOverloadingFailNetResourceV2.inputStream, VersionType.MAJOR,
                     superCreator.getLoggedSuper().activeActorId)
         })
     }
@@ -273,8 +273,8 @@ class FunctionsTest {
     }
 
     private void testMethodOverloading(Resource resource) {
-        def petriNet = petriNetService.importPetriNet(resource.inputStream, VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId).getNet()
+        def petriNet = petriNetService.importProcess(resource.inputStream, VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId).getProcess()
         assert petriNet
 
         Case aCase = workflowService.createCase(petriNet.stringId, "Test", "", superCreator.getLoggedSuper().activeActorId).getCase()

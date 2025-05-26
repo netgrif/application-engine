@@ -302,11 +302,11 @@ class RequestTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(TestHelper.stream("request.xml"),
+        def net = petriNetService.importProcess(TestHelper.stream("request.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
-        assert net.getNet() != null
+        assert net.getProcess() != null
 
-        netId = net.getNet().getStringId()
+        netId = net.getProcess().getStringId()
 
         List<ApplicationRole> applicationRoles = new ArrayList<>()
         applicationRoles.add(roleService.findApplicationRoleByImportId("default"))

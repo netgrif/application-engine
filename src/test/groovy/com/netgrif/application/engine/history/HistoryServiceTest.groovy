@@ -53,10 +53,10 @@ class HistoryServiceTest {
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"),
+        ImportPetriNetEventOutcome net = petriNetService.importProcess(new FileInputStream("src/test/resources/all_data.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
-        assert net.getNet() != null
-        this.net = net.getNet()
+        assert net.getProcess() != null
+        this.net = net.getProcess()
 
     }
 

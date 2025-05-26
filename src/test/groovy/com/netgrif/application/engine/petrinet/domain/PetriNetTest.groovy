@@ -57,12 +57,12 @@ class PetriNetTest {
     void testClone() {
         int beforeImportNet = (int) roleRepository.count()
 
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR,
+        def netOptional = petriNetService.importProcess(netResource.inputStream, VersionType.MAJOR,
                 superCreator.loggedSuper.activeActorId)
 
-        assert netOptional.getNet() != null
+        assert netOptional.getProcess() != null
 
-        def net = netOptional.getNet()
+        def net = netOptional.getProcess()
         def clone = net.clone()
 
         def arcs = clone.getInputArcsOf(CLONE_NET_TRANS_ID)
@@ -78,19 +78,19 @@ class PetriNetTest {
 
     @Test
     void testVersioning() {
-        def outcome1 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR,
+        def outcome1 = petriNetService.importProcess(netResource.inputStream, VersionType.MAJOR,
                 superCreator.loggedSuper.activeActorId)
-        Process net1 = outcome1.getNet()
+        Process net1 = outcome1.getProcess()
         assert net1
 
-        def outcome2 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR,
+        def outcome2 = petriNetService.importProcess(netResource.inputStream, VersionType.MAJOR,
                 superCreator.loggedSuper.activeActorId)
-        Process net2 = outcome2.getNet()
+        Process net2 = outcome2.getProcess()
         assert net2
 
-        def outcome3 = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR,
+        def outcome3 = petriNetService.importProcess(netResource2.inputStream, VersionType.MAJOR,
                 superCreator.loggedSuper.activeActorId)
-        Process net3 = outcome3.getNet()
+        Process net3 = outcome3.getProcess()
         assert net3
 
         List<PetriNetReference> nets = petriNetService.getReferencesByVersion(null, Locale.UK)

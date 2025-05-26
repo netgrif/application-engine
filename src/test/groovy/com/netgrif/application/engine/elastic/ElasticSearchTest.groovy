@@ -104,9 +104,9 @@ class ElasticSearchTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getNet()
-        def net2 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getNet()
+        def net = petriNetService.importProcess(new FileInputStream("src/test/resources/all_data.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess()
+        def net2 = petriNetService.importProcess(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess()
 
         assert net
         assert net2

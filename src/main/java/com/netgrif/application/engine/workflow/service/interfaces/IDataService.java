@@ -9,8 +9,9 @@ import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.layoutoutcomes.GetLayoutsEventOutcome;
+import com.netgrif.application.engine.workflow.domain.params.GetDataParams;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
-import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,25 +24,9 @@ import java.util.Map;
 
 public interface IDataService {
 
-    GetDataEventOutcome getData(String taskId, String actorId);
+    GetDataEventOutcome getData(GetDataParams getDataParams);
 
-    GetDataEventOutcome getData(String taskId, String actorId, Map<String, String> params);
-
-    GetDataEventOutcome getData(Task task, Case useCase, String actorId);
-
-    GetDataEventOutcome getData(Task task, Case useCase, String actorId, Map<String, String> params);
-
-    SetDataEventOutcome setData(String taskId, DataSet values, String actorId);
-
-    SetDataEventOutcome setData(String taskId, DataSet values, String actorId, Map<String, String> params);
-
-    SetDataEventOutcome setData(Case useCase, DataSet dataSet, String actorId);
-
-    SetDataEventOutcome setData(Case useCase, DataSet dataSet, String actorId, Map<String, String> params);
-
-    SetDataEventOutcome setData(Task task, DataSet values, String actorId);
-
-    SetDataEventOutcome setData(Task task, DataSet values, String actorId, Map<String, String> params);
+    SetDataEventOutcome setData(SetDataParams setDataParams);
 
     SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField, String actorId);
     

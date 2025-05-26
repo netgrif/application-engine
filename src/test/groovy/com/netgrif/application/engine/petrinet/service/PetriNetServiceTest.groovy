@@ -109,11 +109,11 @@ class PetriNetServiceTest {
         long processCount = petriNetRepository.count()
         long taskCount = taskRepository.count()
 
-        ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR,
+        ImportPetriNetEventOutcome testNetOptional = petriNetService.importProcess(stream(NET_FILE), VersionType.MAJOR,
                 superCreator.getLoggedSuper().activeActorId)
-        assert testNetOptional.getNet() != null
+        assert testNetOptional.getProcess() != null
         assert petriNetRepository.count() == processCount + 1
-        Process testNet = testNetOptional.getNet()
+        Process testNet = testNetOptional.getProcess()
         Thread.sleep(5000)
         ElasticPetriNet elasticTestNet = elasticPetriNetRepository.findByStringId(testNet.stringId)
         assert elasticTestNet != null && elasticTestNet.getUriNodeId() == uriService.getRoot().id.toString()
@@ -135,7 +135,7 @@ class PetriNetServiceTest {
 //        assert user.roles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
 
-        petriNetService.deletePetriNet(testNet.stringId)
+        petriNetService.deleteProcess(testNet.stringId)
         assert petriNetRepository.count() == processCount
         Thread.sleep(5000)
         assert elasticPetriNetRepository.findByStringId(testNet.stringId) == null
@@ -158,9 +158,9 @@ class PetriNetServiceTest {
     @Test
     void findAllByUriNodeIdTest() {
         UriNode myNode = uriService.getOrCreate("/test", UriContentType.DEFAULT)
-        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId,
+        petriNetService.importProcess(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId,
                 myNode.id.toString())
-        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId,
+        petriNetService.importProcess(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId,
                 myNode.id.toString())
 
         Thread.sleep(2000)
@@ -173,8 +173,8 @@ class PetriNetServiceTest {
     void processSearch() {
         int processCount = (int) petriNetRepository.count()
 
-        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
-        petriNetService.importPetriNet(stream(NET_SEARCH_FILE), VersionType.MAJOR, testIdentity.toSession().activeActorId)
+        petriNetService.importProcess(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
+        petriNetService.importProcess(stream(NET_SEARCH_FILE), VersionType.MAJOR, testIdentity.toSession().activeActorId)
 
         assert petriNetRepository.count() == processCount + 2
 
@@ -227,25 +227,25 @@ class PetriNetServiceTest {
 
     @Test
     void deleteParentPetriNet() {
-        Process superParentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getNet()
+        Process superParentNet = petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getProcess()
         Case superParentCase = importHelper.createCaseAsSuper("Super parent case", superParentNet)
 
-        Process parentNetMajor = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getNet()
+        Process parentNetMajor = petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getProcess()
         Case parentMajorCase = importHelper.createCaseAsSuper("Parent major case", parentNetMajor)
 
-        Process parentNetMinor = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
-                VersionType.MINOR, superCreator.getLoggedSuper().activeActorId).getNet()
+        Process parentNetMinor = petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
+                VersionType.MINOR, superCreator.getLoggedSuper().activeActorId).getProcess()
         Case parentMinorCase = importHelper.createCaseAsSuper("Parent minor case", parentNetMinor)
 
-        Process childNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/child_extending_parent.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getNet()
+        Process childNet = petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/child_extending_parent.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getProcess()
         Case parentChildCase = importHelper.createCaseAsSuper("Child case", childNet)
 
         TestHelper.login(superCreator.getSuperIdentity())
 
-        petriNetService.deletePetriNet(parentNetMajor.stringId)
+        petriNetService.deleteProcess(parentNetMajor.stringId)
         assert petriNetRepository.findById(superParentNet.stringId).isPresent()
         assert petriNetRepository.findById(parentNetMajor.stringId).isEmpty()
         assert petriNetRepository.findById(parentNetMinor.stringId).isPresent()
@@ -255,7 +255,7 @@ class PetriNetServiceTest {
         assert caseRepository.findById(parentMinorCase.stringId).isPresent()
         assert caseRepository.findById(parentChildCase.stringId).isPresent()
 
-        petriNetService.deletePetriNet(parentNetMinor.stringId)
+        petriNetService.deleteProcess(parentNetMinor.stringId)
         assert petriNetRepository.findById(superParentNet.stringId).isPresent()
         assert petriNetRepository.findById(parentNetMinor.stringId).isEmpty()
         assert petriNetRepository.findById(childNet.stringId).isEmpty()
@@ -263,7 +263,7 @@ class PetriNetServiceTest {
         assert caseRepository.findById(parentMinorCase.stringId).isEmpty()
         assert caseRepository.findById(parentChildCase.stringId).isEmpty()
 
-        petriNetService.deletePetriNet(superParentNet.stringId)
+        petriNetService.deleteProcess(superParentNet.stringId)
         assert petriNetRepository.findById(superParentNet.stringId).isEmpty()
         assert caseRepository.findById(superParentCase.stringId).isEmpty()
     }

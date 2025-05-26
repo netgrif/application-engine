@@ -53,9 +53,9 @@ class ProcessRoleServiceTest {
     void shouldFindAllRoles() throws IOException, MissingPetriNetMetaDataException {
         List<Role> processRoles = roleService.findAll();
         int originalRoles = processRoles.size();
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR,
+        petriNetService.importProcess(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR,
                 superCreator.getLoggedSuper().getActiveActorId());
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/role_all_data.xml"), VersionType.MAJOR,
+        petriNetService.importProcess(new FileInputStream("src/test/resources/role_all_data.xml"), VersionType.MAJOR,
                 superCreator.getLoggedSuper().getActiveActorId());
         processRoles = roleService.findAll();
         assertNotNull(processRoles);
@@ -91,7 +91,7 @@ class ProcessRoleServiceTest {
 
     @Test
     void shouldFindAllRolesByName() throws IOException, MissingPetriNetMetaDataException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR,
+        petriNetService.importProcess(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR,
                 superCreator.getLoggedSuper().getActiveActorId());
         List<ProcessRole> processRoles = roleService.findProcessRolesByDefaultTitle("Process role");
         assertNotNull(processRoles);

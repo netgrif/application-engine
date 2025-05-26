@@ -19,4 +19,6 @@ public interface IElasticPetriNetService {
 
     List<Process> findAllByUriNodeId(String uriNodeId);
 
+    List<Process> findAllByIdentifier(String identifier);
+
 }

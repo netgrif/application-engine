@@ -53,8 +53,8 @@ class ActionRefTest {
     @Disabled("TODO: deprecated action ref")
     void testEventImport() {
 
-        Process net = petriNetService.importPetriNet(new FileInputStream(NET_FILE), VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId).getNet()
+        Process net = petriNetService.importProcess(new FileInputStream(NET_FILE), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId).getProcess()
 
         assert net.dataSet.get("text_1").events.size() == 8
         assert net.transitions.get("task").dataSet.get("text_1").events.size() == 8

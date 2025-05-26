@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectWriter
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.Identity
-import com.netgrif.application.engine.authentication.domain.IdentityState
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.authorization.domain.ApplicationRole
 import com.netgrif.application.engine.authorization.domain.Role
@@ -118,11 +117,11 @@ class InsuranceTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(TestHelper.stream("insurance_portal_demo_test_new.xml"),
+        def net = petriNetService.importProcess(TestHelper.stream("insurance_portal_demo_test_new.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
-        assert net.getNet() != null
+        assert net.getProcess() != null
 
-        netId = net.getNet().getStringId()
+        netId = net.getProcess().getStringId()
 
         List<ApplicationRole> applicationRoles = new ArrayList<>()
         applicationRoles.add(roleService.findApplicationRoleByImportId("default"))

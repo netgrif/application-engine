@@ -10,30 +10,30 @@ import java.util.List;
 @Data
 public abstract class PetriNetEventOutcome extends EventOutcome {
 
-    private Process net;
+    private Process process;
 
     protected PetriNetEventOutcome() {
     }
 
-    protected PetriNetEventOutcome(Process net) {
-        this.net = net;
+    protected PetriNetEventOutcome(Process process) {
+        this.process = process;
     }
 
-    protected PetriNetEventOutcome(I18nString message, Process net) {
+    protected PetriNetEventOutcome(I18nString message, Process process) {
         super(message);
-        this.net = net;
+        this.process = process;
     }
 
-    protected PetriNetEventOutcome(I18nString message, List<EventOutcome> outcomes, Process net) {
+    protected PetriNetEventOutcome(I18nString message, List<EventOutcome> outcomes, Process process) {
         super(message, outcomes);
-        this.net = net;
+        this.process = process;
     }
 
-    public Process getNet() {
-        return net;
+    public Process getProcess() {
+        return process;
     }
 
-    public void setNet(Process net) {
-        this.net = net;
+    public void setProcess(Process process) {
+        this.process = process;
     }
 }

@@ -68,8 +68,8 @@ public class SystemCaseFactoryRegistryTest {
 
         TestHelper.login(superCreator.getSuperIdentity());
 
-        Process testProcess = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"),
-                VersionType.MAJOR, superCreator.getSuperIdentity().getMainActorId()).getNet();
+        Process testProcess = petriNetService.importProcess(new FileInputStream("src/test/resources/all_data.xml"),
+                VersionType.MAJOR, superCreator.getSuperIdentity().getMainActorId()).getProcess();
         Case testCase = importHelper.createCase("Test", testProcess);
 
         assert registry.fromCase(workflowService.findOne(testCase.getStringId())) == null;

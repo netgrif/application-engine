@@ -60,10 +60,10 @@ class WorkflowServiceTest {
 
     @Test
     void testFindOneImmediateData() {
-        def testNet = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR,
+        def testNet = petriNetService.importProcess(stream(NET_FILE), VersionType.MAJOR,
                 superCreator.getLoggedSuper().getActiveActorId())
-        assert testNet.getNet() != null
-        Case aCase = importHelper.createCase("Case 1", testNet.getNet())
+        assert testNet.getProcess() != null
+        Case aCase = importHelper.createCase("Case 1", testNet.getProcess())
 
         assert aCase.getImmediateData().size() == 5
 
@@ -75,7 +75,7 @@ class WorkflowServiceTest {
 
     @Test
     void testFirstTransitionAuto() {
-        def testNet = petriNetService.importPetriNet(stream(FIRST_AUTO_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getNet()
+        def testNet = petriNetService.importProcess(stream(FIRST_AUTO_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess()
         assert testNet
 
         def net = testNet
@@ -89,7 +89,7 @@ class WorkflowServiceTest {
 
     @Test
     void testSecondTransitionAuto() {
-        def net = petriNetService.importPetriNet(stream(SECOND_AUTO_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getNet()
+        def net = petriNetService.importProcess(stream(SECOND_AUTO_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess()
 
         Case aCase = workflowService.createCase(net.stringId, "autoErr", "red", superCreator.getLoggedSuper().getActiveActorId()).getCase()
         importHelper.assignTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
@@ -104,10 +104,10 @@ class WorkflowServiceTest {
 
     @Test
     void createCaseWithLocale() {
-        def testNet = petriNetService.importPetriNet(stream(CASE_LOCALE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
-        assert testNet.getNet() != null
+        def testNet = petriNetService.importProcess(stream(CASE_LOCALE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        assert testNet.getProcess() != null
 
-        def net = testNet.getNet()
+        def net = testNet.getProcess()
         Case aCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper().activeActorId, new Locale('sk')).getCase()
 
         assert aCase.title == "Slovenský preklad"
@@ -121,11 +121,11 @@ class WorkflowServiceTest {
 
     @Test
     void createCaseOfExtendedPetriNet() {
-        Process superParentNet = petriNetService.importPetriNet(stream(SUPER_PARENT_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).net
-        petriNetService.importPetriNet(stream(PARENT_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        Process superParentNet = petriNetService.importProcess(stream(SUPER_PARENT_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).process
+        petriNetService.importProcess(stream(PARENT_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
         // child extends version 1.1.0
-        Process parentNet = petriNetService.importPetriNet(stream(PARENT_NET_FILE), VersionType.MINOR, superCreator.getLoggedSuper().getActiveActorId()).net
-        Process childNet = petriNetService.importPetriNet(stream(CHILD_NET_FILE), VersionType.MINOR, superCreator.getLoggedSuper().getActiveActorId()).net
+        Process parentNet = petriNetService.importProcess(stream(PARENT_NET_FILE), VersionType.MINOR, superCreator.getLoggedSuper().getActiveActorId()).process
+        Process childNet = petriNetService.importProcess(stream(CHILD_NET_FILE), VersionType.MINOR, superCreator.getLoggedSuper().getActiveActorId()).process
 
         Case aCase = workflowService.createCase(childNet.stringId, null, null, superCreator.getLoggedSuper().getActiveActorId()).getCase()
         assert aCase

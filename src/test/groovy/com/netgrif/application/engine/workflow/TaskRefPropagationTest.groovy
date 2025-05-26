@@ -51,14 +51,14 @@ class TaskRefPropagationTest {
 
     @BeforeEach
     void beforeAll() {
-        def parent = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_parent.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
-        def child = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_child.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        def parent = petriNetService.importProcess(new FileInputStream("src/test/resources/taskRef_propagation_test_parent.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        def child = petriNetService.importProcess(new FileInputStream("src/test/resources/taskRef_propagation_test_child.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
 
-        assert parent.getNet() != null
-        assert child.getNet() != null
+        assert parent.getProcess() != null
+        assert child.getProcess() != null
 
-        netParent = parent.getNet()
-        netChild = child.getNet()
+        netParent = parent.getProcess()
+        netChild = child.getProcess()
 
         TestHelper.login(superCreator.superIdentity)
     }

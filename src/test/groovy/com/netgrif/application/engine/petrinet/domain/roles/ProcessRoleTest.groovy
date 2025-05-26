@@ -87,9 +87,9 @@ class ProcessRoleTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rolref_view.xml"),
+        def net = petriNetService.importProcess(new FileInputStream("src/test/resources/rolref_view.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
-        assert net.getNet() != null
+        assert net.getProcess() != null
 
         ProcessRole viewRole = userRoleRepository.findByImportId("role1")
         ProcessRole performRole = userRoleRepository.findByImportId("role2")

@@ -38,16 +38,23 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.rules.domain.RuleRepository
 import com.netgrif.application.engine.startup.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.FilterRunner
+import com.netgrif.application.engine.transaction.NaeTransaction
 import com.netgrif.application.engine.validations.interfaces.IValidationService
 import com.netgrif.application.engine.workflow.domain.*
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.GetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.TaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.menu.MenuItemBody
 import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams
+import com.netgrif.application.engine.workflow.domain.params.GetDataParams
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
@@ -65,6 +72,8 @@ import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.mongodb.MongoTransactionManager
+import org.springframework.transaction.TransactionDefinition
 
 import java.text.Normalizer
 import java.util.stream.Collectors
@@ -174,6 +183,9 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     PublicViewProperties publicViewProperties
 
     @Autowired
+    MongoTransactionManager transactionManager
+
+    @Autowired
     IValidationService validationService
 
     @Autowired
@@ -214,6 +226,94 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         this.actionsRunner = actionsRunner
         this.outcomes = new ArrayList<>()
         this.Frontend = new FrontendActionOutcome(this.useCase, this.task, this.outcomes)
+    }
+
+    /**
+     * Method runs provided code in database transaction. If the provided code fails, the rollback callback is called
+     * and no exception is thrown. If the callback fails the subject exception is thrown.
+     * <br>
+     * Simple example:
+     * <pre>
+     *     trans: t.t1,
+     *     text: f.textId;
+     *
+     *     transactional {
+     *         change text value { "some text value" }
+     *         make text, visible on trans when { true }
+     *     }
+     *     createCase("my_process", "My case")
+     * </pre>
+     * Complex example:
+     * <pre>
+     *     trans: t.t1,
+     *     result: f.resultId,
+     *     text: f.textId;
+     *
+     *     def myTransaction = transactional (
+     *          timeout: 1000,
+     *          forceCreation: true,
+     *          event: {
+     *              createCase("my_process", "My case")
+     *              change text value { "some text value" }
+     *          },
+     *          onCommit: {
+     *              make text, editable on trans when { true }
+     *          },
+     *          onRollBack: { error ->
+     *              handleError(error)
+     *          }
+     *     )
+     *     change result value { myTransaction.wasRolledBack }
+     * </pre>
+     *
+     * @param timeout timeout in milliseconds. If the time is reached, transaction fails. The default value is
+     * {@link org.springframework.transaction.TransactionDefinition#TIMEOUT_DEFAULT}
+     * @param forceCreation if set to true, new transaction is created under any situation. If set to false new
+     * transaction is created only if none transaction is active
+     * @param event code to be run in transaction
+     * @param onCommit callback, that is called after the successful commit
+     * @param onRollBack callback, that is called after event failure
+     *
+     * @returns {@link com.netgrif.application.engine.transaction.NaeTransaction} with state after the commit and callback execution
+     * */
+    @NamedVariant
+    NaeTransaction transaction(int timeout = TransactionDefinition.TIMEOUT_DEFAULT, boolean forceCreation = false, Closure event,
+                               Closure onCommit = null, Closure onRollBack = null) {
+        def transactionBuilder = NaeTransaction.builder()
+                .timeout(timeout)
+                .forceCreation(forceCreation)
+                .event(event)
+                .onCommit(onCommit)
+                .onRollBack(onRollBack)
+                .transactionManager(transactionManager)
+
+        NaeTransaction transaction = transactionBuilder.build()
+        executeTransaction(transaction)
+        throwIfCallBackFailed(transaction)
+
+        return transaction
+    }
+
+    /**
+     * Logs and throws an exception if the transaction failed on callback execution.
+     *
+     * @param transaction object after the commit / rollback
+     * */
+    protected void throwIfCallBackFailed(NaeTransaction transaction) {
+        if (transaction.onCallBackException == null){
+            return
+        }
+        log.error("Transaction synchronization call back execution failed with message: {} ", transaction.onCallBackException.getMessage())
+        throw transaction.onCallBackException
+    }
+
+    protected void executeTransaction(NaeTransaction transaction) {
+        try {
+            transaction.begin()
+        } catch (Exception e) {
+            log.warn("Transaction failed in action: $action.definition")
+            log.error("Transaction failed with error: {}", e.getMessage(), e)
+        }
     }
 
     void initFieldsMap(Map<String, String> fieldIds, Case useCase) {
@@ -451,9 +551,9 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     SetDataEventOutcome setData(Field<?> field, Map changes, LoggedIdentity identity = identityService.loggedIdentity) {
-        SetDataEventOutcome outcome = dataService.setData(useCase, new DataSet([
+        SetDataEventOutcome outcome = dataService.setData(new SetDataParams(useCase, new DataSet([
                 (field.stringId): field.class.newInstance(changes)
-        ] as Map<String, Field<?>>), identity.activeActorId)
+        ] as Map<String, Field<?>>), identity.activeActorId))
         this.outcomes.add(outcome)
         updateCase()
         return outcome
@@ -531,9 +631,9 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     private addTaskOutcomes(Task task, DataSet dataSet) {
-        this.outcomes.add(taskService.assignTask(task.stringId))
-        this.outcomes.add(dataService.setData(task.stringId, dataSet, identityService.loggedIdentity.activeActorId))
-        this.outcomes.add(taskService.finishTask(task.stringId))
+        this.outcomes.add(taskService.assignTask(new TaskParams(task.stringId)))
+        this.outcomes.add(dataService.setData(new SetDataParams(task.stringId, dataSet, identityService.loggedIdentity.activeActorId)))
+        this.outcomes.add(taskService.finishTask(new TaskParams(task.stringId)))
     }
 
     List<String> searchCases(Closure<Predicate> predicates) {
@@ -739,20 +839,43 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     Case createCase(String identifier, String title = null, String color = "", LoggedIdentity author = identityService.loggedIdentity,
                     Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
-        return workflowService.createCaseByIdentifier(identifier, title, color, author.activeActorId, locale, params).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier(identifier)
+                .title(title)
+                .authorId(author.activeActorId)
+                .params(params)
+                .build()
+        return workflowService.createCaseByIdentifier(createCaseParams).getCase()
     }
 
     Case createCase(Process net, String title = net.defaultCaseName.getTranslation(locale), String color = "", LoggedIdentity author = identityService.loggedIdentity,
                     Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
-        CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, author.activeActorId, params)
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .title(title)
+                .authorId(author.activeActorId)
+                .params(params)
+                .build()
+        CreateCaseEventOutcome outcome = workflowService.createCase(createCaseParams)
         this.outcomes.add(outcome)
         return outcome.getCase()
+    }
+
+    Case deleteCase(Case useCase) {
+        DeleteCaseEventOutcome outcome = workflowService.deleteCase(new DeleteCaseParams(useCase))
+        return outcome.case
+    }
+
+    Case deleteCase(String caseId) {
+        DeleteCaseEventOutcome outcome = workflowService.deleteCase(new DeleteCaseParams(caseId))
+        return outcome.case
     }
 
     /**
      * todo javadoc
      * */
     LoggedIdentity getLoggedOrSystem() {
+        // todo: release/8.0.0 system has no identity
         LoggedIdentity identity = identityService.getLoggedIdentity()
         return identity ?: identityService.getLoggedSystemIdentity()
     }
@@ -760,14 +883,24 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     Task assignTask(String transitionId, Case aCase = useCase, LoggedIdentity assignee = identityService.loggedIdentity,
                     Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        AssignTaskEventOutcome outcome = taskService.assignTask(assignee.activeActorId, taskId, params)
+        TaskParams taskParams = TaskParams.with()
+                .taskId(taskId)
+                .assigneeId(assignee.activeActorId)
+                .params(params)
+                .build()
+        AssignTaskEventOutcome outcome = taskService.assignTask(taskParams)
         this.outcomes.add(outcome)
         updateCase()
         return outcome.getTask()
     }
 
     Task assignTask(Task task, LoggedIdentity assignee = identityService.loggedIdentity, Map<String, String> params = [:]) {
-        return addTaskOutcomeAndReturnTask(taskService.assignTask(task, assignee.activeActorId, params))
+        TaskParams taskParams = TaskParams.with()
+                .task(task)
+                .assigneeId(assignee.activeActorId)
+                .params(params)
+                .build()
+        return addTaskOutcomeAndReturnTask(taskService.assignTask(taskParams))
     }
 
     void assignTasks(List<Task> tasks, LoggedIdentity assignee = identityService.loggedIdentity, Map<String, String> params = [:]) {
@@ -776,11 +909,21 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     Task cancelTask(String transitionId, Case aCase = useCase, LoggedIdentity assignee = identityService.loggedIdentity, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        return addTaskOutcomeAndReturnTask(taskService.cancelTask(assignee.activeActorId, taskId, params))
+        TaskParams taskParams = TaskParams.with()
+                .taskId(taskId)
+                .assigneeId(assignee.activeActorId)
+                .params(params)
+                .build()
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(taskParams))
     }
 
     Task cancelTask(Task task, LoggedIdentity assignee = identityService.loggedIdentity, Map<String, String> params = [:]) {
-        return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, assignee.activeActorId, params))
+        TaskParams taskParams = TaskParams.with()
+                .task(task)
+                .assigneeId(assignee.activeActorId)
+                .params(params)
+                .build()
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(taskParams))
     }
 
     void cancelTasks(List<Task> tasks, LoggedIdentity assignee = identityService.loggedIdentity, Map<String, String> params = [:]) {
@@ -796,11 +939,21 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     void finishTask(String transitionId, Case aCase = useCase, LoggedIdentity assignee = identityService.loggedIdentity,
                     Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        addTaskOutcomeAndReturnTask(taskService.finishTask(assignee.activeActorId, taskId, params))
+        TaskParams taskParams = TaskParams.with()
+                .taskId(taskId)
+                .assigneeId(assignee.activeActorId)
+                .params(params)
+                .build()
+        addTaskOutcomeAndReturnTask(taskService.finishTask(taskParams))
     }
 
     void finishTask(Task task, LoggedIdentity assignee = identityService.loggedIdentity, Map<String, String> params = [:]) {
-        addTaskOutcomeAndReturnTask(taskService.finishTask(task, assignee.activeActorId, params))
+        TaskParams taskParams = TaskParams.with()
+                .task(task)
+                .assigneeId(assignee.activeActorId)
+                .params(params)
+                .build()
+        addTaskOutcomeAndReturnTask(taskService.finishTask(taskParams))
     }
 
     void finishTasks(List<Task> tasks, LoggedIdentity assignee = identityService.loggedIdentity, Map<String, String> params = [:]) {
@@ -865,7 +1018,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     // TODO: release/8.0.0 merge check, params x dataset
     SetDataEventOutcome setData(DataSet dataSet, String actorId = identityService.loggedIdentity.activeActorId) {
-        return addSetDataOutcomeToOutcomes(dataService.setData(useCase, dataSet, actorId))
+        return addSetDataOutcomeToOutcomes(dataService.setData(new SetDataParams(useCase, dataSet, actorId)))
     }
 
     SetDataEventOutcome setData(Task task, DataSet dataSet, String actorId = identityService.loggedIdentity.activeActorId,
@@ -875,7 +1028,13 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     SetDataEventOutcome setData(String taskId, DataSet dataSet, String actorId = identityService.loggedIdentity.activeActorId,
                                 Map<String, String> params = [:]) {
-        return addSetDataOutcomeToOutcomes(dataService.setData(taskId, dataSet, actorId, params))
+        SetDataParams setDataParams = SetDataParams.with()
+                .taskId(taskId)
+                .dataSet(dataSet)
+                .actorId(actorId)
+                .params(params)
+                .build()
+        return addSetDataOutcomeToOutcomes(dataService.setData(setDataParams))
     }
 
     SetDataEventOutcome setData(Transition transition, DataSet dataSet, String actorId = identityService.loggedIdentity.activeActorId,
@@ -887,7 +1046,13 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
                                 Map<String, String> params = [:]) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
-        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, dataSet, actorId, params))
+        SetDataParams setDataParams = SetDataParams.with()
+                .task(task)
+                .dataSet(dataSet)
+                .actorId(actorId)
+                .params(params)
+                .build()
+        return addSetDataOutcomeToOutcomes(dataService.setData(setDataParams))
     }
 
     @Deprecated
@@ -915,13 +1080,25 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     Map<String, Field> getData(Task task, String actorId = identityService.loggedIdentity.activeActorId, Map<String, String> params = [:]) {
         def useCase = workflowService.findOne(task.caseId)
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, actorId, params)))
+        GetDataParams getDataParams = GetDataParams.with()
+                .task(task)
+                .useCase(useCase)
+                .actorId(actorId)
+                .params(params)
+                .build()
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(getDataParams)))
     }
 
     Map<String, Field> getData(String taskId, String actorId = identityService.loggedIdentity.activeActorId, Map<String, String> params = [:]) {
         Task task = taskService.findById(taskId)
         def useCase = workflowService.findOne(task.caseId)
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, actorId, params)))
+        GetDataParams getDataParams = GetDataParams.with()
+                .task(task)
+                .useCase(useCase)
+                .actorId(actorId)
+                .params(params)
+                .build()
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(getDataParams)))
     }
 
     Map<String, Field> getData(Transition transition, String actorId = identityService.loggedIdentity.activeActorId,
@@ -936,7 +1113,13 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         if (!task) {
             return new HashMap<String, Field>()
         }
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, actorId, params)))
+        GetDataParams getDataParams = GetDataParams.with()
+                .task(task)
+                .useCase(useCase)
+                .actorId(actorId)
+                .params(params)
+                .build()
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(getDataParams)))
     }
 
     private List<DataRef> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome) {
@@ -1220,7 +1403,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         if (!createDefaultFilters) {
             return []
         }
-        return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.getStringId.eq(identityService.getLoggedSystemIdentity().activeActorId)) })
+        return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.getStringId.eq(userService.getSystemUser().stringId)) })
     }
 
     /**
@@ -1375,7 +1558,10 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      * @return
      */
     def deleteFilter(Case filter) {
-        workflowService.deleteCase(filter.stringId)
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
+                .useCase(filter)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 
     /**
@@ -1630,7 +1816,10 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      */
     def deleteMenuItem(Case item) {
         async.run {
-            workflowService.deleteCase(item.stringId)
+            DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
+                    .useCase(item)
+                    .build()
+            workflowService.deleteCase(deleteCaseParams)
         }
     }
 
@@ -1821,14 +2010,14 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     List<Case> findCasesElastic(String query, Pageable pageable) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
-        List<Case> result = elasticCaseService.search([request], identityService.getLoggedSystemIdentity(), pageable, LocaleContextHolder.locale, false).content
+        List<Case> result = elasticCaseService.search([request], identityService.getLoggedIdentity().activeActorId, pageable, LocaleContextHolder.locale, false).content
         return result
     }
 
     long countCasesElastic(String query) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
-        return elasticCaseService.count([request], identityService.getLoggedSystemIdentity(), LocaleContextHolder.locale, false)
+        return elasticCaseService.count([request], identityService.getLoggedIdentity().activeActorId, LocaleContextHolder.locale, false)
     }
 
     @Deprecated

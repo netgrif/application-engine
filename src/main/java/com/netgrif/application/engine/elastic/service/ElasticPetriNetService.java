@@ -86,4 +86,10 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
         List<ElasticPetriNet> elasticPetriNets = repository.findAllByUriNodeId(uriNodeId);
         return petriNetService.findAllById(elasticPetriNets.stream().map(ElasticPetriNet::getStringId).collect(Collectors.toList()));
     }
+
+    @Override
+    public List<Process> findAllByIdentifier(String identifier) {
+        List<ElasticPetriNet> elasticProcesses = repository.findAllByIdentifier(identifier);
+        return petriNetService.findAllById(elasticProcesses.stream().map(ElasticPetriNet::getStringId).collect(Collectors.toList()));
+    }
 }

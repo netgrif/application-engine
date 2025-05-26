@@ -18,7 +18,7 @@ import com.netgrif.application.engine.utils.InputStreamToString;
 import com.netgrif.application.engine.workflow.domain.*;
 import com.netgrif.application.engine.workflow.domain.filter.FilterImportExport;
 import com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList;
-import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -76,9 +76,6 @@ public class FilterImportExportService implements IFilterImportExportService {
     private ISessionManagerService sessionManagerService;
 
     @Autowired
-    private IDataService dataService;
-
-    @Autowired
     private FileStorageConfiguration fileStorageConfiguration;
 
     @Autowired
@@ -86,14 +83,22 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Override
     public void createFilterImport(Actor author) {
-        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER, "Import filters " + author.getName(), "",
-                author.getCase().getStringId());
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier(IMPORT_NET_IDENTIFIER)
+                .title("Import filters " + author.getName())
+                .authorId(author.getStringId())
+                .build();
+        workflowService.createCase(createCaseParams);
     }
 
     @Override
     public void createFilterExport(Actor author) {
-        workflowService.createCaseByIdentifier(EXPORT_NET_IDENTIFIER, "Export filters " + author.getName(), "",
-                author.getCase().getStringId());
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier(EXPORT_NET_IDENTIFIER)
+                .title("Import filters " + author.getName())
+                .authorId(author.getStringId())
+                .build();
+        workflowService.createCase(createCaseParams);
     }
 
     /**
@@ -239,7 +244,7 @@ public class FilterImportExportService implements IFilterImportExportService {
             workflowService.save(filterCase.get());
         });
         taskService.assignTasks(taskService.findAllById(new ArrayList<>(importedFilterTaskIds.values())),
-                sessionManagerService.getActiveActorId());
+                sessionManagerService.getActiveActorId(), new HashMap<>());
         changeFilterField(importedFilterTaskIds.values());
         return importedFilterTaskIds;
     }

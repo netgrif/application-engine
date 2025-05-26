@@ -3,6 +3,7 @@ package com.netgrif.application.engine
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.State
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
@@ -44,8 +45,8 @@ class Async {
 
         def t1Id = $case.getTaskStringId("t1")
 
-        taskService.assignTask(t1Id)
-        taskService.finishTask(t1Id)
+        taskService.assignTask(new TaskParams(t1Id))
+        taskService.finishTask(new TaskParams(t1Id))
 
         $case = workflowService.findOne($case.stringId)
         List<Task> tasks = taskService.findAllByCase($case.stringId)

@@ -50,16 +50,16 @@ class ReindexTest {
 
     @Test
     void reindexTest() {
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"),
+        ImportPetriNetEventOutcome net = petriNetService.importProcess(new FileInputStream("src/test/resources/all_data.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
-        assert net.getNet() != null
+        assert net.getProcess() != null
         int countTread = Thread.activeCount()
         List<Thread> threads = []
         List<Case> savedCase = []
         for (int i in 1..2000) {
             threads << Thread.start {
                 TestHelper.login(superCreator.superIdentity)
-                def useCase = workflowService.createCase(net.getNet().stringId, "Test", "color",
+                def useCase = workflowService.createCase(net.getProcess().stringId, "Test", "color",
                         superCreator.getLoggedSuper().getActiveActorId()).getCase()
                 savedCase.add(useCase)
             }
@@ -73,7 +73,7 @@ class ReindexTest {
         for (int i in 1..4000) {
             threads << Thread.start {
                 TestHelper.login(superCreator.superIdentity)
-                def useCase = workflowService.createCase(net.getNet().stringId, "Test", "color",
+                def useCase = workflowService.createCase(net.getProcess().stringId, "Test", "color",
                         superCreator.getLoggedSuper().getActiveActorId()).getCase()
                 savedCase.add(useCase)
             }

@@ -56,15 +56,15 @@ class CaseApiTest {
 
     @Test
     void testCreate() {
-        testNet = petriNetService.importPetriNet(stream(CREATE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        testNet = petriNetService.importProcess(stream(CREATE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
 
-        assert testNet.getNet() != null
+        assert testNet.getProcess() != null
 
-        Case aCase = importHelper.createCase("Case 1", testNet.getNet())
+        Case aCase = importHelper.createCase("Case 1", testNet.getProcess())
         importHelper.assignTaskToSuper("Task", aCase.stringId)
         importHelper.finishTaskAsSuper("Task", aCase.stringId)
 
-        assert caseRepository.findAllByProcessIdentifier(testNet.getNet().identifier).size() > 1
+        assert caseRepository.findAllByProcessIdentifier(testNet.getProcess().identifier).size() > 1
     }
 
     public static final String SEARCH_NET_FILE = "ipc_where.xml"
@@ -73,13 +73,13 @@ class CaseApiTest {
     void testSearch() {
         testHelper.truncateDbs()
 
-        testNet = petriNetService.importPetriNet(stream(SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        testNet = petriNetService.importProcess(stream(SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
 
-        assert testNet.getNet() != null
+        assert testNet.getProcess() != null
 
         List<Case> cases = []
         5.times { index ->
-            cases << importHelper.createCase("Case $index" as String, testNet.getNet())
+            cases << importHelper.createCase("Case $index" as String, testNet.getProcess())
         }
 
         importHelper.assignTaskToSuper("Task", cases[0].stringId)

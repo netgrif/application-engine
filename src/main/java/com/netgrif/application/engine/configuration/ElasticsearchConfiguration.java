@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
 import com.netgrif.application.engine.configuration.properties.UriProperties;
-import com.netgrif.application.engine.workflow.service.CaseEventHandler;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -73,10 +72,5 @@ public class ElasticsearchConfiguration {
     @Bean
     public ElasticsearchOperations elasticsearchTemplate() {
         return new ElasticsearchRestTemplate(client());
-    }
-
-    @Bean
-    public CaseEventHandler caseEventHandler() {
-        return new CaseEventHandler();
     }
 }

@@ -51,8 +51,8 @@ class ChangeFieldValueInitTest {
     @Test
     void testInitValues() {
         // todo: release/8.0.0 field text_static is not injected into expression delegate
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/change_field_value_init.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
-        Case useCase = importHelper.createCase("test", optNet.getNet())
+        ImportPetriNetEventOutcome optNet = petriNetService.importProcess(new FileInputStream("src/test/resources/petriNets/change_field_value_init.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
+        Case useCase = importHelper.createCase("test", optNet.getProcess())
 
         assert useCase.dataSet.get("text_static").rawValue == "TEST VALUE"
         assert useCase.dataSet.get("text_dynamic").rawValue == "TEST VALUE DYNAMIC"

@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
@@ -71,9 +70,9 @@ class AuthenticationControllerTest {
         smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
         smtpServer.start()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test_new.xml"),
+        def net = petriNetService.importProcess(new FileInputStream("src/test/resources/insurance_portal_demo_test_new.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
-        assert net.getNet() != null
+        assert net.getProcess() != null
     }
 
     @Test

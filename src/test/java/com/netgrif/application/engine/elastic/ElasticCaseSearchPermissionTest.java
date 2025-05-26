@@ -180,8 +180,8 @@ public class ElasticCaseSearchPermissionTest {
     }
 
     private void createTestCase(String identifier) throws IOException, MissingPetriNetMetaDataException {
-        Process process = petriNetService.importPetriNet(new FileInputStream(String.format("src/test/resources/petriNets/%s.xml", identifier)),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getNet();
+        Process process = petriNetService.importProcess(new FileInputStream(String.format("src/test/resources/petriNets/%s.xml", identifier)),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess();
         TestHelper.login(superCreator.getSuperIdentity());
         testCase = importHelper.createCase("Case permissions", process);
         TestHelper.logout();

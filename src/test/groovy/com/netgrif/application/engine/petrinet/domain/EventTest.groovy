@@ -82,8 +82,8 @@ class EventTest {
         testHelper.truncateDbs()
         TestHelper.login(superCreator.superIdentity)
 
-        Process net = petriNetService.importPetriNet(stream(EVENT_NET_FILE), VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId).getNet()
+        Process net = petriNetService.importProcess(stream(EVENT_NET_FILE), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId).getProcess()
         instance = helper.createCase(EVENT_NET_CASE, net)
 
         outcome = helper.assignTaskToSuper(EVENT_NET_TASK, instance.stringId)

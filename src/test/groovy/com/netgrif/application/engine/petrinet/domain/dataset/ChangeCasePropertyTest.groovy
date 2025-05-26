@@ -58,8 +58,8 @@ class ChangeCasePropertyTest {
     @BeforeEach
     void initNet() {
         testHelper.truncateDbs()
-        net = petriNetService.importPetriNet(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId).getNet()
+        net = petriNetService.importProcess(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId).getProcess()
         assert net != null
     }
 

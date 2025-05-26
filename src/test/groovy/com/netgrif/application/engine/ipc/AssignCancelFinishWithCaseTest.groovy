@@ -57,15 +57,15 @@ class AssignCancelFinishWithCaseTest {
 
     @Test
     void testAssignCancelFinish() {
-        def testNet = petriNetService.importPetriNet(stream(ASSIGN_CANCEL_FINISH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        def testNet = petriNetService.importProcess(stream(ASSIGN_CANCEL_FINISH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
 
-        assert testNet.getNet() != null
+        assert testNet.getProcess() != null
 
         TestHelper.login(superCreator.superIdentity)
-        Case aCase = importHelper.createCase("Case 1", testNet.getNet())
+        Case aCase = importHelper.createCase("Case 1", testNet.getProcess())
         importHelper.assignTaskToSuper("Task", aCase.stringId)
 
-        def cases = caseRepository.findAllByProcessIdentifier(testNet.getNet().identifier)
+        def cases = caseRepository.findAllByProcessIdentifier(testNet.getProcess().identifier)
         assert cases.find { it.title == "Case 2" }.dataSet.get("field").rawValue == 1
     }
 }

@@ -13,6 +13,7 @@ import com.netgrif.application.engine.manager.service.interfaces.ISessionManager
 import com.netgrif.application.engine.petrinet.domain.DataRef
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
@@ -21,6 +22,10 @@ import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dat
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.GetDataParams
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -86,7 +91,7 @@ class ImportHelper {
     Optional<Process> createNet(String fileName, VersionType release = VersionType.MAJOR, String actorId = userService.getSystemUser()?.stringId,
                                 String uriNodeId = uriService.getRoot().stringId) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        Process petriNet = petriNetService.importPetriNet(netStream, release, actorId, uriNodeId).getNet()
+        Process petriNet = petriNetService.importProcess(new ImportProcessParams(netStream, release, actorId, uriNodeId)).getProcess()
         log.info("Imported '${petriNet?.title?.defaultValue}' ['${petriNet?.identifier}', ${petriNet?.stringId}]")
         return Optional.of(petriNet)
     }
@@ -117,7 +122,12 @@ class ImportHelper {
     }
 
     Case createCase(String title, Process net, LoggedIdentity author) {
-        return workflowService.createCase(net.getStringId(), title, "", author.activeActorId).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .title(title)
+                .authorId(author.activeActorId)
+                .build()
+        return workflowService.createCase(createCaseParams).getCase()
     }
 
     Case createCase(String title, Process net) {
@@ -129,7 +139,7 @@ class ImportHelper {
     }
 
     AssignTaskEventOutcome assignTask(String taskTitle, String caseId, LoggedIdentity assignee) {
-        return taskService.assignTask(assignee.activeActorId, getTaskId(taskTitle, caseId))
+        return taskService.assignTask(new TaskParams(assignee.activeActorId, getTaskId(taskTitle, caseId)))
     }
 
     AssignTaskEventOutcome assignTaskToSuper(String taskTitle, String caseId) {
@@ -137,7 +147,7 @@ class ImportHelper {
     }
 
     FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedIdentity assignee) {
-        return taskService.finishTask(assignee.activeActorId, getTaskId(taskTitle, caseId))
+        return taskService.finishTask(new TaskParams(assignee.activeActorId, getTaskId(taskTitle, caseId)))
     }
 
     FinishTaskEventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
@@ -145,7 +155,7 @@ class ImportHelper {
     }
 
     CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedIdentity assignee) {
-        return taskService.cancelTask(assignee.activeActorId, getTaskId(taskTitle, caseId))
+        return taskService.cancelTask(new TaskParams(assignee.activeActorId, getTaskId(taskTitle, caseId)))
     }
 
     CancelTaskEventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {
@@ -158,7 +168,7 @@ class ImportHelper {
     }
 
     SetDataEventOutcome setTaskData(String taskId, DataSet dataSet) {
-        dataService.setData(taskId, dataSet, userService.getSystemUser().stringId)
+        dataService.setData(new SetDataParams(taskId, dataSet, userService.getSystemUser().stringId))
     }
 
     SetDataEventOutcome setTaskData(String taskTitle, String caseId, DataSet data) {
@@ -166,6 +176,6 @@ class ImportHelper {
     }
 
     List<DataRef> getTaskData(String taskTitle, String caseId) {
-        return dataService.getData(getTaskId(taskTitle, caseId), userService.getSystemUser().stringId).getData()
+        return dataService.getData(new GetDataParams(getTaskId(taskTitle, caseId), userService.getSystemUser().stringId)).getData()
     }
 }

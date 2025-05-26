@@ -96,11 +96,11 @@ public class VariableArcsTest {
         repository.deleteAll();
         assertNotNull(roleService.findDefaultRole());
         testHelper.truncateDbs();
-        ImportPetriNetEventOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), VersionType.MAJOR,
+        ImportPetriNetEventOutcome outcome = service.importProcess(new FileInputStream(NET_PATH), VersionType.MAJOR,
                 superCreator.getLoggedSuper().getActiveActorId());
 
-        assert outcome.getNet() != null;
-        Process net = outcome.getNet();
+        assert outcome.getProcess() != null;
+        Process net = outcome.getProcess();
         this.loaded = service.getPetriNet(net.getStringId());
 
         testIdentity = importHelper.createIdentity(IdentityParams.with()

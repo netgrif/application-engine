@@ -52,11 +52,11 @@ class DynamicChoicesTest {
     @Test
     void testDynamicEnum() {
         // todo: release/8.0.0 choices does not exist anymore
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml"),
+        ImportPetriNetEventOutcome optNet = petriNetService.importProcess(new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
 
-        assert optNet.getNet() != null
-        def net = optNet.getNet()
+        assert optNet.getProcess() != null
+        def net = optNet.getProcess()
 
         def aCase = importHelper.createCase("Case", net)
 

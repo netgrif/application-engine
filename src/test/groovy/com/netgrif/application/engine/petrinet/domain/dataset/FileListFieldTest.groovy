@@ -85,10 +85,10 @@ class FileListFieldTest {
     }
 
     Process getNet() {
-        def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileListField.xml"), VersionType.MAJOR,
+        def netOptional = petriNetService.importProcess(new FileInputStream("src/test/resources/remoteFileListField.xml"), VersionType.MAJOR,
                 superCreator.getLoggedSuper().activeActorId)
-        assert netOptional.getNet() != null
-        return netOptional.getNet()
+        assert netOptional.getProcess() != null
+        return netOptional.getProcess()
     }
 
     @Test

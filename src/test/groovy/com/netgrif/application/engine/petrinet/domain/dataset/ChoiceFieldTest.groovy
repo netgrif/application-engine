@@ -58,9 +58,9 @@ class ChoiceFieldTest {
 
     @Test
     void testChoices() {
-        def netOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
-        assert netOptional.getNet() != null
-        def net = netOptional.getNet()
+        def netOptional = petriNetService.importProcess(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        assert netOptional.getProcess() != null
+        def net = netOptional.getProcess()
 
         Set<I18nString> choices = ((ChoiceField) net.dataSet["enumeration"]).choices
         assert choices.size() == 3

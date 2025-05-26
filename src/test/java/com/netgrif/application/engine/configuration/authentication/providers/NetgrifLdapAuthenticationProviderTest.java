@@ -14,7 +14,6 @@ import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.SuperCreator;
-import org.bson.types.ObjectId;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -173,8 +172,8 @@ class NetgrifLdapAuthenticationProviderTest {
 
     @Test
     void assignRoleGroup() throws Exception {
-        Process net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/role_all_data.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getNet();
+        Process net = petriNetService.importProcess(new FileInputStream("src/test/resources/role_all_data.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess();
         assert net != null;
         // TODO: release/8.0.0 fix
 //        Map<String, ProcessRole> roles = net.getRoles();
@@ -212,8 +211,8 @@ class NetgrifLdapAuthenticationProviderTest {
 //        JSONArray countProcessRole = (JSONArray) json.get("processRoles");
 //        assert countProcessRole.length() == 1;
 
-        Process net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/role_all_data.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getNet();
+        Process net = petriNetService.importProcess(new FileInputStream("src/test/resources/role_all_data.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess();
         assert net != null;
         // TODO: release/8.0.0 fix
 //        Map<String, ProcessRole> roles = net.getRoles();

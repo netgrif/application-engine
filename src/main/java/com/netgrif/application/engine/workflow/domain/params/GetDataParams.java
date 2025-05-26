@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.workflow.domain.params;
 
-import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import lombok.AllArgsConstructor;
@@ -17,20 +16,20 @@ public class GetDataParams {
 
     private String taskId;
     private Task task;
-    private IUser user;
+    private String actorId;
     private Case useCase;
     private Boolean isTransactional;
     @Builder.Default
     private Map<String, String> params = new HashMap<>();
 
-    public GetDataParams(Task task, Case useCase, IUser user) {
+    public GetDataParams(Task task, Case useCase, String actorId) {
         this.task = task;
         this.useCase = useCase;
-        this.user = user;
+        this.actorId = actorId;
     }
 
-    public GetDataParams(String taskId, IUser user) {
+    public GetDataParams(String taskId, String actorId) {
         this.taskId = taskId;
-        this.user = user;
+        this.actorId = actorId;
     }
 }

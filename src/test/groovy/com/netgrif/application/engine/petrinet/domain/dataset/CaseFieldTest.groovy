@@ -63,10 +63,10 @@ class CaseFieldTest {
 
     @Test
     void testAllowedNets() {
-        def testNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
-        assert testNet.getNet() != null
+        def testNet = petriNetService.importProcess(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        assert testNet.getProcess() != null
 
-        Case aCase = importHelper.createCase("Case 1", testNet.getNet())
+        Case aCase = importHelper.createCase("Case 1", testNet.getProcess())
 
         Field<?> field = aCase.getDataSet().get(CASE_FIELD_ID)
         assert field instanceof CaseField
@@ -113,10 +113,10 @@ class CaseFieldTest {
 
     @Test
     void testImmediateAllowedNets() {
-        def testNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
-        assert testNet.getNet() != null
+        def testNet = petriNetService.importProcess(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        assert testNet.getProcess() != null
 
-        Case aCase = importHelper.createCase("Case 1", testNet.getNet())
+        Case aCase = importHelper.createCase("Case 1", testNet.getProcess())
 
         assert aCase.getImmediateData().size() == 1
         CaseField caseRef = (CaseField) aCase.getImmediateData().get(0)
@@ -159,13 +159,13 @@ class CaseFieldTest {
 
     @Test
     void testChangeValueAction() {
-        def notAllowedNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
-        assert notAllowedNet.getNet() != null
+        def notAllowedNet = petriNetService.importProcess(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        assert notAllowedNet.getProcess() != null
 
-        def testNet = petriNetService.importPetriNet(stream(CHANGE_VALUE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
-        assert testNet.getNet() != null
+        def testNet = petriNetService.importProcess(stream(CHANGE_VALUE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        assert testNet.getProcess() != null
 
-        Case aCase = importHelper.createCase("Case 1", testNet.getNet())
+        Case aCase = importHelper.createCase("Case 1", testNet.getProcess())
 
         assert aCase.getDataSet().get(CASE_FIELD_ID).rawValue == null
 

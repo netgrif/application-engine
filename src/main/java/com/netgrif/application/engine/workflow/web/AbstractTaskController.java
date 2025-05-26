@@ -11,6 +11,8 @@ import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dat
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.layoutoutcomes.GetLayoutsEventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessageResource;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
+import com.netgrif.application.engine.workflow.domain.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -89,8 +91,12 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> assign(LoggedIdentity identity, String taskId) {
         try {
+            TaskParams taskParams = TaskParams.with()
+                    .taskId(taskId)
+                    .assigneeId(identity.getActiveActorId())
+                    .build();
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + identity.getUsername(),
-                    taskService.assignTask(identity.getActiveActorId(), taskId));
+                    taskService.assignTask(taskParams));
         } catch (TransitionNotExecutableException e) {
             log.error("Assigning task [{}] failed: ", taskId, e);
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
@@ -109,8 +115,12 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> finish(LoggedIdentity identity, String taskId) {
         try {
+            TaskParams taskParams = TaskParams.with()
+                    .taskId(taskId)
+                    .assigneeId(identity.getActiveActorId())
+                    .build();
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " finished",
-                    taskService.finishTask(identity.getActiveActorId(), taskId));
+                    taskService.finishTask(taskParams));
         } catch (Exception e) {
             log.error("Finishing task [{}] failed: ", taskId, e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
@@ -123,8 +133,12 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> cancel(LoggedIdentity identity, String taskId) {
         try {
+            TaskParams taskParams = TaskParams.with()
+                    .taskId(taskId)
+                    .assigneeId(identity.getActiveActorId())
+                    .build();
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " canceled",
-                    taskService.cancelTask(identity.getActiveActorId(), taskId));
+                    taskService.cancelTask(taskParams));
         } catch (Exception e) {
             log.error("Canceling task [{}] failed: ", taskId, e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
@@ -191,7 +205,7 @@ public abstract class AbstractTaskController {
         return CountResponse.taskCount(count);
     }
 
-//// TODO: NAE-1969 fix
+//// TODO: release/8.0.0 fix
     public EntityModel<EventOutcomeWithMessage> getData(String taskId, Locale locale, Authentication auth) {
         try {
             GetLayoutsEventOutcome outcome = dataService.getLayouts(taskId, locale, ((LoggedIdentity) auth.getPrincipal()).getActiveActorId());
@@ -208,8 +222,8 @@ public abstract class AbstractTaskController {
     public EntityModel<EventOutcomeWithMessage> setData(String taskId, TaskDataSets dataBody, Authentication auth) {
         try {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
-            dataBody.getBody().forEach((task, dataSet) -> outcomes.put(task, dataService.setData(task, dataSet,
-                    ((LoggedIdentity) auth.getPrincipal()).getActiveActorId())));
+            dataBody.getBody().forEach((task, dataSet) -> outcomes.put(task, dataService.setData(new SetDataParams(task,
+                    dataSet, ((LoggedIdentity) auth.getPrincipal()).getActiveActorId()))));
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set", mainOutcome);
         } catch (IllegalArgumentWithChangedFieldsException e) {

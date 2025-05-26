@@ -60,11 +60,11 @@ class AssignRemoveTest {
     @Test
     @Disabled("Create functions or update test")
     void testAssignAndRemoveRole() throws MissingPetriNetMetaDataException, IOException {
-        ImportPetriNetEventOutcome netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"),
+        ImportPetriNetEventOutcome netOptional = petriNetService.importProcess(new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
 
-        assert netOptional.getNet() != null
-        def net = netOptional.getNet()
+        assert netOptional.getProcess() != null
+        def net = netOptional.getProcess()
         // todo: release/8.0.0
 //        def roleCount = userService.system.roles.size()
 //

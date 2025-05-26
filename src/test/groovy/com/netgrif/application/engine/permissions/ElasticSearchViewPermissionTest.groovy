@@ -79,15 +79,15 @@ class ElasticSearchViewPermissionTest {
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/view_permission_test.xml"), 
+        ImportPetriNetEventOutcome net = petriNetService.importProcess(new FileInputStream("src/test/resources/view_permission_test.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
-        assert net.getNet() != null
-        this.net = net.getNet()
+        assert net.getProcess() != null
+        this.net = net.getProcess()
 
-        ImportPetriNetEventOutcome netWithUserRefs = petriNetService.importPetriNet(new FileInputStream("src/test/resources/view_permission_with_userRefs_test.xml"), 
+        ImportPetriNetEventOutcome netWithUserRefs = petriNetService.importProcess(new FileInputStream("src/test/resources/view_permission_with_userRefs_test.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
-        assert netWithUserRefs.getNet() != null
-        this.netWithUserRefs = netWithUserRefs.getNet()
+        assert netWithUserRefs.getProcess() != null
+        this.netWithUserRefs = netWithUserRefs.getProcess()
 
         testIdentity = importHelper.createIdentity(IdentityParams.with()
                 .firstname(new TextField("Role"))

@@ -46,10 +46,10 @@ class MapFieldTest {
 
     @Test
     void testImport() {
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
-        assert netOptional.getNet() != null
+        def netOptional = petriNetService.importProcess(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
+        assert netOptional.getProcess() != null
 
-        def net = netOptional.getNet()
+        def net = netOptional.getProcess()
         assert net.dataSet.size() == 1
 
         EnumerationMapField field = net.dataSet["enumeration"] as EnumerationMapField
@@ -70,10 +70,10 @@ class MapFieldTest {
 
     @Test
     void testValue() {
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
-        assert netOptional.getNet() != null
+        def netOptional = petriNetService.importProcess(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
+        assert netOptional.getProcess() != null
 
-        Case aCase = importHelper.createCase("Case", netOptional.getNet())
+        Case aCase = importHelper.createCase("Case", netOptional.getProcess())
 
         assert aCase.dataSet.get("enumeration") != null
         assert aCase.dataSet.get("enumeration").rawValue == "second"
@@ -107,10 +107,10 @@ class MapFieldTest {
 
     @Test
     void testImportMultichoice() {
-        def netOptional = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
-        assert netOptional.getNet() != null
+        def netOptional = petriNetService.importProcess(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
+        assert netOptional.getProcess() != null
 
-        def net = netOptional.getNet()
+        def net = netOptional.getProcess()
         assert net.dataSet.size() == 1
 
         MultichoiceMapField field = net.dataSet.get("multichoice") as MultichoiceMapField
@@ -132,10 +132,10 @@ class MapFieldTest {
 
     @Test
     void testValueMultichoice() {
-        def netOptional = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
-        assert netOptional.getNet() != null
+        def netOptional = petriNetService.importProcess(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
+        assert netOptional.getProcess() != null
 
-        Case aCase = importHelper.createCase("Case", netOptional.getNet())
+        Case aCase = importHelper.createCase("Case", netOptional.getProcess())
         MultichoiceMapField multichoiceMapField = aCase.dataSet.get("multichoice") as MultichoiceMapField
         assert multichoiceMapField != null
         assert multichoiceMapField.rawValue.size() == 2
