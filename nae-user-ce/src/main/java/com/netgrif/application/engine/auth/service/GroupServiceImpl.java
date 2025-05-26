@@ -108,6 +108,9 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void removeAllByRealmIdIn(Collection<String> realmIds) {
+        if (realmIds == null || realmIds.isEmpty()) {
+            this.removeAllGroups();
+        }
         this.groupRepository.removeAllByRealmIdIn(realmIds);
     }
 
@@ -264,6 +267,11 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Page<Group> findAllFromRealm(String realmId, Pageable pageable) {
         return groupRepository.findAllByRealmId(realmId, pageable);
+    }
+
+    @Override
+    public Page<Group> findAllFromRealmIn(Collection<String> realmIds, Pageable pageable) {
+        return groupRepository.findAllByRealmIdIn(realmIds, pageable);
     }
 
     @Override

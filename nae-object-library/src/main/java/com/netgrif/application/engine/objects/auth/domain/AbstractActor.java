@@ -30,12 +30,24 @@ public abstract class AbstractActor implements Serializable {
     protected Set<ProcessRole> processRoles = new HashSet<>();
     protected Set<String> groupIds = new HashSet<>();
 
+    public AbstractActor(ObjectId id, String realmId) {
+        this.id = id;
+        this.realmId = realmId;
+    }
+
+    public AbstractActor(String stringId, String realmId) {
+        this.id = new ObjectId(stringId);
+        this.realmId = realmId;
+    }
+
     /**
      * Gets the display name for a user or the group name for a group.
      *
      * @return the display name
      */
     abstract String getName();
+
+    abstract String getFullName();
 
     /**
      * Gets the {@link ObjectId} of this authorizing object in String form
@@ -88,7 +100,7 @@ public abstract class AbstractActor implements Serializable {
     }
 
     /**
-     * Gets attribute value
+     * Gets attribute value by attribute key
      *
      * @param key of attribute
      * @return the attribute value
@@ -102,7 +114,7 @@ public abstract class AbstractActor implements Serializable {
     }
 
     /**
-     * Removes attribute
+     * Removes attribute by attribute key
      *
      * @param key of attribute
      */
@@ -195,9 +207,7 @@ public abstract class AbstractActor implements Serializable {
         }
     }
 
-    /**
-     * @param name
-     */
+
     public void removeAuthorityByName(String name) {
         if (this.authoritySet == null) {
             this.authoritySet = new HashSet<>();

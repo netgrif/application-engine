@@ -37,6 +37,8 @@ public interface GroupService {
 
     Page<Group> findAllFromRealm(String realmId, Pageable pageable);
 
+    Page<Group> findAllFromRealmIn(Collection<String> realmIds, Pageable pageable);
+
     void removeAllGroups();
 
     void removeAllByRealmId(String realmId);

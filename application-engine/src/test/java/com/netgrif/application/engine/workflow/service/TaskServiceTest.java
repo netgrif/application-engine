@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
+import com.netgrif.application.engine.MockService;
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.UserService;
@@ -26,6 +27,7 @@ import com.netgrif.application.engine.workflow.domain.repositories.CaseRepositor
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +39,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Set;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -82,6 +85,9 @@ public class TaskServiceTest {
     @Autowired
     private DefaultRealmRunner realmRunner;
 
+    @Autowired
+    private MockService mock;
+
     @BeforeEach
     public void setUp() throws Exception {
         mongoTemplate.getDb().drop();
@@ -92,13 +98,13 @@ public class TaskServiceTest {
 
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         PetriNet net = petriNetRepository.findAll().get(0);
-        workflowService.createCase(net.getStringId(), "Storage Unit", "color", mockLoggedUser());
+        workflowService.createCase(net.getStringId(), "Storage Unit", "color", mock.mockLoggedUser());
     }
 
     @Test
     public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
         PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
-        LoggedUser loggedUser = mockLoggedUser();
+        LoggedUser loggedUser = mock.mockLoggedUser();
         CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
         User user = new User();
         user.setFirstName("name");
@@ -129,12 +135,5 @@ public class TaskServiceTest {
         assert useCase.getConsumedTokens().size() == 0;
         assert useCase.getActivePlaces().size() == 1;
         assert useCase.getActivePlaces().values().contains(5);
-    }
-
-    public LoggedUser mockLoggedUser() {
-        Authority authorityUser = authorityService.getOrCreate(Authority.user);
-        // TODO JOFO!!!
-//        return new LoggedUserImpl(new ObjectId().toString(), "super@netgrif.com", "password", Collections.singleton(authorityUser), Collections.emptySet(), Collections.emptySet());
-        return new LoggedUserImpl();
     }
 }

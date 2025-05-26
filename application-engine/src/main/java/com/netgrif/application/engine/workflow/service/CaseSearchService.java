@@ -48,6 +48,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     public static final String AUTHOR_IDENTIFIER = "identifier";
     public static final String AUTHOR_REALM = "realmId";
     public static final String AUTHOR_NAME = "name";
+    public static final String AUTHOR_USERNAME = "username";
 
     public static final String TRANSITION = "transition";
     public static final String FULLTEXT = "fullText";
@@ -177,7 +178,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     private static BooleanExpression authorObject(HashMap<String, Object> query) {
         if (query.containsKey(AUTHOR_NAME)) {
-            return QCase.case$.author.fullName.equalsIgnoreCase((String) query.get(AUTHOR_NAME));
+            return QCase.case$.author.displayName.equalsIgnoreCase((String) query.get(AUTHOR_NAME));
         } else if (query.containsKey(AUTHOR_ID)) {
             String searchValue = "";
             if (query.get(AUTHOR_ID) instanceof String)
@@ -187,6 +188,8 @@ public class CaseSearchService extends MongoSearchService<Case> {
             return QCase.case$.author.displayName.equalsIgnoreCase((String) query.get(AUTHOR_DISPLAYNAME));
         } else if (query.containsKey(AUTHOR_IDENTIFIER)) {
             return QCase.case$.author.identifier.equalsIgnoreCase((String) query.get(AUTHOR_IDENTIFIER));
+        } else if (query.containsKey(AUTHOR_USERNAME)) {
+            return QCase.case$.author.identifier.equalsIgnoreCase((String) query.get(AUTHOR_USERNAME));
         } else if (query.containsKey(AUTHOR_REALM)) {
             return QCase.case$.author.realmId.equalsIgnoreCase((String) query.get(AUTHOR_REALM));
         }
@@ -285,7 +288,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         List<BooleanExpression> predicates = new ArrayList<>();
         predicates.add(QCase.case$.visualId.startsWithIgnoreCase(searchPhrase));
         predicates.add(QCase.case$.title.containsIgnoreCase(searchPhrase));
-        predicates.add(QCase.case$.author.fullName.containsIgnoreCase(searchPhrase));
+        predicates.add(QCase.case$.author.displayName.containsIgnoreCase(searchPhrase));
         predicates.add(QCase.case$.author.identifier.containsIgnoreCase(searchPhrase));
 
         try {

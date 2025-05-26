@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
+import java.util.Set;
 
 @Component
 @Profile("test")
@@ -20,8 +21,9 @@ public class MockService {
 
     public LoggedUser mockLoggedUser() {
         Authority authorityUser = authorityService.getOrCreate(Authority.user);
-        // TODO JOFO!!!
-//        return new LoggedUserImpl(new ObjectId().toString(), "super@netgrif.com", "password", Collections.singleton(authorityUser), Collections.emptySet(), Collections.emptySet());
-        return new LoggedUserImpl();
+        LoggedUser loggedUser = new LoggedUserImpl(new ObjectId(), null, "testUsername", "testFirstName", "testMiddleName", "testLastName", "test@email.com", "", null, null, null, null);
+        loggedUser.setAuthoritySet(Set.of(authorityUser));
+        return loggedUser;
+
     }
 }

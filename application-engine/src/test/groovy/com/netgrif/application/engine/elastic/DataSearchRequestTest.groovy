@@ -105,9 +105,9 @@ class DataSearchRequestTest {
         def testUser2 = users[1]
         // saving authorities / roles crashes the workflowService (on case save)
         testUser1.processRoles = []
-        testUser1.authorities = []
+        testUser1.authoritySet = []
         testUser2.processRoles = []
-        testUser2.authorities = []
+        testUser2.authoritySet = []
 
         LocalDate date = LocalDate.of(2020, 7, 25);
         Case _case = importHelper.createCase("correct", net.getNet())
@@ -144,7 +144,7 @@ class DataSearchRequestTest {
                 new AbstractMap.SimpleEntry<String, String>("boolean.booleanValue" as String, "true" as String),
                 new AbstractMap.SimpleEntry<String, String>("text" as String, "hello world" as String),
                 new AbstractMap.SimpleEntry<String, String>("text.textValue.keyword" as String, "hello world" as String),
-                new AbstractMap.SimpleEntry<String, String>("user" as String, "${testUser1.name} ${testUser1.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("user" as String, "${testUser1.name} ${testUser1.username}" as String),
                 new AbstractMap.SimpleEntry<String, String>("user.usernameValue.keyword" as String, "${testUser1.username}" as String),
                 new AbstractMap.SimpleEntry<String, String>("user.fullNameValue.keyword" as String, "${testUser1.name}" as String),
                 new AbstractMap.SimpleEntry<String, String>("user.userIdValue" as String, "${testUser1.getStringId()}" as String),

@@ -55,6 +55,11 @@ public class Group extends AbstractActor implements Serializable {
         return this.displayName;
     }
 
+    @Override
+    public String getFullName() {
+        return this.displayName;
+    }
+
     public void addMemberId(String userId) {
         if (this.memberIds == null) {
             this.memberIds = new HashSet<>();

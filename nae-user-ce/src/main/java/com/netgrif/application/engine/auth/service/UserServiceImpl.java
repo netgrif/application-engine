@@ -201,11 +201,12 @@ public class UserServiceImpl implements UserService {
         // TODO: delete whole group or change owner of group?
         Set<String> userIds = userRepository.findAllByStateAndExpirationDateBefore(state, expirationDate, mongoTemplate, collectionNames)
                 .stream().map(AbstractActor::getStringId).collect(Collectors.toSet());
-        realmIds.forEach(realmId -> {
-            groupService.findAllFromRealm(realmId, Pageable.unpaged()).forEach(group -> {
-                group.getMemberIds().removeAll(userIds);
-                groupService.save(group);
-            });
+        Page<Group> groups = realmIds == null || realmIds.isEmpty()
+                ? groupService.findAll(Pageable.unpaged())
+                : groupService.findAllFromRealmIn(realmIds, Pageable.unpaged());
+        groups.forEach(group -> {
+            group.getMemberIds().removeAll(userIds);
+            groupService.save(group);
         });
         userRepository.removeAllByStateAndExpirationDateBefore(state, expirationDate, mongoTemplate, collectionNames);
     }
@@ -296,7 +297,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteAllUsers(Collection<String> realmIds) {
         log.debug("Deleting all users in realms [{}]", realmIds);
-        groupService.removeAllByRealmIdIn(new HashSet<>(realmIds));
+        groupService.removeAllByRealmIdIn(realmIds);
         userRepository.deleteAll(mongoTemplate, collectionNameProvider.getCollectionNamesForRealms(realmIds));
     }
 

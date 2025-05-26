@@ -11,6 +11,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId
+import org.bson.types.ObjectId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -73,12 +74,12 @@ class GroovyShellFactoryTest {
 
         def user = userService.findUserByUsername(userService.getSystem().getEmail(), null)
         def processRoleCount = user.get().processRoles.size()
-        def roles = roleService.findAll(net.getStringId())
+        def roles = roleService.findAllByNetIdentifier(net.getStringId())
         assert roles.size() == 1
         roleService.assignRolesToUser(
                 user.get(),
                 new HashSet<ProcessResourceId>(roles.collect { it._id } + user.get().processRoles.collect { it._id }),
-                new LoggedUserImpl("", "a", "", [] as Set, [] as Set, [] as Set)
+                new LoggedUserImpl(new ObjectId(), null, "a", "a", "", "b", "test@mail.com", "", null, null, null, null)
         )
         user = userService.findUserByUsername(userService.getSystem().getEmail(), null)
         assert user.get().processRoles.size() == processRoleCount + 1

@@ -3,6 +3,7 @@ package com.netgrif.application.engine.workflow
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -54,7 +55,7 @@ class UserRefsTest {
     @BeforeEach
     void before() {
         helper.truncateDbs()
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/userrefs_test.xml"), VersionType.MAJOR, userService.transformToLoggedUser(userService.getLoggedOrSystem())).getNet()
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/userrefs_test.xml"), VersionType.MAJOR, ActorTransformer.toLoggedUser(userService.getLoggedOrSystem())).getNet()
         assert net
         netId = net.getStringId()
         def userEmails = ["super@netgrif.com", "engine@netgrif.com"]

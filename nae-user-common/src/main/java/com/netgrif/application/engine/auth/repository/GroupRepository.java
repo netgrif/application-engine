@@ -23,6 +23,8 @@ public interface GroupRepository extends MongoRepository<Group, String>, Queryds
 
     Page<Group> findAllByRealmId(String realmId, Pageable pageable);
 
+    Page<Group> findAllByRealmIdIn(Collection<String> realmIds, Pageable pageable);
+
     void removeAllByRealmIdIn(Collection<String> realmIds);
 
     void removeAllByRealmId(String realmId);

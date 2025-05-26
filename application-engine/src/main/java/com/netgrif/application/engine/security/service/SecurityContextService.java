@@ -71,7 +71,7 @@ public class SecurityContextService implements ISecurityContextService {
     }
 
     private void reloadSecurityContext(LoggedUser loggedUser, boolean forceRefresh) {
-        if (isUserLogged(loggedUser) && cachedTokens.contains(loggedUser.getId())) {
+        if (isUserLogged(loggedUser) && cachedTokens.contains(loggedUser.getStringId())) {
             if (forceRefresh) {
                 loggedUser = ActorTransformer.toLoggedUser(userService.findById(loggedUser.getStringId(), null));
             }

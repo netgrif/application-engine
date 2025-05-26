@@ -3,13 +3,17 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
-
+import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
+import com.netgrif.application.engine.objects.auth.domain.Authority
+import com.netgrif.application.engine.objects.auth.domain.User
+import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -26,8 +30,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
+import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockMultipartFile
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers
+import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -37,11 +46,12 @@ import org.springframework.web.context.WebApplicationContext
 
 import static org.hamcrest.core.StringContains.containsString
 import static org.springframework.http.MediaType.APPLICATION_JSON
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -90,6 +100,8 @@ class FileFieldTest {
 
     private ObjectMapper objectMapper
 
+    private Authentication auth
+
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
@@ -98,6 +110,16 @@ class FileFieldTest {
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build()
         objectMapper = new ObjectMapper()
+
+        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+
+        def adminUser = importHelper.createUser(new User(firstName: "Admin", lastName: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+                [auths.get("admin")] as Authority[],
+//                [] as Group[],
+                [] as ProcessRole[])
+
+        auth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(adminUser), "password", [auths.get("admin")] as List<AuthorityImpl>)
+        auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
     }
 
     PetriNet getNet() {
@@ -117,7 +139,8 @@ class FileFieldTest {
 
         mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file")
                 .param("fieldId", FIELD_ID)
-                .with(httpBasic(USER_EMAIL, userPassword)))
+                .with(csrf().asHeader())
+                .with(authentication(this.auth)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
@@ -139,7 +162,8 @@ class FileFieldTest {
 
         mockMvc.perform(get("/api/task/" + taskPair.task + "/file")
                 .param("fieldId", FIELD_ID)
-                .with(httpBasic(USER_EMAIL, userPassword)))
+                .with(csrf().asHeader())
+                .with(authentication(this.auth)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
@@ -160,7 +184,8 @@ class FileFieldTest {
         mockMvc.perform(delete("/api/task/" + taskPair.task + "/file")
                 .content(objectMapper.writeValueAsBytes(requestBody))
                 .contentType(APPLICATION_JSON)
-                .with(httpBasic(USER_EMAIL, userPassword))
+                .with(csrf().asHeader())
+                .with(authentication(this.auth))
         ).andDo(print())
                 .andExpect(status().isOk())
                 .andReturn()
@@ -168,7 +193,8 @@ class FileFieldTest {
         Assertions.assertThatThrownBy(() ->
                 mockMvc.perform(get("/api/task/" + taskPair.task + "/file")
                         .param("fieldId", FIELD_ID)
-                        .with(httpBasic(USER_EMAIL, userPassword))
+                        .with(csrf().asHeader())
+                        .with(authentication(this.auth))
                 ).andDo(print())
         ).isInstanceOf(FileNotFoundException.class)
     }
@@ -202,7 +228,8 @@ class FileFieldTest {
         mockMvc.perform(multipart("/api/task/" + taskPair.task + "/file")
                 .file(file)
                 .file(data)
-                .with(httpBasic(USER_EMAIL, userPassword))
+                .with(csrf().asHeader())
+                .with(authentication(this.auth))
         ).andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaTypes.HAL_JSON_VALUE))

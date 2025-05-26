@@ -116,10 +116,10 @@ class FilterImportExportTest {
         assert exportNet.isPresent()
 
         importCase = this.workflowService.searchOne(
-                QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER) & QCase.case$.author.username.eq(DUMMY_USER_MAIL)
+                QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER) & QCase.case$.author.identifier.eq(DUMMY_USER_MAIL)
         )
         exportCase = this.workflowService.searchOne(
-                QCase.case$.processIdentifier.eq(EXPORT_NET_IDENTIFIER) & QCase.case$.author.username.eq(DUMMY_USER_MAIL)
+                QCase.case$.processIdentifier.eq(EXPORT_NET_IDENTIFIER) & QCase.case$.author.identifier.eq(DUMMY_USER_MAIL)
         )
         assert importCase != null
         assert exportCase != null
