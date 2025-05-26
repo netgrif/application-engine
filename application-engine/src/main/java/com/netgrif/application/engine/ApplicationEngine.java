@@ -24,18 +24,18 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
+@Aspect
 @EnableCaching
-@EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
+@EnableMongoAuditing
 @EnableMethodSecurity
 @EnableAspectJAutoProxy
+@ConfigurationPropertiesScan
+@EnableMongoRepositories("com.netgrif")
 @SpringBootApplication(
         exclude = {DataSourceAutoConfiguration.class},
         scanBasePackages = {"com.netgrif"})
-@EnableMongoAuditing
-@EnableMongoRepositories("com.netgrif")
-@ConfigurationPropertiesScan
-@Aspect
-@Slf4j
+@EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
 public class ApplicationEngine {
 
     @Bean
