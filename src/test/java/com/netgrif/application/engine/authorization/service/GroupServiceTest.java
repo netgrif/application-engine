@@ -11,6 +11,8 @@ import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.DefaultGroupRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -398,12 +400,16 @@ public class GroupServiceTest {
      * @param groupIds Ids of groups to be member of
      * */
     private Group createGroup(String name, List<String> groupIds) {
-        Case groupCase = workflowService.createCaseByIdentifier(GroupConstants.PROCESS_IDENTIFIER, name, "", null).getCase();
-        return new Group(dataService.setData(groupCase, GroupParams.with()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier(GroupConstants.PROCESS_IDENTIFIER)
+                .title(name)
+                .build();
+        Case groupCase = workflowService.createCase(createCaseParams).getCase();
+        return new Group(dataService.setData(new SetDataParams(groupCase, GroupParams.with()
                 .name(new TextField(name))
                 .parentGroupId(CaseField.withValue(List.of(defaultGroupRunner.getDefaultGroup().getStringId())))
                 .groupIds(CaseField.withValue(groupIds))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 }

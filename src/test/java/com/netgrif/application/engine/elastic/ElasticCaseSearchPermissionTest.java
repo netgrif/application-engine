@@ -17,12 +17,15 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ApplicationRoleRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.junit.jupiter.api.BeforeEach;
@@ -180,8 +183,8 @@ public class ElasticCaseSearchPermissionTest {
     }
 
     private void createTestCase(String identifier) throws IOException, MissingPetriNetMetaDataException {
-        Process process = petriNetService.importProcess(new FileInputStream(String.format("src/test/resources/petriNets/%s.xml", identifier)),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess();
+        Process process = petriNetService.importProcess(new ImportProcessParams(new FileInputStream(String.format("src/test/resources/petriNets/%s.xml", identifier)),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess();
         TestHelper.login(superCreator.getSuperIdentity());
         testCase = importHelper.createCase("Case permissions", process);
         TestHelper.logout();
@@ -258,17 +261,17 @@ public class ElasticCaseSearchPermissionTest {
     }
 
     private Group updateGroupWithParent(Group group, String parentGroupId) {
-        return new Group(dataService.setData(group.getCase(), GroupParams.with()
+        return new Group(dataService.setData(new SetDataParams(group.getCase(), GroupParams.with()
                 .parentGroupId(CaseField.withValue(List.of(parentGroupId)))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 
     private User updateUserMembership(User user, Set<String> groupIds) {
-        return new User(dataService.setData(user.getCase(), UserParams.with()
+        return new User(dataService.setData(new SetDataParams(user.getCase(), UserParams.with()
                 .groupIds(CaseField.withValue(new ArrayList<>(groupIds)))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 
     private User initializeTestUserWithGroup() {
@@ -279,11 +282,15 @@ public class ElasticCaseSearchPermissionTest {
     }
 
     private Group createGroup(String name) {
-        Case groupCase = workflowService.createCaseByIdentifier(GroupConstants.PROCESS_IDENTIFIER, name, "", null).getCase();
-        return new Group(dataService.setData(groupCase, GroupParams.with()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier(GroupConstants.PROCESS_IDENTIFIER)
+                .title(name)
+                .build();
+        Case groupCase = workflowService.createCase(createCaseParams).getCase();
+        return new Group(dataService.setData(new SetDataParams(groupCase, GroupParams.with()
                 .name(new TextField(name))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 
     private void assignProcessRole(String actorId, ProcessRole role) {

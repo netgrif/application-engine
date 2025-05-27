@@ -9,10 +9,12 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
@@ -71,8 +73,8 @@ class UserRefsTest {
         // todo release/8.0.0 userList is already tested in RoleServiceTest
         helper.truncateDbs()
         helper.login(superCreator.superIdentity)
-        def net = petriNetService.importProcess(new FileInputStream("src/test/resources/userrefs_test.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getProcess()
+        def net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/userrefs_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)).getProcess()
         assert net
         netId = net.getStringId()
         def userEmails = [configuration.email, "engine@netgrif.com"]
@@ -83,9 +85,9 @@ class UserRefsTest {
             Identity identity = identityService.findByUsername(userEmails[it % 2]).get()
             String actorId = identity.toSession().activeActorId
             String taskId = _case.getTaskStringId("t1")
-            dataService.setData(taskId, new DataSet([
+            dataService.setData(new SetDataParams(taskId, new DataSet([
                     "user_list_1": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(actorId)]))
-            ] as Map<String, Field<?>>), superCreator.getLoggedSuper().activeActorId).getCase()
+            ] as Map<String, Field<?>>), superCreator.getLoggedSuper().activeActorId)).getCase()
             actorIds.add(actorId)
         }
     }

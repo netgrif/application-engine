@@ -10,6 +10,7 @@ import com.netgrif.application.engine.authorization.service.interfaces.IUserServ
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ImportHelper;
@@ -68,8 +69,8 @@ public class SystemCaseFactoryRegistryTest {
 
         TestHelper.login(superCreator.getSuperIdentity());
 
-        Process testProcess = petriNetService.importProcess(new FileInputStream("src/test/resources/all_data.xml"),
-                VersionType.MAJOR, superCreator.getSuperIdentity().getMainActorId()).getProcess();
+        Process testProcess = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/all_data.xml"),
+                VersionType.MAJOR, superCreator.getSuperIdentity().getMainActorId())).getProcess();
         Case testCase = importHelper.createCase("Test", testProcess);
 
         assert registry.fromCase(workflowService.findOne(testCase.getStringId())) == null;

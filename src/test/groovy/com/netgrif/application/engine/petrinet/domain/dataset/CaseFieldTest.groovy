@@ -3,6 +3,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -63,7 +64,7 @@ class CaseFieldTest {
 
     @Test
     void testAllowedNets() {
-        def testNet = petriNetService.importProcess(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        def testNet = petriNetService.importProcess(new ImportProcessParams(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
         assert testNet.getProcess() != null
 
         Case aCase = importHelper.createCase("Case 1", testNet.getProcess())
@@ -113,7 +114,7 @@ class CaseFieldTest {
 
     @Test
     void testImmediateAllowedNets() {
-        def testNet = petriNetService.importProcess(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        def testNet = petriNetService.importProcess(new ImportProcessParams(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
         assert testNet.getProcess() != null
 
         Case aCase = importHelper.createCase("Case 1", testNet.getProcess())
@@ -159,10 +160,10 @@ class CaseFieldTest {
 
     @Test
     void testChangeValueAction() {
-        def notAllowedNet = petriNetService.importProcess(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        def notAllowedNet = petriNetService.importProcess(new ImportProcessParams(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
         assert notAllowedNet.getProcess() != null
 
-        def testNet = petriNetService.importProcess(stream(CHANGE_VALUE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        def testNet = petriNetService.importProcess(new ImportProcessParams(stream(CHANGE_VALUE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
         assert testNet.getProcess() != null
 
         Case aCase = importHelper.createCase("Case 1", testNet.getProcess())

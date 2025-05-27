@@ -13,6 +13,8 @@ import com.netgrif.application.engine.authorization.domain.params.GroupParams;
 import com.netgrif.application.engine.authorization.domain.params.UserParams;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -82,26 +84,38 @@ public class AllActorServiceTest {
     }
 
     private Group createGroup(String name) {
-        Case groupCase = workflowService.createCaseByIdentifier(GroupConstants.PROCESS_IDENTIFIER, name, "", null).getCase();
-        return new Group(dataService.setData(groupCase, GroupParams.with()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier(GroupConstants.PROCESS_IDENTIFIER)
+                .title(name)
+                .build();
+        Case groupCase = workflowService.createCase(createCaseParams).getCase();
+        return new Group(dataService.setData(new SetDataParams(groupCase, GroupParams.with()
                 .name(new TextField(name))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 
     private User createUser(String email) {
-        Case userCase = workflowService.createCaseByIdentifier(UserConstants.PROCESS_IDENTIFIER, email, "", null).getCase();
-        return new User(dataService.setData(userCase, UserParams.with()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier(UserConstants.PROCESS_IDENTIFIER)
+                .title(email)
+                .build();
+        Case userCase = workflowService.createCase(createCaseParams).getCase();
+        return new User(dataService.setData(new SetDataParams(userCase, UserParams.with()
                 .email(new TextField(email))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 
     private Identity createIdentity(String username) {
-        Case identityCase = workflowService.createCaseByIdentifier(IdentityConstants.PROCESS_IDENTIFIER, username, "", null).getCase();
-        return new Identity(dataService.setData(identityCase, IdentityParams.with()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier(IdentityConstants.PROCESS_IDENTIFIER)
+                .title(username)
+                .build();
+        Case identityCase = workflowService.createCase(createCaseParams).getCase();
+        return new Identity(dataService.setData(new SetDataParams(identityCase, IdentityParams.with()
                 .username(new TextField(username))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 }

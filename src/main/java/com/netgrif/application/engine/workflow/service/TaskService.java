@@ -56,6 +56,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -169,6 +170,7 @@ public class TaskService implements ITaskService {
     @Override
     public AssignTaskEventOutcome assignTask(TaskParams taskParams) throws TransitionNotExecutableException {
         fillMissingAttributes(taskParams);
+        throwIfNotEnabled(taskParams.getTask());
 
         if (taskParams.getIsTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
@@ -291,6 +293,7 @@ public class TaskService implements ITaskService {
     @Override
     public FinishTaskEventOutcome finishTask(TaskParams taskParams) throws TransitionNotExecutableException {
         fillMissingAttributes(taskParams);
+        throwIfNotEnabled(taskParams.getTask());
 
         if (taskParams.getIsTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
@@ -419,6 +422,7 @@ public class TaskService implements ITaskService {
     @Override
     public CancelTaskEventOutcome cancelTask(TaskParams taskParams) {
         fillMissingAttributes(taskParams);
+        throwIfNotEnabled(taskParams.getTask());
 
         if (taskParams.getIsTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
@@ -574,6 +578,12 @@ public class TaskService implements ITaskService {
         }
         if (taskParams.getIsTransactional() == null) {
             taskParams.setIsTransactional(transactionProperties.isTaskEventTransactional());
+        }
+    }
+
+    private void throwIfNotEnabled(@NotNull Task task) {
+        if (!task.getState().equals(State.ENABLED)) {
+            throw new IllegalArgumentException("Cannot continue. The task is not active!");
         }
     }
 

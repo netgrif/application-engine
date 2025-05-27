@@ -16,11 +16,14 @@ import com.netgrif.application.engine.authorization.service.interfaces.IUserServ
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ApplicationRoleRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.junit.jupiter.api.BeforeEach;
@@ -102,11 +105,11 @@ public class CaseAuthorizationServiceTest {
                         .lastname(new TextField("lastname"))
                 .build());
 
-        testProcess = petriNetService.importProcess(new FileInputStream("src/test/resources/petriNets/case_authorization_test.xml"),
-                VersionType.MAJOR, userService.getSystemUser().getStringId()).getProcess();
+        testProcess = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/petriNets/case_authorization_test.xml"),
+                VersionType.MAJOR, userService.getSystemUser().getStringId())).getProcess();
 
-        testProcessWithDefault = petriNetService.importProcess(new FileInputStream("src/test/resources/petriNets/case_authorization_default_test.xml"),
-                VersionType.MAJOR, userService.getSystemUser().getStringId()).getProcess();
+        testProcessWithDefault = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/petriNets/case_authorization_default_test.xml"),
+                VersionType.MAJOR, userService.getSystemUser().getStringId())).getProcess();
 
         TestHelper.login(testIdentity);
     }
@@ -343,17 +346,17 @@ public class CaseAuthorizationServiceTest {
     }
 
     private Group updateGroupWithParent(Group group, String parentGroupId) {
-        return new Group(dataService.setData(group.getCase(), GroupParams.with()
+        return new Group(dataService.setData(new SetDataParams(group.getCase(), GroupParams.with()
                 .parentGroupId(CaseField.withValue(List.of(parentGroupId)))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 
     private User updateUserMembership(User user, Set<String> groupIds) {
-        return new User(dataService.setData(user.getCase(), UserParams.with()
+        return new User(dataService.setData(new SetDataParams(user.getCase(), UserParams.with()
                 .groupIds(CaseField.withValue(new ArrayList<>(groupIds)))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 
     private User initializeTestUserWithGroup() {
@@ -364,10 +367,14 @@ public class CaseAuthorizationServiceTest {
     }
 
     private Group createGroup(String name) {
-        Case groupCase = workflowService.createCaseByIdentifier(GroupConstants.PROCESS_IDENTIFIER, name, "", null).getCase();
-        return new Group(dataService.setData(groupCase, GroupParams.with()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier(GroupConstants.PROCESS_IDENTIFIER)
+                .title(name)
+                .build();
+        Case groupCase = workflowService.createCase(createCaseParams).getCase();
+        return new Group(dataService.setData(new SetDataParams(groupCase, GroupParams.with()
                 .name(new TextField(name))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 }

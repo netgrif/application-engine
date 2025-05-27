@@ -13,6 +13,7 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -82,14 +83,14 @@ class ExportServiceTest {
     @Order(2)
     void testCaseMongoExport() {
         String exportTask = mainCase.getTaskStringId("t1")
-        taskService.assignTask(superCreator.getLoggedSuper().activeActorId, exportTask)
+        taskService.assignTask(new TaskParams(superCreator.getLoggedSuper().activeActorId, exportTask))
         File csvFile = new File("src/test/resources/csv/case_mongo_export.csv")
         assert csvFile.readLines().size() == 11
         String[] headerSplit = csvFile.readLines()[0].split(",")
         assert (headerSplit.contains("immediate_multichoice")
                 && headerSplit.contains("immediate_number")
                 && !headerSplit.contains("text"))
-        taskService.cancelTask(superCreator.getLoggedSuper().activeActorId, exportTask)
+        taskService.cancelTask(new TaskParams(superCreator.getLoggedSuper().activeActorId, exportTask))
     }
 
     @Test
@@ -97,21 +98,21 @@ class ExportServiceTest {
     void testCaseElasticExport() {
         Thread.sleep(5000)  //Elastic wait
         String exportTask = mainCase.getTaskStringId("t2")
-        taskService.assignTask(superCreator.getLoggedSuper().activeActorId, exportTask)
+        taskService.assignTask(new TaskParams(superCreator.getLoggedSuper().activeActorId, exportTask))
         File csvFile = new File("src/test/resources/csv/case_elastic_export.csv")
         assert csvFile.readLines().size() == 11
         String[] headerSplit = csvFile.readLines()[0].split(",")
         assert (headerSplit.contains("text")
                 && !headerSplit.contains("immediate_multichoice")
                 && !headerSplit.contains("immediate_number"))
-        taskService.cancelTask(superCreator.getLoggedSuper().activeActorId, exportTask)
+        taskService.cancelTask(new TaskParams(superCreator.getLoggedSuper().activeActorId, exportTask))
     }
 
     @Test
     @Order(4)
     void testTaskMongoExport() {
         String exportTask = mainCase.getTaskStringId("t3")
-        taskService.assignTask(superCreator.getLoggedSuper().activeActorId, exportTask)
+        taskService.assignTask(new TaskParams(superCreator.getLoggedSuper().activeActorId, exportTask))
         File csvFile = new File("src/test/resources/csv/task_mongo_export.csv")
         assert csvFile.readLines().size() == 11
         String[] headerSplit = csvFile.readLines()[0].split(",")
@@ -119,7 +120,7 @@ class ExportServiceTest {
                 && headerSplit.contains("immediate_number")
                 && headerSplit.contains("text")
                 && !headerSplit.contains("no_export"))
-        taskService.cancelTask(superCreator.getLoggedSuper().activeActorId, exportTask)
+        taskService.cancelTask(new TaskParams(superCreator.getLoggedSuper().activeActorId, exportTask))
     }
 
     @Test
@@ -128,7 +129,7 @@ class ExportServiceTest {
     void testTaskElasticExport() {
         Thread.sleep(10000)  //Elastic wait
         String exportTask = mainCase.getTaskStringId("t4")
-        taskService.assignTask(superCreator.getLoggedSuper().activeActorId, exportTask)
+        taskService.assignTask(new TaskParams(superCreator.getLoggedSuper().activeActorId, exportTask))
         Thread.sleep(20000)  //Elastic wait
 
         def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
@@ -145,14 +146,14 @@ class ExportServiceTest {
                 && headerSplit.contains("immediate_number")
                 && !headerSplit.contains("text")
                 && !headerSplit.contains("no_export"))
-        taskService.cancelTask(superCreator.getLoggedSuper().activeActorId, exportTask)
+        taskService.cancelTask(new TaskParams(superCreator.getLoggedSuper().activeActorId, exportTask))
     }
 
     @Test
     void buildDefaultCsvTaskHeaderTest(){
         def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
         String exportTask = mainCase.getTaskStringId("t4")
-        taskService.assignTask(superCreator.getLoggedSuper().activeActorId, exportTask)
+        taskService.assignTask(new TaskParams(superCreator.getLoggedSuper().activeActorId, exportTask))
         List<Task> task = taskRepository.findAll(QTask.task.processId.eq(processId) & QTask.task.transitionId.eq("t4")) as List<Task>
         Set<String> header = exportService.buildDefaultCsvTaskHeader(task)
         assert header != null

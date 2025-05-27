@@ -16,6 +16,8 @@ import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -488,9 +490,12 @@ public class IdentityServiceTest {
     }
 
     private Identity doCreateIdentity(IdentityParams params) {
-        Case identityCase = workflowService.createCaseByIdentifier("identity", params.getUsername().getRawValue(),
-                "", null).getCase();
-        return new Identity(dataService.setData(identityCase, params.toDataSet(), null).getCase());
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier("identity")
+                .title(params.getUsername().getRawValue())
+                .build();
+        Case identityCase = workflowService.createCase(createCaseParams).getCase();
+        return new Identity(dataService.setData(new SetDataParams(identityCase, params.toDataSet(), null)).getCase());
     }
 
 }

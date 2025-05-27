@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -46,7 +47,7 @@ class MapFieldTest {
 
     @Test
     void testImport() {
-        def netOptional = petriNetService.importProcess(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
+        def netOptional = petriNetService.importProcess(new ImportProcessParams(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId))
         assert netOptional.getProcess() != null
 
         def net = netOptional.getProcess()
@@ -70,7 +71,7 @@ class MapFieldTest {
 
     @Test
     void testValue() {
-        def netOptional = petriNetService.importProcess(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
+        def netOptional = petriNetService.importProcess(new ImportProcessParams(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId))
         assert netOptional.getProcess() != null
 
         Case aCase = importHelper.createCase("Case", netOptional.getProcess())
@@ -107,7 +108,7 @@ class MapFieldTest {
 
     @Test
     void testImportMultichoice() {
-        def netOptional = petriNetService.importProcess(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
+        def netOptional = petriNetService.importProcess(new ImportProcessParams(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId))
         assert netOptional.getProcess() != null
 
         def net = netOptional.getProcess()
@@ -132,7 +133,7 @@ class MapFieldTest {
 
     @Test
     void testValueMultichoice() {
-        def netOptional = petriNetService.importProcess(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
+        def netOptional = petriNetService.importProcess(new ImportProcessParams(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId))
         assert netOptional.getProcess() != null
 
         Case aCase = importHelper.createCase("Case", netOptional.getProcess())

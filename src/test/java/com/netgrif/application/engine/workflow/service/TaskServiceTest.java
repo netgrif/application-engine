@@ -10,6 +10,7 @@ import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyE
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -19,6 +20,8 @@ import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.TaskParams;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -76,19 +79,28 @@ public class TaskServiceTest {
     public void setUp() throws Exception {
         testHelper.truncateDbs();
 
-        petriNetService.importProcess(new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR,
-                superCreator.getLoggedSuper().getActiveActorId());
+        petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR,
+                superCreator.getLoggedSuper().getActiveActorId()));
         Process net = petriNetRepository.findAll().get(0);
-        workflowService.createCase(net.getStringId(), "Storage Unit", "color", mockService.mockLoggedIdentity().getActiveActorId());
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .title("Storage Unit")
+                .authorId(mockService.mockLoggedIdentity().getActiveActorId())
+                .build();
+        workflowService.createCase(createCaseParams);
     }
 
     @Test
     public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        Process net = petriNetService.importProcess(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess();
+        Process net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess();
         LoggedIdentity mockedLoggedIdentity = mockService.mockLoggedIdentity();
-        CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color",
-                mockedLoggedIdentity.getActiveActorId());
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .title("Reset test")
+                .authorId(mockedLoggedIdentity.getActiveActorId())
+                .build();
+        CreateCaseEventOutcome outcome = workflowService.createCase(createCaseParams);
 
         Identity identity = importHelper.createIdentity(IdentityParams.with()
                 .firstname(new TextField("firstname"))
@@ -105,14 +117,14 @@ public class TaskServiceTest {
 
         assert task != null;
 
-        service.assignTask(identity.toSession().getActiveActorId(), task.getStringId());
+        service.assignTask(new TaskParams(identity.toSession().getActiveActorId(), task.getStringId()));
         Case useCase = caseRepository.findById(outcome.getCase().getStringId()).get();
 
         assert useCase.getConsumedTokens().size() == 1;
         assert useCase.getConsumedTokens().containsValue(5);
         assert useCase.getActivePlaces().isEmpty();
 
-        service.cancelTask(identity.toSession().getActiveActorId(), task.getStringId());
+        service.cancelTask(new TaskParams(identity.toSession().getActiveActorId(), task.getStringId()));
         useCase = caseRepository.findById(useCase.getStringId()).get();
 
         assert useCase.getConsumedTokens().isEmpty();

@@ -4,9 +4,11 @@ import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.Test
@@ -27,8 +29,8 @@ class DynamicEnumerationTest extends EngineTest {
     void testDynamicEnum() {
         TestHelper.login(superCreator.superIdentity)
 
-        ImportPetriNetEventOutcome optNet = petriNetService.importProcess(new FileInputStream("src/test/resources/test_autocomplete_dynamic.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        ImportPetriNetEventOutcome optNet = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/test_autocomplete_dynamic.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
 
         assert optNet.getProcess() != null
         def net = optNet.getProcess()
@@ -42,7 +44,7 @@ class DynamicEnumerationTest extends EngineTest {
         def dataSet = new DataSet([
                 "autocomplete": new EnumerationField(rawValue: new I18nString("Case"))
         ] as Map<String, Field<?>>)
-        dataService.setData(task.stringId, dataSet, superCreator.getLoggedSuper().activeActorId)
+        dataService.setData(new SetDataParams(task.stringId, dataSet, superCreator.getLoggedSuper().activeActorId))
 
         def caseOpt = caseRepository.findById(aCase.stringId)
         assert caseOpt.isPresent()

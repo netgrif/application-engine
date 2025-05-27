@@ -277,9 +277,6 @@ public class PetriNetService implements IPetriNetService {
         if (importProcessParams.getXmlFile() == null) {
             throw new IllegalArgumentException("No Petriflow source file provided.");
         }
-        if (importProcessParams.getAuthorId() == null) {
-            throw new IllegalArgumentException("No author of Process provided.");
-        }
         if (importProcessParams.getReleaseType() == null) {
             throw new IllegalArgumentException("Version type is null.");
         }

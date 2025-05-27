@@ -15,6 +15,8 @@ import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.DefaultGroupRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -368,21 +370,29 @@ public class UserServiceTest {
     }
 
     private User createUser(String email, List<String> additionalGroupIds) {
-        Case userCase = workflowService.createCaseByIdentifier(UserConstants.PROCESS_IDENTIFIER, email, "", null).getCase();
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier(UserConstants.PROCESS_IDENTIFIER)
+                .title(email)
+                .build();
+        Case userCase = workflowService.createCase(createCaseParams).getCase();
         List<String> groupIds = new ArrayList<>(additionalGroupIds);
         groupIds.add(defaultGroupRunner.getDefaultGroup().getStringId());
-        return new User(dataService.setData(userCase, UserParams.with()
+        return new User(dataService.setData(new SetDataParams(userCase, UserParams.with()
                 .email(new TextField(email))
                 .groupIds(CaseField.withValue(groupIds))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 
     private Group createGroup(String name) {
-        Case groupCase = workflowService.createCaseByIdentifier(GroupConstants.PROCESS_IDENTIFIER, name, "", null).getCase();
-        return new Group(dataService.setData(groupCase, GroupParams.with()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier(GroupConstants.PROCESS_IDENTIFIER)
+                .title(name)
+                .build();
+        Case groupCase = workflowService.createCase(createCaseParams).getCase();
+        return new Group(dataService.setData(new SetDataParams(groupCase, GroupParams.with()
                 .name(new TextField(name))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 }

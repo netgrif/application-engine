@@ -3,6 +3,7 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.QTask;
+import com.netgrif.application.engine.workflow.domain.State;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
@@ -105,6 +106,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
         BooleanBuilder builder = new BooleanBuilder();
 
         buildStringIdQuery(request, builder);
+        buildStateQuery(request, builder);
 //        buildRoleQuery(request, builder);
         buildCaseQuery(request, builder);
         buildTitleQuery(request, builder);
@@ -125,6 +127,18 @@ public class TaskSearchService extends MongoSearchService<Task> {
         query.and(
                 constructPredicateTree(
                         request.stringId.stream().map(this::stringIdQuery).collect(Collectors.toList()),
+                        BooleanBuilder::or)
+        );
+    }
+
+    private void buildStateQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.state == null || request.state.isEmpty()) {
+            return;
+        }
+
+        query.and(
+                constructPredicateTree(
+                        request.state.stream().map(this::stateQuery).collect(Collectors.toList()),
                         BooleanBuilder::or)
         );
     }
@@ -151,6 +165,10 @@ public class TaskSearchService extends MongoSearchService<Task> {
 //
     public Predicate stringIdQuery(String id) {
         return QTask.task.id.eq(new ObjectId(id));
+    }
+
+    public Predicate stateQuery(State state) {
+        return QTask.task.state.eq(state);
     }
 
     private void buildCaseQuery(TaskSearchRequest request, BooleanBuilder query) {

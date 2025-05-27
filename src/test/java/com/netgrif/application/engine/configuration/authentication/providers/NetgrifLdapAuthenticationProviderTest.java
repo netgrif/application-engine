@@ -12,6 +12,7 @@ import com.netgrif.application.engine.orgstructure.web.requestbodies.LdapGroupSe
 import com.netgrif.application.engine.orgstructure.web.responsebodies.LdapGroupResponseBody;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.SuperCreator;
 import org.json.JSONObject;
@@ -172,8 +173,8 @@ class NetgrifLdapAuthenticationProviderTest {
 
     @Test
     void assignRoleGroup() throws Exception {
-        Process net = petriNetService.importProcess(new FileInputStream("src/test/resources/role_all_data.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess();
+        Process net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/role_all_data.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess();
         assert net != null;
         // TODO: release/8.0.0 fix
 //        Map<String, ProcessRole> roles = net.getRoles();
@@ -211,8 +212,8 @@ class NetgrifLdapAuthenticationProviderTest {
 //        JSONArray countProcessRole = (JSONArray) json.get("processRoles");
 //        assert countProcessRole.length() == 1;
 
-        Process net = petriNetService.importProcess(new FileInputStream("src/test/resources/role_all_data.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess();
+        Process net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/role_all_data.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess();
         assert net != null;
         // TODO: release/8.0.0 fix
 //        Map<String, ProcessRole> roles = net.getRoles();

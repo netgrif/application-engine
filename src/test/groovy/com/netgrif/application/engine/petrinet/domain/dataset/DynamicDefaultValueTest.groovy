@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -42,8 +43,8 @@ class DynamicDefaultValueTest {
 
     @Test
     void testInitValues() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importProcess(new FileInputStream("src/test/resources/petriNets/dynamic_init.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
+        ImportPetriNetEventOutcome optNet = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/petriNets/dynamic_init.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
         Case useCase = importHelper.createCase("test", optNet.getProcess())
 
         assert useCase.dataSet.get("text").rawValue == superCreator.superIdentity.firstname

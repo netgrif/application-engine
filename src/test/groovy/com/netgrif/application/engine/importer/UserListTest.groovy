@@ -10,6 +10,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
@@ -18,6 +19,7 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -71,8 +73,8 @@ class UserListTest {
     @Test
     void testUserList() throws MissingPetriNetMetaDataException, IOException {
         TestHelper.login(superCreator.superIdentity)
-        ImportPetriNetEventOutcome net = petriNetService.importProcess(new FileInputStream("src/test/resources/user_list.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
+        ImportPetriNetEventOutcome net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/user_list.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
 
         assert net.getProcess() != null;
         Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("User List"));
@@ -83,9 +85,9 @@ class UserListTest {
         Task task = taskService.findByCases(new FullPageRequest(), Collections.singletonList(caseOpt.get().getStringId())).stream().collect(Collectors.toList()).get(0)
 
         User user = userService.findById(superCreator.getLoggedSuper().activeActorId).get()
-        dataService.setData(task.stringId, new DataSet([
+        dataService.setData(new SetDataParams(task.stringId, new DataSet([
                 "users_1": new UserListField(rawValue: new UserListFieldValue(new UserFieldValue(user)))
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId())
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
 
         Role caseRole = roleService.findCaseRoleByCaseIdAndImportId(caseOpt.get().stringId, "users_1")
         assert taskService.findById(task.stringId).caseRolePermissions.containsKey(caseRole.stringId)

@@ -5,6 +5,7 @@ import com.netgrif.application.engine.importer.service.AllDataConfiguration
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.Transition
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
@@ -48,8 +49,8 @@ class AllDataTransitionTest {
 
     @Test
     void testAllData() throws MissingPetriNetMetaDataException, IOException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importProcess(resourceFile.inputStream, VersionType.MAJOR,
-                superCreator.getLoggedSuper().getActiveActorId());
+        ImportPetriNetEventOutcome outcome = petriNetService.importProcess(new ImportProcessParams(resourceFile.inputStream, VersionType.MAJOR,
+                superCreator.getLoggedSuper().getActiveActorId()))
         assert outcome.getProcess() != null
         Process net = outcome.getProcess()
 

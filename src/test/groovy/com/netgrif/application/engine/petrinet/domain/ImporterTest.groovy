@@ -6,6 +6,7 @@ import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -13,6 +14,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
@@ -87,11 +89,11 @@ class ImporterTest {
     @Test
     void importTest() {
         long beforeImportNet = roleRepository.count()
-        def netOptional = petriNetService.importProcess(
+        def netOptional = petriNetService.importProcess(new ImportProcessParams(
                 firstVersionResource.inputStream,
                 VersionType.MAJOR,
                 superCreator.loggedSuper.activeActorId
-        )
+        ))
         assert netOptional.getProcess() != null
         assert roleRepository.count() == beforeImportNet + 2
         long statusImportRole = roleRepository.count()
@@ -173,11 +175,11 @@ class ImporterTest {
         }
         assert net.places.size() == 0
 
-        def netOptional2 = petriNetService.importProcess(
+        def netOptional2 = petriNetService.importProcess(new ImportProcessParams(
                 secondVersionResource.inputStream,
                 VersionType.MAJOR,
                 superCreator.loggedSuper.activeActorId
-        )
+        ))
 
         assert roleRepository.count() == statusImportRole + 1
         assert netOptional2.getProcess() != null
@@ -293,10 +295,15 @@ class ImporterTest {
 
     @Test
     void initialBehaviorTest() {
-        Process net = petriNetService.importProcess(new ClassPathResource("/initial_behavior.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess()
+        Process net = petriNetService.importProcess(new ImportProcessParams(new ClassPathResource("/initial_behavior.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess()
 
         assert net
-        Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper.activeActorId).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .title("Test case")
+                .authorId(superCreator.loggedSuper.activeActorId)
+                .build()
+        Case testCase = workflowService.createCase(createCaseParams).getCase()
 
         assertBehaviors(testCase.dataSet.get(NUMBER_FIELD).behaviors.get("t1"), FORBIDDEN)
         assertBehaviors(testCase.dataSet.get(TEXT_FIELD).behaviors.get("t1"), HIDDEN)
@@ -323,7 +330,7 @@ class ImporterTest {
 
     @Test
     void enumerationMultichoiceOptionsTest() throws IOException, MissingPetriNetMetaDataException {
-        Process net = petriNetService.importProcess(new ClassPathResource("/enumeration_multichoice_options.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess()
+        Process net = petriNetService.importProcess(new ImportProcessParams(new ClassPathResource("/enumeration_multichoice_options.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess()
 
         assert net != null
 
@@ -343,7 +350,7 @@ class ImporterTest {
 
     @Test
     void createTransitionNoLabel() {
-        Process net = petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/NoLabel.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess()
+        Process net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/importTest/NoLabel.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess()
         assert net
         Process importNet = petriNetService.findByImportId(net.getImportId()).get()
         assert importNet
@@ -354,21 +361,21 @@ class ImporterTest {
 
     @Test
     void importNetWithParent() {
-        Process superParentNet = petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess()
+        Process superParentNet = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess()
         assert superParentNet
 
-        Process parentNet = petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess()
+        Process parentNet = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess()
         assert parentNet.version == new Version(1, 0, 0)
 
-        parentNet = petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
-                VersionType.MINOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess()
+        parentNet = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
+                VersionType.MINOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess()
         assert parentNet.version == new Version(1, 1, 0)
         assert parentNet.parentIdentifiers.size() == 1
 
-        Process childNet = petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/child_extending_parent.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess()
+        Process childNet = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/importTest/child_extending_parent.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess()
         assert childNet.identifier == "child_extending_parent"
         assert childNet.title.defaultValue == "Child extending parent"
         assert childNet.creationDate != parentNet.creationDate
@@ -423,34 +430,34 @@ class ImporterTest {
     @Test
     void importNetWithNonExistingParent() {
         assertThrows(IllegalArgumentException.class, () -> {
-            petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/extending_non_existing_parent.xml"),
-                    VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+            petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/importTest/extending_non_existing_parent.xml"),
+                    VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
         })
     }
 
     @Test
     void importNetsWithInvalidExtension() {
-        Process superParentNet = petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess()
+        Process superParentNet = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess()
         assert superParentNet
 
-        Process parentNet = petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess()
+        Process parentNet = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess()
         assert parentNet
 
         assertThrows(IllegalArgumentException.class, () -> {
-            petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/extending_with_invalid_extension_1.xml"),
-                    VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+            petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/importTest/extending_with_invalid_extension_1.xml"),
+                    VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
         })
 
         assertThrows(IllegalArgumentException.class, () -> {
-            petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/extending_with_invalid_extension_2.xml"),
-                    VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+            petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/importTest/extending_with_invalid_extension_2.xml"),
+                    VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
         })
 
         assertThrows(IllegalArgumentException.class, () -> {
-            petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/extending_with_invalid_extension_3.xml"),
-                    VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+            petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/importTest/extending_with_invalid_extension_3.xml"),
+                    VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
         })
     }
 

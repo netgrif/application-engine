@@ -239,9 +239,6 @@ public class DataService implements IDataService {
     }
 
     private void fillMissingAttributes(SetDataParams setDataParams) {
-        if (setDataParams.getActorId() == null) {
-            throw new IllegalArgumentException("Actor must be provided on set data.");
-        }
         if (setDataParams.getTask() == null) {
             if (setDataParams.getTaskId() != null) {
                 Task task = taskService.findOne(setDataParams.getTaskId());
@@ -327,9 +324,14 @@ public class DataService implements IDataService {
         Case useCase = workflowService.findOne(task.getCaseId());
 
         GetLayoutsEventOutcome outcome = new GetLayoutsEventOutcome(useCase, task);
+        LayoutContainer originContainer = useCase.getProcess().getTransition(task.getTransitionId()).getLayoutContainer();
+        if (originContainer == null) {
+            return outcome;
+        }
+
         outcome.setLayout(
-                this.processLayoutContainer(useCase.getProcess().getTransition(task.getTransitionId()).getLayoutContainer().clone(), task, useCase, actorId,
-                        outcome, locale, false, new LinkedHashSet<>())
+                this.processLayoutContainer(originContainer.clone(), task, useCase, actorId, outcome, locale,
+                        false, new LinkedHashSet<>())
         );
         return outcome;
     }

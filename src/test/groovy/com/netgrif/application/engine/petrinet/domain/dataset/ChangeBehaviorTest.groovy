@@ -5,9 +5,11 @@ import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
@@ -45,8 +47,8 @@ class ChangeBehaviorTest extends EngineTest {
     @Override
     void before() {
         super.before()
-        net = petriNetService.importProcess(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR,
-                userService.getSystemUser().stringId).getProcess()
+        net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR,
+                userService.getSystemUser().stringId)).getProcess()
         assert net != null
 
         TestHelper.login(superCreator.superIdentity)
@@ -59,9 +61,9 @@ class ChangeBehaviorTest extends EngineTest {
         Task mainTask = taskService.searchOne(QTask.task.transitionId.eq(MAIN_TRANSITION) & QTask.task.caseId.eq(testCase.stringId))
         assert mainTask
 
-        dataService.setData(mainTask.stringId, new DataSet([
+        dataService.setData(new SetDataParams(mainTask.stringId, new DataSet([
                 "boolean_0": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId())
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_0_FIELD_ID).rawValue == true
@@ -82,9 +84,9 @@ class ChangeBehaviorTest extends EngineTest {
         Task otherTask2 = taskService.searchOne(QTask.task.transitionId.eq(TEST_TRANSITION_2) & QTask.task.caseId.eq(testCase.stringId))
         assert otherTask2
 
-        dataService.setData(mainTask.stringId, new DataSet([
+        dataService.setData(new SetDataParams(mainTask.stringId, new DataSet([
                 "boolean_1": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId())
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_1_FIELD_ID).rawValue == true
@@ -108,9 +110,9 @@ class ChangeBehaviorTest extends EngineTest {
         Task otherTask = taskService.searchOne(QTask.task.transitionId.eq(TEST_TRANSITION_1) & QTask.task.caseId.eq(testCase.stringId))
         assert otherTask
 
-        dataService.setData(mainTask.stringId, new DataSet([
+        dataService.setData(new SetDataParams(mainTask.stringId, new DataSet([
                 "boolean_2": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId())
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_2_FIELD_ID).rawValue == true
@@ -129,9 +131,9 @@ class ChangeBehaviorTest extends EngineTest {
         Task otherTask = taskService.searchOne(QTask.task.transitionId.eq(TEST_TRANSITION_1) & QTask.task.caseId.eq(testCase.stringId))
         assert otherTask
 
-        dataService.setData(mainTask.stringId, new DataSet([
+        dataService.setData(new SetDataParams(mainTask.stringId, new DataSet([
                 "boolean_3": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId())
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_3_FIELD_ID).rawValue == true
@@ -150,18 +152,18 @@ class ChangeBehaviorTest extends EngineTest {
         Task mainTask = taskService.searchOne(QTask.task.transitionId.eq(MAIN_TRANSITION) & QTask.task.caseId.eq(testCase.stringId))
         assert mainTask
 
-        dataService.setData(mainTask.stringId, new DataSet([
+        dataService.setData(new SetDataParams(mainTask.stringId, new DataSet([
                 "boolean_0": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId())
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_0_FIELD_ID).rawValue == true
         assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).behavior == EDITABLE
         assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).required == true
 
-        dataService.setData(mainTask.stringId, new DataSet([
+        dataService.setData(new SetDataParams(mainTask.stringId, new DataSet([
                 "boolean_0": new BooleanField(rawValue: false)
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId())
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_0_FIELD_ID).rawValue == false

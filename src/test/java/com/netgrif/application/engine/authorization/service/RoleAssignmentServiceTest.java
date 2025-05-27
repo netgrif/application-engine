@@ -12,6 +12,8 @@ import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.startup.DefaultGroupRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.junit.jupiter.api.BeforeEach;
@@ -326,27 +328,35 @@ public class RoleAssignmentServiceTest {
     }
 
     private Group createGroup(String name) {
-        Case groupCase = workflowService.createCaseByIdentifier(GroupConstants.PROCESS_IDENTIFIER, name, "", null).getCase();
-        return new Group(dataService.setData(groupCase, GroupParams.with()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier(GroupConstants.PROCESS_IDENTIFIER)
+                .title(name)
+                .build();
+        Case groupCase = workflowService.createCase(createCaseParams).getCase();
+        return new Group(dataService.setData(new SetDataParams(groupCase, GroupParams.with()
                 .name(new TextField(name))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 
     private Group updateGroupWithParent(Group group, String parentGroupId) {
-        return new Group(dataService.setData(group.getCase(), GroupParams.with()
+        return new Group(dataService.setData(new SetDataParams(group.getCase(), GroupParams.with()
                 .parentGroupId(CaseField.withValue(List.of(parentGroupId)))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 
     private User createUser(String email, List<String> additionalGroupIds) {
-        Case userCase = workflowService.createCaseByIdentifier(UserConstants.PROCESS_IDENTIFIER, email, "", null).getCase();
-        return new User(dataService.setData(userCase, UserParams.with()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier(UserConstants.PROCESS_IDENTIFIER)
+                .title(email)
+                .build();
+        Case userCase = workflowService.createCase(createCaseParams).getCase();
+        return new User(dataService.setData(new SetDataParams(userCase, UserParams.with()
                 .email(new TextField(email))
                 .groupIds(CaseField.withValue(additionalGroupIds))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 
     private RoleAssignment assignProcessRole(String actorId, String roleId) {

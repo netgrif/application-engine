@@ -9,6 +9,9 @@ import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.startup.DefaultGroupRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +58,7 @@ public class GroupTest {
         assert childGroup.getParentGroupId().equals(parentGroup.getStringId());
         assert user.getGroupIds().size() == 1;
 
-        workflowService.deleteCase(parentGroup.getCase());
+        workflowService.deleteCase(new DeleteCaseParams(parentGroup.getCase()));
 
         user = new User(workflowService.findOne(user.getStringId()));
         assert user.getGroupIds().isEmpty() || user.getGroupIds() == null;
@@ -65,27 +68,35 @@ public class GroupTest {
     }
 
     private User updateUserMembership(User user, Set<String> groupIds) {
-        return new User(dataService.setData(user.getCase(), UserParams.with()
+        return new User(dataService.setData(new SetDataParams(user.getCase(), UserParams.with()
                 .groupIds(CaseField.withValue(new ArrayList<>(groupIds)))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 
     private Group createGroup(String name, String parentGroupId) {
-        Case groupCase = workflowService.createCaseByIdentifier(GroupConstants.PROCESS_IDENTIFIER, name, "", null).getCase();
-        return new Group(dataService.setData(groupCase, GroupParams.with()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier(GroupConstants.PROCESS_IDENTIFIER)
+                .title(name)
+                .build();
+        Case groupCase = workflowService.createCase(createCaseParams).getCase();
+        return new Group(dataService.setData(new SetDataParams(groupCase, GroupParams.with()
                 .name(new TextField(name))
                 .parentGroupId(CaseField.withValue(List.of(parentGroupId)))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 
     private User createUser(String email, List<String> additionalGroupIds) {
-        Case userCase = workflowService.createCaseByIdentifier(UserConstants.PROCESS_IDENTIFIER, email, "", null).getCase();
-        return new User(dataService.setData(userCase, UserParams.with()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier(UserConstants.PROCESS_IDENTIFIER)
+                .title(email)
+                .build();
+        Case userCase = workflowService.createCase(createCaseParams).getCase();
+        return new User(dataService.setData(new SetDataParams(userCase, UserParams.with()
                 .email(new TextField(email))
                 .groupIds(CaseField.withValue(additionalGroupIds))
                 .build()
-                .toDataSet(), null).getCase());
+                .toDataSet(), null)).getCase());
     }
 }

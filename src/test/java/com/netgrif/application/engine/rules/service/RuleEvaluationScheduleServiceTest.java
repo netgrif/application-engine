@@ -3,6 +3,7 @@ package com.netgrif.application.engine.rules.service;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.rules.domain.RuleRepository;
@@ -14,6 +15,7 @@ import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
@@ -65,8 +67,8 @@ class RuleEvaluationScheduleServiceTest {
     @Test
     @Disabled
     void testScheduledRule() throws IOException, MissingPetriNetMetaDataException, RuleEvaluationScheduleException, InterruptedException, MissingIconKeyException {
-        ImportPetriNetEventOutcome importOutcome = petriNetService.importProcess(new FileInputStream("src/test/resources/rule_engine_test.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
+        ImportPetriNetEventOutcome importOutcome = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/rule_engine_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()));
 
         StoredRule rule = StoredRule.builder()
                 .when("$case: Case() $event: ScheduledRuleFact(instanceId == $case.stringId, ruleIdentifier == \"rule2\")")
@@ -77,8 +79,12 @@ class RuleEvaluationScheduleServiceTest {
                 .build();
         ruleRepository.save(rule);
 
-        CreateCaseEventOutcome caseOutcome = workflowService.createCase(importOutcome.getProcess().getStringId(), "Original title",
-                "original color", superCreator.getLoggedSuper().getActiveActorId());
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(importOutcome.getProcess())
+                .title("Original title")
+                .authorId(superCreator.getLoggedSuper().getActiveActorId())
+                .build();
+        CreateCaseEventOutcome caseOutcome = workflowService.createCase(createCaseParams);
         ScheduleOutcome outcome = ruleEvaluationScheduleService.scheduleRuleEvaluationForCase(caseOutcome.getCase(), "rule2", TriggerBuilder.newTrigger().withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).withRepeatCount(5)));
 
         assert outcome.getJobDetail() != null;

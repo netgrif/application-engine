@@ -1,12 +1,14 @@
 package com.netgrif.application.engine.importer
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.authorization.domain.constants.GroupConstants
 import com.netgrif.application.engine.importer.service.AllDataConfiguration
 import com.netgrif.application.engine.importer.service.PermissionFactory
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.authorization.domain.permissions.CasePermission
 import com.netgrif.application.engine.authorization.domain.permissions.TaskPermission
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.startup.SuperCreator
@@ -15,6 +17,7 @@ import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.TaskPair
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
@@ -459,13 +462,18 @@ class PredefinedRolesPermissionsTest {
     }
 
     private NetCaseTask importAndCreate(Resource model) {
-        ImportPetriNetEventOutcome importOutcome = petriNetService.importProcess(model.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
+        ImportPetriNetEventOutcome importOutcome = petriNetService.importProcess(new ImportProcessParams(model.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId))
 
         assert importOutcome.getProcess() != null
 
         Process net = importOutcome.getProcess()
 
-        CreateCaseEventOutcome createCaseOutcome = workflowService.createCase(net.stringId, '', '', superCreator.loggedSuper.activeActorId)
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .title('')
+                .authorId(superCreator.loggedSuper.activeActorId)
+                .build()
+        CreateCaseEventOutcome createCaseOutcome = workflowService.createCase(createCaseParams)
         assert createCaseOutcome.getCase() != null
         Case aCase = createCaseOutcome.getCase()
 

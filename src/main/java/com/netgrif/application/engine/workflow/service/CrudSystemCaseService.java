@@ -9,6 +9,8 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.CaseParams;
 import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.SystemCase;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
 import com.netgrif.application.engine.workflow.service.interfaces.ICrudSystemCaseService;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -172,10 +174,13 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
 
     @SuppressWarnings("unchecked")
     protected T doCreate(CaseParams params, String activeActorId) {
-        Case systemCase = workflowService.createCaseByIdentifier(getProcessIdentifier(), null, "",
-                activeActorId).getCase();
-        systemCase = dataService.setData(systemCase, params.toDataSet(),
-                activeActorId).getCase();
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier(getProcessIdentifier())
+                .authorId(activeActorId)
+                .build();
+        Case systemCase = workflowService.createCase(createCaseParams).getCase();
+        systemCase = dataService.setData(new SetDataParams(systemCase, params.toDataSet(),
+                activeActorId)).getCase();
         if (params.getProperties() != null) {
             systemCase.setProperties(params.getProperties());
             systemCase = workflowService.save(systemCase);
@@ -216,8 +221,8 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
 
     @SuppressWarnings("unchecked")
     protected T doUpdate(SystemCase systemObject, CaseParams params, String activeActorId) {
-        Case systemCase = dataService.setData(systemObject.getCase(), params.toDataSet(),
-                activeActorId).getCase();
+        Case systemCase = dataService.setData(new SetDataParams(systemObject.getCase(), params.toDataSet(),
+                activeActorId)).getCase();
 
         if (params.getProperties() != null) {
             systemCase.setProperties(params.getProperties());

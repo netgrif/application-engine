@@ -5,6 +5,7 @@ import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.domain.Role;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.SuperCreator;
@@ -53,10 +54,10 @@ class ProcessRoleServiceTest {
     void shouldFindAllRoles() throws IOException, MissingPetriNetMetaDataException {
         List<Role> processRoles = roleService.findAll();
         int originalRoles = processRoles.size();
-        petriNetService.importProcess(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR,
-                superCreator.getLoggedSuper().getActiveActorId());
-        petriNetService.importProcess(new FileInputStream("src/test/resources/role_all_data.xml"), VersionType.MAJOR,
-                superCreator.getLoggedSuper().getActiveActorId());
+        petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR,
+                superCreator.getLoggedSuper().getActiveActorId()));
+        petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/role_all_data.xml"), VersionType.MAJOR,
+                superCreator.getLoggedSuper().getActiveActorId()));
         processRoles = roleService.findAll();
         assertNotNull(processRoles);
         assertFalse(processRoles.isEmpty());
@@ -91,8 +92,8 @@ class ProcessRoleServiceTest {
 
     @Test
     void shouldFindAllRolesByName() throws IOException, MissingPetriNetMetaDataException {
-        petriNetService.importProcess(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR,
-                superCreator.getLoggedSuper().getActiveActorId());
+        petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR,
+                superCreator.getLoggedSuper().getActiveActorId()));
         List<ProcessRole> processRoles = roleService.findProcessRolesByDefaultTitle("Process role");
         assertNotNull(processRoles);
         assertFalse(processRoles.isEmpty());

@@ -3,6 +3,7 @@ package com.netgrif.application.engine.workflow
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -51,8 +52,8 @@ class TaskRefPropagationTest {
 
     @BeforeEach
     void beforeAll() {
-        def parent = petriNetService.importProcess(new FileInputStream("src/test/resources/taskRef_propagation_test_parent.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
-        def child = petriNetService.importProcess(new FileInputStream("src/test/resources/taskRef_propagation_test_child.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        def parent = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/taskRef_propagation_test_parent.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
+        def child = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/taskRef_propagation_test_child.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
 
         assert parent.getProcess() != null
         assert child.getProcess() != null

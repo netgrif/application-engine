@@ -15,6 +15,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.security.service.SecurityContextService;
 import com.netgrif.application.engine.workflow.domain.CaseParams;
+import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams;
 import com.netgrif.application.engine.workflow.service.CrudSystemCaseService;
 import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -263,7 +264,7 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
 
         List<Identity> identities = findAllByStateAndExpirationDateBefore(state, dateTime);
         for (Identity identity : identities) {
-            workflowService.deleteCase(identity.getCase());
+            workflowService.deleteCase(new DeleteCaseParams(identity.getCase()));
         }
 
         return identities;
