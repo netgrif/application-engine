@@ -4,11 +4,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -53,7 +52,11 @@ public abstract class ElasticTask {
 
     private String transactionId;
 
-    private Set<String> roles;
+    private Map<String, Map<String, Boolean>> roles;
+
+    private Map<String, Map<String, Boolean>> userRefs;
+
+    private Map<String, Map<String, Boolean>> users;
 
     private Set<String> viewUserRefs;
 
@@ -89,12 +92,17 @@ public abstract class ElasticTask {
             this.priority = task.getPriority();
         this.userId = task.getUserId();
         this.startDate = task.getStartDate();
-        this.roles = task.getRoles().keySet();
+        this.roles = task.getRoles();
+        this.userRefs = task.getUserRefs();
+        this.users = task.getUsers();
         this.viewRoles = new HashSet<>(task.getViewRoles());
         this.viewUserRefs = new HashSet<>(task.getViewUserRefs());
         this.negativeViewRoles = new HashSet<>(task.getNegativeViewRoles());
         this.viewUsers = new HashSet<>(task.getViewUsers());
         this.negativeViewUsers = new HashSet<>(task.getNegativeViewUsers());
+        this.assignPolicy = task.getAssignPolicy().toString();
+        this.dataFocusPolicy = task.getDataFocusPolicy().toString();
+        this.finishPolicy = task.getFinishPolicy().toString();
         this.tags = new HashMap<>(task.getTags());
     }
 
