@@ -497,7 +497,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public Optional<Process> findByImportId(String id) {
-        return Optional.of(repository.findByImportId(id));
+        return Optional.ofNullable(repository.findByImportId(id));
     }
 
     @Override
@@ -512,6 +512,7 @@ public class PetriNetService implements IPetriNetService {
             this.addValueCriteria(query, queryTotal, Criteria.where("title.defaultValue").regex(criteriaClass.getTitle(), "i"));
         }
         if (criteriaClass.getInitials() != null) {
+            // todo: release/8.0.0 does not work - see PetriNetServiceTest
             this.addValueCriteria(query, queryTotal, Criteria.where("properties.initials").regex(criteriaClass.getInitials(), "i"));
         }
         if (criteriaClass.getDefaultCaseName() != null) {

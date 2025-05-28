@@ -10,6 +10,7 @@ import com.netgrif.application.engine.authentication.web.requestbodies.Registrat
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.mail.EmailType
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -70,8 +71,8 @@ class AuthenticationControllerTest {
         smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
         smtpServer.start()
 
-        def net = petriNetService.importProcess(new FileInputStream("src/test/resources/insurance_portal_demo_test_new.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        def net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/insurance_portal_demo_test_new.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
         assert net.getProcess() != null
     }
 

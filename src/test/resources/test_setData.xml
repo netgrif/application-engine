@@ -20,6 +20,16 @@
 	<data type="button">
 		<id>button_1</id>
 		<title/>
+		<event type="set">
+			<id>x0</id>
+			<actions phase="pre">
+				<action>
+					button_0: f.button_0;
+
+					change button_0 value { 1337 }
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="caseRef">
 		<id>caseRef_1</id>

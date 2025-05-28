@@ -1,0 +1,40 @@
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../main/resources/petriNets/petriflow_schema.xsd">
+	<id>transaction_test_secondary</id>
+	<version>1.0.0</version>
+	<title>transaction_test_secondary</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<properties>
+		<property key="initials">TRS</property>
+	</properties>
+	<processEvents/>
+	<caseEvents/>
+	<data type="text">
+		<id>text_2</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>text_without_action</id>
+		<title/>
+	</data>
+	<transition>
+		<id>t1</id>
+		<x>496</x>
+		<y>144</y>
+		<title>t1</title>
+		<flex>
+			<id>t1_flex</id>
+		</flex>
+		<event type="assign">
+			<id>x1</id>
+			<actions phase="post">
+				<action id="action_23">
+					<![CDATA[
+					createCase("transaction_test", "toBeRemovedNestedOnFailure")
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+</process>

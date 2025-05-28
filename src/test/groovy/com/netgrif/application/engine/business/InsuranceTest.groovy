@@ -12,6 +12,7 @@ import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.authorization.domain.ProcessRole
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -117,8 +118,8 @@ class InsuranceTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importProcess(TestHelper.stream("insurance_portal_demo_test_new.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        def net = petriNetService.importProcess(new ImportProcessParams(TestHelper.stream("insurance_portal_demo_test_new.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
         assert net.getProcess() != null
 
         netId = net.getProcess().getStringId()

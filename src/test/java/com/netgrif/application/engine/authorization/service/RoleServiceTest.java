@@ -4,6 +4,8 @@ import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authorization.domain.*;
+import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
+import com.netgrif.application.engine.authorization.domain.params.UserParams;
 import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
 import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import com.netgrif.application.engine.authorization.domain.permissions.TaskPermission;
@@ -14,12 +16,17 @@ import com.netgrif.application.engine.history.domain.baseevent.repository.EventL
 import com.netgrif.application.engine.history.domain.actorevents.ActorAssignRoleEventLog;
 import com.netgrif.application.engine.history.domain.actorevents.ActorRemoveRoleEventLog;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserField;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,6 +67,12 @@ public class RoleServiceTest {
     @Autowired
     private ImportHelper importHelper;
 
+    @Autowired
+    private IWorkflowService workflowService;
+
+    @Autowired
+    private IDataService dataService;
+
     @BeforeEach
     public void beforeEach() {
         helper.truncateDbs();
@@ -99,18 +112,19 @@ public class RoleServiceTest {
         Set<String> emptySet = roleService.findAllRoleIdsByActorAndGroups(null);
         assert emptySet != null && emptySet.isEmpty();
 
-        String actorId = "actor_id";
+        User testUser = createUser("test@user.com");
+
         String processRoleId = "role1";
         String caseRoleId = "role3";
         RoleAssignment processRoleAssignment = new ProcessRoleAssignment();
-        processRoleAssignment.setActorId(actorId);
+        processRoleAssignment.setActorId(testUser.getStringId());
         processRoleAssignment.setRoleId(processRoleId);
         CaseRoleAssignment caseRoleAssignment = new CaseRoleAssignment();
-        caseRoleAssignment.setActorId(actorId);
+        caseRoleAssignment.setActorId(testUser.getStringId());
         caseRoleAssignment.setRoleId(caseRoleId);
         assignmentRepository.saveAll(List.of(processRoleAssignment, caseRoleAssignment));
 
-        Set<String> roleIds = roleService.findAllRoleIdsByActorAndGroups(actorId);
+        Set<String> roleIds = roleService.findAllRoleIdsByActorAndGroups(testUser.getStringId());
         assert roleIds != null;
         assert roleIds.size() == 2;
         assert roleIds.contains(processRoleId);
@@ -474,5 +488,17 @@ public class RoleServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> roleService.assignRolesToActor("nonExistingId",
                 Set.of(caseRole.getStringId())));
+    }
+
+    private User createUser(String email) {
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .processIdentifier(UserConstants.PROCESS_IDENTIFIER)
+                .title(email)
+                .build();
+        Case userCase = workflowService.createCase(createCaseParams).getCase();
+        return new User(dataService.setData(new SetDataParams(userCase, UserParams.with()
+                .email(new TextField(email))
+                .build()
+                .toDataSet(), null)).getCase());
     }
 }

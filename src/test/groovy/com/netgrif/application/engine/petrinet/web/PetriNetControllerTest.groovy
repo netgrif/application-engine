@@ -9,6 +9,7 @@ import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ApplicationRoleRunner
 import com.netgrif.application.engine.startup.ImportHelper
@@ -81,8 +82,8 @@ class PetriNetControllerTest {
     void before() {
         testHelper.truncateDbs()
 
-        def net = petriNetService.importProcess(stream(NET_FILE), VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId)
+        def net = petriNetService.importProcess(new ImportProcessParams(stream(NET_FILE), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId))
         assert net.getProcess() != null
 
         this.net = net.getProcess()

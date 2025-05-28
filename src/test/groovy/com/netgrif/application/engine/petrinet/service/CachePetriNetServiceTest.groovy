@@ -8,6 +8,7 @@ import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -65,7 +66,7 @@ class CachePetriNetServiceTest {
     @Test
     void cacheTest() {
         assert cacheManager.getCache(cacheProperties.getPetriNetNewest()).get("processDeleteTest") == null
-        ImportPetriNetEventOutcome testNetOptional = petriNetService.importProcess(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
+        ImportPetriNetEventOutcome testNetOptional = petriNetService.importProcess(new ImportProcessParams(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
         assert testNetOptional.getProcess() != null
         Process testNet = testNetOptional.getProcess()
 

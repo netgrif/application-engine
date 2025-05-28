@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
@@ -53,8 +54,8 @@ class ActionRefTest {
     @Disabled("TODO: deprecated action ref")
     void testEventImport() {
 
-        Process net = petriNetService.importProcess(new FileInputStream(NET_FILE), VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId).getProcess()
+        Process net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream(NET_FILE), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId)).getProcess()
 
         assert net.dataSet.get("text_1").events.size() == 8
         assert net.transitions.get("task").dataSet.get("text_1").events.size() == 8

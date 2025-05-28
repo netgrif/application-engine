@@ -293,7 +293,6 @@ public class TaskService implements ITaskService {
     @Override
     public FinishTaskEventOutcome finishTask(TaskParams taskParams) throws TransitionNotExecutableException {
         fillMissingAttributes(taskParams);
-        throwIfNotEnabled(taskParams.getTask());
 
         if (taskParams.getIsTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
@@ -422,7 +421,6 @@ public class TaskService implements ITaskService {
     @Override
     public CancelTaskEventOutcome cancelTask(TaskParams taskParams) {
         fillMissingAttributes(taskParams);
-        throwIfNotEnabled(taskParams.getTask());
 
         if (taskParams.getIsTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
@@ -620,6 +618,14 @@ public class TaskService implements ITaskService {
         }
     }
 
+    @Override
+    public boolean isAssigned(Task task) {
+        if (task == null) {
+            return false;
+        }
+        return task.getAssigneeId() != null;
+    }
+
     /**
      * Updates {@link State} of the provided tasks, that exist in provided {@link Case}. Only tasks with the changed
      * state are updated in database.
@@ -728,17 +734,6 @@ public class TaskService implements ITaskService {
             return new UpdateTaskStateOutcome(willBeChanged, false);
         }
     }
-
-//    @Override
-//    public CreateTasksOutcome createTasks(Case useCase) {
-//        Process net = useCase.getProcess();
-//        List<Task> tasks = new ArrayList<>();
-//
-//        net.getTransitions().values()
-//                .forEach(transition -> tasks.add(createFromTransition(transition, useCase)));
-//
-//        return new CreateTasksOutcome(workflowService.save(useCase), tasks);
-//    }
 
     private boolean isExecutable(Transition transition, Case useCase) {
         List<PTArc> arcsOfTransition = useCase.getProcess().getInputArcsOf(transition.getImportId());

@@ -31,7 +31,7 @@ public class TaskAuthorizationService extends AuthorizationService implements IT
         }
         try {
             Task task = taskService.findById(taskId);
-            return !isAssigned(task)
+            return !taskService.isAssigned(task)
                     && canCallEvent(task.getProcessRolePermissions(), task.getCaseRolePermissions(), TaskPermission.ASSIGN);
         } catch(IllegalArgumentException ignore) {
             return false;
@@ -48,7 +48,7 @@ public class TaskAuthorizationService extends AuthorizationService implements IT
         }
         try {
             Task task = taskService.findById(taskId);
-            return isAssigned(task) && isAssignee(task)
+            return taskService.isAssigned(task) && isAssignee(task)
                     && canCallEvent(task.getProcessRolePermissions(), task.getCaseRolePermissions(), TaskPermission.CANCEL);
         } catch(IllegalArgumentException ignore) {
             return false;
@@ -62,7 +62,7 @@ public class TaskAuthorizationService extends AuthorizationService implements IT
         }
         try {
             Task task = taskService.findById(taskId);
-            return isAssigned(task)
+            return taskService.isAssigned(task)
                     && canCallEvent(task.getProcessRolePermissions(), task.getCaseRolePermissions(), TaskPermission.REASSIGN);
         } catch(IllegalArgumentException ignore) {
             return false;
@@ -79,7 +79,7 @@ public class TaskAuthorizationService extends AuthorizationService implements IT
         }
         try {
             Task task = taskService.findById(taskId);
-            return isAssigned(task) && isAssignee(task)
+            return taskService.isAssigned(task) && isAssignee(task)
                     && canCallEvent(task.getProcessRolePermissions(), task.getCaseRolePermissions(), TaskPermission.FINISH);
         } catch(IllegalArgumentException ignore) {
             return false;
@@ -144,9 +144,5 @@ public class TaskAuthorizationService extends AuthorizationService implements IT
         }
 
         return task.getAssigneeId().equals(loggedIdentity.getActiveActorId());
-    }
-
-    private boolean isAssigned(Task task) {
-        return task.getAssigneeId() != null;
     }
 }

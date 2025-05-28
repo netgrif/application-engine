@@ -12,6 +12,7 @@ import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -98,8 +99,8 @@ class RemoveActionTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importProcess(new FileInputStream("src/test/resources/removeRole_test.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        def net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/removeRole_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
         assert net.getProcess() != null
 
         this.petriNet = net.getProcess()

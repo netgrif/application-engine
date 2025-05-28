@@ -7,10 +7,12 @@ import com.netgrif.application.engine.configuration.properties.SuperAdminConfigu
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -84,8 +86,8 @@ class FileFieldTest {
     }
 
     Process getNet() {
-        def netOptional = petriNetService.importProcess(new FileInputStream("src/test/resources/remoteFileField.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
+        def netOptional = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/remoteFileField.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
         assert netOptional.getProcess() != null
         return netOptional.getProcess()
     }
@@ -101,8 +103,12 @@ class FileFieldTest {
     void downloadFileByCase() {
         Process net = getNet()
 
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black",
-                superCreator.loggedSuper.activeActorId).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .title("Test file download")
+                .authorId(superCreator.loggedSuper.activeActorId)
+                .build()
+        Case useCase = workflowService.createCase(createCaseParams).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), superCreator.loggedSuper)
 
         mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file")
@@ -119,8 +125,12 @@ class FileFieldTest {
     void downloadFileByTask() {
         Process net = getNet()
 
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black",
-                superCreator.loggedSuper.activeActorId).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .title("Test file download")
+                .authorId(superCreator.loggedSuper.activeActorId)
+                .build()
+        Case useCase = workflowService.createCase(createCaseParams).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), superCreator.loggedSuper)
 
         mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file")

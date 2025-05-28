@@ -25,6 +25,8 @@ public interface ITaskService {
 
     boolean reloadTasks(Case useCase);
 
+    boolean isAssigned(Task task);
+
     CreateTasksOutcome createAndSetTasksInCase(Case useCase);
 
     Task findOne(String taskId);

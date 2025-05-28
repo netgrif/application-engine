@@ -9,6 +9,7 @@ import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepo
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -104,9 +105,9 @@ class ElasticSearchTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importProcess(new FileInputStream("src/test/resources/all_data.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess()
-        def net2 = petriNetService.importProcess(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess()
+        def net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/all_data.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess()
+        def net2 = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess()
 
         assert net
         assert net2

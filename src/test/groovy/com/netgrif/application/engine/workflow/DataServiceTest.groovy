@@ -21,9 +21,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @CompileStatic
 class DataServiceTest {
 
-    private static final String TASK_TITLE = "Transition";
-    private static final String FILE_FIELD_TITLE = "File";
-    private static final String TEXT_FIELD_TITLE = "Result";
+    private static final String TASK_TITLE = "Transition"
+    private static final String FILE_FIELD_TITLE = "File"
+    private static final String TEXT_FIELD_TITLE = "Result"
 
     @Autowired
     private ImportHelper importHelper

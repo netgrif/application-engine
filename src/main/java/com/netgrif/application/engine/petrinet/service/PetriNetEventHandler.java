@@ -20,7 +20,7 @@ public class PetriNetEventHandler {
     private final IElasticPetriNetService service;
     private final IElasticPetriNetMappingService petriNetMappingService;
 
-    @TransactionalEventListener(fallbackExecution = true, condition = "#event.collectionName == 'petriNet'")
+    @TransactionalEventListener(fallbackExecution = true, condition = "#event.collectionName == 'process'")
     public void onAfterSave(AfterSaveEvent<Process> event) {
         Process process = event.getSource();
         try {
@@ -30,7 +30,7 @@ public class PetriNetEventHandler {
         }
     }
 
-    @TransactionalEventListener(fallbackExecution = true, condition = "#event.collectionName == 'petriNet'")
+    @TransactionalEventListener(fallbackExecution = true, condition = "#event.collectionName == 'process'")
     public void onAfterDelete(AfterDeleteEvent<Process> event) {
         Document document = event.getDocument();
         if (document == null || document.isEmpty()) {

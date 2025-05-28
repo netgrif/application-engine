@@ -5,10 +5,12 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -86,11 +88,15 @@ class EncryptionTest {
     }
 
     private String createCase() {
-        ImportPetriNetEventOutcome net = petriNetService.importProcess(new FileInputStream("src/test/resources/mapping_test.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
+        ImportPetriNetEventOutcome net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/mapping_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
         assert net.getProcess() != null
-        def useCase = workflowService.createCase(net.getProcess().stringId, "Encryption test", "color",
-                mockService.mockLoggedIdentity().activeActorId).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net.getProcess())
+                .title("Encryption test")
+                .authorId(mockService.mockLoggedIdentity().activeActorId)
+                .build()
+        def useCase = workflowService.createCase(createCaseParams).getCase()
         def nameField = useCase.process.dataSet.values().find { v -> v.title.defaultValue == FIELD_NAME }
 //        TODO: release/8.0.0
 //        useCase.dataSet.put(nameField.stringId, new DataField(FIELD_VALUE))

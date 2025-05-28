@@ -7,6 +7,7 @@ import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
+import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -79,15 +80,19 @@ public class EventService implements IEventService {
     @Override
     public List<EventOutcome> processDataEvents(Field<?> field, DataEventType actionTrigger, EventPhase phase, Case useCase,
                                                 Task task, Field<?> newDataField, Map<String, String> params) {
-        // todo: release/8.0.0 actionType from schema is ignored
         LinkedList<Action> fieldActions = new LinkedList<>();
         if (field.getEvents() != null && field.getEvents().containsKey(actionTrigger)) {
             fieldActions.addAll(DataRef.getEventAction(field.getEvents().get(actionTrigger), phase));
         }
         if (task != null) {
             Transition transition = useCase.getProcess().getTransition(task.getTransitionId());
-            if (transition.getDataSet().containsKey(field.getStringId()) && !transition.getDataSet().get(field.getStringId()).getEvents().isEmpty()) {
-                fieldActions.addAll(DataRef.getEventAction(transition.getDataSet().get(field.getStringId()).getEvents().get(actionTrigger), phase));
+            boolean containsField = transition.getDataSet().containsKey(field.getStringId());
+            if (containsField) {
+                Map<DataEventType, DataEvent> fieldEvents = transition.getDataSet().get(field.getStringId()).getEvents();
+                boolean hasEvent = !fieldEvents.isEmpty() && fieldEvents.containsKey(actionTrigger);
+                if (hasEvent) {
+                    fieldActions.addAll(DataRef.getEventAction(fieldEvents.get(actionTrigger), phase));
+                }
             }
         }
 

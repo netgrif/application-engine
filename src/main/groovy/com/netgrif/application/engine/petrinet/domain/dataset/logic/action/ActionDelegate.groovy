@@ -542,7 +542,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
                 changeBehaviourAndSave(field, behavior, trans)
             }
         } else if (transitionObject instanceof Closure && transitionObject == transitions) {
-            useCase.process.transitions.each { transitionEntry ->
+            useCase.process.transitions.map.each { transitionEntry ->
                 changeBehaviourAndSave(field, behavior, transitionEntry.value)
             }
         } else {
@@ -845,7 +845,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
                 .authorId(author.activeActorId)
                 .params(params)
                 .build()
-        return workflowService.createCaseByIdentifier(createCaseParams).getCase()
+        return workflowService.createCase(createCaseParams).getCase()
     }
 
     Case createCase(Process net, String title = net.defaultCaseName.getTranslation(locale), String color = "", LoggedIdentity author = identityService.loggedIdentity,

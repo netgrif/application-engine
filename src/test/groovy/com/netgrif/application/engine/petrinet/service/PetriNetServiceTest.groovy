@@ -5,20 +5,23 @@ import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.authorization.domain.User
+import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.authorization.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
+import com.netgrif.application.engine.petrinet.domain.params.DeleteProcessParams
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
@@ -34,6 +37,8 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+import static org.junit.jupiter.api.Assertions.assertThrows
+
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
@@ -41,6 +46,9 @@ class PetriNetServiceTest {
 
     public static final String NET_FILE = "process_delete_test.xml"
     public static final String NET_SEARCH_FILE = "process_search_test.xml"
+    public static final String NET_IMPORT_FILE = "net_import_1.xml"
+    public static final String PETRINET_IMPORT_FAILURE_FILE = "petriNet_import_failure.xml"
+    public static final String PETRINET_IMPORT_FAILURE_IDENTIFIER = "petriNet_import_failure"
     public static final String CUSTOMER_USER_MAIL = "customer@netgrif.com"
 
     @Autowired
@@ -85,7 +93,7 @@ class PetriNetServiceTest {
     @Autowired
     private ElasticPetriNetRepository elasticPetriNetRepository
 
-    private Identity testIdentity;
+    private Identity testIdentity
 
 
     private static InputStream stream(String name) {
@@ -109,8 +117,8 @@ class PetriNetServiceTest {
         long processCount = petriNetRepository.count()
         long taskCount = taskRepository.count()
 
-        ImportPetriNetEventOutcome testNetOptional = petriNetService.importProcess(stream(NET_FILE), VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId)
+        ImportPetriNetEventOutcome testNetOptional = petriNetService.importProcess(new ImportProcessParams(stream(NET_FILE), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId))
         assert testNetOptional.getProcess() != null
         assert petriNetRepository.count() == processCount + 1
         Process testNet = testNetOptional.getProcess()
@@ -135,7 +143,7 @@ class PetriNetServiceTest {
 //        assert user.roles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
 
-        petriNetService.deleteProcess(testNet.stringId)
+        petriNetService.deleteProcess(new DeleteProcessParams(testNet.stringId))
         assert petriNetRepository.count() == processCount
         Thread.sleep(5000)
         assert elasticPetriNetRepository.findByStringId(testNet.stringId) == null
@@ -158,10 +166,10 @@ class PetriNetServiceTest {
     @Test
     void findAllByUriNodeIdTest() {
         UriNode myNode = uriService.getOrCreate("/test", UriContentType.DEFAULT)
-        petriNetService.importProcess(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId,
-                myNode.id.toString())
-        petriNetService.importProcess(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId,
-                myNode.id.toString())
+        petriNetService.importProcess(new ImportProcessParams(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId,
+                myNode.id.toString()))
+        petriNetService.importProcess(new ImportProcessParams(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId,
+                myNode.id.toString()))
 
         Thread.sleep(2000)
 
@@ -173,8 +181,8 @@ class PetriNetServiceTest {
     void processSearch() {
         int processCount = (int) petriNetRepository.count()
 
-        petriNetService.importProcess(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
-        petriNetService.importProcess(stream(NET_SEARCH_FILE), VersionType.MAJOR, testIdentity.toSession().activeActorId)
+        petriNetService.importProcess(new ImportProcessParams(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
+        petriNetService.importProcess(new ImportProcessParams(stream(NET_SEARCH_FILE), VersionType.MAJOR, testIdentity.toSession().activeActorId))
 
         assert petriNetRepository.count() == processCount + 2
 
@@ -227,25 +235,25 @@ class PetriNetServiceTest {
 
     @Test
     void deleteParentPetriNet() {
-        Process superParentNet = petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getProcess()
+        Process superParentNet = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)).getProcess()
         Case superParentCase = importHelper.createCaseAsSuper("Super parent case", superParentNet)
 
-        Process parentNetMajor = petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getProcess()
+        Process parentNetMajor = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)).getProcess()
         Case parentMajorCase = importHelper.createCaseAsSuper("Parent major case", parentNetMajor)
 
-        Process parentNetMinor = petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
-                VersionType.MINOR, superCreator.getLoggedSuper().activeActorId).getProcess()
+        Process parentNetMinor = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
+                VersionType.MINOR, superCreator.getLoggedSuper().activeActorId)).getProcess()
         Case parentMinorCase = importHelper.createCaseAsSuper("Parent minor case", parentNetMinor)
 
-        Process childNet = petriNetService.importProcess(new FileInputStream("src/test/resources/importTest/child_extending_parent.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getProcess()
+        Process childNet = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/importTest/child_extending_parent.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)).getProcess()
         Case parentChildCase = importHelper.createCaseAsSuper("Child case", childNet)
 
         TestHelper.login(superCreator.getSuperIdentity())
 
-        petriNetService.deleteProcess(parentNetMajor.stringId)
+        petriNetService.deleteProcess(new DeleteProcessParams(parentNetMajor.stringId))
         assert petriNetRepository.findById(superParentNet.stringId).isPresent()
         assert petriNetRepository.findById(parentNetMajor.stringId).isEmpty()
         assert petriNetRepository.findById(parentNetMinor.stringId).isPresent()
@@ -255,7 +263,7 @@ class PetriNetServiceTest {
         assert caseRepository.findById(parentMinorCase.stringId).isPresent()
         assert caseRepository.findById(parentChildCase.stringId).isPresent()
 
-        petriNetService.deleteProcess(parentNetMinor.stringId)
+        petriNetService.deleteProcess(new DeleteProcessParams(parentNetMinor.stringId))
         assert petriNetRepository.findById(superParentNet.stringId).isPresent()
         assert petriNetRepository.findById(parentNetMinor.stringId).isEmpty()
         assert petriNetRepository.findById(childNet.stringId).isEmpty()
@@ -263,8 +271,50 @@ class PetriNetServiceTest {
         assert caseRepository.findById(parentMinorCase.stringId).isEmpty()
         assert caseRepository.findById(parentChildCase.stringId).isEmpty()
 
-        petriNetService.deleteProcess(superParentNet.stringId)
+        petriNetService.deleteProcess(new DeleteProcessParams(superParentNet.stringId))
         assert petriNetRepository.findById(superParentNet.stringId).isEmpty()
         assert caseRepository.findById(superParentCase.stringId).isEmpty()
+    }
+
+    @Test
+    void testTransactionalImportFailure() {
+        TestHelper.login(superCreator.superIdentity)
+
+        petriNetService.importProcess(new ImportProcessParams(stream(NET_IMPORT_FILE), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId))
+
+        ImportProcessParams importProcessParams = ImportProcessParams.with()
+                .isTransactional(true)
+                .xmlFile(stream(PETRINET_IMPORT_FAILURE_FILE))
+                .releaseType(VersionType.MAJOR)
+                .authorId(superCreator.getLoggedSuper().activeActorId)
+                .build()
+
+        assertThrows(RuntimeException.class, { petriNetService.importProcess(importProcessParams) })
+
+        assert petriNetService.findByImportId(PETRINET_IMPORT_FAILURE_IDENTIFIER).isEmpty()
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPre")) == null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPost")) == null
+    }
+
+    @Test
+    void testNonTransactionalImportFailure() {
+        TestHelper.login(superCreator.superIdentity)
+
+        petriNetService.importProcess(new ImportProcessParams(stream(NET_IMPORT_FILE), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId))
+
+        ImportProcessParams importProcessParams = ImportProcessParams.with()
+                .isTransactional(false)
+                .xmlFile(stream(PETRINET_IMPORT_FAILURE_FILE))
+                .releaseType(VersionType.MAJOR)
+                .authorId(superCreator.getLoggedSuper().activeActorId)
+                .build()
+
+        assertThrows(RuntimeException.class, { petriNetService.importProcess(importProcessParams) })
+
+        assert petriNetService.findByImportId(PETRINET_IMPORT_FAILURE_IDENTIFIER).isPresent()
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPre")) != null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPost")) != null
     }
 }

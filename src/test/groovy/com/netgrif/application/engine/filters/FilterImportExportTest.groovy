@@ -16,6 +16,8 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.*
 import com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.ActorFilterSearchService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
@@ -152,16 +154,16 @@ class FilterImportExportTest {
         validateFilterXML(new FileInputStream(exportedFiltersField.getPath()))
         importedTasksIds.forEach({ taskId ->
             Task filterTask = this.taskService.findOne(taskId)
-            this.dataService.setData(filterTask, new DataSet([
+            this.dataService.setData(new SetDataParams(filterTask, new DataSet([
                     (VISIBILITY_FIELD): new EnumerationMapField(rawValue: FILTER_VISIBILITY_PRIVATE),
                     (NEW_TITLE_FIELD) : new TextField(rawValue: this.workflowService.findOne(filterTask.caseId).title + " new")
-            ] as Map<String, Field<?>>), dummyIdentity.toSession().activeActorId)
+            ] as Map<String, Field<?>>), dummyIdentity.toSession().activeActorId))
         })
         Task importTask = this.taskService.searchOne(QTask.task.caseId.eq(importCase.stringId) & QTask.task.transitionId.eq("importFilter"))
-        this.dataService.setData(importTask, new DataSet([
+        this.dataService.setData(new SetDataParams(importTask, new DataSet([
                 (IMPORTED_FILTERS_FIELD): new TaskField(rawValue: importedTasksIds)
-        ] as Map<String, Field<?>>), dummyIdentity.toSession().activeActorId)
-        this.taskService.finishTask(importTask, dummyIdentity.toSession().activeActorId)
+        ] as Map<String, Field<?>>), dummyIdentity.toSession().activeActorId))
+        this.taskService.finishTask(new TaskParams(importTask, dummyIdentity.toSession().activeActorId))
         Thread.sleep(1000)
         filterCases = this.userFilterSearchService.autocompleteFindFilters("")
         List<String> filterCasesNames = filterCases.stream().map({ filterCase -> filterCase.title }).collect(Collectors.toList())

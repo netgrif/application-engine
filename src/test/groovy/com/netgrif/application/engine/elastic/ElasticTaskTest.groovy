@@ -7,6 +7,7 @@ import com.netgrif.application.engine.elastic.domain.repoitories.ElasticTaskRepo
 import com.netgrif.application.engine.elastic.service.ReindexingTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -73,7 +74,8 @@ class ElasticTaskTest {
 
     @Test
     void taskReindexTest() {
-        def optional = petriNetService.importProcess(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        def optional = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/all_data.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
         assert optional.getProcess() != null
 
         def net = optional.getProcess()

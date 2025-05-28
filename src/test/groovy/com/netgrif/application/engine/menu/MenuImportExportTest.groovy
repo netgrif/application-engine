@@ -13,6 +13,7 @@ import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.menu.MenuAndFilters
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.ActorFilterSearchService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
@@ -134,13 +135,13 @@ class MenuImportExportTest {
         workflowService.save(groupCase)
 
         QTask qTask = new QTask("task");
-        Task task = taskService.searchOne(qTask.transitionId.eq(GROUP_NAV_TASK).and(qTask.caseId.eq(groupCase.stringId)));
-        dataService.setData(task, ImportHelper.populateDataset([
+        Task task = taskService.searchOne(qTask.transitionId.eq(GROUP_NAV_TASK) & qTask.caseId.eq(groupCase.stringId));
+        dataService.setData(new SetDataParams(task, ImportHelper.populateDataset([
                 (IMPORT_BUTTON_FIELD): [
                         "value": "1",
                         "type" : "button"
                 ]
-        ]), dummyIdentity.toSession().activeActorId)
+        ]), dummyIdentity.toSession().activeActorId))
         Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq(DUMMY_USER_GROUP_TITLE))
         assert caseOpt.isPresent()
         groupCase = caseOpt.get()
@@ -196,7 +197,7 @@ class MenuImportExportTest {
 
 
     private SetDataEventOutcome setData(task, Map<String, Map<String, Object>> values) {
-        return dataService.setData(task, ImportHelper.populateDataset(values), dummyIdentity.toSession().activeActorId)
+        return dataService.setData(new SetDataParams(task, ImportHelper.populateDataset(values), dummyIdentity.toSession().activeActorId))
     }
 
 

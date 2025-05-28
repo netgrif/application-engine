@@ -139,7 +139,7 @@ class ImportHelper {
     }
 
     AssignTaskEventOutcome assignTask(String taskTitle, String caseId, LoggedIdentity assignee) {
-        return taskService.assignTask(new TaskParams(assignee.activeActorId, getTaskId(taskTitle, caseId)))
+        return taskService.assignTask(new TaskParams(getTaskId(taskTitle, caseId), assignee.activeActorId))
     }
 
     AssignTaskEventOutcome assignTaskToSuper(String taskTitle, String caseId) {
@@ -147,7 +147,7 @@ class ImportHelper {
     }
 
     FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedIdentity assignee) {
-        return taskService.finishTask(new TaskParams(assignee.activeActorId, getTaskId(taskTitle, caseId)))
+        return taskService.finishTask(new TaskParams(getTaskId(taskTitle, caseId), assignee.activeActorId))
     }
 
     FinishTaskEventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
@@ -155,7 +155,7 @@ class ImportHelper {
     }
 
     CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedIdentity assignee) {
-        return taskService.cancelTask(new TaskParams(assignee.activeActorId, getTaskId(taskTitle, caseId)))
+        return taskService.cancelTask(new TaskParams(getTaskId(taskTitle, caseId), assignee.activeActorId))
     }
 
     CancelTaskEventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {

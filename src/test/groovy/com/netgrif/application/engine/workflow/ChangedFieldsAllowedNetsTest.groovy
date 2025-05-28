@@ -52,7 +52,7 @@ class ChangedFieldsAllowedNetsTest {
         assert netOptional.isPresent()
         net = netOptional.get()
 
-        helper.login(superCreator.superIdentity)
+        TestHelper.login(superCreator.superIdentity)
     }
 
     // NAE-1374

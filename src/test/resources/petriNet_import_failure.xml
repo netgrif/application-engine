@@ -1,0 +1,31 @@
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>petriNet_import_failure</id>
+    <version>1.0.0</version>
+    <title>Test</title>
+    <defaultRole>false</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
+    <processEvents>
+        <event type="upload">
+            <id>x123</id>
+            <actions phase="pre">
+                <action id="action_0">
+					<![CDATA[
+                    createCase("new_model", "CaseFromPre")
+                    ]]>
+				</action>
+            </actions>
+            <actions phase="post">
+                <action id="action_1">
+					<![CDATA[
+                    createCase("new_model", "CaseFromPost")
+                    throw new RuntimeException("error on purpose")
+                    ]]>
+				</action>
+            </actions>
+        </event>
+    </processEvents>
+    <caseEvents/>
+</process>

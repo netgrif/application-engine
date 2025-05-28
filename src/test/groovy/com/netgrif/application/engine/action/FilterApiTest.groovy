@@ -65,7 +65,7 @@ class FilterApiTest {
         Case item = getMenuItem(caze)
         Case filter = getFilter(caze)
 
-        assert item.uriNodeId == uriService.findByUri("netgrif/test").id
+        assert item.uriNodeId == uriService.findByUri("netgrif/test").id.toString()
         assert item.dataSet.get("icon_name").rawValue == "device_hub"
         assert item.dataSet.get("entry_name").rawValue.toString() == "FILTER"
         assert item.dataSet.get("menu_item_identifier").rawValue.toString() == "new_menu_item"

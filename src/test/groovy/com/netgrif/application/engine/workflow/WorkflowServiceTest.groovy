@@ -9,7 +9,9 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
@@ -20,6 +22,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+import static com.netgrif.application.engine.workflow.domain.params.CreateCaseParams.with
+import static org.junit.jupiter.api.Assertions.assertThrows
+
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
@@ -29,6 +34,8 @@ class WorkflowServiceTest {
     public static final String NET_FILE = "case_search_test.xml"
     public static final String CASE_LOCALE_NET_FILE = "create_case_locale.xml"
     public static final String FIRST_AUTO_NET_FILE = "petriNets/NAE_1382_first_trans_auto.xml"
+    public static final String CREATE_CASE_FAILURE_NET_FILE = "create_case_failure.xml"
+    public static final String DELETE_CASE_FAILURE_NET_FILE = "delete_case_failure.xml"
     public static final String SECOND_AUTO_NET_FILE = "petriNets/NAE_1382_first_trans_auto_2.xml"
     public static final String CHILD_NET_FILE = "importTest/child_extending_parent.xml"
     public static final String PARENT_NET_FILE = "importTest/parent_to_be_extended.xml"
@@ -166,5 +173,95 @@ class WorkflowServiceTest {
 
         assert aCase.dataSet.fields.size() == 4
         assert (aCase.dataSet.get("taskref2").value.value as List)[0] == aCase.tasks["t0"].taskId.toString()
+    }
+
+    @Test
+    void testTransactionalCreateCaseFailure() {
+        petriNetService.importProcess(new ImportProcessParams(
+                stream(CASE_LOCALE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
+        Process process = petriNetService.importProcess(new ImportProcessParams(
+                stream(CREATE_CASE_FAILURE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)).getProcess()
+
+        CreateCaseParams createCaseParams = with()
+                .isTransactional(true)
+                .process(process)
+                .title("FailedCase")
+                .authorId(superCreator.getLoggedSuper().activeActorId)
+                .build()
+
+        assertThrows(RuntimeException.class, { workflowService.createCase(createCaseParams) })
+
+        assert workflowService.searchOne(QCase.case$.title.eq("FailedCase")) == null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPre")) == null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPost")) == null
+    }
+
+    @Test
+    void testNonTransactionalCreateCaseFailure() {
+        petriNetService.importProcess(new ImportProcessParams(
+                stream(CASE_LOCALE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
+        Process process = petriNetService.importProcess(new ImportProcessParams(
+                stream(CREATE_CASE_FAILURE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)).getProcess()
+
+        CreateCaseParams createCaseParams = with()
+                .isTransactional(false)
+                .process(process)
+                .title("FailedCase")
+                .authorId(superCreator.getLoggedSuper().activeActorId)
+                .build()
+
+        assertThrows(RuntimeException.class, { workflowService.createCase(createCaseParams) })
+
+        assert workflowService.searchOne(QCase.case$.title.eq("FailedCase")) != null // failure in post action
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPre")) != null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPost")) != null
+    }
+
+    @Test
+    void testTransactionalDeleteCaseFailure() {
+        Process process = petriNetService.importProcess(new ImportProcessParams(
+                stream(DELETE_CASE_FAILURE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)).getProcess()
+
+        CreateCaseParams createCaseParams = with()
+                .process(process)
+                .title("CaseToRemove")
+                .authorId(superCreator.getLoggedSuper().activeActorId)
+                .build()
+
+        Case useCase = workflowService.createCase(createCaseParams).getCase()
+
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
+                .isTransactional(true)
+                .useCase(useCase)
+                .build()
+        assertThrows(RuntimeException.class, { workflowService.deleteCase(deleteCaseParams) })
+
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseToRemove")) != null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPre")) == null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPost")) == null
+    }
+
+    @Test
+    void testNonTransactionalDeleteCaseFailure() {
+        Process process = petriNetService.importProcess(new ImportProcessParams(
+                stream(DELETE_CASE_FAILURE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)).getProcess()
+
+        CreateCaseParams createCaseParams = with()
+                .process(process)
+                .title("CaseToRemove")
+                .authorId(superCreator.getLoggedSuper().activeActorId)
+                .build()
+
+        Case useCase = workflowService.createCase(createCaseParams).getCase()
+
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
+                .isTransactional(false)
+                .useCase(useCase)
+                .build()
+        assertThrows(RuntimeException.class, { workflowService.deleteCase(deleteCaseParams) })
+
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseToRemove")) == null // failure in post action
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPre")) != null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPost")) != null
     }
 }

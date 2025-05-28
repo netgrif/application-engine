@@ -7,6 +7,7 @@ import com.netgrif.application.engine.authorization.domain.repositories.ProcessR
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -87,8 +88,8 @@ class ProcessRoleTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importProcess(new FileInputStream("src/test/resources/rolref_view.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
+        def net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/rolref_view.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
         assert net.getProcess() != null
 
         ProcessRole viewRole = userRoleRepository.findByImportId("role1")

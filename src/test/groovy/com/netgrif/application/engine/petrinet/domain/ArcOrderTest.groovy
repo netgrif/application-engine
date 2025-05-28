@@ -4,6 +4,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.arcs.ArcOrderComparator
 import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -50,7 +51,7 @@ class ArcOrderTest {
 
     @Test
     void testOrder() {
-        def net = petriNetService.importProcess(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getProcess()
+        def net = petriNetService.importProcess(new ImportProcessParams(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess()
 
         def arcs = net.getInputArcsOf(NET_TASK)
         def sorted = arcs.sort { a1, a2 -> ArcOrderComparator.getInstance().compare(a1, a2) }

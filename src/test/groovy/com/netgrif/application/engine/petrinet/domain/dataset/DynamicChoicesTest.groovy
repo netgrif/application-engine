@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -52,8 +53,8 @@ class DynamicChoicesTest {
     @Test
     void testDynamicEnum() {
         // todo: release/8.0.0 choices does not exist anymore
-        ImportPetriNetEventOutcome optNet = petriNetService.importProcess(new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        ImportPetriNetEventOutcome optNet = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
 
         assert optNet.getProcess() != null
         def net = optNet.getProcess()

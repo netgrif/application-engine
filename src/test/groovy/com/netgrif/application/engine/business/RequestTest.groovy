@@ -14,6 +14,7 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
 import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -302,8 +303,8 @@ class RequestTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importProcess(TestHelper.stream("request.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
+        def net = petriNetService.importProcess(new ImportProcessParams(TestHelper.stream("request.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
         assert net.getProcess() != null
 
         netId = net.getProcess().getStringId()
@@ -323,7 +324,7 @@ class RequestTest {
         Thread.sleep(2000)
 
         auth = new UsernamePasswordAuthenticationToken(identity.toSession(), "password")
-        auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
+        auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
         objectWriter = objectMapper.writer().withDefaultPrettyPrinter()
     }

@@ -191,8 +191,8 @@
             vulputate ut eu sapien. Phasellus vel.</init>
     </data>
     <data type="user" immediate="true">
-        <id>actor</id>
-        <title>Actor</title>
+        <id>user</id>
+        <title>User</title>
     </data>
     <data type="userList" immediate="true">
         <id>userList</id>
@@ -319,7 +319,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>actor</id>
+                    <id>user</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>
@@ -465,7 +465,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>actor</id>
+                    <id>user</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>

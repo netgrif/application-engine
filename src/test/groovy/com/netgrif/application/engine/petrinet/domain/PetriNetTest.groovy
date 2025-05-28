@@ -7,6 +7,7 @@ import com.netgrif.application.engine.petrinet.domain.arcs.InhibitorArc
 import com.netgrif.application.engine.petrinet.domain.arcs.ReadArc
 import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc
 import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference
 import com.netgrif.application.engine.startup.SuperCreator
@@ -57,8 +58,8 @@ class PetriNetTest {
     void testClone() {
         int beforeImportNet = (int) roleRepository.count()
 
-        def netOptional = petriNetService.importProcess(netResource.inputStream, VersionType.MAJOR,
-                superCreator.loggedSuper.activeActorId)
+        def netOptional = petriNetService.importProcess(new ImportProcessParams(netResource.inputStream, VersionType.MAJOR,
+                superCreator.loggedSuper.activeActorId))
 
         assert netOptional.getProcess() != null
 
@@ -78,18 +79,18 @@ class PetriNetTest {
 
     @Test
     void testVersioning() {
-        def outcome1 = petriNetService.importProcess(netResource.inputStream, VersionType.MAJOR,
-                superCreator.loggedSuper.activeActorId)
+        def outcome1 = petriNetService.importProcess(new ImportProcessParams(netResource.inputStream, VersionType.MAJOR,
+                superCreator.loggedSuper.activeActorId))
         Process net1 = outcome1.getProcess()
         assert net1
 
-        def outcome2 = petriNetService.importProcess(netResource.inputStream, VersionType.MAJOR,
-                superCreator.loggedSuper.activeActorId)
+        def outcome2 = petriNetService.importProcess(new ImportProcessParams(netResource.inputStream, VersionType.MAJOR,
+                superCreator.loggedSuper.activeActorId))
         Process net2 = outcome2.getProcess()
         assert net2
 
-        def outcome3 = petriNetService.importProcess(netResource2.inputStream, VersionType.MAJOR,
-                superCreator.loggedSuper.activeActorId)
+        def outcome3 = petriNetService.importProcess(new ImportProcessParams(netResource2.inputStream, VersionType.MAJOR,
+                superCreator.loggedSuper.activeActorId))
         Process net3 = outcome3.getProcess()
         assert net3
 

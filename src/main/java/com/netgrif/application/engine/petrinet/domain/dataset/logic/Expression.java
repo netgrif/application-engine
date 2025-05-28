@@ -41,6 +41,7 @@ public class Expression<T> implements Serializable {
 
     @Override
     public Expression<T> clone() {
+        // todo: release/8.0.0 clone defaultValue
         if (defaultValue != null) {
             return Expression.ofStatic(defaultValue);
         }

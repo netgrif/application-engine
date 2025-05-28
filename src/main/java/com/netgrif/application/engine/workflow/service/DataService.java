@@ -347,10 +347,10 @@ public class DataService implements IDataService {
         for (LayoutItem item : container.getItems()) {
             if (item.getDataRefId() != null) {
                 if (!dataRefs.containsKey(item.getDataRefId())) {       // This should never happen
+                    // todo: release/8.0.0 throw an exception?
                     item.setDataRefId(null);
                     continue;
                 }
-                item.setDataRef(dataRefs.get(item.getDataRefId()));
 
                 Field<?> field = useCase.getDataSet().get(item.getDataRefId());
                 DataFieldBehavior behavior = field.getBehaviors().get(task.getTransitionId());
@@ -358,6 +358,8 @@ public class DataService implements IDataService {
                 if (behavior.isForbidden()) {
                     continue;
                 }
+                item.setDataRef(dataRefs.get(item.getDataRefId()));
+
                 outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, null, new HashMap<>()));
                 historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE, actorId));
 
@@ -686,7 +688,8 @@ public class DataService implements IDataService {
     }
 
     private boolean saveLocalFile(Case useCase, FileField field, MultipartFile multipartFile) {
-        if (useCase.getDataSet().get(field.getStringId()).getValue().getValue() != null) {
+        DataFieldValue<?> fieldValue = useCase.getDataSet().get(field.getStringId()).getValue();
+        if (fieldValue != null && fieldValue.getValue() != null) {
             new File(field.getFilePath(useCase.getStringId())).delete();
             useCase.getDataSet().get(field.getStringId()).getValue().setValue(null);
         }

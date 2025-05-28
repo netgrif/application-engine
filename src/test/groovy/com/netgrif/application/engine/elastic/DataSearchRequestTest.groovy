@@ -19,12 +19,14 @@ import com.netgrif.application.engine.petrinet.domain.dataset.I18nField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -109,8 +111,8 @@ class DataSearchRequestTest {
 
         repository.deleteAll()
 
-        def net = petriNetService.importProcess(new FileInputStream("src/test/resources/all_data.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        def net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/all_data.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
         assert net.getProcess() != null
 
         def actors = userService.findAll()
@@ -141,11 +143,12 @@ class DataSearchRequestTest {
 
         Task actionTrigger = taskService.searchOne(QTask.task.caseId.eq(_case.stringId) & QTask.task.transitionId.eq("t4"))
         assert actionTrigger != null
-        dataService.setData(actionTrigger, new DataSet([
+        dataService.setData(new SetDataParams(actionTrigger, new DataSet([
                 "testActionTrigger": new TextField(rawValue: "random value")
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().activeActorId)
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().activeActorId))
 
         10.times {
+//            todo: release/8.0.0 created case already contains modified values -> problem with field cloning
             _case = importHelper.createCase("wrong${it}", net.getProcess())
             workflowService.save(_case)
         }
@@ -236,7 +239,8 @@ class DataSearchRequestTest {
 
             log.info(String.format("Testing %s == %s", testCase.getKey(), testCase.getValue()))
 
-            Page<Case> result = searchService.search([request] as List, mockService.mockLoggedIdentity(), PageRequest.of(0, 100), null, false)
+            Page<Case> result = searchService.search([request] as List, superCreator.loggedSuper.activeActorId,
+                    PageRequest.of(0, 100), null, false)
             assert result
             assert result.size() == 1
         }

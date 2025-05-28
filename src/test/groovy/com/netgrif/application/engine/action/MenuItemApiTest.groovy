@@ -12,6 +12,9 @@ import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
+import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -203,26 +206,26 @@ class MenuItemApiTest extends EngineTest {
         String newIdentifier = "new_identifier"
 
         String duplicateTaskId = testFolder.getTaskStringId("duplicate_item")
-        taskService.assignTask(duplicateTaskId)
+        taskService.assignTask(new TaskParams(duplicateTaskId))
 
         assertThrows(IllegalArgumentException.class, () -> {
             testFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE.attributeId).rawValue = new I18nString("")
             testFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER.attributeId).rawValue = newIdentifier
             testFolder = workflowService.save(testFolder)
-            taskService.finishTask(duplicateTaskId)
+            taskService.finishTask(new TaskParams(duplicateTaskId))
         })
 
         assertThrows(IllegalArgumentException.class, () -> {
             testFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE.attributeId).rawValue = new I18nString(newTitle)
             testFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER.attributeId).rawValue = "new_menu_item"
             testFolder = workflowService.save(testFolder)
-            taskService.finishTask(duplicateTaskId)
+            taskService.finishTask(new TaskParams(duplicateTaskId))
         })
 
         testFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE.attributeId).rawValue = new I18nString(newTitle)
         testFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER.attributeId).rawValue = newIdentifier
         testFolder = workflowService.save(testFolder)
-        taskService.finishTask(duplicateTaskId)
+        taskService.finishTask(new TaskParams(duplicateTaskId))
 
         Thread.sleep(2000)
         List<Case> duplicatedAsList = findCasesElastic(String.format("processIdentifier:preference_item AND dataSet.%s.fulltextValue:%s",
@@ -248,7 +251,7 @@ class MenuItemApiTest extends EngineTest {
     List<Case> findCasesElastic(String query, Pageable pageable) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
-        List<Case> result = elasticCaseService.search([request], superCreator.loggedSuper, pageable, LocaleContextHolder.locale, false).content
+        List<Case> result = elasticCaseService.search([request], superCreator.loggedSuper.activeActorId, pageable, LocaleContextHolder.locale, false).content
         return result
     }
 
@@ -282,7 +285,7 @@ class MenuItemApiTest extends EngineTest {
         assert workflowService.findOne(testFolder.stringId) != null
         assert workflowService.findOne(leafItemId) != null
 
-        workflowService.deleteCase(testFolder)
+        workflowService.deleteCase(new DeleteCaseParams(testFolder))
         sleep(2000)
         netgrifFolder = workflowService.findOne(netgrifFolderId)
         assert !(netgrifFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId).rawValue as ArrayList).contains(testFolder.stringId)
@@ -307,7 +310,7 @@ class MenuItemApiTest extends EngineTest {
     }
 
     def setData(Case caze, DataSet dataSet) {
-        dataService.setData(caze.tasks["t1"].taskStringId, dataSet, superCreator.loggedSuper.activeActorId)
+        dataService.setData(new SetDataParams(caze.tasks["t1"].taskStringId, dataSet, superCreator.loggedSuper.activeActorId))
         return workflowService.findOne(caze.stringId)
     }
 }

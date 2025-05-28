@@ -1,0 +1,31 @@
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+	<id>delete_case_failure</id>
+	<version>1.0.0</version>
+	<title>Test</title>
+	<defaultRole>false</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<properties>
+		<property key="initials">TST</property>
+	</properties>
+	<processEvents/>
+	<caseEvents>
+		<event type="delete">
+			<id>x123</id>
+			<actions phase="pre">
+				<action id="action_2">
+					<![CDATA[
+					createCase("delete_case_failure", "CaseFromPre")
+					]]>
+				</action>
+			</actions>
+			<actions phase="post">
+				<action id="action_3">
+					<![CDATA[
+					createCase("delete_case_failure", "CaseFromPost")
+					throw new RuntimeException("error on purpose")
+					]]>
+				</action>
+			</actions>
+		</event>
+	</caseEvents>
+</process>

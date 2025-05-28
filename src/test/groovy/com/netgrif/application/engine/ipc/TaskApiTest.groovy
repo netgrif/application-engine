@@ -10,6 +10,7 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -75,8 +76,8 @@ class TaskApiTest {
     @Test
     @Disabled("GroovyRuntime Could not find matching constructor")
     void testTaskSearch() {
-        def netOptional = petriNetService.importProcess(stream(TASK_SEARCH_NET_FILE),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
+        def netOptional = petriNetService.importProcess(new ImportProcessParams(stream(TASK_SEARCH_NET_FILE),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
 
         assert netOptional.getProcess() != null
 
@@ -107,8 +108,8 @@ class TaskApiTest {
     @Test
     @Disabled()
     void testTaskEventActions() {
-        def netOptional = petriNetService.importProcess(stream(TASK_EVENTS_NET_FILE),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
+        def netOptional = petriNetService.importProcess(new ImportProcessParams(stream(TASK_EVENTS_NET_FILE),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
 
         assert netOptional.getProcess() != null
 
@@ -141,8 +142,8 @@ class TaskApiTest {
     @Test
     @Disabled("spusta 2 krat")
     void testTaskExecution() {
-        def limitsNetOptional = petriNetService.importProcess(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
-        def leasingNetOptional = petriNetService.importProcess(stream(LEASING_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
+        def limitsNetOptional = petriNetService.importProcess(new ImportProcessParams(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
+        def leasingNetOptional = petriNetService.importProcess(new ImportProcessParams(stream(LEASING_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
 
         assert limitsNetOptional.getProcess() != null
         assert leasingNetOptional.getProcess() != null
@@ -217,8 +218,8 @@ class TaskApiTest {
 
     @Test
     void testTaskBulkActions() {
-        def netOptional = petriNetService.importProcess(stream(TASK_BULK_NET_FILE),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
+        def netOptional = petriNetService.importProcess(new ImportProcessParams(stream(TASK_BULK_NET_FILE),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
 
         assert netOptional.getProcess() != null
         Process net = netOptional.getProcess()
@@ -243,8 +244,8 @@ class TaskApiTest {
 
     @Test
     void testGetData() {
-        def netOptional = petriNetService.importProcess(stream(TASK_GETTER_NET_FILE),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
+        def netOptional = petriNetService.importProcess(new ImportProcessParams(stream(TASK_GETTER_NET_FILE),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
 
         assert netOptional.getProcess() != null
         Process net = netOptional.getProcess()
@@ -273,8 +274,8 @@ class TaskApiTest {
 
     @Test
     void testSetData() {
-        def netOptional = petriNetService.importProcess(stream(TASK_SETTER_NET_FILE),
-                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
+        def netOptional = petriNetService.importProcess(new ImportProcessParams(stream(TASK_SETTER_NET_FILE),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
 
         assert netOptional.getProcess() != null
         Process net = netOptional.getProcess()

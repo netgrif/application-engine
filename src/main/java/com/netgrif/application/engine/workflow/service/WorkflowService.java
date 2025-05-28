@@ -214,6 +214,7 @@ public class WorkflowService implements IWorkflowService {
     private CreateCaseEventOutcome doCreateCase(CreateCaseParams createCaseParams) {
         Case useCase = createCaseObject(createCaseParams);
         CreateTasksOutcome createTasksOutcome = taskService.createAndSetTasksInCase(useCase);
+        dataSetInitializer.populateDataSet(useCase, createCaseParams.getParams());
 
         Process process = createCaseParams.getProcess();
         roleService.resolveCaseRolesOnCase(useCase, useCase.getProcess().getCaseRolePermissions(), false);
@@ -275,7 +276,6 @@ public class WorkflowService implements IWorkflowService {
      * */
     private Case createCaseObject(CreateCaseParams createCaseParams) {
         Case useCase = new Case(createCaseParams.getProcess());
-        dataSetInitializer.populateDataSet(useCase, createCaseParams.getParams());
         useCase.setAuthorId(createCaseParams.getAuthorId());
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(createCaseParams.getMakeTitle().apply(useCase));
@@ -291,15 +291,20 @@ public class WorkflowService implements IWorkflowService {
             createCaseParams.setIsTransactional(transactionProperties.isCreateCaseTransactional());
         }
         if (createCaseParams.getProcess() == null) {
-            Process petriNet;
+            Process process;
             if (createCaseParams.getProcessId() != null) {
-                petriNet = petriNetService.get(new ObjectId(createCaseParams.getProcessId())).clone();
+                process = petriNetService.get(new ObjectId(createCaseParams.getProcessId())).clone();
             } else if (createCaseParams.getProcessIdentifier() != null) {
-                petriNet = petriNetService.getNewestVersionByIdentifier(createCaseParams.getProcessIdentifier()).clone();
+                Process originalProcess = petriNetService.getNewestVersionByIdentifier(createCaseParams.getProcessIdentifier());
+                if (originalProcess == null) {
+                    throw new IllegalArgumentException(String.format("Could not find the Process [%s] for the Case creation.",
+                            createCaseParams.getProcessIdentifier()));
+                }
+                process = petriNetService.getNewestVersionByIdentifier(createCaseParams.getProcessIdentifier()).clone();
             } else {
-                throw new IllegalArgumentException("Could not find the PetriNet for the Case from provided inputs on case creation.");
+                throw new IllegalArgumentException("Could not find the Process for the Case from provided inputs on case creation.");
             }
-            createCaseParams.setProcess(petriNet);
+            createCaseParams.setProcess(process);
         }
         if (createCaseParams.getMakeTitle() == null && createCaseParams.getProcess() != null) {
             createCaseParams.setMakeTitle(resolveDefaultCaseTitle(createCaseParams));

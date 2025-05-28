@@ -3,6 +3,7 @@ package com.netgrif.application.engine.petrinet.domain
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 
@@ -66,7 +67,7 @@ class EventTest {
     private SystemUserRunner userRunner
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
     @Autowired
     private TestHelper testHelper
 
@@ -82,8 +83,8 @@ class EventTest {
         testHelper.truncateDbs()
         TestHelper.login(superCreator.superIdentity)
 
-        Process net = petriNetService.importProcess(stream(EVENT_NET_FILE), VersionType.MAJOR,
-                superCreator.getLoggedSuper().activeActorId).getProcess()
+        Process net = petriNetService.importProcess(new ImportProcessParams(stream(EVENT_NET_FILE), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId)).getProcess()
         instance = helper.createCase(EVENT_NET_CASE, net)
 
         outcome = helper.assignTaskToSuper(EVENT_NET_TASK, instance.stringId)

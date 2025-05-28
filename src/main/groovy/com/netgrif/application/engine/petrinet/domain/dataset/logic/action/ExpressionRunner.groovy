@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap
 import com.netgrif.application.engine.event.IGroovyShellFactory
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
@@ -29,6 +30,9 @@ abstract class ExpressionRunner {
     @Lazy
     @Autowired
     private IIdentityService identityService
+
+    @Autowired
+    private IUserService userService
 
     private Map<String, Closure> cache
 
@@ -71,6 +75,6 @@ abstract class ExpressionRunner {
         delegate.metaClass.field = field
         // TODO: release/8.0.0
         delegate.metaClass.loggedUser = identityService.loggedIdentity
-        delegate.metaClass.systemUser = identityService.loggedSystemIdentity
+        delegate.metaClass.systemUser = userService.systemUser
     }
 }

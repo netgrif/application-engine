@@ -91,7 +91,7 @@
                         <actions phase="pre">
                             <action id="action_0">
 								<![CDATA[
-                                change user_list_1 value { [userService.findByEmail(email.value, true).id] }
+                                change user_list_1 value { [userService.findByEmail(email.value).id] }
                                 ]]>
 							</action>
                         </actions>
