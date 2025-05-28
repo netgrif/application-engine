@@ -8,10 +8,11 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
+/**
+ * Abstract base class for user entities in the system.
+ * Extends AbstractActor to inherit authentication and authorization capabilities.
+ */
 @Data
 @Slf4j
 @NoArgsConstructor
@@ -19,21 +20,39 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractUser extends AbstractActor {
 
+    /** Username used for authentication and identification */
     @NotNull
     protected String username;
 
+    /** User's first/given name */
     @NotNull
     protected String firstName;
 
+    /** User's middle name (optional) */
     protected String middleName;
 
+    /** User's last/family name */
     @NotNull
     protected String lastName;
 
+    /** User's email address */
     protected String email;
 
+    /** URL or identifier of user's avatar image */
     protected String avatar;
-    
+
+    /**
+     * Constructs a new user with Object ID.
+     *
+     * @param id MongoDB ObjectId of the user
+     * @param realmId Security realm identifier
+     * @param username User's login name
+     * @param firstName User's first name
+     * @param middleName User's middle name
+     * @param lastName User's last name
+     * @param email User's email address
+     * @param avatar User's avatar URL/identifier
+     */
     public AbstractUser(ObjectId id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar) {
         super(id, realmId);
         this.username = username;
@@ -44,6 +63,18 @@ public abstract class AbstractUser extends AbstractActor {
         this.avatar = avatar;
     }
 
+    /**
+     * Constructs a new user with String ID.
+     *
+     * @param id String representation of MongoDB ObjectId
+     * @param realmId Security realm identifier
+     * @param username User's login name
+     * @param firstName User's first name
+     * @param middleName User's middle name
+     * @param lastName User's last name
+     * @param email User's email address
+     * @param avatar User's avatar URL/identifier
+     */
     public AbstractUser(String id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar) {
         super(id, realmId);
         this.username = username;
@@ -54,113 +85,104 @@ public abstract class AbstractUser extends AbstractActor {
         this.avatar = avatar;
     }
 
-
     /**
-     * Retrieves the password associated with the user, encoded via a password encoder.
-     *
-     * @return the encoded password as a String, or null if no password is set
+     * Gets the user's password.
+     * @return the user's password
      */
     public abstract String getPassword();
 
     /**
-     * Sets the password for the user. This method encodes the given password
-     * and stores it securely in the user's credentials.
-     *
-     * @param password the password to be encoded and saved as a string
+     * Sets the user's password.
+     * @param password new password to set
      */
     public abstract void setPassword(String password);
 
     /**
      * Sets a credential for the user.
-     *
-     * @param key        The unique identifier used to associate the credential.
-     *                   This is typically used to distinguish between multiple credentials.
-     * @param credential The credential object containing type, value, and other details 
-     *                   such as order and enabled status, to be associated with the key.
+     * @param key credential identifier
+     * @param credential credential value object
      */
     public void setCredential(String key, Credential<?> credential) {}
 
     /**
-     * Sets a credential with specified properties.
-     *
-     * @param type the type of the credential, such as "password" or "token"
-     * @param value the value of the credential
-     * @param order the priority order of the credential; lower values indicate higher priority
-     * @param enabled indicates if the credential is enabled or disabled
+     * Sets a credential with specified parameters.
+     * @param type credential type
+     * @param value credential value
+     * @param order credential priority order
+     * @param enabled whether credential is enabled
      */
     public void setCredential(String type, String value, int order, boolean enabled) {}
 
     /**
-     * Activates multi-factor authentication (MFA) for the specified type with the provided secret. 
-     *
-     * @param type the type of MFA to activate, e.g., "TOTP" or "SMS". It cannot be null or empty.
-     * @param secret the shared secret used for the MFA method. It cannot be null or empty.
+     * Activates Multi-Factor Authentication for the user.
+     * @param type MFA type identifier
+     * @param secret MFA secret key
      */
     public void activateMFA(String type, String secret) {}
 
     /**
-     * Activates Multi-Factor Authentication (MFA) for the specified type.
-     *
-     * @param type the type of MFA to be activated (e.g., "TOTP", "SMS").
-     * @param secret the secret key used for the MFA setup.
-     * @param enabled whether the MFA should be immediately enabled or not.
-     * @throws IllegalArgumentException if the type or secret is null or empty.
+     * Activates Multi-Factor Authentication with enabled state.
+     * @param type MFA type identifier
+     * @param secret MFA secret key
+     * @param enabled whether MFA should be enabled
      */
     public void activateMFA(String type, String secret, boolean enabled) {}
 
     /**
-     * Checks if a credential of the specified type is enabled.
-     *
-     * @param type the type of the credential to check
-     * @return true if the credential of the specified type is enabled, false otherwise
+     * Checks if a credential is enabled.
+     * @param type credential type to check
+     * @return true if credential is enabled, false otherwise
      */
     public boolean isCredentialEnabled(String type) {
         return false;
     }
 
     /**
-     * Retrieves a credential associated with the specified type.
-     *
-     * @param type the type of the credential to retrieve
-     * @return the credential of the given type, or null if not found
+     * Gets a credential by its type.
+     * @param type credential type
+     * @return credential object or null if not found
      */
     public Credential<?> getCredential(String type) {
         return null;
     }
 
     /**
-     * Disables the credential associated with the specified type. If a credential with the provided type exists,
-     * it will be marked as disabled.
-     *
-     * @param type the type of the credential to be disabled
+     * Disables a credential by its type.
+     * @param type credential type to disable
      */
     public void disableCredential(String type) {}
 
     /**
-     * Sets a property for a specific credential type.
-     *
-     * @param type the type of the credential to modify
-     * @param key the property key to set
-     * @param value the property value to assign; must be serializable
+     * Sets a property for a specific credential.
+     * @param type credential type
+     * @param key property key
+     * @param value property value
      */
     public void setCredentialProperty(String type, String key, Object value) {}
 
     /**
-     * Retrieves a credential property based on the specified type and key.
-     *
-     * @param type the type of credential to retrieve the property from
-     * @param key the key of the property to be retrieved
-     * @return the value of the property as an Object, or null if the credential or property does not exist
+     * Gets a property value from a credential.
+     * @param type credential type
+     * @param key property key
+     * @return property value or null if not found
      */
     public Object getCredentialProperty(String type, String key) {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     * Returns user's first and last name concatenated.
+     */
     @Override
     public String getName() {
         return String.join(" ", firstName, lastName).trim();
     }
 
+    /**
+     * {@inheritDoc}
+     * Returns user's full name including middle name if present.
+     */
     @Override
     public String getFullName() {
         return String.join(" ", firstName,
