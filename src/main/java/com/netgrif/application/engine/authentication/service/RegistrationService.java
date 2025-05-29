@@ -8,7 +8,6 @@ import com.netgrif.application.engine.authentication.service.interfaces.IRegistr
 import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest;
 import com.netgrif.application.engine.authentication.web.requestbodies.RegistrationRequest;
 import com.netgrif.application.engine.authorization.domain.User;
-import com.netgrif.application.engine.authorization.domain.Role;
 import com.netgrif.application.engine.authorization.domain.params.UserParams;
 import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
@@ -17,14 +16,16 @@ import com.netgrif.application.engine.event.events.authentication.IdentityRegist
 import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
-import com.netgrif.application.engine.startup.ApplicationRoleRunner;
+import com.netgrif.application.engine.transaction.NaeTransaction;
+import groovy.lang.Closure;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -38,7 +39,7 @@ public class RegistrationService implements IRegistrationService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final IRoleService roleService;
     private final IUserService userService;
-    private final ApplicationRoleRunner applicationRoleRunner;
+    private final MongoTransactionManager transactionManager;
     private final ServerAuthProperties serverAuthProperties;
     private final IIdentityService identityService;
     private final ApplicationEventPublisher publisher;
@@ -46,13 +47,13 @@ public class RegistrationService implements IRegistrationService {
     private static final String TOKEN_DELIMITER = ":";
 
     public RegistrationService(BCryptPasswordEncoder bCryptPasswordEncoder, IRoleService roleService,
-                               @Lazy IUserService userService, ApplicationRoleRunner applicationRoleRunner,
+                               @Lazy IUserService userService, MongoTransactionManager transactionManager,
                                ServerAuthProperties serverAuthProperties, IIdentityService identityService,
                                ApplicationEventPublisher publisher) {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.roleService = roleService;
         this.userService = userService;
-        this.applicationRoleRunner = applicationRoleRunner;
+        this.transactionManager = transactionManager;
         this.serverAuthProperties = serverAuthProperties;
         this.identityService = identityService;
         this.publisher = publisher;
@@ -62,7 +63,6 @@ public class RegistrationService implements IRegistrationService {
      * todo javadoc
      * */
     @Override
-    @Transactional
     public Identity createNewIdentity(NewIdentityRequest request) {
         IdentityParams identityParams = IdentityParams.with()
                 .username(new TextField(request.email))
@@ -81,27 +81,43 @@ public class RegistrationService implements IRegistrationService {
             identity = identityService.update(identityOpt.get(), identityParams);
         } else {
             log.info("Creating new identity [{}]", request.email);
-            identity = identityService.createWithDefaultUser(identityParams);
-
-            if (request.roles != null && !request.roles.isEmpty()) {
-                roleService.assignRolesToActor(identity.getMainActorId(), request.roles);
+            if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+                NaeTransaction transaction = NaeTransaction.builder()
+                        .transactionManager(transactionManager)
+                        .event(new Closure<>(null) {
+                            @Override
+                            public Identity call() {
+                                return doCreateNewIdentity(identityParams, request);
+                            }
+                        })
+                        .build();
+                transaction.begin();
+                identity = (Identity) transaction.getResultOfEvent();
+            } else {
+                identity = doCreateNewIdentity(identityParams, request);
             }
-            Role defaultAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.DEFAULT_APP_ROLE);
-            Role defaultProcessRole = roleService.findDefaultRole();
-            roleService.assignRolesToActor(identity.getMainActorId(), Set.of(defaultAppRole.getStringId(),
-                    defaultProcessRole.getStringId()));
-
-            if (request.groups != null && !request.groups.isEmpty()) {
-                Optional<User> userOpt = userService.findById(identity.getMainActorId());
-                if (userOpt.isEmpty()) {
-                    throw new IllegalStateException(String.format("Cannot find user with id [%s], that was just created.",
-                            identity.getMainActorId()));
-                }
-                userService.addGroups(userOpt.get(), request.groups);
-            }
-
-            publisher.publishEvent(new IdentityRegistrationEvent(identity));
         }
+
+        return identity;
+    }
+
+    private Identity doCreateNewIdentity(IdentityParams identityParams, NewIdentityRequest request) {
+        Identity identity = identityService.createWithDefaultUser(identityParams);
+
+        if (request.roles != null && !request.roles.isEmpty()) {
+            roleService.assignRolesToActor(identity.getMainActorId(), request.roles);
+        }
+
+        if (request.groups != null && !request.groups.isEmpty()) {
+            Optional<User> userOpt = userService.findById(identity.getMainActorId());
+            if (userOpt.isEmpty()) {
+                throw new IllegalStateException(String.format("Cannot find user with id [%s], that was just created.",
+                        identity.getMainActorId()));
+            }
+            userService.addGroups(userOpt.get(), request.groups);
+        }
+
+        publisher.publishEvent(new IdentityRegistrationEvent(identity));
 
         return identity;
     }
@@ -110,10 +126,9 @@ public class RegistrationService implements IRegistrationService {
      * todo javadoc
      * */
     @Override
-    @Transactional
     public Identity registerIdentity(RegistrationRequest registrationRequest) throws InvalidIdentityTokenException {
         String email = decodeToken(registrationRequest.token)[0];
-        log.info("Registering user {}", email);
+        log.info("Registering identity [{}]", email);
 
         Optional<Identity> identityOpt = identityService.findByUsername(email);
         if (identityOpt.isEmpty()) {
@@ -121,6 +136,28 @@ public class RegistrationService implements IRegistrationService {
         }
 
         Identity identity = identityOpt.get();
+
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            Identity finalIdentity = identity;
+            NaeTransaction transaction = NaeTransaction.builder()
+                    .transactionManager(transactionManager)
+                    .event(new Closure<>(null) {
+                        @Override
+                        public Identity call() {
+                            return doRegisterIdentity(finalIdentity, registrationRequest);
+                        }
+                    })
+                    .build();
+            transaction.begin();
+            identity = (Identity) transaction.getResultOfEvent();
+        } else {
+            identity = doRegisterIdentity(identity, registrationRequest);
+        }
+
+        return identity;
+    }
+
+    private Identity doRegisterIdentity(Identity identity, RegistrationRequest registrationRequest) {
         IdentityParams identityParams = IdentityParams.with()
                 .password(new TextField(registrationRequest.password))
                 .firstname(new TextField(registrationRequest.firstname))
@@ -129,6 +166,7 @@ public class RegistrationService implements IRegistrationService {
                 .expirationDateTime(new DateTimeField(null))
                 .state(new EnumerationMapField(IdentityState.ACTIVE.name()))
                 .build();
+
         identity = identityService.encodePasswordAndUpdate(identity, identityParams);
 
         Optional<User> userOpt = userService.findById(identity.getMainActorId());
@@ -210,7 +248,6 @@ public class RegistrationService implements IRegistrationService {
      * todo javadoc
      * */
     @Override
-    @Transactional
     @Scheduled(cron = "0 0 1 * * *")
     public void removeExpiredIdentities() {
         log.info("Removing expired unactivated identities");
@@ -223,7 +260,6 @@ public class RegistrationService implements IRegistrationService {
      * todo javadoc
      * */
     @Override
-    @Transactional
     @Scheduled(cron = "0 0 1 * * *")
     public void resetExpiredToken() {
         log.info("Resetting expired identity tokens");
@@ -233,15 +269,32 @@ public class RegistrationService implements IRegistrationService {
             log.info("There are none expired tokens. Everything is awesome.");
             return;
         }
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            NaeTransaction transaction = NaeTransaction.builder()
+                    .transactionManager(transactionManager)
+                    .event(new Closure<>(null) {
+                        @Override
+                        public List<Identity> call() {
+                            return doResetExpiredToken(identities);
+                        }
+                    })
+                    .build();
+            transaction.begin();
+        } else {
+            doResetExpiredToken(identities);
+        }
 
+        log.info("Reset {} expired identity tokens", identities.size());
+    }
+
+    private List<Identity> doResetExpiredToken(List<Identity> identities) {
         identities.forEach(identity -> {
             identityService.update(identity, IdentityParams.with()
                     .registrationToken(new TextField(null))
                     .expirationDateTime(new DateTimeField(null))
                     .build());
         });
-
-        log.info("Reset {} expired identity tokens", identities.size());
+        return identities;
     }
 
     /**

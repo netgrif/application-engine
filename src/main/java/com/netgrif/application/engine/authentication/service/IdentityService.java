@@ -14,17 +14,20 @@ import com.netgrif.application.engine.manager.service.interfaces.ISessionManager
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.security.service.SecurityContextService;
+import com.netgrif.application.engine.transaction.NaeTransaction;
 import com.netgrif.application.engine.workflow.domain.CaseParams;
 import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams;
 import com.netgrif.application.engine.workflow.service.CrudSystemCaseService;
 import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import groovy.lang.Closure;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -43,8 +46,10 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
     public IdentityService(BCryptPasswordEncoder passwordEncoder, SecurityContextService securityContextService,
                            @Lazy IDataService dataService, @Lazy IWorkflowService workflowService,
                            @Lazy IElasticCaseSearchService elasticCaseSearchService, @Lazy IUserService userService,
-                           SystemCaseFactoryRegistry systemCaseFactoryRegistry, @Lazy ISessionManagerService sessionManagerService) {
-        super(sessionManagerService, dataService, workflowService, systemCaseFactoryRegistry, elasticCaseSearchService);
+                           SystemCaseFactoryRegistry systemCaseFactoryRegistry, @Lazy ISessionManagerService sessionManagerService,
+                           MongoTransactionManager mongoTransactionManager) {
+        super(sessionManagerService, dataService, workflowService, systemCaseFactoryRegistry, elasticCaseSearchService,
+                mongoTransactionManager);
         this.passwordEncoder = passwordEncoder;
         this.securityContextService = securityContextService;
         this.userService = userService;
@@ -155,15 +160,29 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
      * @return Created identity with the User (as {@link Identity#getMainActorId()}). Cannot be null.
      * */
     @Override
-    @Transactional
     public Identity createWithDefaultUser(IdentityParams identityParams) {
         validateAndFixCreateParams(identityParams);
 
         UserParams userParams = UserParams.fromIdentityParams(identityParams);
-        User defaultUser = userService.create(userParams);
-
-        identityParams.setMainActor(CaseField.withValue(List.of(defaultUser.getStringId())));
-        return encodePasswordAndCreate(identityParams);
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            NaeTransaction transaction = NaeTransaction.builder()
+                    .transactionManager(transactionManager)
+                    .event(new Closure<Identity>(null) {
+                        @Override
+                        public Identity call() {
+                            User defaultUser = userService.create(userParams);
+                            identityParams.setMainActor(CaseField.withValue(List.of(defaultUser.getStringId())));
+                            return encodePasswordAndCreate(identityParams);
+                        }
+                    })
+                    .build();
+            transaction.begin();
+            return (Identity) transaction.getResultOfEvent();
+        } else {
+            User defaultUser = userService.create(userParams);
+            identityParams.setMainActor(CaseField.withValue(List.of(defaultUser.getStringId())));
+            return encodePasswordAndCreate(identityParams);
+        }
     }
 
     /**
@@ -174,7 +193,6 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
      * @throws IllegalArgumentException if parameters validation fails
      * */
     @Override
-    @Transactional
     public Identity encodePasswordAndCreate(IdentityParams params) {
         encodePassword(params);
         return create(params);
@@ -189,7 +207,6 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
      * @throws IllegalArgumentException if identity or parameters validation fails
      * */
     @Override
-    @Transactional
     public Identity encodePasswordAndUpdate(Identity identity, IdentityParams params) {
         encodePassword(params);
         return update(identity, params);
@@ -204,7 +221,6 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
      * @throws IllegalArgumentException if identity or actorId is null
      * */
     @Override
-    @Transactional
     public Identity addAdditionalActor(Identity identity, String actorId) {
         if (identity == null) {
             throw new IllegalArgumentException("Provided identity is null");
@@ -225,7 +241,6 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
      * @throws IllegalArgumentException if identity is null or actorIds is null or empty
      * */
     @Override
-    @Transactional
     public Identity addAdditionalActors(Identity identity, Set<String> actorIds) {
         if (identity == null) {
             throw new IllegalArgumentException("Provided identity is null");
@@ -256,15 +271,31 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
      * @throws IllegalArgumentException if state or dateTime is null
      * */
     @Override
-    @Transactional
     public List<Identity> removeAllByStateAndExpirationDateBefore(IdentityState state, LocalDateTime dateTime) {
         if (state == null || dateTime == null) {
             throw new IllegalArgumentException("Identity state or expiration date is null");
         }
 
         List<Identity> identities = findAllByStateAndExpirationDateBefore(state, dateTime);
-        for (Identity identity : identities) {
-            workflowService.deleteCase(new DeleteCaseParams(identity.getCase()));
+
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            NaeTransaction transaction = NaeTransaction.builder()
+                    .transactionManager(transactionManager)
+                    .event(new Closure<>(null) {
+                        @Override
+                        public List<Identity> call() {
+                            for (Identity identity : identities) {
+                                workflowService.deleteCase(new DeleteCaseParams(identity.getCase()));
+                            }
+                            return identities;
+                        }
+                    })
+                    .build();
+            transaction.begin();
+        } else {
+            for (Identity identity : identities) {
+                workflowService.deleteCase(new DeleteCaseParams(identity.getCase()));
+            }
         }
 
         return identities;

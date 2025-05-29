@@ -5,6 +5,7 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import com.netgrif.application.engine.transaction.NaeTransaction;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.CaseParams;
 import com.netgrif.application.engine.workflow.domain.QCase;
@@ -15,12 +16,14 @@ import com.netgrif.application.engine.workflow.service.interfaces.ICrudSystemCas
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.service.throwable.CaseAlreadyExistsException;
+import groovy.lang.Closure;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.mongodb.MongoTransactionManager;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -35,6 +38,7 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
     protected final IWorkflowService workflowService;
     protected final SystemCaseFactoryRegistry systemCaseFactory;
     protected final IElasticCaseSearchService elasticCaseSearchService;
+    protected final MongoTransactionManager transactionManager;
     /**
      * todo javadoc
      * */
@@ -42,12 +46,13 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
 
     protected CrudSystemCaseService(ISessionManagerService sessionManagerService, IDataService dataService,
                                     IWorkflowService workflowService, SystemCaseFactoryRegistry systemCaseFactory,
-                                    IElasticCaseSearchService elasticCaseSearchService) {
+                                    IElasticCaseSearchService elasticCaseSearchService, MongoTransactionManager transactionManager) {
         this.sessionManagerService = sessionManagerService;
         this.dataService = dataService;
         this.workflowService = workflowService;
         this.systemCaseFactory = systemCaseFactory;
         this.elasticCaseSearchService = elasticCaseSearchService;
+        this.transactionManager = transactionManager;
         this.forbiddenKeywords = ConcurrentHashMap.newKeySet();
     }
 
@@ -148,7 +153,7 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
      * @throws IllegalArgumentException if the input parameters are invalid
      * */
     @Override
-    @Transactional
+    @SuppressWarnings("unchecked")
     public T create(CaseParams params) throws IllegalArgumentException, IllegalStateException, CaseAlreadyExistsException {
         if (params == null) {
             throw new IllegalArgumentException("Please provide input parameters.");
@@ -165,10 +170,25 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
         }
 
         final String activeActorId = sessionManagerService.getActiveActorId();
-        T systemObject = doCreate(params, activeActorId);
+
+        T systemObject;
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            NaeTransaction transaction = NaeTransaction.builder()
+                    .transactionManager(transactionManager)
+                    .event(new Closure<T>(null) {
+                        @Override
+                        public T call() {
+                            return doCreate(params, activeActorId);
+                        }
+                    })
+                    .build();
+            transaction.begin();
+            systemObject = (T) transaction.getResultOfEvent();
+        } else {
+            systemObject = doCreate(params, activeActorId);
+        }
 
         postCreationActions(systemObject);
-
         return systemObject;
     }
 
@@ -197,7 +217,7 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
     }
 
     @Override
-    @Transactional
+    @SuppressWarnings("unchecked")
     public T update(T systemObject, CaseParams params) throws IllegalArgumentException, IllegalStateException {
         if (systemObject == null) {
             throw new IllegalArgumentException("Please provide case to be updated");
@@ -212,7 +232,23 @@ public abstract class CrudSystemCaseService<T extends SystemCase> implements ICr
         validateAndFixUpdateParams(params);
 
         final String activeActorId = sessionManagerService.getActiveActorId();
-        systemObject = doUpdate(systemObject, params, activeActorId);
+
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            T finalSystemObject = systemObject;
+            NaeTransaction transaction = NaeTransaction.builder()
+                    .transactionManager(transactionManager)
+                    .event(new Closure<T>(null) {
+                        @Override
+                        public T call() {
+                            return doUpdate(finalSystemObject, params, activeActorId);
+                        }
+                    })
+                    .build();
+            transaction.begin();
+            systemObject = (T) transaction.getResultOfEvent();
+        } else {
+            systemObject = doUpdate(systemObject, params, activeActorId);
+        }
 
         postUpdateActions(systemObject);
 

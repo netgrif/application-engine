@@ -11,6 +11,7 @@ import com.netgrif.application.engine.workflow.service.SystemCaseFactoryRegistry
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -21,12 +22,11 @@ public abstract class ActorService<T extends Actor> extends CrudSystemCaseServic
 
     public ActorService(ISessionManagerService sessionManagerService, IDataService dataService,
                         IWorkflowService workflowService, SystemCaseFactoryRegistry systemCaseFactory,
-                        IElasticCaseSearchService elasticCaseSearchService) {
-        super(sessionManagerService, dataService, workflowService, systemCaseFactory, elasticCaseSearchService);
+                        IElasticCaseSearchService elasticCaseSearchService, MongoTransactionManager mongoTransactionManager) {
+        super(sessionManagerService, dataService, workflowService, systemCaseFactory, elasticCaseSearchService, mongoTransactionManager);
     }
 
     @Override
-    @Transactional
     public T addGroup(T actor, String groupId) {
         if (groupId == null) {
             throw new IllegalArgumentException("Group is not provided");
@@ -35,7 +35,6 @@ public abstract class ActorService<T extends Actor> extends CrudSystemCaseServic
     }
 
     @Override
-    @Transactional
     public T addGroups(T actor, Set<String> groupIdsToAdd) {
         if (actor == null) {
             throw new IllegalArgumentException("Provided actor is null");
@@ -62,7 +61,6 @@ public abstract class ActorService<T extends Actor> extends CrudSystemCaseServic
     }
 
     @Override
-    @Transactional
     public T removeGroup(T actor, String groupId) {
         if (groupId == null) {
             throw new IllegalArgumentException("Group is not provided");
@@ -71,7 +69,6 @@ public abstract class ActorService<T extends Actor> extends CrudSystemCaseServic
     }
 
     @Override
-    @Transactional
     public T removeGroups(T actor, Set<String> groupIdsToRemove) {
         if (actor == null) {
             throw new IllegalArgumentException("Provided actor is null");

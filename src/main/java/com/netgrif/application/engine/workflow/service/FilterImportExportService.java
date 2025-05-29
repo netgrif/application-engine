@@ -25,7 +25,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
@@ -294,7 +293,6 @@ public class FilterImportExportService implements IFilterImportExportService {
 //        filterCase.getDataSet().get(allowedNetsMissing ? FIELD_FILTER : FIELD_MISSING_ALLOWED_NETS).makeHidden(IMPORT_FILTER_TRANSITION);
     }
 
-    @Transactional
     protected FilterImportExportList loadFromXML() throws IOException, IllegalFilterFileException {
         Case exportCase = workflowService.searchOne(
                 QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER)
@@ -314,7 +312,6 @@ public class FilterImportExportService implements IFilterImportExportService {
         return xmlMapper.readValue(importedFilter, FilterImportExportList.class);
     }
 
-    @Transactional
     protected FileFieldValue createXML(FilterImportExportList filters) throws IOException {
         String filePath = fileStorageConfiguration.getStoragePath() + "/filterExport/" + sessionManagerService.getActiveActorId() + "/" + filterProperties.getFileName();
         File f = new File(filePath);

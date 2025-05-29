@@ -16,6 +16,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,8 +33,8 @@ public class GroupService extends ActorService<Group> implements IGroupService {
     public GroupService(ISessionManagerService sessionManagerService, IDataService dataService,
                         IWorkflowService workflowService, SystemCaseFactoryRegistry systemCaseFactory,
                         IElasticCaseSearchService elasticCaseSearchService, @Lazy DefaultGroupRunner defaultGroupRunner,
-                        IRoleService roleService) {
-        super(sessionManagerService, dataService, workflowService, systemCaseFactory, elasticCaseSearchService);
+                        IRoleService roleService, MongoTransactionManager mongoTransactionManager) {
+        super(sessionManagerService, dataService, workflowService, systemCaseFactory, elasticCaseSearchService, mongoTransactionManager);
         this.defaultGroupRunner = defaultGroupRunner;
         this.roleService = roleService;
     }

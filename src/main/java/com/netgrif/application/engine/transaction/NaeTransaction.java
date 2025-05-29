@@ -68,7 +68,7 @@ public class NaeTransaction {
      * Does additional setups for transaction by {@link TransactionTemplate} and executes provided {@link NaeTransaction#event}.
      * <br>
      * If the execution is successful callback {@link NaeTransaction#onCommit} is called. Otherwise {@link NaeTransaction#onRollBack}
-     * is called. If any of the callback fails, exception isn't thrown, but saved in {@link NaeTransaction#onCallBackException}
+     * is called. If any of the callback fails, the exception is thrown and saved in {@link NaeTransaction#onEventException}
      * */
     public void begin() {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);

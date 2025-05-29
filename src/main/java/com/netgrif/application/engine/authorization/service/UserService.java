@@ -15,6 +15,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -28,8 +29,10 @@ public class UserService extends ActorService<User> implements IUserService {
 
     public UserService(@Lazy IDataService dataService, ISessionManagerService sessionManagerService,
                        @Lazy IElasticCaseSearchService elasticCaseSearchService, @Lazy IWorkflowService workflowService,
-                       SystemCaseFactoryRegistry systemCaseFactoryRegistry, IGroupService groupService, SystemUserRunner systemUserRunner) {
-        super(sessionManagerService, dataService, workflowService, systemCaseFactoryRegistry, elasticCaseSearchService);
+                       SystemCaseFactoryRegistry systemCaseFactoryRegistry, IGroupService groupService,
+                       SystemUserRunner systemUserRunner, MongoTransactionManager mongoTransactionManager) {
+        super(sessionManagerService, dataService, workflowService, systemCaseFactoryRegistry, elasticCaseSearchService,
+                mongoTransactionManager);
         this.groupService = groupService;
         this.systemUserRunner = systemUserRunner;
     }
