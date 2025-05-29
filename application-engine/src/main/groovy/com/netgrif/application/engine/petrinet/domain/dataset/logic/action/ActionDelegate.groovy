@@ -31,7 +31,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.*
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.FieldBehavior
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
@@ -192,7 +191,7 @@ class ActionDelegate {
 
     FrontendActionOutcome Frontend
 
-    ModuleHolder Module
+    ModuleHolder NaeModule
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -215,7 +214,7 @@ class ActionDelegate {
         this.initTransitionsMap(action.transitionIds)
         this.outcomes = new ArrayList<>()
         this.Frontend = new FrontendActionOutcome(this.useCase, this.task, this.outcomes)
-        this.Module = new ModuleHolder()
+        this.NaeModule = new ModuleHolder()
     }
 
     def initFieldsMap(Map<String, String> fieldIds) {
