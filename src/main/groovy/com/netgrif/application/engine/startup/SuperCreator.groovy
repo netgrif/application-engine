@@ -1,96 +1,81 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.auth.domain.*
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.authentication.domain.Identity
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
+import com.netgrif.application.engine.authorization.domain.Role
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 
 @Slf4j
-@ConditionalOnProperty(value = "admin.create-super", matchIfMissing = true)
 @Component
 @CompileStatic
+@ConditionalOnProperty(value = "admin.create-super", matchIfMissing = true)
 class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     @Autowired
-    private IAuthorityService authorityService
+    private ApplicationRoleRunner applicationRoleRunner
 
+    @Autowired
+    private IIdentityService identityService
+
+    @Lazy
     @Autowired
     private IUserService userService
 
     @Autowired
-    private INextGroupService groupService
-
-    @Autowired
-    private IProcessRoleService processRoleService
+    private IRoleService roleService
 
     @Autowired
     private SuperAdminConfiguration configuration
 
-    private IUser superUser
+    private Identity superIdentity
 
     @Override
     void run(String... strings) {
-        log.info("Creating Super user")
+        log.info("Creating Super identity")
         createSuperUser()
     }
 
     private void createSuperUser() {
-        Authority adminAuthority = authorityService.getOrCreate(Authority.admin)
-        Authority systemAuthority = authorityService.getOrCreate(Authority.systemAdmin)
-
-        IUser superUser = userService.findByEmail(configuration.email)
-        if (superUser != null) {
-            log.info("Super user detected")
-            this.superUser = superUser
+        Optional<Identity> superIdentityOpt = identityService.findByUsername(configuration.email)
+        if (superIdentityOpt.isPresent()) {
+            log.info("Super identity detected")
+            this.superIdentity = superIdentityOpt.get()
             return
         }
-        this.superUser = userService.saveNew(new User(
-                name: configuration.name,
-                surname: configuration.surname,
-                email: configuration.email,
-                password: configuration.password,
-                state: UserState.ACTIVE,
-                authorities: [adminAuthority, systemAuthority] as Set<Authority>,
-                processRoles: processRoleService.findAll() as Set<ProcessRole>))
-        log.info("Super user created")
+        this.superIdentity = identityService.createWithDefaultUser(IdentityParams.with()
+                .username(new TextField(configuration.email))
+                .firstname(new TextField(configuration.name))
+                .lastname(new TextField(configuration.surname))
+                .password(new TextField(configuration.password))
+                .build())
+
+        identityService.registerForbiddenKeywords(Set.of(configuration.email))
+        userService.registerForbiddenKeywords(Set.of(configuration.email))
+
+        Role adminAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE)
+        Role systemAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.SYSTEM_ADMIN_APP_ROLE)
+        roleService.assignRolesToActor(this.superIdentity.toSession().activeActorId,
+                [adminAppRole.stringId, systemAppRole.stringId] as Set)
+
+        log.info("Super identity created with actor")
     }
 
-    void setAllToSuperUser() {
-        setAllGroups()
-        setAllProcessRoles()
-        setAllAuthorities()
-        log.info("Super user updated")
+    Identity getSuperIdentity() {
+        return this.superIdentity
     }
 
-    void setAllGroups() {
-        groupService.findAllGroups().each {
-            groupService.addUser(superUser, it)
-        }
-    }
-
-    void setAllProcessRoles() {
-        superUser.setProcessRoles(processRoleService.findAll() as Set<ProcessRole>)
-        superUser = userService.save(superUser) as IUser
-    }
-
-    void setAllAuthorities() {
-        superUser.setAuthorities(authorityService.findAll() as Set<Authority>)
-        superUser = userService.save(superUser) as IUser
-    }
-
-    IUser getSuperUser() {
-        return superUser
-    }
-
-    LoggedUser getLoggedSuper() {
-        return superUser.transformToLoggedUser()
+    LoggedIdentity getLoggedSuper() {
+        return superIdentity.toSession()
     }
 }

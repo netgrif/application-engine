@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * User application preferences. Contains:
+ * Identity application preferences. Contains:
  * <ul>
  *     <li>locale</li>
  *     <li>task filters for each task view</li>
@@ -26,7 +26,7 @@ import java.util.Map;
 public class Preferences implements Serializable {
 
     @Id
-    private String userId;
+    private String identityId;
 
     private String locale;
 
@@ -50,8 +50,8 @@ public class Preferences implements Serializable {
     @Field
     private Map<String, List<String>> headers = new HashMap<>();
 
-    public Preferences(String userId) {
-        this.userId = userId;
+    public Preferences(String identityId) {
+        this.identityId = identityId;
         this.drawerWidth = 200;
     }
 }

@@ -1,0 +1,147 @@
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
+	<id>group</id>
+	<version>1.0.0</version>
+	<title>Group</title>
+	<icon>groups</icon>
+	<defaultRole>false</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<caseName>Group</caseName>
+	<roleRef>
+		<id>admin</id>
+		<permission>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</permission>
+	</roleRef>
+	<caseEvents>
+		<event type="delete">
+			<id>group_removal</id>
+			<actions phase="pre">
+				<action id="action_1">
+				def actors = allActorService.findAll()
+				actors.each { actor ->
+					if (actor.stringId == useCase.stringId) {
+						return
+					}
+					actor = userService.removeGroup(actor, useCase.stringId)
+					if (actor.case.processIdentifier != com.netgrif.application.engine.authorization.domain.constants.GroupConstants.PROCESS_IDENTIFIER) {
+						return
+					}
+					def typedActor = (com.netgrif.application.engine.authorization.domain.Group) actor
+					if (typedActor.parentGroupId != useCase.stringId) {
+						return
+					}
+					groupService.update(actor, com.netgrif.application.engine.authorization.domain.params.GroupParams.with()
+							.parentGroupId(com.netgrif.application.engine.petrinet.domain.dataset.CaseField.withValue([]))
+							.build())
+				}
+				</action>
+			</actions>
+		</event>
+	</caseEvents>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
+	<data type="text" immediate="true">
+		<id>name</id>
+		<title>Email</title>
+	</data>
+	<data type="caseRef">
+		<id>groupIds</id>
+		<title>Groups</title>
+		<event type="set">
+			<id>groupIds_set</id>
+			<actions phase="post">
+				<action type="value">
+					if (groupIds.value == null) {
+						return
+					}
+					if (groupIds.rawValue.contains(useCase.stringId)) {
+						throw new IllegalArgumentException("Cannot add self as member of the group.")
+					}
+				</action>
+			</actions>
+		</event>
+		<allowedNets>
+			<allowedNet>group</allowedNet>
+		</allowedNets>
+	</data>
+	<data type="caseRef">
+		<id>parentGroupId</id>
+		<title>Parent group id</title>
+		<event type="set">
+			<id>parentGroupId_set</id>
+			<actions phase="post">
+				<action type="value">
+					if (parentGroupId.value == null) {
+						return
+					}
+					if (parentGroupId.rawValue.size() &gt; 1) {
+						throw new IllegalArgumentException("Cannot have multiple references to parent group")
+					}
+					if (parentGroupId.rawValue[0] == useCase.stringId) {
+						throw new IllegalArgumentException("Cannot use self reference as parent group")
+					}
+				</action>
+			</actions>
+		</event>
+		<allowedNets>
+			<allowedNet>group</allowedNet>
+		</allowedNets>
+	</data>
+<!--	todo preklady-->
+	<transition>
+		<id>t1</id>
+		<x>368</x>
+		<y>208</y>
+		<title>Data</title>
+		<roleRef>
+			<id>admin</id>
+			<permission>
+				<perform>true</perform>
+			</permission>
+		</roleRef>
+		<flex>
+			<id>t1_flex</id>
+			<item>
+				<dataRef>
+					<id>name</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+			</item>
+			<item>
+				<dataRef>
+					<id>parentGroupId</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+			</item>
+			<item>
+				<dataRef>
+					<id>groupIds</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+			</item>
+		</flex>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>368</x>
+		<y>304</y>
+		<tokens>1</tokens>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>read</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</process>

@@ -3,7 +3,7 @@ package com.netgrif.application.engine.elastic.service;
 import com.netgrif.application.engine.elastic.domain.ElasticJob;
 import com.netgrif.application.engine.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.domain.ElasticTaskJob;
-import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository;
+import com.netgrif.application.engine.elastic.domain.repoitories.ElasticTaskRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.InvalidDataAccessApiUsageException;

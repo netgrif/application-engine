@@ -1,11 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>test</id>
-    <initials>TST</initials>
+    <version>1.0.0</version>
     <title>Test</title>
     <defaultRole>true</defaultRole>
-
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
+    <processEvents/>
+    <caseEvents/>
     <data type="caseRef" immediate="true">
         <id>caseref</id>
         <title>Caseref</title>
@@ -14,45 +17,66 @@
         </allowedNets>
     </data>
     <data type="boolean">
-        <id>setVal</id>
-        <title>Switch</title>
-        <action trigger="set">
-            <!-- @formatter:off -->
-            caseref: f.caseref;
-            change caseref allowedNets { return ["hello", "world"]}
-            <!-- @formatter:on -->
-        </action>
-    </data>
-    <data type="boolean">
         <id>setNull</id>
         <title>Switch</title>
-        <action trigger="set">
-            <!-- @formatter:off -->
-            caseref: f.caseref;
-            change caseref allowedNets { return null}
-            <!-- @formatter:on -->
-        </action>
+        <event type="set">
+            <id>setNull_set</id>
+            <actions phase="post">
+                <action id="action_1">
+					<![CDATA[
+                    change caseref allowedNets { return null}
+                    ]]>
+				</action>
+            </actions>
+        </event>
     </data>
-
+    <data type="boolean">
+        <id>setVal</id>
+        <title>Switch</title>
+        <event type="set">
+            <id>setVal_set</id>
+            <actions phase="post">
+                <action id="action_0">
+					<![CDATA[
+                    change caseref allowedNets { return ["hello", "world"]}
+                    ]]>
+				</action>
+            </actions>
+        </event>
+    </data>
     <transition>
-        <id>1</id>
+        <id>t1</id>
         <x>1</x>
         <y>1</y>
-        <label>Tran</label>
-        <dataGroup>
-            <id>1</id>
-            <dataRef>
-                <id>setVal</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>setNull</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
+        <title>Tran</title>
+        <flex>
+            <id>t1_flex</id>
+            <item>
+                <dataRef>
+                    <id>setVal</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>setNull</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
-</document>
+</process>

@@ -1,10 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>create_case_net</id>
-    <initials>TST</initials>
+    <version>1.0.0</version>
     <title>Test</title>
     <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
+    <processEvents/>
+    <caseEvents/>
     <data type="number">
         <id>field</id>
         <title>Field</title>
@@ -19,14 +24,16 @@
         <id>task</id>
         <x>0</x>
         <y>0</y>
-        <label>Task</label>
+        <title>Task</title>
         <event type="finish">
-            <id>1</id>
+            <id>t1</id>
             <actions phase="post">
-                <action>
+                <action id="action_0">
+					<![CDATA[
                     createCase("create_case_net","Create Case Case");
-                </action>
+                    ]]>
+				</action>
             </actions>
         </event>
     </transition>
-</document>
+</process>

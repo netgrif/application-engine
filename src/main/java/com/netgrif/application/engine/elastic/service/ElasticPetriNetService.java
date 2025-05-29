@@ -1,11 +1,12 @@
 package com.netgrif.application.engine.elastic.service;
 
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet;
-import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository;
+import com.netgrif.application.engine.elastic.domain.repoitories.ElasticPetriNetRepository;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -15,8 +16,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
 @Slf4j
+@Service
+@RequiredArgsConstructor
 public class ElasticPetriNetService implements IElasticPetriNetService {
 
     private final ElasticPetriNetRepository repository;
@@ -24,11 +26,6 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
     private final Executor executors;
 
     private IPetriNetService petriNetService;
-
-    public ElasticPetriNetService(ElasticPetriNetRepository repository, Executor executors) {
-        this.repository = repository;
-        this.executors = executors;
-    }
 
     @Lazy
     @Autowired
@@ -47,12 +44,12 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
                     elasticPetriNet.update(net);
                     repository.save(elasticPetriNet);
                 }
-                log.debug("[" + net.getStringId() + "]: PetriNet \"" + net.getTitle() + "\" indexed");
+                log.debug("[{}]: PetriNet \"{}\" indexed", net.getStringId(), net.getTitle());
             } catch (InvalidDataAccessApiUsageException ignored) {
-                log.debug("[" + net.getStringId() + "]: PetriNet \"" + net.getTitle() + "\" has duplicates, will be reindexed");
+                log.debug("[{}]: PetriNet \"{}\" has duplicates, will be reindexed", net.getStringId(), net.getTitle());
                 repository.deleteAllByStringId(net.getStringId());
                 repository.save(net);
-                log.debug("[" + net.getStringId() + "]: PetriNet \"" + net.getTitle() + "\" indexed");
+                log.debug("[{}]: PetriNet \"{}\" indexed", net.getStringId(), net.getTitle());
             }
         });
     }
@@ -66,18 +63,18 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
     public void remove(String id) {
         executors.execute(id, () -> {
             repository.deleteAllByStringId(id);
-            log.info("[" + id + "]: PetriNet \"" + id + "\" deleted");
+            log.info("[{}]: PetriNet \"{}\" deleted", id, id);
         });
     }
 
     @Override
-    public String findUriNodeId(PetriNet net) {
+    public String findUriNodeId(Process net) {
         if (net == null) {
             return null;
         }
         ElasticPetriNet elasticPetriNet = repository.findByStringId(net.getStringId());
         if (elasticPetriNet == null) {
-            log.warn("[" + net.getStringId() + "] PetriNet with id [" + net.getStringId() + "] is not indexed.");
+            log.warn("[{}] PetriNet with id [{}] is not indexed.", net.getStringId(), net.getStringId());
             return null;
         }
 
@@ -85,8 +82,14 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
     }
 
     @Override
-    public List<PetriNet> findAllByUriNodeId(String uriNodeId) {
+    public List<Process> findAllByUriNodeId(String uriNodeId) {
         List<ElasticPetriNet> elasticPetriNets = repository.findAllByUriNodeId(uriNodeId);
         return petriNetService.findAllById(elasticPetriNets.stream().map(ElasticPetriNet::getStringId).collect(Collectors.toList()));
+    }
+
+    @Override
+    public List<Process> findAllByIdentifier(String identifier) {
+        List<ElasticPetriNet> elasticProcesses = repository.findAllByIdentifier(identifier);
+        return petriNetService.findAllById(elasticProcesses.stream().map(ElasticPetriNet::getStringId).collect(Collectors.toList()));
     }
 }

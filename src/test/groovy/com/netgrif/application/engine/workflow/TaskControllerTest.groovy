@@ -1,21 +1,17 @@
 package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.authentication.domain.Identity
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
+import com.netgrif.application.engine.authorization.domain.Role
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.utils.FullPageRequest
@@ -28,7 +24,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.netgrif.application.engine.workflow.web.TaskController
 import com.netgrif.application.engine.workflow.web.WorkflowController
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
-import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
@@ -62,13 +57,10 @@ class TaskControllerTest {
     private WorkflowController workflowController
 
     @Autowired
-    private IProcessRoleService processRoleService
+    private IRoleService roleService
 
     @Autowired
     private IDataService dataService
-
-    @Autowired
-    private IUserService userService
 
     @Autowired
     private IPetriNetService petriNetService
@@ -83,34 +75,35 @@ class TaskControllerTest {
     private ImportHelper helper
 
     @Autowired
-    private IAuthorityService authorityService
+    private IWorkflowService workflowService
 
     @Autowired
-    private IWorkflowService workflowService
+    private IIdentityService identityService
 
     @Autowired
     private TaskController taskController
 
-    private PetriNet net
+    private Process net
 
     private Case useCase
 
-    private ProcessRole role
+    private Role role
 
     private Task task
+
+    private Identity testIdentity
 
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
-        userService.saveNew(new User(
-                name: "Dummy",
-                surname: "Netgrif",
-                email: DUMMY_USER_MAIL,
-                password: "superAdminPassword",
-                state: UserState.ACTIVE,
-                authorities: [authorityService.getOrCreate(Authority.user)] as Set<Authority>,
-                processRoles: [] as Set<ProcessRole>))
+        testIdentity = helper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Dummy"))
+                .lastname(new TextField("Netgrif"))
+                .username(new TextField(DUMMY_USER_MAIL))
+                .password(new TextField("superAdminPassword"))
+                .build(), new ArrayList<Role>())
         importNet()
+        TestHelper.login(superCreator.superIdentity)
     }
 
     @Test
@@ -123,7 +116,7 @@ class TaskControllerTest {
     @Test
     void testDeleteFile() {
         Case testCase = helper.createCase("My case", net)
-        String taskId = testCase.getTaskStringId("1")
+        String taskId = testCase.getTaskStringId("t1")
 
         // TODO: release/8.0.0
 // java.lang.NullPointerException: Cannot invoke "com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue.getName()" because the return value of "com.netgrif.application.engine.workflow.domain.DataFieldValue.getValue()" is null
@@ -139,7 +132,7 @@ class TaskControllerTest {
     @Test
     void testDeleteFileByName() {
         Case testCase = helper.createCase("My case", net)
-        String taskId = testCase.getTaskStringId( "1")
+        String taskId = testCase.getTaskStringId( "t1")
 
         dataService.saveFiles(taskId, "fileList", new MockMultipartFile[]{new MockMultipartFile("test", "test", null, new byte[]{})})
         testCase = workflowService.findOne(testCase.stringId)
@@ -155,14 +148,14 @@ class TaskControllerTest {
         createCase()
         findTask()
         setUserListValue()
-        setUserRole()
+        setActorRole()
         assert !findTasksByMongo().empty
     }
 
     void testWithRole() {
         createCase()
         findTask()
-        setUserRole()
+        setActorRole()
         assert !findTasksByMongo().empty
     }
 
@@ -174,7 +167,7 @@ class TaskControllerTest {
     }
 
     void importNet() {
-        PetriNet netOptional = helper.createNet("all_data_refs.xml", VersionType.MAJOR).get()
+        Process netOptional = helper.createNet("all_data_refs.xml", VersionType.MAJOR).get()
         assert netOptional != null
         net = netOptional
     }
@@ -183,6 +176,15 @@ class TaskControllerTest {
         useCase = null
         useCase = helper.createCase("My case", net)
         assert useCase != null
+    }
+
+    void setUserListValue() {
+        assert task != null
+        // TODO: release/8.0.0 field 'performable_users' does not exist
+//        String userId = userService.findByEmail(DUMMY_USER_MAIL).getStringId()
+//        dataService.setData(task.stringId, new DataSet([
+//                "performable_users": new UserListField(rawValue: new UserListFieldValue(dataService.makeUserFieldValue(userId)))
+//        ] as Map<String, Field<?>>))
     }
 
     void findTask() {
@@ -196,30 +198,16 @@ class TaskControllerTest {
         assert task != null
     }
 
-    void setUserListValue() {
-        assert task != null
-        String userId = userService.findByEmail(DUMMY_USER_MAIL).getStringId()
-        // TODO: release/8.0.0 field 'performable_users' does not exist
-//        dataService.setData(task.stringId, new DataSet([
-//                "performable_users": new UserListField(rawValue: new UserListFieldValue(dataService.makeUserFieldValue(userId)))
-//        ] as Map<String, Field<?>>))
-    }
-
-    void setUserRole() {
-        List<ProcessRole> roles = processRoleService.findAll(net.stringId)
-
-        for (ProcessRole role : roles) {
-            if (role.importId == "process_role") {
-                this.role = role
-            }
-        }
-        processRoleService.assignRolesToUser(userService.findByEmail(DUMMY_USER_MAIL).getStringId(), [role.id.toString()] as Set, userService.getLoggedOrSystem().transformToLoggedUser())
+    void setActorRole() {
+        this.role = roleService.findProcessRoleByImportId("process_role")
+        roleService.assignRolesToActor(testIdentity.toSession().activeActorId, [role.id.toString()] as Set)
     }
 
     Page<Task> findTasksByMongo() {
         List<TaskSearchRequest> taskSearchRequestList = new ArrayList<>()
         taskSearchRequestList.add(new TaskSearchRequest())
-        Page<Task> tasks = taskService.search(taskSearchRequestList, new FullPageRequest(), userService.findByEmail(DUMMY_USER_MAIL).transformToLoggedUser(), new Locale("en"), false)
+        String actorId = testIdentity.toSession().activeActorId
+        Page<Task> tasks = taskService.search(taskSearchRequestList, new FullPageRequest(), actorId, new Locale("en"), false)
         return tasks
     }
 }

@@ -3,10 +3,11 @@ package com.netgrif.application.engine.elastic
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.elastic.domain.ElasticTask
-import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
+import com.netgrif.application.engine.elastic.domain.repoitories.ElasticTaskRepository
 import com.netgrif.application.engine.elastic.service.ReindexingTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -16,10 +17,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
@@ -68,9 +67,6 @@ class ElasticTaskTest {
     @Autowired
     protected IElasticTaskService elasticTaskService
 
-    @Value("classpath:task_reindex_test.xml")
-    private Resource netResource
-
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
@@ -78,10 +74,12 @@ class ElasticTaskTest {
 
     @Test
     void taskReindexTest() {
-        def optional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert optional.getNet() != null
+        def optional = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/all_data.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
+        assert optional.getProcess() != null
 
-        def net = optional.getNet()
+        def net = optional.getProcess()
+        TestHelper.login(superCreator.superIdentity)
         10.times {
             helper.createCase("Case $it", net)
         }
@@ -100,7 +98,7 @@ class ElasticTaskTest {
         ElasticTask result = resultFuture.get()
 
         assert result != null
-        assert result.getTitle().equals("Test")
+        assert result.getTitle() == "Test"
 
         ElasticTask resultFromDB = elasticTaskRepository.findByTaskId("TestTask")
         assert resultFromDB.getTitle() == "Test"
@@ -111,7 +109,7 @@ class ElasticTaskTest {
         ElasticTask result2 = resultFuture2.get()
 
         assert result2 != null
-        assert result2.getTitle().equals("Test2")
+        assert result2.getTitle() == "Test2"
 
         task.setTitle("Test3")
 
@@ -119,7 +117,7 @@ class ElasticTaskTest {
         ElasticTask result3 = resultFuture3.get()
 
         assert result3 != null
-        assert result3.getTitle().equals("Test3")
+        assert result3.getTitle() == "Test3"
     }
 
     @Test
@@ -165,7 +163,7 @@ class ElasticTaskTest {
                     Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(taskParallel)
                     ElasticTask result = resultFuture.get()
                     assert result != null
-                    assert result.getTitle().equals("START" + index)
+                    assert result.getTitle() == "START" + index
                 } catch (Exception e) {
                     e.printStackTrace()
                 } finally {
@@ -207,7 +205,7 @@ class ElasticTaskTest {
                     Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(taskParallel)
                     ElasticTask result = resultFuture.get()
                     assert result != null
-                    assert result.getTitle().equals("START" + index)
+                    assert result.getTitle() == "START" + index
                 } catch (Exception e) {
                     e.printStackTrace()
                 } finally {
@@ -223,7 +221,7 @@ class ElasticTaskTest {
         Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(task) as CompletableFuture<ElasticTask>
         ElasticTask result = resultFuture.get()
         assert result != null
-        assert result.getTitle().equals(title)
+        assert result.getTitle() == title
     }
 
 
@@ -249,7 +247,7 @@ class ElasticTaskTest {
                     Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(taskParallel)
                     ElasticTask result = resultFuture.get()
                     assert result != null
-                    assert result.getTitle().equals("TestTask"+ index)
+                    assert result.getTitle() == "TestTask" + index
                 } catch (Exception e) {
                     e.printStackTrace()
                 } finally {
@@ -273,7 +271,7 @@ class ElasticTaskTest {
         Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(task) as CompletableFuture<ElasticTask>
         ElasticTask result = resultFuture.get()
         assert result != null
-        assert result.getTitle().equals(title)
+        assert result.getTitle() == title
     }
 
 

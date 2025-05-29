@@ -8,6 +8,8 @@ import com.netgrif.application.engine.utils.DateUtils;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.Optional;
 
 @Component
@@ -17,13 +19,8 @@ public class DateFieldBuilder extends FieldBuilder<DateField> {
     public DateField build(Data data, Importer importer) {
         DateField field = new DateField();
         initialize(field);
-        setDefaultValue(field, data, defaultValueString -> {
-            if (defaultValueString == null) {
-                return;
-            }
-            Optional<LocalDate> defaultValue = DateUtils.parseDate(defaultValueString);
-            field.setDefaultValue(defaultValue.orElse(null));
-        });
+        // TODO: release/8.0.0
+        setDefaultValue(field, data,s -> LocalDate.parse(s, DateTimeFormatter.ISO_LOCAL_DATE));
         return field;
     }
 

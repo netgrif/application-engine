@@ -6,7 +6,8 @@ import com.netgrif.application.engine.petrinet.domain.arcs.Arc
 import com.netgrif.application.engine.petrinet.domain.arcs.InhibitorArc
 import com.netgrif.application.engine.petrinet.domain.arcs.ReadArc
 import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference
 import com.netgrif.application.engine.startup.SuperCreator
@@ -25,7 +26,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest
 class PetriNetTest {
 
-    public static final String CLONE_NET_TASK = "2"
+    public static final String CLONE_NET_TRANS_ID = "t2"
 
     @Autowired
     private Importer importer
@@ -37,7 +38,7 @@ class PetriNetTest {
     private SuperCreator superCreator
 
     @Autowired
-    private ProcessRoleRepository processRoleRepository
+    private ProcessRoleRepository roleRepository
 
     @Autowired
     private TestHelper testHelper
@@ -55,16 +56,17 @@ class PetriNetTest {
 
     @Test
     void testClone() {
-        int beforeImportNet = processRoleRepository.count()
+        int beforeImportNet = (int) roleRepository.count()
 
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importProcess(new ImportProcessParams(netResource.inputStream, VersionType.MAJOR,
+                superCreator.loggedSuper.activeActorId))
 
-        assert netOptional.getNet() != null
+        assert netOptional.getProcess() != null
 
-        def net = netOptional.getNet()
+        def net = netOptional.getProcess()
         def clone = net.clone()
 
-        def arcs = clone.getArcsOfTransition(CLONE_NET_TASK)
+        def arcs = clone.getInputArcsOf(CLONE_NET_TRANS_ID)
 
         assert arcs.size() == 4
         assert arcs.any { it instanceof Arc }
@@ -72,25 +74,27 @@ class PetriNetTest {
         assert arcs.any { it instanceof ResetArc }
         assert arcs.any { it instanceof ReadArc }
 
-        assert net.roles.size() == 2
-        assert processRoleRepository.count() == beforeImportNet + 2
+        assert roleRepository.count() == beforeImportNet + 2
     }
 
     @Test
     void testVersioning() {
-        def outcome1 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
-        PetriNet net1 = outcome1.getNet()
+        def outcome1 = petriNetService.importProcess(new ImportProcessParams(netResource.inputStream, VersionType.MAJOR,
+                superCreator.loggedSuper.activeActorId))
+        Process net1 = outcome1.getProcess()
         assert net1
 
-        def outcome2 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
-        PetriNet net2 = outcome2.getNet()
+        def outcome2 = petriNetService.importProcess(new ImportProcessParams(netResource.inputStream, VersionType.MAJOR,
+                superCreator.loggedSuper.activeActorId))
+        Process net2 = outcome2.getProcess()
         assert net2
 
-        def outcome3 = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
-        PetriNet net3 = outcome3.getNet()
+        def outcome3 = petriNetService.importProcess(new ImportProcessParams(netResource2.inputStream, VersionType.MAJOR,
+                superCreator.loggedSuper.activeActorId))
+        Process net3 = outcome3.getProcess()
         assert net3
 
-        List<PetriNetReference> nets = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK)
+        List<PetriNetReference> nets = petriNetService.getReferencesByVersion(null, Locale.UK)
         assert nets.findAll { it.identifier in [net1.identifier, net3.identifier] }.size() == 2
         assert nets.find { it.identifier == "new_model" }.version == "1.0.0"
         assert nets.find { it.identifier == "test" }.version == "2.0.0"

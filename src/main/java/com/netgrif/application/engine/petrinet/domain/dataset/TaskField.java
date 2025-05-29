@@ -5,7 +5,7 @@ import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Data
@@ -13,7 +13,6 @@ public class TaskField extends Field<List<String>> {
 
     public TaskField() {
         super();
-        this.defaultValue = new ArrayList<>();
     }
 
     @Override

@@ -1,24 +1,28 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>main</id>
-    <initials>ORG</initials>
+    <version>1.0.0</version>
     <title>main</title>
     <icon>business</icon>
     <defaultRole>false</defaultRole>
-
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">ORG</property>
+    </properties>
     <caseName>Nová organizácia</caseName>
-    <!-- ROLES -->
+    <processEvents/>
+    <caseEvents/>
     <role>
         <id>admin_main</id>
         <title>admin_main</title>
         <event type="assign">
-            <id>1</id>
+            <id>admin_main_assign</id>
             <actions phase="pre">
-                <action>
+                <action id="action_0">
+					<![CDATA[
                     assignRole("admin_secondary","secondary")
-                </action>
+                    ]]>
+				</action>
             </actions>
         </event>
     </role>
-</document>
+</process>

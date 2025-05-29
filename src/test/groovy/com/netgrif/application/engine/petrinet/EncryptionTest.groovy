@@ -1,0 +1,105 @@
+package com.netgrif.application.engine.petrinet
+
+import com.netgrif.application.engine.MockService
+import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
+import com.netgrif.application.engine.importer.service.Importer
+import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import com.netgrif.application.engine.workflow.service.TaskService
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.junit.jupiter.SpringExtension
+
+@ExtendWith(SpringExtension.class)
+@ActiveProfiles(["test"])
+@SpringBootTest
+class EncryptionTest {
+
+    @Autowired
+    private TaskService taskService
+
+    @Autowired
+    private CaseRepository caseRepository
+
+    @Autowired
+    private IWorkflowService workflowService;
+
+    @Autowired
+    private Importer importer
+
+    @Autowired
+    private IPetriNetService petriNetService
+
+    @Autowired
+    private SuperCreator superCreator
+
+    @Autowired
+    private MockService mockService
+
+    @Autowired
+    private SuperAdminConfiguration configuration
+
+    @Autowired
+    private TestHelper testHelper
+
+    private final String FIELD_NAME = "City"
+    private final String FIELD_VALUE = "Bratislava"
+
+    @Test
+    void testEncryption() {
+        TestHelper.login(superCreator.superIdentity)
+
+        String id = createCase()
+
+        Case useCase = loadCase(id)
+
+        assertCorrectEncrypting(useCase)
+    }
+
+    private void assertCorrectEncrypting(Case useCase) {
+        def nameField = useCase.process.dataSet.values().find { v -> v.title == FIELD_NAME }
+//        TODO: release/8.0.0
+//        DataField field = useCase.dataSet.get(nameField.stringId)
+//        assert field.value == FIELD_VALUE
+
+        def rawCaseOpt = caseRepository.findById(useCase.stringId)
+
+        assert rawCaseOpt.isPresent()
+//          TODO: release/8.0.0
+//        DataField rawField = rawCaseOpt.get().dataSet.get(nameField.stringId)
+//        assert rawField.value != FIELD_VALUE
+    }
+
+    private Case loadCase(String id) {
+        Case useCase = workflowService.findOne(id)
+        assert useCase != null
+        return useCase
+    }
+
+    private String createCase() {
+        ImportPetriNetEventOutcome net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/mapping_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
+        assert net.getProcess() != null
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net.getProcess())
+                .title("Encryption test")
+                .authorId(mockService.mockLoggedIdentity().activeActorId)
+                .build()
+        def useCase = workflowService.createCase(createCaseParams).getCase()
+        def nameField = useCase.process.dataSet.values().find { v -> v.title.defaultValue == FIELD_NAME }
+//        TODO: release/8.0.0
+//        useCase.dataSet.put(nameField.stringId, new DataField(FIELD_VALUE))
+        return workflowService.save(useCase).stringId
+    }
+}

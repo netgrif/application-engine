@@ -1,16 +1,24 @@
 package com.netgrif.application.engine
 
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository
-import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
-import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
-import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
-import com.netgrif.application.engine.petrinet.service.ProcessRoleService
+import com.netgrif.application.engine.authentication.domain.Identity
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
+import com.netgrif.application.engine.authorization.domain.repositories.RoleAssignmentRepository
+import com.netgrif.application.engine.authorization.domain.repositories.RoleRepository
+import com.netgrif.application.engine.authorization.service.RoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IGroupService
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService
+import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository
+import com.netgrif.application.engine.elastic.domain.repoitories.ElasticTaskRepository
+import com.netgrif.application.engine.petrinet.domain.repositories.UriNodeRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.*
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 
 @Component
@@ -21,17 +29,21 @@ class TestHelper {
     @Autowired
     private MongoTemplate template
     @Autowired
-    private UserRepository userRepository
+    private RoleRepository roleRepository
     @Autowired
-    private ProcessRoleRepository roleRepository
+    private RoleAssignmentRepository roleAssignmentRepository
     @Autowired
-    private ProcessRoleService roleService
+    private RoleService roleService
     @Autowired
-    private SystemUserRunner systemUserRunner
+    private SystemUserRunner systemIdentityRunner
+    @Lazy
     @Autowired
-    private DefaultRoleRunner defaultRoleRunner
+    private SystemProcessRunner systemProcessRunner
     @Autowired
-    private AnonymousRoleRunner anonymousRoleRunner
+    private ApplicationRoleRunner applicationRoleRunner
+    @Lazy
+    @Autowired
+    private AnonymousIdentityRunner anonymousIdentityRunner
     @Autowired
     private ElasticTaskRepository elasticTaskRepository
     @Autowired
@@ -39,41 +51,66 @@ class TestHelper {
     @Autowired
     private UriNodeRepository uriNodeRepository
     @Autowired
-    private GroupRunner groupRunner
-    @Autowired
     private IFieldActionsCacheService actionsCacheService
     @Autowired
     private FilterRunner filterRunner
     @Autowired
     private FinisherRunner finisherRunner
     @Autowired
-    private ImpersonationRunner impersonationRunner
-    @Autowired
     private UriRunner uriRunner
     @Autowired
     private IPetriNetService petriNetService
+    @Autowired
+    private ValidationRunner validationRunner
+    @Autowired
+    private DefaultGroupRunner defaultGroupRunner
+    @Autowired
+    private IUserService userService
+    @Autowired
+    private IGroupService groupService
+    @Autowired
+    private IIdentityService identityService;
 
     void truncateDbs() {
         template.db.drop()
         elasticTaskRepository.deleteAll()
         elasticCaseRepository.deleteAll()
         uriNodeRepository.deleteAll()
-        userRepository.deleteAll()
+        roleAssignmentRepository.deleteAll()
         roleRepository.deleteAll()
         roleService.clearCache()
         actionsCacheService.clearActionCache()
         actionsCacheService.clearFunctionCache()
         actionsCacheService.clearNamespaceFunctionCache()
         petriNetService.evictAllCaches()
+        userService.clearForbiddenKeywords()
+        groupService.clearForbiddenKeywords()
+        identityService.clearForbiddenKeywords()
 
-        defaultRoleRunner.run()
-        anonymousRoleRunner.run()
-        systemUserRunner.run()
         uriRunner.run()
-        groupRunner.run()
+        systemProcessRunner.run()
+        applicationRoleRunner.run()
+        defaultGroupRunner.run()
+        systemIdentityRunner.run()
+        anonymousIdentityRunner.run()
         filterRunner.run()
-        impersonationRunner.run()
         superCreator.run()
+        validationRunner.run()
         finisherRunner.run()
+    }
+
+    static void login(Identity identity) {
+        LoggedIdentity loggedTest = identity.toSession()
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedTest,
+                loggedTest.getPassword(), loggedTest.getAuthorities())
+        SecurityContextHolder.getContext().setAuthentication(token)
+    }
+
+    static void logout() {
+        SecurityContextHolder.getContext().setAuthentication(null)
+    }
+
+    static InputStream stream(String resource) {
+        return TestHelper.getClassLoader().getResourceAsStream(resource)
     }
 }

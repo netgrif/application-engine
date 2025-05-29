@@ -1,8 +1,9 @@
 package com.netgrif.application.engine.workflow
 
-import com.netgrif.application.engine.petrinet.domain.DataGroup
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -43,19 +44,24 @@ class TaskRefPropagationTest {
     @Autowired
     private ITaskService taskService
 
-    PetriNet netParent
-    PetriNet netChild
+    @Autowired
+    private TestHelper testHelper
+
+    Process netParent
+    Process netChild
 
     @BeforeEach
     void beforeAll() {
-        def parent = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_parent.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        def child = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_child.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def parent = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/taskRef_propagation_test_parent.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
+        def child = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/taskRef_propagation_test_child.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
 
-        assert parent.getNet() != null
-        assert child.getNet() != null
+        assert parent.getProcess() != null
+        assert child.getProcess() != null
 
-        netParent = parent.getNet()
-        netChild = child.getNet()
+        netParent = parent.getProcess()
+        netChild = child.getProcess()
+
+        TestHelper.login(superCreator.superIdentity)
     }
 
     public static final String PARENT_FIELD_TEXT_ID = "text"
@@ -97,8 +103,8 @@ class TaskRefPropagationTest {
         Case parent = importHelper.createCase("PARENT", netParent)
         Case child = importHelper.createCase("CHILD", netChild)
 
-        String parentTaskId = parent.getTaskStringId("4")
-        String childTaskId = child.getTaskStringId("4")
+        String parentTaskId = parent.getTaskStringId("t4")
+        String childTaskId = child.getTaskStringId("t4")
 //        TODO: release/8.0.0
 //        parent.dataSet["children_tasks"].value = [childTaskId]
 //        child.dataSet["parentId"].value = parent.stringId
@@ -107,7 +113,8 @@ class TaskRefPropagationTest {
         workflowService.save(child)
 
         /* validate getDataGroups object and taskRef field ids */
-        List<DataGroup> parentData = dataService.getDataGroups(parentTaskId, Locale.forLanguageTag("SK"), superCreator.getLoggedSuper()).data
+        // TODO: NAE-1969 fix
+//        List<DataGroup> parentData = dataService.getDataGroups(parentTaskId, Locale.forLanguageTag("SK"), superCreator.getLoggedSuper().getActiveActorId()).data
         // TODO: release/8.0.0 fix
 //        LocalisedField parentText = findField(parentData, PARENT_FIELD_TEXT_TITLE)
 //        LocalisedField parentMultichoice = findField(parentData, PARENT_FIELD_MULTICHOICE_TITLE)

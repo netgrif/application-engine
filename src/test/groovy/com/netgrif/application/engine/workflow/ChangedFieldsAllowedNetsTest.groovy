@@ -1,10 +1,9 @@
 package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
@@ -41,7 +40,10 @@ class ChangedFieldsAllowedNetsTest {
     @Autowired
     private TestHelper testHelper
 
-    private PetriNet net
+    @Autowired
+    private SuperCreator superCreator
+
+    private Process net
 
     @BeforeEach
     void beforeAll() {
@@ -49,6 +51,8 @@ class ChangedFieldsAllowedNetsTest {
         def netOptional = importHelper.createNet("changed_fields_allowed_nets.xml")
         assert netOptional.isPresent()
         net = netOptional.get()
+
+        TestHelper.login(superCreator.superIdentity)
     }
 
     // NAE-1374

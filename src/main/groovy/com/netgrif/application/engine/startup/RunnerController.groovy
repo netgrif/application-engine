@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.startup
 
+
 import org.springframework.stereotype.Component
 
 @Component
@@ -10,24 +11,23 @@ class RunnerController {
             MongoDbRunner,
             StorageRunner,
             RuleEngineRunner,
-            DefaultRoleRunner,
-            AnonymousRoleRunner,
-            AuthorityRunner,
-            SystemUserRunner,
+            ApplicationRoleRunner,
             AllDataTransitionRunner,
             UriRunner,
+            SystemProcessRunner,
+            DefaultGroupRunner,
+            SystemUserRunner,
+            AnonymousIdentityRunner,
             FunctionsCacheRunner,
             FilterRunner,
-            GroupRunner,
             DefaultFiltersRunner,
-            ImpersonationRunner,
             DashboardRunner,
             SuperCreator,
             FlushSessionsRunner,
             MailRunner,
             DemoRunner,
             QuartzSchedulerRunner,
-            FinisherRunnerSuperCreator,
+            ValidationRunner,
             FinisherRunner,
     ]
 

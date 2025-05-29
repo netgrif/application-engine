@@ -527,6 +527,7 @@
                         </goals>
                         <configuration>
                             <!-- The package of your generated sources -->
+                            <!--TODO: release/8.0.0 fix importer package marked as generated sources inside generated sources bug-->
                             <packageName>com.netgrif.application.engine.importer.model</packageName>
                             <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
                             <sources>

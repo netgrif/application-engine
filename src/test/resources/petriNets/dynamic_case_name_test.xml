@@ -1,33 +1,42 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
     <id>dynamic_choices</id>
+    <version>1.0.0</version>
     <title>dynamic_choices</title>
     <defaultRole>true</defaultRole>
-    <initials>DVT</initials>
-
-    <caseName dynamic="true">
-        new I18nString("SK $text.rawValue" as String, ["en": "EN $text.rawValue" as String])
-    </caseName>
-    <!-- ROLES -->
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">DVT</property>
+    </properties>
+    <caseName dynamic="true" id="title">"SK text value ${1+2+3}"</caseName>
     <data type="number">
         <id>number</id>
         <title>number</title>
-        <init dynamic="true">1 + 2 + 3</init>
+        <init dynamic="true">
+            <![CDATA[
+			1 + 2 + 3
+			]]>
+        </init>
     </data>
     <data type="text">
         <id>text</id>
         <title>text</title>
         <init dynamic="true">
-            "text value ${number.rawValue as Integer}" as String
+            <![CDATA[
+			"text value ${number.rawValue as Integer}" as String
+			]]>
         </init>
     </data>
-
+    <i18n locale="en">
+        <i18nString id="title">"EN text value ${1+2+3}"</i18nString>
+    </i18n>
     <transition>
         <id>transition</id>
         <x>200</x>
         <y>200</y>
-        <label>Transition</label>
+        <title>Transition</title>
         <assignPolicy>auto</assignPolicy>
+        <flex>
+            <id>transition_flex</id>
+        </flex>
     </transition>
-
-</document>
+</process>

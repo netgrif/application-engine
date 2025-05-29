@@ -4,6 +4,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.arcs.ArcOrderComparator
 import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -21,7 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class ArcOrderTest {
 
     public static final String NET_FILE = "arc_order_test.xml"
-    public static final String NET_TASK = "1"
+    public static final String NET_TASK = "t1"
 
     @Autowired
     private Importer importer
@@ -42,23 +43,22 @@ class ArcOrderTest {
         return ArcOrderTest.getClassLoader().getResourceAsStream(name)
     }
 
-
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
+        TestHelper.login(superCreator.superIdentity)
     }
 
     @Test
     void testOrder() {
-        def net = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        def net = petriNetService.importProcess(new ImportProcessParams(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess()
 
-        def arcs = net.getArcsOfTransition(NET_TASK)
+        def arcs = net.getInputArcsOf(NET_TASK)
         def sorted = arcs.sort { a1, a2 -> ArcOrderComparator.getInstance().compare(a1, a2) }
         assert sorted.last() instanceof ResetArc
 
         def instance = helper.createCase("Arc Case", net)
         helper.assignTaskToSuper(NET_TASK, instance.stringId)
-
         assert true
     }
 }

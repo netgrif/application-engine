@@ -1,10 +1,11 @@
 package com.netgrif.application.engine.migration
 
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
@@ -20,49 +21,50 @@ class ActionMigration {
     private IPetriNetService petriNetService
 
     @Autowired
-    private IUserService userService;
+    private IUserService userService
 
     void migrateActions(String petriNetPath) {
         InputStream netStream = new ClassPathResource(petriNetPath).inputStream
-        ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(netStream, VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser())
-        List<PetriNet> oldPetriNets
+        ImportPetriNetEventOutcome newPetriNet = petriNetService.importProcess(new ImportProcessParams(netStream, VersionType.MAJOR,
+                userService.getSystemUser().stringId))
+        List<Process> oldPetriNets
 
-        if(newPetriNet.getNet() != null) {
+        if(newPetriNet.getProcess() != null) {
             String message = "Petri net from file [" + petriNetPath + "] was not imported"
             log.error(message)
             throw new IllegalArgumentException(message)
         } else {
-            oldPetriNets = petriNetService.getByIdentifier(newPetriNet.getNet().importId)
-                    .stream().filter({ net -> (net.version != newPetriNet.getNet().version)})
+            oldPetriNets = petriNetService.getByIdentifier(newPetriNet.getProcess().importId)
+                    .stream().filter({ net -> (net.version != newPetriNet.getProcess().version)})
                     .collect(Collectors.toList())
         }
 
         if(oldPetriNets.size() == 0){
-            String message = "Older version of Petri net with ID [" + newPetriNet.getNet().importId + "] is not present in MongoDB."
+            String message = "Older version of Petri net with ID [" + newPetriNet.getProcess().importId + "] is not present in MongoDB."
             log.error(message)
             throw new IllegalArgumentException(message)
         } else {
             oldPetriNets.each {net ->
-                migrateDataSetActions(newPetriNet.getNet(), net)
-                migrateDataRefActions(newPetriNet.getNet(), net)
+                migrateDataSetActions(newPetriNet.getProcess(), net)
+                migrateDataRefActions(newPetriNet.getProcess(), net)
                 petriNetService.save(net)
             }
         }
     }
 
-    private void migrateDataSetActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
+    private void migrateDataSetActions(Process newPetriNet, Process oldPetriNet) {
         newPetriNet.dataSet.each { key, data ->
             if (data.events != null && data.events.size() > 0) {
-                oldPetriNet.dataSet[key].events = data.events
+                oldPetriNet.dataSet.get(key).events = data.events
             }
         }
     }
 
-    private void migrateDataRefActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
+    private void migrateDataRefActions(Process newPetriNet, Process oldPetriNet) {
         newPetriNet.transitions.each { transKey, trans ->
             trans.dataSet.each { dataKey, data ->
                 if (data.events != null && data.events.size() > 0) {
-                    oldPetriNet.transitions[transKey].dataSet[dataKey].events = data.events
+                    oldPetriNet.transitions.get(transKey).dataSet.get(dataKey).events = data.events
                 }
             }
         }

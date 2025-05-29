@@ -1,18 +1,18 @@
 package com.netgrif.application.engine.petrinet.domain
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.DefaultRoleRunner
+
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.startup.SystemUserRunner
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.TaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import com.netgrif.application.engine.workflow.service.TaskService
@@ -61,19 +61,13 @@ class EventTest {
     private SuperCreator superCreator
 
     @Autowired
-    private DefaultRoleRunner roleRunner
-
-    @Autowired
     private MongoTemplate template
-
-    @Autowired
-    private UserRepository userRepository
 
     @Autowired
     private SystemUserRunner userRunner
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
     @Autowired
     private TestHelper testHelper
 
@@ -87,8 +81,10 @@ class EventTest {
     @Test
     void testEventImport() {
         testHelper.truncateDbs()
+        TestHelper.login(superCreator.superIdentity)
 
-        PetriNet net = petriNetService.importPetriNet(stream(EVENT_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        Process net = petriNetService.importProcess(new ImportProcessParams(stream(EVENT_NET_FILE), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId)).getProcess()
         instance = helper.createCase(EVENT_NET_CASE, net)
 
         outcome = helper.assignTaskToSuper(EVENT_NET_TASK, instance.stringId)

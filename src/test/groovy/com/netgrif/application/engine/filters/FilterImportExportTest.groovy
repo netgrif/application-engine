@@ -1,23 +1,24 @@
 package com.netgrif.application.engine.filters
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.authentication.domain.Identity
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.FilterField
 import com.netgrif.application.engine.petrinet.domain.dataset.TaskField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.startup.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.*
 import com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList
-import com.netgrif.application.engine.workflow.service.UserFilterSearchService
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
+import com.netgrif.application.engine.workflow.service.ActorFilterSearchService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -71,34 +72,37 @@ class FilterImportExportTest {
     private static final String FILTER_FIELD = "filter"
 
     @Autowired
-    IFilterImportExportService importExportService
+    private IFilterImportExportService importExportService
 
     @Autowired
-    FilterRunner filterRunner
+    private FilterRunner filterRunner
 
     @Autowired
-    TestHelper testHelper
+    private TestHelper testHelper
 
     @Autowired
-    IWorkflowService workflowService
+    private IWorkflowService workflowService
 
     @Autowired
-    ImportHelper importHelper
+    private ImportHelper importHelper
 
     @Autowired
-    DefaultFiltersRunner defaultFiltersRunner
+    private DefaultFiltersRunner defaultFiltersRunner
 
     @Autowired
-    UserFilterSearchService userFilterSearchService
+    private ActorFilterSearchService userFilterSearchService
 
     @Autowired
-    ITaskService taskService
+    private ITaskService taskService
 
     @Autowired
     private IDataService dataService
 
+    @Autowired
+    private SuperCreator superCreator
+
     private Authentication userAuth
-    private User dummyUser
+    private Identity dummyIdentity
     private Case importCase
     private Case exportCase
 
@@ -106,23 +110,25 @@ class FilterImportExportTest {
     void setup() {
         this.testHelper.truncateDbs()
         this.defaultFiltersRunner.run()
+        TestHelper.login(superCreator.superIdentity)
         createTestFilter()
-        dummyUser = createDummyUser()
-        userAuth = new UsernamePasswordAuthenticationToken(dummyUser.transformToLoggedUser(), DUMMY_USER_PASSWORD)
+        dummyIdentity = createDummyIdentity()
+        userAuth = new UsernamePasswordAuthenticationToken(createDummyIdentity().toSession(), DUMMY_USER_PASSWORD)
         SecurityContextHolder.getContext().setAuthentication(userAuth)
 
-        Optional<PetriNet> importNet = this.filterRunner.createImportFiltersNet()
-        Optional<PetriNet> exportNet = this.filterRunner.createExportFiltersNet()
+        Optional<Process> importNet = this.filterRunner.createImportFiltersNet()
+        Optional<Process> exportNet = this.filterRunner.createExportFiltersNet()
         assert importNet.isPresent()
         assert exportNet.isPresent()
 
         importCase = this.workflowService.searchOne(
-                QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER).and(QCase.case$.author.email.eq(DUMMY_USER_MAIL))
+                QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER) & QCase.case$.authorId.eq(dummyIdentity.mainActorId)
         )
+        assert importCase != null // todo: release/8.0.0 fails because identityService doesnt create cases
+
         exportCase = this.workflowService.searchOne(
-                QCase.case$.processIdentifier.eq(EXPORT_NET_IDENTIFIER).and(QCase.case$.author.email.eq(DUMMY_USER_MAIL))
+                QCase.case$.processIdentifier.eq(EXPORT_NET_IDENTIFIER) & QCase.case$.authorId.eq(dummyIdentity.mainActorId)
         )
-        assert importCase != null
         assert exportCase != null
     }
 
@@ -148,16 +154,16 @@ class FilterImportExportTest {
         validateFilterXML(new FileInputStream(exportedFiltersField.getPath()))
         importedTasksIds.forEach({ taskId ->
             Task filterTask = this.taskService.findOne(taskId)
-            this.dataService.setData(filterTask, new DataSet([
+            this.dataService.setData(new SetDataParams(filterTask, new DataSet([
                     (VISIBILITY_FIELD): new EnumerationMapField(rawValue: FILTER_VISIBILITY_PRIVATE),
                     (NEW_TITLE_FIELD) : new TextField(rawValue: this.workflowService.findOne(filterTask.caseId).title + " new")
-            ] as Map<String, Field<?>>))
+            ] as Map<String, Field<?>>), dummyIdentity.toSession().activeActorId))
         })
-        Task importTask = this.taskService.searchOne(QTask.task.caseId.eq(importCase.stringId).and(QTask.task.transitionId.eq("importFilter")))
-        this.dataService.setData(importTask, new DataSet([
+        Task importTask = this.taskService.searchOne(QTask.task.caseId.eq(importCase.stringId) & QTask.task.transitionId.eq("importFilter"))
+        this.dataService.setData(new SetDataParams(importTask, new DataSet([
                 (IMPORTED_FILTERS_FIELD): new TaskField(rawValue: importedTasksIds)
-        ] as Map<String, Field<?>>))
-        this.taskService.finishTask(importTask, dummyUser)
+        ] as Map<String, Field<?>>), dummyIdentity.toSession().activeActorId))
+        this.taskService.finishTask(new TaskParams(importTask, dummyIdentity.toSession().activeActorId))
         Thread.sleep(1000)
         filterCases = this.userFilterSearchService.autocompleteFindFilters("")
         List<String> filterCasesNames = filterCases.stream().map({ filterCase -> filterCase.title }).collect(Collectors.toList())
@@ -295,11 +301,13 @@ class FilterImportExportTest {
         })
     }
 
-    private User createDummyUser() {
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        return importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
-                [] as ProcessRole[])
+    private Identity createDummyIdentity() {
+        return importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Dummy"))
+                .lastname(new TextField("Identity"))
+                .username(new TextField(DUMMY_USER_MAIL))
+                .password(new TextField(DUMMY_USER_PASSWORD))
+                .build(), new ArrayList<>())
     }
 
     private static void validateFilterXML(InputStream xml) throws IllegalFilterFileException {

@@ -1,63 +1,61 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
     <id>new_model</id>
     <version>1.0.0</version>
-    <initials>NEW</initials>
     <title>New Model</title>
     <icon>home</icon>
     <defaultRole>true</defaultRole>
     <anonymousRole>true</anonymousRole>
-    <transitionRole>false</transitionRole>
+    <properties>
+        <property key="initials">NEW</property>
+    </properties>
     <transition>
         <id>t1</id>
         <x>460</x>
         <y>100</y>
-        <label/>
+        <title/>
     </transition>
     <transition>
         <id>t2</id>
         <x>580</x>
         <y>220</y>
-        <label/>
+        <title/>
     </transition>
     <transition>
         <id>t3</id>
         <x>460</x>
         <y>340</y>
-        <label/>
+        <title/>
     </transition>
     <transition>
         <id>t4</id>
         <x>340</x>
         <y>220</y>
-        <label/>
+        <title/>
     </transition>
     <place>
         <id>p1</id>
         <x>340</x>
         <y>100</y>
         <tokens>1</tokens>
-        <static>false</static>
     </place>
     <place>
         <id>p2</id>
         <x>580</x>
         <y>100</y>
         <tokens>0</tokens>
-        <static>false</static>
     </place>
     <place>
         <id>p3</id>
         <x>580</x>
         <y>340</y>
         <tokens>0</tokens>
-        <static>false</static>
     </place>
     <place>
         <id>p4</id>
         <x>340</x>
         <y>340</y>
         <tokens>0</tokens>
-        <static>false</static>
     </place>
     <arc>
         <id>a1</id>
@@ -115,4 +113,4 @@
         <destinationId>p1</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
-</document>
+</process>

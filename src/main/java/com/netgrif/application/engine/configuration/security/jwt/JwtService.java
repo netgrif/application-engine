@@ -1,14 +1,12 @@
 package com.netgrif.application.engine.configuration.security.jwt;
 
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -20,15 +18,12 @@ import java.util.function.Function;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class JwtService implements IJwtService {
-
+    // todo javadoc everywhere
     private String secret = "";
 
-    @Autowired
-    private JwtProperties properties;
-
-    @Autowired
-    private IProcessRoleService roleService;
+    private final JwtProperties properties;
 
     @PostConstruct
     private void resolveSecret() {
@@ -36,7 +31,7 @@ public class JwtService implements IJwtService {
             PrivateKeyReader reader = new PrivateKeyReader(properties.getAlgorithm());
             secret = Base64.getEncoder().encodeToString(reader.get(properties.getPrivateKey().getFile().getPath()).getEncoded());
         } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
-            log.error("Error while resolving secret key: " + e.getMessage(), e);
+            log.error("Error while resolving secret key: {}", e.getMessage(), e);
         }
     }
 
@@ -53,27 +48,26 @@ public class JwtService implements IJwtService {
     }
 
     @Override
-    public LoggedUser getLoggedUser(String token, Authority anonymousAuthority) {
-        LinkedHashMap<String, Object> userMap = (LinkedHashMap<String, Object>) getAllClaimsFromToken(token).get("user");
-        LoggedUser user = new LoggedUser(
-                userMap.get("id").toString(),
-                userMap.get("username").toString(),
-                "n/a",
-                Collections.singleton(anonymousAuthority)
-        );
-        user.setFullName(userMap.get("fullName").toString());
-        user.setAnonymous((boolean) userMap.get("anonymous"));
-        user.setProcessRoles(Collections.singleton(roleService.anonymousRole().getStringId()));
-        return user;
+    @SuppressWarnings("unchecked")
+    public LoggedIdentity getLoggedIdentity(String token) {
+        LinkedHashMap<String, Object> loggedIdentityMap = (LinkedHashMap<String, Object>) getAllClaimsFromToken(token).get("identity");
+        return LoggedIdentity.with()
+                .identityId(loggedIdentityMap.get("identityId").toString())
+                .username(loggedIdentityMap.get("username").toString())
+                .password("n/a")
+                .fullName(loggedIdentityMap.get("fullName").toString())
+                .activeActorId(loggedIdentityMap.get("activeActorId").toString())
+                .properties((Map<String, String>) loggedIdentityMap.get("properties"))
+                .build();
     }
 
-    private Date getExpirationDateFromToken(String token) throws ExpiredJwtException {
-        return getClaimFromToken(token, Claims::getExpiration);
+    private void getExpirationDateFromToken(String token) throws ExpiredJwtException {
+        getClaimFromToken(token, Claims::getExpiration);
     }
 
-    private <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) throws ExpiredJwtException {
+    private <T> void getClaimFromToken(String token, Function<Claims, T> claimsResolver) throws ExpiredJwtException {
         final Claims claims = getAllClaimsFromToken(token);
-        return claimsResolver.apply(claims);
+        claimsResolver.apply(claims);
     }
 
     private Claims getAllClaimsFromToken(String token) throws ExpiredJwtException {

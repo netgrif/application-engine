@@ -1,14 +1,17 @@
-package com.netgrif.application.engine.petrinet.webprocessRolesAndPermissionses
+package com.netgrif.application.engine.petrinet.web
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
+import com.netgrif.application.engine.authentication.domain.Identity
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
+import com.netgrif.application.engine.authorization.domain.ApplicationRole
+import com.netgrif.application.engine.authorization.domain.Role
 import com.netgrif.application.engine.ipc.TaskApiTest
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.startup.ApplicationRoleRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import org.junit.jupiter.api.BeforeEach
@@ -63,7 +66,10 @@ class PetriNetControllerTest {
     @Autowired
     private TestHelper testHelper
 
-    private PetriNet net
+    @Autowired
+    private ApplicationRoleRunner applicationRoleRunner
+
+    private Process net
 
     private Authentication userAuth
     private Authentication adminAuth
@@ -76,32 +82,36 @@ class PetriNetControllerTest {
     void before() {
         testHelper.truncateDbs()
 
-        def net = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert net.getNet() != null
+        def net = petriNetService.importProcess(new ImportProcessParams(stream(NET_FILE), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId))
+        assert net.getProcess() != null
 
-        this.net = net.getNet()
+        this.net = net.getProcess()
 
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
                 .build()
 
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+        Identity identity = importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Role"))
+                .lastname(new TextField("Identity"))
+                .username(new TextField(USER_EMAIL))
+                .password(new TextField("password"))
+                .build(), new ArrayList<Role>())
 
-        importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
-//                [] as Group[],
-                [] as ProcessRole[])
-
-        userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
+        userAuth = new UsernamePasswordAuthenticationToken(identity.toSession(), "password")
         userAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("admin")] as Authority[],
-//                [] as Group[],
-                [] as ProcessRole[])
+        ApplicationRole adminAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE)
+        Identity adminIdentity = importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Admin"))
+                .lastname(new TextField("Identity"))
+                .username(new TextField(ADMIN_EMAIL))
+                .password(new TextField("password"))
+                .build(), List.of(adminAppRole))
 
-        adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
+        adminAuth = new UsernamePasswordAuthenticationToken(adminIdentity.toSession(), "password")
         adminAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
     }
 

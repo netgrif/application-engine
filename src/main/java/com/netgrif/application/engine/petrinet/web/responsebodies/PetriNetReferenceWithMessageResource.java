@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import org.springframework.hateoas.CollectionModel;
 
 import java.util.Collections;
@@ -12,7 +12,7 @@ public class PetriNetReferenceWithMessageResource extends CollectionModel<PetriN
         super(Collections.singleton(content));
     }
 
-    public static PetriNetReferenceWithMessageResource successMessage(String msg, PetriNet net, Locale locale) {
+    public static PetriNetReferenceWithMessageResource successMessage(String msg, Process net, Locale locale) {
         return new PetriNetReferenceWithMessageResource(new PetriNetReferenceWithMessage(msg, net, locale));
     }
 

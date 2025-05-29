@@ -2,11 +2,12 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,15 +38,17 @@ class DynamicDefaultValueTest {
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
+        TestHelper.login(superCreator.superIdentity)
     }
 
     @Test
     void testInitValues() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_init.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
-        Case useCase = importHelper.createCase("test", optNet.getNet())
+        ImportPetriNetEventOutcome optNet = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/petriNets/dynamic_init.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
+        Case useCase = importHelper.createCase("test", optNet.getProcess())
 
-        assert useCase.dataSet.get("text").rawValue == superCreator.superUser.name
-        assert useCase.dataSet.get("number").rawValue as Integer == superCreator.superUser.name.length()
+        assert useCase.dataSet.get("text").rawValue == superCreator.superIdentity.firstname
+        assert useCase.dataSet.get("number").rawValue as Integer == superCreator.superIdentity.firstname.length()
         assert useCase.dataSet.get("date").rawValue != null
         assert useCase.dataSet.get("dateTime").rawValue != null
         assert (useCase.dataSet.get("user").rawValue as UserFieldValue) != null

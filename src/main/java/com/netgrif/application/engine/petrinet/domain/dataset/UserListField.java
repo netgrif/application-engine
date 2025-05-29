@@ -3,11 +3,12 @@ package com.netgrif.application.engine.petrinet.domain.dataset;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class UserListField extends Field<UserListFieldValue> {
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class UserListField extends FieldWithAllowedRoles<UserListFieldValue> {
 
     public UserListField() {
         super();

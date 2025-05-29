@@ -2,10 +2,11 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -23,37 +24,40 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class DynamicChoicesTest {
 
     @Autowired
-    private TestHelper testHelper;
+    private TestHelper testHelper
 
     @Autowired
     private ImportHelper importHelper
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreator superCreator
 
     @Autowired
-    private IDataService dataService;
+    private IDataService dataService
 
     @Autowired
-    private ITaskService taskService;
+    private ITaskService taskService
 
     @Autowired
-    private CaseRepository caseRepository;
+    private CaseRepository caseRepository
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs();
+        testHelper.truncateDbs()
+        TestHelper.login(superCreator.superIdentity)
     }
 
     @Test
     void testDynamicEnum() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        // todo: release/8.0.0 choices does not exist anymore
+        ImportPetriNetEventOutcome optNet = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
 
-        assert optNet.getNet() != null;
-        def net = optNet.getNet()
+        assert optNet.getProcess() != null
+        def net = optNet.getProcess()
 
         def aCase = importHelper.createCase("Case", net)
 

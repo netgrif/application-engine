@@ -11,9 +11,9 @@ import java.util.List;
 @Deprecated(since = "6.3.0")
 public interface FinishTaskEventLogRepository extends MongoRepository<FinishTaskEventLog, ObjectId> {
 
-    List<FinishTaskEventLog> findAllByTaskId(ObjectId taskId);
+    List<FinishTaskEventLog> findAllByTaskId(String taskId);
 
-    List<FinishTaskEventLog> findAllByUserId(String id);
+    List<FinishTaskEventLog> findAllByActorId(String id);
 
     List<FinishTaskEventLog> findAllByCaseId(String caseId);
 }

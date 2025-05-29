@@ -1,14 +1,16 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessage;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessageResource;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateCaseBody;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.EntityModel;
@@ -23,6 +25,7 @@ import java.util.Locale;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @ConditionalOnProperty(
         value = "nae.public.workflow.web.enabled",
         havingValue = "true",
@@ -33,24 +36,24 @@ import java.util.Locale;
 public class PublicWorkflowController {
 
     private final IWorkflowService workflowService;
+    private final ISessionManagerService sessionManagerService;
 
-    private final IUserService userService;
-
-    public PublicWorkflowController(IWorkflowService workflowService, IUserService userService) {
-        this.userService = userService;
-        this.workflowService = workflowService;
-    }
-
-    @PreAuthorize("@workflowAuthorizationService.canCallCreate(@userService.getAnonymousLogged(), #body.netId)")
+    @PreAuthorize("@caseAuthorizationService.canCallCreate(#body.netId)")
     @PostMapping(value = "/case", consumes = "application/json;charset=UTF-8", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Create new case")
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Locale locale) {
-        LoggedUser loggedUser = userService.getAnonymousLogged();
+        LoggedIdentity identity = sessionManagerService.getLoggedIdentity();
         try {
-            CreateCaseEventOutcome outcome = this.workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
+            CreateCaseParams createCaseParams = CreateCaseParams.with()
+                    .processId(body.netId)
+                    .title(body.title)
+                    .authorId(identity.getActiveActorId())
+                    .locale(locale)
+                    .build();
+            CreateCaseEventOutcome outcome = this.workflowService.createCase(createCaseParams);
             return EventOutcomeWithMessageResource.successMessage("Case created successfully", outcome);
         } catch (Exception e) {
-            log.error("Creating case failed:" + e.getMessage(), e);
+            log.error("Creating case failed: {}", e.getMessage(), e);
             return EventOutcomeWithMessageResource.errorMessage("Creating case failed: " + e.getMessage());
         }
     }

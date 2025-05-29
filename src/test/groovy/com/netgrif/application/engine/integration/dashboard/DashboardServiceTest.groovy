@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.integration.dashboard
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -22,10 +22,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class DashboardServiceTest {
 
     @Autowired
-    IWorkflowService workflowService
+    private IWorkflowService workflowService
 
     @Autowired
-    ImportHelper helper
+    private ImportHelper helper
 
     @Autowired
     private IPetriNetService petriNetService
@@ -42,11 +42,13 @@ class DashboardServiceTest {
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
+        TestHelper.login(superCreator.superIdentity)
     }
 
     @Test
     void dashboardIntegerTest() {
-        PetriNet net1 = helper.createNet("all_data.xml", VersionType.MAJOR).get()
+        // todo: release/8.0.0 file petriNets/all_data.xml is empty
+        Process net1 = helper.createNet("all_data.xml", VersionType.MAJOR).get()
         Random random = new Random()
         (1..30).each {
             Case aCase = helper.createCase("Default title", net1)
@@ -57,7 +59,8 @@ class DashboardServiceTest {
 
     @Test
     void dashboardStringTest() {
-        PetriNet net1 = helper.createNet("all_data.xml", VersionType.MAJOR).get()
+        // todo: release/8.0.0 file petriNets/all_data.xml is empty
+        Process net1 = helper.createNet("all_data.xml", VersionType.MAJOR).get()
         Random random = new Random()
         (1..30).each {
             Case aCase = helper.createCase("Default title", net1)

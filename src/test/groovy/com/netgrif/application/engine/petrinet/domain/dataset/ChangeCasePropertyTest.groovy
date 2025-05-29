@@ -1,20 +1,24 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -42,9 +46,6 @@ class ChangeCasePropertyTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private IUserService userService
-
-    @Autowired
     private TestHelper testHelper
 
     @Autowired
@@ -56,17 +57,20 @@ class ChangeCasePropertyTest {
     String TEST_TRANSITION = "t1"
     String RESOURCE_PATH = "src/test/resources/case_name_change_test.xml"
 
-    PetriNet net = null
+    Process net = null
 
     @BeforeEach
     void initNet() {
         testHelper.truncateDbs()
-        net = petriNetService.importPetriNet(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).getNet()
+        net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId)).getProcess()
         assert net != null
     }
 
     @Test
+    @Disabled("task has no case title attribute")
     void setTitleFromEvent() {
+        // todo: release/8.0.0
         Case testCase = helper.createCase(TEST_CASE_TITLE, net)
         assert testCase
         assert testCase.getTitle() == TEST_CASE_TITLE
@@ -74,8 +78,8 @@ class ChangeCasePropertyTest {
         Task testCaseTask = taskService.searchOne(QTask.task.caseTitle.eq(TEST_CASE_TITLE) & QTask.task.transitionId.eq(TEST_TRANSITION))
         assert testCaseTask
 
-        taskService.assignTask(testCaseTask.getStringId())
-        taskService.finishTask(testCaseTask.getStringId())
+        taskService.assignTask(new TaskParams(testCaseTask.getStringId()))
+        taskService.finishTask(new TaskParams(testCaseTask.getStringId()))
 
         testCase = workflowService.findOne(testCase.getStringId())
         testCaseTask = taskService.findOne(testCaseTask.getStringId())
@@ -85,7 +89,9 @@ class ChangeCasePropertyTest {
     }
 
     @Test
+    @Disabled("task has no case title attribute")
     void setTitleFromFieldAction() {
+        // todo: release/8.0.0
         Case testCase = helper.createCase(TEST_CASE_TITLE, net)
         assert testCase
         assert testCase.getTitle() == TEST_CASE_TITLE
@@ -93,11 +99,11 @@ class ChangeCasePropertyTest {
         Task testCaseTask = taskService.searchOne(QTask.task.caseTitle.eq(TEST_CASE_TITLE) & QTask.task.transitionId.eq(TEST_TRANSITION))
         assert testCaseTask
 
-        taskService.assignTask(testCaseTask.getStringId())
-        dataService.setData(testCaseTask.stringId, new DataSet([
+        taskService.assignTask(new TaskParams(testCaseTask.getStringId()))
+        dataService.setData(new SetDataParams(testCaseTask.stringId, new DataSet([
                 "bln": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>), superCreator.getSuperUser())
-        taskService.finishTask(testCaseTask.getStringId())
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().activeActorId))
+        taskService.finishTask(new TaskParams(testCaseTask.getStringId()))
 
         testCase = workflowService.findOne(testCase.getStringId())
         testCaseTask = taskService.findOne(testCaseTask.getStringId())

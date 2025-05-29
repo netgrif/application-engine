@@ -1,0 +1,95 @@
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>task_authorization_service_test</id>
+    <version>1.0.0</version>
+    <title>TaskAuthorizationService test</title>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TAT</property>
+    </properties>
+    <transition>
+        <id>t_assign</id>
+        <x>1</x>
+        <y>1</y>
+        <title>Test assign</title>
+        <roleRef>
+            <id>default</id>
+            <permission>
+                <assign>true</assign>
+            </permission>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>t_finish</id>
+        <x>100</x>
+        <y>1</y>
+        <title>Test finish</title>
+        <roleRef>
+            <id>default</id>
+            <permission>
+                <finish>true</finish>
+            </permission>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>t_cancel</id>
+        <x>200</x>
+        <y>1</y>
+        <title>Test cancel</title>
+        <roleRef>
+            <id>default</id>
+            <permission>
+                <cancel>true</cancel>
+            </permission>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>t_reassign</id>
+        <x>300</x>
+        <y>1</y>
+        <title>Test reassign</title>
+        <roleRef>
+            <id>default</id>
+            <permission>
+                <reassign>true</reassign>
+            </permission>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>t_getdata</id>
+        <x>500</x>
+        <y>1</y>
+        <title>Test get data</title>
+        <roleRef>
+            <id>default</id>
+            <permission>
+                <view>true</view>
+            </permission>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>t_getdata_disabled</id>
+        <x>600</x>
+        <y>1</y>
+        <title>Test get data of disabled task</title>
+        <roleRef>
+            <id>default</id>
+            <permission>
+                <view_disabled>true</view_disabled>
+            </permission>
+        </roleRef>
+    </transition>
+    <place>
+        <id>p1</id>
+        <x>600</x>
+        <y>100</y>
+        <tokens>0</tokens>
+    </place>
+    <arc>
+        <id>a1</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>t_getdata_disabled</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</process>

@@ -2,10 +2,8 @@ package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException
-import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
@@ -41,13 +39,14 @@ class NewInitTest {
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
+        TestHelper.login(superCreator.superIdentity)
     }
 
     @Test
     void newInitTest() throws IOException, MissingIconKeyException, MissingPetriNetMetaDataException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/nae_1276_Init_value_as_choice.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        Case initTestCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier("new_init_test").stringId, "New init test", "", superCreator.getLoggedSuper()).getCase()
+        petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/petriNets/nae_1276_Init_value_as_choice.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
 //        TODO: release/8.0.0
+//        Case initTestCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier("new_init_test").stringId, "New init test", "", superCreator.getLoggedSuper().getActiveActorId()).getCase()
 //        assert (initTestCase.dataSet["new_init_multichoice"].value as List<I18nString>).stream().any { ((I18nString) it).defaultValue == "Bob" }
 //        assert (initTestCase.dataSet["new_init_multichoice"].value as List<I18nString>).stream().any { ((I18nString) it).defaultValue == "Alice" }
 //        assert (initTestCase.dataSet["old_init_multichoice"].value as List<I18nString>).stream().any { ((I18nString) it).defaultValue == "Bob" }

@@ -8,6 +8,6 @@ import java.util.List;
 @Data
 public class LogoutRequest {
 
-    private List<String> users;
+    private List<String> identities;
 
 }

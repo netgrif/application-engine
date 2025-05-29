@@ -1,43 +1,36 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>wst_usersRef</id>
-    <initials>WSU</initials>
+    <version>1.0.0</version>
     <title>WorkflowAuthorizationService test</title>
-    <role>
-        <id>assign_pos_role</id>
-        <name>assign pos role</name>
-    </role>
-    <role>
-        <id>finish_pos_role</id>
-        <name>finish pos role</name>
-    </role>
+    <defaultRole>false</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">WSU</property>
+    </properties>
+    <processEvents/>
+    <caseEvents/>
     <role>
         <id>assign_neg_role</id>
-        <name>assign neg role</name>
+        <title>assign neg role</title>
+    </role>
+    <role>
+        <id>assign_pos_role</id>
+        <title>assign pos role</title>
     </role>
     <role>
         <id>finish_neg_role</id>
-        <name>finish neg role</name>
+        <title>finish neg role</title>
     </role>
-    <data type="userList">
-        <id>assign_pos_ul</id>
-        <title/>
-    </data>
+    <role>
+        <id>finish_pos_role</id>
+        <title>finish pos role</title>
+    </role>
     <data type="userList">
         <id>assign_neg_ul</id>
         <title/>
     </data>
     <data type="userList">
-        <id>delegate_pos_ul</id>
-        <title/>
-    </data>
-    <data type="userList">
-        <id>delegate_neg_ul</id>
-        <title/>
-    </data>
-    <data type="userList">
-        <id>cancel_pos_ul</id>
+        <id>assign_pos_ul</id>
         <title/>
     </data>
     <data type="userList">
@@ -45,11 +38,27 @@
         <title/>
     </data>
     <data type="userList">
-        <id>finish_pos_ul</id>
+        <id>cancel_pos_ul</id>
         <title/>
     </data>
     <data type="userList">
+        <id>delegate_neg_ul</id>
+        <title/>
+    </data>
+    <data type="userList">
+        <id>delegate_pos_ul</id>
+        <title/>
+    </data>
+    <data type="file">
+        <id>file</id>
+        <title>File</title>
+    </data>
+    <data type="userList">
         <id>finish_neg_ul</id>
+        <title/>
+    </data>
+    <data type="userList">
+        <id>finish_pos_ul</id>
         <title/>
     </data>
     <data type="text">
@@ -57,98 +66,87 @@
         <title>Text</title>
         <init>text</init>
     </data>
-    <data type="file">
-        <id>file</id>
-        <title>File</title>
-    </data>
     <transition>
-        <id>1</id>
+        <id>t1</id>
         <x>1</x>
         <y>1</y>
-        <label>Transition</label>
-        <roleRef>
-            <id>assign_pos_role</id>
-            <logic>
-                <assign>true</assign>
-            </logic>
-        </roleRef>
+        <title>Transition</title>
         <roleRef>
             <id>assign_neg_role</id>
-            <logic>
+            <permission>
                 <assign>false</assign>
-            </logic>
+            </permission>
         </roleRef>
         <roleRef>
-            <id>finish_pos_role</id>
-            <logic>
-                <finish>true</finish>
-            </logic>
-        </roleRef>
-        <roleRef>
-            <id>finish_neg_role</id>
-            <logic>
-                <finish>false</finish>
-            </logic>
-        </roleRef>
-        <userRef>
-            <id>assign_pos_ul</id>
-            <logic>
-                <assign>true</assign>
-            </logic>
-        </userRef>
-        <userRef>
             <id>assign_neg_ul</id>
-            <logic>
+            <permission>
                 <assign>false</assign>
-            </logic>
-        </userRef>
-        <userRef>
-            <id>delegate_pos_ul</id>
-            <logic>
-                <delegate>true</delegate>
-            </logic>
-        </userRef>
-        <userRef>
-            <id>delegate_neg_ul</id>
-            <logic>
-                <delegate>false</delegate>
-            </logic>
-        </userRef>
-        <userRef>
-            <id>cancel_pos_ul</id>
-            <logic>
-                <cancel>true</cancel>
-            </logic>
-        </userRef>
-        <userRef>
+            </permission>
+        </roleRef>
+        <roleRef>
+            <id>assign_pos_role</id>
+            <permission>
+                <assign>true</assign>
+            </permission>
+        </roleRef>
+        <roleRef>
+            <id>assign_pos_ul</id>
+            <permission>
+                <assign>true</assign>
+            </permission>
+        </roleRef>
+        <roleRef>
             <id>cancel_neg_ul</id>
-            <logic>
+            <permission>
                 <cancel>false</cancel>
-            </logic>
-        </userRef>
-        <userRef>
-            <id>finish_pos_ul</id>
-            <logic>
-                <finish>true</finish>
-            </logic>
-        </userRef>
-        <userRef>
-            <id>finish_neg_ul</id>
-            <logic>
-                <finish>false</finish>
-            </logic>
-        </userRef>
-        <dataRef>
-            <id>text</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>file</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
+            </permission>
+        </roleRef>
+        <roleRef>
+            <id>cancel_pos_ul</id>
+            <permission>
+                <cancel>true</cancel>
+            </permission>
+        </roleRef>
+        <roleRef>
+            <id>delegate_neg_ul</id>
+            <permission>
+                <reassign>false</reassign>
+            </permission>
+        </roleRef>
+        <roleRef>
+            <id>delegate_pos_ul</id>
+            <permission>
+                <reassign>true</reassign>
+            </permission>
+        </roleRef>
+        <flex>
+            <id>t1_flex</id>
+            <item>
+                <dataRef>
+                    <id>text</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>file</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
-</document>
+</process>

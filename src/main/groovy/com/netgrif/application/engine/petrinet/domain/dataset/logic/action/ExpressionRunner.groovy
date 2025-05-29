@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap
 import com.netgrif.application.engine.event.IGroovyShellFactory
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
@@ -9,6 +11,7 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Lookup
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 
 @Slf4j
@@ -21,9 +24,15 @@ abstract class ExpressionRunner {
     @Lookup("actionDelegate")
     abstract ActionDelegate getExpressionDelegate()
 
-
     @Autowired
     private IGroovyShellFactory shellFactory
+
+    @Lazy
+    @Autowired
+    private IIdentityService identityService
+
+    @Autowired
+    private IUserService userService
 
     private Map<String, Closure> cache
 
@@ -32,15 +41,14 @@ abstract class ExpressionRunner {
         cache = new MaxSizeHashMap<>(cacheSize)
     }
 
-    // TODO: release/8.0.0 fields? Map<String, String> fields
-    def run(Case useCase, Expression expression, Map<String, String> params = [:]) {
+    <T> T run(Expression<T> expression, Case useCase = null, Field<?> field = null, Map<String, String> params = [:]) {
         log.debug("Expression: $expression")
         def code = getExpressionCode(expression)
         try {
-            initCode(code.delegate, useCase, params)
-            code()
+            initCode(code.delegate, useCase, field, params)
+            return code() as T
         } catch (Exception e) {
-            log.error("Action: $expression.definition")
+            log.error("Expression evaluation failed: $expression.definition")
             throw e
         }
     }
@@ -56,11 +64,17 @@ abstract class ExpressionRunner {
         return code.rehydrate(getExpressionDelegate(), code.owner, code.thisObject)
     }
 
-    protected void initCode(def delegate, Case useCase, Map<String, String> params) {
-        delegate.metaClass.useCase = useCase
-        delegate.metaClass.params = params
-        useCase.dataSet.fields.values().forEach { Field<?> field ->
-            delegate.metaClass."$field.importId" = field
+    protected void initCode(def delegate, Case useCase, Field<?> field, Map<String, String> params) {
+        if (useCase != null) {
+            delegate.metaClass.useCase = useCase
+            useCase.dataSet.fields.values().forEach { Field<?> f ->
+                delegate.metaClass."$f.importId" = f
+            }
         }
+        delegate.metaClass.params = params
+        delegate.metaClass.field = field
+        // TODO: release/8.0.0
+        delegate.metaClass.loggedUser = identityService.loggedIdentity
+        delegate.metaClass.systemUser = userService.systemUser
     }
 }

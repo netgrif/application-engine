@@ -2,16 +2,17 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.IUser
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -62,16 +63,16 @@ class FileFieldTest {
     private IWorkflowService workflowService
 
     @Autowired
-    private IUserService userService
-
-    @Autowired
     private WebApplicationContext context
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreator superCreator
+
+    @Autowired
+    private IIdentityService identityService
 
     private MockMvc mockMvc
 
@@ -84,32 +85,35 @@ class FileFieldTest {
                 .build()
     }
 
-    PetriNet getNet() {
-        def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileField.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
-        assert netOptional.getNet() != null
-        return netOptional.getNet()
+    Process getNet() {
+        def netOptional = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/remoteFileField.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
+        assert netOptional.getProcess() != null
+        return netOptional.getProcess()
     }
 
     @Test
     void testRemoteAttribute() {
-        PetriNet net = getNet()
+        Process net = getNet()
         assert net.getField(FIELD_ID).isPresent()
         assert (net.getField(FIELD_ID).get() as FileField).isRemote()
     }
 
     @Test
     void downloadFileByCase() {
-        PetriNet net = getNet()
+        Process net = getNet()
 
-        IUser user = userService.findByEmail(configuration.email, true)
-        assert user != null
-
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black", user.transformToLoggedUser()).getCase()
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .title("Test file download")
+                .authorId(superCreator.loggedSuper.activeActorId)
+                .build()
+        Case useCase = workflowService.createCase(createCaseParams).getCase()
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), superCreator.loggedSuper)
 
         mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file")
                 .param("fieldId", FIELD_ID)
-                .with(httpBasic(configuration.email, configuration.password)))
+                .with(httpBasic(superCreator.superIdentity.username, configuration.password)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
@@ -119,17 +123,19 @@ class FileFieldTest {
 
     @Test
     void downloadFileByTask() {
-        PetriNet net = getNet()
+        Process net = getNet()
 
-        IUser user = userService.findByEmail(configuration.email, true)
-        assert user != null
-
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black", user.transformToLoggedUser()).getCase()
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .title("Test file download")
+                .authorId(superCreator.loggedSuper.activeActorId)
+                .build()
+        Case useCase = workflowService.createCase(createCaseParams).getCase()
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), superCreator.loggedSuper)
 
         mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file")
                 .param("fieldId", FIELD_ID)
-                .with(httpBasic(configuration.email, configuration.password)))
+                .with(httpBasic(superCreator.superIdentity.username, configuration.password)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))

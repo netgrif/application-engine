@@ -12,13 +12,14 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavio
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.utils.FieldUtils;
+import com.netgrif.application.engine.utils.UniqueKeyMapWrapper;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehaviors;
 import com.netgrif.application.engine.workflow.domain.DataFieldValue;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.annotate.JsonIgnore;
 import org.bson.types.ObjectId;
@@ -30,11 +31,12 @@ import java.util.stream.Collectors;
 
 import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.*;
 
+
 @Slf4j
 @Document
 @Data
-@NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
+// TODO: release/8.0.0 check with new schema
 @JsonSubTypes({
         @JsonSubTypes.Type(value = BooleanField.class, name = "BOOLEAN"),
         @JsonSubTypes.Type(value = ButtonField.class, name = "BUTTON"),
@@ -42,7 +44,7 @@ import static com.netgrif.application.engine.petrinet.domain.dataset.logic.Field
         @JsonSubTypes.Type(value = DateField.class, name = "DATE"),
         @JsonSubTypes.Type(value = DateTimeField.class, name = "DATE_TIME"),
         @JsonSubTypes.Type(value = EnumerationField.class, name = "ENUMERATION"),
-        @JsonSubTypes.Type(value = EnumerationMapField.class, name = "ENUMERATION_MAP_FIELD"),
+        @JsonSubTypes.Type(value = EnumerationMapField.class, name = "ENUMERATION_MAP"),
         @JsonSubTypes.Type(value = FileField.class, name = "FILE"),
         @JsonSubTypes.Type(value = FileListField.class, name = "FILE_LIST"),
         @JsonSubTypes.Type(value = FilterField.class, name = "FILTER"),
@@ -50,36 +52,43 @@ import static com.netgrif.application.engine.petrinet.domain.dataset.logic.Field
         @JsonSubTypes.Type(value = MultichoiceField.class, name = "MULTICHOICE"),
         @JsonSubTypes.Type(value = MultichoiceMapField.class, name = "MULTICHOICE_MAP"),
         @JsonSubTypes.Type(value = NumberField.class, name = "NUMBER"),
+        // TODO: release/8.0.0 check name value
+        @JsonSubTypes.Type(value = StringCollectionField.class, name = "STRINGCOLLECTION"),
         @JsonSubTypes.Type(value = TaskField.class, name = "TASK_REF"),
         @JsonSubTypes.Type(value = TextField.class, name = "TEXT"),
         @JsonSubTypes.Type(value = UserField.class, name = "USER"),
         @JsonSubTypes.Type(value = UserListField.class, name = "USER_LIST"),
 })
+@EqualsAndHashCode(callSuper = true)
 public abstract class Field<T> extends Imported {
 
     @Id
     protected ObjectId id;
-    @JsonIgnore
-    protected T defaultValue;
-    @JsonIgnore
-    protected Expression initExpression;
-    protected List<Validation> validations;
-    private I18nString name; //title
+    private I18nString title;
     private I18nString description;
     private I18nString placeholder;
+    // TODO: release/8.0.0 dataset or task?
     private DataFieldBehaviors behaviors;
     private DataFieldValue<T> value;
     @JsonIgnore
+    protected Expression<T> defaultValue;
+    protected List<Validation> validations;
+    @JsonIgnore
     private Boolean immediate;
     @JsonIgnore
-    private Map<DataEventType, DataEvent> events;
-    @JsonIgnore
     private String encryption;
-    private Integer length;
     private Component component;
+    @JsonIgnore
+    private Map<DataEventType, DataEvent> events;
+    // TODO: release/8.0.0 remove?
     @JsonIgnore
     private Long version = 0L;
     // TODO: release/8.0.0 6.2.5: parentTaskId, parentCaseId
+    private UniqueKeyMapWrapper<String> properties;
+
+    public Field() {
+        // TODO: release/8.0.0 no collection can be initialised
+    }
 
     public String getStringId() {
         return importId;
@@ -102,8 +111,8 @@ public abstract class Field<T> extends Imported {
         return this.value.getValue();
     }
 
-    public boolean isImmediate() {
-        return this.immediate != null && this.immediate;
+    public void applyDefaultValue() {
+        this.setRawValue(this.getDefaultValue().getDefaultValue());
     }
 
     public void addActions(Collection<Action> dataEvents, DataEventType type) {
@@ -128,8 +137,8 @@ public abstract class Field<T> extends Imported {
         }
     }
 
-    public boolean isDynamicDefaultValue() {
-        return initExpression != null;
+    public void addEvent(DataEvent event) {
+        events.put(event.getType(), event);
     }
 
     public void addValidation(Validation validation) {
@@ -143,8 +152,11 @@ public abstract class Field<T> extends Imported {
         this.value = null;
     }
 
-    public boolean hasDefault() {
-        return defaultValue != null || initExpression != null;
+    public boolean isImmediate() {
+        if (immediate == null) {
+            return false;
+        }
+        return immediate;
     }
 
     public boolean isNewerThen(Field<?> field) {
@@ -153,29 +165,31 @@ public abstract class Field<T> extends Imported {
 
     @Override
     public String toString() {
-        return name.getDefaultValue();
+        return title.getDefaultValue();
     }
 
     public void clone(Field<T> clone) {
         clone.importId = this.importId;
         clone.id = this.id;
-        clone.defaultValue = this.defaultValue;
-        if (this.initExpression != null) {
-            clone.initExpression = this.initExpression.clone();
+//        TODO: release/8.0.0 clone value? events
+        if (this.defaultValue != null) {
+            clone.defaultValue = this.defaultValue.clone();
         }
         if (this.validations != null) {
             clone.validations = this.validations.stream().map(Validation::clone).collect(Collectors.toList());
         }
-        clone.name = this.name;
-        clone.description = this.description;
-        clone.placeholder = this.placeholder;
+        if (this.title != null) {
+            clone.title = this.title.clone();
+        }
+        if (this.description != null) {
+            clone.description = this.description.clone();
+        }
+        if (this.placeholder != null) {
+            clone.placeholder = this.placeholder.clone();
+        }
         if (this.behaviors != null) {
             clone.behaviors = this.behaviors.clone();
         }
-//        TODO: release/8.0.0 clone value? events
-//        if (this.value != null) {
-//            clone.value = this.value.clone();
-//        }
         clone.immediate = this.immediate;
         if (this.events != null) {
             clone.events = this.events.entrySet()
@@ -183,8 +197,12 @@ public abstract class Field<T> extends Imported {
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
         }
         clone.encryption = this.encryption;
-        clone.length = this.length;
-        clone.component = this.component;
+        if (this.component != null) {
+            clone.component = this.component.clone();
+        }
+        if (this.properties != null) {
+            clone.properties = this.properties.clone();
+        }
     }
 
     public abstract Field<T> clone();
@@ -218,11 +236,11 @@ public abstract class Field<T> extends Imported {
     }
 
     @JsonIgnore
-    public String getTranslatedName(Locale locale) {
-        if (name == null) {
+    public String getTranslatedTitle(Locale locale) {
+        if (title == null) {
             return null;
         }
-        return name.getTranslation(locale);
+        return title.getTranslation(locale);
     }
 
     /**
@@ -241,9 +259,5 @@ public abstract class Field<T> extends Imported {
             return;
         }
         version++;
-    }
-
-    public void applyDefaultValue() {
-        this.setRawValue(this.getDefaultValue());
     }
 }

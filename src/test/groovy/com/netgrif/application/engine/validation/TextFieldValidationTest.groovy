@@ -1,30 +1,31 @@
 package com.netgrif.application.engine.validation
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
-import com.netgrif.application.engine.validation.domain.ValidationDataInput
-import com.netgrif.application.engine.validation.models.TextFieldValidation
-import org.junit.jupiter.api.Assertions
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ValidationDelegate
+
+//import com.netgrif.application.engine.validation.domain.ValidationDataInput
+//import com.netgrif.application.engine.validation.models.TextFieldValidation
+
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-
-import java.util.stream.Collectors
 
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
 class TextFieldValidationTest {
 
-    public static final String ErrorMessage = "Invalid Field value"
     @Autowired
     private TestHelper testHelper
+
+    private static ValidationDelegate getValidationDelegate() {
+        return new ValidationDelegate()
+    }
 
     @BeforeEach
     void setup() {
@@ -32,30 +33,26 @@ class TextFieldValidationTest {
     }
 
     @Test
-    void minlength_Exception() {
-        TextFieldValidation textFieldValidation = new TextFieldValidation()
-        TextField dataField = new TextField(rawValue: 'totok')
-        I18nString validMessage = new I18nString(ErrorMessage)
-        List<String> rules = ["minlength","6"]
-        ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
+    void minlength() {
+        ValidationDelegate delegate = getValidationDelegate()
+        delegate.field = new TextField(rawValue: 'totok')
 
-        IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            textFieldValidation.minlength(input)
-        })
-        Assertions.assertEquals(ErrorMessage, thrown.getMessage());
+        assert !delegate.minlength(6)
+
+        assert delegate.minlength(5)
+
+        assert delegate.minlength(4)
     }
 
     @Test
-    void maxlength_Exception() {
-        TextFieldValidation textFieldValidation = new TextFieldValidation()
-        TextField dataField = new TextField(rawValue: 'totok')
-        I18nString validMessage = new I18nString(ErrorMessage)
-        List<String> rules = ["maxlength","4"]
-        ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
+    void maxlength() {
+        ValidationDelegate delegate = getValidationDelegate()
+        delegate.field = new TextField(rawValue: 'totok')
 
-        IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            textFieldValidation.maxlength(input)
-        })
-        Assertions.assertEquals(ErrorMessage, thrown.getMessage());
+        assert !delegate.maxlength(4)
+
+        assert delegate.maxlength(5)
+
+        assert delegate.maxlength(6)
     }
 }

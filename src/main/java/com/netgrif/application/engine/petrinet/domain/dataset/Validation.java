@@ -1,26 +1,39 @@
 package com.netgrif.application.engine.petrinet.domain.dataset;
 
 import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class Validation implements Serializable {
 
     private static final long serialVersionUID = 3287600522204188694L;
 
-    protected String rule;
+    protected String name;
+    private Arguments clientArguments;
+    private Arguments serverArguments;
     private I18nString message;
+
+    public Validation() {
+        this.clientArguments = new Arguments();
+        this.serverArguments = new Arguments();
+    }
 
     @Override
     public Validation clone() {
         Validation cloned =  new Validation();
-        cloned.setRule(rule);
+        cloned.setName(name);
+        if (clientArguments != null) {
+            cloned.setClientArguments(clientArguments.clone());
+        }
+        if (serverArguments != null) {
+            cloned.setServerArguments(serverArguments.clone());
+        }
         if (this.message != null) {
             cloned.setMessage(this.message.clone());
         }

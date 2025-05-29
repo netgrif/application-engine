@@ -21,14 +21,6 @@ public class PetriNetReferenceResource extends EntityModel<PetriNetReference> {
                 .withRel("identifier"));
 
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                        .methodOn(PetriNetController.class).getRoles(getContent().getStringId(), null))
-                .withRel("roles"));
-
-        add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                        .methodOn(PetriNetController.class).getTransactions(getContent().getStringId(), null))
-                .withRel("transaction"));
-
-        add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
                         .methodOn(PetriNetController.class).getNetFile(getContent().getStringId(), getContent().getTitle(), null, null))
                 .withRel("file"));
     }

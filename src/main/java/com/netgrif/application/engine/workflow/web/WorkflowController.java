@@ -1,15 +1,17 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessage;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessageResource;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -55,7 +57,7 @@ import java.util.Locale;
         havingValue = "true",
         matchIfMissing = true
 )
-@Tag(name = "Workflow")
+@Tag(name = "Workflow Controller")
 public class WorkflowController {
 
     private final IWorkflowService workflowService;
@@ -70,14 +72,20 @@ public class WorkflowController {
         this.dataService = dataService;
     }
 
-    @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
+    @PreAuthorize("@caseAuthorizationService.canCallCreate(#body.netId)")
     @Operation(summary = "Create new case", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        LoggedIdentity identity = (LoggedIdentity) auth.getPrincipal();
         try {
-            CreateCaseEventOutcome outcome = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
-            return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getCase().getStringId() + " was created succesfully", outcome);
+            CreateCaseParams createCaseParams = CreateCaseParams.with()
+                    .processId(body.netId)
+                    .title(body.title)
+                    .authorId(identity.getActiveActorId())
+                    .locale(locale)
+                    .build();
+            CreateCaseEventOutcome outcome = workflowService.createCase(createCaseParams);
+            return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getCase().getStringId() + " was created successfully", outcome);
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
             log.error("Creating case failed:", e);
             return EventOutcomeWithMessageResource.errorMessage("Creating case failed" + e.getMessage());
@@ -110,8 +118,8 @@ public class WorkflowController {
     @Operation(summary = "Generic case search on Elasticsearch database", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> search(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
-        LoggedUser user = (LoggedUser) auth.getPrincipal();
-        Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, locale, operation == MergeFilterOperation.AND);
+        LoggedIdentity identity = (LoggedIdentity) auth.getPrincipal();
+        Page<Case> cases = elasticCaseService.search(searchBody.getList(), identity.getActiveActorId(), pageable, locale, operation == MergeFilterOperation.AND);
 
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                 .search(searchBody, operation, pageable, assembler, auth, locale)).withRel("search");
@@ -124,7 +132,8 @@ public class WorkflowController {
     @Operation(summary = "Get count of the cases", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/count", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CountResponse count(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth, Locale locale) {
-        long count = elasticCaseService.count(searchBody.getList(), (LoggedUser) auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);
+        LoggedIdentity identity = (LoggedIdentity) auth.getPrincipal();
+        long count = elasticCaseService.count(searchBody.getList(), identity.getActiveActorId(), locale, operation == MergeFilterOperation.AND);
         return CountResponse.caseCount(count);
     }
 
@@ -148,9 +157,9 @@ public class WorkflowController {
         return resources;
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@applicationAuthorizationService.hasApplicationRole('admin')")
     @Operation(summary = "Reload tasks of case",
-            description = "Caller must have the ADMIN role",
+            description = "Caller must have the admin role",
             security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/reload/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
@@ -170,7 +179,7 @@ public class WorkflowController {
         }
     }
 
-    @PreAuthorize("@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
+    @PreAuthorize("@caseAuthorizationService.canCallDelete(#caseId)")
     @Operation(summary = "Delete case", security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
@@ -179,7 +188,7 @@ public class WorkflowController {
         if (deleteSubtree) {
             outcome = workflowService.deleteSubtreeRootedAt(caseId);
         } else {
-            outcome = workflowService.deleteCase(caseId);
+            outcome = workflowService.deleteCase(new DeleteCaseParams(caseId));
         }
         return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted", outcome);
     }

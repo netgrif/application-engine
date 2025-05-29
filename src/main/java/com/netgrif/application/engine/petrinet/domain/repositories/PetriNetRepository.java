@@ -1,32 +1,36 @@
 package com.netgrif.application.engine.petrinet.domain.repositories;
 
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 import java.util.List;
 
-public interface PetriNetRepository extends MongoRepository<PetriNet, String>, QuerydslPredicateExecutor<PetriNet> {
+public interface PetriNetRepository extends MongoRepository<Process, String>, QuerydslPredicateExecutor<Process> {
 
-    List<PetriNet> findByTitle_DefaultValue(String title);
+    List<Process> findByTitle_DefaultValue(String title);
 
-    PetriNet findByImportId(String id);
+    Process findByImportId(String id);
 
-    List<PetriNet> findAllByIdentifier(String identifier);
+    List<Process> findAllByIdentifier(String identifier);
 
-    PetriNet findByIdentifierAndVersion(String identifier, Version version);
+    Process findByIdentifierAndVersion(String identifier, Version version);
 
-    Page<PetriNet> findByIdentifier(String identifier, Pageable pageable);
+    @Query("{'parentIdentifiers.id' :  ?0}")
+    List<Process> findAllChildrenByParentId(ObjectId id);
 
-    Page<PetriNet> findByIdentifierIn(List<String> identifier, Pageable pageable);
+    Page<Process> findByIdentifier(String identifier, Pageable pageable);
 
-    List<PetriNet> findAllByVersion(Version version);
+    Page<Process> findByIdentifierIn(List<String> identifier, Pageable pageable);
 
-    List<PetriNet> findAllByUriNodeId(String uri);
+    List<Process> findAllByVersion(Version version);
+
+    List<Process> findAllByUriNodeId(String uri);
 
     void deleteById(ObjectId id);
 }

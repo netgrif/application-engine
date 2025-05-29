@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.arcs;
 
-import com.netgrif.application.engine.petrinet.domain.Place;
+import com.netgrif.application.engine.petrinet.domain.throwable.IllegalMarkingException;
 
 /**
  * If there is an arc <i>a</i> with a weight <i>w=W(p,t)</i> connecting a place <i>p</i> with a transition <i>t</i>,
@@ -19,8 +19,7 @@ public class InhibitorArc extends PTArc {
      */
     @Override
     public boolean isExecutable() {
-        if (this.reference != null) multiplicity = this.reference.getMultiplicity();
-        return ((Place) source).getTokens() < multiplicity;
+        return source.getTokens() < this.getMultiplicity();
     }
 
     /**
@@ -28,6 +27,9 @@ public class InhibitorArc extends PTArc {
      */
     @Override
     public void execute() {
+        if (!this.isExecutable()) {
+            throw new IllegalMarkingException(this.source);
+        }
     }
 
     /**
@@ -37,16 +39,14 @@ public class InhibitorArc extends PTArc {
     public void rollbackExecution(Integer tokensConsumed) {
     }
 
-    @SuppressWarnings("Duplicates")
     @Override
     public InhibitorArc clone() {
         InhibitorArc clone = new InhibitorArc();
         clone.setSourceId(this.sourceId);
         clone.setDestinationId(this.destinationId);
-        clone.setMultiplicity(this.multiplicity);
+        clone.setMultiplicityExpression(this.multiplicityExpression.clone());
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);
-        clone.setReference(this.reference == null ? null : this.reference.clone());
         return clone;
     }
 }

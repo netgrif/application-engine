@@ -4,16 +4,14 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import lombok.Data;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
+// TODO: release/8.0.0 rename
 public abstract class ChoiceField<T> extends Field<T> {
 
-    protected Set<I18nString> choices;
-    protected Expression choicesExpression;
+    protected LinkedHashSet<I18nString> choices;
+    protected Expression<LinkedHashSet<I18nString>> choicesExpression;
 
     public ChoiceField() {
         super();
@@ -23,20 +21,23 @@ public abstract class ChoiceField<T> extends Field<T> {
     public ChoiceField(List<I18nString> choices) {
         this();
         if (choices != null) {
+            if (this.choices == null) {
+                this.choices = new LinkedHashSet<>();
+            }
             this.choices.addAll(choices);
         }
     }
 
-    public ChoiceField(Expression expression) {
+    public ChoiceField(Expression<LinkedHashSet<I18nString>> expression) {
         this();
         this.choicesExpression = expression;
     }
 
-    public Expression getExpression() {
+    public Expression<LinkedHashSet<I18nString>> getExpression() {
         return choicesExpression;
     }
 
-    public void setExpression(Expression choicesExpression) {
+    public void setExpression(Expression<LinkedHashSet<I18nString>> choicesExpression) {
         this.choicesExpression = choicesExpression;
     }
 

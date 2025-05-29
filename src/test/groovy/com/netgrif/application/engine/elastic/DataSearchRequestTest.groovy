@@ -2,9 +2,10 @@ package com.netgrif.application.engine.elastic
 
 import com.netgrif.application.engine.MockService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.domain.ElasticCase
-import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
+import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.ElasticTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
@@ -18,12 +19,14 @@ import com.netgrif.application.engine.petrinet.domain.dataset.I18nField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -51,9 +54,6 @@ import java.time.LocalTime
 @ExtendWith(SpringExtension.class)
 class DataSearchRequestTest {
 
-    public static final String PROCESS_TITLE = "Elastic data search request test"
-    public static final String PROCESS_INITIALS = "TST"
-
     @Autowired
     private WebApplicationContext wac
 
@@ -68,9 +68,6 @@ class DataSearchRequestTest {
 
     @Autowired
     private IWorkflowService workflowService
-
-    @Autowired
-    private IUserService userService
 
     @Autowired
     private MockService mockService
@@ -88,6 +85,12 @@ class DataSearchRequestTest {
     private ITaskService taskService
 
     @Autowired
+    private IIdentityService identityService
+
+    @Autowired
+    private IUserService userService
+
+    @Autowired
     private IDataService dataService
 
     @Autowired
@@ -98,56 +101,55 @@ class DataSearchRequestTest {
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
-//        template.deleteIndex(ElasticCase.class)
+        template.deleteIndex(ElasticCase.class)
         template.createIndex(ElasticCase.class)
         template.putMapping(ElasticCase.class)
 
-//        template.deleteIndex(ElasticTask.class)
+        template.deleteIndex(ElasticTask.class)
         template.createIndex(ElasticTask.class)
         template.putMapping(ElasticTask.class)
 
         repository.deleteAll()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert net.getNet() != null
+        def net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/all_data.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
+        assert net.getProcess() != null
 
-        def users = userService.findAll(true)
-        assert users.size() >= 2
-        def testUser1 = users[0]
-        def testUser2 = users[1]
-        // saving authorities / roles crashes the workflowService (on case save)
-        testUser1.processRoles = []
-        testUser1.authorities = []
-        testUser2.processRoles = []
-        testUser2.authorities = []
+        def actors = userService.findAll()
+        assert actors.size() >= 2
+        def testActor1 = actors[0]
+        def testActor2 = actors[1]
 
-        LocalDate date = LocalDate.of(2020, 7, 25);
-        Case _case = importHelper.createCase("correct", net.getNet())
+        LocalDate date = LocalDate.of(2020, 7, 25)
+        TestHelper.login(superCreator.superIdentity)
+        Case _case = importHelper.createCase("correct", net.getProcess())
         _case.dataSet.get("number").rawValue = 7.0 as Double
         _case.dataSet.get("boolean").rawValue = true
         _case.dataSet.get("text").rawValue = "hello world" as String
-        _case.dataSet.get("user").rawValue = new UserFieldValue(testUser1.stringId, testUser1.name, testUser1.surname, testUser1.email)
+        _case.dataSet.get("user").rawValue = new UserFieldValue(testActor1.stringId, testActor1.firstname,
+                testActor1.lastname, testActor1.email)
         _case.dataSet.get("date").rawValue = date
         _case.dataSet.get("datetime").rawValue = date.atTime(13, 37)
-        _case.dataSet.get("enumeration").rawValue = (_case.petriNet.dataSet.get("enumeration") as ChoiceField).choices.find({ it.defaultValue == "Alice" })
-        _case.dataSet.get("multichoice").rawValue = (_case.petriNet.dataSet.get("multichoice") as ChoiceField).choices.findAll({ it.defaultValue == "Alice" || it.defaultValue == "Bob" }).toSet()
+        _case.dataSet.get("enumeration").rawValue = (_case.process.dataSet.get("enumeration") as ChoiceField).choices.find({ it.defaultValue == "Alice" })
+        _case.dataSet.get("multichoice").rawValue = (_case.process.dataSet.get("multichoice") as ChoiceField).choices.findAll({ it.defaultValue == "Alice" || it.defaultValue == "Bob" }).toSet()
         _case.dataSet.get("enumeration_map").rawValue = "alice"
         _case.dataSet.get("multichoice_map").rawValue = ["alice", "bob"].toSet()
         _case.dataSet.get("file").rawValue = FileFieldValue.fromString("singlefile.txt")
         _case.dataSet.get("fileList").rawValue = FileListFieldValue.fromString("multifile1.txt,multifile2.pdf")
-        _case.dataSet.get("userList").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser1.stringId), dataService.makeUserFieldValue(testUser2.stringId)])
+        _case.dataSet.get("userList").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testActor1.stringId), dataService.makeUserFieldValue(testActor2.stringId)])
         (_case.dataSet.get("i18n_text") as I18nField).rawValue.defaultValue = "Modified i18n text value"
         (_case.dataSet.get("i18n_divider") as I18nField).rawValue.defaultValue = "Modified i18n divider value"
         workflowService.save(_case)
 
-        Task actionTrigger = taskService.searchOne(QTask.task.caseId.eq(_case.stringId).and(QTask.task.transitionId.eq("2")));
+        Task actionTrigger = taskService.searchOne(QTask.task.caseId.eq(_case.stringId) & QTask.task.transitionId.eq("t4"))
         assert actionTrigger != null
-        dataService.setData(actionTrigger, new DataSet([
+        dataService.setData(new SetDataParams(actionTrigger, new DataSet([
                 "testActionTrigger": new TextField(rawValue: "random value")
-        ] as Map<String, Field<?>>), superCreator.getSuperUser())
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().activeActorId))
 
         10.times {
-            _case = importHelper.createCase("wrong${it}", net.getNet())
+//            todo: release/8.0.0 created case already contains modified values -> problem with field cloning
+            _case = importHelper.createCase("wrong${it}", net.getProcess())
             workflowService.save(_case)
         }
 
@@ -158,10 +160,10 @@ class DataSearchRequestTest {
                 new AbstractMap.SimpleEntry<String, String>("boolean.booleanValue" as String, "true" as String),
                 new AbstractMap.SimpleEntry<String, String>("text" as String, "hello world" as String),
                 new AbstractMap.SimpleEntry<String, String>("text.textValue.keyword" as String, "hello world" as String),
-                new AbstractMap.SimpleEntry<String, String>("user" as String, "${testUser1.fullName} ${testUser1.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("user.emailValue.keyword" as String, "${testUser1.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("user.fullNameValue.keyword" as String, "${testUser1.fullName}" as String),
-                new AbstractMap.SimpleEntry<String, String>("user.userIdValue" as String, "${testUser1.getId()}" as String),
+                new AbstractMap.SimpleEntry<String, String>("user" as String, "${testActor1.fullName} ${testActor1.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("user.emailValue.keyword" as String, "${testActor1.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("user.fullNameValue.keyword" as String, "${testActor1.fullName}" as String),
+                new AbstractMap.SimpleEntry<String, String>("user.userIdValue" as String, "${testActor1.stringId}" as String),
                 new AbstractMap.SimpleEntry<String, String>("date.timestampValue" as String, "${Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)).getTime()}" as String),
                 new AbstractMap.SimpleEntry<String, String>("datetime.timestampValue" as String, "${Timestamp.valueOf(date.atTime(13, 37)).getTime()}" as String),
                 new AbstractMap.SimpleEntry<String, String>("enumeration" as String, "Alice" as String),
@@ -200,14 +202,14 @@ class DataSearchRequestTest {
                 new AbstractMap.SimpleEntry<String, String>("fileList.fileNameValue.keyword" as String, "multifile2" as String),
                 new AbstractMap.SimpleEntry<String, String>("fileList.fileExtensionValue.keyword" as String, "txt" as String),
                 new AbstractMap.SimpleEntry<String, String>("fileList.fileExtensionValue.keyword" as String, "pdf" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList" as String, "${testUser1.fullName} ${testUser1.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList" as String, "${testUser2.fullName} ${testUser2.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.emailValue.keyword" as String, "${testUser1.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.emailValue.keyword" as String, "${testUser2.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.fullNameValue.keyword" as String, "${testUser1.fullName}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.fullNameValue.keyword" as String, "${testUser2.fullName}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.userIdValue" as String, "${testUser1.getId()}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.userIdValue" as String, "${testUser2.getId()}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList" as String, "${testActor1.fullName} ${testActor1.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList" as String, "${testActor2.fullName} ${testActor2.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.emailValue.keyword" as String, "${testActor1.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.emailValue.keyword" as String, "${testActor2.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.fullNameValue.keyword" as String, "${testActor1.fullName}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.fullNameValue.keyword" as String, "${testActor2.fullName}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.userIdValue" as String, "${testActor1.stringId}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.userIdValue" as String, "${testActor2.stringId}" as String),
                 new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed" as String, "Eve" as String),
                 new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed" as String, "Eva" as String),
                 new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed.textValue.keyword" as String, "Eve" as String),
@@ -237,7 +239,8 @@ class DataSearchRequestTest {
 
             log.info(String.format("Testing %s == %s", testCase.getKey(), testCase.getValue()))
 
-            Page<Case> result = searchService.search([request] as List, mockService.mockLoggedUser(), PageRequest.of(0, 100), null, false)
+            Page<Case> result = searchService.search([request] as List, superCreator.loggedSuper.activeActorId,
+                    PageRequest.of(0, 100), null, false)
             assert result
             assert result.size() == 1
         }

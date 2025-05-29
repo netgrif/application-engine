@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.querydsl.core.BooleanBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +23,6 @@ import java.util.function.Predicate;
 public class MongoSearchService<T> {
 
     private static final String ERROR_KEY = "ERROR";
-
-    @Autowired
-    private IUserService userService;
 
     @Autowired
     private MongoTemplate mongoTemplate;

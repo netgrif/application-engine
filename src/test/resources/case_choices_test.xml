@@ -1,53 +1,64 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>test</id>
-    <initials>TST</initials>
+    <version>1.0.0</version>
     <title>Test</title>
     <defaultRole>true</defaultRole>
-    <data type="enumeration">
-        <id>enum</id>
-        <title>Enum</title>
-        <values>Choice 1</values>
-        <values>Choice 2</values>
-        <values>Choice 3</values>
-    </data>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
     <data type="boolean">
         <id>bool</id>
         <title>Switch</title>
-        <action trigger="set">
-            <!-- @formatter:off -->
-            enume: f.enum,
-            check: f.this;
-            change enume choices {
-                if (check.rawValue) {
-                    return ["Choice 1","Choice 2","Choice 3"]
-                }
-                return ["Choice A","Choice B","Choice C"]
-            }
-            <!-- @formatter:on -->
-        </action>
+        <event type="set">
+            <id>bool_set</id>
+            <actions phase="post">
+                <action id="action_0">
+					<![CDATA[
+                    change enumeration choices {
+                        if (bool.rawValue) {
+                            return ["Choice 1","Choice 2","Choice 3"]
+                        }
+                        return ["Choice A","Choice B","Choice C"]
+                    }
+                    ]]>
+				</action>
+            </actions>
+        </event>
     </data>
-
+    <data type="enumeration">
+        <id>enumeration</id>
+        <title>Enum</title>
+        <options>
+            <option key="Choice 1">Choice 1</option>
+            <option key="Choice 2">Choice 2</option>
+            <option key="Choice 3">Choice 3</option>
+        </options>
+    </data>
     <transition>
-        <id>1</id>
+        <id>t1</id>
         <x>1</x>
         <y>1</y>
-        <label>Tran</label>
-        <dataGroup>
-            <id>1</id>
-            <dataRef>
-                <id>bool</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>enum</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
+        <title>Tran</title>
+        <flex>
+            <id>t1_flex</id>
+            <item>
+                <dataRef>
+                    <id>bool</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+        </flex>
     </transition>
-</document>
+</process>

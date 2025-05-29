@@ -18,11 +18,12 @@ public enum FieldBehavior {
         return this == EDITABLE || this == VISIBLE || this == HIDDEN;
     }
 
-    public static FieldBehavior fromString(Behavior string) {
-        if (string == null) {
+    // TODO: release/8.0.0 replace FieldBehavior with importer Behavior
+    public static FieldBehavior fromXml(Behavior xmlBehavior) {
+        if (xmlBehavior == null) {
             throw new IllegalArgumentException("Behavior can not be null");
         }
-        return valueOf(string.value().toUpperCase());
+        return valueOf(xmlBehavior.value().toUpperCase());
     }
 
     @Override

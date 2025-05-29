@@ -1,64 +1,96 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>test</id>
-    <initials>TST</initials>
+    <version>1.0.0</version>
     <title>Test</title>
     <defaultRole>true</defaultRole>
-    <!-- ========== DATA ========== -->
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
+    <processEvents/>
+    <caseEvents/>
     <data type="file">
-        <id>1</id>
+        <id>data_1</id>
         <title>file</title>
-        <action trigger="get">
-            <!-- @formatter:off -->
-            field: f.2;
-            change field about {
-            return "2";
-            }
-            <!-- @formatter:on -->
-        </action>
-        <action trigger="set">
-            <!-- @formatter:off -->
-            field: f.3;
-            change field about {
-            return "3";
-            }
-            <!-- @formatter:on -->
-        </action>
+        <event type="get">
+            <id>data_1_get</id>
+            <actions phase="pre">
+                <action id="action_0">
+					<![CDATA[
+                    change data_2 about {
+                        return "2";
+                    }
+                    ]]>
+				</action>
+            </actions>
+        </event>
+        <event type="set">
+            <id>data_1_set</id>
+            <actions phase="post">
+                <action id="action_1">
+					<![CDATA[
+                    change data_3 about {
+                        return "3";
+                    }
+                    ]]>
+				</action>
+            </actions>
+        </event>
     </data>
     <data type="text">
-        <id>2</id>
+        <id>data_2</id>
         <title>2</title>
     </data>
     <data type="text">
-        <id>3</id>
+        <id>data_3</id>
         <title>3</title>
     </data>
-    <!-- ========== TRANSITION ========== -->
     <transition>
         <id>tran</id>
         <x>0</x>
         <y>0</y>
-        <label>tran</label>
-        <dataGroup>
-            <id>1</id>
-            <dataRef>
-                <id>1</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>2</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>3</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
+        <title>tran</title>
+        <flex>
+            <id>tran_flex</id>
+            <item>
+                <dataRef>
+                    <id>data_1</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>data_2</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>data_3</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
-</document>
+</process>

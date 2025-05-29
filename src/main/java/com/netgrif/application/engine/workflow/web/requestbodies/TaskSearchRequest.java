@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow.web.requestbodies;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.netgrif.application.engine.workflow.domain.State;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,8 @@ import java.util.Map;
 @AllArgsConstructor
 public class TaskSearchRequest {
 
+    // todo: release/8.0.0 update
+
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> role;
 
@@ -25,7 +28,7 @@ public class TaskSearchRequest {
     public List<String> title;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    public List<String> user;
+    public List<String> assigneeId;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<PetriNet> process;
@@ -36,13 +39,10 @@ public class TaskSearchRequest {
     public String fullText;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    public List<String> group;
-
-    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    public List<String> users;
-
-    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> stringId;
 
-    public Map<String, String> tags;
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+    public List<State> state;
+
+    public Map<String, String> properties;
 }

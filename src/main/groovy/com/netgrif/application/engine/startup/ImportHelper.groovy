@@ -1,22 +1,31 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.auth.domain.*
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
+
+import com.netgrif.application.engine.authentication.domain.Identity
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
+
+import com.netgrif.application.engine.authorization.domain.Role
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService
 import com.netgrif.application.engine.petrinet.domain.DataRef
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.GetDataParams
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -24,12 +33,12 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import groovy.util.logging.Slf4j
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
+
+import java.util.stream.Collectors
 
 @Slf4j
 @Component
@@ -39,13 +48,16 @@ class ImportHelper {
     private PetriNetRepository petriNetRepository
 
     @Autowired
+    private IIdentityService identityService
+
+    @Autowired
     private IUserService userService
 
     @Autowired
-    private CaseRepository caseRepository
+    private ISessionManagerService sessionManagerService
 
     @Autowired
-    private IAuthorityService authorityService
+    private CaseRepository caseRepository
 
     @Autowired
     private ITaskService taskService
@@ -66,114 +78,88 @@ class ImportHelper {
     private IWorkflowService workflowService
 
     @Autowired
-    private INextGroupService groupService
-
-    @Autowired
-    private ProcessRoleService processRoleService
+    private IRoleService roleService
 
     @Autowired
     private IUriService uriService
 
-    @SuppressWarnings("GroovyAssignabilityCheck")
-    Map<String, Authority> createAuthorities(Map<String, String> authorities) {
-        HashMap<String, Authority> authoritities = new HashMap<>()
-        authorities.each { authority ->
-            authoritities.put(authority.key, authorityService.getOrCreate(authority.value))
-        }
-
-        log.info("Creating ${authoritities.size()} authorities")
-        return authoritities
+    Optional<Process> createNet(String fileName, String release, String actorId = userService.getSystemUser()?.stringId,
+                                String uriNodeId = uriService.getRoot().stringId) {
+        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), actorId, uriNodeId)
     }
 
-    Authority createAuthority(String name) {
-        log.info("Creating authority $name")
-        return authorityService.getOrCreate(name)
-    }
-
-    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
-        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author, uriNodeId)
-    }
-
-    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
+    Optional<Process> createNet(String fileName, VersionType release = VersionType.MAJOR, String actorId = userService.getSystemUser()?.stringId,
+                                String uriNodeId = uriService.getRoot().stringId) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        PetriNet petriNet = petriNetService.importPetriNet(netStream, release, author, uriNodeId).getNet()
+        Process petriNet = petriNetService.importProcess(new ImportProcessParams(netStream, release, actorId, uriNodeId)).getProcess()
         log.info("Imported '${petriNet?.title?.defaultValue}' ['${petriNet?.identifier}', ${petriNet?.stringId}]")
         return Optional.of(petriNet)
     }
 
-    Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser()) {
-        PetriNet petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
+    Optional<Process> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR,
+                                String actorId = userService.getSystemUser()?.stringId) {
+        Process petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
         if (!petriNet) {
-            return createNet(filename, release, author)
+            return createNet(filename, release, actorId)
         }
+        log.info("Process with identifier [{}] already exists", identifier)
         return Optional.of(petriNet)
     }
 
-    ProcessRole getProcessRoleByImportId(PetriNet net, String roleId) {
-        ProcessRole role = net.roles.values().find { it -> it.importId == roleId }
-        return role
+    /**
+     * todo javadoc
+     * */
+    Identity createIdentity(IdentityParams params, List<Role> roles) {
+        Identity identity = identityService.createWithDefaultUser(params)
+
+        Set<String> roleIds = roles.stream().map { role -> role.stringId }.collect(Collectors.toSet())
+        roleService.assignRolesToActor(identity.getMainActorId(), roleIds)
+
+        log.info("Identity [{}][{}] created with default user [{}].", identity.getStringId(), identity.getUsername(),
+                identity.getMainActorId())
+
+        return identity
     }
 
-    Map<String, ProcessRole> getProcessRolesByImportId(PetriNet net, Map<String, String> importId) {
-        HashMap<String, ProcessRole> roles = new HashMap<>()
-        importId.each { it ->
-            roles.put(it.getKey(), getProcessRoleByImportId(net, it.getValue()))
-        }
-        return roles
+    Case createCase(String title, Process net, LoggedIdentity author) {
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .title(title)
+                .authorId(author.activeActorId)
+                .build()
+        return workflowService.createCase(createCaseParams).getCase()
     }
 
-    Map<String, ProcessRole> getProcessRoles(PetriNet net) {
-        List<ProcessRole> roles = processRoleService.findAll(net.stringId)
-        Map<String, ProcessRole> map = [:]
-        net.roles.values().each { netRole ->
-            map[netRole.name.getDefaultValue()] = roles.find { it.roleId == netRole.stringId }
-        }
-        return map
+    Case createCase(String title, Process net) {
+        return createCase(title, net, sessionManagerService.loggedIdentity)
     }
 
-    IUser createUser(User user, Authority[] authorities, ProcessRole[] roles) {
-        authorities.each { user.addAuthority(it) }
-        roles.each { user.addProcessRole(it) }
-        user.state = UserState.ACTIVE
-        user = userService.saveNew(user)
-        log.info("User $user.name $user.surname created")
-        return user
+    Case createCaseAsSuper(String title, Process net) {
+        return createCase(title, net, superCreator.loggedSuper)
     }
 
-    Case createCase(String title, PetriNet net, LoggedUser user) {
-        return workflowService.createCase(net.getStringId(), title, "", user).getCase()
-    }
-
-    Case createCase(String title, PetriNet net) {
-        return createCase(title, net, userService.getSystem().transformToLoggedUser())
-    }
-
-    Case createCaseAsSuper(String title, PetriNet net) {
-        return createCase(title, net, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
-    }
-
-    AssignTaskEventOutcome assignTask(String taskTitle, String caseId, LoggedUser author) {
-        return taskService.assignTask(author, getTaskId(taskTitle, caseId))
+    AssignTaskEventOutcome assignTask(String taskTitle, String caseId, LoggedIdentity assignee) {
+        return taskService.assignTask(new TaskParams(getTaskId(taskTitle, caseId), assignee.activeActorId))
     }
 
     AssignTaskEventOutcome assignTaskToSuper(String taskTitle, String caseId) {
-        return assignTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+        return assignTask(taskTitle, caseId, superCreator.loggedSuper)
     }
 
-    FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedUser author) {
-        return taskService.finishTask(author, getTaskId(taskTitle, caseId))
+    FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedIdentity assignee) {
+        return taskService.finishTask(new TaskParams(getTaskId(taskTitle, caseId), assignee.activeActorId))
     }
 
     FinishTaskEventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
-        return finishTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+        return finishTask(taskTitle, caseId, superCreator.loggedSuper)
     }
 
-    CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedUser user) {
-        return taskService.cancelTask(user, getTaskId(taskTitle, caseId))
+    CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedIdentity assignee) {
+        return taskService.cancelTask(new TaskParams(getTaskId(taskTitle, caseId), assignee.activeActorId))
     }
 
     CancelTaskEventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {
-        return cancelTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+        return cancelTask(taskTitle, caseId, superCreator.loggedSuper)
     }
 
     String getTaskId(String taskTitle, String caseId) {
@@ -182,7 +168,7 @@ class ImportHelper {
     }
 
     SetDataEventOutcome setTaskData(String taskId, DataSet dataSet) {
-        dataService.setData(taskId, dataSet, superCreator.getSuperUser())
+        dataService.setData(new SetDataParams(taskId, dataSet, userService.getSystemUser().stringId))
     }
 
     SetDataEventOutcome setTaskData(String taskTitle, String caseId, DataSet data) {
@@ -190,10 +176,6 @@ class ImportHelper {
     }
 
     List<DataRef> getTaskData(String taskTitle, String caseId) {
-        return dataService.getData(getTaskId(taskTitle, caseId), superCreator.getSuperUser()).getData()
-    }
-
-    void updateSuperUser() {
-        superCreator.setAllToSuperUser();
+        return dataService.getData(new GetDataParams(getTaskId(taskTitle, caseId), userService.getSystemUser().stringId)).getData()
     }
 }

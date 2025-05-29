@@ -9,20 +9,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
+@Getter
 @Document(collection = "eventLogs")
 public abstract class EventLog {
 
     @Id
-    @Getter
     protected ObjectId id;
 
-    @Getter
     protected ObjectId triggerId;
 
-    @Getter
     protected EventPhase eventPhase;
 
-    @Getter
     @Setter
     protected List<ObjectId> triggeredEvents;
 

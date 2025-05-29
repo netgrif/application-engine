@@ -2,16 +2,18 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.IUser
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.authentication.domain.Identity
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,7 +27,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.util.MultiValueMap
 import org.springframework.web.context.WebApplicationContext
 
 import static org.hamcrest.core.StringContains.containsString
@@ -63,13 +64,13 @@ class FileListFieldTest {
     private IWorkflowService workflowService
 
     @Autowired
-    private IUserService userService
-
-    @Autowired
     private WebApplicationContext context
 
     @Autowired
     private IPetriNetService petriNetService
+
+    @Autowired
+    private IIdentityService identityService
 
     @Autowired
     private SuperCreator superCreator
@@ -85,28 +86,34 @@ class FileListFieldTest {
                 .build()
     }
 
-    PetriNet getNet() {
-        def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileListField.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert netOptional.getNet() != null
-        return netOptional.getNet()
+    Process getNet() {
+        def netOptional = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/remoteFileListField.xml"), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId))
+        assert netOptional.getProcess() != null
+        return netOptional.getProcess()
     }
 
     @Test
     void testRemoteAttribute() {
-        PetriNet net = getNet()
+        Process net = getNet()
         assert net.getField(FIELD_ID).isPresent()
-        assert (net.getField(FIELD_ID).get() as FileListField).isRemote()
+        assert (net.getField(FIELD_ID).get()).getProperties().get("remote") == "true"
     }
 
     @Test
     void downloadFileByCaseAndName() {
-        PetriNet net = getNet()
+        Process net = getNet()
 
-        IUser user = userService.findByEmail(configuration.email, true)
-        assert user != null
+        Optional<Identity> identityOpt = identityService.findByUsername(configuration.email)
+        assert identityOpt.isPresent()
 
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .title("Test file from file list download")
+                .authorId(identityOpt.get().toSession().activeActorId)
+                .build()
+        Case useCase = workflowService.createCase(createCaseParams).getCase()
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), identityOpt.get().toSession())
 
         mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/named")
                 .param("fieldId", FIELD_ID)
@@ -121,13 +128,18 @@ class FileListFieldTest {
 
     @Test
     void downloadFileByTask() {
-        PetriNet net = getNet()
+        Process net = getNet()
 
-        IUser user = userService.findByEmail(configuration.email, true)
-        assert user != null
+        Optional<Identity> identityOpt = identityService.findByUsername(configuration.email)
+        assert identityOpt.isPresent()
 
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .title("Test file from file list download")
+                .authorId(identityOpt.get().toSession().activeActorId)
+                .build()
+        Case useCase = workflowService.createCase(createCaseParams).getCase()
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), identityOpt.get().toSession())
 
         // TODO: release/8.0.0 '/test-file-list.txt' or  "test-file.txt" ?
         mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file/named")

@@ -42,9 +42,6 @@ public class CaseSearchRequest {
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> stringId;
 
-    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    public List<String> group;
-
     public Map<String, String> tags;
 
     public CaseSearchRequest(Map<String, Object> request) {
@@ -85,9 +82,6 @@ public class CaseSearchRequest {
         }
         if (request.containsKey("stringId") && request.get("stringId") instanceof List) {
             this.stringId = (List<String>) request.get("stringId");
-        }
-        if (request.containsKey("group") && request.get("group") instanceof List) {
-            this.group = (List<String>) request.get("group");
         }
     }
 

@@ -11,7 +11,5 @@ import java.util.List;
 @Deprecated(since = "6.3.0")
 public interface DelegateTaskEventLogRepository extends MongoRepository<DelegateTaskEventLog, ObjectId> {
 
-    List<DelegateTaskEventLog> findAllByTaskId(ObjectId taskId);
-
-    List<DelegateTaskEventLog> findAllByTaskIdAndDelegate(ObjectId taskId, Long delegateId);
+    List<DelegateTaskEventLog> findAllByTaskId(String taskId);
 }

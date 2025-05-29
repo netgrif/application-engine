@@ -3,11 +3,12 @@ package com.netgrif.application.engine.ipc
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -49,21 +50,22 @@ class CaseApiTest {
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
+        TestHelper.login(superCreator.superIdentity)
     }
 
     public static final String CREATE_NET_FILE = "ipc_createCase.xml"
 
     @Test
     void testCreate() {
-        testNet = petriNetService.importPetriNet(stream(CREATE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        testNet = petriNetService.importProcess(new ImportProcessParams(stream(CREATE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
 
-        assert testNet.getNet() != null
+        assert testNet.getProcess() != null
 
-        Case aCase = importHelper.createCase("Case 1", testNet.getNet())
+        Case aCase = importHelper.createCase("Case 1", testNet.getProcess())
         importHelper.assignTaskToSuper("Task", aCase.stringId)
         importHelper.finishTaskAsSuper("Task", aCase.stringId)
 
-        assert caseRepository.findAllByProcessIdentifier(testNet.getNet().identifier).size() > 1
+        assert caseRepository.findAllByProcessIdentifier(testNet.getProcess().identifier).size() > 1
     }
 
     public static final String SEARCH_NET_FILE = "ipc_where.xml"
@@ -72,13 +74,13 @@ class CaseApiTest {
     void testSearch() {
         testHelper.truncateDbs()
 
-        testNet = petriNetService.importPetriNet(stream(SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        testNet = petriNetService.importProcess(new ImportProcessParams(stream(SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
 
-        assert testNet.getNet() != null
+        assert testNet.getProcess() != null
 
         List<Case> cases = []
         5.times { index ->
-            cases << importHelper.createCase("Case $index" as String, testNet.getNet())
+            cases << importHelper.createCase("Case $index" as String, testNet.getProcess())
         }
 
         importHelper.assignTaskToSuper("Task", cases[0].stringId)

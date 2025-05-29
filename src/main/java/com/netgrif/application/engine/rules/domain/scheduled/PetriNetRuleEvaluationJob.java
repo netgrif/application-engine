@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.rules.domain.scheduled;
 
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.rules.domain.facts.ScheduledRuleFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
@@ -28,7 +28,7 @@ public class PetriNetRuleEvaluationJob extends RuleJob {
     public void doExecute(JobExecutionContext context) {
         String netId = getInstanceId(context);
         log.info("Executing PetriNetRuleEvaluationJob for net " + netId + " of rule " + getRuleIdentifier(context));
-        PetriNet net = petriNetService.getPetriNet(netId);
+        Process net = petriNetService.getPetriNet(netId);
         ruleEngine.evaluateRules(net, new ScheduledRuleFact(netId, getRuleIdentifier(context)));
     }
 

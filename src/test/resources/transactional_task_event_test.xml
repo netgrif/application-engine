@@ -1,0 +1,93 @@
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+	<id>transactional_task_event_test</id>
+	<version>1.0.0</version>
+	<title>Test</title>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<properties>
+		<property key="initials">TST</property>
+	</properties>
+	<processEvents/>
+	<caseEvents/>
+	<transition>
+		<id>assignTest</id>
+		<x>0</x>
+		<y>0</y>
+		<title>Task</title>
+		<flex>
+			<id>assignTest_flex</id>
+		</flex>
+		<event type="assign">
+			<id>x1</id>
+			<actions phase="pre">
+				<action id="action_0">
+					<![CDATA[
+					createCase("transactional_task_event_test", "CasePre")
+					]]>
+				</action>
+			</actions>
+			<actions phase="post">
+				<action id="action_1">
+					<![CDATA[
+					createCase("transactional_task_event_test", "CasePost")
+					throw new RuntimeException("error on purpose")
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>cancelTest</id>
+		<x>0</x>
+		<y>0</y>
+		<title>Task</title>
+		<flex>
+			<id>cancelTest_flex</id>
+		</flex>
+		<event type="cancel">
+			<id>x2</id>
+			<actions phase="pre">
+				<action id="action_2">
+					<![CDATA[
+					createCase("transactional_task_event_test", "CasePre")
+					]]>
+				</action>
+			</actions>
+			<actions phase="post">
+				<action id="action_3">
+					<![CDATA[
+					createCase("transactional_task_event_test", "CasePost")
+					throw new RuntimeException("error on purpose")
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>finishTest</id>
+		<x>0</x>
+		<y>0</y>
+		<title>Task</title>
+		<flex>
+			<id>finishTest_flex</id>
+		</flex>
+		<event type="finish">
+			<id>x3</id>
+			<actions phase="pre">
+				<action id="action_4">
+					<![CDATA[
+					createCase("transactional_task_event_test", "CasePre")
+					]]>
+				</action>
+			</actions>
+			<actions phase="post">
+				<action id="action_5">
+					<![CDATA[
+					createCase("transactional_task_event_test", "CasePost")
+					throw new RuntimeException("error on purpose")
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+</process>

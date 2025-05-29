@@ -1,32 +1,26 @@
 package com.netgrif.application.engine.petrinet.domain;
 
+import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
 import com.netgrif.application.engine.importer.model.DataEventType;
 import com.netgrif.application.engine.importer.model.EventType;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.Event;
-import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
+import com.netgrif.application.engine.petrinet.domain.layout.LayoutContainer;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
-import com.netgrif.application.engine.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
-import com.netgrif.application.engine.petrinet.domain.roles.AssignedUserPermission;
-import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
+import com.netgrif.application.engine.authorization.domain.permissions.TaskPermission;
+import com.netgrif.application.engine.utils.UniqueKeyMapWrapper;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
-import com.querydsl.core.annotations.PropertyType;
-import com.querydsl.core.annotations.QueryType;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Transient;
-import org.apache.lucene.analysis.CharArrayMap;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Document
@@ -34,70 +28,40 @@ import java.util.stream.Collectors;
 @Setter
 public class Transition extends Node {
 
-    @org.springframework.data.mongodb.core.mapping.Field("dataGroups")
-    private Map<String, DataGroup> dataGroups;
-    @org.springframework.data.mongodb.core.mapping.Field("dataSet")
-    private LinkedHashMap<String, DataRef> dataSet;
-    @org.springframework.data.mongodb.core.mapping.Field("roles")
-    private Map<String, Map<RolePermission, Boolean>> roles;
-    private List<String> negativeViewRoles;
-    @org.springframework.data.mongodb.core.mapping.Field("users")
-    private Map<String, Map<RolePermission, Boolean>> userRefs;
-    @org.springframework.data.mongodb.core.mapping.Field("triggers")
-    private List<Trigger> triggers;
-    @QueryType(PropertyType.NONE)
-    private TaskLayout layout;
-    private Integer priority;
-    private AssignPolicy assignPolicy;
     private String icon;
-    private DataFocusPolicy dataFocusPolicy;
+    private LinkedHashMap<String, DataRef> dataSet;
+    private AccessPermissions<TaskPermission> processRolePermissions;
+    private AccessPermissions<TaskPermission> caseRolePermissions;
+    private List<Trigger> triggers;
+    private LayoutContainer layoutContainer;
+    private AssignPolicy assignPolicy;
     private FinishPolicy finishPolicy;
     private Map<EventType, Event> events;
-    private Map<AssignedUserPermission, Boolean> assignedUserPolicy;
-    private String defaultRoleId;
     @Transient
     private Boolean hasAutoTrigger;
-    private Map<String, String> tags;
 
     public Transition() {
         super();
         dataSet = new LinkedHashMap<>();
-        roles = new HashMap<>();
-        userRefs = new HashMap<>();
         triggers = new LinkedList<>();
-        negativeViewRoles = new LinkedList<>();
-        dataGroups = new LinkedHashMap<>();
         assignPolicy = AssignPolicy.MANUAL;
-        dataFocusPolicy = DataFocusPolicy.MANUAL;
         finishPolicy = FinishPolicy.MANUAL;
         events = new HashMap<>();
-        assignedUserPolicy = new HashMap<>();
-        tags = new HashMap<>();
+        processRolePermissions = new AccessPermissions<>();
+        caseRolePermissions = new AccessPermissions<>();
     }
 
     public void setDataRefBehavior(Field<?> field, DataFieldBehavior behavior) {
         // TODO: release/8.0.0
-        setDataRefAttribute(field, dataRef ->  {
-            field.setBehavior(this.importId, behavior);
-            dataRef.setBehavior(behavior);
-        });
+//        setDataRefAttribute(field, dataRef -> {
+//            field.setBehavior(this.importId, behavior);
+//            dataRef.setBehavior(behavior);
+//        });
     }
 
     public void setDataRefComponent(Field<?> field, Component component) {
-        setDataRefAttribute(field, dataRef -> dataRef.setComponent(component));
-    }
-
-    public void setDataRefLayout(Field<?> field, FieldLayout fieldLayout) {
-        setDataRefAttribute(field, dataRef -> dataRef.setLayout(fieldLayout));
-    }
-
-    private void setDataRefAttribute(Field<?> field, Consumer<DataRef> attributeChange) {
-        String fieldId = field.getStringId();
-        if (!dataSet.containsKey(fieldId)) {
-            dataSet.put(fieldId, new DataRef(field));
-        }
-        DataRef dataRef = dataSet.get(fieldId);
-        attributeChange.accept(dataRef);
+        // TODO: release/8.0.0
+//        setDataRefAttribute(field, dataRef -> dataRef.setComponent(component));
     }
 
     public void setDataEvents(String field, Map<DataEventType, DataEvent> events) {
@@ -106,28 +70,12 @@ public class Transition extends Node {
         }
     }
 
-    public void addRole(String roleId, Map<RolePermission, Boolean> permissions) {
-        if (roles.containsKey(roleId) && roles.get(roleId) != null) {
-            roles.get(roleId).putAll(permissions);
-        } else {
-            roles.put(roleId, permissions);
-        }
+    public void addProcessRolePermission(String roleId, Map<TaskPermission, Boolean> permissions) {
+        this.processRolePermissions.addPermissions(roleId, permissions);
     }
 
-    public void addNegativeViewRole(String roleId) {
-        negativeViewRoles.add(roleId);
-    }
-
-    public void addUserRef(String userRefId, Map<RolePermission, Boolean> permissions) {
-        if (userRefs.containsKey(userRefId) && userRefs.get(userRefId) != null) {
-            userRefs.get(userRefId).putAll(permissions);
-        } else {
-            userRefs.put(userRefId, permissions);
-        }
-    }
-
-    public void addDataGroup(DataGroup dataGroup) {
-        dataGroups.put(dataGroup.getStringId(), dataGroup);
+    public void addCaseRolePermission(String userRefId, Map<TaskPermission, Boolean> permissions) {
+        this.caseRolePermissions.addPermissions(userRefId, permissions);
     }
 
     public void addTrigger(Trigger trigger) {
@@ -158,23 +106,17 @@ public class Transition extends Node {
         return getPostActions(EventType.CANCEL);
     }
 
-    public List<Action> getPreDelegateActions() {
-        return getPreActions(EventType.DELEGATE);
-    }
-
-    public List<Action> getPostDelegateActions() {
-        return getPostActions(EventType.DELEGATE);
-    }
-
     private List<Action> getPreActions(EventType type) {
-        if (events.containsKey(type))
+        if (events.containsKey(type)) {
             return events.get(type).getPreActions();
+        }
         return new LinkedList<>();
     }
 
     private List<Action> getPostActions(EventType type) {
-        if (events.containsKey(type))
+        if (events.containsKey(type)) {
             return events.get(type).getPostActions();
+        }
         return new LinkedList<>();
     }
 
@@ -190,13 +132,10 @@ public class Transition extends Node {
         return getMessage(EventType.CANCEL);
     }
 
-    public I18nString getDelegateMessage() {
-        return getMessage(EventType.DELEGATE);
-    }
-
     private I18nString getMessage(EventType type) {
-        if (events.containsKey(type))
+        if (events.containsKey(type)) {
             return events.get(type).getMessage();
+        }
         return null;
     }
 
@@ -238,26 +177,20 @@ public class Transition extends Node {
 
     @Override
     public Transition clone() {
+        // TODO: release/8.0.0
         Transition clone = new Transition();
         clone.setTitle(this.getTitle() == null ? null : this.getTitle().clone());
-        clone.setPosition(this.getPosition().getX(), this.getPosition().getY());
         clone.setImportId(this.importId);
-        clone.setDataGroups(this.dataGroups == null ? null : dataGroups.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y.clone(), LinkedHashMap::new)));
         clone.setDataSet(this.dataSet == null ? null : dataSet.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y.clone(), LinkedHashMap::new)));
-        clone.setRoles(this.roles == null ? null : roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
-        clone.setNegativeViewRoles(new ArrayList<>(negativeViewRoles));
-        clone.setUserRefs(this.userRefs == null ? null : userRefs.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
         clone.setTriggers(this.triggers == null ? null : triggers.stream().map(Trigger::clone).collect(Collectors.toList()));
-        clone.setLayout(this.layout == null ? null : layout.clone());
-        clone.setPriority(priority);
         clone.setAssignPolicy(assignPolicy);
         clone.setIcon(icon);
-        clone.setDataFocusPolicy(dataFocusPolicy);
         clone.setFinishPolicy(finishPolicy);
         clone.setEvents(this.events == null ? null : events.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
-        clone.setAssignedUserPolicy(new HashMap<>(assignedUserPolicy));
-        clone.setTags(new HashMap<>(this.tags));
-        clone.setDefaultRoleId(defaultRoleId);
+        clone.setProperties(new UniqueKeyMapWrapper<>(this.getProperties()));
+        clone.setLayoutContainer(this.layoutContainer == null ? null : this.layoutContainer.clone());
+        clone.setProcessRolePermissions(new AccessPermissions<>(this.processRolePermissions));
+        clone.setCaseRolePermissions(new AccessPermissions<>(this.caseRolePermissions));
         return clone;
     }
 }

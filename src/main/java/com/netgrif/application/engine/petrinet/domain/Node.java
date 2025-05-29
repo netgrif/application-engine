@@ -1,48 +1,20 @@
 package com.netgrif.application.engine.petrinet.domain;
 
-import lombok.Getter;
-import org.bson.types.ObjectId;
+import com.netgrif.application.engine.utils.UniqueKeyMapWrapper;
+import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@EqualsAndHashCode(callSuper = true)
 @Document
-public abstract class Node extends PetriNetObject {
+@Data
+@AllArgsConstructor
+public abstract class Node extends ProcessObject {
 
-    @Getter
-    private Position position;
-
-    @Getter
     private I18nString title;
+    private UniqueKeyMapWrapper<String> properties;
 
     public Node() {
-        this.setObjectId(new ObjectId());
-        position = new Position();
-    }
-
-    public void setPositionX(int x) {
-        position.setX(x);
-    }
-
-    public void setPositionY(int y) {
-        position.setY(y);
-    }
-
-    public void setPosition(int x, int y) {
-        position.setX(x);
-        position.setY(y);
-    }
-
-    public void setPosition(Position positionData) {
-        if (positionData != null) {
-            position.setY(positionData.getY());
-            position.setX(positionData.getX());
-        }
-    }
-
-    public void setTitle(I18nString title) {
-        this.title = title;
-    }
-
-    public void setTitle(String title) {
-        setTitle(new I18nString(title));
+        super();
+        this.properties = new UniqueKeyMapWrapper<>();
     }
 }

@@ -1,11 +1,13 @@
 package com.netgrif.application.engine.petrinet.domain.roles
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
+import com.netgrif.application.engine.authorization.domain.ProcessRole
+import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -48,9 +50,9 @@ class ProcessRoleTest {
 
     private static final String CASE_NAME = "Test case"
     private static final String CASE_INITIALS = "TC"
-    private static final String USER_EMAIL_VIEW = "ProcessRoleTest@test.com"
-    private static final String USER_EMAIL_PERFORM = "ProcessRoleTestPerform@test.com"
-    private static final String USER_EMAIL_BOTH = "ProcessRoleTestPerformView@test.com"
+    private static final String USER_EMAIL_VIEW = "RoleTest@test.com"
+    private static final String USER_EMAIL_PERFORM = "RoleTestPerform@test.com"
+    private static final String USER_EMAIL_BOTH = "RoleTestPerformView@test.com"
 
     private Authentication auth
 
@@ -69,7 +71,7 @@ class ProcessRoleTest {
     private IPetriNetService petriNetService;
 
     @Autowired
-    private ProcessRoleRepository userProcessRoleRepository
+    private ProcessRoleRepository userRoleRepository
 
     @Autowired
     private SuperCreator superCreator;
@@ -86,29 +88,33 @@ class ProcessRoleTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rolref_view.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert net.getNet() != null
+        def net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/rolref_view.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
+        assert net.getProcess() != null
 
-        String netId = net.getNet().getStringId()
+        ProcessRole viewRole = userRoleRepository.findByImportId("role1")
+        ProcessRole performRole = userRoleRepository.findByImportId("role2")
 
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        def processRoles = userProcessRoleRepository.findAllByNetId(netId)
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
-                [processRoles.find {
-                    it.getStringId() == net.getNet().roles.values().find {
-                        it.name.defaultValue == "View"
-                    }.stringId
-                }] as ProcessRole[])
+        importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Test"))
+                .lastname(new TextField("Integration"))
+                .username(new TextField(USER_EMAIL_VIEW))
+                .password(new TextField("password"))
+                .build(), List.of(viewRole))
 
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_PERFORM, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
-                [processRoles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
+        importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Test"))
+                .lastname(new TextField("Integration"))
+                .username(new TextField(USER_EMAIL_PERFORM))
+                .password(new TextField("password"))
+                .build(), List.of(performRole))
 
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_BOTH, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
-                [processRoles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "View" }.stringId },
-                 processRoles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
+        importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Test"))
+                .lastname(new TextField("Integration"))
+                .username(new TextField(USER_EMAIL_BOTH))
+                .password(new TextField("password"))
+                .build(), List.of(viewRole, performRole))
     }
 
     private String caseId

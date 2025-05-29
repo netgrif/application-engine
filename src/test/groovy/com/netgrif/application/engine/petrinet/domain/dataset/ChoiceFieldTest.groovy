@@ -6,6 +6,7 @@ import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.DataRef
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -41,10 +42,10 @@ class ChoiceFieldTest {
     private TestHelper testHelper
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreator superCreator
 
     private Closure<InputStream> stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
@@ -53,15 +54,16 @@ class ChoiceFieldTest {
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
+        TestHelper.login(superCreator.superIdentity)
     }
 
     @Test
     void testChoices() {
-        def netOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert netOptional.getNet() != null
-        def net = netOptional.getNet()
+        def netOptional = petriNetService.importProcess(new ImportProcessParams(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
+        assert netOptional.getProcess() != null
+        def net = netOptional.getProcess()
 
-        Set<I18nString> choices = ((ChoiceField) net.dataSet["enum"]).choices
+        Set<I18nString> choices = ((ChoiceField) net.dataSet["enumeration"]).choices
         assert choices.size() == 3
         assert choices.find { it.defaultValue == "Choice 1" }
         assert choices.find { it.defaultValue == "Choice 2" }
@@ -73,7 +75,7 @@ class ChoiceFieldTest {
                 "bool": new BooleanField(rawValue: true)
         ] as Map<String, Field<?>>))
         List<DataRef> fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
-        choices = ((EnumerationField) fields.find { it.field.name.defaultValue == "Enum" }.field).choices
+        choices = ((EnumerationField) fields.find { it.field.title.defaultValue == "Enum" }.field).choices
 
         assert choices.size() == 3
         assert choices.find { it.defaultValue == "Choice 1" }
@@ -85,7 +87,7 @@ class ChoiceFieldTest {
         ] as Map<String, Field<?>>))
 
         fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
-        choices = ((EnumerationField) fields.find { it.field.name.defaultValue == "Enum" }.field).choices
+        choices = ((EnumerationField) fields.find { it.field.title.defaultValue == "Enum" }.field).choices
 
         assert choices.size() == 3
         assert choices.find { it.defaultValue == "Choice A" }
@@ -97,7 +99,7 @@ class ChoiceFieldTest {
         ] as Map<String, Field<?>>))
 
         fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
-        choices = ((EnumerationField) fields.find { it.field.name.defaultValue == "Enum" }.field).choices
+        choices = ((EnumerationField) fields.find { it.field.title.defaultValue == "Enum" }.field).choices
 
         assert choices.size() == 3
         assert choices.find { it.defaultValue == "Choice 1" }

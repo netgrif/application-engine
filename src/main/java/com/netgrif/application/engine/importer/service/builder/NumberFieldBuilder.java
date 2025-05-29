@@ -13,11 +13,7 @@ public class NumberFieldBuilder extends FieldBuilder<NumberField> {
     public NumberField build(Data data, Importer importer) {
         NumberField field = new NumberField();
         initialize(field);
-        setDefaultValue(field, data, defaultValue -> {
-            if (defaultValue != null) {
-                field.setDefaultValue(Double.parseDouble(defaultValue));
-            }
-        });
+        setDefaultValue(field, data, Double::parseDouble);
         return field;
     }
 

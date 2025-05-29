@@ -1,0 +1,45 @@
+package com.netgrif.application.engine.authorization.service;
+
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
+import com.netgrif.application.engine.authorization.domain.ApplicationRole;
+import com.netgrif.application.engine.authorization.service.interfaces.IApplicationAuthorizationService;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
+import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
+import com.netgrif.application.engine.startup.ApplicationRoleRunner;
+import org.springframework.stereotype.Service;
+
+import java.util.Set;
+
+@Service
+public class ApplicationAuthorizationService extends AuthorizationService implements IApplicationAuthorizationService {
+
+
+    public ApplicationAuthorizationService(ISessionManagerService sessionManagerService, IRoleAssignmentService roleAssignmentService,
+                                           ApplicationRoleRunner applicationRoleRunner) {
+        super(sessionManagerService, applicationRoleRunner, roleAssignmentService);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public boolean hasApplicationRole(String roleName) {
+        if (roleName == null) {
+            return false;
+        }
+
+        LoggedIdentity loggedIdentity = sessionManagerService.getLoggedIdentity();
+        if (loggedIdentity == null || loggedIdentity.getActiveActorId() == null) {
+            return false;
+        }
+
+        ApplicationRole appRole = applicationRoleRunner.getAppRole(roleName);
+        if (appRole == null) {
+            return false;
+        }
+
+        Set<String> roleIds = roleAssignmentService.findAllRoleIdsByActorAndGroups(loggedIdentity.getActiveActorId());
+
+        return roleIds.contains(appRole.getStringId());
+    }
+}

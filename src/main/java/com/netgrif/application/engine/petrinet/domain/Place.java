@@ -1,32 +1,27 @@
 package com.netgrif.application.engine.petrinet.domain;
 
-import com.netgrif.application.engine.petrinet.domain.arcs.reference.Referencable;
-import lombok.Getter;
-import lombok.Setter;
+import com.netgrif.application.engine.petrinet.domain.throwable.IllegalMarkingException;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@EqualsAndHashCode(callSuper = true)
+@Data
+@NoArgsConstructor
 @Document
-public class Place extends Node implements Referencable {
+public class Place extends Node {
 
-    @Getter
-    @Setter
-    private Integer tokens;
+    private int tokens;
 
-    @Getter
-    @Setter
-    private Boolean isStatic;
-
-    public Place() {
-        super();
-    }
 
     public void addTokens(int tokens) {
         this.tokens += tokens;
     }
 
-    public void removeTokens(Integer tokens) throws IllegalArgumentException {
+    public void removeTokens(int tokens) throws IllegalArgumentException {
         if (this.tokens - tokens < 0) {
-            throw new IllegalArgumentException("Place can not have negative number of tokens.");
+            throw new IllegalMarkingException(this);
         }
         this.tokens -= tokens;
     }
@@ -47,16 +42,8 @@ public class Place extends Node implements Referencable {
     public Place clone() {
         Place clone = new Place();
         clone.setTokens(this.tokens);
-        clone.setIsStatic(this.isStatic);
         clone.setTitle(this.getTitle());
-        clone.setPosition(this.getPosition());
-        clone.setObjectId(this.getObjectId());
         clone.setImportId(this.getImportId());
         return clone;
-    }
-
-    @Override
-    public int getMultiplicity() {
-        return tokens;
     }
 }

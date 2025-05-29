@@ -13,11 +13,7 @@ public class ButtonFieldBuilder extends FieldBuilder<ButtonField> {
     public ButtonField build(Data data, Importer importer) {
         ButtonField field = new ButtonField();
         initialize(field);
-        setDefaultValue(field, data, defaultValue -> {
-            if (defaultValue != null) {
-                field.setDefaultValue(Integer.parseInt(defaultValue));
-            }
-        });
+        setDefaultValue(field, data, Integer::parseInt);
         return field;
     }
 

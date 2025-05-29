@@ -15,7 +15,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,7 +41,7 @@ public class ElasticController {
         this.properties = properties;
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@applicationAuthorizationService.hasApplicationRole('admin')")
     @Operation(summary = "Reindex specified cases",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -61,10 +60,10 @@ public class ElasticController {
             }
 
             long numOfPages = (count / properties.getReindexExecutor().getSize()) + 1;
-            log.info("Reindexing cases: " + numOfPages + " pages");
+            log.info("Reindexing cases: {} pages", numOfPages);
 
             for (int page = 0; page < numOfPages; page++) {
-                log.info("Indexing page " + (page + 1));
+                log.info("Indexing page {}", (page + 1));
                 reindexingTask.forceReindexPage(predicate, page, numOfPages);
             }
             return MessageResource.successMessage("Success");

@@ -1,11 +1,10 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
-import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.startup.GroupRunner
+import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.startup.SystemUserRunner
 import org.junit.jupiter.api.BeforeEach
@@ -33,13 +32,7 @@ class FieldTest {
     private MongoTemplate template
 
     @Autowired
-    private UserRepository userRepository
-
-    @Autowired
-    private SystemUserRunner systemUserRunner
-
-    @Autowired
-    private GroupRunner groupRunner
+    private SystemUserRunner systemIdentityRunner
 
     @Autowired
     private TestHelper testHelper
@@ -51,17 +44,17 @@ class FieldTest {
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
     }
 
-    def limitsNetOptional
-    PetriNet net
+    Process net
 
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
+        TestHelper.login(superCreator.superIdentity)
     }
 
     @Test
     void testImport() {
-        limitsNetOptional = importer.importPetriNet(stream(LIMITS_NET_FILE))
+        net = importer.importPetriNet(stream(LIMITS_NET_FILE)).process
 
         assertNet()
         assertNumberField()
@@ -81,40 +74,39 @@ class FieldTest {
     }
 
     private void assertNet() {
-        assert limitsNetOptional.isPresent()
-        net = limitsNetOptional.get()
+        assert net != null
         assert net.dataSet.size() == 15
     }
 
     private void assertNumberField() {
         NumberField field = net.dataSet["number"] as NumberField
-        assert field.defaultValue == 10.0
+        assert field.defaultValue.defaultValue == 10.0
         assert field.description.defaultValue == "Number field description"
-        assert field.name.defaultValue == "Number"
+        assert field.title.defaultValue == "Number"
         assert field.placeholder.defaultValue == "Number field placeholder"
         //TODO: release/8.0.0 validations are ignored
 //        java.lang.NullPointerException: Cannot invoke method get() on null object
-        assert field.validations.get(0).rule == "inrange 0,inf"
-        assert field.validations.get(1).rule == "inrange 0,inf"
-        assert field.validations.get(1).message.defaultValue == "Number field validation message"
+        assert field.validations.get(0).name == "inrange"
+        assert field.validations.get(0).serverArguments.argument.get(0).defaultValue == "0"
+        assert field.validations.get(0).serverArguments.argument.get(1).defaultValue == "inf"
+        assert field.validations.get(0).message.defaultValue == "Number field validation message"
     }
 
     private void assertTextField() {
         TextField field = net.dataSet["text"] as TextField
-        assert field.defaultValue == "text"
+        assert field.defaultValue.defaultValue == "text"
         assert field.description.defaultValue == "Text field description"
-        assert field.name.defaultValue == "Text"
+        assert field.title.defaultValue == "Text"
         assert field.placeholder.defaultValue == "Text field placeholder"
-        assert field.validations.get(0).rule == "email"
-        assert field.validations.get(1).rule == "email"
-        assert field.validations.get(1).message.defaultValue == "Mail validation message"
+        assert field.validations.get(0).name == "email"
+        assert field.validations.get(0).message.defaultValue == "Mail validation message"
     }
 
     private void assertEnumerationField() {
         EnumerationField field = net.dataSet["enumeration"] as EnumerationField
-        assert field.defaultValue == "enumeration"
+        assert field.defaultValue.defaultValue == new I18nString("enumeration")
         assert field.description.defaultValue == "Enumeration field description"
-        assert field.name.defaultValue == "Enumeration"
+        assert field.title.defaultValue == "Enumeration"
         assert field.placeholder.defaultValue == "Enumeration field placeholder"
         assert field.choices.size() == 3
         assert field.choices.find { it.defaultValue == "enumeration" }
@@ -124,11 +116,11 @@ class FieldTest {
 
     private void assertMultichoiceField() {
         MultichoiceField field = net.dataSet["multichoice"] as MultichoiceField
-        assert field.defaultValue.size() == 2
-        assert field.defaultValue.find { it.defaultValue == "multichoice" }
-        assert field.defaultValue.find { it.defaultValue == "multichoice2" }
+        assert field.defaultValue.defaultValue.size() == 2
+        assert field.defaultValue.defaultValue.find { it.defaultValue == "multichoice" }
+        assert field.defaultValue.defaultValue.find { it.defaultValue == "multichoice2" }
         assert field.description.defaultValue == "Multichoice field description"
-        assert field.name.defaultValue == "Multichoice"
+        assert field.title.defaultValue == "Multichoice"
         assert field.placeholder.defaultValue == "Multichoice field placeholder"
         assert field.choices.size() == 3
         assert field.choices.find { it.defaultValue == "multichoice" }
@@ -136,90 +128,99 @@ class FieldTest {
         assert field.choices.find { it.defaultValue == "multichoice3" }
 
         MultichoiceField emptyField = net.dataSet["emptyMultichoice"] as MultichoiceField
-        assert emptyField.defaultValue instanceof HashSet
-        assert emptyField.defaultValue.isEmpty()
+        assert emptyField.defaultValue.defaultValue instanceof HashSet
+        assert emptyField.defaultValue.defaultValue.isEmpty()
     }
 
     private void assertBooleanField() {
         BooleanField field = net.dataSet["boolean"] as BooleanField
-        assert field.defaultValue == true
+        assert field.defaultValue.defaultValue == true
         assert field.description.defaultValue == "Boolean field description"
-        assert field.name.defaultValue == "Boolean"
+        assert field.title.defaultValue == "Boolean"
         assert field.placeholder.defaultValue == "Boolean field placeholder"
     }
 
     private void assertDateField() {
         DateField field = net.dataSet["date"] as DateField
         assert field.description.defaultValue == "Date field description"
-        assert field.name.defaultValue == "Date"
+        assert field.title.defaultValue == "Date"
         assert field.placeholder.defaultValue == "Date field placeholder"
-        assert field.validations.get(0).rule == "between today,future"
-        assert field.validations.get(1).message.defaultValue == "Date field validation message"
-        assert field.validations.get(1).rule == "between today,future"
-        assert field.validations.get(2).message.defaultValue == "Date field validation message 2"
-        assert field.validations.get(2).rule == "between today,tommorow"
+        assert field.validations.get(0).message.defaultValue == "Date field validation message"
+        assert field.validations.get(0).name == "between"
+        assert field.validations.get(0).serverArguments.argument.get(0).defaultValue == "today"
+        assert field.validations.get(0).serverArguments.argument.get(1).defaultValue == "future"
+        assert field.validations.get(1).message.defaultValue == "Date field validation message 2"
+        assert field.validations.get(1).name == "between"
+        assert field.validations.get(1).serverArguments.argument.get(0).defaultValue == "today"
+        assert field.validations.get(1).serverArguments.argument.get(1).defaultValue == "tommorow"
     }
 
     private void assertFileField() {
         FileField field = net.dataSet["file"] as FileField
         assert field.description.defaultValue == "File field description"
-        assert field.name.defaultValue == "File"
+        assert field.title.defaultValue == "File"
         assert field.placeholder.defaultValue == "File field placeholder"
     }
 
     private void assertUserField() {
         UserField field = net.dataSet["user"] as UserField
         assert field.description.defaultValue == "User field description"
-        assert field.name.defaultValue == "User"
+        assert field.title.defaultValue == "User"
         assert field.placeholder.defaultValue == "User field placeholder"
     }
 
     private void assertDateTimeField() {
         DateTimeField field = net.dataSet["dateTime"] as DateTimeField
         assert field.description.defaultValue == "DateTime field description"
-        assert field.name.defaultValue == "DateTime"
+        assert field.title.defaultValue == "DateTime"
         assert field.placeholder.defaultValue == "DateTime field placeholder"
     }
 
     private void assertCaseRef() {
         CaseField field = net.dataSet["caseRef"] as CaseField
-        assert field.name.defaultValue == "CaseRef"
+        assert field.title.defaultValue == "CaseRef"
         assert field.allowedNets.size() == 2
         assert field.allowedNets.containsAll(["processId1", "processId2"])
     }
 
     private void assertUserList() {
         UserListField field = net.dataSet["emptyUserList"] as UserListField
-        assert field.name.defaultValue == "Empty user list"
+        assert field.title.defaultValue == "Empty user list"
         assert field.description.defaultValue == "User list description"
-        assert field.defaultValue == null
+        assert field.defaultValue.defaultValue == null
     }
 
     private void assertTaskRef() {
         TaskField field = net.dataSet["emptyTaskRef"] as TaskField
-        assert field.name.defaultValue == "Empty task ref"
-        assert field.defaultValue instanceof List
-        assert field.defaultValue.isEmpty()
+        assert field.title.defaultValue == "Empty task ref"
+        assert field.defaultValue.defaultValue instanceof List
+        assert field.defaultValue.defaultValue.isEmpty()
     }
 
     private void assertMultichoiceMap() {
         MultichoiceMapField field = net.dataSet["emptyMultichoiceMap"] as MultichoiceMapField
-        assert field.name.defaultValue == "Empty multichoice map"
+        assert field.title.defaultValue == "Empty multichoice map"
         assert field.description.defaultValue == "Multichoice map description"
         assert field.placeholder.defaultValue == "Multichoice map placeholder"
-        assert field.defaultValue instanceof Set
-        assert field.defaultValue.isEmpty()
+        assert field.defaultValue.defaultValue instanceof Set
+        assert field.defaultValue.defaultValue.isEmpty()
     }
 
     private void assertI18nField() {
         I18nField field = net.dataSet["i18n"] as I18nField
-        assert field.name.defaultValue == "Text I18n"
+        assert field.title.defaultValue == "Text I18n"
         assert field.description.defaultValue == "This is I18n text field"
         assert field.placeholder.defaultValue == "Text I18n field"
-        assert field.defaultValue.defaultValue == "Default i18n text value"
-        assert field.validations.get(0).rule == "translationRequired sk,en"
+        assert field.defaultValue.defaultValue.defaultValue == "Default i18n text value"
+        assert field.validations.get(0).name == "translationRequired"
+        assert field.validations.get(0).serverArguments.argument.get(0).defaultValue == "sk"
+        assert field.validations.get(0).serverArguments.argument.get(1).defaultValue == "en"
         assert field.validations.get(0).message.defaultValue == "Slovak and English language required"
-        assert field.validations.get(1).rule == "translationOnly sk,en,cz,de"
+        assert field.validations.get(1).name == "translationOnly"
+        assert field.validations.get(1).serverArguments.argument.get(0).defaultValue == "sk"
+        assert field.validations.get(1).serverArguments.argument.get(1).defaultValue == "en"
+        assert field.validations.get(1).serverArguments.argument.get(2).defaultValue == "cz"
+        assert field.validations.get(1).serverArguments.argument.get(3).defaultValue == "de"
         assert field.validations.get(1).message.defaultValue == "Only Slovak, English, Czech and German languages allowed"
     }
 }

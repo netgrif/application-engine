@@ -2,10 +2,13 @@ package com.netgrif.application.engine;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
-import com.netgrif.application.engine.auth.domain.User;
+import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.mail.EmailType;
 import com.netgrif.application.engine.mail.domain.MailDraft;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import com.netgrif.application.engine.startup.ImportHelper;
 import freemarker.template.TemplateException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +23,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 
 @SpringBootTest
@@ -34,6 +38,9 @@ public class MailSenderServiceTest {
     @Autowired
     private IMailService service;
 
+    @Autowired
+    private ImportHelper importHelper;
+
     private GreenMail smtpServer;
 
     @BeforeEach
@@ -44,7 +51,11 @@ public class MailSenderServiceTest {
 
     @Test
     public void testSend() throws Exception {
-        service.sendRegistrationEmail(new User(RECIPIENT, "", "", ""));
+        Identity identity = importHelper.createIdentity(IdentityParams.with()
+                .username(new TextField(RECIPIENT))
+                .password(new TextField("password"))
+                .build(), new ArrayList<>());
+        service.sendRegistrationEmail(identity);
 
         MimeMessage[] messages = smtpServer.getReceivedMessages();
 

@@ -7,10 +7,10 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField;
 import org.springframework.stereotype.Component;
 
-import java.util.stream.Collectors;
+import java.util.LinkedHashSet;
 
 @Component
-public class MultichoiceFieldBuilder extends FieldBuilder<MultichoiceField> {
+public class MultichoiceFieldBuilder extends ChoiceFieldBuilder<MultichoiceField, LinkedHashSet<I18nString>> {
 
     @Override
     public MultichoiceField build(Data data, Importer importer) {
@@ -18,13 +18,12 @@ public class MultichoiceFieldBuilder extends FieldBuilder<MultichoiceField> {
         initialize(field);
         if (data.getOptions() != null) {
             setFieldOptions(field, data, importer);
-        } else {
-            setFieldChoices(field, data, importer);
         }
-        setDefaultValues(field, data, init -> {
-            if (init != null && !init.isEmpty()) {
-                field.setDefaultValue(init.stream().map(I18nString::new).collect(Collectors.toSet()));
-            }
+        setDefaultValue(field, data, s -> {
+            // todo: release/8.0.0 data.init string split by comma and iterate
+            LinkedHashSet<I18nString> value = new LinkedHashSet<>();
+            value.add(new I18nString(s));
+            return value;
         });
         return field;
     }

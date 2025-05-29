@@ -1,91 +1,70 @@
 package com.netgrif.application.engine.validation
 
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField
 import com.netgrif.application.engine.petrinet.domain.dataset.DateField
 import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
-import org.junit.Ignore
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
-class ValidationTest {
+class ValidationTest extends EngineTest {
 
-    @Autowired
-    private ImportHelper importHelper
+    private Process importTextNet() {
+        Process testNet = importHelper.createNet("validation/valid_text.xml", VersionType.MAJOR).get()
+        assert testNet != null
+        return testNet
+    }
 
-    @Autowired
-    private CaseRepository caseRepository
+    private Process importRegexNet() {
+        Process testNet = importHelper.createNet("validation/valid_regex.xml", VersionType.MAJOR).get()
+        assert testNet != null
+        return testNet
+    }
 
-    @Autowired
-    private TestHelper testHelper
+    private Process importBooleanNet() {
+        Process testNet = importHelper.createNet("validation/valid_boolean.xml", VersionType.MAJOR).get()
+        assert testNet != null
+        return testNet
+    }
 
-    @Autowired
-    private IPetriNetService petriNetService
+    private Process importDateNet() {
+        Process testNet = importHelper.createNet("validation/valid_date.xml", VersionType.MAJOR).get()
+        assert testNet != null
+        return testNet
+    }
 
-    @Autowired
-    private SuperCreator superCreator
+    private Process importNumberNet() {
+        Process testNet = importHelper.createNet("validation/valid_number.xml", VersionType.MAJOR).get()
+        assert testNet != null
+        return testNet
+    }
 
     @BeforeEach
-    void setup() {
-        testHelper.truncateDbs()
-    }
-
-    private PetriNet importTextNet() {
-        PetriNet testNet = importHelper.createNet("validation/valid_text.xml", VersionType.MAJOR).get()
-        assert testNet != null
-        return testNet
-    }
-
-    private PetriNet importRegexNet() {
-        PetriNet testNet = importHelper.createNet("validation/valid_regex.xml", VersionType.MAJOR).get()
-        assert testNet != null
-        return testNet
-    }
-
-    private PetriNet importBooleanNet() {
-        PetriNet testNet = importHelper.createNet("validation/valid_boolean.xml", VersionType.MAJOR).get()
-        assert testNet != null
-        return testNet
-    }
-
-    private PetriNet importDateNet() {
-        PetriNet testNet = importHelper.createNet("validation/valid_date.xml", VersionType.MAJOR).get()
-        assert testNet != null
-        return testNet
-    }
-
-    private PetriNet importNumberNet() {
-        PetriNet testNet = importHelper.createNet("validation/valid_number.xml", VersionType.MAJOR).get()
-        assert testNet != null
-        return testNet
+    void before() {
+        TestHelper.login(superCreator.superIdentity)
     }
 
     // TEXT FIELD
     @Test
     void textValid_email() {
-        PetriNet testNet = importTextNet()
+        Process testNet = importTextNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -97,7 +76,7 @@ class ValidationTest {
 
     @Test
     void textValid_email2() {
-        PetriNet testNet = importTextNet()
+        Process testNet = importTextNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -109,7 +88,7 @@ class ValidationTest {
 
     @Test
     void textValid_email3() {
-        PetriNet testNet = importTextNet()
+        Process testNet = importTextNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -121,7 +100,7 @@ class ValidationTest {
 
     @Test
     void textValid_email_Exception() {
-        PetriNet testNet = importTextNet()
+        Process testNet = importTextNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -136,7 +115,7 @@ class ValidationTest {
 
     @Test
     void textValid_email_Exception2() {
-        PetriNet testNet = importTextNet()
+        Process testNet = importTextNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -152,7 +131,7 @@ class ValidationTest {
 
     @Test
     void textValid_telnumber() {
-        PetriNet testNet = importTextNet()
+        Process testNet = importTextNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -164,7 +143,7 @@ class ValidationTest {
 
     @Test
     void textValid_telnumber2() {
-        PetriNet testNet = importTextNet()
+        Process testNet = importTextNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -176,7 +155,7 @@ class ValidationTest {
 
     @Test
     void textValid_telnumber3() {
-        PetriNet testNet = importTextNet()
+        Process testNet = importTextNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -188,7 +167,7 @@ class ValidationTest {
 
     @Test
     void textValid_telnumber4() {
-        PetriNet testNet = importTextNet()
+        Process testNet = importTextNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -200,7 +179,7 @@ class ValidationTest {
 
     @Test
     void textValid_telnumber_Exception() {
-        PetriNet testNet = importTextNet()
+        Process testNet = importTextNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -216,7 +195,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex01() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -228,7 +207,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex02() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -240,7 +219,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex03() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -252,7 +231,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex04() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -264,7 +243,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex05() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -276,7 +255,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex05_2() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -288,7 +267,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex06() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -300,7 +279,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex06_2() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -312,7 +291,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex06_3() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -324,7 +303,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex01_Exception() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -340,7 +319,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex01_Exception2() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -356,7 +335,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex01_Exception3() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -372,7 +351,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex02_Exception() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -388,7 +367,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex02_Exception2() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -404,7 +383,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex02_Exception3() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -420,7 +399,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex03_Exception() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -436,7 +415,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex03_Exception2() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -452,7 +431,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex03_Exception3() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -468,7 +447,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex04_Exception() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -484,7 +463,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex05_Exception() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -500,7 +479,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex06_Exception() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -516,7 +495,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex06_Exception2() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -532,7 +511,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex06_Exception3() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -548,7 +527,7 @@ class ValidationTest {
 
     @Test
     void regexValid_regex06_Exception4() {
-        PetriNet testNet = importRegexNet()
+        Process testNet = importRegexNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -565,26 +544,26 @@ class ValidationTest {
     // BOOLEAN FIELD
     @Test
     void booleanValid_requiredTrue() {
-        PetriNet testNet = importBooleanNet()
+        Process testNet = importBooleanNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), new DataSet(["boolean_0": new BooleanField(rawValue:true)]))
+        importHelper.setTaskData(task.getStringId(), new DataSet(["boolean_0": new BooleanField(rawValue: true)]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
 
     @Test
     void booleanValid_requiredTrue_Exception() {
-        PetriNet testNet = importBooleanNet()
+        Process testNet = importBooleanNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), new DataSet(["boolean_0": new BooleanField(rawValue:false)]))
+            importHelper.setTaskData(task.getStringId(), new DataSet(["boolean_0": new BooleanField(rawValue: false)]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -593,7 +572,7 @@ class ValidationTest {
 
     @Test
     void booleanValid_requiredTrue_Exception2() {
-        PetriNet testNet = importBooleanNet()
+        Process testNet = importBooleanNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -610,7 +589,7 @@ class ValidationTest {
     // DATE FIELD
     @Test
     void dateValid_between_today() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -622,7 +601,7 @@ class ValidationTest {
 
     @Test
     void dateValid_between_today_plusDay() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -634,7 +613,7 @@ class ValidationTest {
 
     @Test
     void dateValid_between_today_Exception() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -649,7 +628,7 @@ class ValidationTest {
 
     @Test
     void dateValid_between_past() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -661,7 +640,7 @@ class ValidationTest {
 
     @Test
     void dateValid_between_past_minusDay() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -673,7 +652,7 @@ class ValidationTest {
 
     @Test
     void dateValid_between_past_Exception() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -688,7 +667,7 @@ class ValidationTest {
 
     @Test
     void dateValid_between_fromDate() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -700,7 +679,7 @@ class ValidationTest {
 
     @Test
     void dateValid_between_fromDate_today() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -712,7 +691,7 @@ class ValidationTest {
 
     @Test
     void dateValid_between_fromDate_Exception() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -727,7 +706,7 @@ class ValidationTest {
 
     @Test
     void dateValid_between_fromDate_past() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -739,7 +718,7 @@ class ValidationTest {
 
     @Test
     void dateValid_between_fromDate_past_minusDay() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -751,7 +730,7 @@ class ValidationTest {
 
     @Test
     void dateValid_between_fromDate_past_Exception() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -767,7 +746,7 @@ class ValidationTest {
 
     @Test
     void dateValid_between_fromDate_toDate() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -779,37 +758,37 @@ class ValidationTest {
 
     @Test
     void dateValid_between_fromDate_toDate2() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), new DataSet(["date05": new DateField(rawValue: LocalDate.of(2022,3,3))]))
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date05": new DateField(rawValue: LocalDate.of(2022, 3, 3))]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
 
     @Test
     void dateValid_workday() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), new DataSet(["date06": new DateField(rawValue: LocalDate.of(1994,7,4))]))
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date06": new DateField(rawValue: LocalDate.of(1994, 7, 4))]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
 
     @Test
     void dateValid_workday_Exception() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), new DataSet(["date06": new DateField(rawValue: LocalDate.of(1994,7,3))]))
+            importHelper.setTaskData(task.getStringId(), new DataSet(["date06": new DateField(rawValue: LocalDate.of(1994, 7, 3))]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -818,25 +797,25 @@ class ValidationTest {
 
     @Test
     void dateValid_weekend() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), new DataSet(["date07": new DateField(rawValue: LocalDate.of(1994,7,3))]))
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date07": new DateField(rawValue: LocalDate.of(1994, 7, 3))]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
 
     @Test
     void dateValid_weekend_Exception() {
-        PetriNet testNet = importDateNet()
+        Process testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), new DataSet(["date07": new DateField(rawValue: LocalDate.of(1994,7,4))]))
+            importHelper.setTaskData(task.getStringId(), new DataSet(["date07": new DateField(rawValue: LocalDate.of(1994, 7, 4))]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -846,7 +825,7 @@ class ValidationTest {
     // Number Field
     @Test
     void numberValid_odd() {
-        PetriNet testNet = importNumberNet()
+        Process testNet = importNumberNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -858,7 +837,7 @@ class ValidationTest {
 
     @Test
     void numberValid_odd_Exception() {
-        PetriNet testNet = importNumberNet()
+        Process testNet = importNumberNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -874,7 +853,7 @@ class ValidationTest {
 
     @Test
     void numberValid_even() {
-        PetriNet testNet = importNumberNet()
+        Process testNet = importNumberNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -886,7 +865,7 @@ class ValidationTest {
 
     @Test
     void numberValid_even_Exception() {
-        PetriNet testNet = importNumberNet()
+        Process testNet = importNumberNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -902,7 +881,7 @@ class ValidationTest {
 
     @Test
     void numberValid_positive() {
-        PetriNet testNet = importNumberNet()
+        Process testNet = importNumberNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -914,7 +893,7 @@ class ValidationTest {
 
     @Test
     void numberValid_positive_Exception() {
-        PetriNet testNet = importNumberNet()
+        Process testNet = importNumberNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -930,7 +909,7 @@ class ValidationTest {
 
     @Test
     void numberValid_negative() {
-        PetriNet testNet = importNumberNet()
+        Process testNet = importNumberNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -942,7 +921,7 @@ class ValidationTest {
 
     @Test
     void numberValid_negative_Exception() {
-        PetriNet testNet = importNumberNet()
+        Process testNet = importNumberNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -958,7 +937,7 @@ class ValidationTest {
 
     @Test
     void numberValid_decimal() {
-        PetriNet testNet = importNumberNet()
+        Process testNet = importNumberNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -970,7 +949,7 @@ class ValidationTest {
 
     @Test
     void numberValid_decimal_Exception() {
-        PetriNet testNet = importNumberNet()
+        Process testNet = importNumberNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -986,7 +965,7 @@ class ValidationTest {
 
     @Test
     void numberValid_inRange() {
-        PetriNet testNet = importNumberNet()
+        Process testNet = importNumberNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -998,7 +977,7 @@ class ValidationTest {
 
     @Test
     void numberValid_inRange_Exception() {
-        PetriNet testNet = importNumberNet()
+        Process testNet = importNumberNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -1015,7 +994,7 @@ class ValidationTest {
 
     @Test
     void numberValid_inRange_odd() {
-        PetriNet testNet = importNumberNet()
+        Process testNet = importNumberNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -1027,7 +1006,7 @@ class ValidationTest {
 
     @Test
     void numberValid_inRange_odd_Exception() {
-        PetriNet testNet = importNumberNet()
+        Process testNet = importNumberNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -1043,7 +1022,7 @@ class ValidationTest {
 
     @Test
     void numberValid_inRange_odd_Exception2() {
-        PetriNet testNet = importNumberNet()
+        Process testNet = importNumberNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()

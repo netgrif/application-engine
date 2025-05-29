@@ -1,0 +1,15 @@
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>extending_with_invalid_extension_3</id>
+    <version>1.0.0</version>
+    <extends>
+        <id>parent_to_be_extended</id>
+        <version>100</version>
+    </extends>
+    <title>Extending with invalid extension - wrong version</title>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">EIE</property>
+    </properties>
+</process>

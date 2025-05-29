@@ -1,9 +1,8 @@
 package com.netgrif.application.engine.petrinet.domain.dataset;
 
-import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.authorization.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 // TODO: release/8.0.0 remove, store only ObjectId
@@ -13,19 +12,19 @@ import lombok.NoArgsConstructor;
 public class UserFieldValue {
 
     private String id;
-    private String name;
-    private String surname;
+    private String firstname;
+    private String lastname;
     private String email;
 
-    public UserFieldValue(IUser user) {
+    public UserFieldValue(User user) {
         this.id = user.getStringId();
-        this.name = user.getName();
-        this.surname = user.getSurname();
+        this.firstname = user.getFirstname();
+        this.lastname = user.getLastname();
         this.email = user.getEmail();
     }
 
     public String getFullName() {
-        return name + " " + surname;
+        return String.join(" ", firstname, lastname);
     }
 
     @Override

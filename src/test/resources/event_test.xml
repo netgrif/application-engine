@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>test</id>
-    <initials>TST</initials>
+    <version>1.0.0</version>
     <title>Test</title>
     <data type="text">
         <id>task_assign_pre</id>
@@ -23,14 +22,18 @@
     <data type="text">
         <id>task_cancel_pre</id>
         <title>task_cancel_pre</title>
-        <action trigger="set">
-            <!-- @formatter:off -->
-            field: f.chained;
-            change field about {
-                return "chained"
-            }
-            <!-- @formatter:on -->
-        </action>
+        <event type="set">
+            <id>task_cancel_pre_set</id>
+            <actions phase="post">
+                <action>
+                    <!-- @formatter:off -->
+                    change chained about {
+                    return "chained"
+                    }
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="text">
         <id>task_cancel_post</id>
@@ -44,16 +47,13 @@
         <id>task</id>
         <x>0</x>
         <y>0</y>
-        <label>task</label>
+        <title>task</title>
         <event type="assign">
             <id>task_assign</id>
-            <title>Prirad</title>
-            <message>Task assigned</message>
             <actions phase="post">
                 <action>
                     <!-- @formatter:off -->
-                    field: f.task_assign_post;
-                    change field about {
+                    change task_assign_post about {
                         return "task_assign_post"
                     }
                     <!-- @formatter:on -->
@@ -62,23 +62,21 @@
             <actions phase="pre">
                 <action>
                     <!-- @formatter:off -->
-                    field: f.task_assign_pre;
-                    change field about {
+                    change task_assign_pre about {
                         return "task_assign_pre"
                     }
                     <!-- @formatter:on -->
                 </action>
             </actions>
+            <message>Task assigned</message>
+            <title>Prirad</title>
         </event>
         <event type="finish">
             <id>task_finish</id>
-            <title>Dokonic</title>
-            <message>Task finished</message>
             <actions phase="post">
                 <action>
                     <!-- @formatter:off -->
-                    field: f.task_finish_post;
-                    change field about {
+                    change task_finish_post about {
                         return "task_finish_post"
                     }
                     <!-- @formatter:on -->
@@ -87,24 +85,22 @@
             <actions phase="pre">
                 <action>
                     <!-- @formatter:off -->
-                    field: f.task_finish_pre;
-                    change field about {
+                    change task_finish_pre about {
                         return "task_finish_pre"
                     }
                     <!-- @formatter:on -->
                 </action>
             </actions>
+            <message>Task finished</message>
+            <title>Dokonic</title>
         </event>
         <event type="cancel">
             <id>task_cancel</id>
-            <title>Zrus</title>
-            <message>Task cancelled</message>
             <actions phase="post">
                 <action>
                     <!-- @formatter:off -->
-                    field: f.task_cancel_post;
-                    change field about {
-                        return "task_cancel_post"
+                    change task_cancel_post about {
+                    return "task_cancel_post"
                     }
                     <!-- @formatter:on -->
                 </action>
@@ -112,13 +108,14 @@
             <actions phase="pre">
                 <action>
                     <!-- @formatter:off -->
-                    field: f.task_cancel_pre;
-                    change field about {
-                        return "task_cancel_pre"
+                    change task_cancel_pre about {
+                    return "task_cancel_pre"
                     }
                     <!-- @formatter:on -->
                 </action>
             </actions>
+            <message>Task cancelled</message>
+            <title>Zrus</title>
         </event>
     </transition>
-</document>
+</process>

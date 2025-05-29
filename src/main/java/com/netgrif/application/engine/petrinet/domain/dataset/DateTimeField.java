@@ -12,6 +12,11 @@ public class DateTimeField extends Field<LocalDateTime> {
         super();
     }
 
+    public DateTimeField(LocalDateTime dateTime) {
+        this();
+        setRawValue(dateTime);
+    }
+
     @Override
     @QueryType(PropertyType.NONE)
     public DataType getType() {

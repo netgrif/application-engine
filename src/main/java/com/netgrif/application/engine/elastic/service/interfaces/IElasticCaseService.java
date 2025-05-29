@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.elastic.service.interfaces;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
 import org.springframework.data.domain.Page;
@@ -14,17 +12,16 @@ import java.util.Locale;
 public interface IElasticCaseService {
 
     @Async
-    void index(ElasticCase useCase);
+    void index(Case useCase);
 
-    void indexNow(ElasticCase useCase);
-
-    Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection);
-
-    long count(List<CaseSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection);
+    void indexNow(Case useCase);
 
     void remove(String caseId);
 
     void removeByPetriNetId(String processId);
 
-    String findUriNodeId(Case aCase);
+    Page<Case> search(List<CaseSearchRequest> requests, String actorId, Pageable pageable, Locale locale,
+                      Boolean isIntersection);
+
+    long count(List<CaseSearchRequest> requests, String actorId, Locale locale, Boolean isIntersection);
 }

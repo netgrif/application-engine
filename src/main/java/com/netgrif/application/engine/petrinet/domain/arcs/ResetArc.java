@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.petrinet.domain.arcs;
 
-import com.netgrif.application.engine.petrinet.domain.Place;
-
 /**
  * Reset arc does not alter the enabling condition, but involve a change of the marking on <i>p</i> by firing of <i>t</i>:
  * <ul>
@@ -31,22 +29,20 @@ public class ResetArc extends PTArc {
      */
     @Override
     public void execute() {
-        Place place = ((Place) source);
-        place.removeAllTokens();
+        source.removeAllTokens();
     }
 
     @Override
     public void rollbackExecution(Integer tokensConsumed) {
-        ((Place) source).addTokens(tokensConsumed);
+        source.addTokens(tokensConsumed);
     }
 
-    @SuppressWarnings("Duplicates")
     @Override
     public ResetArc clone() {
         ResetArc clone = new ResetArc();
         clone.setSourceId(this.sourceId);
         clone.setDestinationId(this.destinationId);
-        clone.setMultiplicity(this.multiplicity);
+        clone.setMultiplicityExpression(this.multiplicityExpression.clone());
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);
         return clone;

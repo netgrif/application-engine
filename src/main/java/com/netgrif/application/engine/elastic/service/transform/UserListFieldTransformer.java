@@ -22,10 +22,10 @@ public class UserListFieldTransformer extends ElasticDataFieldTransformer<UserLi
             return null;
         }
         List<UserField.UserMappingData> userData = value.getUserValues().stream()
-                .map(user -> new UserField.UserMappingData(
-                        user.getId(),
-                        user.getEmail(),
-                        user.getFullName()
+                .map(actor -> new UserField.UserMappingData(
+                        actor.getId(),
+                        actor.getEmail(),
+                        actor.getFullName()
                 ))
                 .collect(Collectors.toList());
         return new UserField(userData);

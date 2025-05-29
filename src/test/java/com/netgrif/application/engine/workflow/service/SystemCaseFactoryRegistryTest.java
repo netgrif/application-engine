@@ -1,0 +1,96 @@
+package com.netgrif.application.engine.workflow.service;
+
+import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.authorization.domain.Group;
+import com.netgrif.application.engine.authorization.domain.User;
+import com.netgrif.application.engine.authorization.domain.params.GroupParams;
+import com.netgrif.application.engine.authorization.domain.params.UserParams;
+import com.netgrif.application.engine.authorization.service.interfaces.IGroupService;
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
+import com.netgrif.application.engine.petrinet.domain.Process;
+import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams;
+import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.startup.ImportHelper;
+import com.netgrif.application.engine.startup.SuperCreator;
+import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.SystemCase;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+
+@SpringBootTest
+@ActiveProfiles({"test"})
+@ExtendWith(SpringExtension.class)
+public class SystemCaseFactoryRegistryTest {
+
+    @Autowired
+    private SystemCaseFactoryRegistry registry;
+
+    @Autowired
+    private IWorkflowService workflowService;
+
+    @Autowired
+    private SuperCreator superCreator;
+
+    @Autowired
+    private IUserService userService;
+
+    @Autowired
+    private IGroupService groupService;
+
+    @Autowired
+    private IPetriNetService petriNetService;
+
+    @Autowired
+    private TestHelper testHelper;
+
+    @Autowired
+    private ImportHelper importHelper;
+
+    @BeforeEach
+    public void before() {
+        testHelper.truncateDbs();
+    }
+
+    @Test
+    public void testFromCase() throws IOException, MissingPetriNetMetaDataException {
+        assert registry.fromCase(null) == null;
+
+        TestHelper.login(superCreator.getSuperIdentity());
+
+        Process testProcess = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/all_data.xml"),
+                VersionType.MAJOR, superCreator.getSuperIdentity().getMainActorId())).getProcess();
+        Case testCase = importHelper.createCase("Test", testProcess);
+
+        assert registry.fromCase(workflowService.findOne(testCase.getStringId())) == null;
+
+        User user = userService.create(UserParams.with()
+                .email(new TextField("s@meemail.com"))
+                .build());
+
+        SystemCase systemCase = registry.fromCase(user.getCase());
+        assert systemCase != null;
+        assert systemCase instanceof User;
+        assert systemCase.getCase().getStringId().equals(user.getStringId());
+
+        Group group = groupService.create(GroupParams.with()
+                .name(new TextField("group name"))
+                .build());
+
+        systemCase = registry.fromCase(group.getCase());
+        assert systemCase != null;
+        assert systemCase instanceof Group;
+        assert systemCase.getCase().getStringId().equals(group.getStringId());
+    }
+}

@@ -1,15 +1,17 @@
 package com.netgrif.application.engine.ldap.service;
 
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
+import com.netgrif.application.engine.authorization.domain.Role;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.ldap.LdapConfiguration;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import com.netgrif.application.engine.ldap.domain.LdapGroup;
 import com.netgrif.application.engine.ldap.domain.LdapGroupRef;
 import com.netgrif.application.engine.ldap.domain.repository.LdapGroupRoleRepository;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.ldap.core.ContextMapper;
@@ -35,15 +37,15 @@ public class LdapGroupRefService implements ILdapGroupRefService {
 
     private final LdapGroupRoleRepository ldapGroupRoleRepository;
 
-    private final IProcessRoleService processRoleService;
+    private final IRoleService roleService;
 
     private final NaeLdapProperties ldapProperties;
 
     public LdapGroupRefService(LdapConfiguration ldapConfiguration, LdapGroupRoleRepository ldapGroupRoleRepository,
-                               IProcessRoleService processRoleService, NaeLdapProperties ldapProperties) {
+                               IRoleService roleService, NaeLdapProperties ldapProperties) {
         this.ldapConfiguration = ldapConfiguration;
         this.ldapGroupRoleRepository = ldapGroupRoleRepository;
-        this.processRoleService = processRoleService;
+        this.roleService = roleService;
         this.ldapProperties = ldapProperties;
     }
 
@@ -79,45 +81,47 @@ public class LdapGroupRefService implements ILdapGroupRefService {
     }
 
     @Override
-    public void deleteProcessRoleByPetrinet(String petriNet) {
-        ldapGroupRoleRepository.findAll().stream()
-                .filter(ldapGroup -> ldapGroup.getProcessesRoles().stream().anyMatch(processRole -> processRole.getNetId().equals(petriNet)))
-                .forEach(it -> deleteProcessRole(it, petriNet));
+    public void deleteRoleByPetriNet(String petriNet) {
+        // TODO: release/8.0.0
+//        ldapGroupRoleRepository.findAll().stream()
+//                .filter(ldapGroup -> ldapGroup.getProcessesRoles().stream().anyMatch(processRole -> processRole.getNetId().equals(petriNet)))
+//                .forEach(it -> deleteProcessRole(it, petriNet));
     }
 
     @Override
-    public void deleteProcessRole(LdapGroup ldapGroup, String petriNet) {
-        Set<ProcessRole> processRoles = ldapGroup.getProcessesRoles();
-        processRoles.forEach(it -> {
-            if (it.getNetId().equals(petriNet)) {
-                processRoles.remove(it);
-            }
-        });
-        ldapGroup.setProcessesRoles(processRoles);
-        ldapGroupRoleRepository.save(ldapGroup);
+    public void deleteRole(LdapGroup ldapGroup, String petriNet) {
+//        TODO: release/8.0.0
+//        Set<ProcessRole> processRoles = ldapGroup.getProcessesRoles();
+//        processRoles.forEach(it -> {
+//            if (it.getNetId().equals(petriNet)) {
+//                processRoles.remove(it);
+//            }
+//        });
+//        ldapGroup.setProcessesRoles(processRoles);
+//        ldapGroupRoleRepository.save(ldapGroup);
     }
 
     @Override
-    public Set<ProcessRole> getProcessRoleByLdapGroup(Set<String> groupDn) {
-        return ldapGroupRoleRepository.findAllByDnIn(groupDn).stream().map(LdapGroup::getProcessesRoles).flatMap(Collection::stream).collect(Collectors.toSet());
+    public Set<ProcessRole> getRoleByLdapGroup(Set<String> groupDn) {
+        return ldapGroupRoleRepository.findAllByDnIn(groupDn).stream().map(LdapGroup::getProcessesProcessRoles).flatMap(Collection::stream).collect(Collectors.toSet());
     }
 
     @Override
-    public void setRoleToLdapGroup(String groupDn, Set<String> requestedRolesIds, LoggedUser loggedUser) {
-        Set<ProcessRole> requestedRoles = processRoleService.findByIds(requestedRolesIds);
-        if (requestedRoles.isEmpty() && !requestedRolesIds.isEmpty())
+    public void setRoleToLdapGroup(String groupDn, Set<String> requestedRolesIds, LoggedIdentity identity) {
+        List<Role> requestedProcessRoles = roleService.findAllById(requestedRolesIds);
+        if (requestedProcessRoles.isEmpty() && !requestedRolesIds.isEmpty())
             throw new IllegalArgumentException("No process roles found.");
-        if (requestedRoles.size() != requestedRolesIds.size())
+        if (requestedProcessRoles.size() != requestedRolesIds.size())
             throw new IllegalArgumentException("Not all process roles were found!");
 
         LdapGroup ldapGroup = ldapGroupRoleRepository.findByDn(groupDn);
         if (ldapGroup == null) {
             LdapGroup newLdapGroup = new LdapGroup();
             newLdapGroup.setDn(groupDn);
-            newLdapGroup.setProcessesRoles(requestedRoles);
+//            newLdapGroup.setProcessesProcessRoles(requestedProcessRoles);
             ldapGroupRoleRepository.save(newLdapGroup);
         } else {
-            ldapGroup.setProcessesRoles(requestedRoles);
+//            ldapGroup.setProcessesProcessRoles(requestedProcessRoles);
             ldapGroupRoleRepository.save(ldapGroup);
         }
 

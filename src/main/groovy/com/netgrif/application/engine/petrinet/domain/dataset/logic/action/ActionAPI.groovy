@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.querydsl.core.types.Predicate
@@ -36,7 +36,7 @@ interface ActionAPI {
 
     Case createCase(ObjectId netId)
 
-    Case createCase(PetriNet net)
+    Case createCase(Process net)
 
     setData(Field, Map)
 

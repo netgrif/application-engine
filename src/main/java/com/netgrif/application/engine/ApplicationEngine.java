@@ -1,7 +1,5 @@
 package com.netgrif.application.engine;
 
-import com.netgrif.application.engine.petrinet.domain.DataGroupAlignmentConverter;
-import com.netgrif.application.engine.petrinet.domain.layout.LayoutTypeConverter;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -18,6 +16,7 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +24,7 @@ import java.util.List;
 @EnableCaching
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableTransactionManagement
 @EnableAspectJAutoProxy
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @EnableMongoAuditing
@@ -43,8 +43,6 @@ public class ApplicationEngine {
     public MongoCustomConversions customConversions() {
         List<Converter<?, ?>> converters = new ArrayList<>();
         converters.add(new StringToVersionConverter());
-        converters.add(new LayoutTypeConverter());
-        converters.add(new DataGroupAlignmentConverter());
         return new MongoCustomConversions(converters);
     }
 

@@ -2,12 +2,16 @@ package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ipc.TaskApiTest
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
-import com.netgrif.application.engine.utils.InputStreamToString
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.QCase
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
@@ -18,6 +22,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+import static com.netgrif.application.engine.workflow.domain.params.CreateCaseParams.with
+import static org.junit.jupiter.api.Assertions.assertThrows
+
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
@@ -27,7 +34,13 @@ class WorkflowServiceTest {
     public static final String NET_FILE = "case_search_test.xml"
     public static final String CASE_LOCALE_NET_FILE = "create_case_locale.xml"
     public static final String FIRST_AUTO_NET_FILE = "petriNets/NAE_1382_first_trans_auto.xml"
+    public static final String CREATE_CASE_FAILURE_NET_FILE = "create_case_failure.xml"
+    public static final String DELETE_CASE_FAILURE_NET_FILE = "delete_case_failure.xml"
     public static final String SECOND_AUTO_NET_FILE = "petriNets/NAE_1382_first_trans_auto_2.xml"
+    public static final String CHILD_NET_FILE = "importTest/child_extending_parent.xml"
+    public static final String PARENT_NET_FILE = "importTest/parent_to_be_extended.xml"
+    public static final String SUPER_PARENT_NET_FILE = "importTest/super_parent_to_be_extended.xml"
+
 
     @Autowired
     private ImportHelper importHelper
@@ -51,13 +64,15 @@ class WorkflowServiceTest {
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
+        TestHelper.login(superCreator.superIdentity)
     }
 
     @Test
     void testFindOneImmediateData() {
-        def testNet = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert testNet.getNet() != null
-        Case aCase = importHelper.createCase("Case 1", testNet.getNet())
+        def testNet = petriNetService.importProcess(new ImportProcessParams(stream(NET_FILE), VersionType.MAJOR,
+                superCreator.getLoggedSuper().getActiveActorId()))
+        assert testNet.getProcess() != null
+        Case aCase = importHelper.createCase("Case 1", testNet.getProcess())
 
         assert aCase.getImmediateData().size() == 5
 
@@ -69,11 +84,16 @@ class WorkflowServiceTest {
 
     @Test
     void testFirstTransitionAuto() {
-        def testNet = petriNetService.importPetriNet(stream(FIRST_AUTO_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        def testNet = petriNetService.importProcess(new ImportProcessParams(stream(FIRST_AUTO_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess()
         assert testNet
 
         def net = testNet
-        Case aCase = workflowService.createCase(net.stringId, "autoErr", "red", superCreator.getLoggedSuper()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .title("autoErr")
+                .authorId(superCreator.getLoggedSuper().activeActorId)
+                .build()
+        Case aCase = workflowService.createCase(createCaseParams).getCase()
         importHelper.assignTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
         importHelper.finishTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
 
@@ -83,9 +103,14 @@ class WorkflowServiceTest {
 
     @Test
     void testSecondTransitionAuto() {
-        def net = petriNetService.importPetriNet(stream(SECOND_AUTO_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        def net = petriNetService.importProcess(new ImportProcessParams(stream(SECOND_AUTO_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess()
 
-        Case aCase = workflowService.createCase(net.stringId, "autoErr", "red", superCreator.getLoggedSuper()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .title("autoErr")
+                .authorId(superCreator.getLoggedSuper().activeActorId)
+                .build()
+        Case aCase = workflowService.createCase(createCaseParams).getCase()
         importHelper.assignTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
         importHelper.finishTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
 
@@ -98,18 +123,145 @@ class WorkflowServiceTest {
 
     @Test
     void createCaseWithLocale() {
-        def testNet = petriNetService.importPetriNet(stream(CASE_LOCALE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert testNet.getNet() != null
+        def testNet = petriNetService.importProcess(new ImportProcessParams(stream(CASE_LOCALE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
+        assert testNet.getProcess() != null
 
-        def net = testNet.getNet()
-        Case aCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('sk')).getCase()
+        def net = testNet.getProcess()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .authorId(superCreator.getLoggedSuper().activeActorId)
+                .locale(new Locale('sk'))
+                .build()
+        Case aCase = workflowService.createCase(createCaseParams).getCase()
 
         assert aCase.title == "Slovenský preklad"
         // TODO: release/8.0.0 fix uri nodes
 //        assert workflowService.findOne(aCase.stringId).uriNodeId == net.uriNodeId
 
-        Case enCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('en')).getCase()
+        createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .authorId(superCreator.getLoggedSuper().activeActorId)
+                .locale(new Locale('en'))
+                .build()
+        Case enCase = workflowService.createCase(createCaseParams).getCase()
 
         assert enCase.title == "English translation"
+    }
+
+    @Test
+    void createCaseOfExtendedPetriNet() {
+        Process superParentNet = petriNetService.importProcess(new ImportProcessParams(stream(SUPER_PARENT_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).process
+        petriNetService.importProcess(new ImportProcessParams(stream(PARENT_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
+        // child extends version 1.1.0
+        Process parentNet = petriNetService.importProcess(new ImportProcessParams(stream(PARENT_NET_FILE), VersionType.MINOR, superCreator.getLoggedSuper().getActiveActorId())).process
+        Process childNet = petriNetService.importProcess(new ImportProcessParams(stream(CHILD_NET_FILE), VersionType.MINOR, superCreator.getLoggedSuper().getActiveActorId())).process
+
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(childNet)
+                .authorId(superCreator.getLoggedSuper().activeActorId)
+                .build()
+        Case aCase = workflowService.createCase(createCaseParams).getCase()
+        assert aCase
+        assert aCase.processIdentifier == childNet.identifier
+        assert aCase.petriNetObjectId == childNet.objectId
+
+        assert aCase.parentPetriNetIdentifiers.size() == 2
+        assert aCase.parentPetriNetIdentifiers.get(0).identifier == superParentNet.identifier
+        assert aCase.parentPetriNetIdentifiers.get(0).id == superParentNet.objectId
+        assert aCase.parentPetriNetIdentifiers.get(1).identifier == parentNet.identifier
+        assert aCase.parentPetriNetIdentifiers.get(1).id == parentNet.objectId
+
+        assert aCase.dataSet.fields.size() == 4
+        assert (aCase.dataSet.get("taskref2").value.value as List)[0] == aCase.tasks["t0"].taskId.toString()
+    }
+
+    @Test
+    void testTransactionalCreateCaseFailure() {
+        petriNetService.importProcess(new ImportProcessParams(
+                stream(CASE_LOCALE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
+        Process process = petriNetService.importProcess(new ImportProcessParams(
+                stream(CREATE_CASE_FAILURE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)).getProcess()
+
+        CreateCaseParams createCaseParams = with()
+                .isTransactional(true)
+                .process(process)
+                .title("FailedCase")
+                .authorId(superCreator.getLoggedSuper().activeActorId)
+                .build()
+
+        assertThrows(RuntimeException.class, { workflowService.createCase(createCaseParams) })
+
+        assert workflowService.searchOne(QCase.case$.title.eq("FailedCase")) == null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPre")) == null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPost")) == null
+    }
+
+    @Test
+    void testNonTransactionalCreateCaseFailure() {
+        petriNetService.importProcess(new ImportProcessParams(
+                stream(CASE_LOCALE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId))
+        Process process = petriNetService.importProcess(new ImportProcessParams(
+                stream(CREATE_CASE_FAILURE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)).getProcess()
+
+        CreateCaseParams createCaseParams = with()
+                .isTransactional(false)
+                .process(process)
+                .title("FailedCase")
+                .authorId(superCreator.getLoggedSuper().activeActorId)
+                .build()
+
+        assertThrows(RuntimeException.class, { workflowService.createCase(createCaseParams) })
+
+        assert workflowService.searchOne(QCase.case$.title.eq("FailedCase")) != null // failure in post action
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPre")) != null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPost")) != null
+    }
+
+    @Test
+    void testTransactionalDeleteCaseFailure() {
+        Process process = petriNetService.importProcess(new ImportProcessParams(
+                stream(DELETE_CASE_FAILURE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)).getProcess()
+
+        CreateCaseParams createCaseParams = with()
+                .process(process)
+                .title("CaseToRemove")
+                .authorId(superCreator.getLoggedSuper().activeActorId)
+                .build()
+
+        Case useCase = workflowService.createCase(createCaseParams).getCase()
+
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
+                .isTransactional(true)
+                .useCase(useCase)
+                .build()
+        assertThrows(RuntimeException.class, { workflowService.deleteCase(deleteCaseParams) })
+
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseToRemove")) != null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPre")) == null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPost")) == null
+    }
+
+    @Test
+    void testNonTransactionalDeleteCaseFailure() {
+        Process process = petriNetService.importProcess(new ImportProcessParams(
+                stream(DELETE_CASE_FAILURE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)).getProcess()
+
+        CreateCaseParams createCaseParams = with()
+                .process(process)
+                .title("CaseToRemove")
+                .authorId(superCreator.getLoggedSuper().activeActorId)
+                .build()
+
+        Case useCase = workflowService.createCase(createCaseParams).getCase()
+
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
+                .isTransactional(false)
+                .useCase(useCase)
+                .build()
+        assertThrows(RuntimeException.class, { workflowService.deleteCase(deleteCaseParams) })
+
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseToRemove")) == null // failure in post action
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPre")) != null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPost")) != null
     }
 }

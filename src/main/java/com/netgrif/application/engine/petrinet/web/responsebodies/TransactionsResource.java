@@ -21,7 +21,8 @@ public class TransactionsResource extends CollectionModel<TransactionResource> {
     }
 
     private void buildLinks(String netId) {
-        add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
-                .getTransactions(netId, null)).withSelfRel());
+//        TODO: release/8.0.0
+//        add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
+//                .getTransactions(netId, null)).withSelfRel());
     }
 }

@@ -1,66 +1,97 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>test</id>
-    <initials>TST</initials>
+    <version>1.0.0</version>
     <title>Test</title>
     <defaultRole>true</defaultRole>
-    <!-- ROLE -->
-    <!-- DATA -->
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
+    <processEvents/>
+    <caseEvents/>
     <data type="button">
         <id>btn1</id>
         <title>button</title>
         <placeholder>Button title</placeholder>
         <desc>Button field description</desc>
-        <action trigger="set">
-            <!-- @formatter:off -->
-            sequence: f.num;
-            change sequence value { sequence.value + 1 }
-            <!-- @formatter:on -->
-        </action>
+        <event type="set">
+            <id>btn1_set</id>
+            <actions phase="post">
+                <action id="action_0">
+					<![CDATA[
+                    change num value { num.value + 1 }
+                    ]]>
+				</action>
+            </actions>
+        </event>
     </data>
     <data type="button">
         <id>btn2</id>
         <title>button</title>
         <placeholder>Button title</placeholder>
         <desc>Button field description</desc>
-        <action trigger="set">
-            <!-- @formatter:off -->
-            sequence: f.num;
-            change sequence value { sequence.value + 1 }
-            <!-- @formatter:on -->
-        </action>
+        <event type="set">
+            <id>btn2_set</id>
+            <actions phase="post">
+                <action id="action_1">
+					<![CDATA[
+                    change num value { num.value + 1 }
+                    ]]>
+				</action>
+            </actions>
+        </event>
     </data>
     <data type="number">
         <id>num</id>
         <title>number</title>
         <init>0</init>
     </data>
-    <!-- TRANSITIONS -->
     <transition>
         <id>task</id>
         <x>0</x>
         <y>0</y>
-        <label>task</label>
-        <dataRef>
-            <id>btn1</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>btn2</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>num</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
+        <title>task</title>
+        <flex>
+            <id>task_flex</id>
+            <item>
+                <dataRef>
+                    <id>btn1</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>btn2</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>num</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
-    <!-- PLACES -->
-    <!-- ARCS -->
-</document>
+</process>

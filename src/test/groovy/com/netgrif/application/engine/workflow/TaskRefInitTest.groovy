@@ -1,12 +1,14 @@
 package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.TaskField
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
@@ -36,38 +38,43 @@ class TaskRefInitTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private IUserService userService
-
-    @Autowired
     private TestHelper testHelper
 
-    PetriNet net = null
-    PetriNet autoTrigger = null
+    @Autowired
+    private SuperCreator superCreator
+
+    Process net = null
+    Process autoTrigger = null
 
     @BeforeEach
     void initNet() {
         testHelper.truncateDbs()
-        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskref_init.xml"), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).getNet()
-        autoTrigger = petriNetService.importPetriNet(new FileInputStream("src/test/resources/autotrigger_taskref.xml"), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).getNet()
+        net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/taskref_init.xml"), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId)).getProcess()
+        autoTrigger = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/autotrigger_taskref.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)).getProcess()
         assert net != null
+
+        TestHelper.login(superCreator.superIdentity)
     }
 
     @Test
     void testInitValue() {
         Case aCase = helper.createCase("Test task ref init", net)
-        Task task1 = taskService.searchOne(QTask.task.caseTitle.eq("Test task ref init") & QTask.task.transitionId.eq("t1"))
-        Task task2 = taskService.searchOne(QTask.task.caseTitle.eq("Test task ref init") & QTask.task.transitionId.eq("t2"))
-        Task task3 = taskService.searchOne(QTask.task.caseTitle.eq("Test task ref init") & QTask.task.transitionId.eq("t3"))
 
-        List<String> taskref_0_values = ((TaskField)aCase.dataSet.get("taskRef_0")).rawValue
-        List<String> taskref_1_values = ((TaskField)aCase.dataSet.get("taskRef_1")).rawValue
-        List<String> taskref_2_values = ((TaskField)aCase.dataSet.get("taskRef_2")).rawValue
-        List<String> taskref_3_values = ((TaskField)aCase.dataSet.get("taskRef_3")).rawValue
+        Task task1 = taskService.searchOne(QTask.task.caseId.eq(aCase.stringId) & QTask.task.transitionId.eq("t1"))
+        Task task2 = taskService.searchOne(QTask.task.caseId.eq(aCase.stringId) & QTask.task.transitionId.eq("t2"))
+        Task task3 = taskService.searchOne(QTask.task.caseId.eq(aCase.stringId) & QTask.task.transitionId.eq("t3"))
+
+        List<String> taskref_0_values = ((TaskField) aCase.dataSet.get("taskRef_0")).rawValue
+        List<String> taskref_1_values = ((TaskField) aCase.dataSet.get("taskRef_1")).rawValue
+        List<String> taskref_2_values = ((TaskField) aCase.dataSet.get("taskRef_2")).rawValue
+        List<String> taskref_3_values = ((TaskField) aCase.dataSet.get("taskRef_3")).rawValue
 
         assert taskref_0_values.containsAll([task1.stringId, task3.stringId]) && taskref_0_values.size() == 2
         assert taskref_1_values.containsAll([task2.stringId]) && taskref_1_values.size() == 1
         assert taskref_2_values.containsAll([task1.stringId, task2.stringId]) && taskref_2_values.size() == 2
-        assert taskref_3_values.empty
+        assert taskref_3_values == null
     }
 
     @Test

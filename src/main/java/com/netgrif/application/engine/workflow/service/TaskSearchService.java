@@ -1,39 +1,37 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
-import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.QTask;
+import com.netgrif.application.engine.workflow.domain.State;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
+import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class TaskSearchService extends MongoSearchService<Task> {
 
-    @Autowired
-    private IPetriNetService petriNetService;
+    private final IPetriNetService petriNetService;
+    private final IRoleAssignmentService roleAssignmentService;
 
-    public Predicate buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
-        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-        List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, loggedOrImpersonated, locale)).collect(Collectors.toList());
+    public Predicate buildQuery(List<TaskSearchRequest> requests, String actorId, Locale locale, Boolean isIntersection) {
+        List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, actorId, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
             // one of the queries evaluates to empty set => the entire result is an empty set
             return null;
         } else if (!isIntersection) {
             singleQueries = singleQueries.stream().filter(Objects::nonNull).collect(Collectors.toList());
-            if (singleQueries.size() == 0) {
+            if (singleQueries.isEmpty()) {
                 // all queries result in an empty set => the entire result is an empty set
                 return null;
             }
@@ -41,83 +39,84 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
         BooleanBuilder builder = constructPredicateTree(singleQueries, isIntersection ? BooleanBuilder::and : BooleanBuilder::or);
 
-        BooleanBuilder constraints = new BooleanBuilder(buildRolesQueryConstraint(loggedOrImpersonated));
-        constraints.or(buildUserRefQueryConstraint(loggedOrImpersonated));
-        builder.and(constraints);
-
-        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
-        builder.and(permissionConstraints);
+//        final Set<String> assignedRoleIds = roleAssignmentService.findAllRoleIdsByActorAndGroups(actorId);
+//        BooleanBuilder constraints = new BooleanBuilder(buildProcessRolesQueryConstraint(assignedRoleIds));
+//        constraints.or(buildCaseRolesQueryConstraint(assignedRoleIds));
+//        builder.and(constraints);
+//        BooleanBuilder permissionConstraints = new BooleanBuilder(buildPositiveProcessRoleQueryConstraint(assignedRoleIds));
+//        permissionConstraints.andNot(buildNegativeProcessRoleQueryConstraint(assignedRoleIds));
+//        permissionConstraints.or(buildPositiveCaseRoleQueryConstraint(assignedRoleIds));
+//        permissionConstraints.andNot(buildNegativeCaseRoleQueryConstraint(assignedRoleIds));
+//        builder.and(permissionConstraints);
         return builder;
     }
 
-    protected Predicate buildRolesQueryConstraint(LoggedUser user) {
-        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::roleQuery).collect(Collectors.toList());
-        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
-    }
+//    protected Predicate buildProcessRolesQueryConstraint(Set<String> assignedRoleIds) {
+//        List<Predicate> roleConstraints = assignedRoleIds.stream().map(this::processRoleQuery).collect(Collectors.toList());
+//        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
+//    }
+//
+//    protected Predicate buildCaseRolesQueryConstraint(Set<String> assignedRoleIds) {
+//        List<Predicate> roleConstraints = assignedRoleIds.stream().map(this::caseRoleQuery).collect(Collectors.toList());
+//        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
+//    }
+//
+//    protected Predicate buildPositiveProcessRoleQueryConstraint(Set<String> assignedRoleIds) {
+//        List<Predicate> roleConstraints = assignedRoleIds.stream().map(this::positiveProcessRoleQuery).collect(Collectors.toList());
+//        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
+//    }
+//
+//    protected Predicate buildPositiveCaseRoleQueryConstraint(Set<String> assignedRoleIds) {
+//        Predicate userConstraints = positiveCaseRoleQuery(user.getId());
+//        return constructPredicateTree(Collections.singletonList(userConstraints), BooleanBuilder::or);
+//    }
+//
+//    protected Predicate buildNegativeProcessRoleQueryConstraint(Set<String> assignedRoleIds) {
+//        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::negativeViewRoleQuery).collect(Collectors.toList());
+//        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
+//    }
+//
+//    protected Predicate buildNegativeCaseRoleQueryConstraint(Set<String> assignedRoleIds) {
+//        Predicate userConstraints = negativeViewUsersQuery(user.getId());
+//        return constructPredicateTree(Collections.singletonList(userConstraints), BooleanBuilder::or);
+//    }
+//
+//    public Predicate positiveProcessRoleQuery(String roleId) {
+//        // todo: release/8.0.0 view_disabled
+//        return QTask.task.caseRolePermissions.permissions.isEmpty().and(QTask.task.processRolePermissions.permissions.isEmpty())
+//                .or(QTask.task.processRolePermissions.permissions.get(roleId).eq(Map.of(TaskPermission.VIEW, true)));
+//    }
+//
+//    public Predicate positiveCaseRoleQuery(String userId) {
+//        return QTask.task.caseRolePermissions.permissions.isEmpty().and(QTask.task.processRolePermissions.permissions.isEmpty())
+//                .or(QTask.task.processRolePermissions.permissions.get(roleId).eq(Map.of(TaskPermission.VIEW, true)));
+//        return QTask.task.negativeViewRoles.isEmpty().and(QTask.task.viewUserRefs.isEmpty()).and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewUsers.contains(userId));
+//    }
+//
+//    public Predicate negativeViewRoleQuery(String role) {
+//        return QTask.task.negativeViewRoles.contains(role);
+//    }
+//
+//    public Predicate negativeViewUsersQuery(String userId) {
+//        return QTask.task.negativeViewUsers.contains(userId);
+//    }
 
-    protected Predicate buildUserRefQueryConstraint(LoggedUser user) {
-        Predicate userRefConstraints = userRefQuery(user.getId());
-        return constructPredicateTree(Collections.singletonList(userRefConstraints), BooleanBuilder::or);
-    }
 
-    protected Predicate buildViewRoleQueryConstraint(LoggedUser user) {
-        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::viewRoleQuery).collect(Collectors.toList());
-        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
-    }
-
-    public Predicate viewRoleQuery(String role) {
-        return QTask.task.viewUserRefs.isEmpty().and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewRoles.contains(role));
-    }
-
-    protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
-        Predicate userConstraints = viewUsersQuery(user.getId());
-        return constructPredicateTree(Collections.singletonList(userConstraints), BooleanBuilder::or);
-    }
-
-    public Predicate viewUsersQuery(String userId) {
-        return QTask.task.negativeViewRoles.isEmpty().and(QTask.task.viewUserRefs.isEmpty()).and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewUsers.contains(userId));
-    }
-
-    protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {
-        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::negativeViewRoleQuery).collect(Collectors.toList());
-        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
-    }
-
-    public Predicate negativeViewRoleQuery(String role) {
-        return QTask.task.negativeViewRoles.contains(role);
-    }
-
-    protected Predicate buildNegativeViewUsersQueryConstraint(LoggedUser user) {
-        Predicate userConstraints = negativeViewUsersQuery(user.getId());
-        return constructPredicateTree(Collections.singletonList(userConstraints), BooleanBuilder::or);
-    }
-
-    public Predicate negativeViewUsersQuery(String userId) {
-        return QTask.task.negativeViewUsers.contains(userId);
-    }
-
-
-    private Predicate buildSingleQuery(TaskSearchRequest request, LoggedUser user, Locale locale) {
+    private Predicate buildSingleQuery(TaskSearchRequest request, String actorId, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
 
         buildStringIdQuery(request, builder);
-        buildRoleQuery(request, builder);
+        buildStateQuery(request, builder);
+//        buildRoleQuery(request, builder);
         buildCaseQuery(request, builder);
         buildTitleQuery(request, builder);
-        buildUserQuery(request, builder);
+        buildAssigneeQuery(request, builder);
         buildProcessQuery(request, builder);
         buildFullTextQuery(request, builder);
         buildTransitionQuery(request, builder);
-        buildTagsQuery(request, builder);
-        boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, builder);
+        buildPropertiesQuery(request, builder);
 
-        if (resultAlwaysEmpty)
-            return null;
-        else
-            return builder;
+        return builder;
     }
 
     private void buildStringIdQuery(TaskSearchRequest request, BooleanBuilder query) {
@@ -132,28 +131,44 @@ public class TaskSearchService extends MongoSearchService<Task> {
         );
     }
 
-    private void buildRoleQuery(TaskSearchRequest request, BooleanBuilder query) {
-        if (request.role == null || request.role.isEmpty()) {
+    private void buildStateQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.state == null || request.state.isEmpty()) {
             return;
         }
 
         query.and(
                 constructPredicateTree(
-                        request.role.stream().map(this::roleQuery).collect(Collectors.toList()),
+                        request.state.stream().map(this::stateQuery).collect(Collectors.toList()),
                         BooleanBuilder::or)
         );
     }
-
-    public Predicate roleQuery(String role) {
-        return QTask.task.roles.containsKey(role);
-    }
-
+//
+//    private void buildRoleQuery(TaskSearchRequest request, BooleanBuilder query) {
+//        if (request.role == null || request.role.isEmpty()) {
+//            return;
+//        }
+//
+//        query.and(
+//                constructPredicateTree(
+//                        request.role.stream().map(this::roleQuery).collect(Collectors.toList()),
+//                        BooleanBuilder::or)
+//        );
+//    }
+//
+//    public Predicate processRoleQuery(String roleId) {
+//        return QTask.task.processRolePermissions.permissions.containsKey(roleId);
+//    }
+//
+//    public Predicate caseRoleQuery(String roleId) {
+//        return QTask.task.caseRolePermissions.permissions.containsKey(roleId);
+//    }
+//
     public Predicate stringIdQuery(String id) {
         return QTask.task.id.eq(new ObjectId(id));
     }
 
-    public Predicate userRefQuery(String userId) {
-        return QTask.task.users.containsKey(userId);
+    public Predicate stateQuery(State state) {
+        return QTask.task.state.eq(state);
     }
 
     private void buildCaseQuery(TaskSearchRequest request, BooleanBuilder query) {
@@ -175,9 +190,9 @@ public class TaskSearchService extends MongoSearchService<Task> {
     private Predicate caseRequestQuery(TaskSearchCaseRequest caseRequest) {
         if (caseRequest.id != null) {
             return caseIdQuery(caseRequest.id);
-        } else if (caseRequest.title != null) {
+        } /*else if (caseRequest.title != null) {
             return caseTitleQuery(caseRequest.title);
-        }
+        }*/
         return null;
     }
 
@@ -185,9 +200,9 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return QTask.task.caseId.eq(caseId);
     }
 
-    public Predicate caseTitleQuery(String caseTitle) {
-        return QTask.task.caseTitle.containsIgnoreCase(caseTitle);
-    }
+//    public Predicate caseTitleQuery(String caseTitle) {
+//        return QTask.task.containsIgnoreCase(caseTitle);
+//    }
 
     private void buildTitleQuery(TaskSearchRequest request, BooleanBuilder query) {
         if (request.title == null || request.title.isEmpty()) {
@@ -205,20 +220,20 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return QTask.task.title.defaultValue.containsIgnoreCase(query);
     }
 
-    private void buildUserQuery(TaskSearchRequest request, BooleanBuilder query) {
-        if (request.user == null || request.user.isEmpty()) {
+    private void buildAssigneeQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.assigneeId == null || request.assigneeId.isEmpty()) {
             return;
         }
 
         query.and(
                 constructPredicateTree(
-                        request.user.stream().map(this::userQuery).collect(Collectors.toList()),
+                        request.assigneeId.stream().map(this::assigneeQuery).collect(Collectors.toList()),
                         BooleanBuilder::or)
         );
     }
 
-    public Predicate userQuery(String userId) {
-        return QTask.task.userId.eq(userId);
+    public Predicate assigneeQuery(String assigneeId) {
+        return QTask.task.assigneeId.eq(assigneeId);
     }
 
     private void buildProcessQuery(TaskSearchRequest request, BooleanBuilder query) {
@@ -248,7 +263,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     public Predicate fullTextQuery(String searchedText) {
         BooleanBuilder builder = new BooleanBuilder();
         builder.or(QTask.task.title.defaultValue.containsIgnoreCase(searchedText));
-        builder.or(QTask.task.caseTitle.containsIgnoreCase(searchedText));
+//        builder.or(QTask.task.caseTitle.containsIgnoreCase(searchedText));
         return builder;
     }
 
@@ -268,38 +283,19 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return QTask.task.transitionId.eq(transitionId);
     }
 
-    public boolean buildGroupQuery(TaskSearchRequest request, LoggedUser user, Locale locale, BooleanBuilder query) {
-        if (request.group == null || request.group.isEmpty())
-            return false;
-
-        PetriNetSearch processQuery = new PetriNetSearch();
-        processQuery.setGroup(request.group);
-        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
-        if (groupProcesses.size() == 0)
-            return true;
-
-        query.and(
-                constructPredicateTree(
-                        groupProcesses.stream().map(PetriNetReference::getStringId).map(QTask.task.processId::eq).collect(Collectors.toList()),
-                        BooleanBuilder::or
-                )
-        );
-        return false;
-    }
-
-    private void buildTagsQuery(TaskSearchRequest request, BooleanBuilder query) {
-        if (request.tags == null || request.tags.isEmpty()) {
+    private void buildPropertiesQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.properties == null || request.properties.isEmpty()) {
             return;
         }
 
         query.and(
                 constructPredicateTree(
-                        request.tags.entrySet().stream().map(entry -> this.tagQuery(entry.getKey(), entry.getValue())).collect(Collectors.toList()),
+                        request.properties.entrySet().stream().map(entry -> this.tagQuery(entry.getKey(), entry.getValue())).collect(Collectors.toList()),
                         BooleanBuilder::and)
         );
     }
 
     public Predicate tagQuery(String key, String value) {
-        return QTask.task.tags.get(key).eq(value);
+        return QTask.task.properties.get(key).eq(value);
     }
 }

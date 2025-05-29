@@ -3,17 +3,17 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -59,14 +59,15 @@ class CaseFieldTest {
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
+        TestHelper.login(superCreator.superIdentity)
     }
 
     @Test
     void testAllowedNets() {
-        def testNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert testNet.getNet() != null
+        def testNet = petriNetService.importProcess(new ImportProcessParams(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
+        assert testNet.getProcess() != null
 
-        Case aCase = importHelper.createCase("Case 1", testNet.getNet())
+        Case aCase = importHelper.createCase("Case 1", testNet.getProcess())
 
         Field<?> field = aCase.getDataSet().get(CASE_FIELD_ID)
         assert field instanceof CaseField
@@ -113,10 +114,10 @@ class CaseFieldTest {
 
     @Test
     void testImmediateAllowedNets() {
-        def testNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert testNet.getNet() != null
+        def testNet = petriNetService.importProcess(new ImportProcessParams(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
+        assert testNet.getProcess() != null
 
-        Case aCase = importHelper.createCase("Case 1", testNet.getNet())
+        Case aCase = importHelper.createCase("Case 1", testNet.getProcess())
 
         assert aCase.getImmediateData().size() == 1
         CaseField caseRef = (CaseField) aCase.getImmediateData().get(0)
@@ -159,13 +160,13 @@ class CaseFieldTest {
 
     @Test
     void testChangeValueAction() {
-        def notAllowedNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert notAllowedNet.getNet() != null
+        def notAllowedNet = petriNetService.importProcess(new ImportProcessParams(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
+        assert notAllowedNet.getProcess() != null
 
-        def testNet = petriNetService.importPetriNet(stream(CHANGE_VALUE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert testNet.getNet() != null
+        def testNet = petriNetService.importProcess(new ImportProcessParams(stream(CHANGE_VALUE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
+        assert testNet.getProcess() != null
 
-        Case aCase = importHelper.createCase("Case 1", testNet.getNet())
+        Case aCase = importHelper.createCase("Case 1", testNet.getProcess())
 
         assert aCase.getDataSet().get(CASE_FIELD_ID).rawValue == null
 

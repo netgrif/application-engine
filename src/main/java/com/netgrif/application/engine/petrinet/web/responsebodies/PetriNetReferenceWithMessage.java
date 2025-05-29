@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.workflow.web.responsebodies.ResponseMessage;
 import lombok.Data;
 
@@ -16,7 +16,7 @@ public class PetriNetReferenceWithMessage extends ResponseMessage {
         setError(msg);
     }
 
-    public PetriNetReferenceWithMessage(String msg, PetriNet net, Locale locale) {
+    public PetriNetReferenceWithMessage(String msg, Process net, Locale locale) {
         super();
         setSuccess(msg);
         setNet(new PetriNetReference(net, locale));

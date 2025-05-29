@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>parent_to_be_extended</id>
+    <version>1.0.0</version>
+    <extends>
+        <id>super_parent_to_be_extended</id>
+        <version>1.0.0</version>
+    </extends>
+    <title>Parent test net to be extended</title>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+
+    <properties>
+        <property key="tag1">tag1</property>
+    </properties>
+
+    <role>
+        <id>role1</id>
+        <title>Role 1</title>
+    </role>
+
+    <data type="text">
+        <id>variable1</id>
+        <title>Attribute1</title>
+    </data>
+
+    <transition>
+        <id>t1</id>
+        <x>0</x>
+        <y>0</y>
+        <title>Test</title>
+        <flex>
+            <id>dg</id>
+            <item>
+                <dataRef>
+                    <id>variable1</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+        </flex>
+    </transition>
+
+    <place>
+        <id>p1</id>
+        <x>0</x>
+        <y>0</y>
+        <tokens>1</tokens>
+    </place>
+
+    <arc>
+        <id>a1</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>t1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+
+</process>

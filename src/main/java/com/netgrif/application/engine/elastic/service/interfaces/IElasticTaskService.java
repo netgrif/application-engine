@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.elastic.service.interfaces;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -19,16 +18,18 @@ public interface IElasticTaskService {
 
     Future<ElasticTask> scheduleTaskIndexing(ElasticTask task);
 
+    // todo: release/8.0.0 inconsistency with IElasticCaseService (type of input)
     @Async
     void index(ElasticTask task);
 
     void indexNow(ElasticTask task);
 
-    Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection);
-
-    long count(List<ElasticTaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection);
-
     void remove(String taskId);
 
     void removeByPetriNetId(String petriNetId);
+
+    Page<Task> search(List<ElasticTaskSearchRequest> requests, String actorId, Pageable pageable, Locale locale,
+                      Boolean isIntersection);
+
+    long count(List<ElasticTaskSearchRequest> requests, String actorId, Locale locale, Boolean isIntersection);
 }

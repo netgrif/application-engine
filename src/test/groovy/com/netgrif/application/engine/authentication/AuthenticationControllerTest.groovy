@@ -1,0 +1,129 @@
+package com.netgrif.application.engine.authentication
+
+import com.icegreen.greenmail.util.GreenMail
+import com.icegreen.greenmail.util.ServerSetup
+import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
+import com.netgrif.application.engine.authentication.web.AuthenticationController
+import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest
+import com.netgrif.application.engine.authentication.web.requestbodies.RegistrationRequest
+import com.netgrif.application.engine.importer.service.Importer
+import com.netgrif.application.engine.mail.EmailType
+import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.SuperCreator
+import org.jsoup.Jsoup
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.junit.jupiter.SpringExtension
+
+import javax.mail.BodyPart
+import javax.mail.MessagingException
+import javax.mail.internet.MimeMessage
+import javax.mail.internet.MimeMultipart
+
+@ExtendWith(SpringExtension.class)
+@ActiveProfiles(["test"])
+@SpringBootTest
+class AuthenticationControllerTest {
+
+    private static final String EMAIL = "test@test.com"
+    private static final String NAME = "name"
+    private static final String SURNAME = "surname"
+    private static final String PASSWORD = "password"
+    private static final String CASE_NAME = "Test case"
+    private static final String CASE_INITIALS = "TC"
+    public static final String GROUP_NAME = "Insurance Company"
+
+    @Autowired
+    private AuthenticationController controller
+
+    @Autowired
+    private Importer importer
+
+    @Autowired
+    private ImportHelper importHelper
+
+    @Autowired
+    private IPetriNetService petriNetService
+
+    @Autowired
+    private IIdentityService identityService
+
+    @Autowired
+    private TestHelper testHelper
+
+    @Autowired
+    private SuperCreator superCreator
+
+    private GreenMail smtpServer
+
+    @BeforeEach
+    void before() {
+        testHelper.truncateDbs()
+        smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
+        smtpServer.start()
+
+        def net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/insurance_portal_demo_test_new.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
+        assert net.getProcess() != null
+    }
+
+    @Test
+//    @WithMockUser(roles = "ADMIN")
+    void inviteTest() {
+        TestHelper.login(superCreator.superIdentity)
+        controller.invite(new NewIdentityRequest(email: EMAIL, groups: [] as Set, roles: [] as Set), null)
+
+        MimeMessage[] messages = smtpServer.getReceivedMessages()
+        assertMessageReceived(messages)
+
+        String content = getTextFromMimeMultipart(messages[0].content as MimeMultipart)
+        String token = content.substring(content.indexOf("/signup/") + "/signup/".length(), content.lastIndexOf(" This is"))
+
+        controller.signup(new RegistrationRequest(token: token, firstname: NAME, lastname: SURNAME, password: PASSWORD))
+
+        assert identityService.existsByUsername(EMAIL)
+
+    }
+
+    @AfterEach
+    void after() {
+        smtpServer.stop()
+    }
+
+    @SuppressWarnings("GrMethodMayBeStatic")
+    private void assertMessageReceived(MimeMessage[] messages) throws MessagingException {
+        assert messages.length > 0
+
+        MimeMessage message = messages[0]
+
+        assert "test@example.com".equalsIgnoreCase(message.getFrom()[0].toString())
+        assert EmailType.REGISTRATION.getSubject().equalsIgnoreCase(message.getSubject())
+    }
+
+    private String getTextFromMimeMultipart(MimeMultipart mimeMultipart) throws MessagingException, IOException {
+        String result = ""
+        int count = mimeMultipart.getCount()
+        for (int i = 0; i < count; i++) {
+            BodyPart bodyPart = mimeMultipart.getBodyPart(i)
+            if (bodyPart.isMimeType("text/plain")) {
+                result = result + "\n" + bodyPart.getContent()
+                break // without break same text appears twice in my tests
+            } else if (bodyPart.isMimeType("text/html")) {
+                String html = (String) bodyPart.getContent()
+                result = result + "\n" + Jsoup.parse(html).text()
+            } else if (bodyPart.getContent() instanceof MimeMultipart) {
+                result = result + getTextFromMimeMultipart((MimeMultipart) bodyPart.getContent())
+            }
+        }
+        return result
+    }
+}

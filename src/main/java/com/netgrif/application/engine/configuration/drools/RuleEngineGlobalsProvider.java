@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.configuration.drools;
 
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.drools.interfaces.IRuleEngineGlobalsProvider;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
@@ -35,6 +36,7 @@ public class RuleEngineGlobalsProvider implements IRuleEngineGlobalsProvider {
     private final IElasticTaskService elasticTaskService;
     private final IDataService dataService;
     private final IMailService mailService;
+    private final IIdentityService identityService;
     private final IUserService userService;
     private final FactRepository factRepository;
 
@@ -45,6 +47,7 @@ public class RuleEngineGlobalsProvider implements IRuleEngineGlobalsProvider {
                                      @Autowired IElasticTaskService elasticTaskService,
                                      @Autowired IDataService dataService,
                                      @Autowired IMailService mailService,
+                                     @Autowired IIdentityService identityService,
                                      @Autowired IUserService userService,
                                      @Autowired FactRepository factRepository) {
         this.ruleEvaluationScheduleService = ruleEvaluationScheduleService;
@@ -54,6 +57,7 @@ public class RuleEngineGlobalsProvider implements IRuleEngineGlobalsProvider {
         this.elasticTaskService = elasticTaskService;
         this.dataService = dataService;
         this.mailService = mailService;
+        this.identityService = identityService;
         this.userService = userService;
         this.factRepository = factRepository;
     }
@@ -67,7 +71,8 @@ public class RuleEngineGlobalsProvider implements IRuleEngineGlobalsProvider {
     protected List<RuleEngineGlobal> initializeGlobals() {
         List<RuleEngineGlobal> globals = new ArrayList<>();
         globals.add(engineGlobal("com.netgrif.application.engine.workflow.service.interfaces", "ITaskService", "taskService", taskService));
-        globals.add(engineGlobal("com.netgrif.application.engine.auth.service.interfaces", "IUserService", "userService", userService));
+        globals.add(engineGlobal("com.netgrif.application.engine.authentication.service.interfaces", "IIdentityService", "identityService", identityService));
+        globals.add(engineGlobal("com.netgrif.application.engine.authorization.service.interfaces", "IUserService", "userService", userService));
         globals.add(engineGlobal("com.netgrif.application.engine.elastic.service.interfaces", "IElasticCaseService", "elasticCaseService", elasticCaseService));
         globals.add(engineGlobal("com.netgrif.application.engine.elastic.service.interfaces", "IElasticTaskService", "elasticTaskService", elasticTaskService));
         globals.add(engineGlobal("com.netgrif.application.engine.rules.domain", "FactRepository", "factRepository", factRepository));

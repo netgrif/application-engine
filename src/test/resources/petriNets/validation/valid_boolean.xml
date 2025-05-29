@@ -1,17 +1,20 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:noNamespaceSchemaLocation="../../../../main/resources/petriNets/petriflow_schema.xsd">
 	<id>valid_boolean</id>
-	<initials>VB1</initials>
+	<version>1.0.0</version>
 	<title>Validacia BooleanFieldu</title>
 	<icon>check_circle</icon>
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
-	<transitionRole>false</transitionRole>
+	<properties>
+		<property key="initials">VB1</property>
+	</properties>
 	<data type="boolean">
 		<id>boolean_0</id>
 		<title/>
 		<validations>
 			<validation>
-				<expression>requiredTrue</expression>
+				<name>requiredTrue</name>
 				<message>error-boolean</message>
 			</validation>
 		</validations>
@@ -20,52 +23,35 @@
 		<id>t1</id>
 		<x>260</x>
 		<y>100</y>
-		<label>Test</label>
-		<dataGroup>
-			<id>t1_0</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-			<dataRef>
-				<id>boolean_0</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-		<event type="assign">
-			<id>t1_assign</id>
-		</event>
-		<event type="finish">
-			<id>t1_finish</id>
-		</event>
-		<event type="cancel">
-			<id>t1_cancel</id>
-		</event>
-		<event type="delegate">
-			<id>t1_delegate</id>
-		</event>
+		<title>Test</title>
+		<flex>
+			<id>t1_flex</id>
+			<item>
+				<dataRef>
+					<id>boolean_0</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+		</flex>
 	</transition>
 	<place>
 		<id>p1</id>
 		<x>180</x>
 		<y>100</y>
 		<tokens>1</tokens>
-		<static>false</static>
 	</place>
 	<place>
 		<id>p2</id>
 		<x>340</x>
 		<y>100</y>
 		<tokens>0</tokens>
-		<static>false</static>
 	</place>
 	<arc>
 		<id>a1</id>
@@ -81,4 +67,4 @@
 		<destinationId>p2</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
-</document>
+</process>

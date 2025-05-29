@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.importer.model.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
@@ -13,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Transient;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +20,6 @@ import static com.netgrif.application.engine.petrinet.domain.dataset.logic.Field
 
 
 @Data
-@NoArgsConstructor
 public class DataRef {
 
     private String fieldId;
@@ -29,15 +28,20 @@ public class DataRef {
     @Transient
     private DataFieldBehavior behavior;
     private Map<DataEventType, DataEvent> events;
-    private FieldLayout layout;
     private Component component;
-    @Transient
-    protected String parentTaskId;
-    @Transient
-    protected String parentCaseId;
+    // TODO: release/8.0.0 parentCaseId
+    // TODO: release/8.0.0 uniqeue key map
+    private Map<String, String> properties;
+
+    public DataRef() {
+        this.events = new HashMap<>();
+        this.properties = new HashMap<>();
+    }
 
     public DataRef(Field<?> field, DataFieldBehavior behavior) {
+        this();
         this.field = field;
+        this.fieldId = field.getImportId();
         this.setBehavior(behavior);
     }
 
@@ -61,6 +65,10 @@ public class DataRef {
         } else {
             return event.getPostActions();
         }
+    }
+
+    public void addEvent(DataEvent event) {
+        events.put(event.getType(), event);
     }
 
     @Override
@@ -94,7 +102,11 @@ public class DataRef {
 
     public DataRef clone() {
         DataRef cloned = new DataRef();
-        // TODO: release/8.0.0 implement
+        cloned.setFieldId(this.fieldId);
+        cloned.setField(this.field == null ? null : this.field.clone());
+        cloned.setBehavior(this.behavior == null ? null : this.behavior.clone());
+        cloned.setEvents(this.events == null || this.events.isEmpty() ? new HashMap<>() : new HashMap<>(this.events));
+        cloned.setComponent(this.component == null ? null : this.component.clone());
         return cloned;
     }
 }

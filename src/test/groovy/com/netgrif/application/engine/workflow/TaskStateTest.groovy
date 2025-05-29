@@ -2,14 +2,17 @@ package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.AllDataConfiguration
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
+import org.junit.Assert
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -43,20 +46,26 @@ class TaskStateTest {
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
+        TestHelper.login(superCreator.superIdentity)
     }
 
     @Test
     void testTaskState() {
         def netOptional = importHelper.createNet("NAE-1858_task_state.xml")
         assert netOptional.isPresent()
-        PetriNet net = netOptional.get()
+        Process net = netOptional.get()
 
-        Case useCase = workflowService.createCase(net.stringId, "Test Case", "", superCreator.superUser.transformToLoggedUser())?.case
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .title("Test Case")
+                .authorId(superCreator.getLoggedSuper().activeActorId)
+                .build()
+        Case useCase = workflowService.createCase(createCaseParams)?.case
         assert useCase
 
         List<Task> tasks = taskService.findAllByCase(useCase.stringId)
         tasks.each { task ->
-            assert (task.title as String) == "N" ? task.state == DISABLED : task.state == ENABLED
+            Assert.assertTrue(task.transitionId, (task.title as String) == "N" ? task.state == DISABLED : task.state == ENABLED)
         }
     }
 
@@ -64,24 +73,29 @@ class TaskStateTest {
     void testTaskState2() {
         def netOptional = importHelper.createNet("NAE-1858_task_state_2.xml")
         assert netOptional.isPresent()
-        PetriNet net = netOptional.get()
+        Process net = netOptional.get()
 
-        Case useCase = workflowService.createCase(net.stringId, "Test Case", "", superCreator.superUser.transformToLoggedUser())?.case
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .process(net)
+                .title("Test Case")
+                .authorId(superCreator.getLoggedSuper().activeActorId)
+                .build()
+        Case useCase = workflowService.createCase(createCaseParams)?.case
         assert useCase
 
         4.times { index ->
             List<Task> tasks = taskService.findAllByCase(useCase.stringId)
             String transitionId = "t${index + 1}"
-            tasks.each { t->
+            tasks.each { t ->
                 assert t.transitionId in [transitionId, allDataConfiguration.allData.id] ? t.state == ENABLED : t.state == DISABLED
             }
-            Task task = tasks.find {it.transitionId == transitionId}
-            taskService.assignTask(task.stringId)
+            Task task = tasks.find { it.transitionId == transitionId }
+            taskService.assignTask(new TaskParams(task.stringId))
             tasks = taskService.findAllByCase(useCase.stringId)
-            tasks.each { t->
+            tasks.each { t ->
                 assert t.transitionId in [allDataConfiguration.allData.id] ? t.state == ENABLED : t.state == DISABLED
             }
-            taskService.finishTask(task.stringId)
+            taskService.finishTask(new TaskParams(task.stringId))
         }
     }
 }

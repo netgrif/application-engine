@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain
 
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.startup.ImportHelper
 import org.junit.jupiter.api.Test
@@ -31,24 +31,19 @@ class ArcReferenceTest {
     @Autowired
     private ImportHelper helper
 
-    @Autowired
-    private IUserService userService
-
     private def stream = { String name ->
         return ArcOrderTest.getClassLoader().getResourceAsStream(name)
     }
 
     @Test
     void testReference() {
-        def net = importer.importPetriNet(stream(NET_FILE)).get()
-
-        assert net
+        assert importer.importPetriNet(stream(NET_FILE)).process
     }
 
     @Test
     void testInvalidReference() {
         assertThrows(IllegalArgumentException.class, () -> {
-            importer.importPetriNet(stream(NET_INVALID_FILE)).get()
+            importer.importPetriNet(stream(NET_INVALID_FILE))
         });
     }
 }

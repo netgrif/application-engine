@@ -1,38 +1,62 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.auth.domain.IUser
-import com.netgrif.application.engine.auth.domain.LoggedUser
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.authentication.domain.constants.SystemUserConstants
+import com.netgrif.application.engine.authorization.domain.Role
+import com.netgrif.application.engine.authorization.domain.User
+import com.netgrif.application.engine.authorization.domain.params.UserParams
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 
+@Slf4j
 @Component
-@ConditionalOnProperty(value = "admin.create-system-user", matchIfMissing = true)
 @CompileStatic
 class SystemUserRunner extends AbstractOrderedCommandLineRunner {
 
-    public static final String SYSTEM_USER_EMAIL = "engine@netgrif.com"
-    public static final String SYSTEM_USER_NAME = "application"
-    public static final String SYSTEM_USER_SURNAME = "engine"
+    @Lazy
+    @Autowired
+    private IUserService userService
 
     @Autowired
-    private IUserService service
+    private IRoleService roleService
 
-    private IUser systemUser
+    @Autowired
+    private ApplicationRoleRunner applicationRoleRunner
 
-    IUser createSystemUser() {
-        return service.createSystemUser()
-    }
-
-    LoggedUser getLoggedSystem() {
-        return this.systemUser.transformToLoggedUser()
-    }
+    private User systemUser
 
     @Override
     void run(String... strings) throws Exception {
-        this.systemUser = createSystemUser()
+        Optional<User> systemOpt = userService.findByEmail(SystemUserConstants.EMAIL)
+        if (systemOpt.isPresent()) {
+            this.systemUser = systemOpt.get()
+            return
+        }
+        this.systemUser = createSystemIdentityWithUser()
     }
 
+    private User createSystemIdentityWithUser() {
+        User systemUser = userService.create(UserParams.with()
+                .email(new TextField(SystemUserConstants.EMAIL))
+                .firstname(new TextField(SystemUserConstants.FIRSTNAME))
+                .lastname(new TextField(SystemUserConstants.LASTNAME))
+                .build())
+
+        Role adminAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE)
+        Role systemAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.SYSTEM_ADMIN_APP_ROLE)
+        roleService.assignRolesToActor(systemUser.stringId, [adminAppRole.stringId, systemAppRole.stringId] as Set)
+
+        userService.registerForbiddenKeywords(Set.of(systemUser.getEmail()))
+        log.info("Created system user [{}] with id [{}].", systemUser.getEmail(), systemUser.stringId)
+        return systemUser
+    }
+
+    User getSystemUser() {
+        return systemUser;
+    }
 }

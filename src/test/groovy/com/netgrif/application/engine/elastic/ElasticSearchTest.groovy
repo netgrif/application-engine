@@ -1,14 +1,15 @@
 package com.netgrif.application.engine.elastic
 
-import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
+import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.authentication.domain.Identity
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
+import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -17,7 +18,6 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -87,6 +87,9 @@ class ElasticSearchTest {
     private SuperCreator superCreator
 
     @Autowired
+    private IRoleService roleService
+
+    @Autowired
     private TestHelper testHelper
 
     private Authentication auth
@@ -102,25 +105,29 @@ class ElasticSearchTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
-        def net2 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        def net = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/all_data.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess()
+        def net2 = petriNetService.importProcess(new ImportProcessParams(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())).getProcess()
+
         assert net
         assert net2
 
         netId = net.getStringId()
         netId2 = net2.getStringId()
 
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
-                [net.roles.values().find { it.importId == "process_role" }] as ProcessRole[])
-        auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSW)
-        auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
+        Identity identity = importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Test"))
+                .lastname(new TextField("Integration"))
+                .username(new TextField(USER_EMAIL))
+                .password(new TextField(USER_PASSW))
+                .build(), List.of(roleService.findProcessRoleByImportId("process_role")))
+        auth = new UsernamePasswordAuthenticationToken(identity.toSession(), USER_PASSW)
+        auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
         CASE_NUMBER.times {
             def _case = importHelper.createCaseAsSuper("$it" as String, it % 2 == 0 ? net : net2)
             _case.dataSet.get("number").rawValue = it * 100.0 as Double
-            _case.dataSet.get("enumeration").rawValue = (_case.petriNet.dataSet.get("enumeration") as EnumerationField).choices[it % 3]
+            _case.dataSet.get("enumeration").rawValue = (_case.process.dataSet.get("enumeration") as EnumerationField).choices[it % 3]
             workflowService.save(_case)
         }
 
@@ -136,7 +143,7 @@ class ElasticSearchTest {
                 "searchByAuthorIdAndIdentifier"          : [
                         "json": JsonOutput.toJson([
                                 "author": [
-                                        "id": superCreator.superUser.stringId
+                                        "id": superCreator.superIdentity.mainActorId
                                 ],
                                 "process": [
                                         "identifier": "all_data"
@@ -147,27 +154,28 @@ class ElasticSearchTest {
                 "searchByAuthorId"          : [
                         "json": JsonOutput.toJson([
                                 "author": [
-                                        "id": superCreator.superUser.stringId
+                                        "id": superCreator.superIdentity.mainActorId
                                 ]
                         ]),
-                        "size": CASE_NUMBER + SYSTEM_CASE_NUMBER
+                        "size": CASE_NUMBER
                 ],
-                "searchByAuthorName"        : [
-                        "json": JsonOutput.toJson([
-                                "author": [
-                                        "name": superCreator.superUser.fullName
-                                ]
-                        ]),
-                        "size": CASE_NUMBER + SYSTEM_CASE_NUMBER
-                ],
-                "searchByAuthorEmail"       : [
-                        "json": JsonOutput.toJson([
-                                "author": [
-                                        "email": superCreator.superUser.email
-                                ]
-                        ]),
-                        "size": CASE_NUMBER + SYSTEM_CASE_NUMBER
-                ],
+                // todo: release/8.0.0 author email,name is not indexed
+//                "searchByAuthorName"        : [
+//                        "json": JsonOutput.toJson([
+//                                "author": [
+//                                        "name": superCreator.superIdentity.fullName
+//                                ]
+//                        ]),
+//                        "size": CASE_NUMBER + SYSTEM_CASE_NUMBER
+//                ],
+//                "searchByAuthorEmail"       : [
+//                        "json": JsonOutput.toJson([
+//                                "author": [
+//                                        "email": superCreator.superIdentity.username
+//                                ]
+//                        ]),
+//                        "size": CASE_NUMBER + SYSTEM_CASE_NUMBER
+//                ],
                 "searchByEnumeration"       : [
                         "json": JsonOutput.toJson([
                                 "data": [

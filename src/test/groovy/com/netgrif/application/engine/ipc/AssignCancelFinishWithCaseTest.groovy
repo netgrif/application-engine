@@ -3,6 +3,7 @@ package com.netgrif.application.engine.ipc
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportProcessParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -57,14 +58,15 @@ class AssignCancelFinishWithCaseTest {
 
     @Test
     void testAssignCancelFinish() {
-        def testNet = petriNetService.importPetriNet(stream(ASSIGN_CANCEL_FINISH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def testNet = petriNetService.importProcess(new ImportProcessParams(stream(ASSIGN_CANCEL_FINISH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()))
 
-        assert testNet.getNet() != null
+        assert testNet.getProcess() != null
 
-        Case aCase = importHelper.createCase("Case 1", testNet.getNet())
+        TestHelper.login(superCreator.superIdentity)
+        Case aCase = importHelper.createCase("Case 1", testNet.getProcess())
         importHelper.assignTaskToSuper("Task", aCase.stringId)
 
-        def cases = caseRepository.findAllByProcessIdentifier(testNet.getNet().identifier)
+        def cases = caseRepository.findAllByProcessIdentifier(testNet.getProcess().identifier)
         assert cases.find { it.title == "Case 2" }.dataSet.get("field").rawValue == 1
     }
 }
