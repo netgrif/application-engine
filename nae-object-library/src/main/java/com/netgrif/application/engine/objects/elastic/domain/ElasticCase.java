@@ -10,6 +10,8 @@ import com.netgrif.application.engine.objects.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -66,6 +68,12 @@ public abstract class ElasticCase implements Serializable {
     private Set<String> taskIds;
 
     private Set<String> taskMongoIds;
+
+    private Map<String, Map<String, Boolean>> permissions;
+
+    private Map<String, Map<String, Boolean>> userRefs;
+
+    private Map<String, Map<String, Boolean>> users;
 
     private Set<String> enabledRoles;
 

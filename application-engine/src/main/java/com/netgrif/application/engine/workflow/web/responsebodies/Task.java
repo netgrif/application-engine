@@ -1,14 +1,12 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.objects.petrinet.domain.layout.TaskLayout;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import lombok.Data;
-import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,7 +36,9 @@ public class Task {
 
     private Integer priority;
 
-    private User user;
+    private String userId;
+
+    private String userRealmId;
 
     private Map<String, Map<String, Boolean>> roles;
 
@@ -85,7 +85,8 @@ public class Task {
         this.caseColor = task.getCaseColor();
         this.caseTitle = task.getCaseTitle();
         this.priority = task.getPriority();
-        this.user = task.getUser() != null ? User.createUser(task.getUser()) : null;
+        this.userId = task.getUser() != null ? task.getUser().getStringId() : null;
+        this.userRealmId = task.getUserRealmId() != null ? task.getUser().getRealmId() : null;
         this.roles = task.getRoles();
         this.users = task.getUsers();
         this.startDate = task.getStartDate();
