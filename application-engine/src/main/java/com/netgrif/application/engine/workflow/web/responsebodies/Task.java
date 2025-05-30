@@ -38,6 +38,8 @@ public class Task {
 
     private String userId;
 
+    private String userRealmId;
+
     private Map<String, Map<String, Boolean>> roles;
 
     private Map<String, Map<String, Boolean>> users;
@@ -84,6 +86,7 @@ public class Task {
         this.caseTitle = task.getCaseTitle();
         this.priority = task.getPriority();
         this.userId = task.getUser() != null ? task.getUser().getStringId() : null;
+        this.userRealmId = task.getUserRealmId() != null ? task.getUser().getRealmId() : null;
         this.roles = task.getRoles();
         this.users = task.getUsers();
         this.startDate = task.getStartDate();

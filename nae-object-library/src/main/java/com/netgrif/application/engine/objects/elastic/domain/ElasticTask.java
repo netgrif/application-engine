@@ -45,6 +45,8 @@ public abstract class ElasticTask {
 
     private String userId;
 
+    private String userRealmId;
+
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime startDate;
@@ -90,6 +92,7 @@ public abstract class ElasticTask {
         if (task.getPriority() != null)
             this.priority = task.getPriority();
         this.userId = task.getUserId();
+        this.userRealmId = task.getUserRealmId();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles();
         this.userRefs = task.getUserRefs();
@@ -112,6 +115,7 @@ public abstract class ElasticTask {
         this.caseTitleSortable = this.caseTitle;
         this.priority = task.getPriority();
         this.userId = task.getUserId();
+        this.userRealmId = task.getUserRealmId();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles();
         this.viewRoles = task.getViewRoles();
