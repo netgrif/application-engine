@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.configuration;
 
-//import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.pdf.generator.service.PdfDataHelper;
@@ -12,9 +11,9 @@ import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGener
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 
 @Configuration
@@ -27,6 +26,7 @@ public class PrototypesConfiguration {
     }
 
     @Bean("actionDelegate")
+    @ConditionalOnMissingBean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public ActionDelegate actionDelegate() {
         return new ActionDelegate();
