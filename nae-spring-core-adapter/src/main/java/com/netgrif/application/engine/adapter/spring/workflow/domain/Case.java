@@ -51,7 +51,6 @@ public class Case extends com.netgrif.application.engine.objects.workflow.domain
         return super.getDataSet();
     }
 
-    @JsonIgnore
     @Override
     public Set<TaskPair> getTasks() {
         return super.getTasks();
