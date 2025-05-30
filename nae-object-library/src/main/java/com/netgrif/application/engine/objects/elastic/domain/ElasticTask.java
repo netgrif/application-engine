@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public abstract class ElasticTask {
 

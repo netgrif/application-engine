@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public abstract class ElasticCase implements Serializable {
 
