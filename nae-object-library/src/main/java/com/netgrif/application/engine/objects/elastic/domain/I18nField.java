@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -13,7 +14,9 @@ public abstract class I18nField extends TextField {
 
     public String[] keyValue;
 
-    public I18nField(Set<String> keys, Set<String> values) {
+    public Map<String, String> translations;
+
+    public I18nField(Set<String> keys, Set<String> values, Map<String, String> translations) {
         super(new String[0]);
         this.keyValue = keys.toArray(new String[0]);
         this.textValue = values.toArray(new String[0]);

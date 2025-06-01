@@ -341,6 +341,9 @@ public abstract class User extends AbstractUser implements RegisteredUser, Seria
 
     @Override
     public String getTelNumber() {
+        if (attributes == null) {
+            return null;
+        }
         if (attributes.containsKey("tel")) {
             return (String) attributes.get("tel").getValue();
         }
@@ -349,9 +352,13 @@ public abstract class User extends AbstractUser implements RegisteredUser, Seria
 
     @Override
     public void setTelNumber(String telNumber) {
+        if (attributes == null) {
+            attributes = new HashMap<>();
+        }
         if (attributes.containsKey("tel")) {
             ((Attribute<String>) attributes.get("tel")).setValue(telNumber);
         }
         attributes.put("tel", new Attribute<>(telNumber, false));
     }
+
 }
