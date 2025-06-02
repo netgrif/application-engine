@@ -1,9 +1,13 @@
 package com.netgrif.application.engine.objects.elastic.domain;
 
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldValue;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+import java.util.stream.IntStream;
 
 @Data
 @NoArgsConstructor
@@ -38,6 +42,20 @@ public abstract class UserField extends DataField {
             this.userIdValue[i] = values[i].userId;
             super.fulltextValue[i] = String.format("%s %s", values[i].fullName, values[i].email);
         }
+    }
+
+    @Override
+    public Object getValue() {
+        if (userIdValue != null && userIdValue.length == 1) {
+            String[] fullNameSplit = fullNameValue[0].split(" ");
+            return new UserFieldValue(userIdValue[0], fullNameSplit[0], fullNameSplit[1], emailValue[0]);
+        } else if (userIdValue != null && userIdValue.length > 1) {
+            return IntStream.range(0, userIdValue.length).mapToObj(i -> {
+                String[] fullNameSplit = fullNameValue[i].split(" ");
+                return new UserFieldValue(userIdValue[i], fullNameSplit[0], fullNameSplit[1], emailValue[i]);
+            }).toList();
+        }
+        return null;
     }
 
     @AllArgsConstructor

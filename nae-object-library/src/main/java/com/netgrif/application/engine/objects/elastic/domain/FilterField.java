@@ -18,5 +18,10 @@ public abstract class FilterField extends FieldWithAllowedNetsField {
         super(fullTextValue, allowedNets);
         this.filterMetadata = filterMetadata != null ? filterMetadata : new HashMap<>();
     }
+
+    @Override
+    public Object getValue() {
+        return super.getValue();
+    }
 }
 

@@ -6,10 +6,16 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.Arrays;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public abstract class FileField extends DataField {
+
+    public String[] filePath;
 
     public String[] fileNameValue;
 
@@ -17,9 +23,11 @@ public abstract class FileField extends DataField {
 
     public FileField(FileFieldValue value) {
         super(value.getName());
+        this.filePath = new String[1];
         this.fileNameValue = new String[1];
         this.fileExtensionValue = new String[1];
         FileNameAndExtension extracted = this.extractFileExtensionFromName(value.getName());
+        this.filePath[0] = value.getPath();
         this.fileNameValue[0] = extracted.name;
         this.fileExtensionValue[0] = extracted.extension;
     }
@@ -34,6 +42,16 @@ public abstract class FileField extends DataField {
             this.fileExtensionValue[i] = extracted.extension;
             super.fulltextValue[i] = values[i].getName();
         }
+    }
+
+    @Override
+    public Object getValue() {
+        if (fileNameValue != null && fileNameValue.length == 1) {
+            return new FileFieldValue(fileNameValue[0] + "." + fileExtensionValue[0], filePath[0]);
+        } else if (fileNameValue != null && fileNameValue.length > 1) {
+            return IntStream.range(0, fileNameValue.length).mapToObj(i -> new FileFieldValue(fileNameValue[i] + "." + fileExtensionValue[i], filePath[i])).toList();
+        }
+        return null;
     }
 
     private FileNameAndExtension extractFileExtensionFromName(String filename) {
