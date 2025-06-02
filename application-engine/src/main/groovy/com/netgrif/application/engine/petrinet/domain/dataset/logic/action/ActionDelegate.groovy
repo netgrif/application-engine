@@ -1601,6 +1601,7 @@ class ActionDelegate {
     @NamedVariant
     Case createFilter(def title, String query, String type, List<String> allowedNets,
                       String icon, String visibility, def filterMetadata) {
+        type = type.capitalize();
         Case filterCase = createCase(FilterRunner.FILTER_PETRI_NET_IDENTIFIER, title as String)
         filterCase.setIcon(icon)
         filterCase.dataSet[DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID].value = (title instanceof I18nString) ? title : new I18nString(title as String)
@@ -1611,7 +1612,7 @@ class ActionDelegate {
         def setDataMap = [
                 (DefaultFiltersRunner.FILTER_TYPE_FIELD_ID)      : [
                         "type" : "enumeration_map",
-                        "value": type.capitalize()
+                        "value": type
                 ],
                 (DefaultFiltersRunner.FILTER_VISIBILITY_FIELD_ID): [
                         "type" : "enumeration_map",
