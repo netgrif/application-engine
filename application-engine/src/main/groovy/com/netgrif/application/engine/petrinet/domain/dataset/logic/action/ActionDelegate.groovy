@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
+import com.mchange.v2.lang.StringUtils
 import com.netgrif.application.engine.AsyncRunner
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
@@ -1610,7 +1611,7 @@ class ActionDelegate {
         def setDataMap = [
                 (DefaultFiltersRunner.FILTER_TYPE_FIELD_ID)      : [
                         "type" : "enumeration_map",
-                        "value": type
+                        "value": type.capitalize()
                 ],
                 (DefaultFiltersRunner.FILTER_VISIBILITY_FIELD_ID): [
                         "type" : "enumeration_map",
