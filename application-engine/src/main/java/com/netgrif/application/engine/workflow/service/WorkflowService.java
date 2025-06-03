@@ -34,6 +34,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.objects.workflow.service.InitValueExpressionEvaluator;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -188,7 +189,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> getAll(Pageable pageable) {
-        Page<Case> page = repository.findAll(pageable);
+        Page<Case> page = repository.findAllByWorkspaceId(userService.getLoggedOrSystem().getWorkspaceId(), pageable);
         page.getContent().forEach(this::setPetriNet);
         decryptDataSets(page.getContent());
         return setImmediateDataFields(page);
@@ -196,7 +197,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> findAllByUri(String uri, Pageable pageable) {
-        Page<Case> page = repository.findAllByUriNodeId(uri, pageable);
+        Page<Case> page = repository.findAllByUriNodeIdAndWorkspaceId(uri, userService.getLoggedOrSystem().getWorkspaceId(), pageable);
         page.getContent().forEach(this::setPetriNet);
         decryptDataSets(page.getContent());
         return setImmediateDataFields(page);
@@ -204,7 +205,8 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> search(Predicate predicate, Pageable pageable) {
-        Page<Case> page = repository.findAll(predicate, pageable);
+        Predicate expression = new BooleanBuilder(predicate).and(QCase.case$.workspaceId.eq(userService.getLoggedOrSystem().getWorkspaceId()));
+        Page<Case> page = repository.findAll(expression, pageable);
         page.getContent().forEach(this::setPetriNet);
         return setImmediateDataFields(page);
     }

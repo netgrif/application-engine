@@ -38,13 +38,13 @@ public interface UserService {
 
     IUser createUserFromThirdParty(String username, String email, String firstName, String lastName, String realmId, String authMethod);
 
-    void addDefaultRole(IUser user);
+    void addDefaultRoles(IUser user);
 
     void addAnonymousAuthorities(IUser user);
 
     void addAllRolesToAdminByUsername(String username);
 
-    void addAnonymousRole(IUser user);
+    void addAnonymousRoles(IUser user);
 
     IUser findById(String id, String realmId);
 

@@ -37,6 +37,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
+import com.querydsl.core.BooleanBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -728,19 +729,22 @@ public class TaskService implements ITaskService {
 
     @Override
     public Page<Task> searchAll(com.querydsl.core.types.Predicate predicate) {
-        Page<Task> tasks = taskRepository.findAll(predicate, new FullPageRequest());
+        com.querydsl.core.types.Predicate expression = new BooleanBuilder(predicate).and(QTask.task.workspaceId.eq(userService.getLoggedOrSystem().getWorkspaceId()));
+        Page<Task> tasks = taskRepository.findAll(expression, new FullPageRequest());
         return loadUsers(tasks);
     }
 
     @Override
     public Page<Task> search(com.querydsl.core.types.Predicate predicate, Pageable pageable) {
-        Page<Task> tasks = taskRepository.findAll(predicate, pageable);
+        com.querydsl.core.types.Predicate expression = new BooleanBuilder(predicate).and(QTask.task.workspaceId.eq(userService.getLoggedOrSystem().getWorkspaceId()));
+        Page<Task> tasks = taskRepository.findAll(expression, pageable);
         return loadUsers(tasks);
     }
 
     @Override
     public Task searchOne(com.querydsl.core.types.Predicate predicate) {
-        Page<Task> tasks = taskRepository.findAll(predicate, PageRequest.of(0, 1));
+        com.querydsl.core.types.Predicate expression = new BooleanBuilder(predicate).and(QTask.task.workspaceId.eq(userService.getLoggedOrSystem().getWorkspaceId()));
+        Page<Task> tasks = taskRepository.findAll(expression, PageRequest.of(0, 1));
         if (tasks.getTotalElements() > 0)
             return tasks.getContent().get(0);
         return null;
@@ -843,8 +847,8 @@ public class TaskService implements ITaskService {
                 scheduleTaskExecution(task, timeTrigger.getStartDate(), useCase);
             }
         }
-        ProcessRole defaultRole = processRoleService.defaultRole();
-        ProcessRole anonymousRole = processRoleService.anonymousRole();
+        ProcessRole defaultRole = processRoleService.defaultRole(transition.getWorkspaceId());
+        ProcessRole anonymousRole = processRoleService.anonymousRole(transition.getWorkspaceId());
         for (Map.Entry<String, Map<String, Boolean>> entry : transition.getRoles().entrySet()) {
             if (useCase.getEnabledRoles().contains(entry.getKey())
                     || defaultRole.getStringId().equals(entry.getKey())

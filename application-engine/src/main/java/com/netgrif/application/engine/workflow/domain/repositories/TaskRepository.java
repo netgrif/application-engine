@@ -3,6 +3,7 @@ package com.netgrif.application.engine.workflow.domain.repositories;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
+import com.querydsl.core.types.Predicate;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

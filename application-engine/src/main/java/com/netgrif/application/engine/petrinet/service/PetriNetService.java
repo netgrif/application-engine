@@ -287,12 +287,10 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public void deleteDefaultProcesses(String workspaceId) {
-        for (org.springframework.core.io.Resource resource : defaultProcessResource.getDefaultProcesses()) {
-            List<PetriNet> nets = repository.findAllByIdentifierAndWorkspaceId(resource.getFilename().split(".")[0], workspaceId);
-            nets.forEach(petriNet -> {
-                asyncRunner.execute(() -> deletePetriNet(petriNet.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser()), workspaceId);
-            });
+    public void deleteWorkspaceProcesses(String workspaceId) {
+        List<PetriNet> nets = repository.findAllByWorkspaceId(workspaceId);
+        for (PetriNet net : nets) {
+            asyncRunner.execute(() -> deletePetriNet(net.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser()), workspaceId);
         }
     }
 

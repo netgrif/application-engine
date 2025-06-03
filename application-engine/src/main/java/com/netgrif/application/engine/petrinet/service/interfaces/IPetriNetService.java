@@ -57,7 +57,7 @@ public interface IPetriNetService {
 
     List<PetriNet> importDefaultProcesses(String workspaceId);
 
-    void deleteDefaultProcesses(String workspaceId);
+    void deleteWorkspaceProcesses(String workspaceId);
 
     Optional<PetriNet> save(PetriNet petriNet);
 

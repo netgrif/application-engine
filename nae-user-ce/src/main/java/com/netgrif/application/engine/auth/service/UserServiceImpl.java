@@ -169,7 +169,7 @@ public class UserServiceImpl implements UserService {
     public IUser createUser(IUser user, String realmId) {
         log.info("Creating user [{}] in realm [{}]", user.getUsername(), realmId);
         addDefaultAuthorities(user);
-        addDefaultRole(user);
+        addDefaultRoles(user);
         ((User) user).addAuthMethod("basic");
         setPassword(((User) user), ((User) user).getPassword());
 
@@ -195,7 +195,7 @@ public class UserServiceImpl implements UserService {
         log.info("Creating user [{}] from third-party auth [{}] in realm [{}] without password", username, authMethod, realmId);
         User user = initializeNewUser(username, email, firstName, lastName, realmId);
         addDefaultAuthorities(user);
-        addDefaultRole(user);
+        addDefaultRoles(user);
         setDisablePassword(user);
         user.addAuthMethod(authMethod);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
@@ -230,10 +230,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addDefaultRole(IUser user) {
-        log.trace("Assigning default role to user [{}]", user.getUsername());
-        user.addProcessRole(processRoleService.defaultRole());
+    public void addDefaultRoles(IUser user) {
+        log.trace("Assigning default roles to user [{}]", user.getUsername());
+        Set<ProcessRole> roles = user.getProcessRoles();
+        defaultWorkspaceService.getAllWorkspaces().forEach(workspace ->
+                roles.add(processRoleService.defaultRole(workspace.getId()))
+        );
+        user.setProcessRoles(roles);
     }
+
+
 
     @Override
     public void addAnonymousAuthorities(IUser user) {
@@ -261,9 +267,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addAnonymousRole(IUser user) {
-        log.trace("Assigning anonymous role to user [{}]", user.getUsername());
-        user.addProcessRole(processRoleService.anonymousRole());
+    public void addAnonymousRoles(IUser user) {
+        log.trace("Assigning anonymous roles to user [{}]", user.getUsername());
+        Set<ProcessRole> roles = user.getProcessRoles();
+        defaultWorkspaceService.getAllWorkspaces().forEach(workspace ->
+                roles.add(processRoleService.anonymousRole(workspace.getId()))
+        );
+        user.setProcessRoles(roles);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.netgrif.application.engine.objects.auth.domain.Attribute;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.objects.petrinet.domain.workspace.DefaultWorkspaceService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -33,6 +34,7 @@ public class JwtService implements IJwtService {
     private final JwtProperties properties;
     private final ProcessRoleService roleService;
     private final AuthorityService authorityService;
+    private final DefaultWorkspaceService defaultWorkspaceService;
 
     @PostConstruct
     private void resolveSecret() {
@@ -81,6 +83,7 @@ public class JwtService implements IJwtService {
         user.setFirstName(userMap.get("firstName").toString());
         user.getAttributes().put("anonymous", new Attribute<>(true, false));
         user.setProcessRoles(Collections.singleton(roleService.anonymousRole()));
+        user.setWorkspaceId(defaultWorkspaceService.getDefaultWorkspace().getId());
         return user;
     }
 

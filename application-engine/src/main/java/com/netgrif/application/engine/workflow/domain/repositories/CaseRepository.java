@@ -25,10 +25,12 @@ public interface CaseRepository extends MongoRepository<Case, String>, QuerydslP
 
     List<Case> findAllByWorkspaceId(String workspaceId);
 
+    Page<Case> findAllByWorkspaceId(String workspaceId, Pageable pageable);
+
     @Query("{ '_id.objectId': { $in: ?0 } }")
     List<Case> findAllByObjectIdsIn(List<ObjectId> objectIds);
 
-    Page<Case> findAllByUriNodeId(String uri, Pageable pageable);
+    Page<Case> findAllByUriNodeIdAndWorkspaceId(String uri, String workspaceId, Pageable pageable);
 
     List<Case> findAllByPetriNetObjectId(ObjectId petriNetObjectId);
 

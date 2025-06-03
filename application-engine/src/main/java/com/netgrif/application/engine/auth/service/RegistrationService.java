@@ -11,6 +11,8 @@ import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.objects.petrinet.domain.workspace.DefaultWorkspaceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,8 @@ public class RegistrationService implements IRegistrationService {
     private ServerAuthProperties serverAuthProperties;
     @Autowired
     private ProcessRoleService processRoleService;
+    @Autowired
+    private DefaultWorkspaceService defaultWorkspaceService;
 
     @Override
     @Transactional
@@ -132,7 +136,12 @@ public class RegistrationService implements IRegistrationService {
         if (newUser.processRoles != null && !newUser.processRoles.isEmpty()) {
             user.setProcessRoles(new HashSet<>(processRole.findByIds(newUser.processRoles)));
         }
-        userService.addRole(user, processRoleService.getDefaultRole().getStringId());
+        Set<ProcessRole> roles = user.getProcessRoles();
+        defaultWorkspaceService.getAllWorkspaces().forEach(workspace ->
+                roles.add(processRoleService.defaultRole(workspace.getId()))
+        );
+        user.setProcessRoles(roles);
+
         user = (User) userService.saveUser(user, null);
 
         if (newUser.groups != null && !newUser.groups.isEmpty()) {

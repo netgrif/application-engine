@@ -12,6 +12,7 @@ import com.netgrif.application.engine.impersonation.service.interfaces.IImperson
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.objects.petrinet.domain.workspace.DefaultWorkspaceService;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.DataField;
@@ -50,6 +51,9 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
 
     @Autowired
     protected ProcessRoleService processRoleService;
+
+    @Autowired
+    private DefaultWorkspaceService defaultWorkspaceService;
 
     @Override
     public Page<IUser> getConfiguredImpersonationUsers(String query, LoggedUser impersonator, Pageable pageable) {
@@ -104,7 +108,9 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     @Override
     public List<ProcessRole> getRoles(List<Case> configs, IUser impersonated) {
         List<ProcessRole> impersonatedRoles = new ArrayList<>();
-        impersonatedRoles.add(processRoleService.defaultRole());
+        defaultWorkspaceService.getAllWorkspaces().forEach(workspace ->
+                impersonatedRoles.add(processRoleService.defaultRole(workspace.getId()))
+        );
         if (configs.isEmpty()) {
             return impersonatedRoles;
         }

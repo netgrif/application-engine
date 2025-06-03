@@ -201,16 +201,6 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     }
 
     @Override
-    public ProcessRole getDefaultRole() {
-        return processRoleRepository.findByImportId(ProcessRole.DEFAULT_ROLE);
-    }
-
-    @Override
-    public ProcessRole getAnonymousRole() {
-        return processRoleRepository.findByImportId(ProcessRole.ANONYMOUS_ROLE);
-    }
-
-    @Override
     public Collection<ProcessRole> findAllByIds(Collection<ProcessResourceId> collection) {
         return processRoleRepository.findAllByCompositeId(collection.stream().map(ProcessResourceId::getStringId).collect(Collectors.toList()));
     }
@@ -348,7 +338,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     @Override
     public List<ProcessRole> findAll() {
-        return processRoleRepository.findAll();
+        return findAllByWorkspaceId(userService.getLoggedOrSystem().getWorkspaceId());
     }
 
     @Override
@@ -375,8 +365,18 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     @Override
     public ProcessRole defaultRole() {
+        return defaultRole(userService.getLoggedOrSystem().getWorkspaceId());
+    }
+
+    @Override
+    public ProcessRole anonymousRole() {
+        return anonymousRole(userService.getLoggedOrSystem().getWorkspaceId());
+    }
+
+    @Override
+    public ProcessRole defaultRole(String workspaceId) {
         if (defaultRole == null) {
-            Set<ProcessRole> roles = processRoleRepository.findAllByName_DefaultValueAndWorkspaceId(ProcessRole.DEFAULT_ROLE, userService.getLoggedOrSystem().getWorkspaceId());
+            Set<ProcessRole> roles = processRoleRepository.findAllByImportIdAndWorkspaceId(ProcessRole.DEFAULT_ROLE, workspaceId);
             if (roles.isEmpty())
                 throw new IllegalStateException("No default process role has been found!");
             if (roles.size() > 1)
@@ -387,9 +387,9 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     }
 
     @Override
-    public ProcessRole anonymousRole() {
+    public ProcessRole anonymousRole(String workspaceId) {
         if (anonymousRole == null) {
-            Set<ProcessRole> roles = processRoleRepository.findAllByImportIdAndWorkspaceId(ProcessRole.ANONYMOUS_ROLE, userService.getLoggedOrSystem().getWorkspaceId());
+            Set<ProcessRole> roles = processRoleRepository.findAllByImportIdAndWorkspaceId(ProcessRole.ANONYMOUS_ROLE, workspaceId);
             if (roles.isEmpty())
                 throw new IllegalStateException("No anonymous process role has been found!");
             if (roles.size() > 1)
@@ -438,17 +438,6 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         }
 
         this.processRoleRepository.deleteAllBy_idIn(roleToDelete);
-    }
-
-    /**
-     * @param importId id from a process of a role
-     * @return a process role object
-     * @deprecated use {@link ProcessRoleService#findAllByImportId(String)} instead
-     */
-    @Deprecated(forRemoval = true, since = "6.2.0")
-    @Override
-    public ProcessRole findByImportId(String importId) {
-        return processRoleRepository.findAllByImportIdAndWorkspaceId(importId, userService.getLoggedOrSystem().getWorkspaceId()).stream().findFirst().orElse(null);
     }
 
     @Override

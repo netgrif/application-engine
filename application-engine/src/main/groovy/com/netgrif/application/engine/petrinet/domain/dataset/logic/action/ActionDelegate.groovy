@@ -614,7 +614,7 @@ class ActionDelegate {
     List<String> searchCases(Closure<Predicate> predicates) {
         QCase qCase = new QCase("case")
         def expression = predicates(qCase)
-        Page<Case> page = workflowService.searchAll(new BooleanBuilder(expression).and(qCase.workspaceId.eq(userService.loggedOrSystem.getWorkspaceId())))
+        Page<Case> page = workflowService.searchAll(expression)
 
         return page.content.collect { it.stringId }
     }
@@ -893,19 +893,19 @@ class ActionDelegate {
 
     List<Case> findCases(Closure<Predicate> predicate) {
         QCase qCase = new QCase("case")
-        Page<Case> result = workflowService.searchAll(new BooleanBuilder(predicate(qCase)).and(qCase.workspaceId.eq(userService.loggedOrSystem.getWorkspaceId())))
+        Page<Case> result = workflowService.searchAll(predicate(qCase))
         return result.content
     }
 
     List<Case> findCases(Closure<Predicate> predicate, Pageable pageable) {
         QCase qCase = new QCase("case")
-        Page<Case> result = workflowService.search(new BooleanBuilder(predicate(qCase)).and(qCase.workspaceId.eq(userService.loggedOrSystem.getWorkspaceId())), pageable)
+        Page<Case> result = workflowService.search(predicate(qCase), pageable)
         return result.content
     }
 
     Case findCase(Closure<Predicate> predicate) {
         QCase qCase = new QCase("case")
-        return workflowService.searchOne(new BooleanBuilder(predicate(qCase)).and(qCase.workspaceId.eq(userService.loggedOrSystem.getWorkspaceId())))
+        return workflowService.searchOne(predicate(qCase))
     }
 
     Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
@@ -966,19 +966,19 @@ class ActionDelegate {
 
     List<Task> findTasks(Closure<Predicate> predicate) {
         QTask qTask = new QTask("task")
-        Page<Task> result = taskService.searchAll(new BooleanBuilder(predicate(qTask)).and(qTask.workspaceId.eq(userService.loggedOrSystem.getWorkspaceId())))
+        Page<Task> result = taskService.searchAll(predicate(qTask))
         return result.content
     }
 
     List<Task> findTasks(Closure<Predicate> predicate, Pageable pageable) {
         QTask qTask = new QTask("task")
-        Page<Task> result = taskService.search(new BooleanBuilder(predicate(qTask)).and(qTask.workspaceId.eq(userService.loggedOrSystem.getWorkspaceId())), pageable)
+        Page<Task> result = taskService.search(predicate(qTask), pageable)
         return result.content
     }
 
     Task findTask(Closure<Predicate> predicate) {
         QTask qTask = new QTask("task")
-        return taskService.searchOne(new BooleanBuilder(predicate(qTask)).and(qTask.workspaceId.eq(userService.loggedOrSystem.getWorkspaceId())))
+        return taskService.searchOne(predicate(qTask))
     }
 
     Task findTask(String mongoId) {
@@ -1547,7 +1547,7 @@ class ActionDelegate {
         if (!createDefaultFilters) {
             return []
         }
-        return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.id.eq(userService.system.stringId)).and(it.workspaceId.eq(userService.system.workspaceId)) })
+        return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.id.eq(userService.system.stringId)) })
     }
 
     /**
