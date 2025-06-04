@@ -129,9 +129,9 @@ public class UserServiceImpl implements UserService {
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
         Optional<IUser> userOpt = userRepository.findByUsername(username, mongoTemplate, collectionName).map(user -> (IUser) user);
         if (userOpt.isPresent()) {
-            log.debug("User [{}] found in realm [{}]", username, collectionName);
+            log.debug("User [{}] found in realm [{}]", username, realmId);
         } else {
-            log.warn("User [{}] not found in realm [{}]", username, collectionName);
+            log.warn("User [{}] not found in realm [{}]", username, realmId);
         }
         return userOpt;
     }
