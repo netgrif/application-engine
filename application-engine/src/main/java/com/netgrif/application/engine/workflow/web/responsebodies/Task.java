@@ -86,7 +86,7 @@ public class Task {
         this.caseTitle = task.getCaseTitle();
         this.priority = task.getPriority();
         this.userId = task.getUser() != null ? task.getUser().getStringId() : null;
-        this.userRealmId = task.getUserRealmId() != null ? task.getUser().getRealmId() : null;
+        this.userRealmId = task.getUser() != null ? task.getUser().getRealmId() : null;
         this.roles = task.getRoles();
         this.users = task.getUsers();
         this.startDate = task.getStartDate();

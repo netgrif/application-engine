@@ -4,10 +4,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Data
@@ -33,5 +31,14 @@ public abstract class MapField extends TextField {
         }
         this.textValue = values.toArray(new String[0]);
         this.fulltextValue = values.toArray(new String[0]);
+    }
+
+    public Object getValue() {
+        if (keyValue != null && keyValue.length == 1) {
+            return keyValue[0];
+        } else if (keyValue != null && keyValue.length > 1) {
+            return new LinkedHashSet<>(Arrays.asList(keyValue));
+        }
+        return null;
     }
 }
