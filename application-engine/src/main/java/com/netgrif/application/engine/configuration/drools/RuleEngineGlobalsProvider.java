@@ -4,7 +4,6 @@
 //import com.netgrif.application.engine.configuration.drools.interfaces.IRuleEngineGlobalsProvider;
 //import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 //import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
-//import com.netgrif.application.engine.mail.interfaces.IMailService;
 //import com.netgrif.application.engine.rules.domain.FactRepository;
 //import com.netgrif.application.engine.rules.service.interfaces.IRuleEvaluationScheduleService;
 //import com.netgrif.application.engine.workflow.service.interfaces.IDataService;

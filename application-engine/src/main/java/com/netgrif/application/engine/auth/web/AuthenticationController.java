@@ -12,8 +12,6 @@ import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.application.engine.auth.service.UserFactory;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
-import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
-import com.netgrif.application.engine.mail.interfaces.IMailService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import freemarker.template.TemplateException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,13 +49,7 @@ public class AuthenticationController {
     private IRegistrationService registrationService;
 
     @Autowired
-    private IMailService mailService;
-
-    @Autowired
     private UserService userService;
-
-    @Autowired
-    private IMailAttemptService mailAttemptService;
 
     @Autowired
     private ServerAuthProperties serverAuthProperties;
@@ -85,32 +77,6 @@ public class AuthenticationController {
         } catch (InvalidUserTokenException e) {
             log.error(e.getMessage());
             return MessageResource.errorMessage("Invalid token!");
-        }
-    }
-
-    @Operation(summary = "Send invitation to a new user", security = {@SecurityRequirement(name = "BasicAuth")})
-    @PostMapping(value = "/invite", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource invite(@RequestBody NewUserRequest newUserRequest, Authentication auth) {
-        try {
-            if (!serverAuthProperties.isOpenRegistration() && (auth == null || !((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated().isAdmin())) {
-                return MessageResource.errorMessage("Only admin can invite new users!");
-            }
-
-            newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
-            if (mailAttemptService.isBlocked(newUserRequest.email)) {
-                return MessageResource.successMessage("Done");
-            }
-
-            RegisteredUser user = registrationService.createNewUser(newUserRequest);
-            if (user == null)
-                return MessageResource.successMessage("Done");
-            mailService.sendRegistrationEmail(user);
-
-            mailAttemptService.mailAttempt(newUserRequest.email);
-            return MessageResource.successMessage("Done");
-        } catch (IOException | TemplateException | MessagingException e) {
-            log.error(e.toString());
-            return MessageResource.errorMessage("Failed");
         }
     }
 
@@ -148,27 +114,6 @@ public class AuthenticationController {
         }
         LoggedUser loggedUser = (LoggedUser) authentication.getPrincipal();
         return ResponseEntity.ok(userResponseFactory.getUser(userService.findById(loggedUser.getId(), null), locale));
-    }
-
-    @Operation(summary = "Reset password")
-    @PostMapping(value = "/reset", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource resetPassword(@RequestBody String recoveryEmail) {
-        if (mailAttemptService.isBlocked(recoveryEmail)) {
-            return MessageResource.successMessage("Done");
-        }
-        try {
-            RegisteredUser user = registrationService.resetPassword(recoveryEmail);
-            if (user != null) {
-                mailService.sendPasswordResetEmail(user);
-                mailAttemptService.mailAttempt(user.getEmail());
-                return MessageResource.successMessage("Done");
-            } else {
-                return MessageResource.successMessage("Done");
-            }
-        } catch (MessagingException | IOException | TemplateException e) {
-            log.error(e.toString());
-            return MessageResource.errorMessage("Failed");
-        }
     }
 
     @Operation(summary = "Account recovery")

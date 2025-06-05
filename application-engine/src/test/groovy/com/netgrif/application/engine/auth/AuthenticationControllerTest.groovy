@@ -7,13 +7,11 @@ import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.IUser;
-import com.netgrif.application.engine.objects.auth.domain.User
+import com.netgrif.application.engine.objects.auth.domain.IUser
 import com.netgrif.application.engine.auth.web.AuthenticationController
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.mail.EmailType
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
