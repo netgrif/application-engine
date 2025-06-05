@@ -47,12 +47,18 @@ public abstract class UserField extends DataField {
     @Override
     public Object getValue() {
         if (userIdValue != null && userIdValue.length == 1) {
-            String[] fullNameSplit = fullNameValue[0].split(" ");
-            return new UserFieldValue(userIdValue[0], fullNameSplit[0], fullNameSplit[1], emailValue[0]);
+            String fullName = fullNameValue[0] != null ? fullNameValue[0] : "";
+            String[] fullNameSplit = fullName.split(" ", 2);
+            String firstName = fullNameSplit.length > 0 ? fullNameSplit[0] : "";
+            String lastName = fullNameSplit.length > 1 ? fullNameSplit[1] : "";
+            return new UserFieldValue(userIdValue[0], firstName, lastName, emailValue[0]);
         } else if (userIdValue != null && userIdValue.length > 1) {
             return IntStream.range(0, userIdValue.length).mapToObj(i -> {
-                String[] fullNameSplit = fullNameValue[i].split(" ");
-                return new UserFieldValue(userIdValue[i], fullNameSplit[0], fullNameSplit[1], emailValue[i]);
+                String fullName = fullNameValue[i] != null ? fullNameValue[i] : "";
+                String[] fullNameSplit = fullName.split(" ", 2);
+                String firstName = fullNameSplit.length > 0 ? fullNameSplit[0] : "";
+                String lastName = fullNameSplit.length > 1 ? fullNameSplit[1] : "";
+                return new UserFieldValue(userIdValue[i], firstName, lastName, emailValue[i]);
             }).toList();
         }
         return null;

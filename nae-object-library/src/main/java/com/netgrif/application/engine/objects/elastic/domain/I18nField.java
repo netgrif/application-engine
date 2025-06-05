@@ -26,6 +26,9 @@ public abstract class I18nField extends TextField {
 
     @Override
     public Object getValue() {
-        return new I18nString(textValue[0], translations);
+        if (textValue != null && textValue.length > 0) {
+            return new I18nString(textValue[0], translations);
+        }
+        return null;
     }
 }

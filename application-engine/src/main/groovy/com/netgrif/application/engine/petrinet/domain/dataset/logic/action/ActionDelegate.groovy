@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
-import com.mchange.v2.lang.StringUtils
+
 import com.netgrif.application.engine.AsyncRunner
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
@@ -32,6 +32,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.*
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.FieldBehavior
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
@@ -60,7 +61,6 @@ import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
 import com.querydsl.core.types.Predicate
 import groovy.transform.NamedVariant
 import org.bson.types.ObjectId
@@ -1601,7 +1601,10 @@ class ActionDelegate {
     @NamedVariant
     Case createFilter(def title, String query, String type, List<String> allowedNets,
                       String icon, String visibility, def filterMetadata) {
-        type = type.capitalize();
+        if (type == null || type.length() == 0) {
+            throw new IllegalArgumentException("Filter type cannot be null or empty");
+        }
+        type = type.toLowerCase().capitalize()
         Case filterCase = createCase(FilterRunner.FILTER_PETRI_NET_IDENTIFIER, title as String)
         filterCase.setIcon(icon)
         filterCase.dataSet[DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID].value = (title instanceof I18nString) ? title : new I18nString(title as String)
