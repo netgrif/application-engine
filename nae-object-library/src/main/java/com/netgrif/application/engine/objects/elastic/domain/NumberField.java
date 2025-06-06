@@ -16,4 +16,8 @@ public abstract class NumberField extends DataField {
         super(value.toString());
         this.numberValue = value;
     }
+
+    public Object getValue() {
+        return numberValue;
+    }
 }

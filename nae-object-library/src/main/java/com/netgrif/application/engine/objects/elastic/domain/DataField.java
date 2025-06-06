@@ -22,4 +22,8 @@ public abstract class DataField implements Serializable {
         this.fulltextValue = new String[1];
         this.fulltextValue[0] = fulltextValue;
     }
+
+    public Object getValue() {
+        return (fulltextValue != null && fulltextValue.length > 0) ? fulltextValue[0] : null;
+    }
 }

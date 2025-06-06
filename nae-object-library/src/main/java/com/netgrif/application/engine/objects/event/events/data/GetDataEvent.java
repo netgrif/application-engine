@@ -5,6 +5,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import lombok.Getter;
 
+
 @Getter
 public class GetDataEvent extends DataEvent {
 
@@ -21,12 +22,12 @@ public class GetDataEvent extends DataEvent {
     }
 
     public GetDataEvent(GetDataEventOutcome eventOutcome, EventPhase eventPhase, IUser user) {
-        super(eventOutcome,eventPhase, user);
+        super(eventOutcome, eventPhase, user);
         this.eventOutcome = eventOutcome;
     }
 
     @Override
     public String getMessage() {
-        return "GetDataEvent: GET [" + eventOutcome.getMessage().toString() + "]";
+        return "GetDataEvent: GET [" + (eventOutcome.getMessage() == null ? "NULL" : eventOutcome.getMessage().toString()) + "]";
     }
 }

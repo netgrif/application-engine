@@ -16,4 +16,9 @@ public abstract class BooleanField extends DataField {
         super(value.toString());
         this.booleanValue = value;
     }
+
+    @Override
+    public Object getValue() {
+        return booleanValue;
+    }
 }

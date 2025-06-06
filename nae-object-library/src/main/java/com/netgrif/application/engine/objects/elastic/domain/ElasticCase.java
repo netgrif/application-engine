@@ -5,19 +5,19 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.ImmediateField;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -63,11 +63,19 @@ public abstract class ElasticCase implements Serializable {
 
     private String authorEmail;
 
+    private List<ImmediateField> immediateData;
+
     private Map<String, DataField> dataSet;
 
     private Set<String> taskIds;
 
     private Set<String> taskMongoIds;
+
+    private Map<String, Map<String, Boolean>> permissions;
+
+    private Map<String, Map<String, Boolean>> userRefs;
+
+    private Map<String, Map<String, Boolean>> users;
 
     private Set<String> enabledRoles;
 
@@ -110,6 +118,7 @@ public abstract class ElasticCase implements Serializable {
         tags = new HashMap<>(useCase.getTags());
 
         dataSet = new HashMap<>();
+        immediateData = useCase.getImmediateData().stream().map(ImmediateField::new).collect(Collectors.toList());
     }
 
     public void update(ElasticCase useCase) {
@@ -131,5 +140,6 @@ public abstract class ElasticCase implements Serializable {
         tags = useCase.getTags();
 
         dataSet = useCase.getDataSet();
+        immediateData = useCase.getImmediateData();
     }
 }

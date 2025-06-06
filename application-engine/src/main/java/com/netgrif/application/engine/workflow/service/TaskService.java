@@ -190,6 +190,7 @@ public class TaskService implements ITaskService {
 
         startExecution(transition, useCase);
         task.setUserId(user.getSelfOrImpersonated().getStringId());
+        task.setUserRealmId(user.getSelfOrImpersonated().getRealmId());
         task.setStartDate(LocalDateTime.now());
         task.setUser(user.getSelfOrImpersonated());
 
@@ -271,6 +272,7 @@ public class TaskService implements ITaskService {
         task.setFinishDate(LocalDateTime.now());
         task.setFinishedBy(task.getUserId());
         task.setUserId(null);
+        task.setUserRealmId(null);
 
         useCase = workflowService.findOne(useCase.getStringId());
         save(task);
@@ -439,6 +441,7 @@ public class TaskService implements ITaskService {
     protected void delegate(IUser delegated, Task task, Case useCase) throws TransitionNotExecutableException {
         if (task.getUserId() != null) {
             task.setUserId(delegated.getStringId());
+            task.setUserRealmId(delegated.getRealmId());
             task.setUser(delegated);
             save(task);
         } else {

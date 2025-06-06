@@ -69,6 +69,9 @@ public abstract class Task implements Serializable {
     @Setter
     private String userId;
 
+    @Setter
+    private String userRealmId;
+
     @Getter
     @Setter
     private IUser user;
@@ -275,6 +278,11 @@ public abstract class Task implements Serializable {
     @JsonIgnore
     public String getUserId() {
         return userId;
+    }
+
+    @JsonIgnore
+    public String getUserRealmId() {
+        return userRealmId;
     }
 
     public String getTranslatedEventTitle(EventType assign, Locale locale) {

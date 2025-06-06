@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
+
 import com.netgrif.application.engine.AsyncRunner
 import com.netgrif.application.engine.AsyncRunnerWrapper
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
@@ -194,7 +195,7 @@ class ActionDelegate {
 
     FrontendActionOutcome Frontend
 
-    ModuleHolder Module
+    ModuleHolder NaeModule
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -217,7 +218,7 @@ class ActionDelegate {
         this.initTransitionsMap(action.transitionIds)
         this.outcomes = new ArrayList<>()
         this.Frontend = new FrontendActionOutcome(this.useCase, this.task, this.outcomes)
-        this.Module = new ModuleHolder()
+        this.NaeModule = new ModuleHolder()
     }
 
     def initFieldsMap(Map<String, String> fieldIds) {
@@ -1602,6 +1603,10 @@ class ActionDelegate {
     @NamedVariant
     Case createFilter(def title, String query, String type, List<String> allowedNets,
                       String icon, String visibility, def filterMetadata) {
+        if (type == null || type.length() == 0) {
+            throw new IllegalArgumentException("Filter type cannot be null or empty");
+        }
+        type = type.toLowerCase().capitalize()
         Case filterCase = createCase(FilterRunner.FILTER_PETRI_NET_IDENTIFIER, title as String)
         filterCase.setIcon(icon)
         filterCase.dataSet[DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID].value = (title instanceof I18nString) ? title : new I18nString(title as String)
