@@ -32,7 +32,7 @@ public interface RealmService {
 
     Optional<Realm> getRealmByName(String name);
 
-    <C extends AbstractAuthConfig, T extends AuthMethod<C>> T addProvider(String realmId, AuthMethodConfig<C> config);
+    <C extends AbstractAuthConfig> Realm addProvider(String realmId, AuthMethodConfig<C> config);
 
     void removeProvider(String realmId, String providerId);
 
