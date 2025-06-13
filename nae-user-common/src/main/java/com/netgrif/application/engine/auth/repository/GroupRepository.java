@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
@@ -16,9 +17,9 @@ public interface GroupRepository extends MongoRepository<Group, String>, Queryds
 
     Optional<Group> findByIdentifier(String identifier);
 
-    Set<Group> findAllByMemberIdsContains(String memberId);
+    Page<Group> findAllByMemberIdsContains(String memberId, Pageable pageable);
 
-    Page<Group> findAllByIdIn(Set<String> ids, Pageable pageable);
+    Page<Group> findAllByIdIn(Collection<String> ids, Pageable pageable);
 
     Page<Group> findAllByRealmId(String realmId, Pageable pageable);
 }

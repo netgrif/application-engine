@@ -43,14 +43,12 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         throw new UnsupportedOperationException("This method is not supported. Use 'UserRepository.deleteAll(MongoTemplate, Collection<String>)' instead.'");
     }
 
-    default Page<User> findAll(Predicate predicate, Pageable pageable, MongoTemplate mongoTemplate, Collection<String> collectionNames) {
+    default Page<User> findAll(Predicate predicate, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
         Assert.notNull(predicate, "Predicate must not be null");
         Assert.notNull(pageable, "Pageable must not be null");
 
-        return PageableUtils.listToPage(collectionNames.stream().map(collection -> {
-            SpringDataMongodbQuery<com.netgrif.application.engine.adapter.spring.auth.domain.User> query = createQuery(predicate, mongoTemplate, collection);
-            return query.fetch().stream().map(User.class::cast).toList();
-        }).flatMap(List::stream).toList(), pageable);
+        SpringDataMongodbQuery<com.netgrif.application.engine.adapter.spring.auth.domain.User> query = createQuery(predicate, mongoTemplate, collection);
+        return query.fetchPage(pageable).map(User.class::cast);
     }
 
     default Optional<User> findById(ObjectId objectId, MongoTemplate mongoTemplate, String collectionName) {
@@ -79,23 +77,17 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         collectionName.forEach(collection -> mongoTemplate.remove(new Query(), collection));
     }
 
-    default Page<User> findDistinctByStateAndProcessRoles__idIn(UserState state, List<ProcessResourceId> roleId, Pageable pageable, MongoTemplate mongoTemplate, Set<String> collectionNames) {
-        Set<User> resultUserSet = collectionNames.stream().map(collectionName ->
-            mongoTemplate.find(
-                Query.query(
-                    Criteria.where("state").is(state)
-                            .and("processRoles._id").in(roleId))
-                .with(pageable),
-                com.netgrif.application.engine.adapter.spring.auth.domain.User.class,
-                collectionName)
-        ).flatMap(List::stream).collect(Collectors.toSet());
-        return new PageImpl<>(resultUserSet.stream().toList(), pageable, resultUserSet.size());
+    default Page<User> findDistinctByStateAndProcessRoles__idIn(UserState state, List<ProcessResourceId> roleId, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
+        Query query = Query.query(
+                Criteria.where("state").is(state)
+                        .and("processRoles._id").in(roleId));
+        return resolveUserPage(pageable, mongoTemplate, collection, query);
     }
 
-    default List<User> findAllByProcessRoles__idIn(List<ProcessResourceId> rolesId, MongoTemplate mongoTemplate, Set<String> collectionNames) {
-        return collectionNames.stream().map(collectionName ->
-           mongoTemplate.find(Query.query(Criteria.where("processRoles._id").in(rolesId)), com.netgrif.application.engine.adapter.spring.auth.domain.User.class, collectionName)
-        ).flatMap(List::stream).map(User.class::cast).toList();
+    default Page<User> findAllByProcessRoles__idIn(List<ProcessResourceId> rolesId, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
+        Query query = Query.query(
+                Criteria.where("processRoles._id").in(rolesId));
+        return resolveUserPage(pageable, mongoTemplate, collection, query);
     }
 
     default void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime, MongoTemplate mongoTemplate, Set<String> collectionNames) {
@@ -104,26 +96,33 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         );
     }
 
-    default List<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime, MongoTemplate mongoTemplate, Set<String> collectionNames) {
-        return collectionNames.stream().map(collectionName ->
-                mongoTemplate.find(Query.query(Criteria.where("state").is(state).and("credentials.token.properties.expirationDate").lt(dateTime)), com.netgrif.application.engine.adapter.spring.auth.domain.User.class, collectionName)
-        ).flatMap(List::stream).map(User.class::cast).toList();
+    default Page<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
+        Query query = Query.query(
+                Criteria.where("state").is(state)
+                        .and("credentials.token.properties.expirationDate").lt(dateTime));
+        return resolveUserPage(pageable, mongoTemplate, collection, query);
     }
 
-    default Page<User> findAllByIdInAndState(Set<ObjectId> ids, UserState state, Pageable pageable, MongoTemplate mongoTemplate, Set<String> collectionNames) {
-        Set<User> resultUserSet = collectionNames.stream().map(collectionName ->
-            mongoTemplate.find(
-                Query.query(
-                    Criteria.where("id").in(ids)
-                            .and("state").is(state))
-                    .with(pageable),
-                com.netgrif.application.engine.adapter.spring.auth.domain.User.class,
-                collectionName)
-        ).flatMap(List::stream).collect(Collectors.toSet());
-        return new PageImpl<>(resultUserSet.stream().toList(), pageable, resultUserSet.size());
+    default Page<User> findAllByIdInAndState(Set<ObjectId> ids, UserState state, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
+        Query query = Query.query(
+                        Criteria.where("id").in(ids)
+                                .and("state").is(state));
+        return resolveUserPage(pageable, mongoTemplate, collection, query);
     }
 
     private SpringDataMongodbQuery<com.netgrif.application.engine.adapter.spring.auth.domain.User> createQuery(Predicate predicate, MongoTemplate mongoTemplate, String collectionName) {
         return new SpringDataMongodbQuery<>(mongoTemplate, com.netgrif.application.engine.adapter.spring.auth.domain.User.class, collectionName).where(predicate);
+    }
+
+    private static PageImpl<User> resolveUserPage(Pageable pageable, MongoTemplate mongoTemplate, String collection, Query query) {
+        List<User> resultUserList = mongoTemplate.find(
+                        query.with(pageable),
+                        com.netgrif.application.engine.adapter.spring.auth.domain.User.class,
+                        collection)
+                .stream()
+                .map(User.class::cast)
+                .collect(Collectors.toList());
+        long total = mongoTemplate.count(query.limit(-1).skip(-1), com.netgrif.application.engine.adapter.spring.auth.domain.User.class);
+        return new PageImpl<>(resultUserList, pageable, total);
     }
 }

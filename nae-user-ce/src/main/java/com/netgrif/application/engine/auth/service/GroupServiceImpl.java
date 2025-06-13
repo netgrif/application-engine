@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.auth.service;
 
+import com.netgrif.application.engine.adapter.spring.utils.PageableUtils;
 import com.netgrif.application.engine.auth.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.auth.repository.GroupRepository;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
@@ -75,7 +76,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Page<Group> findAllByIds(Set<String> ids, Pageable pageable) {
+    public Page<Group> findAllByIds(Collection<String> ids, Pageable pageable) {
         Page<Group> groups = groupRepository.findAllByIdIn(ids, pageable);
         groups.getContent().forEach(this::populateMembers);
         return groups;
@@ -185,13 +186,15 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Set<String> getAllCoMembers(IUser user) {
-        Set<Group> userMembershipGroups = groupRepository.findAllByMemberIdsContains(user.getStringId());
+    public Page<String> getAllCoMembers(IUser user, Pageable pageable) {
+        Page<Group> userMembershipGroups = groupRepository.findAllByMemberIdsContains(user.getStringId(), pageable);
         IUser system = userService.getSystem();
-        return userMembershipGroups.stream().map(Group::getMemberIds).flatMap(Set::stream)
-                .filter(id -> !id.equals(user.getStringId()))
-                .filter(id -> !id.equals(system.getStringId()))
-                .collect(Collectors.toSet());
+        return PageableUtils.listToPage(
+                userMembershipGroups.stream().map(Group::getMemberIds).flatMap(Set::stream)
+                        .filter(id -> !id.equals(user.getStringId()) && !id.equals(system.getStringId()))
+                        .collect(Collectors.toList()),
+                userMembershipGroups.getPageable()
+        ) ;
     }
 
     @Override
@@ -219,13 +222,13 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<Group> findByIds(Collection<String> ids) {
-        return groupRepository.findAllById(ids);
+    public Page<Group> findByIds(Collection<String> ids, Pageable pageable) {
+        return groupRepository.findAllByIdIn(ids, pageable);
     }
 
     @Override
-    public Collection<String> getGroupsOwnerEmails(Collection<String> groupIds) {
-        return this.findByIds(groupIds).stream().map(this::getGroupOwnerEmail).toList();
+    public Page<String> getGroupsOwnerEmails(Collection<String> groupIds, Pageable pageable) {
+        return this.findByIds(groupIds, pageable).map(this::getGroupOwnerEmail);
     }
 
     @Override

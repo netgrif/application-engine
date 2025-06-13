@@ -201,7 +201,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds) {
+    public Page<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds, Pageable pageable) {
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
         return userRepository.findAllByStateAndExpirationDateBefore(state, expirationDate, mongoTemplate, collectionNames);
     }
@@ -301,7 +301,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<IUser> findAllCoMembers(com.netgrif.application.engine.objects.auth.domain.LoggedUser loggedUser, Pageable pageable) {
-        Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser());
+        Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser(), Pageable.unpaged()).stream().collect(Collectors.toSet());
         members.add(loggedUser.getSelfOrImpersonated().getId());
         Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForAllRealm();
@@ -310,7 +310,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<IUser> searchAllCoMembers(String query, com.netgrif.application.engine.objects.auth.domain.LoggedUser loggedUser, Pageable pageable) {
-        Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser());
+        // TODO: how to send pageable to group service????
+        Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser(), Pageable.unpaged()).stream().collect(Collectors.toSet());
         members.add(loggedUser.getSelfOrImpersonated().getId());
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForAllRealm();
         return changeType(userRepository.findAll(buildPredicate(members.stream().map(ObjectId::new)
@@ -328,7 +329,7 @@ public class UserServiceImpl implements UserService {
         }
 
 
-        Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser());
+        Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser(), Pageable.unpaged()).stream().collect(Collectors.toSet());
         members.add(loggedUser.getSelfOrImpersonated().getId());
         BooleanExpression predicate = buildPredicate(members.stream().map(ObjectId::new).collect(Collectors.toSet()), query);
         if (!(roleIds == null || roleIds.isEmpty())) {
