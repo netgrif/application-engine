@@ -1,9 +1,13 @@
 package com.netgrif.application.engine.objects.elastic.domain;
 
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldValue;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+import java.util.stream.IntStream;
 
 @Data
 @NoArgsConstructor
@@ -38,6 +42,26 @@ public abstract class UserField extends DataField {
             this.userIdValue[i] = values[i].userId;
             super.fulltextValue[i] = String.format("%s %s", values[i].fullName, values[i].email);
         }
+    }
+
+    @Override
+    public Object getValue() {
+        if (userIdValue != null && userIdValue.length == 1) {
+            String fullName = fullNameValue[0] != null ? fullNameValue[0] : "";
+            String[] fullNameSplit = fullName.split(" ", 2);
+            String firstName = fullNameSplit.length > 0 ? fullNameSplit[0] : "";
+            String lastName = fullNameSplit.length > 1 ? fullNameSplit[1] : "";
+            return new UserFieldValue(userIdValue[0], firstName, lastName, emailValue[0]);
+        } else if (userIdValue != null && userIdValue.length > 1) {
+            return IntStream.range(0, userIdValue.length).mapToObj(i -> {
+                String fullName = fullNameValue[i] != null ? fullNameValue[i] : "";
+                String[] fullNameSplit = fullName.split(" ", 2);
+                String firstName = fullNameSplit.length > 0 ? fullNameSplit[0] : "";
+                String lastName = fullNameSplit.length > 1 ? fullNameSplit[1] : "";
+                return new UserFieldValue(userIdValue[i], firstName, lastName, emailValue[i]);
+            }).toList();
+        }
+        return null;
     }
 
     @AllArgsConstructor
