@@ -2124,7 +2124,7 @@ class ActionDelegate {
 
     protected Case getOrCreateFolderItem(String path) {
         String pathName = path.substring(path.lastIndexOf(MenuItemConstants.PATH_SEPARATOR.attributeId) + 1);
-        MenuItemBody body = new MenuItemBody(new I18nString(pathNUame), "folder")
+        MenuItemBody body = new MenuItemBody(new I18nString(pathName), "folder")
         return getOrCreateFolderRecursive(path, body)
     }
 
