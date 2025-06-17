@@ -223,6 +223,11 @@ public class PetriNetService implements IPetriNetService {
         return outcome;
     }
 
+    protected void evaluateRules(Event event) {
+        publisher.publishEvent(event);
+
+    }
+
     @Override
     public Optional<PetriNet> save(PetriNet petriNet) {
         petriNet.initializeArcs();
