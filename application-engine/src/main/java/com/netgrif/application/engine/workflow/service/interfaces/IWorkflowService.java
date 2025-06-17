@@ -83,7 +83,5 @@ public interface IWorkflowService {
 
     Case decrypt(Case useCase);
 
-    Page<Case> findAllByUri(String uri, Pageable pageable);
-
     Page<Case> search(Predicate predicate, Pageable pageable);
 }

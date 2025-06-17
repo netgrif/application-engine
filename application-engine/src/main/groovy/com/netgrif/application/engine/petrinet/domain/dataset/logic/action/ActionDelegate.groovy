@@ -51,7 +51,6 @@ import com.netgrif.application.engine.objects.workflow.service.InitValueExpressi
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.runner.FilterRunner
@@ -178,9 +177,6 @@ class ActionDelegate {
 
     @Autowired
     ExportConfiguration exportConfiguration
-
-    @Autowired
-    IUriService uriService
 
     @Autowired
     IImpersonationService impersonationService
@@ -1468,18 +1464,6 @@ class ActionDelegate {
         return this.dataService.getFile(useCase, task, field, forPreview)
     }
 
-    def getUri(String uri) {
-        return uriService.findByUri(uri)
-    }
-
-    def createUri(String uri, UriContentType type) {
-        return uriService.getOrCreate(uri, type)
-    }
-
-    def moveUri(String uri, String dest) {
-        return uriService.move(uri, dest)
-    }
-
     /**
      * Action API case search function using Elasticsearch database
      * @param requests the CaseSearchRequest list
@@ -1701,12 +1685,6 @@ class ActionDelegate {
              filter = workflowService.findOne(filter.stringId)
              def icon = cl() as String
              filter.setIcon(icon)
-             workflowService.save(filter)
-         },
-         uri           : { cl ->
-             filter = workflowService.findOne(filter.stringId)
-             def uri = cl() as String
-             filter.setUriNodeId(uriService.findByUri(uri).stringId)
              workflowService.save(filter)
          }]
     }
@@ -2108,11 +2086,10 @@ class ActionDelegate {
             throw new IllegalArgumentException("Menu item identifier $sanitizedIdentifier is not unique!")
         }
 
-        Case parentItemCase = getOrCreateFolderItem(body.uri)
+        Case parentItemCase = getOrCreateFolderItem(body.path)
         I18nString newName = body.menuName ?: (body.filter?.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString)
 
         Case menuItemCase = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, newName?.defaultValue)
-        menuItemCase.setUriNodeId(uriService.findByUri(body.uri).stringId)
         menuItemCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_ALLOWED_ROLES.attributeId].options = body.allowedRoles
         menuItemCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_BANNED_ROLES.attributeId].options = body.bannedRoles
         if (parentItemCase != null) {
@@ -2120,8 +2097,7 @@ class ActionDelegate {
         }
         menuItemCase = workflowService.save(menuItemCase)
         Task newItemTask = taskService.findOne(menuItemCase.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)
-        String nodePath = createNodePath(body.uri, sanitizedIdentifier)
-        uriService.getOrCreate(nodePath, UriContentType.CASE)
+        String nodePath = createNodePath(body.path, sanitizedIdentifier)
 
         newItemTask = assignTask(newItemTask)
         setData(newItemTask, body.toDataSet(parentItemCase.stringId, nodePath))
@@ -2138,22 +2114,22 @@ class ActionDelegate {
                 .toLowerCase()
     }
 
-    protected String createNodePath(String uri, String identifier) {
-        if (uri == uriService.getUriSeparator()) {
-            return uri + identifier
+    protected String createNodePath(String path, String identifier) {
+        if (path == MenuItemConstants.PATH_SEPARATOR.attributeId) {
+            return path + identifier
         } else {
-            return uri + uriService.getUriSeparator() + identifier
+            return path + MenuItemConstants.PATH_SEPARATOR.attributeId + identifier
         }
     }
 
-    protected Case getOrCreateFolderItem(String uri) {
-        UriNode node = uriService.getOrCreate(uri, UriContentType.CASE)
-        MenuItemBody body = new MenuItemBody(new I18nString(node.name), "folder")
-        return getOrCreateFolderRecursive(node, body)
+    protected Case getOrCreateFolderItem(String path) {
+        String pathName = path.substring(path.lastIndexOf(MenuItemConstants.PATH_SEPARATOR.attributeId) + 1);
+        MenuItemBody body = new MenuItemBody(new I18nString(pathNUame), "folder")
+        return getOrCreateFolderRecursive(path, body)
     }
 
-    protected Case getOrCreateFolderRecursive(UriNode node, MenuItemBody body, Case childFolderCase = null) {
-        Case folder = findFolderCase(node)
+    protected Case getOrCreateFolderRecursive(String path, MenuItemBody body, Case childFolderCase = null) {
+        Case folder = findFolderCase(path)
         if (folder != null) {
             if (childFolderCase != null) {
                 folder = appendChildCaseIdAndSave(folder, childFolderCase.stringId)
@@ -2163,7 +2139,6 @@ class ActionDelegate {
         }
 
         folder = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, body.menuName.toString())
-        folder.setUriNodeId(node.parentId)
         if (childFolderCase != null) {
             folder = appendChildCaseIdAndSave(folder, childFolderCase.stringId)
             initializeParentId(childFolderCase, folder.stringId)
@@ -2172,18 +2147,41 @@ class ActionDelegate {
         }
         Task newItemTask = taskService.findOne(folder.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)
         assignTask(newItemTask)
-        setData(newItemTask, body.toDataSet(null, node.path))
+        setData(newItemTask, body.toDataSet(null, path))
         finishTask(newItemTask)
 
         folder = workflowService.findOne(folder.stringId)
-        if (node.parentId != null) {
-            UriNode parentNode = uriService.findById(node.parentId)
-            body = new MenuItemBody(new I18nString(parentNode.name), "folder")
-
-            getOrCreateFolderRecursive(parentNode, body, folder)
+        if (hasParent(path)) {
+            body = new MenuItemBody(new I18nString(nameFromPath(path)), "folder")
+            String parentPath = parentPath(path)
+            getOrCreateFolderRecursive(parentPath, body, folder)
         }
 
         return folder
+    }
+
+    protected String nameFromPath(String path) {
+        if (path == null || path == MenuItemConstants.PATH_SEPARATOR.attributeId || path.length() == 0) {
+            return ""
+        }
+        if (path.lastIndexOf(MenuItemConstants.PATH_SEPARATOR.attributeId) == 0) {
+            return path.replace(MenuItemConstants.PATH_SEPARATOR.attributeId, "")
+        }
+        return path.substring(path.lastIndexOf(MenuItemConstants.PATH_SEPARATOR.attributeId))
+    }
+
+    protected String parentPath(String path) {
+        if (path == null || path == MenuItemConstants.PATH_SEPARATOR.attributeId || path.length() == 0 || path.lastIndexOf(MenuItemConstants.PATH_SEPARATOR.attributeId) == 0) {
+            return MenuItemConstants.PATH_SEPARATOR.attributeId
+        }
+        return path.substring(0, path.lastIndexOf(MenuItemConstants.PATH_SEPARATOR.attributeId))
+    }
+
+    protected boolean hasParent(String path) {
+        if (path == null || path == MenuItemConstants.PATH_SEPARATOR.attributeId || path.length() == 0) {
+            return false
+        }
+        return true
     }
 
     /**
@@ -2207,8 +2205,7 @@ class ActionDelegate {
             casesToSave.add(oldParent)
         }
 
-        UriNode destNode = uriService.getOrCreate(destUri, UriContentType.CASE)
-        Case newParent = getOrCreateFolderItem(destNode.path)
+        Case newParent = getOrCreateFolderItem(destUri)
         if (newParent != null) {
             item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value = [newParent.stringId] as ArrayList
             newParent = appendChildCaseId(newParent, item.stringId)
@@ -2217,8 +2214,7 @@ class ActionDelegate {
             item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value = null
         }
 
-        item.uriNodeId = destNode.stringId
-        item = resolveAndHandleNewNodePath(item, destNode.path)
+        item = resolveAndHandleNewNodePath(item, destUri)
         casesToSave.add(item)
 
         if (hasChildren(item)) {
@@ -2256,14 +2252,11 @@ class ActionDelegate {
         }
 
         Case duplicated = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, newTitle.defaultValue)
-        duplicated.uriNodeId = originItem.uriNodeId
         duplicated.dataSet = originItem.dataSet
         duplicated.title = newTitle.defaultValue
         duplicated = workflowService.save(duplicated)
 
-        UriNode node = uriService.findById(originItem.uriNodeId)
-        String newNodePath = createNodePath(node.path, sanitizedIdentifier)
-        uriService.getOrCreate(newNodePath, UriContentType.CASE)
+        String newNodePath = createNodePath((String) originItem.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH].value, sanitizedIdentifier)
 
         Task newItemTask = taskService.findOne(duplicated.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)
         Map updatedDataSet = [
@@ -2315,9 +2308,7 @@ class ActionDelegate {
 
         List<Case> casesToSave = new ArrayList<>()
         for (child in children) {
-            UriNode parentNode = uriService.getOrCreate(parentFolder.getFieldValue(MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId) as String, UriContentType.CASE)
-            child.uriNodeId = parentNode.stringId
-            child = resolveAndHandleNewNodePath(child, parentNode.path)
+            child = resolveAndHandleNewNodePath(child, (String) parentFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH].value)
 
             casesToSave.add(child)
             casesToSave.addAll(updateNodeInChildrenFoldersRecursive(child))
@@ -2328,15 +2319,14 @@ class ActionDelegate {
 
     private Case resolveAndHandleNewNodePath(Case folderItem, String destUri) {
         String newNodePath = resolveNewNodePath(folderItem, destUri)
-        UriNode newNode = uriService.getOrCreate(newNodePath, UriContentType.CASE)
-        folderItem.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId].value = newNode.path
+        folderItem.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId].value = newNodePath
 
         return folderItem
     }
 
     private String resolveNewNodePath(Case folderItem, String destUri) {
         return destUri +
-                uriService.getUriSeparator() +
+                MenuItemConstants.PATH_SEPARATOR.attributeId +
                 folderItem.getFieldValue(MenuItemConstants.PREFERENCE_ITEM_FIELD_IDENTIFIER.attributeId) as String
     }
 
@@ -2380,8 +2370,8 @@ class ActionDelegate {
         return workflowService.save(childFolderCase)
     }
 
-    protected Case findFolderCase(UriNode node) {
-        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.nodePath.textValue.keyword:\"$node.path\"")
+    protected Case findFolderCase(String path) {
+        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.nodePath.textValue.keyword:\"$path\"")
     }
 
     /**
@@ -2423,9 +2413,8 @@ class ActionDelegate {
      * @param name
      * @return
      */
-    Case findMenuItem(String uri, String name) {
-        UriNode uriNode = uriService.findByUri(uri)
-        return findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND title.keyword:\"$name\" AND uriNodeId:\"$uriNode.stringId\"")
+    Case findMenuItem(String path, String name) {
+        return findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND title.keyword:\"$name\" AND dataSet.nodePath.fulltextValue.keyword:\"$path\"")
     }
 
     Case findMenuItemByUriAndIdentifier(String uri, String identifier) {
@@ -2590,8 +2579,6 @@ class ActionDelegate {
         Case menuItem = findMenuItem(sanitize(id))
         if (!menuItem) {
             Case filter = createFilter(title, query, type, allowedNets, icon, DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, null)
-            createUri(uri, UriContentType.DEFAULT)
-
             return createMenuItem(uri, id, title, icon, filter, roles, bannedRoles)
         } else {
             Case filter = getFilterFromMenuItem(menuItem)
@@ -2803,67 +2790,57 @@ class ActionDelegate {
         return "${publicViewUrl}/${Base64.getEncoder().encodeToString(identifier.bytes)}" as String
     }
 
-    void updateMultichoiceWithCurrentNode(MultichoiceMapField field, UriNode node) {
-        List<String> splitPathList = splitUriPath(node.path)
+    void updateMultichoiceWithCurrentNode(MultichoiceMapField field, String path) {
+        List<String> splitPathList = splitUriPath(path)
 
-        change field options { findOptionsBasedOnSelectedNode(node, splitPathList) }
+        change field options { findOptionsBasedOnSelectedNode(path, splitPathList) }
         change field value { splitPathList }
     }
 
-    List<String> splitUriPath(String uri) {
-        String rootUri = uriService.getUriSeparator()
-        String[] splitPath = uri.split(uriService.getUriSeparator())
-        if (splitPath.length == 0 && uri == rootUri) {
-            splitPath = [rootUri]
+    List<String> splitUriPath(String path) {
+        String rootPath = MenuItemConstants.PATH_SEPARATOR.attributeId
+        String[] splitPath = path.split(MenuItemConstants.PATH_SEPARATOR.attributeId)
+        if (splitPath.length == 0 && path == rootPath) {
+            splitPath = [rootPath]
         } else if (splitPath.length == 0) {
-            throw new IllegalArgumentException("Wrong uri value: \"${uri}\"")
+            throw new IllegalArgumentException("Wrong path value: \"${path}\"")
         } else {
-            splitPath[0] = rootUri
+            splitPath[0] = rootPath
         }
         return splitPath as ArrayList
     }
 
-    Map<String, I18nString> findOptionsBasedOnSelectedNode(UriNode node) {
-        return findOptionsBasedOnSelectedNode(node, splitUriPath(node.path))
+    Map<String, I18nString> findOptionsBasedOnSelectedNode(String path) {
+        return findOptionsBasedOnSelectedNode(path, splitUriPath(path))
     }
 
-    Map<String, I18nString> findOptionsBasedOnSelectedNode(UriNode node, List<String> splitPathList) {
+    Map<String, I18nString> findOptionsBasedOnSelectedNode(String path, List<String> splitPathList) {
         Map<String, I18nString> options = new HashMap<>()
 
         options.putAll(splitPathList.collectEntries { [(it): new I18nString(it)] })
 
-        Set<String> childrenIds = node.getChildrenId()
+        Case caseByPath = findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.nodePath.textValue.keyword:\"$path\"")
+        Set<String> childrenIds = caseByPath.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as Set
         if (!childrenIds.isEmpty()) {
             for (String id : childrenIds) {
-                UriNode childNode = uriService.findById(id)
-                options.put(childNode.name, new I18nString(childNode.name))
+                Case childFolderCase = workflowService.findOne(id)
+                options.put(childFolderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_NAME.attributeId].value as String, new I18nString(childFolderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_NAME.attributeId].value as String))
             }
         }
 
         return options
     }
 
-    String getCorrectedUri(String uncheckedUri) {
-        String rootUri = uriService.getUriSeparator()
-        if (uncheckedUri == "") {
-            return rootUri
+    String getCorrectedUri(String uncheckedPath) {
+        String rootPath = MenuItemConstants.PATH_SEPARATOR.attributeId
+        if (uncheckedPath == "") {
+            return rootPath
         }
-
-        UriNode node = uriService.findByUri(uncheckedUri)
-
-        while (node == null) {
-            int lastIdx = uncheckedUri.lastIndexOf(uriService.getUriSeparator())
-            if (lastIdx == -1) {
-                return rootUri
-            }
-            uncheckedUri = uncheckedUri.substring(0, uncheckedUri.lastIndexOf(uriService.getUriSeparator()))
-            if (uncheckedUri == "") {
-                return rootUri
-            }
-            node = uriService.findByUri(uncheckedUri)
+        int lastIdx = uncheckedPath.lastIndexOf(MenuItemConstants.PATH_SEPARATOR.attributeId)
+        if (lastIdx == -1) {
+            return rootPath
         }
-
-        return node.path
+        return uncheckedPath
     }
 
     Field<?> getFieldOfTask(String taskId, String fieldId) {

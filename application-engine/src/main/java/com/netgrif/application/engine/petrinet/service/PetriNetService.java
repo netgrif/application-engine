@@ -30,7 +30,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingI
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.objects.petrinet.domain.version.Version;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
@@ -128,9 +127,6 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     protected IElasticPetriNetMappingService petriNetMappingService;
 
-    @Autowired
-    protected IUriService uriService;
-
     protected ApplicationEventPublisher publisher;
 
     protected IElasticPetriNetService elasticPetriNetService;
@@ -184,36 +180,19 @@ public class PetriNetService implements IPetriNetService {
         return self.get(petriNetIds.stream().map(ObjectId::new).collect(Collectors.toList()));
     }
 
-
     @Override
     @Deprecated
     public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author, uriService.getDefault().getStringId());
-    }
-
-    @Override
-    @Deprecated
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author, uriNodeId);
+        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author);
     }
 
     @Override
     public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, releaseType, author, uriService.getDefault().getStringId());
+        return importPetriNet(xmlFile, releaseType, author, new HashMap<>());
     }
 
     @Override
     public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, releaseType, author, uriService.getDefault().getStringId(), params);
-    }
-
-    @Override
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, releaseType, author, uriNodeId, new HashMap<>());
-    }
-
-    @Override
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author, String uriNodeId, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
         ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
         IOUtils.copy(xmlFile, xmlCopy);
@@ -222,7 +201,6 @@ public class PetriNetService implements IPetriNetService {
             return outcome;
         }
         PetriNet net = imported.get();
-        net.setUriNodeId(uriNodeId);
 
         PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
         if (existingNet != null) {
@@ -243,18 +221,6 @@ public class PetriNetService implements IPetriNetService {
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
         outcome.setNet(imported.get());
         return outcome;
-    }
-
-    private ImportPetriNetEventOutcome addMessageToOutcome(PetriNet net, ProcessEventType type, ImportPetriNetEventOutcome outcome) {
-        if (net.getProcessEvents().containsKey(type)) {
-            outcome.setMessage(net.getProcessEvents().get(type).getMessage());
-        }
-        return outcome;
-    }
-
-    protected void evaluateRules(Event event) {
-        publisher.publishEvent(event);
-
     }
 
     @Override
@@ -302,15 +268,8 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNet> findAllByUriNodeId(String uriNodeId) {
-        List<PetriNet> nets = elasticPetriNetService.findAllByUriNodeId(uriNodeId);
-        nets.forEach(PetriNet::initializeArcs);
-        return nets;
-    }
-
-    @Override
     public List<PetriNet> findAllById(List<String> ids) {
-        return StreamSupport.stream(repository.findAllById(ids).spliterator(), false).collect(Collectors.toList());
+        return new ArrayList<>(repository.findAllById(ids));
     }
 
     @Override
@@ -320,7 +279,7 @@ public class PetriNetService implements IPetriNetService {
         if (nets.isEmpty()) {
             return null;
         }
-        return nets.get(0);
+        return nets.getFirst();
     }
 
     /**

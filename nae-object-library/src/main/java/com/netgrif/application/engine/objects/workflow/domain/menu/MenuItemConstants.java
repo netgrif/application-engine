@@ -55,7 +55,11 @@ public enum MenuItemConstants {
 
     // TRANSITIONS
     PREFERENCE_ITEM_SETTINGS_TRANS_ID("item_settings"),
-    PREFERENCE_ITEM_FIELD_INIT_TRANS_ID("initialize");
+    PREFERENCE_ITEM_FIELD_INIT_TRANS_ID("initialize"),
+
+    // SEPARATOR
+    PATH_SEPARATOR("/");
+
     @Getter
     private final String attributeId;
 

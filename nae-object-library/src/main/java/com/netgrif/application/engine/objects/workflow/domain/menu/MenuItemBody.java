@@ -26,7 +26,7 @@ public class MenuItemBody {
     private I18nString tabName;
     private String menuIcon = "filter_none";
     private String tabIcon;
-    private String uri;
+    private String path;
     private String identifier;
     private Case filter;
     private Map<String, I18nString> allowedRoles;
@@ -76,8 +76,8 @@ public class MenuItemBody {
         this.tabIcon = tabIcon;
     }
 
-    public MenuItemBody(String uri, String identifier, I18nString name, String icon) {
-        this.uri = uri;
+    public MenuItemBody(String path, String identifier, I18nString name, String icon) {
+        this.path = path;
         this.identifier = identifier;
         this.menuName = name;
         this.tabName = name;
@@ -85,8 +85,8 @@ public class MenuItemBody {
         this.tabIcon = icon;
     }
 
-    public MenuItemBody(String uri, String identifier, I18nString menuName, I18nString tabName, String menuIcon, String tabIcon) {
-        this.uri = uri;
+    public MenuItemBody(String path, String identifier, I18nString menuName, I18nString tabName, String menuIcon, String tabIcon) {
+        this.path = path;
         this.identifier = identifier;
         this.menuName = menuName;
         this.tabName = tabName;
@@ -94,8 +94,8 @@ public class MenuItemBody {
         this.tabIcon = tabIcon;
     }
 
-    public MenuItemBody(String uri, String identifier, String name, String icon) {
-        this.uri = uri;
+    public MenuItemBody(String path, String identifier, String name, String icon) {
+        this.path = path;
         this.identifier = identifier;
         this.menuName = new I18nString(name);
         this.tabName = new I18nString(name);
@@ -103,8 +103,8 @@ public class MenuItemBody {
         this.tabIcon = icon;
     }
 
-    public MenuItemBody(String uri, String identifier, String menuName, String tabName, String menuIcon, String tabIcon) {
-        this.uri = uri;
+    public MenuItemBody(String path, String identifier, String menuName, String tabName, String menuIcon, String tabIcon) {
+        this.path = path;
         this.identifier = identifier;
         this.menuName = new I18nString(menuName);
         this.tabName = new I18nString(tabName);
