@@ -30,11 +30,11 @@ class PluginInjector {
         MetaClass keyClassMeta = PluginHolder.metaClass
         MetaClass pluginMetaClass = PluginMeta.metaClass
 
-        List<EntryPoint> entryPoints = plugin.entryPoints.values()
+        List<EntryPoint> entryPoints = new ArrayList(plugin.entryPoints.values())
 
         entryPoints.each { ep ->
             MetaClass entryPointMetaClass = EntryPointMeta.metaClass
-            List<Method> methods = ep.methods.values()
+            List<Method> methods = new ArrayList(ep.methods.values())
 
             methods.each { method->
                 entryPointMetaClass[method.name] = { Serializable... args ->
