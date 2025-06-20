@@ -1,0 +1,12 @@
+logging:
+  config: classpath:logback.xml
+netgrif:
+  engine:
+    data:
+      rest:
+        base-path: /api
+        detection-strategy: annotated
+    jackson:
+      default-property-inclusion: non_null
+      serialization:
+        write-dates-as-timestamps: true

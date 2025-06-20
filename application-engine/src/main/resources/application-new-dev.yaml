@@ -1,0 +1,4 @@
+netgrif:
+  engine:
+    logging:
+      endpoints: true
