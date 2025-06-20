@@ -52,6 +52,7 @@ import com.netgrif.application.engine.pdf.generator.config.PdfResource
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
+import com.netgrif.application.engine.plugin.meta.PluginHolder
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.runner.FilterRunner
@@ -195,6 +196,8 @@ class ActionDelegate {
 
     ModuleHolder NaeModule
 
+    PluginHolder Plugin
+
     /**
      * Reference of case and task in which current action is taking place.
      */
@@ -217,6 +220,7 @@ class ActionDelegate {
         this.outcomes = new ArrayList<>()
         this.Frontend = new FrontendActionOutcome(this.useCase, this.task, this.outcomes)
         this.NaeModule = new ModuleHolder()
+        this.Plugin = new PluginHolder()
     }
 
     def initFieldsMap(Map<String, String> fieldIds) {
