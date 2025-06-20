@@ -45,7 +45,7 @@ public class PluginRunner implements ApplicationEngineStartupRunner {
                 Plugin plugin = Plugin.builder()
                         .identifier(config.getPluginName())
                         .name(config.getPluginName())
-                        .version("0.0.1")
+                        .version(config.getVersion())
                         .description(StringUtils.EMPTY)
                         .entryPoints(config.getEntryPoints())
                         .build();
