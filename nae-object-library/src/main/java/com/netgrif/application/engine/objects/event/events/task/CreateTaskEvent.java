@@ -17,7 +17,7 @@ public class CreateTaskEvent extends TaskEvent {
 
     @Override
     public String getMessage() {
-        return "CreateTaskEvent: Task [" + taskEventOutcome.getTask().getStringId() + "] created";
+        return "CreateTaskEvent: Task [" + (taskEventOutcome.getTask() == null ? MISSING_IDENTIFIER : taskEventOutcome.getTask().getStringId())+ "] created";
     }
 
     @Override

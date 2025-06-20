@@ -8,7 +8,7 @@ LABEL org.opencontainers.image.vendor="NETGRIF"
 
 RUN mkdir -p /opt/netgrif/engine
 RUN mkdir -p /opt/netgrif/engine/modules
-COPY application-engine/target/app-exec.jar /opt/netgrif/engine/app.jar
+COPY application-engine/target/application-engine-7.0.0-SNAPSHOT-exec.jar /opt/netgrif/engine/app.jar
 COPY application-engine/src/main/resources /opt/netgrif/engine/src/main/resources
 
 WORKDIR /opt/netgrif/engine

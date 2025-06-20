@@ -239,9 +239,8 @@ public class PetriNetService implements IPetriNetService {
         outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.PRE));
         save(net);
-        outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params));
-        publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
         outcome.setNet(imported.get());
+        outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params));
         return outcome;
     }
 
@@ -534,6 +533,7 @@ public class PetriNetService implements IPetriNetService {
         processRoleService.deleteRolesOfNet(petriNet, loggedUser);
 
         log.info("[" + processId + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
+        publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.PRE));
         repository.deleteBy_id(petriNet.getObjectId());
         evictCache(petriNet);
         functionCacheService.reloadCachedFunctions(petriNet);
