@@ -1,17 +1,16 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.adapter.spring.plugin.service.EntryPointLoaderService;
+import com.netgrif.application.engine.adapter.spring.plugin.config.PluginRegistrationConfiguration;
 import com.netgrif.application.engine.objects.plugin.domain.Plugin;
 import com.netgrif.application.engine.plugin.PluginInjector;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
-import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -27,13 +26,12 @@ import java.util.Map;
 )
 public class PluginRunner implements ApplicationEngineStartupRunner {
 
-    private final EntryPointLoaderService entryPointLoaderService;
-
+    private final ApplicationContext applicationContext;
     private final PluginInjector pluginInjector;
 
-    public PluginRunner(@Autowired(required = false) EntryPointLoaderService entryPointLoaderService,
+    public PluginRunner(ApplicationContext applicationContext,
                         PluginInjector pluginInjector) {
-        this.entryPointLoaderService = entryPointLoaderService;
+        this.applicationContext = applicationContext;
         this.pluginInjector = pluginInjector;
     }
 
@@ -42,18 +40,17 @@ public class PluginRunner implements ApplicationEngineStartupRunner {
         log.info("Registering plugins.");
         Map<String, Plugin> pluginMap = new HashMap<>();
 
-        entryPointLoaderService.getAll().forEach(entryPoint -> {
-            if (!pluginMap.containsKey(entryPoint.getPluginName())) {
+        applicationContext.getBeansOfType(PluginRegistrationConfiguration.class).forEach((key, config) -> {
+            if (!pluginMap.containsKey(config.getPluginName())) {
                 Plugin plugin = Plugin.builder()
-                        .identifier(entryPoint.getPluginName())
-                        .name(entryPoint.getPluginName())
+                        .identifier(config.getPluginName())
+                        .name(config.getPluginName())
                         .version("0.0.1")
                         .description(StringUtils.EMPTY)
-                        .entryPoints(new HashMap<>())
+                        .entryPoints(config.getEntryPoints())
                         .build();
-                pluginMap.put(entryPoint.getPluginName(), plugin);
+                pluginMap.put(config.getPluginName(), plugin);
             }
-            pluginMap.get(entryPoint.getPluginName()).getEntryPoints().put(entryPoint.getName(), entryPoint);
         });
         pluginMap.values().forEach(pluginInjector::inject);
     }
