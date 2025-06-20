@@ -39,7 +39,7 @@ public class PluginRunner implements ApplicationEngineStartupRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        log.info("Registering new plugins.");
+        log.info("Registering plugins.");
         Map<String, Plugin> pluginMap = new HashMap<>();
 
         entryPointLoaderService.getAll().forEach(entryPoint -> {
