@@ -1,7 +1,11 @@
 package com.netgrif.application.engine.adapter.spring.plugin.config;
 
+import com.netgrif.application.engine.objects.plugin.domain.EntryPoint;
+
+import java.util.Map;
+
 public interface PluginRegistrationConfiguration {
     String getPluginName();
     String getVersion();
-    Object getEntryPoints();
+    Map<String, EntryPoint> getEntryPoints();
 }
