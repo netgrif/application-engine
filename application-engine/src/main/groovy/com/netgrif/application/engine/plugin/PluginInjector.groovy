@@ -11,38 +11,63 @@ import com.netgrif.application.engine.plugin.meta.PluginMeta
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
+/**
+ * Component responsible for injecting plugin entry points and methods into
+ * the application's meta-class system at runtime. Uses Groovy's metaClass
+ * mechanism to dynamically add closures that delegate calls to PluginService.
+ *
+ * @see ActionDelegate
+ * @see PluginService
+ */
 @Component
 class PluginInjector {
 
+    /**
+     * Service used to invoke methods on the injected plugins.
+     */
     @Autowired
     protected PluginService pluginService
 
     /**
-     * Injects provided plugin into meta class of {@link ActionDelegate}
+     * Injects the provided plugin into the application's meta-class system.
+     * This will allow calls to plugin entry points and methods via dynamic
+     * properties on {@link PluginHolder}.
      *
-     * @param plugin case of plugin to be injected
-     * */
+     * @param plugin the Plugin instance to be injected
+     */
     void inject(Plugin plugin) {
         updateMetaClasses(plugin)
     }
 
+    /**
+     * Updates meta-class definitions for the given plugin by registering
+     * each entry point and its methods as closures. Each generated closure
+     * delegates invocation to the {@link PluginService}.
+     *
+     * @param plugin the Plugin instance whose entry points and methods
+     *               are to be exposed dynamically
+     */
     protected void updateMetaClasses(Plugin plugin) {
-        MetaClass keyClassMeta = PluginHolder.metaClass
-        MetaClass pluginMetaClass = PluginMeta.metaClass
+        def pluginMeta = new PluginMeta()
 
-        List<EntryPoint> entryPoints = new ArrayList(plugin.entryPoints.values())
+        plugin.entryPoints.values().each { EntryPoint ep ->
+            def epMeta = new EntryPointMeta()
 
-        entryPoints.each { ep ->
-            MetaClass entryPointMetaClass = EntryPointMeta.metaClass
-            List<Method> methods = new ArrayList(ep.methods.values())
-
-            methods.each { method->
-                entryPointMetaClass[method.name] = { Serializable... args ->
-                    return pluginService.call(plugin.identifier, ep.name, method.name, args)
+            ep.methods.values().each { Method method ->
+                /**
+                 * Dynamically generated method closure for entry point invocation.
+                 *
+                 * @param args variable-length list of Serializable arguments
+                 * @return the result returned by PluginService.call(...)
+                 */
+                epMeta.metaClass."${method.name}" = { Serializable... args ->
+                    pluginService.call(plugin.identifier, ep.name, method.name, args)
                 }
             }
-            pluginMetaClass[ep.name] = new EntryPointMeta()
+
+            pluginMeta.metaClass."${ep.name}" = epMeta
         }
-        keyClassMeta[plugin.name] = new PluginMeta()
+
+        PluginHolder.metaClass."${plugin.name}" = pluginMeta
     }
 }
