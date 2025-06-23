@@ -115,8 +115,13 @@ class ImportHelper {
 
     Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.transformToLoggedUser(userService.getSystem())) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        PetriNet petriNet = petriNetService.importPetriNet(netStream, release, author).getNet()
-        log.info("Imported '${petriNet?.title?.defaultValue}' ['${petriNet?.identifier}', ${petriNet?.stringId}]")
+        def outcome = petriNetService.importPetriNet(netStream, release, author)
+        PetriNet petriNet = outcome.getNet()
+        if (petriNet == null) {
+                log.warn("Import of [$fileName] produced no PetriNet object")
+                return Optional.empty()
+            }
+        log.info("Imported '${petriNet.title?.defaultValue}' ['${petriNet.identifier}', ${petriNet.stringId}]")
         return Optional.of(petriNet)
     }
 
