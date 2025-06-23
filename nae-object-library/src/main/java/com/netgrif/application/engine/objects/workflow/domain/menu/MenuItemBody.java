@@ -4,6 +4,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import jakarta.annotation.Nullable;
@@ -26,6 +27,7 @@ public class MenuItemBody {
     private I18nString tabName;
     private String menuIcon = "filter_none";
     private String tabIcon;
+    @Getter
     private String path;
     private String identifier;
     private Case filter;
@@ -157,6 +159,10 @@ public class MenuItemBody {
 
     public Map<String, Map<String, Object>> toDataSet(String parentId, String nodePath) {
         return toDataSet(parentId, nodePath, false);
+    }
+
+    public void setPath(String path) {
+        this.path = path != null ? path.trim() : null;
     }
 
     private Map<String, Map<String, Object>> toDataSet(String parentId, String nodePath, boolean ignoreParentId) {
