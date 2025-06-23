@@ -51,7 +51,6 @@ import com.netgrif.application.engine.objects.workflow.service.InitValueExpressi
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.plugin.meta.PluginHolder
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
