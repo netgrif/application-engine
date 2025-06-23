@@ -61,9 +61,9 @@ public enum MenuItemConstants {
     PATH_SEPARATOR("/");
 
     @Getter
-    private final String attributeId;
+    private final String value;
 
-    MenuItemConstants(String attributeId) {
-        this.attributeId = attributeId;
+    MenuItemConstants(String value) {
+        this.value = value;
     }
 }

@@ -117,7 +117,7 @@ public class MenuItemBody {
         Map<String, Object> fieldMap = new LinkedHashMap<>();
         fieldMap.put("type", fieldType.getName());
         fieldMap.put("value", fieldValue);
-        dataSet.put(fieldId.getAttributeId(), fieldMap);
+        dataSet.put(fieldId.getValue(), fieldMap);
     }
 
     private static String sanitize(String input) {

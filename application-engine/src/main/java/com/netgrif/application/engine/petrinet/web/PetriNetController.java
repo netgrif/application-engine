@@ -112,7 +112,7 @@ public class PetriNetController {
             ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(multipartFile.getInputStream(), release, (LoggedUser) auth.getPrincipal());
             return EventOutcomeWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully",
                     LocalisedEventOutcomeFactory.from(importPetriNetOutcome, locale));
-        } catch (IOException e) {
+        } catch (IOException | IllegalArgumentException e) {
             log.error("Importing Petri net failed: ", e);
             return EventOutcomeWithMessageResource.errorMessage("IO error while importing Petri net");
         } catch (MissingPetriNetMetaDataException e) {
