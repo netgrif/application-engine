@@ -27,15 +27,15 @@ Example action to change value of this field:
     
     <!-- Setting with UserListFieldValue -->
     change userList value {
-        new com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue(
+        new com.netgrif.core.petrinet.domain.dataset.UserListFieldValue(
             [
-                new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(
+                new com.netgrif.core.petrinet.domain.dataset.UserFieldValue(
                     "userId1",
                     "John",
                     "Doe",
                     "john@doe.com"
                 ),
-                new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(
+                new com.netgrif.core.petrinet.domain.dataset.UserFieldValue(
                     "userId2",
                     "Alice",
                     "Doe",

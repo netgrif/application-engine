@@ -47,7 +47,7 @@ jobs:
     needs: build
     services:
       mongo:
-        image: mongo:7.0.9
+        image: mongo:8.0.3
         ports:
           - 27017:27017
 
@@ -57,7 +57,7 @@ jobs:
           - 6379:6379
 
       elasticsearch:
-        image: elasticsearch:8.10.4
+        image: elasticsearch:8.15.3
         ports:
           - 9200:9200
           - 9300:9300
@@ -103,7 +103,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Generate certificates
-        run: cd src/main/resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../../../..
+        run: cd application-engine/src/main/resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../../../../..
 
       - name: Build
         run: mvn clean package install -DskipTests=true
@@ -257,8 +257,8 @@ jobs:
       - name: Build project
         run: |
           mkdir -p netgrif-application-engine-${{ steps.getVersion.outputs.version }}/src/main/resources/
-          cp target/*-exec.jar netgrif-application-engine-${{ steps.getVersion.outputs.version }}
-          cp -R src/main/resources/*  netgrif-application-engine-${{ steps.getVersion.outputs.version }}/src/main/resources/
+          cp application-engine/target/*-exec.jar netgrif-application-engine-${{ steps.getVersion.outputs.version }}
+          cp -R application-engine/src/main/resources/*  netgrif-application-engine-${{ steps.getVersion.outputs.version }}/src/main/resources/
           zip -r netgrif-application-engine-${{ steps.getVersion.outputs.version }}.zip netgrif-application-engine-${{ steps.getVersion.outputs.version }}
 
       - name: Upload binaries to release

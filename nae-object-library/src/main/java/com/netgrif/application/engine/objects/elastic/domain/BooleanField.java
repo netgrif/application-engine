@@ -1,0 +1,24 @@
+package com.netgrif.application.engine.objects.elastic.domain;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public abstract class BooleanField extends DataField {
+
+    public Boolean booleanValue;
+
+    public BooleanField(Boolean value) {
+        super(value.toString());
+        this.booleanValue = value;
+    }
+
+    @Override
+    public Object getValue() {
+        return booleanValue;
+    }
+}

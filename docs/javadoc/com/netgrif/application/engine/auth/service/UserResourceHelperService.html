@@ -206,27 +206,27 @@ implements <a href="interfaces/IUserResourceHelperService.html" title="interface
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>protected <a href="../domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getImpersonated(com.netgrif.application.engine.auth.domain.LoggedUser,boolean)">getImpersonated</a></span>&#8203;(<a href="../domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;loggedUser,
+<td class="colFirst"><code>protected <a href="../domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getImpersonated(com.netgrif.core.auth.domain.Authority;.LoggedUser,boolean)">getImpersonated</a></span>&#8203;(<a href="../domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;loggedUser,
                boolean&nbsp;small)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../web/responsebodies/User.html" title="class in com.netgrif.application.engine.auth.web.responsebodies">User</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getLocalisedUser(com.netgrif.application.engine.auth.domain.IUser,com.netgrif.application.engine.auth.domain.IUser,java.util.Locale)">getLocalisedUser</a></span>&#8203;(<a href="../domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user,
-                <a href="../domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;impersonated,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getLocalisedUser(com.netgrif.core.auth.domain.IUser,com.netgrif.core.auth.domain.IUser,java.util.Locale)">getLocalisedUser</a></span>&#8203;(<a href="../domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user,
+                <a href="../domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;impersonated,
                 java.util.Locale&nbsp;locale)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../web/responsebodies/User.html" title="class in com.netgrif.application.engine.auth.web.responsebodies">User</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getLocalisedUser(com.netgrif.application.engine.auth.domain.IUser,java.util.Locale)">getLocalisedUser</a></span>&#8203;(<a href="../domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getLocalisedUser(com.netgrif.core.auth.domain.IUser,java.util.Locale)">getLocalisedUser</a></span>&#8203;(<a href="../domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user,
                 java.util.Locale&nbsp;locale)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../web/responsebodies/UserResource.html" title="class in com.netgrif.application.engine.auth.web.responsebodies">UserResource</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getResource(com.netgrif.application.engine.auth.domain.LoggedUser,java.util.Locale,boolean)">getResource</a></span>&#8203;(<a href="../domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;loggedUser,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getResource(com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.Locale,boolean)">getResource</a></span>&#8203;(<a href="../domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;loggedUser,
            java.util.Locale&nbsp;locale,
            boolean&nbsp;small)</code></th>
 <td class="colLast">&nbsp;</td>
@@ -293,57 +293,57 @@ implements <a href="interfaces/IUserResourceHelperService.html" title="interface
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="getResource(com.netgrif.application.engine.auth.domain.LoggedUser,java.util.Locale,boolean)">
+<a id="getResource(com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.Locale,boolean)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getResource</h4>
-<pre class="methodSignature">public&nbsp;<a href="../web/responsebodies/UserResource.html" title="class in com.netgrif.application.engine.auth.web.responsebodies">UserResource</a>&nbsp;getResource&#8203;(<a href="../domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;loggedUser,
+<pre class="methodSignature">public&nbsp;<a href="../web/responsebodies/UserResource.html" title="class in com.netgrif.application.engine.auth.web.responsebodies">UserResource</a>&nbsp;getResource&#8203;(<a href="../domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;loggedUser,
                                 java.util.Locale&nbsp;locale,
                                 boolean&nbsp;small)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IUserResourceHelperService.html#getResource(com.netgrif.application.engine.auth.domain.LoggedUser,java.util.Locale,boolean)">getResource</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IUserResourceHelperService.html" title="interface in com.netgrif.application.engine.auth.service.interfaces">IUserResourceHelperService</a></code></dd>
+<dd><code><a href="interfaces/IUserResourceHelperService.html#getResource(com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.Locale,boolean)">getResource</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IUserResourceHelperService.html" title="interface in com.netgrif.application.engine.auth.service.interfaces">IUserResourceHelperService</a></code></dd>
 </dl>
 </li>
 </ul>
-<a id="getLocalisedUser(com.netgrif.application.engine.auth.domain.IUser,com.netgrif.application.engine.auth.domain.IUser,java.util.Locale)">
+<a id="getLocalisedUser(com.netgrif.core.auth.domain.IUser,com.netgrif.core.auth.domain.IUser,java.util.Locale)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getLocalisedUser</h4>
-<pre class="methodSignature">public&nbsp;<a href="../web/responsebodies/User.html" title="class in com.netgrif.application.engine.auth.web.responsebodies">User</a>&nbsp;getLocalisedUser&#8203;(<a href="../domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user,
-                             <a href="../domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;impersonated,
+<pre class="methodSignature">public&nbsp;<a href="../web/responsebodies/User.html" title="class in com.netgrif.application.engine.auth.web.responsebodies">User</a>&nbsp;getLocalisedUser&#8203;(<a href="../domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user,
+                             <a href="../domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;impersonated,
                              java.util.Locale&nbsp;locale)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IUserResourceHelperService.html#getLocalisedUser(com.netgrif.application.engine.auth.domain.IUser,com.netgrif.application.engine.auth.domain.IUser,java.util.Locale)">getLocalisedUser</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IUserResourceHelperService.html" title="interface in com.netgrif.application.engine.auth.service.interfaces">IUserResourceHelperService</a></code></dd>
+<dd><code><a href="interfaces/IUserResourceHelperService.html#getLocalisedUser(com.netgrif.core.auth.domain.IUser,com.netgrif.core.auth.domain.IUser,java.util.Locale)">getLocalisedUser</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IUserResourceHelperService.html" title="interface in com.netgrif.application.engine.auth.service.interfaces">IUserResourceHelperService</a></code></dd>
 </dl>
 </li>
 </ul>
-<a id="getLocalisedUser(com.netgrif.application.engine.auth.domain.IUser,java.util.Locale)">
+<a id="getLocalisedUser(com.netgrif.core.auth.domain.IUser,java.util.Locale)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getLocalisedUser</h4>
-<pre class="methodSignature">public&nbsp;<a href="../web/responsebodies/User.html" title="class in com.netgrif.application.engine.auth.web.responsebodies">User</a>&nbsp;getLocalisedUser&#8203;(<a href="../domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user,
+<pre class="methodSignature">public&nbsp;<a href="../web/responsebodies/User.html" title="class in com.netgrif.application.engine.auth.web.responsebodies">User</a>&nbsp;getLocalisedUser&#8203;(<a href="../domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user,
                              java.util.Locale&nbsp;locale)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IUserResourceHelperService.html#getLocalisedUser(com.netgrif.application.engine.auth.domain.IUser,java.util.Locale)">getLocalisedUser</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IUserResourceHelperService.html" title="interface in com.netgrif.application.engine.auth.service.interfaces">IUserResourceHelperService</a></code></dd>
+<dd><code><a href="interfaces/IUserResourceHelperService.html#getLocalisedUser(com.netgrif.core.auth.domain.IUser,java.util.Locale)">getLocalisedUser</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IUserResourceHelperService.html" title="interface in com.netgrif.application.engine.auth.service.interfaces">IUserResourceHelperService</a></code></dd>
 </dl>
 </li>
 </ul>
-<a id="getImpersonated(com.netgrif.application.engine.auth.domain.LoggedUser,boolean)">
+<a id="getImpersonated(com.netgrif.core.auth.domain.Authority;.LoggedUser,boolean)">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>getImpersonated</h4>
-<pre class="methodSignature">protected&nbsp;<a href="../domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;getImpersonated&#8203;(<a href="../domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;loggedUser,
+<pre class="methodSignature">protected&nbsp;<a href="../domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;getImpersonated&#8203;(<a href="../domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;loggedUser,
                                 boolean&nbsp;small)</pre>
 </li>
 </ul>

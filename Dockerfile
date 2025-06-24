@@ -1,14 +1,17 @@
-FROM maven:3.9.7 AS build
-MAINTAINER Netgrif <devops@netgrif.com>
-WORKDIR /app
-COPY src /app/src
-COPY pom.xml /app
-RUN mvn -P docker-build -DskipTests=true -f /app/pom.xml clean package install
-
-
 FROM openjdk:21-jdk
-MAINTAINER Netgrif <devops@netgrif.com>
-COPY --from=build app/target/app-exec.jar /app.jar
-COPY --from=build app/src/main/resources  /src/main/resources
+LABEL authors="Netgrif <devops@netgrif.com>"
+LABEL org.opencontainers.image.authors="NETGRIF <devops@netgrif.com>"
+LABEL org.opencontainers.image.title="Netgrif Application Engine"
+LABEL org.opencontainers.image.url="https://platform.netgrif.cloud"
+LABEL org.opencontainers.image.documentation="https://platform.netgrif.cloud/docs"
+LABEL org.opencontainers.image.vendor="NETGRIF"
+
+RUN mkdir -p /opt/netgrif/engine
+RUN mkdir -p /opt/netgrif/engine/modules
+COPY application-engine/target/app-exec.jar /opt/netgrif/engine/app.jar
+COPY application-engine/src/main/resources /opt/netgrif/engine/src/main/resources
+
+WORKDIR /opt/netgrif/engine
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","/app.jar"]
+
+ENTRYPOINT ["java","-Dfile.encoding=UTF-8","-jar","app.jar"]

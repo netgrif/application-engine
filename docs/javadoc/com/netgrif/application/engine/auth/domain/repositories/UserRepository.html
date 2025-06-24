@@ -117,7 +117,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <!-- ======== START OF CLASS DATA ======== -->
 <main role="main">
 <div class="header">
-<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">com.netgrif.application.engine.auth.domain.repositories</a></div>
+<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">com.netgrif.core.auth.domain.Authority;.repositories</a></div>
 <h2 title="Interface UserRepository" class="title">Interface UserRepository</h2>
 </div>
 <div class="contentContainer">
@@ -126,16 +126,16 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <dl>
 <dt>All Superinterfaces:</dt>
-<dd><code>org.springframework.data.repository.CrudRepository&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>,&#8203;java.lang.String&gt;</code>, <code>org.springframework.data.mongodb.repository.MongoRepository&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>,&#8203;java.lang.String&gt;</code>, <code>org.springframework.data.repository.PagingAndSortingRepository&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>,&#8203;java.lang.String&gt;</code>, <code>org.springframework.data.repository.query.QueryByExampleExecutor&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;</code>, <code>org.springframework.data.querydsl.binding.QuerydslBinderCustomizer&lt;<a href="../QUser.html" title="class in com.netgrif.application.engine.auth.domain">QUser</a>&gt;</code>, <code>org.springframework.data.querydsl.QuerydslPredicateExecutor&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;</code>, <code>org.springframework.data.repository.Repository&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>,&#8203;java.lang.String&gt;</code></dd>
+<dd><code>org.springframework.data.repository.CrudRepository&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>,&#8203;java.lang.String&gt;</code>, <code>org.springframework.data.mongodb.repository.MongoRepository&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>,&#8203;java.lang.String&gt;</code>, <code>org.springframework.data.repository.PagingAndSortingRepository&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>,&#8203;java.lang.String&gt;</code>, <code>org.springframework.data.repository.query.QueryByExampleExecutor&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;</code>, <code>org.springframework.data.querydsl.binding.QuerydslBinderCustomizer&lt;<a href="../QUser.html" title="class in com.netgrif.core.auth.domain.Authority;">QUser</a>&gt;</code>, <code>org.springframework.data.querydsl.QuerydslPredicateExecutor&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;</code>, <code>org.springframework.data.repository.Repository&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>,&#8203;java.lang.String&gt;</code></dd>
 </dl>
 <dl>
 <dt>All Known Implementing Classes:</dt>
-<dd><code><a href="UserRepositoryImpl.html" title="class in com.netgrif.application.engine.auth.domain.repositories">UserRepositoryImpl</a></code></dd>
+<dd><code><a href="UserRepositoryImpl.html" title="class in com.netgrif.core.auth.domain.Authority;.repositories">UserRepositoryImpl</a></code></dd>
 </dl>
 <hr>
 <pre>@Repository
 public interface <span class="typeNameLabel">UserRepository</span>
-extends org.springframework.data.mongodb.repository.MongoRepository&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>,&#8203;java.lang.String&gt;, org.springframework.data.querydsl.QuerydslPredicateExecutor&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;, org.springframework.data.querydsl.binding.QuerydslBinderCustomizer&lt;<a href="../QUser.html" title="class in com.netgrif.application.engine.auth.domain">QUser</a>&gt;</pre>
+extends org.springframework.data.mongodb.repository.MongoRepository&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>,&#8203;java.lang.String&gt;, org.springframework.data.querydsl.QuerydslPredicateExecutor&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;, org.springframework.data.querydsl.binding.QuerydslBinderCustomizer&lt;<a href="../QUser.html" title="class in com.netgrif.core.auth.domain.Authority;">QUser</a>&gt;</pre>
 </li>
 </ul>
 </div>
@@ -158,8 +158,8 @@ extends org.springframework.data.mongodb.repository.MongoRepository&lt;<a href="
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>default void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#customize(org.springframework.data.querydsl.binding.QuerydslBindings,com.netgrif.application.engine.auth.domain.QUser)">customize</a></span>&#8203;(org.springframework.data.querydsl.binding.QuerydslBindings&nbsp;bindings,
-         <a href="../QUser.html" title="class in com.netgrif.application.engine.auth.domain">QUser</a>&nbsp;qUser)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#customize(org.springframework.data.querydsl.binding.QuerydslBindings,com.netgrif.core.auth.domain.Authority;.QUser)">customize</a></span>&#8203;(org.springframework.data.querydsl.binding.QuerydslBindings&nbsp;bindings,
+         <a href="../QUser.html" title="class in com.netgrif.core.auth.domain.Authority;">QUser</a>&nbsp;qUser)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
@@ -168,48 +168,48 @@ extends org.springframework.data.mongodb.repository.MongoRepository&lt;<a href="
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.List&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findAllBy_idIn(java.util.Set)">findAllBy_idIn</a></span>&#8203;(java.util.Set&lt;org.bson.types.ObjectId&gt;&nbsp;ids)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i3" class="rowColor">
-<td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findAllBy_idInAndState(java.util.Set,com.netgrif.application.engine.auth.domain.UserState,org.springframework.data.domain.Pageable)">findAllBy_idInAndState</a></span>&#8203;(java.util.Set&lt;org.bson.types.ObjectId&gt;&nbsp;ids,
-                      <a href="../UserState.html" title="enum in com.netgrif.application.engine.auth.domain">UserState</a>&nbsp;state,
+<td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findAllBy_idInAndState(java.util.Set,com.netgrif.core.auth.domain.Authority;.UserState,org.springframework.data.domain.Pageable)">findAllBy_idInAndState</a></span>&#8203;(java.util.Set&lt;org.bson.types.ObjectId&gt;&nbsp;ids,
+                      <a href="../UserState.html" title="enum in com.netgrif.core.auth.domain.Authority;">UserState</a>&nbsp;state,
                       org.springframework.data.domain.Pageable&nbsp;pageable)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.List&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findAllByIdIn(java.util.Set)">findAllByIdIn</a></span>&#8203;(java.util.Set&lt;java.lang.String&gt;&nbsp;ids)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i5" class="rowColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.List&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findAllByProcessRoles__idIn(java.util.List)">findAllByProcessRoles__idIn</a></span>&#8203;(java.util.List&lt;java.lang.String&gt;&nbsp;roleId)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i6" class="altColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findAllByStateAndExpirationDateBefore(com.netgrif.application.engine.auth.domain.UserState,java.time.LocalDateTime)">findAllByStateAndExpirationDateBefore</a></span>&#8203;(<a href="../UserState.html" title="enum in com.netgrif.application.engine.auth.domain">UserState</a>&nbsp;userState,
+<td class="colFirst"><code>java.util.List&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findAllByStateAndExpirationDateBefore(com.netgrif.core.auth.domain.Authority;.UserState,java.time.LocalDateTime)">findAllByStateAndExpirationDateBefore</a></span>&#8203;(<a href="../UserState.html" title="enum in com.netgrif.core.auth.domain.Authority;">UserState</a>&nbsp;userState,
                                      java.time.LocalDateTime&nbsp;dateTime)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i7" class="rowColor">
-<td class="colFirst"><code><a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a></code></td>
+<td class="colFirst"><code><a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findByEmail(java.lang.String)">findByEmail</a></span>&#8203;(java.lang.String&nbsp;email)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i8" class="altColor">
-<td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findDistinctByStateAndProcessRoles__idIn(com.netgrif.application.engine.auth.domain.UserState,java.util.List,org.springframework.data.domain.Pageable)">findDistinctByStateAndProcessRoles__idIn</a></span>&#8203;(<a href="../UserState.html" title="enum in com.netgrif.application.engine.auth.domain">UserState</a>&nbsp;state,
+<td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findDistinctByStateAndProcessRoles__idIn(com.netgrif.core.auth.domain.Authority;.UserState,java.util.List,org.springframework.data.domain.Pageable)">findDistinctByStateAndProcessRoles__idIn</a></span>&#8203;(<a href="../UserState.html" title="enum in com.netgrif.core.auth.domain.Authority;">UserState</a>&nbsp;state,
                                         java.util.List&lt;java.lang.String&gt;&nbsp;roleId,
                                         org.springframework.data.domain.Pageable&nbsp;pageable)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i9" class="rowColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeAllByStateAndExpirationDateBefore(com.netgrif.application.engine.auth.domain.UserState,java.time.LocalDateTime)">removeAllByStateAndExpirationDateBefore</a></span>&#8203;(<a href="../UserState.html" title="enum in com.netgrif.application.engine.auth.domain">UserState</a>&nbsp;state,
+<td class="colFirst"><code>java.util.List&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeAllByStateAndExpirationDateBefore(com.netgrif.core.auth.domain.Authority;.UserState,java.time.LocalDateTime)">removeAllByStateAndExpirationDateBefore</a></span>&#8203;(<a href="../UserState.html" title="enum in com.netgrif.core.auth.domain.Authority;">UserState</a>&nbsp;state,
                                        java.time.LocalDateTime&nbsp;dateTime)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -265,14 +265,14 @@ extends org.springframework.data.mongodb.repository.MongoRepository&lt;<a href="
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="findAllBy_idInAndState(java.util.Set,com.netgrif.application.engine.auth.domain.UserState,org.springframework.data.domain.Pageable)">
+<a id="findAllBy_idInAndState(java.util.Set,com.netgrif.core.auth.domain.Authority;.UserState,org.springframework.data.domain.Pageable)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>findAllBy_idInAndState</h4>
-<pre class="methodSignature">org.springframework.data.domain.Page&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;&nbsp;findAllBy_idInAndState&#8203;(java.util.Set&lt;org.bson.types.ObjectId&gt;&nbsp;ids,
-                                                                  <a href="../UserState.html" title="enum in com.netgrif.application.engine.auth.domain">UserState</a>&nbsp;state,
+<pre class="methodSignature">org.springframework.data.domain.Page&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;&nbsp;findAllBy_idInAndState&#8203;(java.util.Set&lt;org.bson.types.ObjectId&gt;&nbsp;ids,
+                                                                  <a href="../UserState.html" title="enum in com.netgrif.core.auth.domain.Authority;">UserState</a>&nbsp;state,
                                                                   org.springframework.data.domain.Pageable&nbsp;pageable)</pre>
 </li>
 </ul>
@@ -282,26 +282,26 @@ extends org.springframework.data.mongodb.repository.MongoRepository&lt;<a href="
 <ul class="blockList">
 <li class="blockList">
 <h4>findByEmail</h4>
-<pre class="methodSignature"><a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&nbsp;findByEmail&#8203;(java.lang.String&nbsp;email)</pre>
+<pre class="methodSignature"><a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&nbsp;findByEmail&#8203;(java.lang.String&nbsp;email)</pre>
 </li>
 </ul>
-<a id="findAllByStateAndExpirationDateBefore(com.netgrif.application.engine.auth.domain.UserState,java.time.LocalDateTime)">
+<a id="findAllByStateAndExpirationDateBefore(com.netgrif.core.auth.domain.Authority;.UserState,java.time.LocalDateTime)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>findAllByStateAndExpirationDateBefore</h4>
-<pre class="methodSignature">java.util.List&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;&nbsp;findAllByStateAndExpirationDateBefore&#8203;(<a href="../UserState.html" title="enum in com.netgrif.application.engine.auth.domain">UserState</a>&nbsp;userState,
+<pre class="methodSignature">java.util.List&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;&nbsp;findAllByStateAndExpirationDateBefore&#8203;(<a href="../UserState.html" title="enum in com.netgrif.core.auth.domain.Authority;">UserState</a>&nbsp;userState,
                                                            java.time.LocalDateTime&nbsp;dateTime)</pre>
 </li>
 </ul>
-<a id="findDistinctByStateAndProcessRoles__idIn(com.netgrif.application.engine.auth.domain.UserState,java.util.List,org.springframework.data.domain.Pageable)">
+<a id="findDistinctByStateAndProcessRoles__idIn(com.netgrif.core.auth.domain.Authority;.UserState,java.util.List,org.springframework.data.domain.Pageable)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>findDistinctByStateAndProcessRoles__idIn</h4>
-<pre class="methodSignature">org.springframework.data.domain.Page&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;&nbsp;findDistinctByStateAndProcessRoles__idIn&#8203;(<a href="../UserState.html" title="enum in com.netgrif.application.engine.auth.domain">UserState</a>&nbsp;state,
+<pre class="methodSignature">org.springframework.data.domain.Page&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;&nbsp;findDistinctByStateAndProcessRoles__idIn&#8203;(<a href="../UserState.html" title="enum in com.netgrif.core.auth.domain.Authority;">UserState</a>&nbsp;state,
                                                                                     java.util.List&lt;java.lang.String&gt;&nbsp;roleId,
                                                                                     org.springframework.data.domain.Pageable&nbsp;pageable)</pre>
 </li>
@@ -312,16 +312,16 @@ extends org.springframework.data.mongodb.repository.MongoRepository&lt;<a href="
 <ul class="blockList">
 <li class="blockList">
 <h4>findAllByProcessRoles__idIn</h4>
-<pre class="methodSignature">java.util.List&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;&nbsp;findAllByProcessRoles__idIn&#8203;(java.util.List&lt;java.lang.String&gt;&nbsp;roleId)</pre>
+<pre class="methodSignature">java.util.List&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;&nbsp;findAllByProcessRoles__idIn&#8203;(java.util.List&lt;java.lang.String&gt;&nbsp;roleId)</pre>
 </li>
 </ul>
-<a id="removeAllByStateAndExpirationDateBefore(com.netgrif.application.engine.auth.domain.UserState,java.time.LocalDateTime)">
+<a id="removeAllByStateAndExpirationDateBefore(com.netgrif.core.auth.domain.Authority;.UserState,java.time.LocalDateTime)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>removeAllByStateAndExpirationDateBefore</h4>
-<pre class="methodSignature">java.util.List&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;&nbsp;removeAllByStateAndExpirationDateBefore&#8203;(<a href="../UserState.html" title="enum in com.netgrif.application.engine.auth.domain">UserState</a>&nbsp;state,
+<pre class="methodSignature">java.util.List&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;&nbsp;removeAllByStateAndExpirationDateBefore&#8203;(<a href="../UserState.html" title="enum in com.netgrif.core.auth.domain.Authority;">UserState</a>&nbsp;state,
                                                              java.time.LocalDateTime&nbsp;dateTime)</pre>
 </li>
 </ul>
@@ -331,7 +331,7 @@ extends org.springframework.data.mongodb.repository.MongoRepository&lt;<a href="
 <ul class="blockList">
 <li class="blockList">
 <h4>findAllByIdIn</h4>
-<pre class="methodSignature">java.util.List&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;&nbsp;findAllByIdIn&#8203;(java.util.Set&lt;java.lang.String&gt;&nbsp;ids)</pre>
+<pre class="methodSignature">java.util.List&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;&nbsp;findAllByIdIn&#8203;(java.util.Set&lt;java.lang.String&gt;&nbsp;ids)</pre>
 </li>
 </ul>
 <a id="findAllBy_idIn(java.util.Set)">
@@ -340,7 +340,7 @@ extends org.springframework.data.mongodb.repository.MongoRepository&lt;<a href="
 <ul class="blockList">
 <li class="blockList">
 <h4>findAllBy_idIn</h4>
-<pre class="methodSignature">java.util.List&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;&nbsp;findAllBy_idIn&#8203;(java.util.Set&lt;org.bson.types.ObjectId&gt;&nbsp;ids)</pre>
+<pre class="methodSignature">java.util.List&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;&nbsp;findAllBy_idIn&#8203;(java.util.Set&lt;org.bson.types.ObjectId&gt;&nbsp;ids)</pre>
 </li>
 </ul>
 <a id="existsByEmail(java.lang.String)">
@@ -352,17 +352,17 @@ extends org.springframework.data.mongodb.repository.MongoRepository&lt;<a href="
 <pre class="methodSignature">boolean&nbsp;existsByEmail&#8203;(java.lang.String&nbsp;email)</pre>
 </li>
 </ul>
-<a id="customize(org.springframework.data.querydsl.binding.QuerydslBindings,com.netgrif.application.engine.auth.domain.QUser)">
+<a id="customize(org.springframework.data.querydsl.binding.QuerydslBindings,com.netgrif.core.auth.domain.Authority;.QUser)">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>customize</h4>
 <pre class="methodSignature">default&nbsp;void&nbsp;customize&#8203;(org.springframework.data.querydsl.binding.QuerydslBindings&nbsp;bindings,
-                       <a href="../QUser.html" title="class in com.netgrif.application.engine.auth.domain">QUser</a>&nbsp;qUser)</pre>
+                       <a href="../QUser.html" title="class in com.netgrif.core.auth.domain.Authority;">QUser</a>&nbsp;qUser)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>customize</code>&nbsp;in interface&nbsp;<code>org.springframework.data.querydsl.binding.QuerydslBinderCustomizer&lt;<a href="../QUser.html" title="class in com.netgrif.application.engine.auth.domain">QUser</a>&gt;</code></dd>
+<dd><code>customize</code>&nbsp;in interface&nbsp;<code>org.springframework.data.querydsl.binding.QuerydslBinderCustomizer&lt;<a href="../QUser.html" title="class in com.netgrif.core.auth.domain.Authority;">QUser</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>

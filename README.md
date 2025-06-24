@@ -29,6 +29,40 @@ NAE provides additional components to make integration to your project/environme
 
 * License: [NETGRIF Community License](https://netgrif.com/license)
 
+## DEV quick-start
+
+1. **Build everything once**
+
+Compiles the entire multi-module project and pulls down every dependency.
+
+```bash
+mvn clean install
+```
+
+2. **Loading nae-user-ce as symlink to modules**
+
+```bash
+bash -c 'jar_path=$(find nae-user-ce/target/ -maxdepth 1 -type f -name "nae-user-ce-*.jar" ! -name "*-javadoc.jar" ! -name "*-sources.jar" | head -n1) && [[ -n "$jar_path" ]] && cd application-engine/modules && ln -sf ../../"$jar_path" nae-user-ce.jar && echo "✅ Create a Symlink → application-engine/modules/nae-user-ce.jar" || echo "❌ JAR file not found!"'
+```
+3. **Rebuild only the engine**
+
+```bash
+mvn -pl application-engine -Pdev clean install
+```
+4. **Run the app**
+
+In IntelliJ choose “ApplicationEngine DEV with modules” and press Run (main class org.springframework.boot.loader.launch.PropertiesLauncher, profile dev). The launcher loads every JAR in application-engine/modules/, including the symlinked nae-user-ce.jar.
+
+## Repository Content
+
+| Name                    | Description | Dependencies |
+|-------------------------|-------------|--------------|
+| nae-object-library      |             |              |
+| nae-spring-core-adapter |             |              |
+| nae-user-common         |             |              |
+| nae-user-ce             |             |              |
+| engine                  |             |              |
+
 ## Components
 
 Netgrif Application Engine (or NAE for short) consists of several key components:
@@ -61,7 +95,7 @@ run and use the engine:
 |--------------------------------------------------------|---------|-----------------------------------------------------------------|:-----------------------------------------------------------------------|
 | [Java](https://openjdk.java.net/)                      | 21+     | Java Development Kit                                            | [OpenJDK 21](https://openjdk.java.net/install/)                        |
 | [Redis](https://redis.io/)                             | 7+      | Key-value in-memory database used for user sessions and caching | [Redis 7.2.5](https://redis.io/download)                               |
-| [MongoDB](https://www.mongodb.com/)                    | 8+      | Main document store database                                    | [MongoDB 8.0.3](hhttps://www.mongodb.com/docs/manual/installation/)        |
+| [MongoDB](https://www.mongodb.com/)                    | 8+      | Main document store database                                    | [MongoDB 8.0.3](hhttps://www.mongodb.com/docs/manual/installation/)    |
 | [Elasticsearch](https://www.elastic.co/elasticsearch/) | 8+      | Index database used for better application search               | [Elasticsearch 8.10.4](https://www.elastic.co/downloads/elasticsearch) |
 
 If you are planning on developing docker container based solution you can use our [docker-compose](docker-compose.yml)
