@@ -2119,11 +2119,10 @@ class ActionDelegate {
     }
 
     protected String createNodePath(String path, String identifier) {
-        if (path == MenuItemConstants.PATH_SEPARATOR.value) {
-            return path + identifier
-        } else {
-            return path + MenuItemConstants.PATH_SEPARATOR.value + identifier
-        }
+        String normalized = path.endsWith(MenuItemConstants.PATH_SEPARATOR.value) && path != MenuItemConstants.PATH_SEPARATOR.value
+                    ? path.substring(0, path.length() - 1)
+                    : path
+        return normalized + MenuItemConstants.PATH_SEPARATOR.value + identifier
     }
 
     protected Case getOrCreateFolderItem(String path) {
