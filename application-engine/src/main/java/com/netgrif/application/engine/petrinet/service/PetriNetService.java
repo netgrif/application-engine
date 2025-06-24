@@ -239,8 +239,9 @@ public class PetriNetService implements IPetriNetService {
         outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.PRE));
         save(net);
-        outcome.setNet(imported.get());
         outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params));
+        outcome.setNet(imported.get());
+        publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
         return outcome;
     }
 
