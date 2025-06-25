@@ -9,7 +9,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileListFi
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.utils.DateUtils;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedField;
 import org.jsoup.Jsoup;
 
 import java.text.NumberFormat;

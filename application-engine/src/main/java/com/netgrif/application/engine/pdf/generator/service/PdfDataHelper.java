@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service;
 
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.*;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.*;
@@ -12,7 +13,6 @@ import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
-import com.netgrif.application.engine.workflow.web.responsebodies.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
