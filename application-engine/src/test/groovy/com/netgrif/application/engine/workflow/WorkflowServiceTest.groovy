@@ -102,7 +102,6 @@ class WorkflowServiceTest {
         def net = testNet.getNet()
         Case aCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('sk')).getCase()
         assert aCase.title.equals("Slovenský preklad")
-        assert workflowService.findOne(aCase.stringId).uriNodeId == net.uriNodeId
 
         Case enCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('en')).getCase()
         assert enCase.title.equals("English translation")

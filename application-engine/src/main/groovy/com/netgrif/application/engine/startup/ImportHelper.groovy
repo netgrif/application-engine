@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
@@ -91,9 +90,6 @@ class ImportHelper {
     @Autowired
     private ProcessRoleService processRoleService
 
-    @Autowired
-    private IUriService uriService
-
     private final ClassLoader loader = ImportHelper.getClassLoader()
 
 
@@ -113,14 +109,19 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = userService.transformToLoggedUser(userService.getSystem()), String uriNodeId = uriService.getDefault().stringId) {
-        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author, uriNodeId)
+    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = userService.transformToLoggedUser(userService.getSystem())) {
+        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author)
     }
 
-    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.transformToLoggedUser(userService.getSystem()), String uriNodeId = uriService.getDefault().stringId) {
+    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.transformToLoggedUser(userService.getSystem())) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        PetriNet petriNet = petriNetService.importPetriNet(netStream, release, author, uriNodeId).getNet()
-        log.info("Imported '${petriNet?.title?.defaultValue}' ['${petriNet?.identifier}', ${petriNet?.stringId}]")
+        def outcome = petriNetService.importPetriNet(netStream, release, author)
+        PetriNet petriNet = outcome.getNet()
+        if (petriNet == null) {
+                log.warn("Import of [$fileName] produced no PetriNet object")
+                return Optional.empty()
+            }
+        log.info("Imported '${petriNet.title?.defaultValue}' ['${petriNet.identifier}', ${petriNet.stringId}]")
         return Optional.of(petriNet)
     }
 
