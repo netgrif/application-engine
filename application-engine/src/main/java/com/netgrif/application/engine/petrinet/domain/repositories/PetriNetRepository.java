@@ -16,15 +16,13 @@ public interface PetriNetRepository extends MongoRepository<PetriNet, String>, Q
 
     PetriNet findByImportId(String id);
 
-    List<PetriNet> findAllByIdentifier(String identifier);
-
     PetriNet findByIdentifierAndVersion(String identifier, Version version);
 
     Page<PetriNet> findByIdentifier(String identifier, Pageable pageable);
 
     Page<PetriNet> findByIdentifierIn(List<String> identifier, Pageable pageable);
 
-    List<PetriNet> findAllByVersion(Version version);
+    Page<PetriNet> findAllByVersion(Version version, Pageable pageable);
 
     List<PetriNet> findAllByUriNodeId(String uri);
 

@@ -187,6 +187,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Page<String> getAllCoMembers(IUser user, Pageable pageable) {
+        // TODO JOFO: rework for pagination
         Page<Group> userMembershipGroups = groupRepository.findAllByMemberIdsContains(user.getStringId(), pageable);
         IUser system = userService.getSystem();
         return PageableUtils.listToPage(

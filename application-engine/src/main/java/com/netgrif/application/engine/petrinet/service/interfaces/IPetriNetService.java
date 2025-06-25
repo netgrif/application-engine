@@ -61,7 +61,7 @@ public interface IPetriNetService {
 
     PetriNet getPetriNet(String identifier, Version version);
 
-    List<PetriNet> getByIdentifier(String identifier);
+    Page<PetriNet> getByIdentifier(String identifier, Pageable pageable);
 
     List<PetriNet> findAllByUriNodeId(String uriNodeId);
 
@@ -69,15 +69,15 @@ public interface IPetriNetService {
 
     PetriNet getNewestVersionByIdentifier(String identifier);
 
-    List<PetriNet> getAll();
+    Page<PetriNet> getAll(Pageable pageable);
 
     FileSystemResource getFile(String netId, String title);
 
-    List<PetriNetReference> getReferences(LoggedUser user, Locale locale);
+    Page<PetriNetReference> getReferences(LoggedUser user, Locale locale, Pageable pageable);
 
-    List<PetriNetReference> getReferencesByIdentifier(String identifier, LoggedUser user, Locale locale);
+    Page<PetriNetReference> getReferencesByIdentifier(String identifier, LoggedUser user, Locale locale, Pageable pageable);
 
-    List<PetriNetReference> getReferencesByVersion(Version version, LoggedUser user, Locale locale);
+    Page<PetriNetReference> getReferencesByVersion(Version version, LoggedUser user, Locale locale, Pageable pageable);
 
     List<PetriNetReference> getReferencesByUsersProcessRoles(LoggedUser user, Locale locale);
 

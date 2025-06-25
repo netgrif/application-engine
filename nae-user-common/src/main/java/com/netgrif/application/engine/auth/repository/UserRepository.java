@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.auth.repository;
 
-import com.netgrif.application.engine.adapter.spring.utils.PageableUtils;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
@@ -43,7 +42,7 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         throw new UnsupportedOperationException("This method is not supported. Use 'UserRepository.deleteAll(MongoTemplate, Collection<String>)' instead.'");
     }
 
-    default Page<User> findAll(Predicate predicate, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
+    default Page<User> findAllByQuery(Predicate predicate, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
         Assert.notNull(predicate, "Predicate must not be null");
         Assert.notNull(pageable, "Pageable must not be null");
 
@@ -77,14 +76,21 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         collectionName.forEach(collection -> mongoTemplate.remove(new Query(), collection));
     }
 
-    default Page<User> findDistinctByStateAndProcessRoles__idIn(UserState state, List<ProcessResourceId> roleId, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
+    default Page<User> findAllByQuery(Query query, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
+        if (query == null) {
+            query = new Query();
+        }
+        return resolveUserPage(pageable, mongoTemplate, collection, query);
+    }
+
+    default Page<User> findDistinctByStateAndProcessRoles__idIn(UserState state, Collection<ProcessResourceId> roleId, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
         Query query = Query.query(
                 Criteria.where("state").is(state)
                         .and("processRoles._id").in(roleId));
         return resolveUserPage(pageable, mongoTemplate, collection, query);
     }
 
-    default Page<User> findAllByProcessRoles__idIn(List<ProcessResourceId> rolesId, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
+    default Page<User> findAllByProcessRoles__idIn(Collection<ProcessResourceId> rolesId, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
         Query query = Query.query(
                 Criteria.where("processRoles._id").in(rolesId));
         return resolveUserPage(pageable, mongoTemplate, collection, query);
@@ -103,7 +109,13 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         return resolveUserPage(pageable, mongoTemplate, collection, query);
     }
 
-    default Page<User> findAllByIdInAndState(Set<ObjectId> ids, UserState state, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
+    default Page<User> findAllByIds(Collection<ObjectId> ids, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
+        Query query = Query.query(
+                Criteria.where("id").in(ids));
+        return resolveUserPage(pageable, mongoTemplate, collection, query);
+    }
+
+    default Page<User> findAllByIdInAndState(Collection<ObjectId> ids, UserState state, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
         Query query = Query.query(
                         Criteria.where("id").in(ids)
                                 .and("state").is(state));

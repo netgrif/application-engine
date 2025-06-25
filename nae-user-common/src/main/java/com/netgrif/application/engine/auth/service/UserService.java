@@ -60,13 +60,9 @@ public interface UserService {
 
     Page<IUser> findAllByIds(Collection<String> ids, String realmId, Pageable pageable);
 
-    Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable);
+    Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable, String realmId);
 
-    Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable, Collection<String> realmIds);
-
-    Page<IUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, Collection<String> realmIds, Pageable pageable);
-
-    Page<IUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable);
+    Page<IUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, String realmId, Pageable pageable);
 
     void addDefaultAuthorities(IUser user);
 
@@ -112,9 +108,9 @@ public interface UserService {
 
     LoggedUserImpl transformToLoggedUser(IUser user);
 
-   void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
+    void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
 
-    Page<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds, Pageable pageable);
+    Page<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, String realmIds, Pageable pageable);
 
     IUser transformToUser(Author author);
 

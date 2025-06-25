@@ -2,6 +2,7 @@ package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.adapter.spring.workflow.service.FilterImportExportService;
 import com.netgrif.application.engine.auth.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
@@ -19,11 +20,10 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -55,6 +55,8 @@ public class UserServiceImpl implements UserService {
     private GroupConfigurationProperties groupConfigurationProperties;
 
     private IUser systemUser;
+
+    private PaginationProperties paginationProperties;
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
@@ -103,6 +105,12 @@ public class UserServiceImpl implements UserService {
         this.groupService = groupService;
     }
 
+    @Lazy
+    @Autowired
+    public void setPaginationProperties(PaginationProperties paginationProperties) {
+        this.paginationProperties = paginationProperties;
+    }
+
     @Override
     public IUser saveUser(IUser user, String realmId) {
         user.setRealmId(realmId);
@@ -140,13 +148,9 @@ public class UserServiceImpl implements UserService {
     public Page<IUser> findAllUsers(String realmName, Pageable pageable) {
         log.trace("Retrieving all users in realm [{}]", realmName);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmName);
-        Page<IUser> page = PageableExecutionUtils.getPage(
-                mongoTemplate.findAll(IUser.class, collectionName),
-                pageable,
-                () -> mongoTemplate.count(new Query().with(pageable), IUser.class, collectionName)
-        );
-        log.debug("Found [{}] users in realm [{}]", page.getContent().size(), realmName);
-        return page;
+        Page<User> users = userRepository.findAllByQuery(new Query(), pageable, mongoTemplate, collectionName);
+        log.debug("Found [{}] users in realm [{}]", users.getContent().size(), realmName);
+        return changeType(users);
     }
 
     @Override
@@ -201,9 +205,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds, Pageable pageable) {
-        Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
-        return userRepository.findAllByStateAndExpirationDateBefore(state, expirationDate, mongoTemplate, collectionNames);
+    public Page<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, String realmId, Pageable pageable) {
+        String collection = collectionNameProvider.getCollectionNameForRealm(realmId);
+        return userRepository.findAllByStateAndExpirationDateBefore(state, expirationDate, pageable, mongoTemplate, collection);
     }
 
     @Override
@@ -246,7 +250,15 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Admin user with username [%s] cannot be found.".formatted(username));
         }
         IUser user = userOptional.get();
-        user.setProcessRoles(new HashSet<>(processRoleService.findAll()));
+
+        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<ProcessRole> processRoles;
+        do {
+            processRoles = processRoleService.findAll(pageable);
+            user.getProcessRoles().addAll(processRoles.getContent());
+            pageable = pageable.next();
+        } while (processRoles.hasNext());
+
         saveUser(user, user.getRealmId());
     }
 
@@ -301,26 +313,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<IUser> findAllCoMembers(com.netgrif.application.engine.objects.auth.domain.LoggedUser loggedUser, Pageable pageable) {
+        // TODO JOFO: rework for pagination
         Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser(), Pageable.unpaged()).stream().collect(Collectors.toSet());
         members.add(loggedUser.getSelfOrImpersonated().getId());
         Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());
-        Set<String> collectionNames = collectionNameProvider.getCollectionNamesForAllRealm();
-        return changeType(userRepository.findAllByIdInAndState(objMembers, UserState.ACTIVE, pageable, mongoTemplate, collectionNames), pageable);
+        String collectionName = collectionNameProvider.getCollectionNameForRealm(loggedUser.getRealmId());
+        return changeType(userRepository.findAllByIdInAndState(objMembers, UserState.ACTIVE, pageable, mongoTemplate, collectionName));
     }
 
     @Override
     public Page<IUser> searchAllCoMembers(String query, com.netgrif.application.engine.objects.auth.domain.LoggedUser loggedUser, Pageable pageable) {
-        // TODO: how to send pageable to group service????
-        Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser(), Pageable.unpaged()).stream().collect(Collectors.toSet());
-        members.add(loggedUser.getSelfOrImpersonated().getId());
-        Set<String> collectionNames = collectionNameProvider.getCollectionNamesForAllRealm();
-        return changeType(userRepository.findAll(buildPredicate(members.stream().map(ObjectId::new)
-                .collect(Collectors.toSet()), query), pageable, mongoTemplate, collectionNames), pageable);
+        // TODO JOFO: rework for pagination
+        Page<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser(), Pageable.unpaged());
+        members.getContent().add(loggedUser.getSelfOrImpersonated().getId());
+        String collectionName = collectionNameProvider.getCollectionNameForRealm(loggedUser.getRealmId());
+        return changeType(userRepository.findAllByQuery(buildPredicate(members.stream().map(ObjectId::new)
+                .collect(Collectors.toSet()), query), pageable, mongoTemplate, collectionName));
 
     }
 
     @Override
     public Page<IUser> searchAllCoMembers(String query, List<ProcessResourceId> roleIds, List<ProcessResourceId> negateRoleIds, com.netgrif.application.engine.objects.auth.domain.LoggedUser loggedUser, Pageable pageable) {
+        // TODO JOFO: rework for pagination!!!
         if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty()))
             return searchAllCoMembers(query, loggedUser, pageable);
 
@@ -329,61 +343,42 @@ public class UserServiceImpl implements UserService {
         }
 
 
-        Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser(), Pageable.unpaged()).stream().collect(Collectors.toSet());
-        members.add(loggedUser.getSelfOrImpersonated().getId());
+        Page<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser(), Pageable.unpaged());
+        members.getContent().add(loggedUser.getSelfOrImpersonated().getId());
         BooleanExpression predicate = buildPredicate(members.stream().map(ObjectId::new).collect(Collectors.toSet()), query);
         if (!(roleIds == null || roleIds.isEmpty())) {
             predicate = predicate.and(QUser.user.processRoles.any()._id.in(roleIds));
         }
         predicate = predicate.and(QUser.user.processRoles.any()._id.in(negateRoleIds).not());
-        Set<String> collectionNames = collectionNameProvider.getCollectionNamesForAllRealm();
-        Page<User> users = userRepository.findAll(predicate, pageable, mongoTemplate, collectionNames);
+        String collection = collectionNameProvider.getCollectionNameForRealm(loggedUser.getRealmId());
+        Page<User> users = userRepository.findAllByQuery(predicate, pageable, mongoTemplate, collection);
 
-        return changeType(users, pageable);
+        return changeType(users);
     }
 
     @Override
-    public List<IUser> findAllByIds(Collection<String> ids, String realmId) {
+    public Page<IUser> findAllByIds(Collection<String> ids, String realmId, Pageable pageable) {
         log.debug("Finding users by collection of IDs [{}]", ids);
-        return ids.stream().map(id -> findById(id, realmId)).toList();
+        String collection = collectionNameProvider.getCollectionNameForRealm(realmId);
+        Page<User> users = userRepository.findAllByIds(ids.stream().map(ObjectId::new).toList(), pageable, mongoTemplate, collection);
+        return changeType(users);
     }
 
     @Override
-    public Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable) {
-        return this.findAllActiveByProcessRoles(roleIds, pageable, List.of(getLoggedUser().getRealmId()));
+    public Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable, String realmId) {
+        String collection = collectionNameProvider.getCollectionNameForRealm(realmId);
+        Page<User> users = userRepository.findDistinctByStateAndProcessRoles__idIn( UserState.ACTIVE, roleIds, pageable, mongoTemplate, collection);
+        return changeType(users);
     }
 
     @Override
-    public Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable, Collection<String> realmIds) {
-        Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
-        Page<User> users = userRepository.findDistinctByStateAndProcessRoles__idIn(
-                UserState.ACTIVE,
-                new ArrayList<>(roleIds),
-                pageable,
-                mongoTemplate,
-                collectionNames
-        );
-        return changeType(users, pageable);
+    public Page<IUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, String realmId, Pageable pageable) {
+        String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
+        return searchUsersByRoleIds(roleIds, collectionName, pageable);
     }
 
-    @Override
-    public List<IUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, Collection<String> realmIds) {
-        Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
-        return searchUsersByRoleIds(roleIds, collectionNames);
-    }
-
-    @Override
-    public List<IUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds) {
-        Set<String> collectionNames = collectionNameProvider.getCollectionNamesForAllRealm();
-        return searchUsersByRoleIds(roleIds, collectionNames);
-    }
-
-    protected List<IUser> searchUsersByRoleIds(Set<ProcessResourceId> roleIds, Set<String> collectionNames) {
-        List<User> users = userRepository.findAllByProcessRoles__idIn(
-                new ArrayList<>(roleIds),
-                mongoTemplate,
-                collectionNames
-        );
+    protected Page<IUser> searchUsersByRoleIds(Set<ProcessResourceId> roleIds, String collectionName, Pageable pageable) {
+        Page<User> users = userRepository.findAllByProcessRoles__idIn(roleIds, pageable, mongoTemplate, collectionName);
         return changeType(users);
     }
 
@@ -427,7 +422,14 @@ public class UserServiceImpl implements UserService {
         if (systemUser == null) {
             systemUser = createSystemUser();
         }
-        systemUser.setProcessRoles(new HashSet<>(processRoleService.getAll()));
+
+        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<ProcessRole> processRoles;
+        do {
+            processRoles = processRoleService.findAll(pageable);
+            systemUser.getProcessRoles().addAll(processRoles.getContent());
+            pageable = pageable.next();
+        } while (processRoles.hasNext());
         return systemUser;
     }
 
@@ -497,9 +499,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public void removeRoleOfDeletedPetriNet(PetriNet petriNet, Collection<String> realmIds) {
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
-        List<IUser> users = findAllByProcessRoles(petriNet.getRoles().values().stream().map(ProcessRole::get_id).collect(Collectors.toSet()), collectionNames);
-        users.forEach(u -> {
-            petriNet.getRoles().forEach((k, role) -> removeRole(u, role.get_id()));
+        collectionNames.forEach(collection -> {
+            Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+            Page<IUser> users;
+            do {
+                users = findAllByProcessRoles(petriNet.getRoles().values().stream().map(ProcessRole::get_id).collect(Collectors.toSet()), collection, pageable);
+                users.forEach(u -> {
+                    petriNet.getRoles().forEach((k, role) -> removeRole(u, role.get_id()));
+                });
+                pageable = pageable.next();
+            } while (users.hasNext());
         });
     }
 
@@ -617,12 +626,8 @@ public class UserServiceImpl implements UserService {
         log.debug("Password N/A set for user [{}]", user.getUsername());
     }
 
-    private <T> Page<IUser> changeType(Page<T> users, Pageable pageable) {
-        return new PageImpl<>(changeType(users.getContent()), pageable, users.getTotalElements());
-    }
-
-    private <T> List<IUser> changeType(List<T> users) {
-        return users.stream().map(IUser.class::cast).collect(Collectors.toList());
+    private <T> Page<IUser> changeType(Page<T> users) {
+        return users.map(IUser.class::cast);
     }
 
     private BooleanExpression buildPredicate(Set<ObjectId> members, String query) {
