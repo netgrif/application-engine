@@ -36,7 +36,18 @@ class PluginInjector {
      * @param plugin the Plugin instance to be injected
      */
     void inject(Plugin plugin) {
-        updateMetaClasses(plugin)
+        updateMetaClasses(plugin, false)
+    }
+
+    /**
+     * Removes the provided plugin from the application's meta-class system.
+     * This will disable dynamic calls to the plugin's entry points and methods
+     * via {@link PluginHolder}.
+     *
+     * @param plugin the Plugin instance to be removed
+     */
+    void unInject(Plugin plugin) {
+        updateMetaClasses(plugin, true)
     }
 
     /**
@@ -47,7 +58,7 @@ class PluginInjector {
      * @param plugin the Plugin instance whose entry points and methods
      *               are to be exposed dynamically
      */
-    protected void updateMetaClasses(Plugin plugin) {
+    protected void updateMetaClasses(Plugin plugin, boolean isRemoval) {
         def pluginMeta = new PluginMeta()
 
         plugin.entryPoints.values().each { EntryPoint ep ->
@@ -60,14 +71,12 @@ class PluginInjector {
                  * @param args variable-length list of Serializable arguments
                  * @return the result returned by PluginService.call(...)
                  */
-                epMeta.metaClass."${method.name}" = { Serializable... args ->
+                epMeta.metaClass."${method.name}" = isRemoval ? null : { Serializable... args ->
                     pluginService.call(plugin.identifier, ep.name, method.name, args)
                 }
             }
-
-            pluginMeta.metaClass."${ep.name}" = epMeta
+            pluginMeta.metaClass."${ep.name}" = isRemoval ? null : epMeta
         }
-
-        PluginHolder.metaClass."${plugin.name}" = pluginMeta
+        PluginHolder.metaClass."${plugin.name}" = isRemoval ? null : pluginMeta
     }
 }
