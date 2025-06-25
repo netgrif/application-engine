@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.workflow.web.responsebodies;
+package com.netgrif.application.engine.objects.petrinet.domain.dataset.localised;
 
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.MapOptionsField;
