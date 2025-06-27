@@ -2,6 +2,7 @@ package com.netgrif.application.engine.objects.auth.domain;
 
 import com.netgrif.application.engine.objects.auth.provider.AuthMethodConfig;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.time.Duration;
@@ -45,6 +46,11 @@ public class Realm implements Serializable {
     private Duration sessionTimeout = Duration.ofMinutes(30);
 
     private Duration publicSessionTimeout = Duration.ofHours(2);
+
+    private boolean enableLimitSessions = false;
+
+    @Positive
+    private int maxSessionsAllowed = 1;
 
     public Realm() {
     }
