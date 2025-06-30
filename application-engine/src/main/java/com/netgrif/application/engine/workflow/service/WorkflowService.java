@@ -349,10 +349,9 @@ public class WorkflowService implements IWorkflowService {
 //        if (rulesExecuted > 0) {
 //            useCase = save(useCase);
 //        }
-
-        publisher.publishEvent(new CreateCaseEvent(outcome, EventPhase.POST));
         outcome.setCase(setImmediateDataFields(useCase));
         addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
+        publisher.publishEvent(new CreateCaseEvent(outcome, EventPhase.POST));
         return outcome;
     }
 

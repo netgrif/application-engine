@@ -22,7 +22,7 @@ public class ActionStopEvent extends ActionStartEvent {
 
     @Override
     public String getMessage() {
-        return String.format("ActionStopEvent: %s [%s] %s", getTrigger(), getId(), getPhase());
+        return String.format("ActionStopEvent: trigger %s id [%s] phase: %s", getTrigger(), getId(), getPhase());
     }
 
     private long calculateExecutionDuration(LocalDateTime start) {

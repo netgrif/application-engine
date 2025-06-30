@@ -28,6 +28,6 @@ public class GetDataEvent extends DataEvent {
 
     @Override
     public String getMessage() {
-        return "GetDataEvent: GET [" + (eventOutcome.getMessage() == null ? "NULL" : eventOutcome.getMessage().toString()) + "]";
+        return "GetDataEvent: GET [" + (eventOutcome.getMessage() == null ? MISSING_IDENTIFIER : eventOutcome.getMessage().toString()) + "]";
     }
 }

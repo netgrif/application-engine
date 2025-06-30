@@ -27,6 +27,6 @@ public class SetDataEvent extends DataEvent {
 
     @Override
     public String getMessage() {
-        return "SetDataEvent: SET [" + eventOutcome.getMessage().toString() + "]";
+        return "SetDataEvent: SET [" + (eventOutcome.getMessage() == null ? MISSING_IDENTIFIER : eventOutcome.getMessage().toString()) + "]";
     }
 }
