@@ -55,11 +55,15 @@ public enum MenuItemConstants {
 
     // TRANSITIONS
     PREFERENCE_ITEM_SETTINGS_TRANS_ID("item_settings"),
-    PREFERENCE_ITEM_FIELD_INIT_TRANS_ID("initialize");
-    @Getter
-    private final String attributeId;
+    PREFERENCE_ITEM_FIELD_INIT_TRANS_ID("initialize"),
 
-    MenuItemConstants(String attributeId) {
-        this.attributeId = attributeId;
+    // SEPARATOR
+    PATH_SEPARATOR("/");
+
+    @Getter
+    private final String value;
+
+    MenuItemConstants(String value) {
+        this.value = value;
     }
 }

@@ -26,8 +26,6 @@ public interface CaseRepository extends MongoRepository<Case, String>, QuerydslP
     @Query("{ '_id.objectId': { $in: ?0 } }")
     List<Case> findAllByObjectIdsIn(List<ObjectId> objectIds);
 
-    Page<Case> findAllByUriNodeId(String uri, Pageable pageable);
-
     List<Case> findAllByPetriNetObjectId(ObjectId petriNetObjectId);
 
     void deleteAllByPetriNetObjectId(ObjectId petriNetObjectId);

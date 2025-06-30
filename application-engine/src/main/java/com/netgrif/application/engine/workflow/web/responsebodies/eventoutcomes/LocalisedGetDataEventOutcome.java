@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes;
 
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedField;
 import com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.base.LocalisedTaskEventOutcome;
 
 import java.util.List;

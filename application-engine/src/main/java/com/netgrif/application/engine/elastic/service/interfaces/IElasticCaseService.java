@@ -25,6 +25,4 @@ public interface IElasticCaseService {
     void remove(String caseId);
 
     void removeByPetriNetId(String processId);
-
-    String findUriNodeId(Case aCase);
 }
