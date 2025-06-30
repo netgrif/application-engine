@@ -23,3 +23,7 @@ netgrif:
       multipart:
         max-file-size: 50MB
         max-request-size: 50MB
+    mail:
+      domain: ${NETGRIF_ENGINE_MAIL_DOMAIN:localhost}
+      port: ${NETGRIF_ENGINE_MAIL_DOMAIN_PORT:4200}
+      mail-from:
