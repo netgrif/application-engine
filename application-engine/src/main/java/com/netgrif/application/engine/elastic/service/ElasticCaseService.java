@@ -3,7 +3,6 @@ package com.netgrif.application.engine.elastic.service;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
@@ -54,7 +53,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     protected final ElasticCaseRepository repository;
     protected final ElasticsearchTemplate template;
     protected final Executor executors;
-    protected final ElasticsearchProperties elasticsearchProperties;
     protected IPetriNetService petriNetService;
     protected IWorkflowService workflowService;
     protected IElasticCasePrioritySearch iElasticCasePrioritySearch;

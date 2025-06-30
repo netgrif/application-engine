@@ -3,10 +3,23 @@ logging:
 netgrif:
   engine:
     data:
+      drop: false
+      database-name: nae
       rest:
         base-path: /api
         detection-strategy: annotated
+      mongodb:
+        uri: ${NETGRIF_ENGINE_DATA_MONGODB_URI:mongodb://localhost:27017}
+        auto-index-creation: true
+      elasticsearch:
+        url: ${NETGRIF_ENGINE_DATA_ELASTIC_URL:localhost}
+        port: ${NETGRIF_ENGINE_DATA_ELASTIC_PORT:9300}
+        searchPort: ${NETGRIF_ENGINE_DATA_ELASTIC_SEARCH_PORT:9200}
     jackson:
       default-property-inclusion: non_null
       serialization:
         write-dates-as-timestamps: true
+    servlet:
+      multipart:
+        max-file-size: 50MB
+        max-request-size: 50MB

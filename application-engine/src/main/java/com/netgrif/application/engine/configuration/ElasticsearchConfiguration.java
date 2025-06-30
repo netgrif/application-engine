@@ -1,8 +1,7 @@
-package com.netgrif.application.engine.configuration;
+    package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.configuration.properties.UriProperties;
+import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.workflow.service.CaseEventHandler;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
@@ -16,68 +15,31 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 })
 public class ElasticsearchConfiguration extends org.springframework.data.elasticsearch.client.elc.ElasticsearchConfiguration {
 
-    @Value("${spring.data.elasticsearch.url}")
-    private String url;
+    private final DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
 
-    @Value("${spring.data.elasticsearch.searchport}")
-    private int port;
-
-    @Value("${spring.data.elasticsearch.index.petriNet}")
-    private String petriNetIndex;
-
-    @Value("${spring.data.elasticsearch.index.case}")
-    private String caseIndex;
-
-    @Value("${spring.data.elasticsearch.index.task}")
-    private String taskIndex;
-
-    @Value("${spring.data.elasticsearch.reindex}")
-    private String cron;
-
-    private final UriProperties uriProperties;
-
-    public ElasticsearchConfiguration(UriProperties uriProperties) {
-        this.uriProperties = uriProperties;
+    public ElasticsearchConfiguration(DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties) {
+        this.elasticsearchProperties = elasticsearchProperties;
     }
 
     @Bean
     public String springElasticsearchReindex() {
-        return cron;
+        return elasticsearchProperties.getReindex();
     }
 
     @Bean
     public String elasticPetriNetIndex() {
-        return petriNetIndex;
+        return elasticsearchProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.PETRI_NET_INDEX);
     }
 
     @Bean
     public String elasticCaseIndex() {
-        return caseIndex;
+        return elasticsearchProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX);
     }
 
     @Bean
     public String elasticTaskIndex() {
-        return taskIndex;
+        return elasticsearchProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.TASK_INDEX);
     }
-
-    @Bean
-    public String elasticUriIndex() {
-        return uriProperties.getIndex();
-    }
-
-//    @Bean
-//    public ElasticsearchClient elasticsearchClient(RestClient elasticSearchRestClient) {
-//        ElasticsearchTransport transport = new RestClientTransport(
-//                elasticSearchRestClient,
-//                new JacksonJsonpMapper()
-//        );
-//        return new ElasticsearchClient(transport);
-//    }
-//
-//    @Bean
-//    public ElasticsearchTemplate elasticsearchTemplate(ElasticsearchClient elasticsearchClient) {
-//        return new ElasticsearchTemplate(elasticsearchClient);
-//    }
 
     @Bean
     public CaseEventHandler caseEventHandler() {
@@ -87,22 +49,7 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
     @Override
     public ClientConfiguration clientConfiguration() {
         return ClientConfiguration.builder()
-                .connectedTo(url + ":" + port)
+                .connectedTo(elasticsearchProperties.getUrl() + ":" + elasticsearchProperties.getPort())
                 .build();
     }
-
-//    @Bean
-//    @Primary
-//    public ElasticsearchOperations elasticsearchOperations(ElasticsearchConverter elasticsearchConverter, ElasticsearchClient elasticsearchClient) {
-//        ElasticsearchOperations elasticsearchOperations = super.elasticsearchOperations(elasticsearchConverter, elasticsearchClient);
-//        IndexOperations indexOperations = elasticsearchOperations.indexOps(EventLog.class);
-//        elasticsearchClient.indices().
-//        CreateIndexRequest createIndexRequest = CreateIndexRequest.of(b -> b
-//                .index("event_log").m
-//        );
-//        CreateIndexResponse response = elasticsearchClient.indices().create(createIndexRequest);
-//    }
-//        return elasticsearchOperations;
-//    }
-
 }
