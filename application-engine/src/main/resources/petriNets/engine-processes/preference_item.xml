@@ -161,8 +161,7 @@
 			String corrected = getCorrectedUri(newUri)
 
 			if (corrected == newUri) {
-				def node = uriService.findByUri(newUri)
-				change moveDestUri options { findOptionsBasedOnSelectedNode(node) }
+				change moveDestUri options { findOptionsBasedOnSelectedNode(newUri) }
 			} else {
 				change moveDestUri value { splitUriPath(corrected) }
 			}
@@ -191,7 +190,7 @@
 			String prefixUri = selectedUri.value.join("/")
 			prefixUri = prefixUri.replace("//","/")
 
-			String newUri = prefixUri + uriService.getUriSeparator() + newNodeName.value
+			String newUri = prefixUri + "/" + newNodeName.value
 			def newNode = uriService.getOrCreate(newUri, com.netgrif.application.engine.objects.petrinet.domain.UriContentType.CASE)
 
 			change selectedUri value { splitUriPath(newNode.uriPath) }
@@ -249,7 +248,7 @@
 					menu_item_identifier: f.menu_item_identifier;
 
 					change menu_item_identifier value {
-						def idx = nodePath.value.lastIndexOf(uriService.getUriSeparator())
+						def idx = nodePath.value.lastIndexOf("/")
 						return nodePath.value.substring(idx + 1)
 					}
 				</action>

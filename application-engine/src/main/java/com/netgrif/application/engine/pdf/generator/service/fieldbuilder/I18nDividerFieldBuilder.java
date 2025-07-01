@@ -4,7 +4,7 @@ import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfI18nDividerField;
 import com.netgrif.application.engine.objects.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedI18nStringField;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedI18nStringField;
 
 public class I18nDividerFieldBuilder extends FieldBuilder {
 

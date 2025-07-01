@@ -8,7 +8,6 @@ import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
 import com.netgrif.application.engine.objects.event.RunPhase;
 import com.netgrif.application.engine.objects.event.events.user.ImpersonationEvent;
-import com.netgrif.application.engine.objects.event.events.user.ImpersonationPhase;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
 import com.netgrif.application.engine.impersonation.domain.repository.ImpersonatorRepository;
 import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserHasSessionException;

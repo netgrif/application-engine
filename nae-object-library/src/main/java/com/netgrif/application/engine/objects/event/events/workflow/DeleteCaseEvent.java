@@ -11,6 +11,8 @@ public class DeleteCaseEvent extends CaseEvent {
 
     @Override
     public String getMessage() {
-        return "DeleteCaseEvent: Case [" + caseEventOutcome.getCase().getStringId() + "] deleted";
+        return "DeleteCaseEvent: Case [" +
+                (caseEventOutcome.getCase() == null ? MISSING_IDENTIFIER : caseEventOutcome.getCase().getStringId())
+                + "] deleted";
     }
 }

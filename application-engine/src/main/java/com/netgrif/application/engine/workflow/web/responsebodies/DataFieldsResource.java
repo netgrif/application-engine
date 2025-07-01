@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedField;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedFieldFactory;
 import com.netgrif.application.engine.objects.workflow.domain.DataFieldsCollection;
 import lombok.Getter;
 import lombok.NonNull;

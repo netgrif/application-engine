@@ -19,6 +19,7 @@ public class ImpersonationEvent extends UserEvent {
 
     @Override
     public String getMessage() {
-        return "User " + user.getUsername() + " is impersonating: " + impersonated.getUsername() + " phase: " + runPhase;
+        return "User " + (user.getUsername() == null ? MISSING_IDENTIFIER : user.getUsername()) + " is impersonating: " +
+                (impersonated.getUsername() == null ? MISSING_IDENTIFIER : impersonated.getUsername()) + " phase: " + runPhase;
     }
 }

@@ -39,7 +39,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldsResource;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedField;
 import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;

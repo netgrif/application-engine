@@ -11,6 +11,8 @@ public class CreateCaseEvent extends CaseEvent {
 
     @Override
     public String getMessage() {
-        return "CreateCaseEvent: Case [" + caseEventOutcome.getCase().getStringId() + "] created";
+        return "CreateCaseEvent: Case [" +
+                (caseEventOutcome.getCase() == null ? MISSING_IDENTIFIER : caseEventOutcome.getCase().getStringId())
+                + "] created";
     }
 }

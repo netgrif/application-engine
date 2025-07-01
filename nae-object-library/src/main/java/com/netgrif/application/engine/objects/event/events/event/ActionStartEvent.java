@@ -18,6 +18,6 @@ public class ActionStartEvent  extends ActionEvent {
 
     @Override
     public String getMessage() {
-        return String.format("ActionStartEvent: %s [%s] %s", trigger, getId(), getPhase());
+        return String.format("ActionStartEvent: trigger %s id [%s] phase: %s", trigger, getId(), getPhase());
     }
 }
