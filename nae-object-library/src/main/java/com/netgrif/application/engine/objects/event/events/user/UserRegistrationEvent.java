@@ -12,6 +12,7 @@ public class UserRegistrationEvent extends UserEvent {
 
     @Override
     public String getMessage() {
-        return "New user " + user.getUsername() + " registered on " + DateUtils.toString(time);
+        return "New user " +  (user.getUsername() == null ? MISSING_IDENTIFIER : user.getUsername())  + " registered on "
+                + DateUtils.toString(time);
     }
 }

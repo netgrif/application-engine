@@ -15,6 +15,8 @@ public abstract class Event extends EventObject {
     @Getter
     protected LocalDateTime time;
 
+    protected static final String MISSING_IDENTIFIER = "NULL";
+
     public Event(Object source) {
         super(source);
         this.time = LocalDateTime.now();
