@@ -48,8 +48,6 @@ public interface GroupService {
 
     void populateMembers(Group group);
 
-    Page<String> getAllCoMembers(IUser user, Pageable pageable);
-
     Page<Group> findByPredicate(Predicate predicate, Pageable pageable);
 
     Group assignAuthority(String groupId, String authorityId);

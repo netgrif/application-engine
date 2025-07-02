@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.adapter.spring.utils.PageableUtils;
 import com.netgrif.application.engine.auth.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.auth.repository.GroupRepository;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
@@ -16,7 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Getter
@@ -183,19 +181,6 @@ public class GroupServiceImpl implements GroupService {
 //            todo realmId rovnaké ako user realmId?
             group.getMembers().add(userService.findById(id, group.getRealmId()));
         });
-    }
-
-    @Override
-    public Page<String> getAllCoMembers(IUser user, Pageable pageable) {
-        // TODO JOFO: rework for pagination
-        Page<Group> userMembershipGroups = groupRepository.findAllByMemberIdsContains(user.getStringId(), pageable);
-        IUser system = userService.getSystem();
-        return PageableUtils.listToPage(
-                userMembershipGroups.stream().map(Group::getMemberIds).flatMap(Set::stream)
-                        .filter(id -> !id.equals(user.getStringId()) && !id.equals(system.getStringId()))
-                        .collect(Collectors.toList()),
-                userMembershipGroups.getPageable()
-        ) ;
     }
 
     @Override

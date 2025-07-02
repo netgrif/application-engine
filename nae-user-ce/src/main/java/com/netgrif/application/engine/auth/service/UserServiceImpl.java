@@ -20,6 +20,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -313,46 +314,35 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<IUser> findAllCoMembers(com.netgrif.application.engine.objects.auth.domain.LoggedUser loggedUser, Pageable pageable) {
-        // TODO JOFO: rework for pagination
-        Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser(), Pageable.unpaged()).stream().collect(Collectors.toSet());
-        members.add(loggedUser.getSelfOrImpersonated().getId());
-        Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());
-        String collectionName = collectionNameProvider.getCollectionNameForRealm(loggedUser.getRealmId());
-        return changeType(userRepository.findAllByIdInAndState(objMembers, UserState.ACTIVE, pageable, mongoTemplate, collectionName));
+        return this.searchAllCoMembers(null, loggedUser, pageable);
     }
 
     @Override
     public Page<IUser> searchAllCoMembers(String query, com.netgrif.application.engine.objects.auth.domain.LoggedUser loggedUser, Pageable pageable) {
-        // TODO JOFO: rework for pagination
-        Page<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser(), Pageable.unpaged());
-        members.getContent().add(loggedUser.getSelfOrImpersonated().getId());
+        IUser user = this.findById(loggedUser.getSelfOrImpersonated().getId(), loggedUser.getSelfOrImpersonated().getRealmId());
+        BooleanExpression predicate = buildPredicate(user, query);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(loggedUser.getRealmId());
-        return changeType(userRepository.findAllByQuery(buildPredicate(members.stream().map(ObjectId::new)
-                .collect(Collectors.toSet()), query), pageable, mongoTemplate, collectionName));
-
+        Page<User> users = userRepository.findAllByQuery(predicate, pageable, mongoTemplate, collectionName);
+        return changeType(users);
     }
 
     @Override
     public Page<IUser> searchAllCoMembers(String query, List<ProcessResourceId> roleIds, List<ProcessResourceId> negateRoleIds, com.netgrif.application.engine.objects.auth.domain.LoggedUser loggedUser, Pageable pageable) {
-        // TODO JOFO: rework for pagination!!!
-        if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty()))
+        if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty())) {
             return searchAllCoMembers(query, loggedUser, pageable);
-
-        if (negateRoleIds == null) {
-            negateRoleIds = new ArrayList<>();
         }
 
-
-        Page<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser(), Pageable.unpaged());
-        members.getContent().add(loggedUser.getSelfOrImpersonated().getId());
-        BooleanExpression predicate = buildPredicate(members.stream().map(ObjectId::new).collect(Collectors.toSet()), query);
-        if (!(roleIds == null || roleIds.isEmpty())) {
+        IUser user = this.findById(loggedUser.getSelfOrImpersonated().getId(), loggedUser.getSelfOrImpersonated().getRealmId());
+        BooleanExpression predicate = buildPredicate(user, query);
+        if (roleIds != null && !roleIds.isEmpty()) {
             predicate = predicate.and(QUser.user.processRoles.any()._id.in(roleIds));
         }
-        predicate = predicate.and(QUser.user.processRoles.any()._id.in(negateRoleIds).not());
-        String collection = collectionNameProvider.getCollectionNameForRealm(loggedUser.getRealmId());
-        Page<User> users = userRepository.findAllByQuery(predicate, pageable, mongoTemplate, collection);
+        if (negateRoleIds != null && !negateRoleIds.isEmpty()) {
+            predicate = predicate.and(QUser.user.processRoles.any()._id.in(negateRoleIds).not());
+        }
 
+        String collectionName = collectionNameProvider.getCollectionNameForRealm(loggedUser.getRealmId());
+        Page<User> users = userRepository.findAllByQuery(predicate, pageable, mongoTemplate, collectionName);
         return changeType(users);
     }
 
@@ -367,7 +357,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable, String realmId) {
         String collection = collectionNameProvider.getCollectionNameForRealm(realmId);
-        Page<User> users = userRepository.findDistinctByStateAndProcessRoles__idIn( UserState.ACTIVE, roleIds, pageable, mongoTemplate, collection);
+        Page<User> users = userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, roleIds, pageable, mongoTemplate, collection);
         return changeType(users);
     }
 
@@ -630,10 +620,15 @@ public class UserServiceImpl implements UserService {
         return users.map(IUser.class::cast);
     }
 
-    private BooleanExpression buildPredicate(Set<ObjectId> members, String query) {
+    private BooleanExpression buildPredicate(IUser user, String query) {
+        IUser system = this.getSystem();
         BooleanExpression predicate = QUser.user
-                .id.in(members)
+                .groupIds.any().in(user.getGroupIds())
+                .and(QUser.user.id.ne(new ObjectId(system.getStringId())))
                 .and(QUser.user.state.eq(UserState.ACTIVE));
+        if (query == null) {
+            return predicate;
+        }
         for (String word : query.split(" ")) {
             predicate = predicate
                     .andAnyOf(QUser.user.email.containsIgnoreCase(word),
