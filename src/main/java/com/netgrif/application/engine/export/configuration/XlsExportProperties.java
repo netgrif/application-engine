@@ -1,11 +1,15 @@
 package com.netgrif.application.engine.export.configuration;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Min;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Configuration properties for XLS export functionality.
@@ -20,20 +24,6 @@ import javax.validation.constraints.Min;
 @Configuration
 @ConfigurationProperties(prefix = "nae.xls.export")
 public class XlsExportProperties {
-
-    /**
-     * The default name of the exported XLS file (without extension).
-     * <p>
-     * Example: <code>export</code>
-     */
-    private String exportFileName = "export";
-
-    /**
-     * The name of the sheet inside the exported XLS file.
-     * <p>
-     * Example: <code>export</code>
-     */
-    private String sheetName = "export";
 
     /**
      * The maximum number of rows allowed in the export.
@@ -66,27 +56,47 @@ public class XlsExportProperties {
      */
     private boolean exportAllImmediateFields = true;
 
-    /**
-     * Warning message shown when the number of exported records exceeds the configured limit.
-     * <p>
-     * Default: <br>
-     * <code>Tento dokument obsahuje maximálny povolený počet záznamov pre export.
-     * Pre zvýšenie limitu exportu záznamov prosím kontaktuje svojho administrátora.</code>
-     */
-    private String trimWarningMessage = "Tento dokument obsahuje maximálny povolený počet záznamov pre export. Pre zvýšenie limitu exportu záznamov prosím kontaktuje svojho administrátora.";
+    private Map<String, LocaleProperties> locale = new HashMap<>();
 
-    /**
-     * Date format used in the exported XLS file.
-     * <p>
-     * Example: <code>dd.MM.yyyy</code>
-     */
-    private String datePattern = "dd.MM.yyyy";
+    @Getter
+    @Setter
+    public static class LocaleProperties {
+        /**
+         * The default name of the exported XLS file (without extension).
+         * <p>
+         * Example: <code>export</code>
+         */
+        private String exportFileName = "export";
 
-    /**
-     * Date-time format used in the exported XLS file.
-     * <p>
-     * Example: <code>dd.MM.yyyy HH:mm:ss</code>
-     */
-    private String dateTimePattern = "dd.MM.yyyy HH:mm:ss";
+        /**
+         * The name of the sheet inside the exported XLS file.
+         * <p>
+         * Example: <code>export</code>
+         */
+        private String sheetName = "export";
+
+        /**
+         * Warning message shown when the number of exported records exceeds the configured limit.
+         * <p>
+         * Default: <br>
+         * <code>Tento dokument obsahuje maximálny povolený počet záznamov pre export.
+         * Pre zvýšenie limitu exportu záznamov prosím kontaktuje svojho administrátora.</code>
+         */
+        private String trimWarningMessage = "Tento dokument obsahuje maximálny povolený počet záznamov pre export. Pre zvýšenie limitu exportu záznamov prosím kontaktuje svojho administrátora.";
+
+        /**
+         * Date format used in the exported XLS file.
+         * <p>
+         * Example: <code>dd.MM.yyyy</code>
+         */
+        private String datePattern = "dd.MM.yyyy";
+
+        /**
+         * Date-time format used in the exported XLS file.
+         * <p>
+         * Example: <code>dd.MM.yyyy HH:mm:ss</code>
+         */
+        private String dateTimePattern = "dd.MM.yyyy HH:mm:ss";
+    }
 
 }

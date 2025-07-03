@@ -6,6 +6,7 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSer
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.export.configuration.XlsExportProperties;
+import com.netgrif.application.engine.export.domain.ExportedFieldFactory;
 import com.netgrif.application.engine.export.service.interfaces.IXlsExportService;
 import com.netgrif.application.engine.export.domain.CellFactory;
 import com.netgrif.application.engine.export.domain.ExportedField;
@@ -22,7 +23,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -42,6 +42,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.netgrif.application.engine.export.domain.ExportedFieldFactory.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -56,7 +58,7 @@ public class XlsExportService implements IXlsExportService {
 
     @PostConstruct
     public void init() {
-        if (exportProperties.getDatePattern() != null && !exportProperties.getDatePattern().isBlank()) {
+        if (exportProperties.getLocale().getDatePattern() != null && !exportProperties.getDatePattern().isBlank()) {
             CellFactory.DATE_PATTERN = exportProperties.getDatePattern();
         }
         if (exportProperties.getDateTimePattern() != null && !exportProperties.getDateTimePattern().isBlank()) {
@@ -67,28 +69,28 @@ public class XlsExportService implements IXlsExportService {
     @Override
     public File getExportFilteredCasesFile(FilteredCasesRequest request, LoggedUser user, Locale locale) throws Exception {
         List<ExportedField> fieldsToExport = ExportedField.convert(request.getSelectedDataFieldIds(), request.getSelectedDataFieldNames());
-        fieldsToExport = insertPredefinedFields(fieldsToExport, getProcessIdentifierFromFilteredRequest(request));
+        fieldsToExport = insertPredefinedFields(fieldsToExport, getProcessIdentifierFromFilteredRequest(request), locale);
         return getCasesToExcel(request.getQuery(), fieldsToExport, user, locale, request.getIsIntersection());
     }
 
     @Override
     public File getExportFilteredCasesFile(List<CaseSearchRequest> requests, Boolean isIntersection, List<ExportedField> selectedField, LoggedUser user, Locale locale) throws Exception {
-        return getCasesToExcel(requests, insertPredefinedFields(selectedField), user, locale, isIntersection);
+        return getCasesToExcel(requests, insertPredefinedFields(selectedField, locale), user, locale, isIntersection);
     }
 
-    protected List<ExportedField> insertPredefinedFields(List<ExportedField> fieldToExport) {
-        return insertPredefinedFields(fieldToExport, null);
+    protected List<ExportedField> insertPredefinedFields(List<ExportedField> fieldToExport, Locale locale) {
+        return insertPredefinedFields(fieldToExport, null, locale);
     }
 
-    protected List<ExportedField> insertPredefinedFields(List<ExportedField> fieldToExport, String processIdentifier) {
+    protected List<ExportedField> insertPredefinedFields(List<ExportedField> fieldToExport, String processIdentifier, Locale locale) {
         if (fieldToExport == null) return new ArrayList<>();
         Set<ExportedField> fields = new LinkedHashSet<>(fieldToExport);
         if (exportProperties.isAddMetaData()) {
-            replaceInSet(fields, ExportedField.STRING_ID);
-            replaceInSet(fields, ExportedField.VISUAL_ID);
-            replaceInSet(fields, ExportedField.AUTHOR);
-            replaceInSet(fields, ExportedField.TITLE);
-            replaceInSet(fields, ExportedField.CREATION_DATE);
+            replaceInSet(fields, ExportedFieldFactory.META_FIELDS.get(locale).get(STRING_ID));
+            replaceInSet(fields, ExportedFieldFactory.META_FIELDS.get(locale).get(VISUAL_ID));
+            replaceInSet(fields, ExportedFieldFactory.META_FIELDS.get(locale).get(AUTHOR));
+            replaceInSet(fields, ExportedFieldFactory.META_FIELDS.get(locale).get(CREATION_DATE));
+            replaceInSet(fields, ExportedFieldFactory.META_FIELDS.get(locale).get(TITLE));
         }
 
         if (!exportProperties.isExportAllImmediateFields()) {
