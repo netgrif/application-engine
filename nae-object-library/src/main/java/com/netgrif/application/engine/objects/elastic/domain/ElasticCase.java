@@ -31,8 +31,6 @@ public abstract class ElasticCase implements Serializable {
 
     private String id;
 
-    private String uriNodeId;
-
     private Long version;
 
     private Long lastModified;
@@ -92,7 +90,6 @@ public abstract class ElasticCase implements Serializable {
 
     public ElasticCase(Case useCase) {
         stringId = useCase.getStringId();
-        uriNodeId = useCase.getUriNodeId();
         mongoId = useCase.getStringId();   //TODO: Duplication
         lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
         processIdentifier = useCase.getProcessIdentifier();
@@ -121,9 +118,6 @@ public abstract class ElasticCase implements Serializable {
     public void update(ElasticCase useCase) {
         version++;
         lastModified = useCase.getLastModified();
-        if (useCase.getUriNodeId() != null) {
-            uriNodeId = useCase.getUriNodeId();
-        }
         title = useCase.getTitle();
         taskIds = useCase.getTaskIds();
         taskMongoIds = useCase.getTaskMongoIds();
