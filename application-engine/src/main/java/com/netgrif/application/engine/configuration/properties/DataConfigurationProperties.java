@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.autoconfigure.data.rest.RepositoryRestProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 
 import java.time.Duration;
@@ -65,6 +66,7 @@ public class DataConfigurationProperties {
     }
 
     @Data
+    @Primary
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     @ConfigurationProperties(prefix = "netgrif.engine.data.mongodb")
@@ -137,10 +139,9 @@ public class DataConfigurationProperties {
         }
 
         @Data
-        private static class ExecutorProperties {
+        public static class ExecutorProperties {
             private int size = 500;
             private int timeout = 5;
-
         }
     }
 }

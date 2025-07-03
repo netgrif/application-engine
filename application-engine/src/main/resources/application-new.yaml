@@ -24,6 +24,16 @@ netgrif:
         max-file-size: 50MB
         max-request-size: 50MB
     mail:
-      domain: ${NETGRIF_ENGINE_MAIL_DOMAIN:localhost}
-      port: ${NETGRIF_ENGINE_MAIL_DOMAIN_PORT:4200}
-      mail-from:
+      mail-from: ${NETGRIF_ENGINE_MAIL_FROM:test@example.com}
+      default-encoding: UTF-8
+      host: ${NETGRIF_ENGINE_MAIL_HOST:''}
+      port: ${NETGRIF_ENGINE_MAIL_PORT:25}
+      jndi-name:
+        spring:
+          mail:
+            username: ${NETGRIF_ENGINE_MAIL_USERNAME:''}
+            password: ${NETGRIF_ENGINE_MAIL_PASSWORD:''}
+      redirect-to:
+        domain: ${NETGRIF_ENGINE_MAIL_REDIRECT_TO_DOMAIN:localhost}
+        port: ${NETGRIF_ENGINE_MAIL_REDIRECT_TO_PORT:4200}
+        ssl: ${NETGRIF_ENGINE_MAIL_REDIRECT_TO_SSL:false}
