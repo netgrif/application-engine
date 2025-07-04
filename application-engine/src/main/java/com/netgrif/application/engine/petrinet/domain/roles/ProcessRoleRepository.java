@@ -103,19 +103,15 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
 
         List<ObjectId> forObjectIds = partitionedIds.get(false).stream()
                 .map(ObjectId::new)
-                .collect(Collectors.toList());
+                .toList();
 
-        List<ObjectId> forNetworkObjectIds = new ArrayList<>();
-        List<String> forNetworkNetworkIds = new ArrayList<>();
-        partitionedIds.get(true).forEach(id -> {
-            String[] parts = id.split(ProcessResourceId.ID_SEPARATOR);
-            forNetworkNetworkIds.add(parts[0]);
-            forNetworkObjectIds.add(new ObjectId(parts[1]));
-        });
+        List<ProcessResourceId> processResourceIds = partitionedIds.get(true).stream()
+                .map(ProcessResourceId::new)
+                .toList();
 
         List<ProcessRole> processRoles = new ArrayList<>();
         processRoles.addAll(findByObjectIds(forObjectIds));
-        processRoles.addAll(findByNetworkIdsAndObjectIds(forNetworkNetworkIds, forNetworkObjectIds));
+        processRoles.addAll(findByProcessResourceIds(processResourceIds));
         return new HashSet<>(processRoles);
     }
 
@@ -148,12 +144,11 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
     Optional<ProcessRole> findByNetworkIdAndObjectId(String networkId, ObjectId objectId);
 
     /**
-     * Finds all {@link ProcessRole} entities matching the specified network IDs and object IDs.
+     * Finds all {@link ProcessRole} entities by a collection of composite resource IDs.
      *
-     * @param networkIds a collection of short process IDs
-     * @param objectIds  a collection of object IDs
-     * @return a {@link List} of {@link ProcessRole} entities
+     * @param compositeIds a collection of {@link ProcessResourceId} instances representing the composite IDs to filter
+     * @return a {@link List} of {@link ProcessRole} entities matching the provided composite IDs
      */
-    @Query("{ $or: [ { '_id.shortProcessId': ?0, '_id.objectId': ?1 } ] }")
-    List<ProcessRole> findByNetworkIdsAndObjectIds(Collection<String> networkIds, Collection<ObjectId> objectIds);
+    @Query("{ '_id': { $in: ?0 } }")
+    List<ProcessRole> findByProcessResourceIds(Collection<ProcessResourceId> compositeIds);
 }

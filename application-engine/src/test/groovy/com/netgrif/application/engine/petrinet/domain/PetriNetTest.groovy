@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.io.Resource
+import org.springframework.data.domain.Pageable
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
@@ -88,7 +89,7 @@ class PetriNetTest {
         def netOptional3 = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
         assert netOptional3.getNet() != null
 
-        def nets = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK)
+        def nets = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK, Pageable.unpaged())
         assert nets.findAll { it.identifier in [netOptional.getNet().identifier, netOptional3.getNet().identifier] }.size() == 2
         assert nets.find { it.identifier == "new_model" }.version == "1.0.0"
         assert nets.find { it.identifier == "test" }.version == "2.0.0"

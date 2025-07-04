@@ -358,12 +358,19 @@ public class PetriNetService implements IPetriNetService {
         Page<PetriNetReference> references;
         if (version == null) {
             GroupOperation groupByIdentifier = Aggregation.group("identifier").max("version").as("version");
-            Aggregation aggregation = Aggregation.newAggregation(
-                    groupByIdentifier,
-                    Aggregation.sort(pageable.getSort()),
-                    Aggregation.skip((long) pageable.getPageNumber() * pageable.getPageSize()),
-                    Aggregation.limit(pageable.getPageSize())
-            );
+            Aggregation aggregation;
+            if (pageable == null || pageable.isUnpaged()) {
+                 aggregation = Aggregation.newAggregation(
+                         groupByIdentifier
+                );
+            } else {
+                aggregation = Aggregation.newAggregation(
+                        groupByIdentifier,
+                        Aggregation.sort(pageable.getSort()),
+                        Aggregation.skip((long) pageable.getPageNumber() * pageable.getPageSize()),
+                        Aggregation.limit(pageable.getPageSize())
+                );
+            }
             List<Document> results = mongoTemplate.aggregate(aggregation, "petriNet", Document.class).getMappedResults();
             List<PetriNetReference> referenceList = results.stream()
                     .map(doc -> {
