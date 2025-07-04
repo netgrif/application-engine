@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.configuration;
 
+import com.netgrif.application.engine.configuration.properties.MailConfigurationProperties;
 import com.netgrif.application.engine.mail.MailService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -17,48 +17,24 @@ public class MailConfiguration {
     @Autowired
     private freemarker.template.Configuration configuration;
 
-    @Value("${spring.mail.default-encoding}")
-    private String encoding;
-    @Value("${spring.mail.host}")
-    private String host;
-    @Value("${spring.mail.jndi-name.spring.mail.username}")
-    private String username;
-    @Value("${spring.mail.jndi-name.spring.mail.password}")
-    private String password;
-    @Value("${spring.mail.port}")
-    private int port;
-    @Value("${spring.mail.properties.mail.debug}")
-    private boolean debug;
-    @Value("${spring.mail.properties.mail.smtp.debug}")
-    private boolean smtpDebug;
-    @Value("${spring.mail.properties.mail.smtp.auth}")
-    private boolean smtpAuth;
-    @Value("${spring.mail.properties.mail.smtp.starttls}")
-    private boolean smtpStartTls;
-    @Value("${spring.mail.protocol}")
-    private String protocol;
-    @Value("${spring.mail.test-connection}")
-    private boolean testConnection;
-    @Value("${spring.mail.smtp.starttls.enable}")
-    private boolean smtpStartTlsEnable;
-    @Value("${spring.mail.smtp.starttls.required}")
-    private boolean smtpStartTlsRequired;
+    @Autowired
+    private MailConfigurationProperties mailConfigurationProperties;
 
     @Bean
     public JavaMailSenderImpl mailSender() {
         Properties mailProperties = new Properties();
-        mailProperties.put("mail.smtp.starttls.enable", smtpStartTlsEnable);
-        mailProperties.put("mail.smtp.starttls.required", smtpStartTlsRequired);
-        mailProperties.put("mail.debug", debug);
-        mailProperties.put("mail.smtp.debug", smtpDebug);
-        mailProperties.put("mail.smtp.auth", smtpAuth);
-        mailProperties.put("mail.smtp.starttls", smtpStartTls);
+        mailProperties.put("mail.smtp.starttls.enable", mailConfigurationProperties.getProperties().get("mail.smtp.starttls.enable"));
+        mailProperties.put("mail.smtp.starttls.required", mailConfigurationProperties.getProperties().get("mail.smtp.starttls.required"));
+        mailProperties.put("mail.debug", mailConfigurationProperties.getProperties().get("mail.debug"));
+        mailProperties.put("mail.smtp.debug", mailConfigurationProperties.getProperties().get("mail.smtp.debug"));
+        mailProperties.put("mail.smtp.auth", mailConfigurationProperties.getProperties().get("mail.smtp.auth"));
+        mailProperties.put("mail.smtp.starttls", mailConfigurationProperties.getProperties().get("mail.smtp.starttls"));
         JavaMailSenderImpl sender = new JavaMailSenderImpl();
-        sender.setPort(port);
-        sender.setHost(host);
-        sender.setUsername(username);
-        sender.setPassword(password);
-        sender.setProtocol(protocol);
+        sender.setPort(mailConfigurationProperties.getPort());
+        sender.setHost(mailConfigurationProperties.getHost());
+        sender.setUsername(mailConfigurationProperties.getUsername());
+        sender.setPassword(mailConfigurationProperties.getPassword());
+        sender.setProtocol(mailConfigurationProperties.getProtocol());
         sender.setJavaMailProperties(mailProperties);
         return sender;
     }

@@ -49,7 +49,7 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
     @Override
     public ClientConfiguration clientConfiguration() {
         return ClientConfiguration.builder()
-                .connectedTo(elasticsearchProperties.getUrl() + ":" + elasticsearchProperties.getPort())
+                .connectedTo(elasticsearchProperties.getUrl() + ":" + elasticsearchProperties.getSearchPort())
                 .build();
     }
 }

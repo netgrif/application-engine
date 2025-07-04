@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.configuration;
 
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
-import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
 import com.netgrif.application.engine.configuration.security.ImpersonationRequestFilter;
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.application.engine.configuration.security.RestAuthenticationEntryPoint;
@@ -71,7 +71,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     private NaeAuthProperties naeAuthProperties;
 
     @Autowired
-    private SecurityConfigProperties properties;
+    private SecurityConfigurationProperties properties;
 
     @Autowired
     private ISecurityContextService securityContextService;
@@ -174,7 +174,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     }
 
     @Override
-    protected SecurityConfigProperties getSecurityConfigProperties() {
+    protected SecurityConfigurationProperties getSecurityConfigProperties() {
         return properties;
     }
 

@@ -5,9 +5,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.autoconfigure.data.rest.RepositoryRestProperties;
+import org.springframework.boot.autoconfigure.session.RedisSessionProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ public class DataConfigurationProperties {
     private RestProperties rest = new RestProperties();
     private MongoProperties mongodb = new MongoProperties();
     private ElasticsearchProperties elasticsearch = new ElasticsearchProperties();
+    private RedisProperties redis = new RedisProperties();
     private boolean drop = false;
     private String databaseName = "nae";
 
@@ -49,6 +52,9 @@ public class DataConfigurationProperties {
                     ElasticsearchProperties.TASK_INDEX, databaseName + "_task"
             ));
         }
+        if (redis.getNamespace() == null) {
+            redis.setNamespace(databaseName);
+        }
     }
 
     /**
@@ -59,6 +65,7 @@ public class DataConfigurationProperties {
      * Spring Data REST functionalities while adding application-specific customizations.
      */
     @Data
+    @Primary
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     @ConfigurationProperties(prefix = "netgrif.engine.data.rest")
@@ -71,7 +78,7 @@ public class DataConfigurationProperties {
     @EqualsAndHashCode(callSuper = true)
     @ConfigurationProperties(prefix = "netgrif.engine.data.mongodb")
     public static class MongoProperties extends org.springframework.boot.autoconfigure.mongo.MongoProperties {
-        private Boolean drop = true;
+        private Boolean drop = false;
         private Boolean runnerEnsureIndex = true;
     }
 
@@ -143,5 +150,13 @@ public class DataConfigurationProperties {
             private int size = 500;
             private int timeout = 5;
         }
+    }
+
+    @Data
+    @EqualsAndHashCode(callSuper = true)
+    @ConfigurationProperties(prefix = "netgrif.engine.session")
+    public static class RedisProperties extends RedisSessionProperties {
+        private String host;
+        private int port;
     }
 }

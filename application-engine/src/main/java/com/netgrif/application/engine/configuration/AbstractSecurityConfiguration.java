@@ -3,13 +3,10 @@ package com.netgrif.application.engine.configuration;
 import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
 import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
-import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
-import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
-import com.netgrif.application.engine.configuration.properties.enumeration.HSTS;
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.configuration.properties.enumeration.XFrameOptionsMode;
 import com.netgrif.application.engine.configuration.properties.enumeration.XXSSProtection;
 import com.netgrif.application.engine.configuration.security.SessionUtilsProperties;
-//import com.netgrif.application.engine.ldap.filters.LoginAttemptsFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +17,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
-import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
@@ -34,7 +30,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractSecurityConfiguration {
 
     @Autowired
-    protected ServerAuthProperties serverAuthProperties;
+    protected SecurityConfigurationProperties.AuthProperties serverAuthProperties;
 
     @Autowired
     protected SessionUtilsProperties sessionUtilsProperties;
@@ -58,7 +54,7 @@ public abstract class AbstractSecurityConfiguration {
                 && getSecurityConfigProperties().getHeaders().getHsts() != null
                 && getSecurityConfigProperties().getHeaders().getHsts().isEnable()
                 && getSecurityConfigProperties().getHeaders().getHsts().getMaxAge() >= 0) {
-            HSTS headers = getSecurityConfigProperties().getHeaders().getHsts();
+            SecurityConfigurationProperties.HeadersProperties.HSTS headers = getSecurityConfigProperties().getHeaders().getHsts();
             if (Objects.nonNull(headers.isIncludeSubDomains())
                     && Objects.nonNull(headers.isPreload())) {
                 http
@@ -255,6 +251,6 @@ public abstract class AbstractSecurityConfiguration {
 
     protected abstract Environment getEnvironment();
 
-    protected abstract SecurityConfigProperties getSecurityConfigProperties();
+    protected abstract SecurityConfigurationProperties getSecurityConfigProperties();
 
 }

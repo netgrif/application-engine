@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "nae.server.auth")
+@ConfigurationProperties(prefix = "netgrif.engine.server.auth")
 public class ServerAuthProperties {
 
     private boolean openRegistration = true;

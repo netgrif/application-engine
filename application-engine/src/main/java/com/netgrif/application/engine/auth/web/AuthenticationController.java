@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.auth.web;
 
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
@@ -11,7 +12,6 @@ import com.netgrif.application.engine.auth.web.requestbodies.ChangePasswordReque
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.application.engine.auth.service.UserFactory;
-import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
@@ -60,7 +60,7 @@ public class AuthenticationController {
     private IMailAttemptService mailAttemptService;
 
     @Autowired
-    private ServerAuthProperties serverAuthProperties;
+    private SecurityConfigurationProperties.AuthProperties serverAuthProperties;
 
     @Autowired
     private UserFactory userResponseFactory;

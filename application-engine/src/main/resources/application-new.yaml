@@ -28,12 +28,49 @@ netgrif:
       default-encoding: UTF-8
       host: ${NETGRIF_ENGINE_MAIL_HOST:''}
       port: ${NETGRIF_ENGINE_MAIL_PORT:25}
-      jndi-name:
-        spring:
-          mail:
-            username: ${NETGRIF_ENGINE_MAIL_USERNAME:''}
-            password: ${NETGRIF_ENGINE_MAIL_PASSWORD:''}
+      username: ${NETGRIF_ENGINE_MAIL_USERNAME:''}
+      password: ${NETGRIF_ENGINE_MAIL_PASSWORD:''}
+      properties:
+        mail:
+          debug: false
+          smtp:
+            debug: false
+            auth: ${NETGRIF_ENGINE_MAIL_PROPERTIES_MAIL_SMTP_AUTH:false}
+            startls: ${NETGRIF_ENGINE_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS:true}
+      protocol: ${NETGRIF_ENGINE_MAIL_PROTOCOL:smtp}
+      smtp:
+        starttls:
+          enable: ${NETGRIF_ENGINE_MAIL_SMTP_STARTTLS_ENABLE:true}
+          required: ${NETGRIF_ENGINE_MAIL_SMTP_REQUIRED_ENABLE:true}
       redirect-to:
         domain: ${NETGRIF_ENGINE_MAIL_REDIRECT_TO_DOMAIN:localhost}
         port: ${NETGRIF_ENGINE_MAIL_REDIRECT_TO_PORT:4200}
         ssl: ${NETGRIF_ENGINE_MAIL_REDIRECT_TO_SSL:false}
+    security:
+      csrf: false
+      realm-name: NAE-Realm
+      encryption:
+        password: ${NETGRIF_ENGINE_SECURITY_ENCRYPTION_PASSWORD:password}
+        algorithm: PBEWITHSHA256AND256BITAES-CBC-BCE
+      auth:
+        open-registration: ${NETGRIF_ENGINE_SECURITY_AUTH_OPEN_REGISTRATION:true}
+        token-validity-period: 3
+        minimal-password-length: 8
+        enable-profile-edit: true
+      static:
+        enabled: false
+      headers:
+        hsts:
+          enable: true
+          include-sub-domains: true
+      limits:
+        login-attempts: 50
+        login-timeout: 1
+        login-timeout-unit: days
+        email-sends-attempts: 2
+        email-block-duration: 1
+        email-block-time-type: days
+      jwt:
+        expiration: 900000
+        algorithm: RSA
+        private-key: file:src/main/resources/certificates/private.der
