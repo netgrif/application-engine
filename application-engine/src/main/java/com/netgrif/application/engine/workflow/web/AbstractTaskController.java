@@ -7,6 +7,7 @@ import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
+import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.IllegalArgumentWithChangedFieldsException;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;

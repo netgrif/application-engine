@@ -77,9 +77,6 @@ class PetriNetServiceTest {
     private PetriNetRepository petriNetRepository
 
     @Autowired
-    private UriService uriService
-
-    @Autowired
     private CaseRepository caseRepository
 
     @Autowired
@@ -115,8 +112,6 @@ class PetriNetServiceTest {
         PetriNet testNet = testNetOptional.getNet()
         Thread.sleep(5000)
         ElasticPetriNet elasticTestNet = elasticPetriNetRepository.findByStringId(testNet.stringId)
-        assert elasticTestNet != null && elasticTestNet.getUriNodeId() == uriService.getRoot().stringId
-        assert testNet.getUriNodeId() == uriService.getRoot().stringId
         assert petriNetRepository.findById(testNet.stringId).get().uriNodeId == null
         importHelper.createCase("Case 1", testNet)
 
@@ -153,18 +148,6 @@ class PetriNetServiceTest {
             assert e.message.contains(testNet.stringId)
         }
         assert exceptionThrown
-    }
-
-    @Test
-    void findAllByUriNodeIdTest() {
-        UriNode myNode = uriService.getOrCreate("/test", UriContentType.DEFAULT)
-        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), myNode.id)
-        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), myNode.id)
-
-        Thread.sleep(2000)
-
-        List<PetriNet> petriNets = petriNetService.findAllByUriNodeId(myNode.stringId)
-        assert petriNets.size() == 2
     }
 
     @Test

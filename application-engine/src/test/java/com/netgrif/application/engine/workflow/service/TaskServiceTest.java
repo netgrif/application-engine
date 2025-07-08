@@ -22,7 +22,9 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.runner.DefaultRealmRunner;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.startup.runner.SystemUserRunner;
-import com.netgrif.application.engine.startup.runner.UriRunner;
+import com.netgrif.application.engine.objects.workflow.domain.Case;
+import com.netgrif.application.engine.objects.workflow.domain.Task;
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -74,9 +76,6 @@ public class TaskServiceTest {
     private SystemUserRunner userRunner;
 
     @Autowired
-    private UriRunner uriRunner;
-
-    @Autowired
     private IPetriNetService petriNetService;
 
     @Autowired
@@ -94,7 +93,6 @@ public class TaskServiceTest {
         taskRepository.deleteAll();
         realmRunner.run(null);
         userRunner.run(null);
-        uriRunner.run(null);
 
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         PetriNet net = petriNetRepository.findAll().get(0);

@@ -10,8 +10,10 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 
+import static org.springframework.data.elasticsearch.annotations.FieldType.Flattened;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 
 @NoArgsConstructor
@@ -29,11 +31,6 @@ public class ElasticCase extends com.netgrif.application.engine.objects.elastic.
     @Id
     public String getId() {
         return super.getId();
-    }
-
-    @Field(type = Keyword)
-    public String getUriNodeId() {
-        return super.getUriNodeId();
     }
 
     @Version
@@ -94,6 +91,21 @@ public class ElasticCase extends com.netgrif.application.engine.objects.elastic.
     @Field(type = Keyword)
     public Set<String> getTaskMongoIds() {
         return super.getTaskMongoIds();
+    }
+
+    @Field(type = Flattened)
+    public Map<String, Map<String, Boolean>> getUsers() {
+        return super.getUsers();
+    }
+
+    @Field(type = Flattened)
+    public Map<String, Map<String, Boolean>> getUserRefs() {
+        return super.getUserRefs();
+    }
+
+    @Field(type = Flattened)
+    public Map<String, Map<String, Boolean>> getPermissions() {
+        return super.getPermissions();
     }
 
     @Field(type = Keyword)

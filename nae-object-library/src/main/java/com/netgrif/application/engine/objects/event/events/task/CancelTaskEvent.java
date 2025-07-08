@@ -21,7 +21,7 @@ public class CancelTaskEvent extends TaskEvent {
 
     @Override
     public String getMessage() {
-        return "CancelTaskEvent: Task [" + taskEventOutcome.getTask().getStringId() + "] cancelled";
+        return "CancelTaskEvent: Task [" + (taskEventOutcome.getTask() == null ? MISSING_IDENTIFIER : taskEventOutcome.getTask().getStringId()) + "] cancelled";
     }
     @Override
     public EventType getEventType() {

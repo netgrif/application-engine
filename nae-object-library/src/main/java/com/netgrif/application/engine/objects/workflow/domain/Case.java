@@ -31,9 +31,6 @@ public abstract class Case implements Serializable {
     private ProcessResourceId _id;
 
     @Setter
-    private String uriNodeId;
-
-    @Setter
     private LocalDateTime lastModified;
 
     @Setter

@@ -194,7 +194,7 @@ public class TaskService implements ITaskService {
         startExecution(transition, useCase);
         // TODO: impersonation
         task.setUserId(user.getStringId());
-        task.setUserRealm(user.getRealmId());
+        task.setUserRealmId(user.getRealmId());
         task.setStartDate(LocalDateTime.now());
         // TODO: impersonation
         task.setUser(user);
@@ -281,7 +281,7 @@ public class TaskService implements ITaskService {
         task.setFinishDate(LocalDateTime.now());
         task.setFinishedBy(task.getUserId());
         task.setUserId(null);
-        task.setUserRealm(null);
+        task.setUserRealmId(null);
 
         useCase = workflowService.findOne(useCase.getStringId());
         save(task);
@@ -405,7 +405,7 @@ public class TaskService implements ITaskService {
         workflowService.updateMarking(useCase);
 
         task.setUserId(null);
-        task.setUserRealm(null);
+        task.setUserRealmId(null);
         task.setStartDate(null);
         task = save(task);
         workflowService.save(useCase);
@@ -459,7 +459,7 @@ public class TaskService implements ITaskService {
     protected void delegate(AbstractUser delegated, Task task, Case useCase) throws TransitionNotExecutableException {
         if (task.getUserId() != null) {
             task.setUserId(delegated.getStringId());
-            task.setUserRealm(delegated.getRealmId());
+            task.setUserRealmId(delegated.getRealmId());
             task.setUser(delegated);
             save(task);
         } else {
@@ -904,7 +904,7 @@ public class TaskService implements ITaskService {
                 if (users.containsKey(task.getUserId()))
                     task.setUser(users.get(task.getUserId()));
                 else {
-                    task.setUser(userService.findById(task.getUserId(), task.getUserRealm()));
+                    task.setUser(userService.findById(task.getUserId(), task.getUserRealmId()));
                     users.put(task.getUserId(), task.getUser());
                 }
             } else {
@@ -943,7 +943,7 @@ public class TaskService implements ITaskService {
 
     private void setUser(Task task) {
         if (task.getUserId() != null) {
-            task.setUser(userService.findById(task.getUserId(), task.getUserRealm()));
+            task.setUser(userService.findById(task.getUserId(), task.getUserRealmId()));
         }
     }
 

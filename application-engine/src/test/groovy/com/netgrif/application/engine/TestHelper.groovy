@@ -72,9 +72,6 @@ class TestHelper {
     private ImpersonationRunner impersonationRunner
 
     @Autowired
-    private UriRunner uriRunner
-
-    @Autowired
     private ElasticsearchRunner elasticsearchRunner
 
     @Autowired
@@ -101,7 +98,6 @@ class TestHelper {
         defaultRealmRunner.run()
         anonymousRoleRunner.run()
         systemUserRunner.run()
-        uriRunner.run()
         groupRunner.run()
         filterRunner.run()
         impersonationRunner.run()

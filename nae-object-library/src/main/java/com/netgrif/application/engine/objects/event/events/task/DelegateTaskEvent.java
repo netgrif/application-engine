@@ -32,7 +32,7 @@ public class DelegateTaskEvent extends TaskEvent {
 
     @Override
     public String getMessage() {
-        return "DelegateTaskEvent: Task [" + taskEventOutcome.getTask().getStringId() + "] delegated";
+        return "DelegateTaskEvent: Task [" + (taskEventOutcome.getTask() == null ? MISSING_IDENTIFIER : taskEventOutcome.getTask().getStringId()) + "] delegated";
     }
     @Override
     public EventType getEventType() {

@@ -4,6 +4,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import jakarta.annotation.Nullable;
@@ -26,7 +27,8 @@ public class MenuItemBody {
     private I18nString tabName;
     private String menuIcon = "filter_none";
     private String tabIcon;
-    private String uri;
+    @Getter
+    private String path;
     private String identifier;
     private Case filter;
     private Map<String, I18nString> allowedRoles;
@@ -76,8 +78,8 @@ public class MenuItemBody {
         this.tabIcon = tabIcon;
     }
 
-    public MenuItemBody(String uri, String identifier, I18nString name, String icon) {
-        this.uri = uri;
+    public MenuItemBody(String path, String identifier, I18nString name, String icon) {
+        this.path = path;
         this.identifier = identifier;
         this.menuName = name;
         this.tabName = name;
@@ -85,8 +87,8 @@ public class MenuItemBody {
         this.tabIcon = icon;
     }
 
-    public MenuItemBody(String uri, String identifier, I18nString menuName, I18nString tabName, String menuIcon, String tabIcon) {
-        this.uri = uri;
+    public MenuItemBody(String path, String identifier, I18nString menuName, I18nString tabName, String menuIcon, String tabIcon) {
+        this.path = path;
         this.identifier = identifier;
         this.menuName = menuName;
         this.tabName = tabName;
@@ -94,8 +96,8 @@ public class MenuItemBody {
         this.tabIcon = tabIcon;
     }
 
-    public MenuItemBody(String uri, String identifier, String name, String icon) {
-        this.uri = uri;
+    public MenuItemBody(String path, String identifier, String name, String icon) {
+        this.path = path;
         this.identifier = identifier;
         this.menuName = new I18nString(name);
         this.tabName = new I18nString(name);
@@ -103,8 +105,8 @@ public class MenuItemBody {
         this.tabIcon = icon;
     }
 
-    public MenuItemBody(String uri, String identifier, String menuName, String tabName, String menuIcon, String tabIcon) {
-        this.uri = uri;
+    public MenuItemBody(String path, String identifier, String menuName, String tabName, String menuIcon, String tabIcon) {
+        this.path = path;
         this.identifier = identifier;
         this.menuName = new I18nString(menuName);
         this.tabName = new I18nString(tabName);
@@ -117,7 +119,7 @@ public class MenuItemBody {
         Map<String, Object> fieldMap = new LinkedHashMap<>();
         fieldMap.put("type", fieldType.getName());
         fieldMap.put("value", fieldValue);
-        dataSet.put(fieldId.getAttributeId(), fieldMap);
+        dataSet.put(fieldId.getValue(), fieldMap);
     }
 
     private static String sanitize(String input) {
@@ -157,6 +159,10 @@ public class MenuItemBody {
 
     public Map<String, Map<String, Object>> toDataSet(String parentId, String nodePath) {
         return toDataSet(parentId, nodePath, false);
+    }
+
+    public void setPath(String path) {
+        this.path = path != null ? path.trim() : null;
     }
 
     private Map<String, Map<String, Object>> toDataSet(String parentId, String nodePath, boolean ignoreParentId) {

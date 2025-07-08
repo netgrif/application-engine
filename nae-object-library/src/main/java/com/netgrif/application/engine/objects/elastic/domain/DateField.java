@@ -23,4 +23,9 @@ public abstract class DateField extends DataField {
         this.dateValue = dateTime;
         this.timestampValue = Timestamp.valueOf(dateTime).getTime();
     }
+
+    @Override
+    public Object getValue() {
+        return dateValue;
+    }
 }

@@ -10,8 +10,10 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 
+import static org.springframework.data.elasticsearch.annotations.FieldType.Flattened;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 
 @NoArgsConstructor
@@ -92,9 +94,18 @@ public class ElasticTask extends com.netgrif.application.engine.objects.elastic.
         return super.getTransactionId();
     }
 
-    @Field(type = Keyword)
-    @Override
-    public Set<String> getRoles() {
+    @Field(type = Flattened)
+    public Map<String, Map<String, Boolean>> getUsers() {
+        return super.getUsers();
+    }
+
+    @Field(type = Flattened)
+    public Map<String, Map<String, Boolean>> getUserRefs() {
+        return super.getUserRefs();
+    }
+
+    @Field(type = Flattened)
+    public Map<String, Map<String, Boolean>> getRoles() {
         return super.getRoles();
     }
 

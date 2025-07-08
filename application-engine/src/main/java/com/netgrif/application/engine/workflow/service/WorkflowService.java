@@ -196,14 +196,6 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public Page<Case> findAllByUri(String uri, Pageable pageable) {
-        Page<Case> page = repository.findAllByUriNodeId(uri, pageable);
-        page.getContent().forEach(this::setPetriNet);
-        decryptDataSets(page.getContent());
-        return setImmediateDataFields(page);
-    }
-
-    @Override
     public Page<Case> search(Predicate predicate, Pageable pageable) {
         Page<Case> page = repository.findAll(predicate, pageable);
         page.getContent().forEach(this::setPetriNet);
@@ -339,7 +331,6 @@ public class WorkflowService implements IWorkflowService {
         useCase.setAuthor(ActorTransformer.toActorRef(loggedOrImpersonated));
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(makeTitle.apply(useCase));
-        useCase.setUriNodeId(petriNet.getUriNodeId());
 
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
         outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty(), params));
@@ -361,10 +352,9 @@ public class WorkflowService implements IWorkflowService {
 //        if (rulesExecuted > 0) {
 //            useCase = save(useCase);
 //        }
-
-        publisher.publishEvent(new CreateCaseEvent(outcome, EventPhase.POST));
         outcome.setCase(setImmediateDataFields(useCase));
         addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
+        publisher.publishEvent(new CreateCaseEvent(outcome, EventPhase.POST));
         return outcome;
     }
 

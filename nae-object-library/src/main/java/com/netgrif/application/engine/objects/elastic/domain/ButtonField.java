@@ -16,4 +16,9 @@ public abstract class ButtonField extends DataField {
         super(value.toString());
         this.buttonValue = value;
     }
+
+    @Override
+    public Object getValue() {
+        return buttonValue;
+    }
 }

@@ -21,12 +21,12 @@ public class GetDataEvent extends DataEvent {
     }
 
     public GetDataEvent(GetDataEventOutcome eventOutcome, EventPhase eventPhase, AbstractUser user) {
-        super(eventOutcome,eventPhase, user);
+        super(eventOutcome, eventPhase, user);
         this.eventOutcome = eventOutcome;
     }
 
     @Override
     public String getMessage() {
-        return "GetDataEvent: GET [" + eventOutcome.getMessage().toString() + "]";
+        return "GetDataEvent: GET [" + (eventOutcome.getMessage() == null ? MISSING_IDENTIFIER : eventOutcome.getMessage().toString()) + "]";
     }
 }

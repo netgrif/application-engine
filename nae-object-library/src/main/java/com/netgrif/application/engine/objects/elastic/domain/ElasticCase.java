@@ -5,20 +5,19 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.ImmediateField;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -31,8 +30,6 @@ public abstract class ElasticCase implements Serializable {
     private static final long serialVersionUID = 7536959921044863265L;
 
     private String id;
-
-    private String uriNodeId;
 
     private Long version;
 
@@ -64,11 +61,19 @@ public abstract class ElasticCase implements Serializable {
 
     private String authorUsername;
 
+    private List<ImmediateField> immediateData;
+
     private Map<String, DataField> dataSet;
 
     private Set<String> taskIds;
 
     private Set<String> taskMongoIds;
+
+    private Map<String, Map<String, Boolean>> permissions;
+
+    private Map<String, Map<String, Boolean>> userRefs;
+
+    private Map<String, Map<String, Boolean>> users;
 
     private Set<String> enabledRoles;
 
@@ -87,7 +92,6 @@ public abstract class ElasticCase implements Serializable {
 
     public ElasticCase(Case useCase) {
         stringId = useCase.getStringId();
-        uriNodeId = useCase.getUriNodeId();
         mongoId = useCase.getStringId();   //TODO: Duplication
         lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
         processIdentifier = useCase.getProcessIdentifier();
@@ -111,14 +115,12 @@ public abstract class ElasticCase implements Serializable {
         tags = new HashMap<>(useCase.getTags());
 
         dataSet = new HashMap<>();
+        immediateData = useCase.getImmediateData().stream().map(ImmediateField::new).collect(Collectors.toList());
     }
 
     public void update(ElasticCase useCase) {
         version++;
         lastModified = useCase.getLastModified();
-        if (useCase.getUriNodeId() != null) {
-            uriNodeId = useCase.getUriNodeId();
-        }
         title = useCase.getTitle();
         taskIds = useCase.getTaskIds();
         taskMongoIds = useCase.getTaskMongoIds();
@@ -131,5 +133,6 @@ public abstract class ElasticCase implements Serializable {
         tags = useCase.getTags();
 
         dataSet = useCase.getDataSet();
+        immediateData = useCase.getImmediateData();
     }
 }

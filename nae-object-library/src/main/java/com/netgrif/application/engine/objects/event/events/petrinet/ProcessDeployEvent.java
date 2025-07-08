@@ -16,6 +16,6 @@ public class ProcessDeployEvent extends ProcessEvent {
 
     @Override
     public String getMessage() {
-        return "ProcessDeployEvent: PetriNet [" + eventOutcome.getNet().getIdentifier() + "] imported";
+        return "ProcessDeployEvent: PetriNet [" +  (eventOutcome.getNet() == null ? MISSING_IDENTIFIER : eventOutcome.getNet().getIdentifier()) +"] imported";
     }
 }

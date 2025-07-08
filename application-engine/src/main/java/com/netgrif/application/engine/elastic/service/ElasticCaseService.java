@@ -168,19 +168,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         }
     }
 
-    public String findUriNodeId(Case aCase) {
-        if (aCase == null) {
-            return null;
-        }
-        ElasticCase elasticCase = repository.findByStringId(aCase.getStringId());
-        if (elasticCase == null) {
-            log.warn("[" + aCase.getStringId() + "] Case with id [" + aCase.getStringId() + "] is not indexed.");
-            return null;
-        }
-
-        return elasticCase.getUriNodeId();
-    }
-
     protected NativeQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
         List<BoolQuery.Builder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
 
