@@ -26,11 +26,11 @@ public abstract class UserListField extends UserField {
         this.userIdValue = new String[values.length];
         this.userRealmIdValue = new String[values.length];
         for (int i = 0; i < values.length; i++) {
-            this.usernameValue[i] = values[i].email;
+            this.usernameValue[i] = values[i].username;
             this.fullNameValue[i] = values[i].fullName;
             this.userIdValue[i] = values[i].userId;
             this.userRealmIdValue[i] = values[i].userRealmId;
-            super.fulltextValue[i] = String.format("%s %s", values[i].fullName, values[i].email);
+            super.fulltextValue[i] = String.format("%s %s", values[i].fullName, values[i].username);
         }
     }
 
