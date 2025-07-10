@@ -1088,6 +1088,8 @@ public class Importer {
             role.setGlobal(importRole.isGlobal());
         } else {
             role.setProcessId(net.getStringId());
+            role.setProcessTitle(net.getTitle());
+            role.setProcessIdentifier(net.getIdentifier());
         }
         return role;
     }
