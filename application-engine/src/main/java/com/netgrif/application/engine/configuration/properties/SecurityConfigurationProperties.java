@@ -47,7 +47,7 @@ public class SecurityConfigurationProperties {
 
     private EncryptionProperties encryption = new EncryptionProperties();
 
-    private AuthProperties serverAuth = new AuthProperties();
+    private AuthProperties auth = new AuthProperties();
 
     private StaticProperties staticSecurity = new StaticProperties();
 

@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.configuration;
 
+import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -12,35 +14,28 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
 
+import static org.bouncycastle.cms.RecipientId.password;
+
 @Configuration
-@EnableRedisIndexedHttpSession(redisNamespace = "spring:session:${spring.session.redis.namespace}")
+@EnableRedisIndexedHttpSession(redisNamespace = "spring:session:${netgrif.engine.data.redis.namespace}")
 @ConditionalOnProperty(
-        value = "nae.server.security.static.enabled",
-        havingValue = "false"
+        value = "netgrif.engine.server.security.static.enabled",
+        havingValue = "false",
+        matchIfMissing = true
 )
+@RequiredArgsConstructor
 public class SessionConfiguration {
 
-    @Value("${spring.session.redis.host}")
-    private String hostName;
-
-    @Value("${spring.session.redis.port}")
-    private Integer port;
-
-    @Value("${spring.session.redis.username:#{null}}")
-    private String username;
-
-    @Value("${spring.session.redis.password:#{null}}")
-    private String password;
-
+    private final DataConfigurationProperties.RedisProperties redisProperties;
 
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
-        hostName = hostName == null ? "localhost" : hostName;
-        port = port == null || port == 0 ? 6379 : port;
+        String hostName = redisProperties.getHost() == null ? "localhost" : redisProperties.getHost();
+        int port = redisProperties.getPort() == 0 ? 6379 : redisProperties.getPort();
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(hostName, port);
-        if(username != null && password !=null && !username.isEmpty() && !password.isEmpty()){
-            redisStandaloneConfiguration.setUsername(username);
-            redisStandaloneConfiguration.setPassword(password);
+        if(redisProperties.getUsername() != null && redisProperties.getPassword() !=null && !redisProperties.getUsername().isEmpty() && !redisProperties.getPassword().isEmpty()){
+            redisStandaloneConfiguration.setUsername(redisProperties.getUsername());
+            redisStandaloneConfiguration.setPassword(redisProperties.getPassword());
         }
         return new JedisConnectionFactory(redisStandaloneConfiguration);
     }

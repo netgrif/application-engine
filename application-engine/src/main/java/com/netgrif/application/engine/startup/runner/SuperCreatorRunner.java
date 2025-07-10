@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.startup.runner;
 
 import com.netgrif.application.engine.auth.service.AuthorityService;
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.auth.service.GroupService;
@@ -11,7 +12,6 @@ import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Pageable;
@@ -30,10 +30,7 @@ import java.util.Set;
 public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
 
     public static final String SUPER_ADMIN_EMAIL = "super@netgrif.com";
-
-    @Value("${nae.admin.password}")
-    private String superAdminPassword;
-
+    private final SecurityConfigurationProperties securityProperties;
     private final AuthorityService authorityService;
     private final UserService userService;
     private final GroupService groupService;
@@ -62,7 +59,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
             user.setLastName("Netgrif");
             user.setUsername(SUPER_ADMIN_EMAIL);
             user.setEmail(SUPER_ADMIN_EMAIL);
-            user.setPassword(superAdminPassword);
+            user.setPassword(securityProperties.getAuth().getAdminPassword());
             user.setState(UserState.ACTIVE);
             user.setAuthorities(authorities);
             user.setProcessRoles(new HashSet<>(processRoleService.findAll()));

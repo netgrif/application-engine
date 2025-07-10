@@ -74,6 +74,12 @@ public class DataConfigurationProperties {
         return redis;
     }
 
+    @Bean
+    @Primary
+    public RestProperties restProperties() {
+        return rest;
+    }
+
     /**
      * Configuration properties for the REST-specific settings under the
      * {@code netgrif.engine.data.rest} prefix.
@@ -173,6 +179,8 @@ public class DataConfigurationProperties {
     public static class RedisProperties extends RedisSessionProperties {
         private String host;
         private int port;
+        private String username;
+        private String password;
     }
 
     @Data

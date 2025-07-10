@@ -12,6 +12,8 @@ import com.netgrif.application.engine.auth.service.interfaces.IRegistrationServi
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
 import com.netgrif.application.engine.configuration.PublicViewProperties
+import com.netgrif.application.engine.configuration.properties.FilterConfigurationProperties
+import com.netgrif.application.engine.configuration.properties.MailConfigurationProperties
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
@@ -95,8 +97,11 @@ class ActionDelegate {
     static final String TRANSITIONS = "transitions"
     public static final String GLOBAL_ROLE = "GLOBAL_ROLE"
 
-    @Value('${nae.mail.from}')
-    private String mailFrom
+    @Autowired
+    MailConfigurationProperties mailProperties
+
+    @Autowired
+    FilterConfigurationProperties filterConfigurationProperties
 
     @Value('${nae.create.default.filters:false}')
     private Boolean createDefaultFilters
@@ -1229,12 +1234,12 @@ class ActionDelegate {
     }
 
     void sendEmail(List<String> to, String subject, String body) {
-        MailDraft mailDraft = MailDraft.builder(mailFrom, to).subject(subject).body(body).build()
+        MailDraft mailDraft = MailDraft.builder(mailProperties.getMailFrom(), to).subject(subject).body(body).build()
         sendMail(mailDraft)
     }
 
     void sendEmail(List<String> to, String subject, String body, Map<String, File> attachments) {
-        MailDraft mailDraft = MailDraft.builder(mailFrom, to).subject(subject).body(body).attachments(attachments).build()
+        MailDraft mailDraft = MailDraft.builder(mailProperties.getMailFrom(), to).subject(subject).body(body).attachments(attachments).build()
         sendMail(mailDraft)
     }
 
@@ -1531,7 +1536,7 @@ class ActionDelegate {
     }
 
     List<Case> findDefaultFilters() {
-        if (!createDefaultFilters) {
+        if (!filterConfigurationProperties.isCreateDefaultFilters()) {
             return []
         }
         return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.id.eq(userService.system.stringId)) })

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 public class FilterConfigurationProperties {
 
     private ExportProperties export = new ExportProperties();
+    private boolean createDefaultFilters = false;
 
     @Data
     @ConfigurationProperties(prefix = "netgrif.engine.filter.export")

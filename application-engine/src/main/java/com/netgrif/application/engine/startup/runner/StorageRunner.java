@@ -19,8 +19,7 @@ import java.io.File;
 @RequiredArgsConstructor
 class StorageRunner implements ApplicationEngineStartupRunner {
 
-    @Value("${nae.storage.clean}")
-    private boolean cleanStorage;
+    private final StorageConfigurationProperties storageConfigurationProperties;
 
     private final StorageConfigurationProperties fileStorageConfiguration;
 
@@ -30,7 +29,7 @@ class StorageRunner implements ApplicationEngineStartupRunner {
         File storage = new File(fileStorageConfiguration.getPath() + File.separator + "uploadedModels" + File.separator + "model.txt");
         storage.getParentFile().mkdirs();
 
-        if (cleanStorage) {
+        if (storageConfigurationProperties.isClean()) {
             log.info("Removing files from storage folder and it's sub-folders");
             purgeDirectory(new File(fileStorageConfiguration.getPath()));
         }

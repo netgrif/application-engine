@@ -23,7 +23,6 @@ public class SessionManagerService implements ISessionManagerService {
 
     protected final RedisIndexedSessionRepository repository;
     protected final SessionRegistry sessionRegistry;
-
     protected final String redisUsernameKey;
 
     public SessionManagerService(RedisIndexedSessionRepository repository, SessionRegistry sessionRegistry, DataConfigurationProperties.RedisProperties redisProperties) {
