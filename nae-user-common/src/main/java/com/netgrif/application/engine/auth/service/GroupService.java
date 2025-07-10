@@ -29,20 +29,20 @@ public interface GroupService {
     /**
      * Creates a new group for a given user.
      *
-     * @param user the user for whom to create the group
+     * @param groupOwner the user for whom to create the group
      * @return the newly created {@link Group}
      */
-    Group create(AbstractUser user);
+    Group create(AbstractUser groupOwner);
 
     /**
      * Creates a new group with specified parameters.
      *
      * @param identifier the unique identifier for the group
      * @param title the display title of the group
-     * @param user the user associated with the group creation
+     * @param groupOwner the user associated with the group creation
      * @return the newly created {@link Group}
      */
-    Group create(String identifier, String title, AbstractUser user);
+    Group create(String identifier, String title, AbstractUser groupOwner);
 
     /**
      * Retrieves the default user group for a given user.

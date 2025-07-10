@@ -143,25 +143,25 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group create(AbstractUser user) {
-        log.info("Creating default group for user: [{}]", user.getStringId());
-        List<Group> userGroups = groupRepository.findByOwnerId(user.getStringId());
-        if (!userGroups.isEmpty() && !Objects.equals(user.getStringId(), userService.getSystem().getStringId())) {
-            throw new IllegalArgumentException("Default group for user [%s] already exists.".formatted(user.getUsername()));
+    public Group create(AbstractUser groupOwner) {
+        log.info("Creating default group for owner: [{}]", groupOwner.getStringId());
+        List<Group> userGroups = groupRepository.findByOwnerId(groupOwner.getStringId());
+        if (!userGroups.isEmpty() && !Objects.equals(groupOwner.getStringId(), userService.getSystem().getStringId())) {
+            throw new IllegalArgumentException("Default group for owner [%s] already exists.".formatted(groupOwner.getUsername()));
         }
-        return create(user.getUsername(), user.getName(), user);
+        return create(groupOwner.getUsername(), groupOwner.getName(), groupOwner);
     }
 
     @Override
-    public Group create(String identifier, String title, AbstractUser user) {
-        log.info("Creating default group for user: [{}]", user.getStringId());
-        Group group = new Group(identifier, user.getRealmId());
-        group.setOwnerId(user.getStringId());
-        group.setOwnerUsername(user.getUsername());
+    public Group create(String identifier, String title, AbstractUser groupOwner) {
+        log.info("Creating default group for user: [{}]", groupOwner.getStringId());
+        Group group = new Group(identifier, groupOwner.getRealmId());
+        group.setOwnerId(groupOwner.getStringId());
+        group.setOwnerUsername(groupOwner.getUsername());
         group.setDisplayName(title);
-        group.addMemberId(user.getStringId());
-        user.addGroupId(group.getStringId());
-        userService.saveUser(user, user.getRealmId());
+        group.addMemberId(groupOwner.getStringId());
+        groupOwner.addGroupId(group.getStringId());
+        userService.saveUser(groupOwner, groupOwner.getRealmId());
         return save(group);
     }
 
