@@ -1,0 +1,30 @@
+netgrif:
+  engine:
+    logging:
+      endpoints: true
+    data:
+      database-name: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_dev
+      mongodb:
+        drop: true
+      elasticsearch:
+        drop: true
+        index:
+          petriNet: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_dev_petrinet
+          case: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_dev_case
+          task: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_dev_taks
+        reindex: 0 */10 * * * *
+    postal-code:
+      enable-import: false
+    storage:
+      clean: true
+      min-io:
+        enabled: true
+        hosts:
+          host_1:
+            host: http://127.0.0.1:9000
+            user: root
+            password: password
+    swagger:
+      enabled: true
+    security:
+      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/v3/api-docs,/v3/api-docs/**,/swagger-ui.html,/swagger-ui/**,/api/public/**,/manage/**

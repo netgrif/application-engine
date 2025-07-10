@@ -8,8 +8,8 @@ import java.util.*;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "nae.cache")
-public class CacheProperties {
+@ConfigurationProperties(prefix = "netgrif.engine.cache")
+public class CacheConfigurationProperties {
 
     private String petriNetById = "petriNetById";
 
