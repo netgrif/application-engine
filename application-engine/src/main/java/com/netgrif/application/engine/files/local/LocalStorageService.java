@@ -1,13 +1,13 @@
 package com.netgrif.application.engine.files.local;
 
 import com.netgrif.application.engine.files.interfaces.IStorageService;
+import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
 import com.netgrif.application.engine.files.throwable.BadRequestException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.application.engine.objects.importer.model.Data;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Storage;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.StorageField;
-import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,10 +21,10 @@ public class LocalStorageService implements IStorageService {
 
     public static final String LOCAL_TYPE = "local";
 
-    private FileStorageConfiguration fileStorageConfiguration;
+    private StorageConfigurationProperties fileStorageConfiguration;
 
     @Autowired
-    public void setFileStorageConfiguration(FileStorageConfiguration fileStorageConfiguration) {
+    public void setFileStorageConfiguration(StorageConfigurationProperties fileStorageConfiguration) {
         this.fileStorageConfiguration = fileStorageConfiguration;
     }
 
@@ -85,12 +85,12 @@ public class LocalStorageService implements IStorageService {
 
     @Override
     public String getPreviewPath(String caseId, String fieldId, String name) {
-        return fileStorageConfiguration.getStoragePath() + "/file_preview/" + caseId + "/" + fieldId + "-" + name;
+        return fileStorageConfiguration.getPath() + "/file_preview/" + caseId + "/" + fieldId + "-" + name;
     }
 
     @Override
     public String getPath(String caseId, String fieldId, String name) {
-        return fileStorageConfiguration.getStoragePath() + "/" + caseId + "/" + fieldId + "-" + name;
+        return fileStorageConfiguration.getPath() + "/" + caseId + "/" + fieldId + "-" + name;
     }
 
 }

@@ -30,7 +30,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
-@ConditionalOnExpression("'${spring.data.elasticsearch.reindex}'!= 'null'")
+@ConditionalOnExpression("'${netgrif.engine.data.elasticsearch.reindex}'!= 'null'")
 public class ReindexingTask {
 
     private static final Logger log = LoggerFactory.getLogger(ReindexingTask.class);
@@ -59,8 +59,8 @@ public class ReindexingTask {
             IElasticCaseMappingService caseMappingService,
             IElasticTaskMappingService taskMappingService,
             IWorkflowService workflowService,
-            @Value("${spring.data.elasticsearch.reindexExecutor.size:20}") int pageSize,
-            @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from) {
+            @Value("${netgrif.engine.data.elasticsearch.reindexExecutor.size:20}") int pageSize,
+            @Value("${netgrif.engine.data.elasticsearch.reindexFrom:#{null}}") Duration from) {
         this.caseRepository = caseRepository;
         this.taskRepository = taskRepository;
         this.elasticCaseRepository = elasticCaseRepository;

@@ -2,16 +2,14 @@ package com.netgrif.application.engine.petrinet.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.ArcImportReference;
-import com.netgrif.application.engine.objects.auth.domain.Group;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.CacheProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
-import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.event.events.Event;
 import com.netgrif.application.engine.objects.event.events.petrinet.ProcessDeleteEvent;
 import com.netgrif.application.engine.objects.event.events.petrinet.ProcessDeployEvent;
@@ -24,7 +22,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
-import com.netgrif.application.engine.objects.petrinet.domain.events.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
@@ -32,7 +29,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.version.Version;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
@@ -65,7 +61,6 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService.transformToReference;
 
@@ -83,7 +78,7 @@ public class PetriNetService implements IPetriNetService {
     protected MongoTemplate mongoTemplate;
 
     @Autowired
-    protected FileStorageConfiguration fileStorageConfiguration;
+    protected StorageConfigurationProperties fileStorageConfiguration;
 
 //    @Autowired
 //    protected IRuleEngine ruleEngine;
@@ -340,7 +335,7 @@ public class PetriNetService implements IPetriNetService {
                 return null;
             title = nets.getFirst().getTitle().getDefaultValue();
         }
-        return new FileSystemResource(fileStorageConfiguration.getStorageArchived() + netId + "-" + title + Importer.FILE_EXTENSION);
+        return new FileSystemResource(fileStorageConfiguration.getArchivedPath() + netId + "-" + title + Importer.FILE_EXTENSION);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service.renderer;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDrawer;
 import lombok.Data;
@@ -17,7 +17,7 @@ public abstract class Renderer {
 
     protected IPdfDrawer pdfDrawer;
 
-    protected PdfResource resource;
+    protected PdfResourceConfigurationProperties resource;
 
     int marginLeft, marginBottom, marginTop;
 
@@ -28,7 +28,7 @@ public abstract class Renderer {
 
     Color colorString, colorLabelString, colorDataGroupLabel;
 
-    protected static int getTextWidth(List<String> values, PDType0Font font, int fontSize, PdfResource resource) throws IOException {
+    protected static int getTextWidth(List<String> values, PDType0Font font, int fontSize, PdfResourceConfigurationProperties resource) throws IOException {
         int result = 0;
         for (String value : values) {
             String formattedValue = removeUnsupportedChars(value, resource);
@@ -38,7 +38,7 @@ public abstract class Renderer {
         return result;
     }
 
-    public static String removeUnsupportedChars(String input, PdfResource resource) {
+    public static String removeUnsupportedChars(String input, PdfResourceConfigurationProperties resource) {
         String value = Jsoup.parse(input.replaceAll("\\s{1,}", " ")).text();
         value = Normalizer.normalize(value, Normalizer.Form.NFC);
         StringBuilder b = new StringBuilder();
@@ -65,7 +65,7 @@ public abstract class Renderer {
 
     public abstract int renderLabel(PdfField field) throws IOException;
 
-    public void setupRenderer(IPdfDrawer pdfDrawer, PdfResource resource) {
+    public void setupRenderer(IPdfDrawer pdfDrawer, PdfResourceConfigurationProperties resource) {
         this.pdfDrawer = pdfDrawer;
         this.resource = resource;
         this.marginLeft = resource.getMarginLeft();

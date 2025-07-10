@@ -32,6 +32,14 @@ public class SecurityConfigurationProperties {
 
     private String realmName;
 
+    private String[] providers;
+
+    private String[] serverPatterns;
+
+    private String[] staticPatterns = {"/favicon.ico", "/favicon.ico", "/manifest.json", "/manifest.json", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"};
+
+    private String[] anonymousExceptions;
+
     /**
      * Headers settings
      */
@@ -62,11 +70,13 @@ public class SecurityConfigurationProperties {
 
         private int tokenValidityPeriod = 3;
 
-        private int minimalPasswordLength = 6;
+        private int minimalPasswordLength = 8;
 
         private boolean enableProfileEdit = true;
 
         private String[] noAuthenticationPatterns = new String[0];
+
+        private String adminPassword;
     }
 
     @Data
@@ -127,7 +137,7 @@ public class SecurityConfigurationProperties {
         @ConfigurationProperties(prefix = "netgrif.engine.security.headers.hsts")
         public static class HSTS {
 
-            private boolean enable;
+            private boolean enable = true;
 
             /**
              * The time, in seconds, that the browser should remember that a site is only to be accessed using HTTPS.
@@ -139,7 +149,7 @@ public class SecurityConfigurationProperties {
             /**
              * If this optional parameter is specified, this rule applies to all of the site's subdomains as well.
              */
-            private boolean includeSubDomains;
+            private boolean includeSubDomains = true;
 
             /**
              * See Preloading Strict Transport Security for details.

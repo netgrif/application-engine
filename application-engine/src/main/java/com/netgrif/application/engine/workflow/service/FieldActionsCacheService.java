@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.configuration.properties.FieldActionsCacheProperties;
+import com.netgrif.application.engine.configuration.properties.RunnerConfigurationProperties;
 import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap;
 import com.netgrif.application.engine.event.IGroovyShellFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FieldActionsCacheService implements IFieldActionsCacheService {
 
-    private final FieldActionsCacheProperties properties;
+    private final RunnerConfigurationProperties.FieldRunnerProperties properties;
 
     private IPetriNetService petriNetService;
 
@@ -36,11 +36,11 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     private Map<String, CachedFunction> functionsCache;
     private final GroovyShell shell;
 
-    public FieldActionsCacheService(FieldActionsCacheProperties properties, IGroovyShellFactory shellFactory) {
+    public FieldActionsCacheService(RunnerConfigurationProperties.FieldRunnerProperties properties, IGroovyShellFactory shellFactory) {
         this.properties = properties;
-        this.actionsCache = new MaxSizeHashMap<>(properties.getActions());
-        this.functionsCache = new MaxSizeHashMap<>(properties.getFunctions());
-        this.namespaceFunctionsCache = new MaxSizeHashMap<>(properties.getNamespaceFunctions());
+        this.actionsCache = new MaxSizeHashMap<>(properties.getActionCacheSize());
+        this.functionsCache = new MaxSizeHashMap<>(properties.getFunctionsCacheSize());
+        this.namespaceFunctionsCache = new MaxSizeHashMap<>(properties.getNamespaceCacheSize());
         this.shell = shellFactory.getGroovyShell();
     }
 
@@ -140,16 +140,16 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public void clearActionCache() {
-        this.actionsCache = new MaxSizeHashMap<>(properties.getActions());
+        this.actionsCache = new MaxSizeHashMap<>(properties.getActionCacheSize());
     }
 
     @Override
     public void clearNamespaceFunctionCache() {
-        this.namespaceFunctionsCache = new MaxSizeHashMap<>(properties.getNamespaceFunctions());
+        this.namespaceFunctionsCache = new MaxSizeHashMap<>(properties.getNamespaceCacheSize());
     }
 
     @Override
     public void clearFunctionCache() {
-        this.functionsCache = new MaxSizeHashMap<>(properties.getFunctions());
+        this.functionsCache = new MaxSizeHashMap<>(properties.getFunctionsCacheSize());
     }
 }

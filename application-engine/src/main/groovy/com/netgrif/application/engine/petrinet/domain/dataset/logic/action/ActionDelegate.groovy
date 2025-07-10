@@ -48,7 +48,7 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.task
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemConstants
 import com.netgrif.application.engine.objects.workflow.service.InitValueExpressionEvaluator
-import com.netgrif.application.engine.pdf.generator.config.PdfResource
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.plugin.meta.PluginHolder
@@ -1150,7 +1150,7 @@ class ActionDelegate {
         if (!sourceTransitionId || !targetFileFieldId)
             throw new IllegalArgumentException("Source transition or target file field is null")
         targetTransitionId = targetTransitionId ?: sourceTransitionId
-        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
+        PdfResourceConfigurationProperties pdfResource = ApplicationContextProvider.getBean(PdfResourceConfigurationProperties.class) as PdfResourceConfigurationProperties
         String filename = pdfResource.getOutputDefaultName()
         String storagePath
         if (pdfResource.getOutputFolder()) {

@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
 import com.google.common.collect.Ordering;
-import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
 import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.configuration.properties.enumeration.XFrameOptionsMode;
@@ -36,7 +35,7 @@ public abstract class AbstractSecurityConfiguration {
     protected SessionUtilsProperties sessionUtilsProperties;
 
     @Autowired
-    private NaeAuthProperties naeAuthProperties;
+    private SecurityConfigurationProperties naeAuthProperties;
 
     @Autowired
     private ApplicationContext context;

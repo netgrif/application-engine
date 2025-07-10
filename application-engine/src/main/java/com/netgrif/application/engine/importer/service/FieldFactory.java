@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.importer.service;
 
 import com.netgrif.application.engine.files.IStorageResolverService;
-import com.netgrif.application.engine.files.minio.MinIoProperties;
+import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
 import com.netgrif.application.engine.objects.importer.model.*;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.objects.petrinet.domain.Component;
@@ -17,7 +17,6 @@ import com.netgrif.application.engine.objects.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataValidationExpressionEvaluator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,8 +32,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public final class FieldFactory {
 
-    @Value("${nae.storage.default-type:local}")
-    private String defaultStorageType;
+    @Autowired
+    private StorageConfigurationProperties fileStorageConfiguration;
 
     @Autowired
     private FormatFactory formatFactory;
@@ -50,11 +49,11 @@ public final class FieldFactory {
 
     @Autowired
     private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
-    private MinIoProperties minIoProperties;
+    private StorageConfigurationProperties minIoProperties;
     private IStorageResolverService storageResolverService;
 
     @Autowired
-    public void setMinIoProperties(MinIoProperties minIoProperties) {
+    public void setMinIoProperties(StorageConfigurationProperties minIoProperties) {
         this.minIoProperties = minIoProperties;
     }
 
@@ -858,6 +857,6 @@ public final class FieldFactory {
     }
 
     private void resolveStorage(Data data, StorageField<?> field) {
-        field.setStorage(StorageFactory.createStorage(data, storageResolverService, defaultStorageType));
+        field.setStorage(StorageFactory.createStorage(data, storageResolverService, fileStorageConfiguration.getDefaultType()));
     }
 }

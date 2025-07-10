@@ -10,5 +10,6 @@ public class DefaultMainConfigurationProperties {
     public static final Map<String, Object> DEFAULT_MAIN_PROPERTIES = Map.of(
             "spring.main.allow-bean-definition-overriding", "true",
             "spring.main.allow-circular-references", "true",
-            "logging.config", "classpath:logback.xml");
+            "logging.config", "classpath:logback.xml",
+            "spring.autoconfigure.exclude", "org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration");
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "nae.ldap")
+@ConfigurationProperties(prefix = "netgrif.engine.ldap")
 public class NaeLdapProperties {
 
     private boolean enabled = false;

@@ -11,11 +11,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 @Component
-@PropertySource("classpath:application.properties")
-@ConfigurationProperties(prefix = "nae.pdf.resources")
+@PropertySource("classpath:application.yaml")
+@ConfigurationProperties(prefix = "netgrif.engine.pdf.resources")
 @Data
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class PdfResource extends PdfProperties {
+public class PdfResourceConfigurationProperties extends PdfConfigurationProperties {
 
     private PDType0Font labelFont;
 

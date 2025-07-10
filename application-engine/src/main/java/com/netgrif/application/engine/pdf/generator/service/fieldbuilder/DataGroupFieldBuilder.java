@@ -1,13 +1,13 @@
 package com.netgrif.application.engine.pdf.generator.service.fieldbuilder;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.domain.PdfDataGroupField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.objects.petrinet.domain.DataGroup;
 
 public class DataGroupFieldBuilder extends FieldBuilder {
 
-    public DataGroupFieldBuilder(PdfResource resource) {
+    public DataGroupFieldBuilder(PdfResourceConfigurationProperties resource) {
         super(resource);
     }
 

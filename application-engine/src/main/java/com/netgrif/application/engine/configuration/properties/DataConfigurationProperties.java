@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.boot.autoconfigure.data.rest.RepositoryRestProperties;
 import org.springframework.boot.autoconfigure.session.RedisSessionProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -33,28 +34,44 @@ public class DataConfigurationProperties {
     private RedisProperties redis = new RedisProperties();
     private boolean drop = false;
     private String databaseName = "nae";
+    private int imagePreviewScalingPx = 400;
+    private ValidationProperties validation = new ValidationProperties();
 
-    @PostConstruct
-    void init() {
+    @Bean
+    @Primary
+    public MongoProperties mongoProperties() {
         if (mongodb.getDrop() == null) {
             mongodb.setDrop(drop);
         }
         if (mongodb.getDatabase() == null) {
             mongodb.setDatabase(databaseName);
         }
+        return mongodb;
+    }
+
+    @Bean
+    @Primary
+    public ElasticsearchProperties elasticsearchProperties() {
         if (elasticsearch.getDrop() == null) {
             elasticsearch.setDrop(drop);
         }
         if (elasticsearch.getIndex() == null || elasticsearch.getIndex().isEmpty()) {
             elasticsearch.setIndex(Map.of(
-                    ElasticsearchProperties.PETRI_NET_INDEX, databaseName + "_petriNet",
+                    ElasticsearchProperties.PETRI_NET_INDEX, databaseName + "_petrinet",
                     ElasticsearchProperties.CASE_INDEX, databaseName + "_case",
                     ElasticsearchProperties.TASK_INDEX, databaseName + "_task"
             ));
         }
+        return elasticsearch;
+    }
+
+    @Bean
+    @Primary
+    public RedisProperties redisProperties() {
         if (redis.getNamespace() == null) {
             redis.setNamespace(databaseName);
         }
+        return redis;
     }
 
     /**
@@ -65,7 +82,6 @@ public class DataConfigurationProperties {
      * Spring Data REST functionalities while adding application-specific customizations.
      */
     @Data
-    @Primary
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     @ConfigurationProperties(prefix = "netgrif.engine.data.rest")
@@ -73,7 +89,6 @@ public class DataConfigurationProperties {
     }
 
     @Data
-    @Primary
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     @ConfigurationProperties(prefix = "netgrif.engine.data.mongodb")
@@ -95,11 +110,11 @@ public class DataConfigurationProperties {
 
         private String reindex;
 
-        private ExecutorProperties reindexExecutor;
+        private ExecutorProperties reindexExecutor = new ExecutorProperties();
 
         private Duration reindexFrom;
 
-        private ExecutorProperties executors;
+        private ExecutorProperties executors = new ExecutorProperties();
 
         private Boolean drop;
 
@@ -158,5 +173,11 @@ public class DataConfigurationProperties {
     public static class RedisProperties extends RedisSessionProperties {
         private String host;
         private int port;
+    }
+
+    @Data
+    @ConfigurationProperties(prefix = "netgrif.engine.data.validation")
+    public static class ValidationProperties {
+        private boolean setDataEnabled = false;
     }
 }

@@ -3,7 +3,7 @@ package com.netgrif.application.engine.mail;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.netgrif.application.engine.configuration.properties.SecurityLimitsProperties;
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +15,12 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class MailAttemptService implements IMailAttemptService {
 
-    private SecurityLimitsProperties securityLimitsProperties;
+    private SecurityConfigurationProperties.SecurityLimitsProperties securityLimitsProperties;
 
     private LoadingCache<String, Integer> attemptsCache;
 
     @Autowired
-    public MailAttemptService(SecurityLimitsProperties securityLimitsProperties) {
+    public MailAttemptService(SecurityConfigurationProperties.SecurityLimitsProperties securityLimitsProperties) {
         super();
         this.securityLimitsProperties = securityLimitsProperties;
         attemptsCache = CacheBuilder.newBuilder().

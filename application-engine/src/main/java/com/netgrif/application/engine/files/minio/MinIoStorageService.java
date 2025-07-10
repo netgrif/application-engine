@@ -36,10 +36,10 @@ public class MinIoStorageService implements IStorageService {
 
     public static final String MINIO_TYPE = "minio";
 
-    private MinIoProperties properties;
+    private StorageConfigurationProperties properties;
 
     @Autowired
-    public void setProperties(MinIoProperties properties) {
+    public void setProperties(StorageConfigurationProperties properties) {
         this.properties = properties;
     }
 
@@ -51,7 +51,7 @@ public class MinIoStorageService implements IStorageService {
     @Override
     public Storage createStorage(Data data) {
         Storage storage = new MinIoStorage();
-        if (!properties.isEnabled()) {
+        if (!properties.getMinIo().isEnabled()) {
             throw new StorageNotEnabledException("Storage of type [" + MINIO_TYPE + "] is not enabled.");
         }
         if (data.getStorage().getHost() != null) {
@@ -107,7 +107,7 @@ public class MinIoStorageService implements IStorageService {
             return minioClient.putObject(PutObjectArgs
                     .builder()
                     .bucket(storage.getBucket()).object(path)
-                    .stream(stream, -1, properties.getPartSize())
+                    .stream(stream, -1, properties.getMinIo().getPartSize())
                     .build()).etag() != null;
         } catch (ErrorResponseException e) {
             log.error(e.getMessage(), e);
@@ -150,13 +150,13 @@ public class MinIoStorageService implements IStorageService {
     }
 
     public static String getBucketOrDefault(String bucket) {
-        return bucket != null ? bucket : MinIoProperties.DEFAULT_BUCKET;
+        return bucket != null ? bucket : StorageConfigurationProperties.MinIoStorageProperties.DEFAULT_BUCKET;
     }
 
     protected MinioClient client(String host) {
         return MinioClient.builder()
-                .endpoint(properties.getHosts(host).getHost())
-                .credentials(properties.getHosts(host).getUser(), properties.getHosts(host).getPassword())
+                .endpoint(properties.getMinIo().getHosts(host).getHost())
+                .credentials(properties.getMinIo().getHosts(host).getUser(), properties.getMinIo().getHosts(host).getPassword())
                 .build();
     }
 }

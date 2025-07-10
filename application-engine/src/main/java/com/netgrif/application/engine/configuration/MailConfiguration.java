@@ -28,7 +28,7 @@ public class MailConfiguration {
         mailProperties.put("mail.debug", mailConfigurationProperties.getProperties().get("mail.debug"));
         mailProperties.put("mail.smtp.debug", mailConfigurationProperties.getProperties().get("mail.smtp.debug"));
         mailProperties.put("mail.smtp.auth", mailConfigurationProperties.getProperties().get("mail.smtp.auth"));
-        mailProperties.put("mail.smtp.starttls", mailConfigurationProperties.getProperties().get("mail.smtp.starttls"));
+        mailProperties.put("mail.smtp.starttls", mailConfigurationProperties.getProperties().get("mail.smtp.starttls.enable"));
         JavaMailSenderImpl sender = new JavaMailSenderImpl();
         sender.setPort(mailConfigurationProperties.getPort());
         sender.setHost(mailConfigurationProperties.getHost());

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Data
 @Component
-@ConfigurationProperties(prefix = "nae.group")
+@ConfigurationProperties(prefix = "netgrif.engine.group")
 public class GroupConfigurationProperties {
 
     /**
