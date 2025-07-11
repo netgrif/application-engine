@@ -40,7 +40,7 @@ public class QuartzConfiguration {
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         List<Resource> resourceList = new ArrayList<>();
         try {
-            Resource[] resourcesClassApp = resolver.getResources("classpath*:/application.properties");
+            Resource[] resourcesClassApp = resolver.getResources("classpath*:/application.yaml");
             Resource[] resourcesClass = resolver.getResources("classpath*:/quartz.properties");
             Resource[] resources = resolver.getResources("file:/*/quartz.properties");
             Collections.addAll(resourceList, resourcesClassApp);
