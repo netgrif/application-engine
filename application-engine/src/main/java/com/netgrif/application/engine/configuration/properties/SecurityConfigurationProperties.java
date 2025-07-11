@@ -77,6 +77,8 @@ public class SecurityConfigurationProperties {
         private String[] noAuthenticationPatterns = new String[0];
 
         private String adminPassword;
+
+        private boolean createSuper = true;
     }
 
     @Data

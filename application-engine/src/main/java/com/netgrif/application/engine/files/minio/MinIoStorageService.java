@@ -29,7 +29,7 @@ import java.security.NoSuchAlgorithmException;
 @Slf4j
 @Service
 @ConditionalOnProperty(
-        value = "nae.storage.minio.enabled",
+        value = "netgrif.engine.storage.minio.enabled",
         havingValue = "true"
 )
 public class MinIoStorageService implements IStorageService {

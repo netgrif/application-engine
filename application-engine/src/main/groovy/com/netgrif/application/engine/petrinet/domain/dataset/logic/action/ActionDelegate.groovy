@@ -103,9 +103,6 @@ class ActionDelegate {
     @Autowired
     FilterConfigurationProperties filterConfigurationProperties
 
-    @Value('${nae.create.default.filters:false}')
-    private Boolean createDefaultFilters
-
     @Autowired
     FieldFactory fieldFactory
 

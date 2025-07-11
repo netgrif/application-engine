@@ -71,10 +71,10 @@ class PdfGeneratorTest {
     @Autowired
     private ITaskService taskService
 
-    @Value('${netgrif.engine.pdf.resources.outputFolder}')
+    @Value('${netgrif.engine.pdf.resources.output-folder}')
     private String pdfOutputFolder;
 
-    @Value('${netgrif.engine.pdf.resources.templateResource}')
+    @Value('${netgrif.engine.pdf.resources.template-resource}')
     private String pdfTemplateFolder
 
     public static final String[] TESTING_DATA = ["pdf_test_1.xml", "pdf_test_2.xml", "pdf_test_3.xml", "all_data_pdf.xml", "flow.xml", "datagroup_test_layout.xml", "simple_taskref.xml", "pdf_run_action.xml"]

@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "nae.public")
+@ConfigurationProperties(prefix = "netgrif.engine.public")
 public class PublicViewProperties {
 
     private String url = "";

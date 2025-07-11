@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-@ConfigurationProperties(prefix = "nae.actions")
+@ConfigurationProperties(prefix = "netgrif.engine.actions")
 @Data
 @Component
 public class ActionsProperties {

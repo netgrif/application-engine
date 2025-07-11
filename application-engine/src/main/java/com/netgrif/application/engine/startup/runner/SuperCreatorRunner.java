@@ -26,7 +26,7 @@ import java.util.Set;
 @Component
 @RunnerOrder(150)
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "admin.create-super", matchIfMissing = true)
+@ConditionalOnProperty(value = "netgrif.engine.security.auth.create-super", matchIfMissing = true)
 public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
 
     public static final String SUPER_ADMIN_EMAIL = "super@netgrif.com";

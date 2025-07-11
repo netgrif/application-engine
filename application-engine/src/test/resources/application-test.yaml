@@ -1,0 +1,67 @@
+
+netgrif:
+  engine:
+    logging:
+      endpoints: true
+    data:
+      database-name: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_test
+      mongodb:
+        drop: true
+      elasticsearch:
+        drop: true
+        index:
+          petriNet: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_test_petrinet
+          case: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_test_case
+          task: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_test_taks
+        reindex: 0 0 0 * * *
+    postal-code:
+      enable-import: true
+      import-file-path: postal_codes_dev.csv
+    storage:
+      clean: true
+      min-io:
+        enabled: true
+        hosts:
+          host_1:
+            host: http://127.0.0.1:9000
+            user: root
+            password: password
+    swagger:
+      enabled: true
+    security:
+      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/v3/api-docs,/v3/api-docs/**,/swagger-ui.html,/swagger-ui/**,/api/public/**,/manage/**
+      limits:
+        login-attempts: 3
+        login-timeout: 3
+        login-timeout-unit: seconds
+    pdf:
+      resources:
+        template-resource: file:src/test/resources/pdfGenerator/example.pdf
+    actions:
+      imports: org.bson.types.ObjectId,com.netgrif.application.engine.objects.petrinet.domain.version.Version,com.netgrif.application.engine.objects.petrinet.domain.PetriNet,com.netgrif.application.engine.objects.petrinet.domain.I18nString
+      star-imports: java.time
+      static-star-imports: java.time.LocalDate
+    runner:
+      expression-runner:
+        cache-size: 200
+    mail:
+      default-encoding: UTF-8
+      host: localhost
+      username: username
+      password: secret
+      port: 2525
+      properties:
+        mail:
+          debug: false
+          smtp:
+            debug: false
+            auth: false
+            starttls:
+              enable: false
+              required: false
+    public:
+      url: test.public.url
+spring:
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true

@@ -14,7 +14,8 @@ netgrif:
           task: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_dev_taks
         reindex: 0 */10 * * * *
     postal-code:
-      enable-import: false
+      enable-import: true
+      import-file-path: postal_codes_dev.csv
     storage:
       clean: true
       min-io:
