@@ -57,7 +57,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api/petrinet")
 @ConditionalOnProperty(
-        value = "nae.petrinet.web.enabled",
+        value = "netgrif.engine.security.web.petri-net-enabled",
         havingValue = "true",
         matchIfMissing = true
 )

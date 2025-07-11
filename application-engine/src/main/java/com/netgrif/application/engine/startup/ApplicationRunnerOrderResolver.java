@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.startup;
 
+import com.netgrif.application.engine.configuration.properties.RunnerConfigurationProperties;
 import com.netgrif.application.engine.startup.annotation.AfterRunner;
 import com.netgrif.application.engine.startup.annotation.BeforeRunner;
 import com.netgrif.application.engine.startup.annotation.ReplaceRunner;
@@ -19,7 +20,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class ApplicationRunnerOrderResolver {
 
-    private final ApplicationRunnerProperties properties;
+    private final RunnerConfigurationProperties.ApplicationRunnerProperties properties;
 
     /**
      * Sorts the given collection of runners by the {@link RunnerOrder} annotation.

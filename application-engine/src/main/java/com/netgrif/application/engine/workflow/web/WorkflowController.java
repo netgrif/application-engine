@@ -57,7 +57,7 @@ import java.util.Map;
 @RestController()
 @RequestMapping("/api/workflow")
 @ConditionalOnProperty(
-        value = "nae.case.web.enabled",
+        value = "netgrif.engine.public.web.case-enabled",
         havingValue = "true",
         matchIfMissing = true
 )

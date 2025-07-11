@@ -40,7 +40,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/auth")
 @ConditionalOnProperty(
-        value = "nae.auth.web.enabled",
+        value = "netgrif.engine.security.web.auth-enabled",
         havingValue = "true",
         matchIfMissing = true
 )

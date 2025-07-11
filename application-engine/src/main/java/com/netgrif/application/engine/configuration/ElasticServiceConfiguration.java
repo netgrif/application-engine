@@ -17,7 +17,7 @@ import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 
 @Configuration
 @ConditionalOnProperty(
-        value = "nae.elastic.service.configuration.enable",
+        value = "netgrif.engine.data.elasticsearch.service.configuration-enabled",
         matchIfMissing = true,
         havingValue = "true"
 )

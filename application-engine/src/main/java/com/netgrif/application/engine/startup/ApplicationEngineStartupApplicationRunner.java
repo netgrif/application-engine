@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.startup;
 
+import com.netgrif.application.engine.configuration.properties.RunnerConfigurationProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.core.Ordered;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ApplicationEngineStartupApplicationRunner extends ApplicationRunnerExecutor<ApplicationEngineStartupRunner> {
 
-    public ApplicationEngineStartupApplicationRunner(ApplicationRunnerOrderResolver orderResolver, ApplicationRunnerProperties properties) {
+    public ApplicationEngineStartupApplicationRunner(ApplicationRunnerOrderResolver orderResolver, RunnerConfigurationProperties.ApplicationRunnerProperties properties) {
         super(orderResolver, properties);
     }
 

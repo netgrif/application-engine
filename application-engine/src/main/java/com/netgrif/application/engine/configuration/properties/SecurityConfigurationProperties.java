@@ -55,6 +55,8 @@ public class SecurityConfigurationProperties {
 
     private JwtProperties jwt = new JwtProperties();
 
+    private WebProperties web = new WebProperties();
+
     @Data
     @ConfigurationProperties(prefix = "netgrif.engine.security.encryption")
     public static class EncryptionProperties {
@@ -199,5 +201,29 @@ public class SecurityConfigurationProperties {
          * Defines which algorithm is used when generating JWT token
          */
         private String algorithm = "RSA";
+    }
+
+    @Data
+    @ConfigurationProperties(prefix = "netgrif.engine.security.web")
+    public static class WebProperties {
+        public boolean userEnabled = true;
+        public boolean petriNetEnabled = true;
+        public boolean caseEnabled = true;
+        public boolean taskEnabled = true;
+        public boolean authEnabled = true;
+        public boolean elasticEnabled = true;
+        public boolean impersonationEnabled = true;
+        public boolean sessionEnabled = true;
+        public boolean groupEnabled = true;
+        public PublicProperties publicWeb = new PublicProperties();
+
+        @Data
+        public static class PublicProperties {
+            private String url;
+            public boolean petriNetEnabled = true;
+            public boolean caseEnabled = true;
+            public boolean taskEnabled = true;
+            public boolean userEnabled = true;
+        }
     }
 }

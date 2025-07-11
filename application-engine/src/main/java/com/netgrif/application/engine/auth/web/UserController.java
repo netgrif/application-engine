@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 @RequestMapping("api/users")
 @Tag(name = "UserController")
 @ConditionalOnProperty(
-        value = "nae.user.web.enabled",
+        value = "netgrif.engine.user.web.enabled",
         havingValue = "true",
         matchIfMissing = true
 )

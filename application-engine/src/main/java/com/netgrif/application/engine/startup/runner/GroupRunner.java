@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RunnerOrder(110)
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "nae.group.default.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(value = "netgrif.engine.group.default-enabled", havingValue = "true", matchIfMissing = true)
 public class GroupRunner implements ApplicationEngineStartupRunner {
 
     private final GroupService groupService;

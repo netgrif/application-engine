@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "netgrif.engine.impersonation")
 public class ImpersonationConfigurationProperties {
 
-    @Value("${netgrif.engine.data.database-name}")
+    @Value("#{redisProperties.namespace}")
     private String redisNamespace;
     private boolean enabled;
     private int configsPerUser = 1000;

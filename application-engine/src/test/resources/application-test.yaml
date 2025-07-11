@@ -1,4 +1,3 @@
-
 netgrif:
   engine:
     logging:
@@ -34,6 +33,9 @@ netgrif:
         login-attempts: 3
         login-timeout: 3
         login-timeout-unit: seconds
+      web:
+        public-web:
+          url: test.public.url
     pdf:
       resources:
         template-resource: file:src/test/resources/pdfGenerator/example.pdf
@@ -59,8 +61,6 @@ netgrif:
             starttls:
               enable: false
               required: false
-    public:
-      url: test.public.url
 spring:
   main:
     allow-bean-definition-overriding: true

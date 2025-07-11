@@ -20,7 +20,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Configuration
 @EnableWebMvc
 @ConditionalOnProperty(
-        value = "nae.openapi.enabled",
+        value = "netgrif.engine.openapi.enabled",
         havingValue = "true",
         matchIfMissing = true
 )

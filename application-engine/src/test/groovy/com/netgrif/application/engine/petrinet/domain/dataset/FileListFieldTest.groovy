@@ -43,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-@TestPropertySource(properties = "nae.storage.minio.enabled=true")
+@TestPropertySource(properties = "netgrif.engine.storage.minio.enabled=true")
 @AutoConfigureMockMvc
 class FileListFieldTest {
 

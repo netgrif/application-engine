@@ -11,9 +11,9 @@ import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
-import com.netgrif.application.engine.configuration.PublicViewProperties
 import com.netgrif.application.engine.configuration.properties.FilterConfigurationProperties
 import com.netgrif.application.engine.configuration.properties.MailConfigurationProperties
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
@@ -70,7 +70,6 @@ import org.quartz.Scheduler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.FileSystemResource
@@ -188,7 +187,7 @@ class ActionDelegate {
 //    IHistoryService historyService
 
     @Autowired
-    PublicViewProperties publicViewProperties
+    SecurityConfigurationProperties.WebProperties webProperties
 
     FrontendActionOutcome Frontend
 
@@ -2791,7 +2790,7 @@ class ActionDelegate {
         ]
     }
 
-    String makeUrl(String publicViewUrl = publicViewProperties.url, String identifier) {
+    String makeUrl(String publicViewUrl = webProperties.publicWeb.url, String identifier) {
         return "${publicViewUrl}/${Base64.getEncoder().encodeToString(identifier.bytes)}" as String
     }
 

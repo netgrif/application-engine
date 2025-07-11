@@ -2,10 +2,10 @@ package com.netgrif.application.engine.configuration;
 
 import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
+import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.configuration.properties.enumeration.XFrameOptionsMode;
 import com.netgrif.application.engine.configuration.properties.enumeration.XXSSProtection;
-import com.netgrif.application.engine.configuration.security.SessionUtilsProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +32,7 @@ public abstract class AbstractSecurityConfiguration {
     protected SecurityConfigurationProperties.AuthProperties serverAuthProperties;
 
     @Autowired
-    protected SessionUtilsProperties sessionUtilsProperties;
+    protected DataConfigurationProperties.RedisProperties redisProperties;
 
     @Autowired
     private SecurityConfigurationProperties naeAuthProperties;
@@ -220,16 +220,16 @@ public abstract class AbstractSecurityConfiguration {
     }
 
     protected void configureSession(HttpSecurity http) throws Exception {
-        if (sessionUtilsProperties.isEnabledLimitSession()) {
+        if (redisProperties.isEnabledLimitSession()) {
             http.sessionManagement(httpSecuritySessionManagementConfigurer -> {
-                httpSecuritySessionManagementConfigurer.maximumSessions(sessionUtilsProperties.getMaxSession());
+                httpSecuritySessionManagementConfigurer.maximumSessions(redisProperties.getMaxSession());
                 httpSecuritySessionManagementConfigurer.sessionFixation().newSession();
             });
         }
     }
 
     protected void configureFilters(HttpSecurity http) {
-        if (sessionUtilsProperties.isEnabledFilter()) {
+        if (redisProperties.isEnabledFilter()) {
 //            http.addFilterBefore(new LoginAttemptsFilter(), ChannelProcessingFilter.class);
         }
     }

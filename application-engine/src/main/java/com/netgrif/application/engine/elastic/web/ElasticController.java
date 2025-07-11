@@ -33,7 +33,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/elastic")
 @ConditionalOnProperty(
-        value = "nae.elastic.web.enabled",
+        value = "netgrif.engine.security.web.elastic-enabled",
         havingValue = "true",
         matchIfMissing = true
 )

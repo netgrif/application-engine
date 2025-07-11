@@ -108,11 +108,11 @@ public class DataConfigurationProperties {
     @ConfigurationProperties(prefix = "netgrif.engine.data.elasticsearch")
     public static class ElasticsearchProperties {
 
-        private String url;
+        private String url = "localhost";
 
-        private int port;
+        private int port = 9300;
 
-        private int searchPort;
+        private int searchPort = 9200;
 
         private String reindex;
 
@@ -139,6 +139,10 @@ public class DataConfigurationProperties {
         private List<String> defaultFilters = new ArrayList<>();
 
         private List<String> defaultSearchFilters = new ArrayList<>();
+
+        private ServiceProperties service = new ServiceProperties();
+
+        private PriorityProperties priority = new PriorityProperties();
 
         public static final String PETRI_NET_INDEX = "petriNet";
 
@@ -171,6 +175,23 @@ public class DataConfigurationProperties {
             private int size = 500;
             private int timeout = 5;
         }
+
+        @Data
+        public static class ServiceProperties {
+            private boolean configurationEnabled = true;
+            private boolean priority;
+        }
+
+        @Data
+        public static class PriorityProperties {
+            private List<String> fullTextFields = List.of(
+                    "title.keyword^2",
+                    "authorName^1",
+                    "authorEmail^1",
+                    "visualId.keyword^2"
+            );
+
+        }
     }
 
     @Data
@@ -181,6 +202,9 @@ public class DataConfigurationProperties {
         private int port;
         private String username;
         private String password;
+        private boolean enabledLimitSession = false;
+        private int maxSession = 1;
+        private boolean enabledFilter = false;
     }
 
     @Data

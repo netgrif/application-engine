@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "nae.dashboard")
+@ConfigurationProperties(prefix = "netgrif.engine.dashboard")
 public class DashboardProperties {
 
     private Boolean enabled = false;
