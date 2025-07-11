@@ -30,7 +30,7 @@ public class SecurityConfigurationProperties {
      */
     private List<String> allowedOrigins;
 
-    private String realmName;
+    private String realmName = "NAE-Realm";
 
     private String[] providers;
 
