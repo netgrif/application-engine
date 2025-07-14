@@ -32,21 +32,21 @@ public class Case extends com.netgrif.application.engine.objects.workflow.domain
         return super.get_id();
     }
 
-    @org.springframework.data.mongodb.core.mapping.Field("activePlaces")
-    @JsonIgnore
     @Override
+    @JsonIgnore
+    @org.springframework.data.mongodb.core.mapping.Field("activePlaces")
     public Map<String, Integer> getActivePlaces() {
         return super.getActivePlaces();
     }
 
-    @JsonIgnore
     @Override
+    @JsonIgnore
     public Map<String, Integer> getConsumedTokens() {
         return super.getConsumedTokens();
     }
 
-    @JsonIgnore
     @Override
+    @JsonIgnore
     public Map<String, DataField> getDataSet() {
         return super.getDataSet();
     }
@@ -56,8 +56,8 @@ public class Case extends com.netgrif.application.engine.objects.workflow.domain
         return super.getTasks();
     }
 
-    @JsonIgnore
     @Override
+    @JsonIgnore
     public Set<String> getEnabledRoles() {
         return super.getEnabledRoles();
     }
@@ -67,33 +67,33 @@ public class Case extends com.netgrif.application.engine.objects.workflow.domain
         return super.getImmediateData();
     }
 
-    @JsonIgnore
     @Override
+    @JsonIgnore
     public Set<String> getImmediateDataFields() {
         return super.getImmediateDataFields();
     }
 
-    @LastModifiedDate
     @Override
+    @LastModifiedDate
     public LocalDateTime getLastModified() {
         return super.getLastModified();
     }
 
-    @JsonIgnore
-    @Transient
     @Override
+    @Transient
+    @JsonIgnore
     public PetriNet getPetriNet() {
         return super.getPetriNet();
     }
 
-    @JsonIgnore
     @Override
+    @JsonIgnore
     public List<String> getViewUserRefs() {
         return super.getViewUserRefs();
     }
 
-    @JsonIgnore
     @Override
+    @JsonIgnore
     public List<String> getViewUsers() {
         return super.getViewUsers();
     }
