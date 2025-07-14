@@ -142,7 +142,7 @@ jobs:
         with:
           java-version: 21
           distribution: 'temurin'
-          server-id: ossrh
+          server-id: central
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
 
@@ -186,6 +186,14 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_AUTH_TOKEN }}
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          install: true
+
       - name: Get Project Version from pom.xml
         uses: entimaniac/read-pom-version-action@1.0.0
         id: getVersion
@@ -193,14 +201,20 @@ jobs:
       - name: Push Version ${{ steps.getVersion.outputs.version }}
         uses: docker/build-push-action@v6
         with:
+          context: .
+          file: ./Dockerfile
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: netgrif/application-engine:${{ steps.getVersion.outputs.version }}
 
       - name: Push Latest
-        if:  ${{ !contains(steps.getVersion.outputs.version, '-SNAPSHOT') }}
+        if: ${{ !contains(steps.getVersion.outputs.version, '-SNAPSHOT') }}
         uses: docker/build-push-action@v6
         with:
+          context: .
+          file: ./Dockerfile
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: netgrif/application-engine:latest
 
   publish-artifact:
