@@ -31,4 +31,6 @@ public class PetriNetSearch {
     private List<String> negativeViewRoles;
 
     private Map<String, String> tags;
+
+    private String search;
 }
