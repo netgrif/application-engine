@@ -119,15 +119,40 @@ netgrif:
         health:
           show-details: when_authorized
           probes:
-            enabled: true
+            enabled: 'true'
         log-file:
           external-file: log/nae.log
       info:
         build:
-          enabled: false
+          enabled: 'false'
         env:
-          enabled: true
+          enabled: 'true'
     logging:
       config: classpath:logback.xml
       file:
         path: log
+      endpoints: 'true'
+      level:
+        org:
+          springframework:
+            data:
+              elasticsearch:
+                core: info
+              mongodb:
+                core:
+                  MongoTemplate: info
+        com:
+          netgrif:
+            application:
+              engine:
+                elastic:
+                  service: info
+                petrinet:
+                  domain:
+                    dataset:
+                      logic:
+                        action:
+                          FieldActionsRunner: debug
+                          runner:
+                            RoleActionsRunner: debug
+                            CaseFieldsExpressionRunner: debug

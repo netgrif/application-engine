@@ -3,7 +3,6 @@ package com.netgrif.application.engine;
 import com.netgrif.application.engine.configuration.ApplicationContextProvider;
 import com.netgrif.application.engine.configuration.JsonRootRelProvider;
 import com.netgrif.application.engine.configuration.groovy.converter.GStringToStringConverter;
-import com.netgrif.application.engine.configuration.properties.MainConfigurationProperties;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Aspect;
