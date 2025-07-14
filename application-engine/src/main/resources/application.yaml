@@ -1,9 +1,9 @@
-logging:
-  config: classpath:logback.xml
-  file:
-    path: log
 netgrif:
   engine:
+    main:
+      allow-bean-definition-overriding: true
+      allow-circular-references: true
+      auto-configure-exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
     data:
       drop: false
       database-name: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}
@@ -127,3 +127,7 @@ netgrif:
           enabled: false
         env:
           enabled: true
+    logging:
+      config: classpath:logback.xml
+      file:
+        path: log

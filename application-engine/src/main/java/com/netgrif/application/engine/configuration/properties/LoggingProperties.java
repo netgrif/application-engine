@@ -22,4 +22,11 @@ public class LoggingProperties {
      * Controlled via the property "logging.endpoints" in the application configuration.
      */
     private boolean endpoints = false;
+    private String config;
+    private FileProperties file = new FileProperties();
+
+    @Data
+    public static class FileProperties {
+        private String path;
+    }
 }

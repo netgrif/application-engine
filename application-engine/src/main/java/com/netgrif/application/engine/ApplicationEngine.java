@@ -3,12 +3,11 @@ package com.netgrif.application.engine;
 import com.netgrif.application.engine.configuration.ApplicationContextProvider;
 import com.netgrif.application.engine.configuration.JsonRootRelProvider;
 import com.netgrif.application.engine.configuration.groovy.converter.GStringToStringConverter;
-import com.netgrif.application.engine.configuration.properties.DefaultMainConfigurationProperties;
+import com.netgrif.application.engine.configuration.properties.MainConfigurationProperties;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -62,7 +61,6 @@ public class ApplicationEngine {
     public static void main(String[] args) {
         SpringApplication application = new SpringApplicationBuilder()
                 .sources(ApplicationEngine.class)
-                .properties(DefaultMainConfigurationProperties.DEFAULT_MAIN_PROPERTIES)
                 .build();
         application.run(args);
     }
