@@ -198,8 +198,8 @@ public class DataConfigurationProperties {
     @EqualsAndHashCode(callSuper = true)
     @ConfigurationProperties(prefix = "netgrif.engine.session")
     public static class RedisProperties extends RedisSessionProperties {
-        private String host;
-        private int port;
+        private String host = "localhost";
+        private int port = 6379;
         private String username;
         private String password;
         private boolean enabledLimitSession = false;

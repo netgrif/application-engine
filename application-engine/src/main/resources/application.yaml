@@ -24,6 +24,8 @@ netgrif:
           task: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_taks
       redis:
         namespace: nae
+        host: ${NETGRIF_ENGINE_DATA_REDIS_HOST:localhost}
+        port: ${NETGRIF_ENGINE_DATA_REDIS_PORT:6379}
     jackson:
       default-property-inclusion: non_null
       serialization:
