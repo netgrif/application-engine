@@ -19,7 +19,7 @@ import static org.bouncycastle.cms.RecipientId.password;
 @Configuration
 @EnableRedisIndexedHttpSession(redisNamespace = "spring:session:${netgrif.engine.data.redis.namespace}")
 @ConditionalOnProperty(
-        value = "netgrif.engine.server.security.static.enabled",
+        value = "netgrif.engine.security.static.enabled",
         havingValue = "false",
         matchIfMissing = true
 )
