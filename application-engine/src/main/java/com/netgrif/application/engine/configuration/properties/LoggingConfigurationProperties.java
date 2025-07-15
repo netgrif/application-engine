@@ -1,9 +1,11 @@
 package com.netgrif.application.engine.configuration.properties;
 
-import clojure.lang.IFn;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -14,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "netgrif.engine.logging")
-public class LoggingProperties {
+public class LoggingConfigurationProperties {
 
     /**
      * Enables or disables logging of REST endpoint requests.
@@ -24,6 +26,7 @@ public class LoggingProperties {
     private boolean endpoints = false;
     private String config;
     private FileProperties file = new FileProperties();
+    private Map<String, Object> level = new HashMap<>();
 
     @Data
     public static class FileProperties {
