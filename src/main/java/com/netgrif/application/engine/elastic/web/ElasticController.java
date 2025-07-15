@@ -85,4 +85,18 @@ public class ElasticController {
             return MessageResource.errorMessage(e.getMessage());
         }
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping(value = "/index/cursor", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public MessageResource cursorAllReindex() {
+        try {
+
+            reindexingTask.reindex();
+            return MessageResource.successMessage("Success");
+
+        } catch (Exception e) {
+            log.error("Could not index: ", e);
+            return MessageResource.errorMessage(e.getMessage());
+        }
+    }
 }

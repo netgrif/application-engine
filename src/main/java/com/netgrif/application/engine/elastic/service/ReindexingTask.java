@@ -1,10 +1,8 @@
 package com.netgrif.application.engine.elastic.service;
 
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
+import com.netgrif.application.engine.elastic.service.interfaces.*;
+import com.netgrif.application.engine.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -13,6 +11,7 @@ import com.netgrif.application.engine.workflow.domain.repositories.TaskRepositor
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +30,7 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @ConditionalOnExpression("'${spring.data.elasticsearch.reindex}'!= 'null'")
@@ -35,17 +38,19 @@ public class ReindexingTask {
 
     private static final Logger log = LoggerFactory.getLogger(ReindexingTask.class);
 
-    private int pageSize;
-    private CaseRepository caseRepository;
-    private TaskRepository taskRepository;
-    private ElasticCaseRepository elasticCaseRepository;
-    private IElasticCaseService elasticCaseService;
-    private IElasticTaskService elasticTaskService;
-    private IElasticCaseMappingService caseMappingService;
-    private IElasticTaskMappingService taskMappingService;
-    private IWorkflowService workflowService;
-
+    private final int pageSize;
+    private final CaseRepository caseRepository;
+    private final TaskRepository taskRepository;
+    private final ElasticCaseRepository elasticCaseRepository;
+    private final IElasticCaseService elasticCaseService;
+    private final IElasticTaskService elasticTaskService;
+    private final IElasticCaseMappingService caseMappingService;
+    private final IElasticTaskMappingService taskMappingService;
+    private final IWorkflowService workflowService;
+    private final MongoTemplate mongoTemplate;
+    private final PetriNetService petriNetService;
     private LocalDateTime lastRun;
+    private final IBulkService bulkService;
 
     @Autowired
     public ReindexingTask(
@@ -59,6 +64,9 @@ public class ReindexingTask {
             IElasticCaseMappingService caseMappingService,
             IElasticTaskMappingService taskMappingService,
             IWorkflowService workflowService,
+            IBulkService bulkService,
+            MongoTemplate mongoTemplate,
+            PetriNetService petriNetService,
             @Value("${spring.data.elasticsearch.reindexExecutor.size:20}") int pageSize,
             @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from) {
         this.caseRepository = caseRepository;
@@ -69,7 +77,10 @@ public class ReindexingTask {
         this.caseMappingService = caseMappingService;
         this.taskMappingService = taskMappingService;
         this.workflowService = workflowService;
+        this.mongoTemplate = mongoTemplate;
+        this.petriNetService = petriNetService;
         this.pageSize = pageSize;
+        this.bulkService = bulkService;
 
         lastRun = LocalDateTime.now();
         if (from != null) {
@@ -81,23 +92,56 @@ public class ReindexingTask {
     public void reindex() {
         log.info("Reindexing stale cases: started reindexing after " + lastRun);
 
-        BooleanExpression predicate = QCase.case$.lastModified.before(LocalDateTime.now()).and(QCase.case$.lastModified.after(lastRun.minusMinutes(2)));
-
+        LocalDateTime now = LocalDateTime.now();
+        BooleanExpression predicate = QCase.case$.lastModified.before(now).and(QCase.case$.lastModified.after(lastRun.minusMinutes(2)));
+        LocalDateTime lastRunOld = lastRun;
         lastRun = LocalDateTime.now();
+
         long count = caseRepository.count(predicate);
         if (count > 0) {
-            reindexAllPages(predicate, count);
+            reindexAllPages(count, now, lastRunOld);
         }
 
         log.info("Reindexing stale cases: end");
     }
 
-    private void reindexAllPages(BooleanExpression predicate, long count) {
+    private void reindexAllPages(long count, LocalDateTime now, LocalDateTime lastRunOld) {
         long numOfPages = ((count / pageSize) + 1);
         log.info("Reindexing " + numOfPages + " pages");
+        ObjectId lastId = null;
 
-        for (int page = 0; page < numOfPages; page++) {
-            reindexPage(predicate, page, numOfPages, false);
+        long page = 0;
+        while (true) {
+            page++;
+            log.info("Reindexing " + page + " / " + numOfPages);
+            Query query = new Query();
+
+            if (lastId != null) {
+                query.addCriteria(Criteria.where("_id").gt(lastId));
+            }
+            query.addCriteria(Criteria.where("lastModified").lt(now).gt(lastRunOld.minusMinutes(2)));
+            query.limit(pageSize);
+
+            List<Case> cases = mongoTemplate.find(query, Case.class);
+            List<Case> casesToIndex = cases.stream().filter(it -> elasticCaseRepository.countByStringIdAndLastModified(it.getStringId(), Timestamp.valueOf(it.getLastModified()).getTime()) == 0).collect(Collectors.toList());
+            if (casesToIndex.isEmpty()) {
+                break;
+            }
+
+            casesToIndex.forEach(c -> {
+                if (c.getPetriNet() == null) {
+                    c.setPetriNet(petriNetService.get(c.getPetriNetObjectId()));
+                }
+            });
+
+            bulkService.bulkIndexCases(casesToIndex);
+
+            List<String> caseIds = casesToIndex.stream().map(Case::getStringId).collect(Collectors.toList());
+            List<Task> tasksToReindex = taskRepository.findAllByCaseIdIn(caseIds);
+
+            bulkService.bulkIndexTasks(tasksToReindex);
+
+            lastId = cases.get(cases.size() - 1).get_id();
         }
     }
 

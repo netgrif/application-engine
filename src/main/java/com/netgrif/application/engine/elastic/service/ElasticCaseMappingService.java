@@ -3,6 +3,7 @@ package com.netgrif.application.engine.elastic.service;
 
 import com.netgrif.application.engine.elastic.domain.BooleanField;
 import com.netgrif.application.engine.elastic.domain.ButtonField;
+import com.netgrif.application.engine.elastic.domain.CaseField;
 import com.netgrif.application.engine.elastic.domain.DateField;
 import com.netgrif.application.engine.elastic.domain.FileField;
 import com.netgrif.application.engine.elastic.domain.I18nField;
@@ -77,6 +78,8 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return this.transformFileListField(caseField);
         } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.UserListField) {
             return this.transformUserListField(caseField);
+        } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.CaseField) {
+            return this.transformCaseField(caseField);
         } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.I18nField) {
             return this.transformI18nField(caseField, (com.netgrif.application.engine.petrinet.domain.dataset.I18nField) netField);
         } else {
@@ -281,6 +284,10 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
     protected Optional<DataField> transformFileListField(com.netgrif.application.engine.workflow.domain.DataField fileListField) {
         return Optional.of(new FileField(((FileListFieldValue) fileListField.getValue()).getNamesPaths().toArray(new FileFieldValue[0])));
+    }
+
+    protected Optional<DataField> transformCaseField(com.netgrif.application.engine.workflow.domain.DataField caseField) {
+        return Optional.of(new CaseField((List<String>) caseField.getValue()));
     }
 
     protected Optional<DataField> transformOtherFields(com.netgrif.application.engine.workflow.domain.DataField otherField, Field netField) {
