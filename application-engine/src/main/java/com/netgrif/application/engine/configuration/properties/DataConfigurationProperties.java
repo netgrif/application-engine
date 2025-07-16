@@ -26,6 +26,7 @@ import java.util.Map;
  * related to REST API settings.
  */
 @Data
+@Configuration
 @ConfigurationProperties(prefix = "netgrif.engine.data")
 public class DataConfigurationProperties {
 
@@ -82,7 +83,6 @@ public class DataConfigurationProperties {
     }
 
     @Bean
-    @Primary
     public ElasticsearchProperties elasticsearchProperties() {
         if (elasticsearch.getDrop() == null) {
             elasticsearch.setDrop(drop);
@@ -114,10 +114,9 @@ public class DataConfigurationProperties {
      * Spring Data REST functionalities while adding application-specific customizations.
      */
     @Data
-    @Configuration
+    @Primary
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
-    @ConfigurationProperties(prefix = "netgrif.engine.data.rest")
     public static class RestProperties extends RepositoryRestProperties {
     }
 
@@ -127,7 +126,6 @@ public class DataConfigurationProperties {
     @Data
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
-    @ConfigurationProperties(prefix = "netgrif.engine.data.mongodb")
     public static class MongoProperties extends org.springframework.boot.autoconfigure.mongo.MongoProperties {
         
         /**
@@ -146,7 +144,6 @@ public class DataConfigurationProperties {
      */
     @Data
     @NoArgsConstructor
-    @ConfigurationProperties(prefix = "netgrif.engine.data.elasticsearch")
     public static class ElasticsearchProperties {
         /**
          * Hostname for the Elasticsearch server.
@@ -394,7 +391,6 @@ public class DataConfigurationProperties {
      * specific validation settings.
      */
     @Data
-    @ConfigurationProperties(prefix = "netgrif.engine.data.validation")
     public static class ValidationProperties {
 
         /**
