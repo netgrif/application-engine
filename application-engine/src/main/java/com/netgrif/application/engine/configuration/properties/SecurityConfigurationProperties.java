@@ -23,7 +23,7 @@ public class SecurityConfigurationProperties {
      * Defines whether Cross-Site Request Forgery (CSRF) is enabled.
      * CSRF helps prevent unauthorized commands from being transmitted from a user that the web application trusts.
      */
-    private boolean csrf = true;
+    private boolean csrf = false;
 
     /**
      * Enables or disables Cross-Origin Resource Sharing (CORS).
