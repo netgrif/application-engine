@@ -235,7 +235,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     @Override
     public List<ProcessRole> saveAll(Iterable<ProcessRole> entities) {
         return StreamSupport.stream(entities.spliterator(), false).map(processRole -> {
-            if (!processRole.isGlobal() || processRoleRepository.findByImportId(processRole.getImportId()) == null) {
+            if (!processRole.isGlobal() || processRoleRepository.findByImportId(processRole.getImportId()).isEmpty()) {
                 return processRoleRepository.save(processRole);
             }
             return null;

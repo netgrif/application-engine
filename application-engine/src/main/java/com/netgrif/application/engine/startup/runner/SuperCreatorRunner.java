@@ -113,7 +113,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     }
 
     public void setAllAuthorities() {
-        superUser.setAuthorities(Set.copyOf(authorityService.findAll(Pageable.unpaged()).stream().toList()));
+        superUser.setAuthorities(new HashSet<>(authorityService.findAll(Pageable.unpaged()).stream().toList()));
         superUser = userService.saveUser(superUser, null);
     }
 

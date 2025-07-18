@@ -252,13 +252,8 @@ public class UserServiceImpl implements UserService {
         }
         IUser user = userOptional.get();
 
-        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-        Page<ProcessRole> processRoles;
-        do {
-            processRoles = processRoleService.findAll(pageable);
-            user.getProcessRoles().addAll(processRoles.getContent());
-            pageable = pageable.next();
-        } while (processRoles.hasNext());
+        Page<ProcessRole> processRoles = processRoleService.findAll(Pageable.unpaged());
+        user.getProcessRoles().addAll(processRoles.getContent());
 
         saveUser(user, user.getRealmId());
     }

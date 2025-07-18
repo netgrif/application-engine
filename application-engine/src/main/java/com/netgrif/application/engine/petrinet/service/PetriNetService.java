@@ -385,7 +385,7 @@ public class PetriNetService implements IPetriNetService {
             );
             AggregationResults<Document> countResults = mongoTemplate.aggregate(
                     countAggregation,
-                    "your_collection_name",
+                    "petriNet",
                     Document.class
             );
             long total = countResults.getUniqueMappedResult() != null

@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "netgrif.pagination")
+@ConfigurationProperties(prefix = "netgrif.engine.pagination")
 public class PaginationProperties {
 
     /**
