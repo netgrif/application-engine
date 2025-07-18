@@ -56,11 +56,6 @@ public class Realm implements Serializable {
     private transient List<AuthMethodConfig<?>> authMethods = new ArrayList<>();
 
     /**
-     * Set of user IDs associated with this realm.
-     */
-    private Set<String> userIds = new HashSet<>();
-
-    /**
      * Indicates whether this realm has administrative privileges.
      */
     private boolean adminRealm;

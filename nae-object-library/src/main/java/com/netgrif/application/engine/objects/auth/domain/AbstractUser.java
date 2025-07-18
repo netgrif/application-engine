@@ -102,7 +102,7 @@ public abstract class AbstractUser extends AbstractActor {
      * @param key credential identifier
      * @param credential credential value object
      */
-    public void setCredential(String key, Credential<?> credential) {}
+    public abstract void setCredential(String key, Credential<?> credential);
 
     /**
      * Sets a credential with specified parameters.
@@ -111,14 +111,14 @@ public abstract class AbstractUser extends AbstractActor {
      * @param order credential priority order
      * @param enabled whether credential is enabled
      */
-    public void setCredential(String type, String value, int order, boolean enabled) {}
+    public abstract void setCredential(String type, String value, int order, boolean enabled);
 
     /**
      * Activates Multi-Factor Authentication for the user.
      * @param type MFA type identifier
      * @param secret MFA secret key
      */
-    public void activateMFA(String type, String secret) {}
+    public abstract void activateMFA(String type, String secret);
 
     /**
      * Activates Multi-Factor Authentication with enabled state.
@@ -126,31 +126,27 @@ public abstract class AbstractUser extends AbstractActor {
      * @param secret MFA secret key
      * @param enabled whether MFA should be enabled
      */
-    public void activateMFA(String type, String secret, boolean enabled) {}
+    public abstract void activateMFA(String type, String secret, boolean enabled);
 
     /**
      * Checks if a credential is enabled.
      * @param type credential type to check
      * @return true if credential is enabled, false otherwise
      */
-    public boolean isCredentialEnabled(String type) {
-        return false;
-    }
+    public abstract boolean isCredentialEnabled(String type);
 
     /**
      * Gets a credential by its type.
      * @param type credential type
      * @return credential object or null if not found
      */
-    public Credential<?> getCredential(String type) {
-        return null;
-    }
+    public abstract Credential<?> getCredential(String type);
 
     /**
      * Disables a credential by its type.
      * @param type credential type to disable
      */
-    public void disableCredential(String type) {}
+    public abstract void disableCredential(String type);
 
     /**
      * Sets a property for a specific credential.
@@ -158,7 +154,7 @@ public abstract class AbstractUser extends AbstractActor {
      * @param key property key
      * @param value property value
      */
-    public void setCredentialProperty(String type, String key, Object value) {}
+    public abstract void setCredentialProperty(String type, String key, Object value);
 
     /**
      * Gets a property value from a credential.
@@ -166,9 +162,7 @@ public abstract class AbstractUser extends AbstractActor {
      * @param key property key
      * @return property value or null if not found
      */
-    public Object getCredentialProperty(String type, String key) {
-        return null;
-    }
+    public abstract Object getCredentialProperty(String type, String key);
 
     /**
      * {@inheritDoc}

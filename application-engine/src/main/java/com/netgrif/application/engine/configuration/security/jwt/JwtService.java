@@ -70,19 +70,16 @@ public class JwtService implements IJwtService {
     @Override
     public LoggedUser getLoggedUser(String token, String authority) {
         LinkedHashMap<String, Object> userMap = (LinkedHashMap<String, Object>) extractAllClaims(token).get("user");
-//        LoggedUser user = new LoggedUserImpl(
-//                userMap.get("id").toString(),
-//                userMap.get("username").toString(),
-//                userMap.get("password").toString(),
-//                Collections.singleton(authorityService.getOrCreate(authority)),
-//                Collections.singleton(roleService.anonymousRole()),
-//                Collections.emptySet()
-//        );
-        // TODO!!!
+
         LoggedUser user = new LoggedUserImpl();
+        user.setId(userMap.get("id").toString());
+        user.setUsername(userMap.get("username").toString());
+        user.setPassword(userMap.get("password").toString());
+        user.setAuthoritySet(Collections.singleton(authorityService.getOrCreate(authority)));
+        user.setProcessRoles(Collections.singleton(roleService.anonymousRole()));
         user.setFirstName(userMap.get("firstName").toString());
         user.getAttributes().put("anonymous", new Attribute<>(true, false));
-        user.setProcessRoles(Collections.singleton(roleService.anonymousRole()));
+
         return user;
     }
 
