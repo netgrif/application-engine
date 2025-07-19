@@ -17,6 +17,7 @@ import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetRefere
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.service.interfaces.IConfigurableMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -91,7 +92,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     public Map<String, I18nString> getAvailableRolesFromNet(EnumerationMapField processField, MultichoiceMapField permittedRoles, MultichoiceMapField bannedRoles) {
 
         if (GLOBAL_ROLE.equals(processField.getValue())) {
-            return processRoleService.findAllGlobalRoles().stream()
+            return processRoleService.findAllGlobalRoles(Pageable.unpaged()).stream()
                     .filter(role -> !permittedRoles.getOptions().containsKey(role.getImportId() + ":" + GLOBAL_ROLE)
                             && !bannedRoles.getOptions().containsKey(role.getImportId() + ":" + GLOBAL_ROLE))
                     .collect(Collectors.toMap(

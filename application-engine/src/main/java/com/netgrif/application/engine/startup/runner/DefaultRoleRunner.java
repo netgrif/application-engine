@@ -30,8 +30,8 @@ public class DefaultRoleRunner implements ApplicationEngineStartupRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("Creating default process role");
-        List<ProcessRole> role = (List<ProcessRole>) processRoleService.findAllByDefaultName(ProcessRole.DEFAULT_ROLE);
-        if (role != null && !role.isEmpty()) {
+        ProcessRole role = processRoleService.findByImportId(ProcessRole.DEFAULT_ROLE);
+        if (role != null) {
             log.info("Default role already exists");
             return;
         }

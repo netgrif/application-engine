@@ -262,7 +262,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<List<Authority>> getAllAuthorities() {
-        return ResponseEntity.ok(authorityService.findAll());
+        return ResponseEntity.ok(authorityService.findAll(Pageable.unpaged()).stream().toList());
     }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")

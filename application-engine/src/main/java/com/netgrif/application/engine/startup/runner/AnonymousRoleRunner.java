@@ -28,8 +28,8 @@ public class AnonymousRoleRunner implements ApplicationEngineStartupRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("Creating anonymous process role");
-        List<ProcessRole> role = processRoleService.findAllByImportId(ProcessRole.ANONYMOUS_ROLE);
-        if (role != null && !role.isEmpty()) {
+        ProcessRole role = processRoleService.findByImportId(ProcessRole.ANONYMOUS_ROLE);
+        if (role != null) {
             log.info("Anonymous role already exists");
             return;
         }

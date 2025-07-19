@@ -11,16 +11,50 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository interface for managing {@link Group} entities in the MongoDB database.
+ * Extends the {@link MongoRepository} interface for basic CRUD operations.
+ */
 @Repository
 public interface GroupRepository extends MongoRepository<Group, String>, QuerydslPredicateExecutor<Group> {
+
     List<Group> findByOwnerId(String id);
 
+    /**
+     * Finds paginated list of all {@link Group} entities that have the given owner ID.
+     *
+     * @param id the ID of the owner
+     * @param pageable the pagination information
+     * @return a set of {@link Group} entities associated with the specified owner ID
+     */
+    Page<Group> findByOwnerId(String id, Pageable pageable);
+
+    /**
+     * Finds a {@link Group} by its unique identifier.
+     *
+     * @param identifier the unique identifier of the group
+     * @return an {@link Optional} containing the {@link Group} if it exists, otherwise {@code Optional.empty()}
+     */
     Optional<Group> findByIdentifier(String identifier);
 
-    List<Group> findAllByMemberIdsContains(String memberId);
+    //List<Group> findAllByMemberIdsContains(String memberId);
 
+    /**
+     * Finds all {@link Group}s with given IDs in a pageable format.
+     *
+     * @param ids the collection of group IDs to query
+     * @param pageable the pagination information
+     * @return a {@link Page} of {@link Group}s with the specified IDs
+     */
     Page<Group> findAllByIdIn(Collection<String> ids, Pageable pageable);
 
+    /**
+     * Finds all {@link Group}s associated with a particular realm ID in a pageable format.
+     *
+     * @param realmId the ID of the realm
+     * @param pageable the pagination information
+     * @return a {@link Page} of {@link Group}s belonging to the specified realm
+     */
     Page<Group> findAllByRealmId(String realmId, Pageable pageable);
 
     Page<Group> findAllByRealmIdIn(Collection<String> realmIds, Pageable pageable);

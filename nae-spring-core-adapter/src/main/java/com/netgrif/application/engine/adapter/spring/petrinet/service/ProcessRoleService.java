@@ -6,6 +6,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.*;
@@ -13,6 +14,9 @@ import java.util.*;
 public interface ProcessRoleService {
     ProcessRole save(ProcessRole processRole);
     List<ProcessRole> saveAll(Iterable<ProcessRole> processRoles);
+    Page<ProcessRole> getAll(Pageable pageable);
+    Page<ProcessRole> findAllByNetId(String netId, Pageable pageable);
+    Optional<ProcessRole> get(ProcessResourceId id);
     void delete(String id);
     void deleteAll(Collection<String> ids);
     void deleteAll();
@@ -27,11 +31,15 @@ public interface ProcessRoleService {
     List<ProcessRole> findAllByNetIdentifier(String identifier);
     Collection<ProcessRole> findAllByIds(Collection<ProcessResourceId> roleIds);
     ProcessRole findById(ProcessResourceId id);
-    Collection<ProcessRole> findAllByDefaultName(String name);
-    List<ProcessRole> findAllByImportId(String importId);
+
+    Page<ProcessRole> findAllByDefaultName(String name, Pageable pageable);
+    Page<ProcessRole> findAllByImportId(String importId, Pageable pageable);
     ProcessRole findById(String id);
-    List<ProcessRole> findByIds(Collection<String> ids);
-    List<ProcessRole> findAllGlobalRoles();
+    Set<ProcessRole> findByIds(Collection<String> ids);
+    ProcessRole findByImportId(String importId);
+    Page<ProcessRole> findAll(Pageable pageable);
+    Page<ProcessRole> findAllGlobalRoles(Pageable pageable);
+    List<ProcessRole> findAll(String netId);
 
     ProcessRole defaultRole();
     ProcessRole anonymousRole();

@@ -147,9 +147,9 @@
 		<action trigger="get">
 			moveDestUri: f.move_dest_uri;
 
-			String uriNodeId = elasticCaseService.findUriNodeId(useCase)
-			def node = uriService.findById(uriNodeId)
-			updateMultichoiceWithCurrentNode(moveDestUri, node)
+//			String uriNodeId = elasticCaseService.findUriNodeId(useCase)
+//			def node = uriService.findById(uriNodeId)
+//			updateMultichoiceWithCurrentNode(moveDestUri, node)
 		</action>
 		<action trigger="set">
 			prevDestUri: f.move_previous_dest_uri,

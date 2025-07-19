@@ -23,6 +23,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -278,7 +279,8 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
         List<PetriNet> petriNets;
         if (processes.isEmpty()) {
-            petriNets = petriNetService.getAll();
+            // TODO JOFO: unpaged necessary?
+            petriNets = petriNetService.getAll(Pageable.unpaged()).getContent();
         } else {
             petriNets = processes.stream().map(process -> petriNetService.getNewestVersionByIdentifier(process)).collect(Collectors.toList());
         }

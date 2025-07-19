@@ -200,7 +200,7 @@ public interface UserService {
      * @param realmId the realm identifier
      * @return list of found users
      */
-    List<AbstractUser> findAllByIds(Collection<String> ids, String realmId);
+    Page<AbstractUser> findAllByIds(Collection<String> ids, String realmId, Pageable pageable);
 
     /**
      * Finds all active users with specific process roles.
@@ -219,7 +219,7 @@ public interface UserService {
      * @param realmIds collection of realm identifiers
      * @return page of users
      */
-    Page<AbstractUser> findAllActiveByProcessRoles(Collection<ProcessResourceId> roleIds, Pageable pageable, Collection<String> realmIds);
+    Page<AbstractUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable, String realmId);
 
     /**
      * Finds all users with specific process roles in specific realms.
@@ -228,15 +228,7 @@ public interface UserService {
      * @param realmIds collection of realm identifiers
      * @return list of users
      */
-    List<AbstractUser> findAllByProcessRoles(Collection<ProcessResourceId> roleIds, Collection<String> realmIds);
-
-    /**
-     * Finds all users with specific process roles.
-     *
-     * @param roleIds collection of process role identifiers
-     * @return list of users
-     */
-    List<AbstractUser> findAllByProcessRoles(Collection<ProcessResourceId> roleIds);
+    Page<AbstractUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, String realmId, Pageable pageable);
 
     /**
      * Adds default authorities to a user.
@@ -417,7 +409,7 @@ public interface UserService {
      * @param realmIds collection of realm identifiers
      * @return list of matching users
      */
-    List<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
+    Page<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, String realmIds, Pageable pageable);
 
     /**
      * Gets all groups associated with an actor.
