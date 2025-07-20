@@ -43,7 +43,7 @@ import java.util.Locale;
 @RestController
 @RequestMapping("/api/task")
 @ConditionalOnProperty(
-        value = "netgrif.engine.public.web.task-enabled",
+        value = "netgrif.engine.web.task-enabled",
         havingValue = "true",
         matchIfMissing = true
 )
