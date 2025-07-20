@@ -388,9 +388,12 @@ public class PetriNetService implements IPetriNetService {
                     "petriNet",
                     Document.class
             );
-            long total = countResults.getUniqueMappedResult() != null
-                    ? countResults.getUniqueMappedResult().getLong("total")
-                    : 0L;
+
+            Number totalNumber = countResults.getUniqueMappedResult() != null
+                    ? countResults.getUniqueMappedResult().get("total", Number.class)
+                    : 0;
+            long total = totalNumber != null ? totalNumber.longValue() : 0L;
+
             references = new PageImpl<>(referenceList, pageable, total);
         } else {
             references = repository.findAllByVersion(version, pageable).map(net -> transformToReference(net, locale));
