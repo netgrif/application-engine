@@ -33,20 +33,14 @@ public class LoggingConfigurationProperties {
     /**
      * Nested configuration properties for file-based logging.
      * These settings allow the specification of file logging paths. Example:
-     *
-     * <pre>
-     * netgrif.engine.logging.file.path=/var/logs/app.log
-     * </pre>
+     * {@code netgrif.engine.logging.file.path=/var/logs/app.log}
      */
     private FileProperties file = new FileProperties();
 
     /**
      * Custom logging levels for various parts of the application.
      * Allows overriding logging levels for specific classes or packages. Example:
-     *
-     * <pre>
-     * netgrif.engine.logging.level.com.netgrif=DEBUG
-     * </pre>
+     * {@code netgrif.engine.logging.level.com.netgrif=DEBUG}
      */
     private Map<String, Object> level = new HashMap<>();
 
@@ -59,10 +53,7 @@ public class LoggingConfigurationProperties {
         /**
          * Specifies the path to the log file where logs will be written.
          * Example:
-         *
-         * <pre>
-         * /var/logs/application.log
-         * </pre>
+         * {@code /var/logs/application.log}
          */
         private String path;
     }

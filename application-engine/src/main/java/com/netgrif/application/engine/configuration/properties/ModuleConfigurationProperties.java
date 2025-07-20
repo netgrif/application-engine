@@ -28,7 +28,7 @@ public class ModuleConfigurationProperties {
         /**
          * Flag indicating whether the service is enabled or not.
          * <p>
-         * Defaults to <code>true</code>.
+         * Defaults to {@code true}.
          */
         private boolean enabled = true;
     }
