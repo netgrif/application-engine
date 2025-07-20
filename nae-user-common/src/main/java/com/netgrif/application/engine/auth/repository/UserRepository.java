@@ -18,7 +18,10 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -34,7 +37,7 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
      *
      * @param entity the entity to save
      * @param <S>    subtype of {@link User}
-     * @return never returns, always throws exception
+     * @return never returns, always throws an exception
      * @throws UnsupportedOperationException as this method is not supported
      */
     @Override
@@ -48,7 +51,7 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
      *
      * @param predicate filter condition
      * @param pageable  pagination details
-     * @return never returns, always throws exception
+     * @return never returns, always throws an exception
      * @throws UnsupportedOperationException as this method is not supported
      */
     @Override
@@ -79,16 +82,8 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
     default Page<User> findAllByQuery(Predicate predicate, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
         Assert.notNull(predicate, "Predicate must not be null");
         Assert.notNull(pageable, "Pageable must not be null");
-
-<<<<<<< HEAD
-        return PageableUtils.listToPage(collectionNames.stream().map(collection -> {
-            SpringDataMongodbQuery<User> query = createQuery(predicate, mongoTemplate, collection);
-            return query.fetch().stream().map(User.class::cast).toList();
-        }).flatMap(List::stream).toList(), pageable);
-=======
-        SpringDataMongodbQuery<com.netgrif.application.engine.adapter.spring.auth.domain.User> query = createQuery(predicate, mongoTemplate, collection);
-        return query.fetchPage(pageable).map(User.class::cast);
->>>>>>> NAE-2122
+        SpringDataMongodbQuery<User> query = createQuery(predicate, mongoTemplate, collection);
+        return query.fetchPage(pageable).map(User.class::cast); // TODO RC4-merge treba tento cast?
     }
 
     /**
@@ -105,12 +100,6 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         );
     }
 
-<<<<<<< HEAD
-    default List<User> findAllByIds(Collection<ObjectId> objectIds, MongoTemplate mongoTemplate, String collectionName) {
-        return mongoTemplate.find(Query.query(Criteria.where("id").in(objectIds)), User.class, collectionName);
-    }
-
-=======
     /**
      * Finds a {@link User} by their username.
      *
@@ -119,7 +108,6 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
      * @param collectionName the collection name
      * @return optional of the user if found, otherwise empty
      */
->>>>>>> NAE-2122
     default Optional<User> findByUsername(String username, MongoTemplate mongoTemplate, String collectionName) {
         return Optional.ofNullable(
                 mongoTemplate.findOne(Query.query(Criteria.where("username").is(username)), User.class, collectionName)
@@ -152,7 +140,6 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         return mongoTemplate.save(user, collectionName);
     }
 
-<<<<<<< HEAD
     default void deleteAllByIdFromCollection(MongoTemplate mongoTemplate, Collection<ObjectId> userIds, String collection) {
         mongoTemplate.remove(
                 new Query(Criteria.where("id").in(userIds)),
@@ -165,40 +152,16 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         mongoTemplate.remove(new Query(), collection);
     }
 
-=======
     /**
      * Deletes all data from specified collections.
      *
      * @param mongoTemplate  the MongoDB template
      * @param collectionName the names of the collections to clear
      */
->>>>>>> NAE-2122
     default void deleteAll(MongoTemplate mongoTemplate, Collection<String> collectionName) {
         collectionName.forEach(collection -> mongoTemplate.remove(new Query(), collection));
     }
 
-<<<<<<< HEAD
-    default Page<User> findDistinctByStateAndProcessRoles__idIn(UserState state, Collection<ProcessResourceId> roleId, Pageable pageable, MongoTemplate mongoTemplate, Collection<String> collectionNames) {
-        Set<User> resultUserSet = collectionNames.stream().map(collectionName ->
-                mongoTemplate.find(
-                        Query.query(
-                                        Criteria.where("state").is(state)
-                                                .and("processRoles._id").in(roleId))
-                                .with(pageable),
-                        User.class,
-                        collectionName)
-        ).flatMap(List::stream).collect(Collectors.toSet());
-        return new PageImpl<>(resultUserSet.stream().toList(), pageable, resultUserSet.size());
-    }
-
-    default List<User> findAllByProcessRoles__idIn(Collection<ProcessResourceId> rolesId, MongoTemplate mongoTemplate, Collection<String> collectionNames) {
-        return collectionNames.stream().map(collectionName ->
-                mongoTemplate.find(Query.query(Criteria.where("processRoles._id").in(rolesId)), User.class, collectionName)
-        ).flatMap(List::stream).map(User.class::cast).collect(Collectors.toList());
-    }
-
-    default void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime, MongoTemplate mongoTemplate, Collection<String> collectionNames) {
-=======
     /**
      * Finds a paginated list of all {@link User} entities using a specified {@link Query}
      *
@@ -256,35 +219,12 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
      * @param collectionNames the set of collection names in which the deletion will be performed.
      */
     default void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime, MongoTemplate mongoTemplate, Set<String> collectionNames) {
->>>>>>> NAE-2122
         collectionNames.forEach(collectionName ->
                 mongoTemplate.remove(Query.query(Criteria.where("state").is(state).and("credentials.token.properties.expirationDate").lt(dateTime)), User.class, collectionName)
         );
     }
 
-<<<<<<< HEAD
-    default List<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime, MongoTemplate mongoTemplate, Collection<String> collectionNames) {
-        return collectionNames.stream().map(collectionName ->
-                mongoTemplate.find(Query.query(Criteria.where("state").is(state).and("credentials.token.properties.expirationDate").lt(dateTime)), User.class, collectionName)
-        ).flatMap(List::stream).map(User.class::cast).collect(Collectors.toList());
-    }
 
-    default Page<User> findAllByIdInAndState(Collection<ObjectId> ids, UserState state, Pageable pageable, MongoTemplate mongoTemplate, Collection<String> collectionNames) {
-        Set<User> resultUserSet = collectionNames.stream().map(collectionName ->
-                mongoTemplate.find(
-                        Query.query(
-                                        Criteria.where("id").in(ids)
-                                                .and("state").is(state))
-                                .with(pageable),
-                        User.class,
-                        collectionName)
-        ).flatMap(List::stream).collect(Collectors.toSet());
-        return new PageImpl<>(resultUserSet.stream().toList(), pageable, resultUserSet.size());
-    }
-
-    private SpringDataMongodbQuery<User> createQuery(Predicate predicate, MongoTemplate mongoTemplate, String collectionName) {
-        return new SpringDataMongodbQuery<>(mongoTemplate, User.class, collectionName).where(predicate);
-=======
     /**
      * Finds a paginated list of all {@link User} entities with the specified state and an expiration date before the given time
      *
@@ -318,16 +258,15 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
     }
 
     /**
-     * Creates a {@link SpringDataMongodbQuery} for {@link com.netgrif.application.engine.adapter.spring.auth.domain.User}.
+     * Creates a {@link SpringDataMongodbQuery} for {@link User}.
      *
      * @param predicate      the filter condition to apply to the query.
      * @param mongoTemplate  the MongoDB template used to execute the query.
      * @param collectionName the name of the collection to query.
      * @return a {@link SpringDataMongodbQuery} configured with the given predicate and collection name.
      */
-    private SpringDataMongodbQuery<com.netgrif.application.engine.adapter.spring.auth.domain.User> createQuery(Predicate predicate, MongoTemplate mongoTemplate, String collectionName) {
-        return new SpringDataMongodbQuery<>(mongoTemplate, com.netgrif.application.engine.adapter.spring.auth.domain.User.class, collectionName).where(predicate);
->>>>>>> NAE-2122
+    private SpringDataMongodbQuery<User> createQuery(Predicate predicate, MongoTemplate mongoTemplate, String collectionName) {
+        return new SpringDataMongodbQuery<>(mongoTemplate, User.class, collectionName).where(predicate);
     }
 
     /**
@@ -343,12 +282,12 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
     private static PageImpl<User> resolveUserPage(Pageable pageable, MongoTemplate mongoTemplate, String collection, Query query) {
         List<User> resultUserList = mongoTemplate.find(
                         query.with(pageable),
-                        com.netgrif.application.engine.adapter.spring.auth.domain.User.class,
+                        User.class,
                         collection)
                 .stream()
                 .map(User.class::cast)
                 .collect(Collectors.toList());
-        long total = mongoTemplate.count(query.limit(-1).skip(-1), com.netgrif.application.engine.adapter.spring.auth.domain.User.class);
+        long total = mongoTemplate.count(query.limit(-1).skip(-1), User.class);
         return new PageImpl<>(resultUserList, pageable, total);
     }
 }
