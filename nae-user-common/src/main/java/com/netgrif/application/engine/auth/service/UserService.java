@@ -58,15 +58,11 @@ public interface UserService {
 
     Page<IUser> findAllCoMembers(com.netgrif.application.engine.objects.auth.domain.LoggedUser loggedUser, Pageable pageable);
 
-    List<IUser> findAllByIds(Collection<String> ids, String realmId);
+    Page<IUser> findAllByIds(Collection<String> ids, String realmId, Pageable pageable);
 
-    Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable);
+    Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable, String realmId);
 
-    Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable, Collection<String> realmIds);
-
-    List<IUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, Collection<String> realmIds);
-
-    List<IUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds);
+    Page<IUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, String realmId, Pageable pageable);
 
     void addDefaultAuthorities(IUser user);
 
@@ -112,9 +108,9 @@ public interface UserService {
 
     LoggedUserImpl transformToLoggedUser(IUser user);
 
-   void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
+    void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
 
-    List<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
+    Page<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, String realmIds, Pageable pageable);
 
     IUser transformToUser(Author author);
 

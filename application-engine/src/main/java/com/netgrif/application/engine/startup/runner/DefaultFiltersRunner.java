@@ -60,16 +60,17 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
         if (!createDefaultFilters) return;
         // All cases
         createCaseFilter("All cases", "assignment", FILTER_VISIBILITY_PUBLIC, "", new ArrayList<String>(),
-                Map.of(
+                new HashMap<>(Map.of(
                         "predicateMetadata", new ArrayList<>(),
-                        "searchCategories", new ArrayList<>()),
+                        "searchCategories", new ArrayList<>())
+                ),
                 Map.of(
                         GERMAN_ISO_3166_CODE, "Alle Fälle",
                         SLOVAK_ISO_3166_CODE, "Všetky prípady"));
 
         // My cases
         createCaseFilter("My cases", "assignment_ind", FILTER_VISIBILITY_PUBLIC, "(author:<<me>>)", new ArrayList<String>(),
-                Map.of(
+                new HashMap<>(Map.of(
                         "predicateMetadata", List.of(List.of(Map.of(
                                 "category", "case_author",
                                 "configuration", Map.of("operator", "equals"),
@@ -79,17 +80,18 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
                                 ))
                         ))),
                         "searchCategories", List.of("case_author")
-                ), Map.of(
+                )),
+                Map.of(
                         GERMAN_ISO_3166_CODE, "Meine Fälle",
                         SLOVAK_ISO_3166_CODE, "Moje prípady"
                 ));
 
         // All tasks
         createTaskFilter("All tasks", "library_add_check", FILTER_VISIBILITY_PUBLIC, "", new ArrayList<String>(),
-                Map.of(
+                new HashMap<>(Map.of(
                         "predicateMetadata", List.of(),
                         "searchCategories", List.of()
-                ),
+                )),
                 Map.of(
                         GERMAN_ISO_3166_CODE, "Alle Aufgaben",
                         SLOVAK_ISO_3166_CODE, "Všetky úlohy"
@@ -97,7 +99,7 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
 
         // My tasks
         createTaskFilter("My tasks", "account_box", FILTER_VISIBILITY_PUBLIC, "(userId:<<me>>)", new ArrayList<String>(),
-                Map.of(
+                new HashMap<>(Map.of(
                         "predicateMetadata", List.of(List.of(Map.of(
                                 "category", "task_assignee",
                                 "configuration", Map.of("operator", "equals"),
@@ -107,7 +109,8 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
                                 ))
                         ))),
                         "searchCategories", List.of("task_assignee")
-                ), Map.of(
+                )),
+                Map.of(
                         GERMAN_ISO_3166_CODE, "Meine Aufgaben",
                         SLOVAK_ISO_3166_CODE, "Moje úlohy"
                 ));

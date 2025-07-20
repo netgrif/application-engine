@@ -3,9 +3,16 @@ package com.netgrif.application.engine.objects.petrinet.domain;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 @Setter
 @Getter
-public class Icon {
+public class Icon implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -140211037056216078L;
+
     private String key;
 
     private String value;

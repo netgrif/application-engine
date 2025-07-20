@@ -208,6 +208,7 @@ buildNumber.properties
 *.iml
 out
 gen
+/storage/
 ### Groovy template
 # .gitignore created from Groovy contributors in https://github.com/apache/groovy/blob/master/.gitignore
 
