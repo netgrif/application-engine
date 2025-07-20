@@ -1,11 +1,13 @@
 package com.netgrif.application.engine.startup.runner;
 
+import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
@@ -14,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +39,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     private final UserService userService;
     private final GroupService groupService;
     private final ProcessRoleService processRoleService;
+    private final PaginationProperties paginationProperties;
 
     @Getter
     private IUser superUser;
@@ -62,7 +67,15 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
             user.setPassword(securityProperties.getAuth().getAdminPassword());
             user.setState(UserState.ACTIVE);
             user.setAuthorities(authorities);
-            user.setProcessRoles(new HashSet<>(processRoleService.findAll()));
+
+            Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+            Page<ProcessRole> processRoles;
+            do {
+                processRoles = processRoleService.findAll(pageable);
+                user.getProcessRoles().addAll(processRoles.getContent());
+                pageable = pageable.next();
+            } while (processRoles.hasNext());
+
             this.superUser = userService.createUser(user, null);
             log.info("Super user created");
         } else {
@@ -85,12 +98,19 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     }
 
     public void setAllProcessRoles() {
-        superUser.setProcessRoles(Set.copyOf(processRoleService.findAll()));
+        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<ProcessRole> processRoles;
+        do {
+            processRoles = processRoleService.findAll(pageable);
+            superUser.getProcessRoles().addAll(processRoles.getContent());
+            pageable = pageable.next();
+        } while (processRoles.hasNext());
+
         superUser = userService.saveUser(superUser, null);
     }
 
     public void setAllAuthorities() {
-        superUser.setAuthorities(Set.copyOf(authorityService.findAll()));
+        superUser.setAuthorities(new HashSet<>(authorityService.findAll(Pageable.unpaged()).stream().toList()));
         superUser = userService.saveUser(superUser, null);
     }
 

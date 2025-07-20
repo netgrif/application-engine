@@ -8,25 +8,52 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
-import java.util.List;
-
+/**
+ * Repository interface for handling operations on {@link PetriNet} entities.
+ * Extends {@link MongoRepository} for standard CRUD operations and {@link QuerydslPredicateExecutor}
+ * to support dynamic queries.
+ */
 public interface PetriNetRepository extends MongoRepository<PetriNet, String>, QuerydslPredicateExecutor<PetriNet> {
 
-    List<PetriNet> findByTitle_DefaultValue(String title);
-
+    /**
+     * Finds a {@link PetriNet} entity by its import identifier.
+     *
+     * @param id the import identifier of the desired PetriNet.
+     * @return the {@link PetriNet} entity matching the given import identifier, or {@code null} if none found.
+     */
     PetriNet findByImportId(String id);
 
-    List<PetriNet> findAllByIdentifier(String identifier);
-
+    /**
+     * Finds a {@link PetriNet} entity by its identifier and version.
+     *
+     * @param identifier the unique identifier of the PetriNet.
+     * @param version    the version of the PetriNet.
+     * @return the {@link PetriNet} entity matching the given identifier and version, or {@code null} if none found.
+     */
     PetriNet findByIdentifierAndVersion(String identifier, Version version);
 
+    /**
+     * Finds a paginated list of {@link PetriNet} entities by their identifier.
+     *
+     * @param identifier the unique identifier of the PetriNet.
+     * @param pageable   the pagination details.
+     * @return a {@link Page} containing the list of matching {@link PetriNet} entities.
+     */
     Page<PetriNet> findByIdentifier(String identifier, Pageable pageable);
 
-    Page<PetriNet> findByIdentifierIn(List<String> identifier, Pageable pageable);
+    /**
+     * Finds a paginated list of {@link PetriNet} entities by their version.
+     *
+     * @param version  the version of the PetriNet.
+     * @param pageable the pagination details.
+     * @return a {@link Page} containing the list of matching {@link PetriNet} entities.
+     */
+    Page<PetriNet> findAllByVersion(Version version, Pageable pageable);
 
-    List<PetriNet> findAllByVersion(Version version);
-
-    List<PetriNet> findAllByUriNodeId(String uri);
-
+    /**
+     * Deletes a {@link PetriNet} entity by its unique object ID.
+     *
+     * @param id the unique ID of the PetriNet to delete.
+     */
     void deleteBy_id(ObjectId id);
 }

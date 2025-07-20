@@ -1061,7 +1061,7 @@ public class Importer {
         if (shouldInitializeRole(importRole)) {
             role = initRole(importRole);
         } else {
-            role = new ArrayList<>(processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId())).get(0);
+            role = processRoleService.findByImportId(ProcessRole.GLOBAL + importRole.getId());
         }
         role.set_id(new ProcessResourceId(new ObjectId(net.getStringId())));
 
@@ -1071,7 +1071,7 @@ public class Importer {
 
     protected boolean shouldInitializeRole(Role importRole) {
         return importRole.isGlobal() == null || !importRole.isGlobal() ||
-                (importRole.isGlobal() && processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId()).isEmpty());
+                (importRole.isGlobal() && processRoleService.findByImportId(ProcessRole.GLOBAL + importRole.getId()) == null);
     }
 
     protected ProcessRole initRole(Role importRole) {
@@ -1088,6 +1088,8 @@ public class Importer {
             role.setGlobal(importRole.isGlobal());
         } else {
             role.setProcessId(net.getStringId());
+            role.setProcessTitle(net.getTitle());
+            role.setProcessIdentifier(net.getIdentifier());
         }
         return role;
     }

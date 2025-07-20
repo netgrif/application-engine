@@ -121,13 +121,14 @@ public class PetriNetController {
     public ResponseEntity<Page<PetriNetReference>> getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Pageable pageable, Authentication auth, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         if (identifier != null && version == null) {
-            return ResponseEntity.ok(new PageImpl<>(service.getReferencesByIdentifier(identifier, user, locale), pageable, 0));
+            return ResponseEntity.ok(service.getReferencesByIdentifier(identifier, user, locale, pageable));
         } else if (identifier == null && version != null) {
-            return ResponseEntity.ok(new PageImpl<>(service.getReferencesByVersion(converter.convert(version), user, locale), pageable, 0));
+            return ResponseEntity.ok(service.getReferencesByVersion(converter.convert(version), user, locale, pageable));
         } else if (identifier != null) {
-            return ResponseEntity.ok(new PageImpl<>(Collections.singletonList(service.getReference(identifier, converter.convert(version), user, locale)), pageable, 0));
+            PetriNetReference reference = service.getReference(identifier, converter.convert(version), user, locale);
+            return ResponseEntity.ok(new PageImpl<>(Collections.singletonList(reference), pageable, reference.getIdentifier().isEmpty() ? 0 : 1));
         } else {
-            return ResponseEntity.ok(new PageImpl<>(service.getReferences(user, locale), pageable, 0));
+            return ResponseEntity.ok(service.getReferences(user, locale, pageable));
         }
     }
 

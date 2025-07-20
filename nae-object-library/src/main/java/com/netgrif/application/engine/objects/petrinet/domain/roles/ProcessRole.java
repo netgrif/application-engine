@@ -42,6 +42,12 @@ public abstract class ProcessRole extends Imported {
     private String processId;
 
     @Setter
+    private String processIdentifier;
+
+    @Setter
+    private I18nString processTitle;
+
+    @Setter
     private String description;
 
     @Setter
@@ -60,6 +66,8 @@ public abstract class ProcessRole extends Imported {
         this._id = processRole._id;
         this.name = processRole.name;
         this.processId = processRole.processId;
+        this.processIdentifier = processRole.processIdentifier;
+        this.processTitle = processRole.processTitle;
         this.description = processRole.description;
         this.events = processRole.events;
     }

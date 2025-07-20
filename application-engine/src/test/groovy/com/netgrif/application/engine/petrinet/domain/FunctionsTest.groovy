@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.io.Resource
+import org.springframework.data.domain.Pageable
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
@@ -123,7 +124,7 @@ class FunctionsTest {
     @Test
     void testNamespaceFunctionException() {
         assertThrows(NullPointerException.class, () -> {
-            def nets = petriNetService.getByIdentifier(FUNCTION_RES_IDENTIFIER)
+            def nets = petriNetService.getByIdentifier(FUNCTION_RES_IDENTIFIER, Pageable.unpaged())
             if (nets) {
                 nets.each {
                     petriNetService.deletePetriNet(it.getStringId(), userService.transformToLoggedUser(userService.getLoggedOrSystem()))
@@ -141,7 +142,7 @@ class FunctionsTest {
     @Test
     void testNewNetVersionMissingMethodException() {
         assertThrows(NullPointerException.class, () -> {
-            def nets = petriNetService.getByIdentifier(FUNCTION_TEST_IDENTIFIER)
+            def nets = petriNetService.getByIdentifier(FUNCTION_TEST_IDENTIFIER, Pageable.unpaged())
             if (nets) {
                 nets.each {
                     petriNetService.deletePetriNet(it.getStringId(), userService.transformToLoggedUser(userService.getLoggedOrSystem()))

@@ -261,8 +261,8 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNet> getByIdentifier(String identifier) {
-        List<PetriNet> nets = repository.findAllByIdentifier(identifier);
+    public Page<PetriNet> getByIdentifier(String identifier, Pageable pageable) {
+        Page<PetriNet> nets = repository.findByIdentifier(identifier, pageable);
         nets.forEach(PetriNet::initializeArcs);
         return nets;
     }
@@ -319,8 +319,8 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNet> getAll() {
-        List<PetriNet> nets = repository.findAll();
+    public Page<PetriNet> getAll(Pageable pageable) {
+        Page<PetriNet> nets = repository.findAll(pageable);
         nets.forEach(PetriNet::initializeArcs);
         return nets;
     }
@@ -339,35 +339,60 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNetReference> getReferences(LoggedUser user, Locale locale) {
-        return getAll().stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
+    public Page<PetriNetReference> getReferences(LoggedUser user, Locale locale, Pageable pageable) {
+        return getAll(pageable).map(net -> transformToReference(net, locale));
     }
 
     @Override
-    public List<PetriNetReference> getReferencesByIdentifier(String identifier, LoggedUser user, Locale locale) {
-        return getByIdentifier(identifier).stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
+    public Page<PetriNetReference> getReferencesByIdentifier(String identifier, LoggedUser user, Locale locale, Pageable pageable) {
+        return getByIdentifier(identifier, pageable).map(net -> transformToReference(net, locale));
     }
 
     @Override
-    public List<PetriNetReference> getReferencesByVersion(Version version, LoggedUser user, Locale locale) {
-        List<PetriNetReference> references;
-
+    public Page<PetriNetReference> getReferencesByVersion(Version version, LoggedUser user, Locale locale, Pageable pageable) {
+        Page<PetriNetReference> references;
         if (version == null) {
             GroupOperation groupByIdentifier = Aggregation.group("identifier").max("version").as("version");
-            Aggregation aggregation = Aggregation.newAggregation(groupByIdentifier);
-            AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, "petriNet", Document.class);
-            references = results.getMappedResults().stream()
+            Aggregation aggregation;
+            if (pageable == null || pageable.isUnpaged()) {
+                 aggregation = Aggregation.newAggregation(
+                         groupByIdentifier
+                );
+            } else {
+                aggregation = Aggregation.newAggregation(
+                        groupByIdentifier,
+                        Aggregation.sort(pageable.getSort()),
+                        Aggregation.skip((long) pageable.getPageNumber() * pageable.getPageSize()),
+                        Aggregation.limit(pageable.getPageSize())
+                );
+            }
+            List<Document> results = mongoTemplate.aggregate(aggregation, "petriNet", Document.class).getMappedResults();
+            List<PetriNetReference> referenceList = results.stream()
                     .map(doc -> {
                         Document versionDoc = doc.get("version", Document.class);
                         Version refVersion = new Version(versionDoc.getLong("major"), versionDoc.getLong("minor"), versionDoc.getLong("patch"));
                         return getReference(doc.getString("_id"), refVersion, user, locale);
                     })
                     .collect(Collectors.toList());
-        } else {
-            references = repository.findAllByVersion(version).stream()
-                    .map(net -> transformToReference(net, locale)).collect(Collectors.toList());
-        }
+            Aggregation countAggregation = Aggregation.newAggregation(
+                    groupByIdentifier,
+                    Aggregation.count().as("total")
+            );
+            AggregationResults<Document> countResults = mongoTemplate.aggregate(
+                    countAggregation,
+                    "petriNet",
+                    Document.class
+            );
 
+            Number totalNumber = countResults.getUniqueMappedResult() != null
+                    ? countResults.getUniqueMappedResult().get("total", Number.class)
+                    : 0;
+            long total = totalNumber != null ? totalNumber.longValue() : 0L;
+
+            references = new PageImpl<>(referenceList, pageable, total);
+        } else {
+            references = repository.findAllByVersion(version, pageable).map(net -> transformToReference(net, locale));
+        }
         return references;
     }
 
@@ -443,7 +468,8 @@ public class PetriNetService implements IPetriNetService {
             if (criteriaClass.getGroup().size() == 1) {
                 this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(groupService.getGroupOwnerEmail(criteriaClass.getGroup().get(0))));
             } else {
-                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(groupService.getGroupsOwnerEmails(criteriaClass.getGroup())));
+                // TODO: pagination?
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(groupService.getGroupsOwnerEmails(criteriaClass.getGroup(), Pageable.unpaged())));
             }
         }
         if (criteriaClass.getVersion() != null) {

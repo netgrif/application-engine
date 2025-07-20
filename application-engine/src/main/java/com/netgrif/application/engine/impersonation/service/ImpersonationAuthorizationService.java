@@ -96,7 +96,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
             return new ArrayList<>();
         }
         Set<String> authIds = extractSetFromField(configs, "impersonated_authorities");
-        return authorityService.findAllByIds(new ArrayList<>(authIds)).stream()
+        return authorityService.findAllByIds(new ArrayList<>(authIds), Pageable.unpaged()).stream()
                 .filter(configAuth -> impersonated.getAuthorities().stream().anyMatch(userAuth -> userAuth.getStringId().equals(configAuth.getStringId())))
                 .collect(Collectors.toList());
     }

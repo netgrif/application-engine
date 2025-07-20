@@ -103,7 +103,7 @@ class UserServiceTest {
         user = userService.addRole(user, dummyRole.get_id())
         assert user.getProcessRoles().size() == 2 && user.getProcessRoles().stream().anyMatch { it.stringId == dummyRole.stringId }
 
-        List<IUser> userList = userService.findAllByProcessRoles(Set.of(dummyRole.get_id()), null)
+        List<IUser> userList = userService.findAllByProcessRoles(Set.of(dummyRole.get_id()), null, Pageable.unpaged())
         assert userList.size() == 1 && userList.getFirst().stringId == user.stringId
     }
 
@@ -114,7 +114,7 @@ class UserServiceTest {
         ((User) user).setExpirationDate(LocalDateTime.now())
         userService.saveUser(user, null)
 
-        List<IUser> userList = userService.findAllByStateAndExpirationDateBefore(UserState.INACTIVE, LocalDateTime.now(), null)
+        List<IUser> userList = userService.findAllByStateAndExpirationDateBefore(UserState.INACTIVE, LocalDateTime.now(), null, Pageable.unpaged())
         assert userList.size() == 1 && userList.getFirst().stringId == user.stringId
     }
 
