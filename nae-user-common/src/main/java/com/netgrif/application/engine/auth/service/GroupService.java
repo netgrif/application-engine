@@ -83,14 +83,6 @@ public interface GroupService {
     Group findById(String id);
 
     /**
-     * Retrieves all groups with the specified IDs.
-     *
-     * @param ids collection of group IDs to find
-     * @return list of {@link Group}s matching the provided IDs
-     */
-    Page<Group> findAllByIds(Collection<String> ids, Pageable pageable);
-
-    /**
      * Finds groups by IDs with pagination support.
      *
      * @param ids collection of group IDs to find
@@ -129,6 +121,8 @@ public interface GroupService {
      * Removes all groups from the system.
      */
     void removeAllGroups();
+
+    List<Group> save(Collection<Group> groups);
 
     /**
      * Removes all groups from a specific realm.

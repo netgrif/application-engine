@@ -40,7 +40,4 @@ public interface RealmService {
 
     void deleteRealm(String realmId);
 
-    void addUserToRealm(String realmId, String userId);
-
-    void removeUserFromRealm(String realmId, String userId);
 }

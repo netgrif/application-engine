@@ -40,7 +40,7 @@ public interface ProcessRoleService {
 
     List<ProcessRole> findAllByNetStringId(String netStringId);
 
-    List<ProcessRole> findAllByNetIdentifier(String identifier);
+    Page<ProcessRole> findAllByNetIdentifier(String identifier, Pageable pageable);
 
     Collection<ProcessRole> findAllByIds(Collection<ProcessResourceId> roleIds);
 
@@ -59,8 +59,6 @@ public interface ProcessRoleService {
     Page<ProcessRole> findAll(Pageable pageable);
 
     Page<ProcessRole> findAllGlobalRoles(Pageable pageable);
-
-    List<ProcessRole> findAll(String netId);
 
     ProcessRole defaultRole();
 

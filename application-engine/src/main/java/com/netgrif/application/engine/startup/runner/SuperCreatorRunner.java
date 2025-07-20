@@ -75,7 +75,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
             PasswordCredential passwordCredential = new PasswordCredential(passwordEncoder.encode(superAdminPassword), 0, true);
             user.setCredential("password", passwordCredential);
             user.setState(UserState.ACTIVE);
-            user.setAuthorities(authorities);
+            user.setAuthoritySet(authorities);
 
             Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
             Page<ProcessRole> processRoles;
@@ -119,7 +119,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     }
 
     public void setAllAuthorities() {
-        superUser.setAuthorities(new HashSet<>(authorityService.findAll(Pageable.unpaged()).stream().toList()));
+        superUser.setAuthoritySet(new HashSet<>(authorityService.findAll(Pageable.unpaged()).stream().toList()));
         superUser = userService.saveUser(superUser, null);
     }
 

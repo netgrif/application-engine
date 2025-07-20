@@ -3,6 +3,7 @@ package com.netgrif.application.engine.adapter.spring.auth.domain;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Attribute;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
+import com.netgrif.application.engine.objects.auth.domain.Credential;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
@@ -32,7 +33,7 @@ public class AnonymousUser extends AbstractUser {
     /**
      * Constructs a new anonymous user with specified reference and authority.
      *
-     * @param ref the anonymous user reference containing basic user information
+     * @param ref                the anonymous user reference containing basic user information
      * @param anonymousAuthority the authority to be assigned if no specific authorities are provided
      */
     public AnonymousUser(AnonymousUserRef ref, Authority anonymousAuthority) {
@@ -55,6 +56,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @return the username of the anonymous user
      */
     @Override
@@ -72,6 +74,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @return the realm ID associated with this anonymous user
      */
     @Override
@@ -89,6 +92,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @return the email address of the anonymous user
      */
     @Override
@@ -98,6 +102,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @param email the email address to set
      */
     @Override
@@ -107,6 +112,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @return the first name of the anonymous user
      */
     @Override
@@ -116,6 +122,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @param firstName the first name to set
      */
     @Override
@@ -125,6 +132,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @return the last name of the anonymous user
      */
     @Override
@@ -134,6 +142,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @param lastName the last name to set
      */
     @Override
@@ -143,6 +152,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @return the first name as the display name for the anonymous user
      */
     @Override
@@ -152,6 +162,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @return null as anonymous users don't have avatars
      */
     @Override
@@ -169,6 +180,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @param groupId the ID of the group to add
      */
     @Override
@@ -178,6 +190,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @return true if all required attributes have non-null values
      */
     @Override
@@ -187,8 +200,9 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
-     * @param key the attribute key
-     * @param value the attribute value
+     *
+     * @param key      the attribute key
+     * @param value    the attribute value
      * @param required whether the attribute is required
      */
     @Override
@@ -198,6 +212,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @param key the key of the attribute
      * @return the value of the attribute, or null if not found
      */
@@ -209,6 +224,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @param key the key of the attribute to remove
      */
     @Override
@@ -218,6 +234,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @param key the key of the attribute to check
      * @return true if the attribute exists and has a non-null value
      */
@@ -228,6 +245,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @param key the key of the attribute to retrieve
      * @return the attribute object, or null if not found
      */
@@ -238,6 +256,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @return a string representation of the anonymous user
      */
     @Override
@@ -247,6 +266,7 @@ public class AnonymousUser extends AbstractUser {
 
     /**
      * {@inheritDoc}
+     *
      * @return null as anonymous users don't have passwords
      */
     @Override
@@ -260,5 +280,51 @@ public class AnonymousUser extends AbstractUser {
      */
     @Override
     public void setPassword(String password) {
+        // ignore
+    }
+
+    @Override
+    public void setCredential(String key, Credential<?> credential) {
+        // ignore
+    }
+
+    @Override
+    public void setCredential(String type, String value, int order, boolean enabled) {
+        // ignore
+    }
+
+    @Override
+    public void activateMFA(String type, String secret) {
+        // ignore
+    }
+
+    @Override
+    public void activateMFA(String type, String secret, boolean enabled) {
+        // ignore
+    }
+
+    @Override
+    public boolean isCredentialEnabled(String type) {
+        return false;
+    }
+
+    @Override
+    public Credential<?> getCredential(String type) {
+        return null;
+    }
+
+    @Override
+    public void disableCredential(String type) {
+        // ignore
+    }
+
+    @Override
+    public void setCredentialProperty(String type, String key, Object value) {
+        // ignore
+    }
+
+    @Override
+    public Object getCredentialProperty(String type, String key) {
+        return null;
     }
 }

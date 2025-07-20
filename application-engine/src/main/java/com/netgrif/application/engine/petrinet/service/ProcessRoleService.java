@@ -2,26 +2,26 @@ package com.netgrif.application.engine.petrinet.service;
 
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.service.GroupService;
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.auth.service.RealmService;
+import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
 import com.netgrif.application.engine.objects.event.events.user.UserRoleChangeEvent;
 import com.netgrif.application.engine.objects.importer.model.EventPhaseType;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context.RoleContext;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.RoleActionsRunner;
 import com.netgrif.application.engine.objects.petrinet.domain.events.Event;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
-import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context.RoleContext;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.RoleActionsRunner;
+import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
-import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,7 +126,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     }
 
     protected void assignRolesToActor(Collection<ProcessRole> oldActorRoles, Collection<ProcessResourceId> requestedRolesIds) {
-        List<ProcessRole> requestedRoles = this.findByIds(requestedRolesIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet()));
+        Collection<ProcessRole> requestedRoles = this.findAllByIds(requestedRolesIds);
         if (requestedRoles.isEmpty() && !requestedRolesIds.isEmpty())
             throw new IllegalArgumentException("No process roles found.");
         if (requestedRoles.size() != requestedRolesIds.size())
@@ -202,13 +202,23 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     @Override
     public ProcessRole getAnonymousRole() {
-       // return processRoleRepository.findAllByImportId(ProcessRole.ANONYMOUS_ROLE).stream().findFirst().orElse(null);
+        // return processRoleRepository.findAllByImportId(ProcessRole.ANONYMOUS_ROLE).stream().findFirst().orElse(null);
         return processRoleRepository.findByImportId(ProcessRole.ANONYMOUS_ROLE).orElse(null);
+    }
+
+    @Override
+    public List<ProcessRole> findAllByNetStringId(String netStringId) {
+        return List.of();
     }
 
     @Override
     public Collection<ProcessRole> findAllByIds(Collection<ProcessResourceId> collection) {
         return processRoleRepository.findAllByIdsSet(collection.stream().map(ProcessResourceId::getStringId).collect(Collectors.toList()));
+    }
+
+    @Override
+    public Set<ProcessRole> findByIds(Collection<String> ids) {
+        return processRoleRepository.findAllByIdsSet(ids);
     }
 
     @Override
@@ -224,11 +234,6 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
             }
             return null;
         }).filter(Objects::nonNull).collect(Collectors.toList());
-    }
-
-    @Override
-    public Set<ProcessRole> findByIds(Set<String> ids) {
-        return processRoleRepository.findAllByIdsSet(ids);
     }
 
     private Set<ProcessRole> updateRequestedRoles(AbstractUser user, Set<ProcessRole> rolesNewToUser, Set<ProcessRole> rolesRemovedFromUser) {
@@ -342,11 +347,6 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         userService.saveUser(user, null);
     }
 
-//    @Override
-//    public Page<ProcessRole> findAll(Pageable pageable) {
-//        return processRoleRepository.findAll(pageable).stream().collect(Collectors.toList());
-//    }
-
     public Page<ProcessRole> findAll(Pageable pageable) {
         return processRoleRepository.findAll(pageable);
     }
@@ -357,52 +357,14 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     }
 
     @Override
-    public List<ProcessRole> findAll(String netId, Pageable pageable) {
-        Optional<PetriNet> netOptional = netRepository.findById(netStringId, Pageable pageable);
-        if (netOptional.isEmpty())
-            throw new IllegalArgumentException("Could not find model with id [" + netStringId + "]");
-        return new ArrayList<>(netOptional.get().getRoles().values());
-    }
-
-    @Override
-    public List<ProcessRole> findAllByNetIdentifier(String identifier) {
-        return processRoleRepository.findAllByProcessId(identifier);
-    }
-
-    @Override
-    public List<ProcessRole> findAllByImportId(String importId) {
-        return processRoleRepository.findAllByImportId(importId);
-    }
-
-    @Override
-    public List<ProcessRole> findAllByDefaultName(String name) {
-        return processRoleRepository.findAllByName_DefaultValue(name);
+    public Page<ProcessRole> findAllByNetIdentifier(String identifier, Pageable pageable) {
+        return processRoleRepository.findAllByProcessId(identifier, pageable);
     }
 
     @Override
     public ProcessRole findById(String id) {
         ObjectId objectId = extractObjectId(id);
         return processRoleRepository.findByIdObjectId(objectId).orElse(null);
-    }
-
-    @Override
-    public Collection<ProcessRole> findAllByIds(Collection<ProcessResourceId> collection) {
-        return processRoleRepository.findAllByCompositeId(collection.stream().map(ProcessResourceId::getStringId).collect(Collectors.toList()));
-    }
-
-    @Override
-    public ProcessRole findById(ProcessResourceId processResourceId) {
-        return processRoleRepository.findByCompositeId(processResourceId.getStringId()).orElse(null);
-    }
-
-    @Override
-    public List<ProcessRole> findByIds(Collection<String> ids) {
-        return processRoleRepository.findAllById(ids);
-    }
-
-    @Override
-    public List<ProcessRole> findAllGlobalRoles() {
-        return processRoleRepository.findAllByGlobalIsTrue();
     }
 
     @Override
@@ -450,12 +412,6 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     @Override
     public Page<ProcessRole> findAllByDefaultName(String name, Pageable pageable) {
         return processRoleRepository.findAllByName_DefaultValue(name, pageable);
-    }
-
-    @Override
-    public ProcessRole findById(String id) {
-        ObjectId objectId = extractObjectId(id);
-        return processRoleRepository.findByIdObjectId(objectId).orElse(null);
     }
 
     @Override

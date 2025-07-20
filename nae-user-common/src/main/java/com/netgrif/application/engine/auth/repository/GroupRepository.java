@@ -37,6 +37,15 @@ public interface GroupRepository extends MongoRepository<Group, String>, Queryds
      */
     Optional<Group> findByIdentifier(String identifier);
 
+    /**
+     * Finds a {@link Group} by the owner's ID and the group's unique identifier.
+     *
+     * @param ownerId the unique identifier of the owner
+     * @param identifier the unique identifier of the group
+     * @return an {@link Optional} containing the {@link Group} if it exists, otherwise {@code Optional.empty()}
+     */
+    Optional<Group> findByOwnerIdAndIdentifier(String ownerId, String identifier);
+
     //List<Group> findAllByMemberIdsContains(String memberId);
 
     /**

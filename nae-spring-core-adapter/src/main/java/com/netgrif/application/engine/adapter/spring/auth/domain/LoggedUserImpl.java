@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.adapter.spring.auth.domain;
 
+import com.netgrif.application.engine.objects.auth.domain.Credential;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
@@ -33,8 +34,8 @@ public class LoggedUserImpl extends LoggedUser implements UserDetails {
      * @param middleName The user's middle name (optional)
      * @param lastName The user's last name
      * @param email The user's email address
-     * @param avatar The URL of user's avatar image
-     * @param workspaceId The identifier of user's workspace
+     * @param avatar The URL of the user's avatar image
+     * @param workspaceId The identifier of the user's workspace
      * @param providerOrigin The authentication provider's origin
      * @param mfaMethods Set of enabled Multi-Factor Authentication methods
      * @param sessionTimeout Duration after which the user's session times out
@@ -47,7 +48,7 @@ public class LoggedUserImpl extends LoggedUser implements UserDetails {
     }
 
     /**
-     * Constructs a new LoggedUserImpl with String as identifier.
+     * Constructs a new LoggedUserImpl with String as an identifier.
      *
      * @param id The user's unique identifier as String
      * @param realmId The identifier of the security realm
@@ -56,8 +57,8 @@ public class LoggedUserImpl extends LoggedUser implements UserDetails {
      * @param middleName The user's middle name (optional)
      * @param lastName The user's last name
      * @param email The user's email address
-     * @param avatar The URL of user's avatar image
-     * @param workspaceId The identifier of user's workspace
+     * @param avatar The URL of the user's avatar image
+     * @param workspaceId The identifier of the user's workspace
      * @param providerOrigin The authentication provider's origin
      * @param mfaMethods Set of enabled Multi-Factor Authentication methods
      * @param sessionTimeout Duration after which the user's session times out
@@ -87,7 +88,7 @@ public class LoggedUserImpl extends LoggedUser implements UserDetails {
 
     /**
      * Returns the password used to authenticate the user.
-     * In this implementation, password is not stored and "N/A" is returned.
+     * In this implementation, the password is not stored and "N/A" is returned.
      *
      * @return The constant string "N/A"
      */
@@ -104,5 +105,50 @@ public class LoggedUserImpl extends LoggedUser implements UserDetails {
      */
     @Override
     public void setPassword(String password) {
+    }
+
+    @Override
+    public void setCredential(String key, Credential<?> credential) {
+        // ignore
+    }
+
+    @Override
+    public void setCredential(String type, String value, int order, boolean enabled) {
+        // ignore
+    }
+
+    @Override
+    public void activateMFA(String type, String secret) {
+        // ignore
+    }
+
+    @Override
+    public void activateMFA(String type, String secret, boolean enabled) {
+        // ignore
+    }
+
+    @Override
+    public boolean isCredentialEnabled(String type) {
+        return false;
+    }
+
+    @Override
+    public Credential<?> getCredential(String type) {
+        return null;
+    }
+
+    @Override
+    public void disableCredential(String type) {
+        // ignore
+    }
+
+    @Override
+    public void setCredentialProperty(String type, String key, Object value) {
+        // ignore
+    }
+
+    @Override
+    public Object getCredentialProperty(String type, String key) {
+        return null;
     }
 }

@@ -41,7 +41,7 @@ public interface UserService {
     AbstractUser saveUser(AbstractUser user);
 
     /**
-     * Saves multiple users in batch.
+     * Saves multiple users in a batch.
      *
      * @param users collection of users to be saved
      * @return list of saved users
@@ -135,7 +135,7 @@ public interface UserService {
     void addAllRolesToAdminByUsername(String username);
 
     /**
-     * Adds anonymous role to a user.
+     * Adds the anonymous role to a user.
      *
      * @param user the user to update
      */
@@ -216,19 +216,21 @@ public interface UserService {
      *
      * @param roleIds collection of process role identifiers
      * @param pageable pagination information
-     * @param realmIds collection of realm identifiers
+     * @param realmId  a realm identifiers
      * @return page of users
      */
-    Page<AbstractUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable, String realmId);
+    Page<AbstractUser> findAllActiveByProcessRoles(Collection<ProcessResourceId> roleIds, String realmId, Pageable pageable);
+
+    Page<AbstractUser> findAllByProcessRoles(Collection<ProcessResourceId> roleIds, Pageable pageable);
 
     /**
      * Finds all users with specific process roles in specific realms.
      *
      * @param roleIds collection of process role identifiers
-     * @param realmIds collection of realm identifiers
+     * @param realmId a realm identifiers
      * @return list of users
      */
-    Page<AbstractUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, String realmId, Pageable pageable);
+    Page<AbstractUser> findAllByProcessRoles(Collection<ProcessResourceId> roleIds, String realmId, Pageable pageable);
 
     /**
      * Adds default authorities to a user.
@@ -313,7 +315,7 @@ public interface UserService {
      * @param pageable pagination information
      * @return page of matching co-members
      */
-    Page<AbstractUser> searchAllCoMembers(String query, Collection<ProcessResourceId> roleIds, 
+    Page<AbstractUser> searchAllCoMembers(String query, Collection<ProcessResourceId> roleIds,
             Collection<ProcessResourceId> negateRoleIds, LoggedUser loggedUser, Pageable pageable);
 
     /**
@@ -379,7 +381,7 @@ public interface UserService {
     /**
      * Transforms an actor reference to a user.
      *
-     * @param author the actor reference to transform
+     * @param author the actor's reference to transform
      * @return the transformed user
      */
     AbstractUser transformToUser(ActorRef author);
@@ -399,7 +401,9 @@ public interface UserService {
      * @param expirationDate the expiration date
      * @param realmIds collection of realm identifiers
      */
-    void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
+    void removeAllByStateAndExpirationDateBeforeForRealms(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
+
+    void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, String realmId);
 
     /**
      * Finds all users with specified state and expiration date before given date in specified realms.

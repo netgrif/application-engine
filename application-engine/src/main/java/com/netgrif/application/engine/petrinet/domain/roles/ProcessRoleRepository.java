@@ -104,12 +104,6 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
         Map<Boolean, List<String>> partitionedIds = ids.stream()
                 .collect(Collectors.partitioningBy(id -> id.contains(ProcessResourceId.ID_SEPARATOR)));
 
-        //TODO: It goes one at a time... make bulk
-    default List<ProcessRole> findAllById(Collection<String> ids) {
-    //    return ids.stream()
-   //             .map(this::findByCompositeId)
-   //             .flatMap(Optional::stream)
-   //             .collect(Collectors.toList());
         List<ObjectId> forObjectIds = partitionedIds.get(false).stream()
                 .map(ObjectId::new)
                 .toList();
@@ -160,4 +154,5 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
      */
     @Query("{ '_id': { $in: ?0 } }")
     List<ProcessRole> findByProcessResourceIds(Collection<ProcessResourceId> compositeIds);
+
 }

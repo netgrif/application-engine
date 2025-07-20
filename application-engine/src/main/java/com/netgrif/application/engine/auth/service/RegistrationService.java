@@ -8,9 +8,9 @@ import com.netgrif.application.engine.configuration.properties.ServerAuthPropert
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,31 +29,22 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class RegistrationService implements IRegistrationService {
 
-    @Autowired
-    protected PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private GroupService groupService;
-
-    @Autowired
-    private ProcessRoleService processRole;
-
-    @Autowired
-    private ServerAuthProperties serverAuthProperties;
-    @Autowired
-    private ProcessRoleService processRoleService;
+    protected final PasswordEncoder passwordEncoder;
+    private final UserService userService;
+    private final GroupService groupService;
+    private final ProcessRoleService processRole;
+    private final ServerAuthProperties serverAuthProperties;
+    private final ProcessRoleService processRoleService;
 
     @Override
     @Transactional
     @Scheduled(cron = "0 0 1 * * *")
     public void removeExpiredUsers() {
         log.info("Removing expired unactivated invited users");
-        userService.removeAllByStateAndExpirationDateBefore(UserState.INACTIVE, LocalDateTime.now(),null);
+        userService.removeAllByStateAndExpirationDateBefore(UserState.INACTIVE, LocalDateTime.now(), null);
     }
 
     @Override
@@ -71,8 +62,8 @@ public class RegistrationService implements IRegistrationService {
             user.setToken(null);
             user.setExpirationDate(null);
         });
-        users = userService.saveUsers(users.stream().map(u -> (AbstractUser) u).collect(Collectors.toList()));
-        log.info("Reset " + users.getContent().size() + " expired user tokens");
+        List<User> savedUsers = userService.saveUsers(users.stream().map(u -> (AbstractUser) u).collect(Collectors.toList()));
+        log.info("Reset " + savedUsers.size() + " expired user tokens");
     }
 
     @Override

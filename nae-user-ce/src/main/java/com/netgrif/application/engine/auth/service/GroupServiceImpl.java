@@ -4,17 +4,16 @@ import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
 import com.netgrif.application.engine.auth.repository.GroupRepository;
+import com.netgrif.application.engine.objects.auth.domain.AbstractActor;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundException;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundExceptionCode;
-import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.querydsl.core.types.Predicate;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 
@@ -76,7 +75,7 @@ public class GroupServiceImpl implements GroupService {
             throw new IllegalArgumentException("Group " + group.getStringId() + " does not exist");
         }
         if (group.getMemberIds() != null) {
-            List<AbstractUser> members = userService.findAllByIds(group.getMemberIds(), group.getRealmId());
+            List<AbstractUser> members = userService.findAllByIds(group.getMemberIds(), group.getRealmId(), Pageable.unpaged()).toList();
             log.debug("Removing group [{}] from members [{}]", group.getStringId(), members);
             members.forEach(user -> {
                 user.removeGroupId(group.getStringId());
@@ -111,12 +110,18 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    public List<Group> save(Collection<Group> groups) {
+        log.debug("Saving groups: {}", groups.stream().map(AbstractActor::getStringId).toList());
+        groups.forEach(group -> group.setModifiedAt(LocalDateTime.now()));
+        return groupRepository.saveAll(groups);
+    }
+
+    @Override
     public void removeAllByRealmId(String realmId) {
         this.groupRepository.removeAllByRealmId(realmId);
     }
 
     @Override
-<<<<<<< HEAD
     public void removeAllByRealmIdIn(Collection<String> realmIds) {
         if (realmIds == null || realmIds.isEmpty()) {
             this.removeAllGroups();
@@ -135,14 +140,8 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Page<Group> findByIds(Collection<String> ids, Pageable pageable) {
+    public Page<Group> findByIds(Collection<String> ids, Pageable pageable) { // previously findAllByIds method
         return groupRepository.findAllByIdIn(ids, pageable);
-=======
-    public Page<Group> findAllByIds(Collection<String> ids, Pageable pageable) {
-        Page<Group> groups = groupRepository.findAllByIdIn(ids, pageable);
-        groups.getContent().forEach(this::populateMembers);
-        return groups;
->>>>>>> NAE-2122
     }
 
     @Override
@@ -159,19 +158,11 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-<<<<<<< HEAD
     public Group create(AbstractUser groupOwner) {
         log.info("Creating default group for owner: [{}]", groupOwner.getStringId());
-        List<Group> userGroups = groupRepository.findByOwnerId(groupOwner.getStringId());
+        Page<Group> userGroups = groupRepository.findByOwnerId(groupOwner.getStringId(), Pageable.ofSize(1));
         if (!userGroups.isEmpty() && !Objects.equals(groupOwner.getStringId(), userService.getSystem().getStringId())) {
             throw new IllegalArgumentException("Default group for owner [%s] already exists.".formatted(groupOwner.getUsername()));
-=======
-    public Group create(IUser user) {
-        log.info("Creating default group for user: [{}]", user.getStringId());
-        Page<Group> userGroups = groupRepository.findByOwnerId(user.getStringId(), Pageable.ofSize(1));
-        if (!userGroups.isEmpty() && !Objects.equals(user.getStringId(), userService.getSystem().getStringId())) {
-            throw new IllegalArgumentException("Default group for user [%s] already exists.".formatted(user.getUsername()));
->>>>>>> NAE-2122
         }
         return create(groupOwner.getUsername(), groupOwner.getName(), groupOwner);
     }
@@ -190,33 +181,11 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-<<<<<<< HEAD
     public Group getDefaultUserGroup(AbstractUser user) {
-        List<Group> userGroup = groupRepository.findByOwnerId(user.getStringId());
-=======
-    public Group getDefaultUserGroup(IUser user) {
->>>>>>> NAE-2122
         String errorMessage = "Default user group for user [%s] does not exist.".formatted(user.getUsername());
-        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-        Page<Group> userGroups;
-        do {
-            userGroups = groupRepository.findByOwnerId(user.getStringId(), pageable);
-
-            Optional<Group> group = userGroups.stream().filter(g -> g.getIdentifier().equals(user.getUsername())).findFirst();
-            if (group.isPresent()) {
-                return group.get();
-            }
-
-            pageable = pageable.next();
-        } while (userGroups.hasNext());
-        throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.DEFAULT_USER_GROUP_NOT_FOUND, errorMessage);
+        Optional<Group> groupOptional = groupRepository.findByOwnerIdAndIdentifier(user.getStringId(), user.getUsername());
+        return groupOptional.orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.DEFAULT_USER_GROUP_NOT_FOUND, errorMessage));
     }
-
-//    @Override
-//    public Group getDefaultUserGroup(AbstractUser user) {
-//        Optional<Group> groupOptional = groupRepository.findByOwnerId(user.getStringId());
-//        return groupOptional.orElseThrow(() ->  new ResourceNotFoundException(ResourceNotFoundExceptionCode.DEFAULT_USER_GROUP_NOT_FOUND, "Default user group for user [" + user.getStringId() + "] does not exist"));
-//    }
 
     @Override
     public void addUserToDefaultSystemGroup(AbstractUser user) {
@@ -272,31 +241,13 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-<<<<<<< HEAD
     public List<AbstractUser> getGroupMembers(Group group) {
-        return this.userService.findAllByIds(group.getMemberIds(), group.getRealmId());
+        return this.userService.findAllByIds(group.getMemberIds(), group.getRealmId(), Pageable.unpaged()).toList();
     }
 
     @Override
-    public List<String> getAllCoMembers(AbstractUser user) {
-        List<Group> userMembershipGroups = groupRepository.findAllByMemberIdsContains(user.getStringId());
-        AbstractUser system = userService.getSystem();
-        return userMembershipGroups.stream().map(Group::getMemberIds).flatMap(Set::stream)
-                .filter(id -> !id.equals(user.getStringId()))
-                .filter(id -> !id.equals(system.getStringId()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-=======
->>>>>>> NAE-2122
     public Page<Group> findByPredicate(Predicate predicate, Pageable pageable) {
         return groupRepository.findAll(predicate, pageable);
-    }
-
-    @Override
-    public List<Group> findAllByIds(Collection<String> ids) {
-        return groupRepository.findAllById(ids);
     }
 
     @Override
@@ -322,7 +273,6 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-<<<<<<< HEAD
     public Pair<Group, Group> addSubgroup(String parentGroupId, String childGroupId) {
         if (parentGroupId.equals(childGroupId)) {
             throw new IllegalArgumentException("Trying to add group to itself [%s]!".formatted(parentGroupId));
@@ -392,17 +342,8 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<String> getGroupsOwnerEmails(Collection<String> groupIds) {
-        return this.findAllByIds(groupIds).stream().map(this::getGroupOwnerEmail).collect(Collectors.toList());
-=======
-    public Page<Group> findByIds(Collection<String> ids, Pageable pageable) {
-        return groupRepository.findAllByIdIn(ids, pageable);
-    }
-
-    @Override
     public Page<String> getGroupsOwnerEmails(Collection<String> groupIds, Pageable pageable) {
         return this.findByIds(groupIds, pageable).map(this::getGroupOwnerEmail);
->>>>>>> NAE-2122
     }
 
     @Override
