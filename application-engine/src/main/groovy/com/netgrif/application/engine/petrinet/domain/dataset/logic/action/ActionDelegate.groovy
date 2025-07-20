@@ -22,9 +22,6 @@ import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.integration.modules.ModuleHolder
-import com.netgrif.application.engine.mail.domain.MailDraft
-import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
-import com.netgrif.application.engine.mail.interfaces.IMailService
 import com.netgrif.application.engine.objects.auth.domain.Author
 import com.netgrif.application.engine.objects.auth.domain.IUser
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser
@@ -126,9 +123,6 @@ class ActionDelegate {
     IPdfGenerator pdfGenerator
 
     @Autowired
-    IMailService mailService
-
-    @Autowired
     GroupService groupService
 
     @Autowired
@@ -136,9 +130,6 @@ class ActionDelegate {
 
     @Autowired
     IRegistrationService registrationService
-
-    @Autowired
-    IMailAttemptService mailAttemptService
 
     @Autowired
     UserDetailsServiceImpl userDetailsService
@@ -1228,20 +1219,6 @@ class ActionDelegate {
         generatePdf(sourceTransitionId: transitionId, targetFileFieldId: fileFieldId, dateZoneId: dateZoneId, sourceCase: fromCase, targetCase: saveToCase)
     }
 
-    void sendEmail(List<String> to, String subject, String body) {
-        MailDraft mailDraft = MailDraft.builder(mailFrom, to).subject(subject).body(body).build()
-        sendMail(mailDraft)
-    }
-
-    void sendEmail(List<String> to, String subject, String body, Map<String, File> attachments) {
-        MailDraft mailDraft = MailDraft.builder(mailFrom, to).subject(subject).body(body).attachments(attachments).build()
-        sendMail(mailDraft)
-    }
-
-    void sendMail(MailDraft mailDraft) {
-        mailService.sendMail(mailDraft)
-    }
-
     def changeUserByEmail(String email) {
         [email  : { cl ->
             changeUserByEmail(email, "email", cl)
@@ -1315,23 +1292,23 @@ class ActionDelegate {
         userService.saveUser(user, null)
     }
 
-    MessageResource inviteUser(String email) {
-        NewUserRequest newUserRequest = new NewUserRequest()
-        newUserRequest.email = email
-        newUserRequest.groups = new HashSet<>()
-        newUserRequest.processRoles = new HashSet<>()
-        return inviteUser(newUserRequest)
-    }
-
-    MessageResource inviteUser(NewUserRequest newUserRequest) {
-        IUser user = registrationService.createNewUser(newUserRequest)
-        if (user == null)
-            return MessageResource.successMessage("Done")
-        mailService.sendRegistrationEmail(user)
-
-        mailAttemptService.mailAttempt(newUserRequest.email)
-        return MessageResource.successMessage("Done")
-    }
+//    MessageResource inviteUser(String email) {
+//        NewUserRequest newUserRequest = new NewUserRequest()
+//        newUserRequest.email = email
+//        newUserRequest.groups = new HashSet<>()
+//        newUserRequest.processRoles = new HashSet<>()
+//        return inviteUser(newUserRequest)
+//    }
+//
+//    MessageResource inviteUser(NewUserRequest newUserRequest) {
+//        IUser user = registrationService.createNewUser(newUserRequest)
+//        if (user == null)
+//            return MessageResource.successMessage("Done")
+//        mailService.sendRegistrationEmail(user)
+//
+//        mailAttemptService.mailAttempt(newUserRequest.email)
+//        return MessageResource.successMessage("Done")
+//    }
 
     void deleteUser(String email) {
         IUser user = userService.findByEmail(email, null)

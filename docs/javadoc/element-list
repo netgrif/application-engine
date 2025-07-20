@@ -85,10 +85,6 @@ com.netgrif.application.engine.ldap.domain.repository
 com.netgrif.application.engine.ldap.filters
 com.netgrif.application.engine.ldap.service
 com.netgrif.application.engine.ldap.service.interfaces
-com.netgrif.application.engine.mail
-com.netgrif.application.engine.mail.domain
-com.netgrif.application.engine.mail.interfaces
-com.netgrif.application.engine.mail.throwables
 com.netgrif.application.engine.manager.service
 com.netgrif.application.engine.manager.service.interfaces
 com.netgrif.application.engine.manager.web
