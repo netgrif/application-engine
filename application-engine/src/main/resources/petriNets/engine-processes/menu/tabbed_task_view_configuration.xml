@@ -41,11 +41,11 @@
 
     <function scope="process" name="updateFilterAutocompleteOptions">
         {
-            com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
-            com.netgrif.application.engine.petrinet.domain.dataset.TaskField previewTaskRef,
-            com.netgrif.application.engine.petrinet.domain.dataset.CaseField selectedFilterRef,
-            com.netgrif.application.engine.petrinet.domain.dataset.ButtonField updateBtn,
-            com.netgrif.application.engine.petrinet.domain.Transition trans
+            com.netgrif.application.engine.objects.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
+            com.netgrif.application.engine.objects.petrinet.domain.dataset.TaskField previewTaskRef,
+            com.netgrif.application.engine.objects.petrinet.domain.dataset.CaseField selectedFilterRef,
+            com.netgrif.application.engine.objects.petrinet.domain.dataset.ButtonField updateBtn,
+            com.netgrif.application.engine.objects.petrinet.domain.Transition trans
                 ->
                 if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
                     change previewTaskRef value {
@@ -68,9 +68,9 @@
     </function>
     <function scope="process" name="updateOptionsBasedOnValue">
         {
-            com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField toBeUpdated,
-            com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField valueSelector,
-            com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField optionsHolder
+            com.netgrif.application.engine.objects.petrinet.domain.dataset.EnumerationMapField toBeUpdated,
+            com.netgrif.application.engine.objects.petrinet.domain.dataset.MultichoiceMapField valueSelector,
+            com.netgrif.application.engine.objects.petrinet.domain.dataset.EnumerationMapField optionsHolder
                 ->
                 def existingOptions = optionsHolder.options
                 def selectedValues = valueSelector.value

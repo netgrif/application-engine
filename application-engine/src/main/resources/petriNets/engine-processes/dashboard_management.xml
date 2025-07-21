@@ -280,7 +280,7 @@
         <id>item_divider</id>
         <title/>
         <init dynamic="true">
-            new com.netgrif.application.engine.petrinet.domain.I18nString("Dashboard item data", [sk: "Dáta položky panelu", de: "Daten zum Dashboard-Element"])
+            new com.netgrif.application.engine.objects.petrinet.domain.I18nString("Dashboard item data", [sk: "Dáta položky panelu", de: "Daten zum Dashboard-Element"])
         </init>
         <component>
             <name>divider</name>

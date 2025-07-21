@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
 
 @Slf4j
 @Component
-@RunnerOrder(102)
+@RunnerOrder(142)
 @RequiredArgsConstructor
 class DefaultDashboardRunner implements ApplicationEngineStartupRunner {
 

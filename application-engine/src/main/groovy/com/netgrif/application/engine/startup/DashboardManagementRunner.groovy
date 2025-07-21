@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.startup
 
+import com.netgrif.application.engine.startup.annotation.RunnerOrder
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.ApplicationArguments
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component
 
 @Slf4j
 @Component
+@RunnerOrder(141)
 @ConditionalOnProperty(value = "nae.dashboard-management.enabled", matchIfMissing = true)
 class DashboardManagementRunner implements ApplicationEngineStartupRunner {
 

@@ -155,7 +155,7 @@
                         change menu_items_list value { "" }
                     } else {
                         change item_icon value { "" }
-                        change item_name value { new com.netgrif.application.engine.petrinet.domain.I18nString("") }
+                        change item_name value { new com.netgrif.application.engine.objects.petrinet.domain.I18nString("") }
                         change external_url value { "" }
                     }
                 </action>
@@ -342,10 +342,10 @@
                             def menuItemCase = workflowService.findOne(menu_items_list.value)
                             change item_name value { menuItemCase.dataSet["menu_name"].value }
                         } else {
-                            change item_name value { new com.netgrif.application.engine.petrinet.domain.I18nString("") }
+                            change item_name value { new com.netgrif.application.engine.objects.petrinet.domain.I18nString("") }
                         }
                     } else {
-                        change item_name value { new com.netgrif.application.engine.petrinet.domain.I18nString("") }
+                        change item_name value { new com.netgrif.application.engine.objects.petrinet.domain.I18nString("") }
                     }
                 </action>
                 <action>
@@ -370,7 +370,7 @@
         <id>filter_divider</id>
         <title/>
         <init dynamic="true">
-            new com.netgrif.application.engine.petrinet.domain.I18nString("Menu item data", [sk: "Dáta menu položky", de: "Daten zum Menüpunkt"])
+            new com.netgrif.application.engine.objects.petrinet.domain.I18nString("Menu item data", [sk: "Dáta menu položky", de: "Daten zum Menüpunkt"])
         </init>
         <component>
             <name>divider</name>
