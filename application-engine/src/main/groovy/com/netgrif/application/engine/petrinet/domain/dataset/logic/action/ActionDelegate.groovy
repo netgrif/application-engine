@@ -55,14 +55,12 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.task
 import com.netgrif.application.engine.objects.workflow.domain.menu.FilterBody
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemConstants
-import com.netgrif.application.engine.objects.workflow.service.InitValueExpressionEvaluator
-import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties
 import com.netgrif.application.engine.objects.workflow.domain.menu.configurations.TabbedCaseViewBody
 import com.netgrif.application.engine.objects.workflow.domain.menu.configurations.TabbedTaskViewBody
 import com.netgrif.application.engine.objects.workflow.domain.menu.configurations.ViewBody
 import com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.DashboardItemBody
 import com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.DashboardManagementBody
-import com.netgrif.application.engine.pdf.generator.config.PdfResource
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.plugin.meta.PluginHolder
