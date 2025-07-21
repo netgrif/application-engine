@@ -107,31 +107,19 @@
 					title: f.title,
 					allowed_nets: f.allowed_nets,
 					query: f.query,
-					group: f.group,
 					identifier: f.identifier,
 					icon: f.icon;
 
-					def item = findMenuItem(identifier.value)
-					def filter = getFilterFromMenuItem(item)
-
-					changeFilter filter query { query.value }
-					changeFilter filter allowedNets { allowed_nets.value.split(",") as List }
-					changeFilter filter icon { icon.value }
-					changeFilter filter title { title.value }
-					changeFilter filter filterMetadata { [
+					def metadata = [
 							"searchCategories"       : [],
 							"predicateMetadata"      : [],
 							"filterType"             : type,
 							"defaultSearchCategories": false,
 							"inheritAllowedNets"     : false
-					] }
-
-					changeMenuItem item filter { filter }
-					changeMenuItem item allowedRoles { ["role_2": "filter_api_test"] }
-					changeMenuItem item uri { uri.value }
-					changeMenuItem item title { title.value }
-					changeMenuItem item caseDefaultHeaders { "meta-title,meta-title,meta-title" }
-					changeMenuItem item taskDefaultHeaders { "meta-title,meta-title,meta-title" }
+					]
+					createOrUpdateMenuItemAndFilter(uri.value, identifier.value, title.value, query.value, "Case",
+							"private", allowed_nets.value.split(",") as List, icon.value, ["role_2": "filter_api_test"],
+							[:], ["meta-title","meta-title","meta-title"], ["meta-title","meta-title","meta-title"], metadata)
 				</action>
 			</actions>
 		</event>
