@@ -11,7 +11,6 @@ import com.netgrif.application.engine.workflow.domain.repositories.TaskRepositor
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +28,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @ConditionalOnExpression("'${spring.data.elasticsearch.reindex}'!= 'null'")
@@ -110,161 +107,27 @@ public class ReindexingTask {
     private void reindexAllPages(long count, LocalDateTime now, LocalDateTime lastRunOld) {
         long numOfPages = ((count / pageSize) + 1);
         log.info("Reindexing " + numOfPages + " pages");
-        ObjectId lastId = null;
-
-        long page = 0;
-        long pageWhile = 0;
-
-        /*MongoCursor<org.bson.Document> cursor = mongoTemplate
-                .getCollection("case")
-                .find()
-                .iterator();
-
-        try {
-            while (cursor.hasNext()) {
-                page++;
-                log.info("Reindexing " + page + " / " + numOfPages);
-                *//*Query query = new Query();
-
-                if (lastId != null) {
-                    query.addCriteria(Criteria.where("_id").gt(lastId));
-                }
-                query.addCriteria(Criteria.where("lastModified").lt(now).gt(lastRunOld.minusMinutes(2)));
-                query.limit(pageSize);*//*
-
-                MongoDatabase
-
-                new ArrayList<>(cursor.next().values());
-                List<Case> cases = mongoTemplate.find(query, Case.class);
-                List<Case> casesToIndex = cases.stream().filter(it -> elasticCaseRepository.countByStringIdAndLastModified(it.getStringId(), Timestamp.valueOf(it.getLastModified()).getTime()) == 0).collect(Collectors.toList());
-                if (casesToIndex.isEmpty()) {
-                    break;
-                }
-
-                casesToIndex.forEach(c -> {
-                    if (c.getPetriNet() == null) {
-                        c.setPetriNet(petriNetService.get(c.getPetriNetObjectId()));
-                    }
-                });
-
-                bulkService.bulkIndexCases(casesToIndex);
-
-                List<String> caseIds = casesToIndex.stream().map(Case::getStringId).collect(Collectors.toList());
-                List<Task> tasksToReindex = taskRepository.findAllByCaseIdIn(caseIds);
-
-                bulkService.bulkIndexTasks(tasksToReindex);
-
-                lastId = cases.get(cases.size() - 1).get_id();
-            }
-        } finally {
-            cursor.close();
-        }*/
-
         Query query = new Query();
 
         query.cursorBatchSize(pageSize);
 
         //query.addCriteria(Criteria.where("lastModified").lt(now).gt(lastRunOld.minusMinutes(2)));
 
-        List<Case> batch = new ArrayList<>(pageSize);
-
         try (CloseableIterator<Case> cursor = mongoTemplate.stream(query, Case.class)) {
-            while (cursor.hasNext()) {
-                /*pageWhile++;
-                log.info("Reindexing -> " + pageWhile);*/
-                batch.add(cursor.next());
-
-                if (batch.size() == pageSize) {
-
-                    page++;
-                    log.info("Reindexing " + page + " / " + numOfPages);
-
-
-                    reindexCasesBatch(batch);
-
-
-
-
-
-                    batch.clear();
+            cursor.stream().forEach(aCase -> {
+                if (elasticCaseRepository.countByStringIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
+                    return;
                 }
-            }
 
-            // posledný batch
-            if (!batch.isEmpty()) {
-                reindexCasesBatch(batch);
-            }
-        }
-
-
-        /*try (CloseableIterator<Case> cursor = mongoTemplate.stream(query, Case.class)) {
-            while (cursor.hasNext()) {
-                batch.add(cursor.next());
-
-                if (batch.size() == pageSize) {
-                    batch.clear();
+                if (aCase.getPetriNet() == null) {
+                    aCase.setPetriNet(petriNetService.get(aCase.getPetriNetObjectId()));
                 }
-            }
-            if (!batch.isEmpty()) {
 
-            }
-        }*/
-
-
-
-       /* while (true) {
-            page++;
-            log.info("Reindexing " + page + " / " + numOfPages);
-            Query query = new Query();
-
-            if (lastId != null) {
-                query.addCriteria(Criteria.where("_id").gt(lastId));
-            }
-            query.addCriteria(Criteria.where("lastModified").lt(now).gt(lastRunOld.minusMinutes(2)));
-            query.limit(pageSize);
-
-            List<Case> cases = mongoTemplate.find(query, Case.class);
-            List<Case> casesToIndex = cases.stream().filter(it -> elasticCaseRepository.countByStringIdAndLastModified(it.getStringId(), Timestamp.valueOf(it.getLastModified()).getTime()) == 0).collect(Collectors.toList());
-            if (casesToIndex.isEmpty()) {
-                break;
-            }
-
-            casesToIndex.forEach(c -> {
-                if (c.getPetriNet() == null) {
-                    c.setPetriNet(petriNetService.get(c.getPetriNetObjectId()));
-                }
+                bulkService.bulkIndexCase(aCase);
             });
-
-            bulkService.bulkIndexCases(casesToIndex);
-
-            List<String> caseIds = casesToIndex.stream().map(Case::getStringId).collect(Collectors.toList());
-            List<Task> tasksToReindex = taskRepository.findAllByCaseIdIn(caseIds);
-
-            bulkService.bulkIndexTasks(tasksToReindex);
-
-            lastId = cases.get(cases.size() - 1).get_id();
-        }*/
-    }
-
-    private void reindexCasesBatch(List<Case> casesBatch) {
-        List<Case> casesToIndex = casesBatch.stream().filter(it -> elasticCaseRepository.countByStringIdAndLastModified(it.getStringId(), Timestamp.valueOf(it.getLastModified()).getTime()) == 0).collect(Collectors.toList());
-        if (casesToIndex.isEmpty()) {
-            log.info("No cases to reindex");
-            return;
         }
 
-        casesToIndex.forEach(c -> {
-            if (c.getPetriNet() == null) {
-                c.setPetriNet(petriNetService.get(c.getPetriNetObjectId()));
-            }
-        });
-
-        bulkService.bulkIndexCases(casesToIndex);
-
-        List<String> caseIds = casesToIndex.stream().map(Case::getStringId).collect(Collectors.toList());
-        List<Task> tasksToReindex = taskRepository.findAllByCaseIdIn(caseIds);
-
-        bulkService.bulkIndexTasks(tasksToReindex);
+        bulkService.indexCases();
     }
 
     public void forceReindexPage(Predicate predicate, int page, long numOfPages) {

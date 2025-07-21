@@ -8,6 +8,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.service.interfaces.*;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,9 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Service responsible for bulk indexing of {@link Case} and {@link Task} entities into Elasticsearch.
@@ -34,54 +33,69 @@ public class BulkService implements IBulkService {
     @Value("${spring.data.elasticsearch.index.case}")
     private String caseIndex;
 
+    @Value("${spring.data.elasticsearch.reindexExecutor.size:20}")
+    private int batchSize;
+
     private final ElasticsearchClient esClient;
 
     private final IElasticCaseMappingService elasticCaseMappingService;
 
     private final IElasticTaskMappingService elasticTaskMappingService;
 
+    private final TaskRepository taskRepository;
+
+    private final List<Case> bulkCases = new ArrayList<>();
+    private final List<String> bulkCaseIds = new ArrayList<>();
+
+    private BulkRequest.Builder builder = new BulkRequest.Builder();
+
 
     BulkService (@Qualifier("elasticsearchClient") ElasticsearchClient elasticsearchClient,
                  IElasticCaseMappingService elasticCaseMappingService,
-                 IElasticTaskMappingService elasticTaskMappingService) {
+                 IElasticTaskMappingService elasticTaskMappingService,
+                 TaskRepository taskRepository) {
         this.esClient = elasticsearchClient;
         this.elasticCaseMappingService = elasticCaseMappingService;
         this.elasticTaskMappingService = elasticTaskMappingService;
+        this.taskRepository = taskRepository;
     }
 
     /**
-     * Performs bulk indexing of a list of {@link Case} objects into the Elasticsearch case index.
-     * Uses upsert semantics — if a document exists, it is updated; otherwise, it is created.
+     * Creates elastic upsert operation for given case — if a document exists, it is updated; otherwise, it is created.
+     * calls indexCases if size of case list in cache equals batch size
      *
-     * @param cases the list of case entities to be indexed
+     * @param aCase the case entities to be indexed
      */
     @Override
-    public void bulkIndexCases(List<Case> cases) {
-        BulkRequest.Builder builder = new BulkRequest.Builder();
+    public void bulkIndexCase(Case aCase) {
+        if (aCase == null) return;
 
-        for (Case c : cases) {
-            try {
-                if (c.getLastModified() == null)
-                    c.setLastModified(LocalDateTime.now());
+        bulkCases.add(aCase);
+        bulkCaseIds.add(aCase.getStringId());
 
-                ElasticCase doc = elasticCaseMappingService.transform(c);
+        try {
+            if (aCase.getLastModified() == null)
+                aCase.setLastModified(LocalDateTime.now());
 
-                builder.operations(op -> op
-                        .update(u -> u
-                                .index(caseIndex)
-                                .id(doc.getStringId())
-                                .action(a -> a
-                                        .doc(doc)
-                                        .docAsUpsert(true)
-                                )
-                        )
-                );
-            } catch (Exception e) {
-                log.error("Failed to prepare bulk operation for case [{}]: {}", c.getStringId(), e.getMessage());
-            }
+            ElasticCase doc = elasticCaseMappingService.transform(aCase);
+
+            builder.operations(op -> op
+                    .update(u -> u
+                            .index(caseIndex)
+                            .id(doc.getStringId())
+                            .action(a -> a
+                                    .doc(doc)
+                                    .docAsUpsert(true)
+                            )
+                    )
+            );
+        } catch (Exception e) {
+            log.error("Failed to prepare bulk operation for case [{}]: {}", aCase.getStringId(), e.getMessage());
         }
 
-        executeAndValidate(builder.build());
+        if (bulkCases.size() == batchSize) {
+            indexCases();
+        }
     }
 
     /**
@@ -93,8 +107,6 @@ public class BulkService implements IBulkService {
     @Override
     public void bulkIndexTasks(List<Task> tasks) {
         if (tasks == null || tasks.isEmpty()) return;
-
-        log.info("Indexing {} tasks", tasks.size());
 
         BulkRequest.Builder requestBuilder = new BulkRequest.Builder();
 
@@ -120,12 +132,31 @@ public class BulkService implements IBulkService {
         executeAndValidate(requestBuilder.build());
     }
 
+    /**
+     * Performs bulk indexing of a list of {@link Case} objects from cache into the Elasticsearch case index.
+     * Clears cache lists and recreates {@link BulkRequest.Builder}
+     */
+    @Override
+    public void indexCases() {
+        if (bulkCases.isEmpty()) {
+            return;
+        }
+
+        executeAndValidate(builder.build());
+        List<Task> tasksToReindex = taskRepository.findAllByCaseIdIn(bulkCaseIds);
+        bulkIndexTasks(tasksToReindex);
+
+        bulkCases.clear();
+        bulkCaseIds.clear();
+        this.builder = new BulkRequest.Builder();
+    }
+
     private void executeAndValidate(BulkRequest request) {
         try {
             BulkResponse response = esClient.bulk(request);
             checkForBulkUpdateFailure(response);
         } catch (Exception e) {
-            log.error("Failed to index bulk " + e.getMessage(), e);
+            log.error("Failed to index bulk {}", e.getMessage(), e);
         }
     }
 
