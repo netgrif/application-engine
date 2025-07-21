@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDataHelper;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDrawer;
@@ -42,12 +42,12 @@ public class PdfGenerator implements IPdfGenerator {
     private IPdfDrawer pdfDrawer;
 
     @Override
-    public void setupPdfGenerator(PdfResource pdfResource) throws IOException {
+    public void setupPdfGenerator(PdfResourceConfigurationProperties pdfResource) throws IOException {
         setupPdfGenerator(pdfResource, 1.4f);
     }
 
     @Override
-    public void setupPdfGenerator(PdfResource pdfResource, float version) throws IOException {
+    public void setupPdfGenerator(PdfResourceConfigurationProperties pdfResource, float version) throws IOException {
         log.info("Setting up PDF generator.");
 
         this.pdf = new PDDocument();
@@ -68,24 +68,24 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     @Override
-    public void addCustomField(PdfField field, PdfResource pdfResource) {
+    public void addCustomField(PdfField field, PdfResourceConfigurationProperties pdfResource) {
         generateData(field, pdfResource);
     }
 
     @Override
-    public File generatePdf(Case formCase, String transitionId, PdfResource pdfResource, List<String> excludedFields) {
+    public File generatePdf(Case formCase, String transitionId, PdfResourceConfigurationProperties pdfResource, List<String> excludedFields) {
         generateData(formCase.getPetriNet(), formCase, formCase.getPetriNet().getTransition(transitionId), pdfResource, excludedFields);
         return generatePdf(pdfResource);
     }
 
     @Override
-    public File generatePdf(Case formCase, String transitionId, PdfResource pdfResource) {
+    public File generatePdf(Case formCase, String transitionId, PdfResourceConfigurationProperties pdfResource) {
         generateData(formCase.getPetriNet(), formCase, formCase.getPetriNet().getTransition(transitionId), pdfResource);
         return generatePdf(pdfResource);
     }
 
     @Override
-    public File generatePdf(PdfResource pdfResource) {
+    public File generatePdf(PdfResourceConfigurationProperties pdfResource) {
         try {
             return transformRequestToPdf(pdfDataHelper.getPdfFields(), pdfResource);
         } catch (IOException e) {
@@ -95,13 +95,13 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     @Override
-    public void generatePdf(Case formCase, String transitionId, PdfResource pdfResource, OutputStream stream) {
+    public void generatePdf(Case formCase, String transitionId, PdfResourceConfigurationProperties pdfResource, OutputStream stream) {
         Transition transition = formCase.getPetriNet().getTransition(transitionId);
         generatePdf(formCase, transition, pdfResource, stream);
     }
 
     @Override
-    public void generatePdf(Case formCase, Transition transition, PdfResource pdfResource, OutputStream stream) {
+    public void generatePdf(Case formCase, Transition transition, PdfResourceConfigurationProperties pdfResource, OutputStream stream) {
         generateData(formCase.getPetriNet(), formCase, transition, pdfResource);
         try {
             transformRequestToPdf(pdfDataHelper.getPdfFields(), pdfResource, stream);
@@ -111,13 +111,13 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     @Override
-    public void generateData(PetriNet petriNet, Case useCase, Transition transition, PdfResource pdfResource, List<String> excludedFields) {
+    public void generateData(PetriNet petriNet, Case useCase, Transition transition, PdfResourceConfigurationProperties pdfResource, List<String> excludedFields) {
         pdfDataHelper.setExcludedFields(excludedFields);
         generateData(useCase.getPetriNet(), useCase, transition, pdfResource);
     }
 
     @Override
-    public void generateData(PetriNet petriNet, Case useCase, Transition transition, PdfResource pdfResource) {
+    public void generateData(PetriNet petriNet, Case useCase, Transition transition, PdfResourceConfigurationProperties pdfResource) {
         pdfDataHelper.setPetriNet(petriNet);
         pdfDataHelper.setTaskId(useCase, transition);
         pdfDataHelper.generateTitleField();
@@ -127,18 +127,18 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     @Override
-    public void generateData(PdfField pdfField, PdfResource pdfResource) {
+    public void generateData(PdfField pdfField, PdfResourceConfigurationProperties pdfResource) {
         pdfDataHelper.getPdfFields().add(pdfField);
         pdfDataHelper.correctFieldsPosition();
     }
 
-    protected File transformRequestToPdf(List<PdfField> pdfFields, PdfResource pdfResource) throws IOException {
+    protected File transformRequestToPdf(List<PdfField> pdfFields, PdfResourceConfigurationProperties pdfResource) throws IOException {
         File output = new File(((ClassPathResource) pdfResource.getOutputResource()).getPath());
         transformRequestToPdf(pdfFields, pdfResource, new FileOutputStream(output));
         return output;
     }
 
-    protected void transformRequestToPdf(List<PdfField> pdfFields, PdfResource pdfResource, OutputStream stream) throws IOException {
+    protected void transformRequestToPdf(List<PdfField> pdfFields, PdfResourceConfigurationProperties pdfResource, OutputStream stream) throws IOException {
         if (pdfResource.getTemplateResource().exists()) {
             InputStream template = pdfResource.getTemplateResource().getInputStream();
             pdfDrawer.setTemplatePdf(PDDocument.load(template));

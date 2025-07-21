@@ -1,19 +1,19 @@
 package com.netgrif.application.engine.auth.service;
 
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
-import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
-import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
-import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,7 +42,7 @@ public class RegistrationService implements IRegistrationService {
     private ProcessRoleService processRole;
 
     @Autowired
-    private ServerAuthProperties serverAuthProperties;
+    private SecurityConfigurationProperties.AuthProperties serverAuthProperties;
     @Autowired
     private ProcessRoleService processRoleService;
 
@@ -59,7 +59,7 @@ public class RegistrationService implements IRegistrationService {
     @Scheduled(cron = "0 0 1 * * *")
     public void resetExpiredToken() {
         log.info("Resetting expired user tokens");
-        List<User> users = userService.findAllByStateAndExpirationDateBefore(UserState.BLOCKED, LocalDateTime.now(), null);
+        Page<User> users = userService.findAllByStateAndExpirationDateBefore(UserState.BLOCKED, LocalDateTime.now(), null, Pageable.unpaged());
         if (users == null || users.isEmpty()) {
             log.info("There are none expired tokens. Everything is awesome.");
             return;
@@ -69,8 +69,8 @@ public class RegistrationService implements IRegistrationService {
             user.setToken(null);
             user.setExpirationDate(null);
         });
-        users = userService.saveUsers(users.stream().map(u -> (IUser) u).collect(Collectors.toList()));
-        log.info("Reset " + users.size() + " expired user tokens");
+        userService.saveUsers(users.stream().map(u -> (IUser) u).collect(Collectors.toList()));
+        log.info("Reset " + users.getContent().size() + " expired user tokens");
     }
 
     @Override

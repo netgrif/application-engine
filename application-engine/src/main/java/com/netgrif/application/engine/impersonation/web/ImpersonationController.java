@@ -35,7 +35,7 @@ import java.util.Locale;
 @RestController
 @RequestMapping("/api/impersonate")
 @ConditionalOnProperty(
-        value = "nae.impersonation.web.enabled",
+        value = "netgrif.engine.security.web.impersonation-enabled",
         havingValue = "true",
         matchIfMissing = true
 )

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service.interfaces;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldType;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface IPdfDrawer {
-    void setupDrawer(PDDocument pdf, PdfResource pdfResource);
+    void setupDrawer(PDDocument pdf, PdfResourceConfigurationProperties pdfResource);
 
     void setTemplatePdf(PDDocument pdf);
 

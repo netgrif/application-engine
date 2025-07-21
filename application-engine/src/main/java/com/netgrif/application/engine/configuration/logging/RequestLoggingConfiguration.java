@@ -5,7 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
-@ConditionalOnProperty(value = "logging.endpoints")
+
+@ConditionalOnProperty(value = "netgrif.engine.logging.endpoints")
 @Configuration
 public class RequestLoggingConfiguration {
 

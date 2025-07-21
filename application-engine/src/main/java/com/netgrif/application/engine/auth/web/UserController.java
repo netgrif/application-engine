@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 @RequestMapping("api/users")
 @Tag(name = "UserController")
 @ConditionalOnProperty(
-        value = "nae.user.web.enabled",
+        value = "netgrif.engine.user.web.enabled",
         havingValue = "true",
         matchIfMissing = true
 )
@@ -260,7 +260,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<List<Authority>> getAllAuthorities() {
-        return ResponseEntity.ok(authorityService.findAll());
+        return ResponseEntity.ok(authorityService.findAll(Pageable.unpaged()).stream().toList());
     }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")

@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/group")
 @ConditionalOnProperty(
-        value = "nae.group.web.enabled",
+        value = "netgrif.engine.security.web.group-enabled",
         havingValue = "true",
         matchIfMissing = true
 )

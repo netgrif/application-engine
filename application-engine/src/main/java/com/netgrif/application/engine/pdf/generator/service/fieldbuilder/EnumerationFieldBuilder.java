@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service.fieldbuilder;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.domain.PdfEnumerationField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfSelectionField;
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class EnumerationFieldBuilder extends SelectionFieldBuilder {
 
-    public EnumerationFieldBuilder(PdfResource resource) {
+    public EnumerationFieldBuilder(PdfResourceConfigurationProperties resource) {
         super(resource);
     }
 

@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "nae.export")
+@ConfigurationProperties(prefix = "netgrif.engine.export")
 public class ExportConfiguration {
 
     private int mongoPageSize = 100;

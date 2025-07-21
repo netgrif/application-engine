@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service.fieldbuilder;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfI18nDividerField;
 import com.netgrif.application.engine.objects.petrinet.domain.DataGroup;
@@ -8,7 +8,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.
 
 public class I18nDividerFieldBuilder extends FieldBuilder {
 
-    public I18nDividerFieldBuilder(PdfResource resource) {
+    public I18nDividerFieldBuilder(PdfResourceConfigurationProperties resource) {
         super(resource);
     }
 

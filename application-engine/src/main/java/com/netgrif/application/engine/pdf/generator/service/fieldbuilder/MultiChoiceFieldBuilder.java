@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service.fieldbuilder;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfMultiChoiceField;
 import com.netgrif.application.engine.objects.petrinet.domain.DataGroup;
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class MultiChoiceFieldBuilder extends SelectionFieldBuilder {
 
-    public MultiChoiceFieldBuilder(PdfResource resource) {
+    public MultiChoiceFieldBuilder(PdfResourceConfigurationProperties resource) {
         super(resource);
     }
 

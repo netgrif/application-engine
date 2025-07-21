@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.domain;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldType;
 
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.List;
 public class PdfDataGroupField extends PdfField {
 
     public PdfDataGroupField(String fieldId, int layoutX, int layoutY, int width, int originalHeight,
-                             String label, boolean dgField, PdfResource resource) {
+                             String label, boolean dgField, PdfResourceConfigurationProperties resource) {
         super(resource);
         this.fieldId = fieldId;
         this.layoutX = layoutX;
@@ -20,7 +20,7 @@ public class PdfDataGroupField extends PdfField {
     }
 
     public PdfDataGroupField(String fieldId, String label, List<String> values, FieldType type,
-                             int x, int bottomY, int width, int height, PdfResource resource) {
+                             int x, int bottomY, int width, int height, PdfResourceConfigurationProperties resource) {
         super(resource);
         this.fieldId = fieldId;
         this.label = label;

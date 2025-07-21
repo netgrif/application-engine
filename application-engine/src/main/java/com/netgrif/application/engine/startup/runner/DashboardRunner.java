@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RunnerOrder(140)
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "nae.dashboard.enabled", matchIfMissing = false)
+@ConditionalOnProperty(value = "netgrif.engine.dashboard.enabled", matchIfMissing = false)
 public class DashboardRunner implements ApplicationEngineStartupRunner {
 
     @Autowired

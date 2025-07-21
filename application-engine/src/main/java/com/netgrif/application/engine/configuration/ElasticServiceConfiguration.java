@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
+import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository;
 import com.netgrif.application.engine.elastic.service.ElasticCaseService;
@@ -17,7 +17,7 @@ import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 
 @Configuration
 @ConditionalOnProperty(
-        value = "nae.elastic.service.configuration.enable",
+        value = "netgrif.engine.data.elasticsearch.service.configuration-enabled",
         matchIfMissing = true,
         havingValue = "true"
 )
@@ -33,7 +33,7 @@ public class ElasticServiceConfiguration {
     private ElasticsearchTemplate elasticsearchTemplate;
 
     @Autowired
-    private ElasticsearchProperties elasticsearchProperties;
+    private DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
 
     @Bean
     @Primary
@@ -54,7 +54,7 @@ public class ElasticServiceConfiguration {
     @Bean
     @Primary
     public IElasticCaseService elasticCaseService() {
-        return new ElasticCaseService(caseRepository, elasticsearchTemplate, executor(), elasticsearchProperties);
+        return new ElasticCaseService(caseRepository, elasticsearchTemplate, executor());
     }
 
     @Bean
@@ -65,7 +65,7 @@ public class ElasticServiceConfiguration {
 
     @Bean
     public IElasticCaseService reindexingTaskElasticCaseService() {
-        return new ElasticCaseService(caseRepository, elasticsearchTemplate, reindexingTaskCaseExecutor(), elasticsearchProperties);
+        return new ElasticCaseService(caseRepository, elasticsearchTemplate, reindexingTaskCaseExecutor());
     }
 
 

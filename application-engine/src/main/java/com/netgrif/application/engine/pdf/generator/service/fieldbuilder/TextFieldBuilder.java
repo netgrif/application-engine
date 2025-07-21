@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service.fieldbuilder;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfTextField;
 import com.netgrif.application.engine.objects.petrinet.domain.DataGroup;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class TextFieldBuilder extends FieldBuilder {
 
-    public TextFieldBuilder(PdfResource resource) {
+    public TextFieldBuilder(PdfResourceConfigurationProperties resource) {
         super(resource);
     }
 

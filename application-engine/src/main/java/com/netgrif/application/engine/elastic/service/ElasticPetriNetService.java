@@ -55,12 +55,6 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
         this.elasticsearchConfiguration = elasticsearchConfiguration;
     }
 
-    @Lazy
-    @Autowired
-    public void setPetriNetService(IPetriNetService petriNetService) {
-        this.petriNetService = petriNetService;
-    }
-
     @Override
     public void index(ElasticPetriNet net) {
         executors.execute(net.getStringId(), () -> {
@@ -93,26 +87,6 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
             repository.deleteAllByStringId(id);
             log.info("[" + id + "]: PetriNet \"" + id + "\" deleted");
         });
-    }
-
-    @Override
-    public String findUriNodeId(PetriNet net) {
-        if (net == null) {
-            return null;
-        }
-        ElasticPetriNet elasticPetriNet = repository.findByStringId(net.getStringId());
-        if (elasticPetriNet == null) {
-            log.warn("[" + net.getStringId() + "] PetriNet with id [" + net.getStringId() + "] is not indexed.");
-            return null;
-        }
-
-        return elasticPetriNet.getUriNodeId();
-    }
-
-    @Override
-    public List<PetriNet> findAllByUriNodeId(String uriNodeId) {
-        List<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticPetriNet> elasticPetriNets = repository.findAllByUriNodeId(uriNodeId);
-        return petriNetService.findAllById(elasticPetriNets.stream().map(ElasticPetriNet::getStringId).collect(Collectors.toList()));
     }
 
     /**
