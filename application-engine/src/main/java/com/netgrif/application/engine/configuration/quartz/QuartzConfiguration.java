@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.configuration.quartz;
 
+import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +30,8 @@ public class QuartzConfiguration {
     @Autowired
     private AutowiringSpringBeanJobFactory jobFactory;
 
-    @Value("${spring.data.mongodb.host:#{null}}")
-    private String addresses;
-
-    @Value("${spring.data.mongodb.uri:#{null}}")
-    private String uri;
-
-    @Value("${nae.quartz.dbName:nae}")
-    private String db;
+    @Autowired
+    private DataConfigurationProperties.MongoProperties mongoProperties;
 
     @Bean
     public Properties quartzProperties() throws IOException {
@@ -45,7 +40,7 @@ public class QuartzConfiguration {
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         List<Resource> resourceList = new ArrayList<>();
         try {
-            Resource[] resourcesClassApp = resolver.getResources("classpath*:/application.properties");
+            Resource[] resourcesClassApp = resolver.getResources("classpath*:/application.yaml");
             Resource[] resourcesClass = resolver.getResources("classpath*:/quartz.properties");
             Resource[] resources = resolver.getResources("file:/*/quartz.properties");
             Collections.addAll(resourceList, resourcesClassApp);
@@ -69,12 +64,12 @@ public class QuartzConfiguration {
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() throws Exception {
         Properties properties = new Properties();
-        if (addresses != null && !addresses.equals("null")) {
-            properties.setProperty("org.quartz.jobStore.mongoUri", "mongodb://" + addresses + ":27017/");
-        } else if (uri != null && !uri.equals("null")) {
-            properties.setProperty("org.quartz.jobStore.mongoUri", uri);
+        if (mongoProperties.getHost() != null && !mongoProperties.getHost().equals("null")) {
+            properties.setProperty("org.quartz.jobStore.mongoUri", "mongodb://" + mongoProperties.getHost() + ":27017/");
+        } else if (mongoProperties.getUri() != null && !mongoProperties.getUri().equals("null")) {
+            properties.setProperty("org.quartz.jobStore.mongoUri", mongoProperties.getUri());
         }
-        properties.setProperty("org.quartz.jobStore.dbName", db);
+        properties.setProperty("org.quartz.jobStore.dbName", mongoProperties.getDatabase());
         properties.setProperty("org.quartz.jobStore.class", "com.netgrif.quartz.mongodb.MongoDBJobStore");
         properties.setProperty("spring.quartz.properties.org.quartz.jobStore.isClustered", "false");
         properties.setProperty("org.quartz.jobStore.isClustered", "true");

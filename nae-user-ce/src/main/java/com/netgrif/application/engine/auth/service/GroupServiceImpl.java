@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.auth.service;
 
+import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
 import com.netgrif.application.engine.auth.repository.GroupRepository;
@@ -7,17 +8,18 @@ import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundException;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundExceptionCode;
+import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.querydsl.core.types.Predicate;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Getter
@@ -34,6 +36,8 @@ public class GroupServiceImpl implements GroupService {
     private GroupConfigurationProperties groupConfigurationProperties;
 
     private Group defaultSystemGroup;
+
+    private PaginationProperties paginationProperties;
 
     @Autowired
     public void setCollectionNameProvider(CollectionNameProvider collectionNameProvider) {
@@ -58,6 +62,11 @@ public class GroupServiceImpl implements GroupService {
     @Autowired
     public void setAuthorityService(AuthorityService authorityService) {
         this.authorityService = authorityService;
+    }
+
+    @Autowired
+    public void setPaginationProperties(PaginationProperties paginationProperties) {
+        this.paginationProperties = paginationProperties;
     }
 
     @Override
@@ -145,7 +154,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group create(AbstractUser groupOwner) {
         log.info("Creating default group for owner: [{}]", groupOwner.getStringId());
-        List<Group> userGroups = groupRepository.findByOwnerId(groupOwner.getStringId());
+        List<Group> userGroups = groupRepository.findByOwnerId(groupOwner.getStringId(), Pageable.ofSize(1));
         if (!userGroups.isEmpty() && !Objects.equals(groupOwner.getStringId(), userService.getSystem().getStringId())) {
             throw new IllegalArgumentException("Default group for owner [%s] already exists.".formatted(groupOwner.getUsername()));
         }
@@ -167,19 +176,22 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group getDefaultUserGroup(AbstractUser user) {
-        List<Group> userGroup = groupRepository.findByOwnerId(user.getStringId());
         String errorMessage = "Default user group for user [%s] does not exist.".formatted(user.getUsername());
-        if (userGroup.isEmpty()) {
-            throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.DEFAULT_USER_GROUP_NOT_FOUND, errorMessage);
-        }
-        return userGroup.stream().filter(g -> g.getIdentifier().equals(user.getUsername())).findFirst().orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.DEFAULT_USER_GROUP_NOT_FOUND, errorMessage));
-    }
+        // TODO: optimize - use ownerId + groupIdentifier == username (no need for iteration)
+        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<Group> userGroups;
+        do {
+            userGroups = groupRepository.findByOwnerId(user.getStringId(), pageable);
 
-//    @Override
-//    public Group getDefaultUserGroup(AbstractUser user) {
-//        Optional<Group> groupOptional = groupRepository.findByOwnerId(user.getStringId());
-//        return groupOptional.orElseThrow(() ->  new ResourceNotFoundException(ResourceNotFoundExceptionCode.DEFAULT_USER_GROUP_NOT_FOUND, "Default user group for user [" + user.getStringId() + "] does not exist"));
-//    }
+            Optional<Group> group = userGroups.stream().filter(g -> g.getIdentifier().equals(user.getUsername())).findFirst();
+            if (group.isPresent()) {
+                return group.get();
+            }
+
+            pageable = pageable.next();
+        } while (userGroups.hasNext());
+        throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.DEFAULT_USER_GROUP_NOT_FOUND, errorMessage);
+    }
 
     @Override
     public void addUserToDefaultSystemGroup(AbstractUser user) {
@@ -229,14 +241,15 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<AbstractUser> getGroupMembersById(String groupId) {
+    public Page<AbstractUser> getGroupMembersById(String groupId) {
         Group group = findById(groupId);
         return this.getGroupMembers(group);
     }
 
     @Override
-    public List<AbstractUser> getGroupMembers(Group group) {
-        return this.userService.findAllByIds(group.getMemberIds(), group.getRealmId());
+    public Page<AbstractUser> getGroupMembers(Group group) {
+        // TODO: pageable
+        return this.userService.findAllByIds(group.getMemberIds(), group.getRealmId(), Pageable.unpaged());
     }
 
     @Override
@@ -279,6 +292,11 @@ public class GroupServiceImpl implements GroupService {
         Group group = findById(groupId);
         group.addAuthority(authorityService.getOne(authorityId));
         return save(group);
+    }
+
+    @Override
+    public Page<Group> findByIds(Collection<String> ids, Pageable pageable) {
+        return groupRepository.findAllByIdIn(ids, pageable);
     }
 
     @Override
@@ -351,8 +369,8 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<String> getGroupsOwnerEmails(Collection<String> groupIds) {
-        return this.findAllByIds(groupIds).stream().map(this::getGroupOwnerEmail).collect(Collectors.toList());
+    public Page<String> getGroupsOwnerEmails(Collection<String> groupIds, Pageable pageable) {
+        return this.findByIds(groupIds, pageable).map(this::getGroupOwnerEmail);
     }
 
     @Override

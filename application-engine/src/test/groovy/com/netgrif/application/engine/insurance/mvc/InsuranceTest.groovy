@@ -61,7 +61,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 @AutoConfigureMockMvc
 @TestPropertySource(
-        locations = "classpath:application-test.properties"
+        locations = "classpath:application-test.yaml"
 )
 class InsuranceTest {
 

@@ -460,12 +460,6 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public Case decrypt(Case useCase) {
-        decryptDataSet(useCase);
-        return useCase;
-    }
-
-    @Override
     public Page<Case> searchAll(Predicate predicate) {
         return search(predicate, new FullPageRequest());
     }

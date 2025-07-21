@@ -3,12 +3,13 @@ package com.netgrif.application.engine.petrinet.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
+import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
+import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.ArcImportReference;
 import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.configuration.properties.CacheProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
 import com.netgrif.application.engine.objects.event.events.Event;
@@ -23,7 +24,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
-import com.netgrif.application.engine.objects.petrinet.domain.events.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
@@ -31,7 +31,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.version.Version;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
@@ -64,7 +63,6 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService.transformToReference;
 
@@ -82,7 +80,7 @@ public class PetriNetService implements IPetriNetService {
     protected MongoTemplate mongoTemplate;
 
     @Autowired
-    protected FileStorageConfiguration fileStorageConfiguration;
+    protected StorageConfigurationProperties fileStorageConfiguration;
 
 //    @Autowired
 //    protected IRuleEngine ruleEngine;
@@ -118,7 +116,7 @@ public class PetriNetService implements IPetriNetService {
     protected CacheManager cacheManager;
 
     @Autowired
-    protected CacheProperties cacheProperties;
+    protected CacheConfigurationProperties cacheProperties;
 
     @Resource
     protected PetriNetService self;
@@ -265,8 +263,8 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNet> getByIdentifier(String identifier) {
-        List<PetriNet> nets = repository.findAllByIdentifier(identifier);
+    public Page<PetriNet> getByIdentifier(String identifier, Pageable pageable) {
+        Page<PetriNet> nets = repository.findByIdentifier(identifier, pageable);
         nets.forEach(PetriNet::initializeArcs);
         return nets;
     }
@@ -323,8 +321,8 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNet> getAll() {
-        List<PetriNet> nets = repository.findAll();
+    public Page<PetriNet> getAll(Pageable pageable) {
+        Page<PetriNet> nets = repository.findAll(pageable);
         nets.forEach(PetriNet::initializeArcs);
         return nets;
     }
@@ -339,39 +337,64 @@ public class PetriNetService implements IPetriNetService {
                 return null;
             title = nets.getFirst().getTitle().getDefaultValue();
         }
-        return new FileSystemResource(fileStorageConfiguration.getStorageArchived() + netId + "-" + title + Importer.FILE_EXTENSION);
+        return new FileSystemResource(fileStorageConfiguration.getArchivedPath() + netId + "-" + title + Importer.FILE_EXTENSION);
     }
 
     @Override
-    public List<PetriNetReference> getReferences(LoggedUser user, Locale locale) {
-        return getAll().stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
+    public Page<PetriNetReference> getReferences(LoggedUser user, Locale locale, Pageable pageable) {
+        return getAll(pageable).map(net -> transformToReference(net, locale));
     }
 
     @Override
-    public List<PetriNetReference> getReferencesByIdentifier(String identifier, LoggedUser user, Locale locale) {
-        return getByIdentifier(identifier).stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
+    public Page<PetriNetReference> getReferencesByIdentifier(String identifier, LoggedUser user, Locale locale, Pageable pageable) {
+        return getByIdentifier(identifier, pageable).map(net -> transformToReference(net, locale));
     }
 
     @Override
-    public List<PetriNetReference> getReferencesByVersion(Version version, LoggedUser user, Locale locale) {
-        List<PetriNetReference> references;
-
+    public Page<PetriNetReference> getReferencesByVersion(Version version, LoggedUser user, Locale locale, Pageable pageable) {
+        Page<PetriNetReference> references;
         if (version == null) {
             GroupOperation groupByIdentifier = Aggregation.group("identifier").max("version").as("version");
-            Aggregation aggregation = Aggregation.newAggregation(groupByIdentifier);
-            AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, "petriNet", Document.class);
-            references = results.getMappedResults().stream()
+            Aggregation aggregation;
+            if (pageable == null || pageable.isUnpaged()) {
+                 aggregation = Aggregation.newAggregation(
+                         groupByIdentifier
+                );
+            } else {
+                aggregation = Aggregation.newAggregation(
+                        groupByIdentifier,
+                        Aggregation.sort(pageable.getSort()),
+                        Aggregation.skip((long) pageable.getPageNumber() * pageable.getPageSize()),
+                        Aggregation.limit(pageable.getPageSize())
+                );
+            }
+            List<Document> results = mongoTemplate.aggregate(aggregation, "petriNet", Document.class).getMappedResults();
+            List<PetriNetReference> referenceList = results.stream()
                     .map(doc -> {
                         Document versionDoc = doc.get("version", Document.class);
                         Version refVersion = new Version(versionDoc.getLong("major"), versionDoc.getLong("minor"), versionDoc.getLong("patch"));
                         return getReference(doc.getString("_id"), refVersion, user, locale);
                     })
                     .collect(Collectors.toList());
-        } else {
-            references = repository.findAllByVersion(version).stream()
-                    .map(net -> transformToReference(net, locale)).collect(Collectors.toList());
-        }
+            Aggregation countAggregation = Aggregation.newAggregation(
+                    groupByIdentifier,
+                    Aggregation.count().as("total")
+            );
+            AggregationResults<Document> countResults = mongoTemplate.aggregate(
+                    countAggregation,
+                    "petriNet",
+                    Document.class
+            );
 
+            Number totalNumber = countResults.getUniqueMappedResult() != null
+                    ? countResults.getUniqueMappedResult().get("total", Number.class)
+                    : 0;
+            long total = totalNumber != null ? totalNumber.longValue() : 0L;
+
+            references = new PageImpl<>(referenceList, pageable, total);
+        } else {
+            references = repository.findAllByVersion(version, pageable).map(net -> transformToReference(net, locale));
+        }
         return references;
     }
 
@@ -451,7 +474,8 @@ public class PetriNetService implements IPetriNetService {
             if (criteriaClass.getGroup().size() == 1) {
                 this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(groupService.getGroupOwnerEmail(criteriaClass.getGroup().get(0))));
             } else {
-                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(groupService.getGroupsOwnerEmails(criteriaClass.getGroup())));
+                // TODO: pagination?
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(groupService.getGroupsOwnerEmails(criteriaClass.getGroup(), Pageable.unpaged())));
             }
         }
         if (criteriaClass.getVersion() != null) {

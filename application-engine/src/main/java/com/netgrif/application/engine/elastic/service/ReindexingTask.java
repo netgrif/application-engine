@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.elastic.service;
 
+import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
@@ -30,7 +31,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
-@ConditionalOnExpression("'${spring.data.elasticsearch.reindex}'!= 'null'")
+@ConditionalOnExpression("'${netgrif.engine.data.elasticsearch.reindex}'!= 'null'")
 public class ReindexingTask {
 
     private static final Logger log = LoggerFactory.getLogger(ReindexingTask.class);
@@ -44,7 +45,7 @@ public class ReindexingTask {
     private IElasticCaseMappingService caseMappingService;
     private IElasticTaskMappingService taskMappingService;
     private IWorkflowService workflowService;
-
+    private DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
     private LocalDateTime lastRun;
 
     @Autowired
@@ -59,8 +60,7 @@ public class ReindexingTask {
             IElasticCaseMappingService caseMappingService,
             IElasticTaskMappingService taskMappingService,
             IWorkflowService workflowService,
-            @Value("${spring.data.elasticsearch.reindexExecutor.size:20}") int pageSize,
-            @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from) {
+            DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties) {
         this.caseRepository = caseRepository;
         this.taskRepository = taskRepository;
         this.elasticCaseRepository = elasticCaseRepository;
@@ -69,11 +69,12 @@ public class ReindexingTask {
         this.caseMappingService = caseMappingService;
         this.taskMappingService = taskMappingService;
         this.workflowService = workflowService;
-        this.pageSize = pageSize;
+        this.elasticsearchProperties = elasticsearchProperties;
+        this.pageSize = elasticsearchProperties.getReindexExecutor().getSize();
 
         lastRun = LocalDateTime.now();
-        if (from != null) {
-            lastRun = lastRun.minus(from);
+        if (this.elasticsearchProperties.getReindexFrom() != null) {
+            lastRun = lastRun.minus(this.elasticsearchProperties.getReindexFrom());
         }
     }
 

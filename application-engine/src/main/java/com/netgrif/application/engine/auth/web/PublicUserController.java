@@ -32,7 +32,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @ConditionalOnProperty(
-        value = "nae.public.user.web.enabled",
+        value = "netgrif.engine.public.web.user-enabled",
         havingValue = "true",
         matchIfMissing = true
 )

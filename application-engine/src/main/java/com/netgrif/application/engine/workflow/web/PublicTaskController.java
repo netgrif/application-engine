@@ -41,7 +41,7 @@ import java.util.Locale;
 @RestController
 @Tag(name = "Public Task Controller")
 @ConditionalOnProperty(
-        value = "nae.public.task.web.enabled",
+        value = "netgrif.engine.security.web.public-web.task-enabled",
         havingValue = "true",
         matchIfMissing = true
 )

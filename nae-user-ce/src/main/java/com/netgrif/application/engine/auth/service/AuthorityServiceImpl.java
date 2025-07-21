@@ -6,10 +6,11 @@ import com.netgrif.application.engine.objects.auth.domain.Authority;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -24,39 +25,15 @@ public class AuthorityServiceImpl implements AuthorityService {
     }
 
     @Override
-    public List<Authority> findAll() {
-        return authorityRepository.findAll();
+    public Page<Authority> findAll(Pageable pageable) {
+        return authorityRepository.findAll(pageable);
     }
 
     @Override
     @Transactional
-    public Authority getOrCreate(String s) {
-        Optional<Authority> authority = authorityRepository.findById(s);
-        return authority.orElseGet(() -> authorityRepository.save(new AuthorityImpl(s)));
-    }
-
-    @Override
-    @Transactional
-    public Authority getOrCreatePermission(String s) {
-        return getOrCreate(s);
-    }
-
-    @Override
-    @Transactional
-    public Authority getOrCreateRole(String s) {
-        return getOrCreate(s);
-    }
-
-    //TODO: this was never used
-    @Override
-    public List<Authority> getAllPermissions() {
-        return List.of();
-    }
-
-    //TODO: this was never used
-    @Override
-    public List<Authority> getAllRoles() {
-        return List.of();
+    public Authority getOrCreate(String name) {
+        Optional<Authority> authority = authorityRepository.findByName(name);
+        return authority.orElseGet(() -> authorityRepository.save(new AuthorityImpl(name)));
     }
 
     @Override
@@ -65,7 +42,7 @@ public class AuthorityServiceImpl implements AuthorityService {
     }
 
     @Override
-    public List<Authority> findAllByIds(Collection<String> ids) {
-        return authorityRepository.findAllBy_idIn(ids.stream().map(ObjectId::new).collect(Collectors.toList()));
+    public Page<Authority> findAllByIds(Collection<String> ids, Pageable pageable) {
+        return authorityRepository.findAllBy_idIn(ids.stream().map(ObjectId::new).collect(Collectors.toList()), pageable);
     }
 }

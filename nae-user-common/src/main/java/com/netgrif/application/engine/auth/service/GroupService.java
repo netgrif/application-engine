@@ -82,22 +82,9 @@ public interface GroupService {
      */
     Group findById(String id);
 
-    /**
-     * Retrieves all groups with the specified IDs.
-     *
-     * @param ids collection of group IDs to find
-     * @return list of {@link Group}s matching the provided IDs
-     */
-    List<Group> findAllByIds(Collection<String> ids);
-
-    /**
-     * Finds groups by IDs with pagination support.
-     *
-     * @param ids collection of group IDs to find
-     * @param pageable pagination information
-     * @return page of {@link Group}s matching the provided IDs
-     */
     Page<Group> findByIds(Collection<String> ids, Pageable pageable);
+
+    Page<Group> findAllByIds(Collection<String> ids, Pageable pageable);
 
     /**
      * Retrieves all groups with pagination support.
@@ -208,14 +195,6 @@ public interface GroupService {
     Group removeUser(AbstractUser user, Group group);
 
     /**
-     * Retrieves IDs of all users who are members of the same groups as the specified user.
-     *
-     * @param user the user whose co-members are to be found
-     * @return list of user IDs who are co-members
-     */
-    List<String> getAllCoMembers(AbstractUser user);
-
-    /**
      * Finds groups matching a given predicate with pagination.
      *
      * @param predicate the search predicate
@@ -316,14 +295,13 @@ public interface GroupService {
      * @return list of {@link AbstractUser}s who are members of the group
      */
     List<AbstractUser> getGroupMembers(Group group);
-
     /**
      * Retrieves email addresses of the owners of specified groups.
      *
      * @param groupIds collection of group IDs
      * @return collection of owner email addresses
      */
-    Collection<String> getGroupsOwnerEmails(Collection<String> groupIds);
+    Page<String> getGroupsOwnerEmails(Collection<String> groupIds, Pageable pageable);
 
     /**
      * Retrieves the email address of a specified group's owner.

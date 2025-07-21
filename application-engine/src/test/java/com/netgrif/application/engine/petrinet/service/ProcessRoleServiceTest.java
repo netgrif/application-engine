@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -54,14 +55,14 @@ class ProcessRoleServiceTest {
 
     @Test
     void shouldFindAllProcessRoles() throws IOException, MissingPetriNetMetaDataException {
-        List<ProcessRole> roles = processRoleService.findAll(Pageable.unpaged());
-        int originalRoles = roles.size();
+        Page<ProcessRole> roles = processRoleService.findAll(Pageable.unpaged());
+        long originalRoles = roles.getTotalElements();
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/role_all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         roles = processRoleService.findAll(Pageable.unpaged());
         assertNotNull(roles);
         assertFalse(roles.isEmpty());
-        assertEquals(originalRoles + 3, roles.size()); // + 2 roles from all_data and 1 role from role_all_data
+        assertEquals(originalRoles + 3, roles.getTotalElements()); // + 2 roles from all_data and 1 role from role_all_data
     }
 
     @Test
@@ -94,20 +95,20 @@ class ProcessRoleServiceTest {
     @Test
     void shouldFindAllProcessRolesByImportId() throws IOException, MissingPetriNetMetaDataException {
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
-        List<ProcessRole> roles = processRoleService.findAllByImportId(ROLE_IMPORT_ID);
+        Page<ProcessRole> roles = processRoleService.findAllByImportId(ROLE_IMPORT_ID, Pageable.unpaged());
         assertNotNull(roles);
         assertFalse(roles.isEmpty());
-        assertEquals(1, roles.size());
+        assertEquals(1, roles.getTotalElements());
         assertEquals(ROLE_IMPORT_ID, roles.stream().findFirst().get().getImportId());
     }
 
     @Test
     void shouldFindAllProcessRolesByName() throws IOException, MissingPetriNetMetaDataException {
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
-        Collection<ProcessRole> roles = processRoleService.findAllByDefaultName("Process role");
+        Page<ProcessRole> roles = processRoleService.findAllByDefaultName("Process role", Pageable.unpaged());
         assertNotNull(roles);
         assertFalse(roles.isEmpty());
-        assertEquals(1, roles.size());
+        assertEquals(1, roles.getTotalElements());
         assertEquals(ROLE_IMPORT_ID, roles.stream().findFirst().get().getImportId());
     }
 }

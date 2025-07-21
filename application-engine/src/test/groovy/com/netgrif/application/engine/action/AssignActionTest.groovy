@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
@@ -148,8 +149,8 @@ class AssignActionTest {
         AbstractUser updatedUser = userService.findByEmail(USER_EMAIL, null)
         Set<ProcessRole> roles = updatedUser.getProcessRoles()
 
-        String adminMainId = processRoleRepository.findAllByName_DefaultValue("admin_main")?.first()?.stringId
-        String adminSecondaryId = processRoleRepository.findAllByName_DefaultValue("admin_secondary")?.first()?.stringId
+        String adminMainId = processRoleRepository.findAllByName_DefaultValue("admin_main", Pageable.ofSize(1))?.first()?.stringId
+        String adminSecondaryId = processRoleRepository.findAllByName_DefaultValue("admin_secondary", Pageable.ofSize(1))?.first()?.stringId
 
         assert roles.find { it.stringId == adminMainId }
         assert roles.find { it.stringId == adminSecondaryId }

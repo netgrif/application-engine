@@ -1,7 +1,9 @@
 package com.netgrif.application.engine.petrinet.config;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.service.GroupService;
+import com.netgrif.application.engine.auth.service.RealmService;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.RoleActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
@@ -27,7 +29,9 @@ public class ProcessBeansConfiguration {
                                                  @Lazy PetriNetService petriNetService,
                                                  @Lazy UserService userService,
                                                  ISecurityContextService securityContextService,
-                                                 @Lazy GroupService groupService
+                                                 @Lazy GroupService groupService,
+                                                 @Lazy RealmService realmService,
+                                                 @Lazy PaginationProperties paginationProperties
                                                  ) {
         return new com.netgrif.application.engine.petrinet.service.ProcessRoleService(
                 processRoleRepository,
@@ -37,7 +41,9 @@ public class ProcessBeansConfiguration {
                 petriNetService,
                 userService,
                 securityContextService,
-                groupService
+                groupService,
+                realmService,
+                paginationProperties
         );
     }
 

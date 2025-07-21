@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.configuration.security.jwt;
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.Attribute;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.AuthorityService;
@@ -30,7 +31,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class JwtService implements IJwtService {
     private byte[] secret;
-    private final JwtProperties properties;
+    private final SecurityConfigurationProperties.JwtProperties properties;
     private final ProcessRoleService roleService;
     private final AuthorityService authorityService;
 

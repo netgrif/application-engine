@@ -4,7 +4,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.netgrif.application.engine.auth.service.interfaces.ILoginAttemptService;
-import com.netgrif.application.engine.configuration.properties.SecurityLimitsProperties;
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,11 +17,11 @@ import java.util.concurrent.ExecutionException;
 public class LoginAttemptService implements ILoginAttemptService {
 
     @Autowired
-    private SecurityLimitsProperties securityLimitsProperties;
+    private SecurityConfigurationProperties.SecurityLimitsProperties securityLimitsProperties;
 
     private LoadingCache<String, Integer> attemptsCache;
 
-    public LoginAttemptService(SecurityLimitsProperties securityLimitsProperties) {
+    public LoginAttemptService(SecurityConfigurationProperties.SecurityLimitsProperties securityLimitsProperties) {
         super();
         attemptsCache = CacheBuilder.newBuilder().
                 expireAfterWrite(securityLimitsProperties.getLoginTimeout(), securityLimitsProperties.getLoginTimeoutUnit()).build(new CacheLoader<>() {

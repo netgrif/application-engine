@@ -4,10 +4,9 @@ import com.icegreen.greenmail.configuration.GreenMailConfiguration
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.application.engine.TestHelper
-
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
-import com.netgrif.application.engine.configuration.PublicViewProperties
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
@@ -43,7 +42,7 @@ class ActionDelegateTest {
     private UserService userService
 
     @Autowired
-    private PublicViewProperties publicViewProperties
+    private SecurityConfigurationProperties.WebProperties webProperties
 
     @BeforeEach
     void before() {
@@ -112,7 +111,7 @@ class ActionDelegateTest {
         final String identifier = "identifier"
         final String url = "test.public.url/${getEncoder().encodeToString(identifier.bytes)}"
         assert actionDelegate.makeUrl(identifier) == url
-        assert actionDelegate.makeUrl(publicViewProperties.url, identifier) == url
+        assert actionDelegate.makeUrl(webProperties.publicWeb.url, identifier) == url
         assert actionDelegate.makeUrl("test.netgrif.com/public", "identifier") == "test.netgrif.com/public/${getEncoder().encodeToString(identifier.bytes)}"
     }
 }

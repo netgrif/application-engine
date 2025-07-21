@@ -7,39 +7,31 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-@ConfigurationProperties(prefix = "nae.actions")
+@ConfigurationProperties(prefix = "netgrif.engine.actions")
 @Data
 @Component
 public class ActionsProperties {
 
     /**
-     * <pre>
      * Class imports. Example:
-     * <code>nae.actions.imports=java.time.LocalDate</code>
-     * Will result in:
-     * <code>import java.date.LocalDate</code>
-     * </pre>
+     * {@code netgrif.engine.actions.imports=java.time.LocalDate}
+     * Will result in: {@code import java.date.LocalDate}
      */
     private List<String> imports = new ArrayList<>();
 
     /**
-     * <pre>
      * Package imports. Example:
-     * <code>nae.actions.star-imports=java.time,com.netgrif</code>
+     * {@code netgrif.engine.actions.star-imports=java.time,com.netgrif}
      * Will result in:
-     * <code>import java.date.*
-     * import com.netgrif.*</code>
-     * </pre>
+     * {@code import java.date.*
+     * import com.netgrif.*}
      */
     private List<String> starImports = new ArrayList<>();
 
     /**
-     * <pre>
      * Static property imports. Example:
-     * <code>nae.actions.static-star-imports=java.time.LocalDate</code>
-     * Will result in:
-     * <code>import static java.time.LocalDate.*</code>
-     * </pre>
+     * {@code netgrif.engine.actions.static-star-imports=java.time.LocalDate}
+     * Will result in: {@code import static java.time.LocalDate.*}
      */
     private List<String> staticStarImports = new ArrayList<>();
 }

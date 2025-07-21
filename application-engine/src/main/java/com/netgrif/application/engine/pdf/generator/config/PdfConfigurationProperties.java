@@ -11,10 +11,10 @@ import org.springframework.stereotype.Component;
 import java.time.ZoneId;
 import java.util.Locale;
 
-@ConfigurationProperties(prefix = "nae.pdf.properties")
+@ConfigurationProperties(prefix = "netgrif.engine.pdf")
 @Component
 @Data
-public class PdfProperties {
+public class PdfConfigurationProperties {
 
     protected int unit = 20;
 

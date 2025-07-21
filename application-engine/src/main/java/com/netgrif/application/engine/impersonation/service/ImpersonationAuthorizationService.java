@@ -1,9 +1,11 @@
 package com.netgrif.application.engine.impersonation.service;
 
+import com.netgrif.application.engine.configuration.properties.ImpersonationConfigurationProperties;
+import com.netgrif.application.engine.objects.auth.domain.Authority;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
@@ -35,7 +37,7 @@ import static com.netgrif.application.engine.startup.runner.ImpersonationRunner.
 public class ImpersonationAuthorizationService implements IImpersonationAuthorizationService {
 
     @Autowired
-    protected ImpersonationProperties properties;
+    protected ImpersonationConfigurationProperties properties;
 
     @Autowired
     protected UserService userService;
@@ -97,7 +99,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
             return new ArrayList<>();
         }
         Set<String> authIds = extractSetFromField(configs, "impersonated_authorities");
-        return authorityService.findAllByIds(new ArrayList<>(authIds)).stream()
+        return authorityService.findAllByIds(new ArrayList<>(authIds), Pageable.unpaged()).stream()
                 .filter(configAuth -> impersonated.getAuthoritySet().stream().anyMatch(userAuth -> userAuth.getStringId().equals(configAuth.getStringId())))
                 .collect(Collectors.toList());
     }

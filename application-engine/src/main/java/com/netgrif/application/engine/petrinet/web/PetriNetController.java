@@ -15,7 +15,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingP
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
@@ -58,7 +57,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api/petrinet")
 @ConditionalOnProperty(
-        value = "nae.petrinet.web.enabled",
+        value = "netgrif.engine.security.web.petri-net-enabled",
         havingValue = "true",
         matchIfMissing = true
 )
@@ -66,9 +65,6 @@ import java.util.Objects;
 public class PetriNetController {
 
     private static final Logger log = LoggerFactory.getLogger(PetriNetController.class);
-
-    @Autowired
-    private FileStorageConfiguration fileStorageConfiguration;
 
     @Autowired
     private IPetriNetService service;
@@ -125,13 +121,14 @@ public class PetriNetController {
     public ResponseEntity<Page<PetriNetReference>> getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Pageable pageable, Authentication auth, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         if (identifier != null && version == null) {
-            return ResponseEntity.ok(new PageImpl<>(service.getReferencesByIdentifier(identifier, user, locale), pageable, 0));
+            return ResponseEntity.ok(service.getReferencesByIdentifier(identifier, user, locale, pageable));
         } else if (identifier == null && version != null) {
-            return ResponseEntity.ok(new PageImpl<>(service.getReferencesByVersion(converter.convert(version), user, locale), pageable, 0));
+            return ResponseEntity.ok(service.getReferencesByVersion(converter.convert(version), user, locale, pageable));
         } else if (identifier != null) {
-            return ResponseEntity.ok(new PageImpl<>(Collections.singletonList(service.getReference(identifier, converter.convert(version), user, locale)), pageable, 0));
+            PetriNetReference reference = service.getReference(identifier, converter.convert(version), user, locale);
+            return ResponseEntity.ok(new PageImpl<>(Collections.singletonList(reference), pageable, reference.getIdentifier().isEmpty() ? 0 : 1));
         } else {
-            return ResponseEntity.ok(new PageImpl<>(service.getReferences(user, locale), pageable, 0));
+            return ResponseEntity.ok(service.getReferences(user, locale, pageable));
         }
     }
 

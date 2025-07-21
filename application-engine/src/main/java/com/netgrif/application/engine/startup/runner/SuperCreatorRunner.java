@@ -1,10 +1,13 @@
 package com.netgrif.application.engine.startup.runner;
 
+import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.service.AuthorityService;
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
@@ -15,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -28,18 +33,16 @@ import java.util.Set;
 @Component
 @RunnerOrder(150)
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "admin.create-super", matchIfMissing = true)
+@ConditionalOnProperty(value = "netgrif.engine.security.auth.create-super", matchIfMissing = true)
 public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
 
     public static final String SUPER_ADMIN_EMAIL = "super@netgrif.com";
-
-    @Value("${nae.admin.password}")
-    private String superAdminPassword;
-
+    private final SecurityConfigurationProperties securityProperties;
     private final AuthorityService authorityService;
     private final UserService userService;
     private final GroupService groupService;
     private final ProcessRoleService processRoleService;
+    private final PaginationProperties paginationProperties;
 
     @Getter
     private AbstractUser superUser;
@@ -67,11 +70,11 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
             user.setLastName("Netgrif");
             user.setUsername(SUPER_ADMIN_EMAIL);
             user.setEmail(SUPER_ADMIN_EMAIL);
-            PasswordCredential passwordCredential = new PasswordCredential(passwordEncoder.encode(superAdminPassword), 0, true);
+            PasswordCredential passwordCredential = new PasswordCredential(passwordEncoder.encode(securityProperties.getAuth().getAdminPassword()), 0, true);
             user.setCredential("password", passwordCredential);
             user.setState(UserState.ACTIVE);
             user.setAuthoritySet(authorities);
-            user.setProcessRoles(new HashSet<>(processRoleService.findAll(Pageable.unpaged())));
+            user.setProcessRoles(new HashSet<>(processRoleService.findAll(Pageable.unpaged()).getContent()));
             this.superUser = userService.createUser(user, null);
             log.info("Super user created");
         } else {
@@ -94,12 +97,12 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     }
 
     public void setAllProcessRoles() {
-        superUser.setProcessRoles(Set.copyOf(processRoleService.findAll(Pageable.unpaged())));
+        superUser.setProcessRoles(new HashSet<>(processRoleService.findAll(Pageable.unpaged()).getContent()));
         superUser = userService.saveUser(superUser, null);
     }
 
     public void setAllAuthorities() {
-        superUser.setAuthoritySet(Set.copyOf(authorityService.findAll()));
+        superUser.setAuthoritySet(new HashSet<>(authorityService.findAll(Pageable.unpaged()).stream().toList()));
         superUser = userService.saveUser(superUser, null);
     }
 

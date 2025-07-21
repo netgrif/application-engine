@@ -21,7 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
-@TestPropertySource(properties = "nae.storage.minio.enabled=true")
+@TestPropertySource(properties = "netgrif.engine.storage.minio.enabled=true")
 @SpringBootTest
 class NewInitTest {
 

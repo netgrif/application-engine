@@ -27,7 +27,7 @@
 //        classes = ApplicationEngine.class
 //)
 //@TestPropertySource(
-//        locations = "classpath:application-test.properties"
+//        locations = "classpath:application-test.yaml"
 //)
 //@ActiveProfiles({"test"})
 //@ExtendWith(SpringExtension.class)

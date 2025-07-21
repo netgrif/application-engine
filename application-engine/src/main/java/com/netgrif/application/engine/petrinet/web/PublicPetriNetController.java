@@ -31,7 +31,7 @@ import static com.netgrif.application.engine.petrinet.web.PetriNetController.dec
 @Slf4j
 @RestController
 @ConditionalOnProperty(
-        value = "nae.public.petrinet.web.enabled",
+        value = "netgrif.engine.security.web.public-web.petri-net-enabled",
         havingValue = "true",
         matchIfMissing = true
 )

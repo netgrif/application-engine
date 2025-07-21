@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class EncryptionConfiguration {
 
-    @Value("${nae.database.password}")
-    private String password;
+    @Autowired
+    private SecurityConfigurationProperties.EncryptionProperties encryptionProperties;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -25,7 +26,7 @@ public class EncryptionConfiguration {
         StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
 
         encryptor.setAlgorithm("PBEWITHSHA256AND256BITAES-CBC-BC");
-        encryptor.setPassword(password);
+        encryptor.setPassword(encryptionProperties.getPassword());
         encryptor.setProvider(new BouncyCastleProvider());
 
         return encryptor;

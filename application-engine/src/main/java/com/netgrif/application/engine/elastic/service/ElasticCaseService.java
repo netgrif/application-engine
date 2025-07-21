@@ -2,8 +2,8 @@ package com.netgrif.application.engine.elastic.service;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
+import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.metrics.export.elastic.ElasticProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -54,12 +55,10 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     protected final ElasticCaseRepository repository;
     protected final ElasticsearchTemplate template;
     protected final Executor executors;
-    protected final ElasticsearchProperties elasticsearchProperties;
+    protected DataConfigurationProperties.ElasticsearchProperties elasticProperties;
     protected IPetriNetService petriNetService;
     protected IWorkflowService workflowService;
     protected IElasticCasePrioritySearch iElasticCasePrioritySearch;
-    @Value("${spring.data.elasticsearch.index.case}")
-    protected String caseIndex;
 
     @Autowired
     @Lazy
@@ -79,6 +78,11 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     @Autowired
     public void setElasticCasePrioritySearch(IElasticCasePrioritySearch iElasticCasePrioritySearch) {
         this.iElasticCasePrioritySearch = iElasticCasePrioritySearch;
+    }
+
+    @Autowired
+    public void setElasticProperties(DataConfigurationProperties.ElasticsearchProperties elasticProperties) {
+        this.elasticProperties = elasticProperties;
     }
 
     @Override
@@ -138,7 +142,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         List<Case> casePage;
         long total;
         if (query != null) {
-            SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, IndexCoordinates.of(caseIndex));
+            SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, IndexCoordinates.of(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX)));
             Page<ElasticCase> indexedCases = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
             total = indexedCases.getTotalElements();

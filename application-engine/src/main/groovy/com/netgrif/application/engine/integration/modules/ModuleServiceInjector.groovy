@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component
 
 @Component
 @RunnerOrder(209)
-@ConditionalOnProperty(value = "nae.modules.services.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(value = "netgrif.engine.module.service.enabled", havingValue = "true", matchIfMissing = true)
 class ModuleServiceInjector implements ApplicationEngineFinishRunner {
 
     private static final Logger log = LoggerFactory.getLogger(ModuleServiceInjector.class)

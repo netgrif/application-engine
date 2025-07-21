@@ -7,9 +7,12 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import lombok.RequiredArgsConstructor;
 import org.springdoc.core.GroupedOpenApi;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -17,14 +20,18 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Configuration
 @EnableWebMvc
 @ConditionalOnProperty(
-        value = "nae.openapi.enabled",
+        value = "netgrif.engine.openapi.enabled",
         havingValue = "true",
         matchIfMissing = true
 )
 public class OpenApiConfiguration {
 
-    @Value("${project.version}")
-    private String projectVersion;
+    private BuildProperties buildProperties;
+
+    @Autowired
+    public void setBuildProperties(BuildProperties buildProperties) {
+        this.buildProperties = buildProperties;
+    }
 
     @Bean
     public OpenAPI applicationEngineOpenApi() {
@@ -35,7 +42,7 @@ public class OpenApiConfiguration {
                 .info(new Info()
                         .title("Netgrif Application Engine")
                         .description("Web services used in every Netgrif application engine project.")
-                        .version(projectVersion)
+                        .version(buildProperties.getVersion())
                         .license(new License()
                                 .name("NETGRIF Community License")
                                 .url("https://netgrif.com/license")))

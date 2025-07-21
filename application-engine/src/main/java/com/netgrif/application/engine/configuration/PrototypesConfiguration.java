@@ -9,7 +9,6 @@ import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDataH
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDrawer;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
-import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -30,12 +29,6 @@ public class PrototypesConfiguration {
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public ActionDelegate actionDelegate() {
         return new ActionDelegate();
-    }
-
-    @Bean("fileStorageConfiguration")
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public FileStorageConfiguration fileStorageConfiguration() {
-        return new FileStorageConfiguration();
     }
 
     @Bean

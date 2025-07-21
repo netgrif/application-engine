@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service.interfaces;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.Transition;
@@ -12,25 +12,25 @@ import java.io.OutputStream;
 import java.util.List;
 
 public interface IPdfGenerator {
-    void setupPdfGenerator(PdfResource pdfResource) throws IOException;
+    void setupPdfGenerator(PdfResourceConfigurationProperties pdfResource) throws IOException;
 
-    void setupPdfGenerator(PdfResource pdfResource, float version) throws IOException;
+    void setupPdfGenerator(PdfResourceConfigurationProperties pdfResource, float version) throws IOException;
 
-    void addCustomField(PdfField field, PdfResource pdfResource) throws IOException;
+    void addCustomField(PdfField field, PdfResourceConfigurationProperties pdfResource) throws IOException;
 
-    File generatePdf(Case formCase, String transitionId, PdfResource pdfResource, List<String> excludedFields);
+    File generatePdf(Case formCase, String transitionId, PdfResourceConfigurationProperties pdfResource, List<String> excludedFields);
 
-    File generatePdf(Case formCase, String transitionId, PdfResource pdfResource) throws IOException;
+    File generatePdf(Case formCase, String transitionId, PdfResourceConfigurationProperties pdfResource) throws IOException;
 
-    File generatePdf(PdfResource pdfResource) throws IOException;
+    File generatePdf(PdfResourceConfigurationProperties pdfResource) throws IOException;
 
-    void generatePdf(Case formCase, String transitionId, PdfResource pdfResource, OutputStream stream);
+    void generatePdf(Case formCase, String transitionId, PdfResourceConfigurationProperties pdfResource, OutputStream stream);
 
-    void generatePdf(Case formCase, Transition transition, PdfResource pdfResource, OutputStream stream);
+    void generatePdf(Case formCase, Transition transition, PdfResourceConfigurationProperties pdfResource, OutputStream stream);
 
-    void generateData(PetriNet petriNet, Case useCase, Transition transition, PdfResource pdfResource, List<String> excludedFields);
+    void generateData(PetriNet petriNet, Case useCase, Transition transition, PdfResourceConfigurationProperties pdfResource, List<String> excludedFields);
 
-    void generateData(PetriNet petriNet, Case useCase, Transition transition, PdfResource pdfResource);
+    void generateData(PetriNet petriNet, Case useCase, Transition transition, PdfResourceConfigurationProperties pdfResource);
 
-    void generateData(PdfField pdfField, PdfResource pdfResource) throws IOException;
+    void generateData(PdfField pdfField, PdfResourceConfigurationProperties pdfResource) throws IOException;
 }

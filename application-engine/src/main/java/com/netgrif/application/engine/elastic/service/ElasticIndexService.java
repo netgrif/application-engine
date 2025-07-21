@@ -4,7 +4,7 @@ package com.netgrif.application.engine.elastic.service;
 import co.elastic.clients.elasticsearch._types.AcknowledgedResponse;
 import co.elastic.clients.elasticsearch.indices.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
+import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public class ElasticIndexService implements IElasticIndexService {
     private static final String PLACEHOLDERS = "petriNetIndex, caseIndex, taskIndex";
     private final ApplicationContext context;
     private final ElasticsearchTemplate elasticsearchTemplate;
-    private final ElasticsearchProperties elasticsearchProperties;
+    private final DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
 
     @Override
     public boolean indexExists(String indexName) {

@@ -1,11 +1,9 @@
 package com.netgrif.application.engine.configuration;
 
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
-import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
-import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
 import com.netgrif.application.engine.configuration.security.ImpersonationRequestFilter;
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.application.engine.configuration.security.RestAuthenticationEntryPoint;
@@ -68,16 +66,13 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     private UserService userService;
 
     @Autowired
-    private NaeAuthProperties naeAuthProperties;
+    private SecurityConfigurationProperties securityConfigurationProperties;
 
     @Autowired
-    private SecurityConfigProperties properties;
+    private SecurityConfigurationProperties properties;
 
     @Autowired
     private ISecurityContextService securityContextService;
-
-    @Autowired
-    protected NaeLdapProperties ldapProperties;
 
     @Autowired
     protected IImpersonationService impersonationService;
@@ -160,12 +155,12 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Override
     protected String[] getStaticPatterns() {
-        return this.naeAuthProperties.getStaticPatterns();
+        return this.securityConfigurationProperties.getStaticPatterns();
     }
 
     @Override
     protected String[] getServerPatterns() {
-        return this.naeAuthProperties.getServerPatterns();
+        return this.securityConfigurationProperties.getServerPatterns();
     }
 
     @Override
@@ -174,7 +169,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     }
 
     @Override
-    protected SecurityConfigProperties getSecurityConfigProperties() {
+    protected SecurityConfigurationProperties getSecurityConfigProperties() {
         return properties;
     }
 
@@ -183,8 +178,8 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
         return new PublicAuthenticationFilter(
                 (ProviderManager) authenticationManager(authenticationManagerBuilder),
                 new AnonymousAuthenticationProvider(ANONYMOUS_USER),
-                naeAuthProperties.getServerPatterns(),
-                naeAuthProperties.getAnonymousExceptions(),
+                securityConfigurationProperties.getServerPatterns(),
+                securityConfigurationProperties.getAnonymousExceptions(),
                 jwtService,
                 userService,
                 authorityService

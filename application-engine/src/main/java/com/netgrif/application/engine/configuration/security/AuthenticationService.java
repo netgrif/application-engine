@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.configuration.security;
 
 
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
+import com.netgrif.application.engine.configuration.properties.ServerConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.configuration.security.interfaces.IAuthenticationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
@@ -28,20 +30,16 @@ import java.util.concurrent.ConcurrentMap;
 @Service
 public class AuthenticationService implements IAuthenticationService, ApplicationListener<SessionDestroyedEvent> {
 
-
-    @Value("${server.login.attempts:10}")
-    private int maxLoginAttempts;
-
-    @Value("${server.login.timeout:15}")
-    private int loginTimeout;
-
     private ConcurrentMap<String, Attempt> cache;
 
-    @Autowired
-    private IImpersonationService impersonationService;
+    private final IImpersonationService impersonationService;
+    private final SecurityConfigurationProperties securityConfigurationProperties;
 
-    public AuthenticationService() {
+    public AuthenticationService(IImpersonationService impersonationService,
+                                 SecurityConfigurationProperties securityConfigurationProperties) {
         super();
+        this.impersonationService = impersonationService;
+        this.securityConfigurationProperties = securityConfigurationProperties;
         cache = new ConcurrentHashMap<>();
     }
 
@@ -80,7 +78,7 @@ public class AuthenticationService implements IAuthenticationService, Applicatio
         timeout(key);
         Attempt attempt = cache.getOrDefault(key, new Attempt());
         attempt.increase();
-        if (attempt.getCount() >= maxLoginAttempts)
+        if (attempt.getCount() >= securityConfigurationProperties.getLimits().getLoginAttempts())
             attempt.setBlockTime(LocalDateTime.now());
 
         cache.put(key, attempt);
@@ -96,7 +94,7 @@ public class AuthenticationService implements IAuthenticationService, Applicatio
         Attempt attempt = cache.get(key);
         if (attempt == null || attempt.getBlockTime() == null)
             return;
-        if (ChronoUnit.SECONDS.between(attempt.getBlockTime(), LocalDateTime.now()) >= loginTimeout)
+        if (ChronoUnit.SECONDS.between(attempt.getBlockTime(), LocalDateTime.now()) >= securityConfigurationProperties.getLimits().getLoginTimeout())
             cache.remove(key);
 
     }

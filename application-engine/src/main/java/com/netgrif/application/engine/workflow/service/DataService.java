@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
 import com.netgrif.application.engine.auth.service.UserService;
@@ -103,11 +104,8 @@ public class DataService implements IDataService {
     @Autowired
     private StorageResolverService storageResolverService;
 
-    @Value("${nae.image.preview.scaling.px:400}")
-    protected int imageScale;
-
-    @Value("${nae.validation.setData.enable:false}")
-    protected boolean validationEnable;
+    @Autowired
+    private DataConfigurationProperties dataConfigurationProperties;
 
     @Override
     public GetDataEventOutcome getData(String taskId) {
@@ -289,7 +287,7 @@ public class DataService implements IDataService {
                 if (modified) {
                     dataField.setLastModified(LocalDateTime.now());
                 }
-                if (validationEnable) {
+                if (dataConfigurationProperties.getValidation().isSetDataEnabled()) {
                     validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), dataField);
                 }
                 outcome.addChangedField(fieldId, changedField);
@@ -550,7 +548,7 @@ public class DataService implements IDataService {
     private ByteArrayOutputStream generateFilePreviewToStream(File file) throws IOException {
         FileFieldDataType fileType = FileFieldDataType.resolveTypeFromName(file.getName());
         BufferedImage image = getBufferedImageFromFile(file, fileType);
-        if (image.getWidth() > imageScale || image.getHeight() > imageScale) {
+        if (image.getWidth() > dataConfigurationProperties.getImagePreviewScalingPx() || image.getHeight() > dataConfigurationProperties.getImagePreviewScalingPx()) {
             image = scaleImagePreview(image);
         }
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -572,7 +570,7 @@ public class DataService implements IDataService {
     }
 
     private BufferedImage scaleImagePreview(BufferedImage image) {
-        float ratio = image.getHeight() > image.getWidth() ? image.getHeight() / (float) imageScale : image.getWidth() / (float) imageScale;
+        float ratio = image.getHeight() > image.getWidth() ? image.getHeight() / (float) dataConfigurationProperties.getImagePreviewScalingPx() : image.getWidth() / (float) dataConfigurationProperties.getImagePreviewScalingPx();
         int targetWidth = Math.round(image.getWidth() / ratio);
         int targetHeight = Math.round(image.getHeight() / ratio);
         Image targetImage = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);

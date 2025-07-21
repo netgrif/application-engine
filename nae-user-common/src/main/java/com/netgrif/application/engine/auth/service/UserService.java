@@ -185,22 +185,13 @@ public interface UserService {
     AbstractUser findByEmail(String email, String realmId);
 
     /**
-     * Finds all co-members for a logged user with pagination.
-     *
-     * @param loggedUser the currently logged user
-     * @param pageable pagination information
-     * @return page of co-members
-     */
-    Page<AbstractUser> findAllCoMembers(LoggedUser loggedUser, Pageable pageable);
-
-    /**
      * Finds all users by their IDs in a specific realm.
      *
      * @param ids collection of user identifiers
      * @param realmId the realm identifier
      * @return list of found users
      */
-    List<AbstractUser> findAllByIds(Collection<String> ids, String realmId);
+    Page<AbstractUser> findAllByIds(Collection<String> ids, String realmId, Pageable pageable);
 
     /**
      * Finds all active users with specific process roles.
@@ -209,34 +200,16 @@ public interface UserService {
      * @param pageable pagination information
      * @return page of users
      */
-    Page<AbstractUser> findAllActiveByProcessRoles(Collection<ProcessResourceId> roleIds, Pageable pageable);
-
-    /**
-     * Finds all active users with specific process roles in specific realms.
-     *
-     * @param roleIds collection of process role identifiers
-     * @param pageable pagination information
-     * @param realmIds collection of realm identifiers
-     * @return page of users
-     */
-    Page<AbstractUser> findAllActiveByProcessRoles(Collection<ProcessResourceId> roleIds, Pageable pageable, Collection<String> realmIds);
+    Page<AbstractUser> findAllActiveByProcessRoles(Collection<ProcessResourceId> roleIds, Pageable pageable, String realmId);
 
     /**
      * Finds all users with specific process roles in specific realms.
      *
      * @param roleIds collection of process role identifiers
-     * @param realmIds collection of realm identifiers
+     * @param realmId realm identifier
      * @return list of users
      */
-    List<AbstractUser> findAllByProcessRoles(Collection<ProcessResourceId> roleIds, Collection<String> realmIds);
-
-    /**
-     * Finds all users with specific process roles.
-     *
-     * @param roleIds collection of process role identifiers
-     * @return list of users
-     */
-    List<AbstractUser> findAllByProcessRoles(Collection<ProcessResourceId> roleIds);
+    Page<AbstractUser> findAllByProcessRoles(Collection<ProcessResourceId> roleIds, String realmId, Pageable pageable);
 
     /**
      * Adds default authorities to a user.
@@ -321,7 +294,7 @@ public interface UserService {
      * @param pageable pagination information
      * @return page of matching co-members
      */
-    Page<AbstractUser> searchAllCoMembers(String query, Collection<ProcessResourceId> roleIds, 
+    Page<AbstractUser> searchAllCoMembers(String query, Collection<ProcessResourceId> roleIds,
             Collection<ProcessResourceId> negateRoleIds, LoggedUser loggedUser, Pageable pageable);
 
     /**
@@ -409,15 +382,7 @@ public interface UserService {
      */
     void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
 
-    /**
-     * Finds all users with specified state and expiration date before given date in specified realms.
-     *
-     * @param state the user state
-     * @param expirationDate the expiration date
-     * @param realmIds collection of realm identifiers
-     * @return list of matching users
-     */
-    List<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
+    Page<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, String realmIds, Pageable pageable);
 
     /**
      * Gets all groups associated with an actor.

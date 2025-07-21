@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.startup.runner;
 
+import com.netgrif.application.engine.configuration.properties.FilterConfigurationProperties;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
@@ -47,18 +48,16 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
     public static final String FILTER_VISIBILITY_PRIVATE = "private";
     public static final String FILTER_VISIBILITY_PUBLIC = "public";
 
-    @Value("${nae.create.default.filters:false}")
-    private Boolean createDefaultFilters;
-
     private final IPetriNetService petriNetService;
     private final IWorkflowService workflowService;
     private final UserService userService;
     private final ITaskService taskService;
     private final IDataService dataService;
+    private final FilterConfigurationProperties filterConfigurationProperties;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        if (!createDefaultFilters) return;
+        if (!filterConfigurationProperties.isCreateDefaultFilters()) return;
         // All cases
         createCaseFilter("All cases", "assignment", FILTER_VISIBILITY_PUBLIC, "", new ArrayList<String>(),
                 new HashMap<>(Map.of(

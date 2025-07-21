@@ -3,7 +3,6 @@ package com.netgrif.application.engine.workflow.service.interfaces;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
@@ -68,20 +67,13 @@ public interface IWorkflowService {
 
     Map<String, I18nString> listToMap(List<Case> cases);
 
-//    @Deprecated
-//    List<Field> getData(String caseId);
-
     Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale);
 
     long count(Map<String, Object> request, LoggedUser user, Locale locale);
 
-//    List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId);
-
     boolean removeTasksFromCase(List<Task> tasks, String caseId);
 
     boolean removeTasksFromCase(List<Task> tasks, Case useCase);
-
-    Case decrypt(Case useCase);
 
     Page<Case> search(Predicate predicate, Pageable pageable);
 }

@@ -1,34 +1,22 @@
 package com.netgrif.application.engine.auth
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser
-import com.netgrif.application.engine.objects.auth.domain.User
-import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.auth.service.UserService
-import com.netgrif.application.engine.configuration.properties.SecurityLimitsProperties
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties
+import com.netgrif.application.engine.objects.auth.domain.Authority
+import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.startup.ImportHelper
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.MethodOrderer
-import org.junit.jupiter.api.Order
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestMethodOrder
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
-import org.springframework.mock.web.MockHttpServletRequest
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.Authentication
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
-import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.request.RequestPostProcessor
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
@@ -58,7 +46,7 @@ class LoginAttemptsTest {
     private ImportHelper importHelper
 
     @Autowired
-    private SecurityLimitsProperties securityLimitsProperties;
+    private SecurityConfigurationProperties.SecurityLimitsProperties securityLimitsProperties;
 
     @Autowired
     private UserService userService;

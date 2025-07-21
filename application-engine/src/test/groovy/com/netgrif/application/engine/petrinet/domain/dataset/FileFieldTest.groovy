@@ -55,11 +55,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = ApplicationEngine.class
-)
-@TestPropertySource(properties = "nae.storage.minio.enabled=true")
+@SpringBootTest
+@TestPropertySource(properties = "netgrif.engine.storage.minio.enabled=true")
 @AutoConfigureMockMvc
 class FileFieldTest {
 
@@ -69,7 +66,7 @@ class FileFieldTest {
     public static final String MOCK_FILE_NAME = "hello.txt"
 
 
-    @Value('${admin.password:password}')
+    @Value('${netgrif.engine.security.auth.admin-password:password}')
     private String userPassword
 
     @Autowired
