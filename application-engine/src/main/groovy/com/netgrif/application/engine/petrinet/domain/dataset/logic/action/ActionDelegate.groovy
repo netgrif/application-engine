@@ -11,7 +11,9 @@ import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
-import com.netgrif.application.engine.configuration.PublicViewProperties
+import com.netgrif.application.engine.configuration.properties.FilterConfigurationProperties
+import com.netgrif.application.engine.configuration.properties.MailConfigurationProperties
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
@@ -48,7 +50,7 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.task
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemConstants
 import com.netgrif.application.engine.objects.workflow.service.InitValueExpressionEvaluator
-import com.netgrif.application.engine.pdf.generator.config.PdfResource
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.plugin.meta.PluginHolder
@@ -68,7 +70,6 @@ import org.quartz.Scheduler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.FileSystemResource
@@ -95,11 +96,11 @@ class ActionDelegate {
     static final String TRANSITIONS = "transitions"
     public static final String GLOBAL_ROLE = "GLOBAL_ROLE"
 
-    @Value('${nae.mail.from}')
-    private String mailFrom
+    @Autowired
+    MailConfigurationProperties mailProperties
 
-    @Value('${nae.create.default.filters:false}')
-    private Boolean createDefaultFilters
+    @Autowired
+    FilterConfigurationProperties filterConfigurationProperties
 
     @Autowired
     FieldFactory fieldFactory
@@ -186,7 +187,7 @@ class ActionDelegate {
 //    IHistoryService historyService
 
     @Autowired
-    PublicViewProperties publicViewProperties
+    SecurityConfigurationProperties.WebProperties webProperties
 
     FrontendActionOutcome Frontend
 
@@ -1150,7 +1151,7 @@ class ActionDelegate {
         if (!sourceTransitionId || !targetFileFieldId)
             throw new IllegalArgumentException("Source transition or target file field is null")
         targetTransitionId = targetTransitionId ?: sourceTransitionId
-        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
+        PdfResourceConfigurationProperties pdfResource = ApplicationContextProvider.getBean(PdfResourceConfigurationProperties.class) as PdfResourceConfigurationProperties
         String filename = pdfResource.getOutputDefaultName()
         String storagePath
         if (pdfResource.getOutputFolder()) {
@@ -1229,12 +1230,12 @@ class ActionDelegate {
     }
 
     void sendEmail(List<String> to, String subject, String body) {
-        MailDraft mailDraft = MailDraft.builder(mailFrom, to).subject(subject).body(body).build()
+        MailDraft mailDraft = MailDraft.builder(mailProperties.getMailFrom(), to).subject(subject).body(body).build()
         sendMail(mailDraft)
     }
 
     void sendEmail(List<String> to, String subject, String body, Map<String, File> attachments) {
-        MailDraft mailDraft = MailDraft.builder(mailFrom, to).subject(subject).body(body).attachments(attachments).build()
+        MailDraft mailDraft = MailDraft.builder(mailProperties.getMailFrom(), to).subject(subject).body(body).attachments(attachments).build()
         sendMail(mailDraft)
     }
 
@@ -1531,7 +1532,7 @@ class ActionDelegate {
     }
 
     List<Case> findDefaultFilters() {
-        if (!createDefaultFilters) {
+        if (!filterConfigurationProperties.isCreateDefaultFilters()) {
             return []
         }
         return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.id.eq(userService.system.stringId)) })
@@ -2789,7 +2790,7 @@ class ActionDelegate {
         ]
     }
 
-    String makeUrl(String publicViewUrl = publicViewProperties.url, String identifier) {
+    String makeUrl(String publicViewUrl = webProperties.publicWeb.url, String identifier) {
         return "${publicViewUrl}/${Base64.getEncoder().encodeToString(identifier.bytes)}" as String
     }
 

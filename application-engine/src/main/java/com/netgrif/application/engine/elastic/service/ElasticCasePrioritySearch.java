@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.elastic.service;
 
-import com.netgrif.application.engine.configuration.ElasticCaseSearchConfiguration;
+import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,10 +12,10 @@ public class ElasticCasePrioritySearch implements IElasticCasePrioritySearch {
 
 
     @Autowired
-    protected ElasticCaseSearchConfiguration elasticCaseSearchConfiguration;
+    protected DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
 
     @Override
     public List<String> fullTextFields() {
-        return elasticCaseSearchConfiguration.getFullTextFields();
+        return elasticsearchProperties.getPriority().getFullTextFields();
     }
 }

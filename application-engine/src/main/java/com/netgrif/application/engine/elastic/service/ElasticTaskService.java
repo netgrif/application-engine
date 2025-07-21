@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
 import com.google.common.collect.ImmutableList;
+import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticJob;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
@@ -56,9 +57,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
 
     protected ITaskService taskService;
     protected ElasticsearchTemplate template;
-
-    @Value("${spring.data.elasticsearch.index.task}")
-    protected String taskIndex;
+    protected DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
 
     @Autowired
     protected ElasticsearchTemplate elasticsearchTemplate;
@@ -90,6 +89,11 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     @Lazy
     public void setTaskService(ITaskService taskService) {
         this.taskService = taskService;
+    }
+
+    @Autowired
+    public void setElasticsearchProperties(DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties) {
+        this.elasticsearchProperties = elasticsearchProperties;
     }
 
     /**
@@ -142,7 +146,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         List<Task> taskPage;
         long total;
         if (query != null) {
-            SearchHits<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask> hits = elasticsearchTemplate.search(query, com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask.class, IndexCoordinates.of(taskIndex));
+            SearchHits<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask> hits = elasticsearchTemplate.search(query, com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask.class, IndexCoordinates.of(elasticsearchProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.TASK_INDEX)));
             Page<ElasticTask> indexedTasks = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getStringId).collect(Collectors.toList()));
             total = indexedTasks.getTotalElements();

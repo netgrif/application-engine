@@ -5,7 +5,7 @@ import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
+import com.netgrif.application.engine.configuration.properties.ImpersonationConfigurationProperties;
 import com.netgrif.application.engine.objects.event.RunPhase;
 import com.netgrif.application.engine.objects.event.events.user.ImpersonationEvent;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class ImpersonationService implements IImpersonationService {
 
     @Autowired
-    protected ImpersonationProperties properties;
+    protected ImpersonationConfigurationProperties properties;
 
     @Autowired
     protected UserService userService;

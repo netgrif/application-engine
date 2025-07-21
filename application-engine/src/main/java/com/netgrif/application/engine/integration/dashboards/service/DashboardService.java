@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.integration.dashboards.service;
 
-import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
+import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.integration.dashboards.service.interfaces.IDashboardService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 public class DashboardService implements IDashboardService {
 
     @Autowired
-    private ElasticsearchProperties properties;
+    private DataConfigurationProperties.ElasticsearchProperties properties;
 
     @Override
     public String searchByQuery(String searchBody, String type) {

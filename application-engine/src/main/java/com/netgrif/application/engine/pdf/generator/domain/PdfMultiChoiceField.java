@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.domain;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.objects.petrinet.domain.DataGroup;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldType;
 
@@ -9,7 +9,7 @@ import java.util.List;
 
 public class PdfMultiChoiceField extends PdfSelectionField {
 
-    public PdfMultiChoiceField(String fieldId, DataGroup dataGroup, FieldType type, String label, List<String> values, List<String> choices, PdfResource resource) {
+    public PdfMultiChoiceField(String fieldId, DataGroup dataGroup, FieldType type, String label, List<String> values, List<String> choices, PdfResourceConfigurationProperties resource) {
         super(resource);
         this.fieldId = fieldId;
         this.dataGroup = dataGroup;
@@ -19,7 +19,7 @@ public class PdfMultiChoiceField extends PdfSelectionField {
         this.choices = choices;
     }
 
-    public PdfMultiChoiceField(String fieldId, String label, List<String> values, List<String> choices, FieldType type, int x, int bottomY, int width, int height, PdfResource resource) {
+    public PdfMultiChoiceField(String fieldId, String label, List<String> values, List<String> choices, FieldType type, int x, int bottomY, int width, int height, PdfResourceConfigurationProperties resource) {
         super(resource);
         this.fieldId = fieldId;
         this.label = label;

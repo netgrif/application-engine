@@ -18,7 +18,7 @@ import java.util.Optional;
 @Component
 @RunnerOrder(140)
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "nae.dashboard.enabled", matchIfMissing = false)
+@ConditionalOnProperty(value = "netgrif.engine.dashboard.enabled", matchIfMissing = false)
 public class DashboardRunner implements ApplicationEngineStartupRunner {
 
     public static final String DASHBOARD_NET_IDENTIFIER = "dashboard";

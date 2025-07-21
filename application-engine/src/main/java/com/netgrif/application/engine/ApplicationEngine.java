@@ -9,6 +9,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -57,6 +58,9 @@ public class ApplicationEngine {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(ApplicationEngine.class, args);
+        SpringApplication application = new SpringApplicationBuilder()
+                .sources(ApplicationEngine.class)
+                .build();
+        application.run(args);
     }
 }

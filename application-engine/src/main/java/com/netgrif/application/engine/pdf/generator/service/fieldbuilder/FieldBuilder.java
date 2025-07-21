@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service.fieldbuilder;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.objects.petrinet.domain.DataGroup;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.FieldLayout;
@@ -19,20 +19,20 @@ public abstract class FieldBuilder {
 
     private static final String GRID = "grid";
 
-    protected PdfResource resource;
+    protected PdfResourceConfigurationProperties resource;
 
     @Getter
     protected int lastX, lastY;
 
-    public FieldBuilder(PdfResource resource) {
+    public FieldBuilder(PdfResourceConfigurationProperties resource) {
         this.resource = resource;
     }
 
-    public static int countTopPosY(PdfField field, PdfResource resource) {
+    public static int countTopPosY(PdfField field, PdfResourceConfigurationProperties resource) {
         return (field.getLayoutY() * resource.getFormGridRowHeight()) + resource.getPadding();
     }
 
-    public static int countBottomPosY(PdfField field, PdfResource resource) {
+    public static int countBottomPosY(PdfField field, PdfResourceConfigurationProperties resource) {
         return (field.getLayoutY() * resource.getFormGridRowHeight()) + field.getHeight() + resource.getPadding();
     }
 

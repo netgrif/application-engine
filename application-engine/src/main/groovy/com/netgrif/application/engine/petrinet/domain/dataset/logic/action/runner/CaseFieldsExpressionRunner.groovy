@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner
 
+import com.netgrif.application.engine.configuration.properties.RunnerConfigurationProperties
 import com.netgrif.application.engine.event.IGroovyShellFactory
 import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
@@ -8,7 +9,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Lookup
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
@@ -22,13 +22,13 @@ abstract class CaseFieldsExpressionRunner {
     @Autowired
     private IGroovyShellFactory shellFactory
 
-    private int cacheSize
+    private RunnerConfigurationProperties expressionsConfigurationProperties
 
-    private Map<String, Closure> cache = new MaxSizeHashMap<>(cacheSize)
+    private Map<String, Closure> cache
 
-    @Autowired
-    CaseFieldsExpressionRunner(@Value('${nae.expressions.runner.cache-size}') int cacheSize) {
-        this.cacheSize = cacheSize
+    CaseFieldsExpressionRunner(RunnerConfigurationProperties expressionsConfigurationProperties) {
+        this.expressionsConfigurationProperties = expressionsConfigurationProperties
+        this.cache = new MaxSizeHashMap<>(this.expressionsConfigurationProperties.getExpressionRunner().getCacheSize());
     }
 
     def run(Case useCase, com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.runner.Expression expression, Map<String, String> params = [:]) {

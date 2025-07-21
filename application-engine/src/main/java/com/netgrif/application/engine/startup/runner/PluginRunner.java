@@ -20,7 +20,7 @@ import java.util.Map;
 @Component
 @RunnerOrder(85)
 @ConditionalOnProperty(
-        value = "nae.plugin.enabled",
+        value = "netgrif.engine.plugin.enabled",
         havingValue = "true",
         matchIfMissing = true
 )

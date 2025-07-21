@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.startup;
 
 import com.netgrif.application.engine.configuration.ApplicationContextProvider;
+import com.netgrif.application.engine.configuration.properties.RunnerConfigurationProperties;
 import com.netgrif.application.engine.startup.annotation.OptionalRunner;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ import static com.netgrif.application.engine.startup.ApplicationRunnerOrderResol
 public abstract class ApplicationRunnerExecutor<T> implements ApplicationRunner {
 
     protected final ApplicationRunnerOrderResolver orderResolver;
-    protected final ApplicationRunnerProperties properties;
+    protected final RunnerConfigurationProperties.ApplicationRunnerProperties properties;
 
     public abstract void executeRunner(T runner, ApplicationArguments args) throws Exception;
 
