@@ -49,7 +49,7 @@ jobs:
         with:
           java-version: 21
           distribution: 'temurin'
-          server-id: netgrif-nexus-snapshots
+          server-id: netgrif-nexus-releases
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
 
