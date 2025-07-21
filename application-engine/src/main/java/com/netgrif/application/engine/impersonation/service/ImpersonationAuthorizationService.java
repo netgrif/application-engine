@@ -11,8 +11,6 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
-import com.netgrif.application.engine.objects.auth.domain.Authority;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
@@ -107,7 +105,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     @Override
     public List<ProcessRole> getRoles(Collection<Case> configs, AbstractUser impersonated) {
         List<ProcessRole> impersonatedRoles = new ArrayList<>();
-        impersonatedRoles.add(processRoleService.defaultRole());
+        impersonatedRoles.add(processRoleService.getDefaultRole());
         if (configs.isEmpty()) {
             return impersonatedRoles;
         }

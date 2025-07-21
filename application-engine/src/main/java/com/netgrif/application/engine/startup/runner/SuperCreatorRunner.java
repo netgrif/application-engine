@@ -1,27 +1,20 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.auth.service.AuthorityService;
+import com.netgrif.application.engine.auth.service.GroupService;
+import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.*;
-import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.auth.service.GroupService;
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
-import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -42,13 +35,9 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     private final UserService userService;
     private final GroupService groupService;
     private final ProcessRoleService processRoleService;
-    private final PaginationProperties paginationProperties;
 
     @Getter
     private AbstractUser superUser;
-
-    @Autowired
-    protected PasswordEncoder passwordEncoder;
 
     @Override
     public void run(ApplicationArguments strings) {
@@ -70,7 +59,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
             user.setLastName("Netgrif");
             user.setUsername(SUPER_ADMIN_EMAIL);
             user.setEmail(SUPER_ADMIN_EMAIL);
-            PasswordCredential passwordCredential = new PasswordCredential(passwordEncoder.encode(securityProperties.getAuth().getAdminPassword()), 0, true);
+            PasswordCredential passwordCredential = new PasswordCredential(securityProperties.getAuth().getAdminPassword(), 0, true);
             user.setCredential("password", passwordCredential);
             user.setState(UserState.ACTIVE);
             user.setAuthoritySet(authorities);

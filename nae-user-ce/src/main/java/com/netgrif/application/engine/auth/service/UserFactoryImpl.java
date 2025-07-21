@@ -21,8 +21,8 @@ public class UserFactoryImpl implements UserFactory {
     public User getUser(AbstractUser user, Locale locale) {
         User result = getUser(user);
 
-        String defaultRoleId = processRoleService.defaultRole().getStringId();
-        String anonymousRoleId = processRoleService.anonymousRole().getStringId();
+        String defaultRoleId = processRoleService.getDefaultRole().getStringId();
+        String anonymousRoleId = processRoleService.getAnonymousRole().getStringId();
         result.setProcessRoles(user.getProcessRoles().stream().map(processRole -> {
             if (processRole.getStringId().equals(defaultRoleId)) {
                 return new ProcessRole(processRole, locale);

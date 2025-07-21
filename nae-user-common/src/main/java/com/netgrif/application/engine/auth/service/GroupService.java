@@ -82,8 +82,6 @@ public interface GroupService {
      */
     Group findById(String id);
 
-    Page<Group> findByIds(Collection<String> ids, Pageable pageable);
-
     Page<Group> findAllByIds(Collection<String> ids, Pageable pageable);
 
     /**
@@ -280,21 +278,6 @@ public interface GroupService {
      */
     List<Group> getGroupSubgroups(Group group);
 
-    /**
-     * Retrieves all members of a specified group.
-     *
-     * @param groupId ID of the group
-     * @return list of {@link AbstractUser}s who are members of the group
-     */
-    List<AbstractUser> getGroupMembersById(String groupId);
-
-    /**
-     * Retrieves all members of a specified group.
-     *
-     * @param group the group whose members are to be retrieved
-     * @return list of {@link AbstractUser}s who are members of the group
-     */
-    List<AbstractUser> getGroupMembers(Group group);
     /**
      * Retrieves email addresses of the owners of specified groups.
      *

@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
-import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
@@ -868,8 +867,8 @@ public class TaskService implements ITaskService {
                 scheduleTaskExecution(task, timeTrigger.getStartDate(), useCase);
             }
         }
-        ProcessRole defaultRole = processRoleService.defaultRole();
-        ProcessRole anonymousRole = processRoleService.anonymousRole();
+        ProcessRole defaultRole = processRoleService.getDefaultRole();
+        ProcessRole anonymousRole = processRoleService.getAnonymousRole();
         for (Map.Entry<String, Map<String, Boolean>> entry : transition.getRoles().entrySet()) {
             if (useCase.getEnabledRoles().contains(entry.getKey())
                     || defaultRole.getStringId().equals(entry.getKey())

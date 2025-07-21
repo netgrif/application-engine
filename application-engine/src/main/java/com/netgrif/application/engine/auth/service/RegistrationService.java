@@ -1,21 +1,20 @@
 package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
+import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
-import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.objects.auth.domain.User;
-import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,8 +26,8 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -53,6 +52,9 @@ public class RegistrationService implements IRegistrationService {
     @Autowired
     private ProcessRoleService processRoleService;
 
+    @Autowired
+    private PaginationProperties paginationProperties;
+
     @Override
     @Transactional
     @Scheduled(cron = "0 0 1 * * *")
@@ -66,17 +68,25 @@ public class RegistrationService implements IRegistrationService {
     @Scheduled(cron = "0 0 1 * * *")
     public void resetExpiredToken() {
         log.info("Resetting expired user tokens");
-        Page<User> users = userService.findAllByStateAndExpirationDateBefore(UserState.BLOCKED, LocalDateTime.now(), null, Pageable.unpaged());
-        if (users == null || users.isEmpty()) {
-            log.info("There are none expired tokens. Everything is awesome.");
-            return;
-        }
 
-        users.forEach(user -> {
-            user.setToken(null);
-            user.setExpirationDate(null);
-        });
-        users = userService.saveUsers(users.stream().map(u -> (AbstractUser) u).collect(Collectors.toList()));
+        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<User> users;
+        do {
+            users = userService.findAllByStateAndExpirationDateBefore(UserState.BLOCKED, LocalDateTime.now(), null, pageable);
+            if (users == null || users.isEmpty()) {
+                log.info("There are none expired tokens. Everything is awesome.");
+                return;
+            }
+
+            users.forEach(user -> {
+                user.setToken(null);
+                user.setExpirationDate(null);
+            });
+            userService.saveUsers(users.getContent().stream().map(AbstractUser.class::cast).toList());
+
+            pageable = pageable.next();
+        } while (users.hasNext());
+
         log.info("Reset " + users.getContent().size() + " expired user tokens");
     }
 

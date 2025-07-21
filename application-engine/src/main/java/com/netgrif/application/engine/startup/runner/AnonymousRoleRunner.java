@@ -10,10 +10,11 @@ import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -26,7 +27,7 @@ public class AnonymousRoleRunner implements ApplicationEngineStartupRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("Creating anonymous process role");
-        List<ProcessRole> role = processRoleService.findAllByImportId(ProcessRole.ANONYMOUS_ROLE);
+        Page<ProcessRole> role = processRoleService.findAllByImportId(ProcessRole.ANONYMOUS_ROLE, Pageable.ofSize(1));
         if (role != null && !role.isEmpty()) {
             log.info("Anonymous role already exists");
             return;

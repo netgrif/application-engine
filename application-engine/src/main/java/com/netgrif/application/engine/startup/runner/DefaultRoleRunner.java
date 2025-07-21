@@ -11,10 +11,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -28,7 +29,7 @@ public class DefaultRoleRunner implements ApplicationEngineStartupRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("Creating default process role");
-        List<ProcessRole> role = (List<ProcessRole>) processRoleService.findAllByDefaultName(ProcessRole.DEFAULT_ROLE);
+        Page<ProcessRole> role = processRoleService.findAllByImportId(ProcessRole.DEFAULT_ROLE, Pageable.ofSize(1));
         if (role != null && !role.isEmpty()) {
             log.info("Default role already exists");
             return;

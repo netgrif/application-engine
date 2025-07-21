@@ -108,7 +108,7 @@ public class VariableArcsTest {
         testHelper.truncateDbs();
         userRunner.run(null);
         repository.deleteAll();
-        assertNotNull(processRoleService.defaultRole());
+        assertNotNull(processRoleService.getDefaultRole());
         testHelper.truncateDbs();
         ImportPetriNetEventOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), VersionType.MAJOR, superCreator.getLoggedSuper());
 

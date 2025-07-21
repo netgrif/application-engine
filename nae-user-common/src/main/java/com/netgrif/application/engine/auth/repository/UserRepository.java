@@ -80,8 +80,8 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         Assert.notNull(predicate, "Predicate must not be null");
         Assert.notNull(pageable, "Pageable must not be null");
 
-        SpringDataMongodbQuery<com.netgrif.application.engine.adapter.spring.auth.domain.User> query = createQuery(predicate, mongoTemplate, collection);
-        return query.fetchPage(pageable).map(User.class::cast);
+        SpringDataMongodbQuery<User> query = createQuery(predicate, mongoTemplate, collection);
+        return query.fetchPage(pageable);
     }
 
     /**
@@ -253,15 +253,15 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
     }
 
     /**
-     * Creates a {@link SpringDataMongodbQuery} for {@link com.netgrif.application.engine.adapter.spring.auth.domain.User}.
+     * Creates a {@link SpringDataMongodbQuery} for {@link User}.
      *
      * @param predicate      the filter condition to apply to the query.
      * @param mongoTemplate  the MongoDB template used to execute the query.
      * @param collectionName the name of the collection to query.
      * @return a {@link SpringDataMongodbQuery} configured with the given predicate and collection name.
      */
-    private SpringDataMongodbQuery<com.netgrif.application.engine.adapter.spring.auth.domain.User> createQuery(Predicate predicate, MongoTemplate mongoTemplate, String collectionName) {
-        return new SpringDataMongodbQuery<>(mongoTemplate, com.netgrif.application.engine.adapter.spring.auth.domain.User.class, collectionName).where(predicate);
+    private SpringDataMongodbQuery<User> createQuery(Predicate predicate, MongoTemplate mongoTemplate, String collectionName) {
+        return new SpringDataMongodbQuery<>(mongoTemplate, User.class, collectionName).where(predicate);
     }
 
     /**
@@ -277,12 +277,9 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
     private static PageImpl<User> resolveUserPage(Pageable pageable, MongoTemplate mongoTemplate, String collection, Query query) {
         List<User> resultUserList = mongoTemplate.find(
                         query.with(pageable),
-                        com.netgrif.application.engine.adapter.spring.auth.domain.User.class,
-                        collection)
-                .stream()
-                .map(User.class::cast)
-                .collect(Collectors.toList());
-        long total = mongoTemplate.count(query.limit(-1).skip(-1), com.netgrif.application.engine.adapter.spring.auth.domain.User.class);
+                        User.class,
+                        collection);
+        long total = mongoTemplate.count(query.limit(-1).skip(-1), User.class, collection);
         return new PageImpl<>(resultUserList, pageable, total);
     }
 }

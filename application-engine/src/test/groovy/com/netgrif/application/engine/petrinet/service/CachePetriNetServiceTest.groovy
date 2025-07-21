@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.service
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.objects.auth.domain.Authority
+import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties

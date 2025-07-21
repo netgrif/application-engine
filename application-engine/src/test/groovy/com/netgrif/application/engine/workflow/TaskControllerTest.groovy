@@ -203,7 +203,7 @@ class TaskControllerTest {
     }
 
     void setUserRole() {
-        List<ProcessRole> roles = processRoleService.findAllByNetIdentifier(net.stringId)
+        List<ProcessRole> roles = processRoleService.findAllByNetStringId(net.stringId)
 
         for (ProcessRole role : roles) {
             if (role.importId == "process_role") {

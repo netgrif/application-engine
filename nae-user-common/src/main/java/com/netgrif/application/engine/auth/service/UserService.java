@@ -7,6 +7,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.core.Authentication;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorRef;
@@ -68,6 +69,8 @@ public interface UserService {
      * @return an Optional containing the user if found
      */
     Optional<AbstractUser> findUserByUsername(String username, String realmName);
+
+    Page<AbstractUser> findAllUsersByQuery(Query query, String realmName, Pageable pageable);
 
     /**
      * Retrieves a paginated list of all users in a specific realm.
@@ -274,6 +277,8 @@ public interface UserService {
      */
     AbstractUser addRole(AbstractUser user, String roleStringId);
 
+    Page<AbstractUser> findAllCoMembers(LoggedUser loggedUser, Pageable pageable);
+
     /**
      * Searches for co-members of a principal user.
      *
@@ -380,9 +385,11 @@ public interface UserService {
      * @param expirationDate the expiration date
      * @param realmIds collection of realm identifiers
      */
-    void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
+    void removeAllByStateAndExpirationDateBeforeForRealms(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
 
     Page<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, String realmIds, Pageable pageable);
+
+    void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, String realmId);
 
     /**
      * Gets all groups associated with an actor.

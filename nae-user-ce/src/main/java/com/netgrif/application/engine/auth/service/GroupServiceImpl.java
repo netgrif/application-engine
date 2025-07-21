@@ -20,6 +20,7 @@ import org.springframework.data.util.Pair;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Getter
@@ -76,16 +77,21 @@ public class GroupServiceImpl implements GroupService {
             throw new IllegalArgumentException("Group " + group.getStringId() + " does not exist");
         }
         if (group.getMemberIds() != null) {
-            List<AbstractUser> members = userService.findAllByIds(group.getMemberIds(), group.getRealmId());
-            log.debug("Removing group [{}] from members [{}]", group.getStringId(), members);
-            members.forEach(user -> {
-                user.removeGroupId(group.getStringId());
-                userService.saveUser(user);
-            });
+            Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+            Page<AbstractUser> members;
+            do {
+                members = userService.findAllByIds(group.getMemberIds(), group.getRealmId(), pageable);
+                log.debug("Removing group [{}] from members [{}]", group.getStringId(), members);
+                members.forEach(user -> {
+                    user.removeGroupId(group.getStringId());
+                    userService.saveUser(user);
+                });
+                pageable = pageable.next();
+            } while (members.hasNext());
         }
         if (group.getSubgroupIds() != null) {
             log.debug("Removing group [{}] from child groups [{}]", group.getStringId(), group.getSubgroupIds());
-            List<Group> subGroups = findByIds(group.getSubgroupIds(), Pageable.unpaged()).stream().toList();
+            List<Group> subGroups = findAllByIds(group.getSubgroupIds(), Pageable.unpaged()).stream().toList();
             subGroups.forEach(subgroup -> {
                 subgroup.removeGroupId(group.getStringId());
                 save(subgroup);
@@ -93,7 +99,7 @@ public class GroupServiceImpl implements GroupService {
         }
         if (group.getGroupIds() != null) {
             log.debug("Removing group [{}] from parent groups [{}]", group.getStringId(), group.getGroupIds());
-            List<Group> groups = findByIds(group.getGroupIds(), Pageable.unpaged()).stream().toList();
+            List<Group> groups = findAllByIds(group.getGroupIds(), Pageable.unpaged()).stream().toList();
             groups.forEach(grup -> {
                 grup.removeSubgroupId(group.getStringId());
                 save(grup);
@@ -134,11 +140,6 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Page<Group> findByIds(Collection<String> ids, Pageable pageable) {
-        return groupRepository.findAllByIdIn(ids, pageable);
-    }
-
-    @Override
     public Optional<Group> findByIdentifier(String identifier) {
         return groupRepository.findByIdentifier(identifier);
     }
@@ -154,7 +155,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group create(AbstractUser groupOwner) {
         log.info("Creating default group for owner: [{}]", groupOwner.getStringId());
-        List<Group> userGroups = groupRepository.findByOwnerId(groupOwner.getStringId(), Pageable.ofSize(1));
+        Page<Group> userGroups = groupRepository.findByOwnerId(groupOwner.getStringId(), Pageable.ofSize(1));
         if (!userGroups.isEmpty() && !Objects.equals(groupOwner.getStringId(), userService.getSystem().getStringId())) {
             throw new IllegalArgumentException("Default group for owner [%s] already exists.".formatted(groupOwner.getUsername()));
         }
@@ -241,35 +242,13 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Page<AbstractUser> getGroupMembersById(String groupId) {
-        Group group = findById(groupId);
-        return this.getGroupMembers(group);
-    }
-
-    @Override
-    public Page<AbstractUser> getGroupMembers(Group group) {
-        // TODO: pageable
-        return this.userService.findAllByIds(group.getMemberIds(), group.getRealmId(), Pageable.unpaged());
-    }
-
-    @Override
-    public List<String> getAllCoMembers(AbstractUser user) {
-        List<Group> userMembershipGroups = groupRepository.findAllByMemberIdsContains(user.getStringId());
-        AbstractUser system = userService.getSystem();
-        return userMembershipGroups.stream().map(Group::getMemberIds).flatMap(Set::stream)
-                .filter(id -> !id.equals(user.getStringId()))
-                .filter(id -> !id.equals(system.getStringId()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public Page<Group> findByPredicate(Predicate predicate, Pageable pageable) {
         return groupRepository.findAll(predicate, pageable);
     }
 
     @Override
-    public List<Group> findAllByIds(Collection<String> ids) {
-        return groupRepository.findAllById(ids);
+    public Page<Group> findAllByIds(Collection<String> ids, Pageable pageable) {
+        return groupRepository.findAllByIdIn(ids, pageable);
     }
 
     @Override
@@ -292,11 +271,6 @@ public class GroupServiceImpl implements GroupService {
         Group group = findById(groupId);
         group.addAuthority(authorityService.getOne(authorityId));
         return save(group);
-    }
-
-    @Override
-    public Page<Group> findByIds(Collection<String> ids, Pageable pageable) {
-        return groupRepository.findAllByIdIn(ids, pageable);
     }
 
     @Override
@@ -351,7 +325,7 @@ public class GroupServiceImpl implements GroupService {
         if (group.getGroupIds() == null || group.getGroupIds().isEmpty()) {
             return new ArrayList<>();
         }
-        return this.findByIds(group.getGroupIds(), Pageable.unpaged()).toList();
+        return this.findAllByIds(group.getGroupIds(), Pageable.unpaged()).toList();
     }
 
     @Override
@@ -365,12 +339,12 @@ public class GroupServiceImpl implements GroupService {
         if (group.getSubgroupIds() == null || group.getSubgroupIds().isEmpty()) {
             return new ArrayList<>();
         }
-        return this.findByIds(group.getSubgroupIds(), Pageable.unpaged()).toList();
+        return this.findAllByIds(group.getSubgroupIds(), Pageable.unpaged()).toList();
     }
 
     @Override
     public Page<String> getGroupsOwnerEmails(Collection<String> groupIds, Pageable pageable) {
-        return this.findByIds(groupIds, pageable).map(this::getGroupOwnerEmail);
+        return this.findAllByIds(groupIds, pageable).map(this::getGroupOwnerEmail);
     }
 
     @Override

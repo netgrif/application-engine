@@ -27,17 +27,14 @@ public interface ProcessRoleService {
 
     Page<ProcessRole> findAll(Pageable pageable);
     List<ProcessRole> findAllByNetStringId(String netStringId);
-    List<ProcessRole> findAllByNetIdentifier(String identifier);
-    Collection<ProcessRole> findAllByIds(Collection<ProcessResourceId> roleIds);
+    List<ProcessRole> findAllByIds(Collection<ProcessResourceId> roleIds);
     ProcessRole findById(ProcessResourceId id);
     Page<ProcessRole> findAllByDefaultName(String name, Pageable pageable);
     Page<ProcessRole> findAllByImportId(String importId, Pageable pageable);
+    ProcessRole findByImportId(String importId);
     ProcessRole findById(String id);
-    Set<ProcessRole> findByIds(Collection<String> ids);
+    List<ProcessRole> findByIds(Collection<String> ids);
     Page<ProcessRole> findAllGlobalRoles(Pageable pageable);
-    List<ProcessRole> findAll(String netId);
-    ProcessRole defaultRole();
-    ProcessRole anonymousRole();
     void deleteRolesOfNet(PetriNet net, LoggedUser loggedUser);
     void clearCache();
 }

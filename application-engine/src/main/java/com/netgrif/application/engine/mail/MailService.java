@@ -2,7 +2,6 @@ package com.netgrif.application.engine.mail;
 
 import com.netgrif.application.engine.configuration.properties.MailConfigurationProperties;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
-import com.netgrif.application.engine.objects.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.mail.domain.MailDraft;
 import com.netgrif.application.engine.mail.interfaces.IMailService;

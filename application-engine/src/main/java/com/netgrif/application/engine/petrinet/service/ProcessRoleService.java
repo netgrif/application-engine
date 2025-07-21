@@ -81,11 +81,6 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     }
 
     @Override
-    public Page<ProcessRole> findAllByNetId(String s, Pageable pageable) {
-        return processRoleRepository.findAllByProcessId(s, pageable);
-    }
-
-    @Override
     public Optional<ProcessRole> get(ProcessResourceId processResourceId) {
         return processRoleRepository.findByCompositeId(processResourceId.getStringId());
     }
@@ -196,27 +191,12 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     }
 
     @Override
-    public ProcessRole getDefaultRole() {
-        return processRoleRepository.findByImportId(ProcessRole.DEFAULT_ROLE).orElse(null);
+    public List<ProcessRole> findAllByIds(Collection<ProcessResourceId> collection) {
+        return new ArrayList<>(processRoleRepository.findAllByIdsSet(collection.stream().map(ProcessResourceId::getStringId).collect(Collectors.toList())));
     }
 
     @Override
-    public ProcessRole getAnonymousRole() {
-        return processRoleRepository.findByImportId(ProcessRole.ANONYMOUS_ROLE).orElse(null);
-    }
-
-    @Override
-    public Collection<ProcessRole> findAllByIds(Collection<ProcessResourceId> collection) {
-        return processRoleRepository.findAllByIdsSet(collection.stream().map(ProcessResourceId::getStringId).collect(Collectors.toList()));
-    }
-
-    @Override
-    public ProcessRole findById(ProcessResourceId processResourceId) {
-        return processRoleRepository.findByCompositeId(processResourceId.getStringId()).orElse(null);
-    }
-
-    @Override
-    public List<ProcessRole> saveAll(Iterable<ProcessRole> entities) {
+    public List<ProcessRole> saveAll(Collection<ProcessRole> entities) {
         return StreamSupport.stream(entities.spliterator(), false).map(processRole -> {
             if (!processRole.isGlobal() || processRoleRepository.findByImportId(processRole.getImportId()).isEmpty()) {
                 return processRoleRepository.save(processRole);
@@ -226,8 +206,8 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     }
 
     @Override
-    public Set<ProcessRole> findByIds(Set<String> ids) {
-        return processRoleRepository.findAllByIdsSet(ids);
+    public List<ProcessRole> findByIds(Collection<String> ids) {
+        return new ArrayList<>(processRoleRepository.findAllByIdsSet(ids));
     }
 
     private Set<ProcessRole> updateRequestedRoles(AbstractUser user, Set<ProcessRole> rolesNewToUser, Set<ProcessRole> rolesRemovedFromUser) {
@@ -360,29 +340,9 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     }
 
     @Override
-    public List<ProcessRole> findAllByNetIdentifier(String identifier) {
-        return processRoleRepository.findAllByProcessId(identifier);
-    }
-
-    @Override
-    public List<ProcessRole> findAllByImportId(String importId) {
-        return processRoleRepository.findAllByImportId(importId);
-    }
-
-    @Override
-    public List<ProcessRole> findAllByDefaultName(String name) {
-        return processRoleRepository.findAllByName_DefaultValue(name);
-    }
-
-    @Override
     public ProcessRole findById(String id) {
         ObjectId objectId = extractObjectId(id);
         return processRoleRepository.findByIdObjectId(objectId).orElse(null);
-    }
-
-    @Override
-    public Collection<ProcessRole> findAllByIds(Collection<ProcessResourceId> collection) {
-        return processRoleRepository.findAllByCompositeId(collection.stream().map(ProcessResourceId::getStringId).collect(Collectors.toList()));
     }
 
     @Override
@@ -391,12 +351,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     }
 
     @Override
-    public List<ProcessRole> findByIds(Collection<String> ids) {
-        return processRoleRepository.findAllById(ids);
-    }
-
-    @Override
-    public ProcessRole defaultRole() {
+    public ProcessRole getDefaultRole() {
         if (defaultRole == null) {
             Page<ProcessRole> roles = processRoleRepository.findAllByImportId(ProcessRole.DEFAULT_ROLE, Pageable.ofSize(2));
             if (roles.isEmpty())
@@ -409,7 +364,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     }
 
     @Override
-    public ProcessRole anonymousRole() {
+    public ProcessRole getAnonymousRole() {
         if (anonymousRole == null) {
             Page<ProcessRole> roles = processRoleRepository.findAllByImportId(ProcessRole.ANONYMOUS_ROLE, Pageable.ofSize(2));
             if (roles.isEmpty())
@@ -440,12 +395,6 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     @Override
     public Page<ProcessRole> findAllByDefaultName(String name, Pageable pageable) {
         return processRoleRepository.findAllByName_DefaultValue(name, pageable);
-    }
-
-    @Override
-    public ProcessRole findById(String id) {
-        ObjectId objectId = extractObjectId(id);
-        return processRoleRepository.findByIdObjectId(objectId).orElse(null);
     }
 
     @Override

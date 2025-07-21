@@ -148,17 +148,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<AbstractUser> findAllUsers(String realmName, Pageable pageable) {
+    public Page<AbstractUser> findAllUsersByQuery(Query query, String realmName, Pageable pageable) {
         log.trace("Retrieving all users in realm [{}]", realmName);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmName);
-        Page<AbstractUser> users = userRepository.findAllByQuery(new Query(), pageable, mongoTemplate, collectionName);
+        Page<User> users = userRepository.findAllByQuery(query, pageable, mongoTemplate, collectionName);
         log.debug("Found [{}] users in realm [{}]", users.getContent().size(), realmName);
-        return users;
+        return changeType(users, users.getPageable());
     }
 
     @Override
-    public AbstractUser createUser(String username, String email, String firstName, String lastName, String password, String realmId) {
-        User user = initializeNewUser(username, email, firstName, lastName, realmId);
+    public Page<AbstractUser> findAllUsers(String realmName, Pageable pageable) {
+        log.trace("Retrieving all users in realm [{}]", realmName);
+        String collectionName = collectionNameProvider.getCollectionNameForRealm(realmName);
+        Page<User> users = userRepository.findAllByQuery(new Query(), pageable, mongoTemplate, collectionName);
+        log.debug("Found [{}] users in realm [{}]", users.getContent().size(), realmName);
+        return changeType(users, users.getPageable());
+    }
+
+    @Override
+    public AbstractUser createUser(String username, String email, String firstName, String lastName, String rawPassword, String realmId) {
+        User user = initializeNewUser(username, email, firstName, lastName, rawPassword, realmId);
         return createUser(user, realmId);
     }
 
@@ -190,7 +199,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createUserFromThirdParty(String username, String email, String firstName, String lastName, String realmId, String authMethod) {
         log.info("Creating user [{}] from third-party auth [{}] in realm [{}] without password", username, authMethod, realmId);
-        User user = initializeNewUser(username, email, firstName, lastName, realmId);
+        User user = initializeNewUser(username, email, firstName, lastName, "N/A", realmId);
         addDefaultAuthorities(user);
         addDefaultRole(user);
         setDisablePassword(user);
@@ -201,20 +210,38 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds) {
-        Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
+    public void removeAllByStateAndExpirationDateBeforeForRealms(UserState state, LocalDateTime expirationDate, Collection<String> realmIds) {
         // TODO: delete whole group or change owner of group?
-        // TODO: pageable iteration over groups
-        Set<String> userIds = userRepository.findAllByStateAndExpirationDateBefore(state, expirationDate, mongoTemplate, collectionNames)
-                .stream().map(AbstractActor::getStringId).collect(Collectors.toSet());
-        Page<Group> groups = realmIds == null || realmIds.isEmpty()
-                ? groupService.findAll(Pageable.unpaged())
-                : groupService.findAllFromRealmIn(realmIds, Pageable.unpaged());
-        groups.forEach(group -> {
-            group.getMemberIds().removeAll(userIds);
-            groupService.save(group);
-        });
-        userRepository.removeAllByStateAndExpirationDateBefore(state, expirationDate, mongoTemplate, collectionNames);
+        if(realmIds == null || realmIds.isEmpty()) {
+            removeAllByStateAndExpirationDateBefore(state, expirationDate, null);
+        } else {
+            realmIds.forEach(realmId -> removeAllByStateAndExpirationDateBefore(state, expirationDate, realmId));
+        }
+    }
+
+    @Override
+    public void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, String realmId) {
+        String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
+        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<User> users;
+        do {
+            users = userRepository.findAllByStateAndExpirationDateBefore(state, expirationDate, pageable, mongoTemplate, collectionName);
+            Set<String> userIds = users.getContent().stream().map(AbstractActor::getStringId).collect(Collectors.toSet());
+            Pageable groupsPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+            Page<Group> groups;
+            do { // TODO refactor because this iterates all groups multiple times :(
+                groups = realmId == null || realmId.isBlank()
+                        ? groupService.findAll(groupsPageable)
+                        : groupService.findAllFromRealm(realmId, groupsPageable);
+                groups.forEach(group -> {
+                    group.getMemberIds().removeAll(userIds);
+                    groupService.save(group);
+                });
+                groupsPageable = groupsPageable.next();
+            } while (groups.hasNext());
+            pageable = pageable.next();
+        } while (users.hasNext());
+        userRepository.removeAllByStateAndExpirationDateBefore(state, expirationDate, mongoTemplate, Set.of(collectionName));
     }
 
     @Override
@@ -225,7 +252,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<Group> getUserGroups(AbstractActor actor) {
-        return groupService.findByIds(actor.getGroupIds(), Pageable.unpaged()).stream().toList();
+        return groupService.findAllByIds(actor.getGroupIds(), Pageable.unpaged()).stream().toList();
     }
 
     @Override
@@ -244,7 +271,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void addDefaultRole(AbstractUser user) {
         log.trace("Assigning default role to user [{}]", user.getUsername());
-        user.addProcessRole(processRoleService.defaultRole());
+        user.addProcessRole(processRoleService.getDefaultRole());
         saveUser(user);
     }
 
@@ -279,7 +306,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void addAnonymousRole(AbstractUser user) {
         log.trace("Assigning anonymous role to user [{}]", user.getUsername());
-        user.addProcessRole(processRoleService.anonymousRole());
+        user.addProcessRole(processRoleService.getAnonymousRole());
     }
 
     @Override
@@ -294,7 +321,7 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(AbstractUser user) {
         log.warn("Deleting user [{}]", user.getUsername());
         String collectionName = collectionNameProvider.getCollectionNameForRealm(user.getRealmId());
-        groupService.findByIds(user.getGroupIds(), Pageable.unpaged()).forEach(group -> {
+        groupService.findAllByIds(user.getGroupIds(), Pageable.unpaged()).forEach(group -> {
             group.removeMemberId(user.getStringId());
             groupService.save(group);
         });
@@ -345,22 +372,22 @@ public class UserServiceImpl implements UserService {
     public Page<AbstractUser> searchAllCoMembers(String query, LoggedUser loggedUser, Pageable pageable) {
 //        AbstractUser user = this.findById(loggedUser.getSelfOrImpersonated().getId(), loggedUser.getSelfOrImpersonated().getRealmId());
         // TODO: impersonation
-        AbstractUser user = this.findById(loggedUser.getId(), loggedUser.getRealmId());
+        AbstractUser user = this.findById(loggedUser.getStringId(), loggedUser.getRealmId());
         BooleanExpression predicate = buildPredicate(user, query);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(loggedUser.getRealmId());
-        Page<AbstractUser> users = userRepository.findAllByQuery(predicate, pageable, mongoTemplate, collectionName);
-        return users;
+        Page<User> users = userRepository.findAllByQuery(predicate, pageable, mongoTemplate, collectionName);
+        return changeType(users, users.getPageable());
     }
 
     @Override
-    public Page<AbstractUser> searchAllCoMembers(String query, List<ProcessResourceId> roleIds, List<ProcessResourceId> negateRoleIds, com.netgrif.application.engine.objects.auth.domain.LoggedUser loggedUser, Pageable pageable) {
+    public Page<AbstractUser> searchAllCoMembers(String query, Collection<ProcessResourceId> roleIds, Collection<ProcessResourceId> negateRoleIds, LoggedUser loggedUser, Pageable pageable) {
         if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty())) {
             return searchAllCoMembers(query, loggedUser, pageable);
         }
 
 //        AbstractUser user = this.findById(loggedUser.getSelfOrImpersonated().getId(), loggedUser.getSelfOrImpersonated().getRealmId());
         // TODO: impersonation
-        AbstractUser user = this.findById(loggedUser.getId(), loggedUser.getRealmId());
+        AbstractUser user = this.findById(loggedUser.getStringId(), loggedUser.getRealmId());
         BooleanExpression predicate = buildPredicate(user, query);
         if (roleIds != null && !roleIds.isEmpty()) {
             predicate = predicate.and(QUser.user.processRoles.any()._id.in(roleIds));
@@ -370,23 +397,23 @@ public class UserServiceImpl implements UserService {
         }
 
         String collectionName = collectionNameProvider.getCollectionNameForRealm(loggedUser.getRealmId());
-        Page<AbstractUser> users = userRepository.findAllByQuery(predicate, pageable, mongoTemplate, collectionName);
-        return users;
+        Page<User> users = userRepository.findAllByQuery(predicate, pageable, mongoTemplate, collectionName);
+        return changeType(users, users.getPageable());
     }
 
     @Override
     public Page<AbstractUser> findAllByIds(Collection<String> ids, String realmId, Pageable pageable) {
         log.debug("Finding users by collection of IDs [{}]", ids);
         String collection = collectionNameProvider.getCollectionNameForRealm(realmId);
-        Page<AbstractUser> users = userRepository.findAllByIds(ids.stream().map(ObjectId::new).toList(), pageable, mongoTemplate, collection);
-        return users;
+        Page<User> users = userRepository.findAllByIds(ids.stream().map(ObjectId::new).toList(), pageable, mongoTemplate, collection);
+        return changeType(users, users.getPageable());
     }
 
     @Override
     public Page<AbstractUser> findAllActiveByProcessRoles(Collection<ProcessResourceId> roleIds, Pageable pageable, String realmId) {
         String collection = collectionNameProvider.getCollectionNameForRealm(realmId);
-        Page<AbstractUser> users = userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, roleIds, pageable, mongoTemplate, collection);
-        return users;
+        Page<User> users = userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, roleIds, pageable, mongoTemplate, collection);
+        return changeType(users, users.getPageable());
     }
 
     @Override
@@ -396,8 +423,8 @@ public class UserServiceImpl implements UserService {
     }
 
     protected Page<AbstractUser> searchUsersByRoleIds(Collection<ProcessResourceId> roleIds, String collectionName, Pageable pageable) {
-        Page<AbstractUser> users = userRepository.findAllByProcessRoles__idIn(roleIds, pageable, mongoTemplate, collectionName);
-        return users;
+        Page<User> users = userRepository.findAllByProcessRoles__idIn(roleIds, pageable, mongoTemplate, collectionName);
+        return changeType(users, users.getPageable());
     }
 
     @Override
@@ -440,7 +467,7 @@ public class UserServiceImpl implements UserService {
         if (systemUser == null) {
             systemUser = createSystemUser();
         }
-        systemUser.setProcessRoles(new HashSet<>(processRoleService.findAll(Pageable.unpaged())));
+        systemUser.setProcessRoles(new HashSet<>(processRoleService.findAll(Pageable.unpaged()).getContent()));
         return systemUser;
     }
 
@@ -532,7 +559,7 @@ public class UserServiceImpl implements UserService {
         return findById(loggedUser.getStringId(), loggedUser.getRealmId());
     }
 
-    protected User initializeNewUser(String username, String email, String firstName, String lastName, String realmId) {
+    protected User initializeNewUser(String username, String email, String firstName, String lastName, String password, String realmId) {
         log.trace("Initializing new user [{}] in realm [{}]", username, realmId);
         User user = new User();
         user.setRealmId(realmId);
@@ -543,6 +570,7 @@ public class UserServiceImpl implements UserService {
         user.setEmailVerified(false);
         user.setCreatedAt(LocalDateTime.now());
         user.setState(UserState.ACTIVE);
+        user.setPassword(password);
         log.debug("User [{}] initialized in realm [{}]", username, realmId);
         return user;
     }
@@ -567,8 +595,8 @@ public class UserServiceImpl implements UserService {
         return users.stream().map(AbstractUser.class::cast).toList();
     }
 
-    private BooleanExpression buildPredicate(IUser user, String query) {
-        IUser system = this.getSystem();
+    private BooleanExpression buildPredicate(AbstractUser user, String query) {
+        AbstractUser system = this.getSystem();
         BooleanExpression predicate = QUser.user
                 .groupIds.any().in(user.getGroupIds())
                 .and(QUser.user.id.ne(new ObjectId(system.getStringId())))
