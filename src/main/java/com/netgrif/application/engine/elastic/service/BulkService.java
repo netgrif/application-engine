@@ -33,8 +33,11 @@ public class BulkService implements IBulkService {
     @Value("${spring.data.elasticsearch.index.case}")
     private String caseIndex;
 
-    @Value("${spring.data.elasticsearch.reindexExecutor.size:20}")
-    private int batchSize;
+    @Value("${spring.data.elasticsearch.reindexExecutor.caseSize:20}")
+    private int caseBatchSize;
+
+    @Value("${spring.data.elasticsearch.reindexExecutor.taskSize:20}")
+    private int taskBatchSize;
 
     private final ElasticsearchClient esClient;
 
@@ -46,6 +49,7 @@ public class BulkService implements IBulkService {
 
     private final List<Case> bulkCases = new ArrayList<>();
     private final List<String> bulkCaseIds = new ArrayList<>();
+    private List<Task> bulkTasks = new ArrayList<>();
 
     private BulkRequest.Builder builder = new BulkRequest.Builder();
 
@@ -93,9 +97,19 @@ public class BulkService implements IBulkService {
             log.error("Failed to prepare bulk operation for case [{}]: {}", aCase.getStringId(), e.getMessage());
         }
 
-        if (bulkCases.size() == batchSize) {
+        if (bulkCases.size() == caseBatchSize) {
             indexCases();
         }
+    }
+
+    /**
+     * Calls bulkIndexTasks with empty list.
+     *
+     */
+    @Override
+    public void bulkIndexTasks() {
+        bulkIndexTasks(List.of());
+        bulkTasks.clear();
     }
 
     /**
@@ -108,28 +122,20 @@ public class BulkService implements IBulkService {
     public void bulkIndexTasks(List<Task> tasks) {
         if (tasks == null || tasks.isEmpty()) return;
 
-        BulkRequest.Builder requestBuilder = new BulkRequest.Builder();
+        tasks.addAll(0, bulkTasks);
+        int totalSize = tasks.size();
 
-        for (Task task : tasks) {
-            try {
-                ElasticTask elasticTask = elasticTaskMappingService.transform(task);
+        for (int i = 0; i < totalSize; i += taskBatchSize) {
+            int end = Math.min(i + taskBatchSize, totalSize);
+            List<Task> batch = tasks.subList(i, end);
 
-                requestBuilder.operations(op -> op
-                        .update(u -> u
-                                .index(taskIndex)
-                                .id(elasticTask.getStringId())
-                                .action(a -> a
-                                        .doc(elasticTask)
-                                        .docAsUpsert(true)
-                                )
-                        )
-                );
-            } catch (Exception e) {
-                log.error("Failed to create upsert request for task [{}]: {}", task.getStringId(), e.getMessage());
+            if (batch.size() < taskBatchSize && !tasks.isEmpty()) {
+                bulkTasks = batch;
+                break;
             }
-        }
 
-        executeAndValidate(requestBuilder.build());
+            indexTaskBatch(batch);
+        }
     }
 
     /**
@@ -154,6 +160,7 @@ public class BulkService implements IBulkService {
     private void executeAndValidate(BulkRequest request) {
         try {
             BulkResponse response = esClient.bulk(request);
+
             checkForBulkUpdateFailure(response);
         } catch (Exception e) {
             log.error("Failed to index bulk {}", e.getMessage(), e);
@@ -163,6 +170,7 @@ public class BulkService implements IBulkService {
     private void checkForBulkUpdateFailure(BulkResponse response) {
         Map<String, String> failedDocuments = new HashMap<>();
 
+
         response.items().forEach(item -> {
             if (item.error() != null) {
                 failedDocuments.put(item.id(), item.error().reason());
@@ -170,11 +178,32 @@ public class BulkService implements IBulkService {
         });
 
         if (!failedDocuments.isEmpty()) {
-            throw new ElasticsearchException(
-                    "Bulk indexing has failures. Use ElasticsearchException.getFailedDocuments() for details [" +
-                            failedDocuments + "]",
-                    failedDocuments
-            );
+            throw new ElasticsearchException("Bulk indexing has failures. Use ElasticsearchException.getFailedDocuments() for details [{}]", failedDocuments);
         }
+    }
+
+    private void indexTaskBatch(List<Task> tasks) {
+        BulkRequest.Builder requestBuilder = new BulkRequest.Builder();
+
+        for (Task task : tasks) {
+            try {
+                ElasticTask elasticTask = elasticTaskMappingService.transform(task);
+
+                requestBuilder.operations(op -> op
+                        .update(u -> u
+                                .index(taskIndex)
+                                .id(elasticTask.getStringId())
+                                .action(a -> a
+                                        .doc(elasticTask)
+                                        .docAsUpsert(true)
+                                )
+                        )
+                );
+            } catch (Exception e) {
+                log.error("Failed to create upsert request for task [{}]: {}", task.getStringId(), e.getMessage());
+            }
+        }
+
+        executeAndValidate(requestBuilder.build());
     }
 }

@@ -69,11 +69,11 @@ public class ElasticController {
             if (count == 0) {
                 log.info("No cases to reindex");
             } else {
-                long numOfPages = (long) ((count / pageSize) + 1);
-                log.info("Reindexing cases: " + numOfPages + " pages");
+                long numOfPages = (count / pageSize) + 1;
+                log.info("Reindexing cases: {} pages", numOfPages);
 
                 for (int page = 0; page < numOfPages; page++) {
-                    log.info("Indexing page " + (page + 1));
+                    log.info("Indexing page {}", (page + 1));
                     Predicate predicate = searchService.buildQuery(searchBody, user, locale);
                     reindexingTask.forceReindexPage(predicate, page, numOfPages);
                 }
@@ -86,8 +86,9 @@ public class ElasticController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping(value = "/index/cursor", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PostMapping(value = "/index/cursor", produces = MediaType.APPLICATION_JSON_VALUE)
     public MessageResource cursorAllReindex() {
         try {
 

@@ -16,7 +16,7 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.*;
 public class CaseField extends DataField {
 
     @Field(type = Text)
-    public List<String> caseValue;
+    private List<String> caseValue;
 
     public CaseField(List<String> value) {
         super(value.toString());

@@ -50,6 +50,8 @@ public class ReindexingTask {
     private LocalDateTime lastRun;
     private final IBulkService bulkService;
 
+    private  final IElasticCaseMappingService elasticCaseMappingService;
+
     @Autowired
     public ReindexingTask(
             CaseRepository caseRepository,
@@ -65,8 +67,9 @@ public class ReindexingTask {
             IBulkService bulkService,
             MongoTemplate mongoTemplate,
             PetriNetService petriNetService,
-            @Value("${spring.data.elasticsearch.reindexExecutor.size:20}") int pageSize,
-            @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from) {
+            @Value("${spring.data.elasticsearch.reindexExecutor.caseSize:20}") int pageSize,
+            @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from,
+            IElasticCaseMappingService elasticCaseMappingService) {
         this.caseRepository = caseRepository;
         this.taskRepository = taskRepository;
         this.elasticCaseRepository = elasticCaseRepository;
@@ -79,6 +82,7 @@ public class ReindexingTask {
         this.petriNetService = petriNetService;
         this.pageSize = pageSize;
         this.bulkService = bulkService;
+        this.elasticCaseMappingService = elasticCaseMappingService;
 
         lastRun = LocalDateTime.now();
         if (from != null) {
@@ -88,7 +92,7 @@ public class ReindexingTask {
 
     @Scheduled(cron = "#{springElasticsearchReindex}")
     public void reindex() {
-        log.info("Reindexing stale cases: started reindexing after " + lastRun);
+        log.info("Reindexing stale cases: started reindexing after {}", lastRun);
 
         LocalDateTime now = LocalDateTime.now();
         //BooleanExpression predicate = QCase.case$.lastModified.before(now).and(QCase.case$.lastModified.after(lastRun.minusMinutes(2)));
@@ -106,7 +110,7 @@ public class ReindexingTask {
 
     private void reindexAllPages(long count, LocalDateTime now, LocalDateTime lastRunOld) {
         long numOfPages = ((count / pageSize) + 1);
-        log.info("Reindexing " + numOfPages + " pages");
+        log.info("Reindexing {} pages", numOfPages);
         Query query = new Query();
 
         query.cursorBatchSize(pageSize);
@@ -115,9 +119,9 @@ public class ReindexingTask {
 
         try (CloseableIterator<Case> cursor = mongoTemplate.stream(query, Case.class)) {
             cursor.stream().forEach(aCase -> {
-                if (elasticCaseRepository.countByStringIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
+                /*if (elasticCaseRepository.countByStringIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
                     return;
-                }
+                }*/
 
                 if (aCase.getPetriNet() == null) {
                     aCase.setPetriNet(petriNetService.get(aCase.getPetriNetObjectId()));
@@ -128,6 +132,7 @@ public class ReindexingTask {
         }
 
         bulkService.indexCases();
+        bulkService.bulkIndexTasks();
     }
 
     public void forceReindexPage(Predicate predicate, int page, long numOfPages) {
@@ -135,7 +140,7 @@ public class ReindexingTask {
     }
 
     private void reindexPage(Predicate predicate, int page, long numOfPages, boolean forced) {
-        log.info("Reindexing " + (page + 1) + " / " + numOfPages);
+        log.info("Reindexing {} / {}", (page + 1), numOfPages);
         Page<Case> cases = this.workflowService.search(predicate, PageRequest.of(page, pageSize));
 
         for (Case aCase : cases) {

@@ -1,6 +1,11 @@
 package com.netgrif.application.engine.configuration;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
+import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.configuration.properties.UriProperties;
+import com.netgrif.application.engine.elastic.service.ElasticSearchJsonpMapper;
 import com.netgrif.application.engine.workflow.service.CaseEventHandler;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
@@ -78,5 +83,13 @@ public class ElasticsearchConfiguration {
     @Bean
     public CaseEventHandler caseEventHandler() {
         return new CaseEventHandler();
+    }
+
+    @Bean
+    public ElasticsearchClient elasticsearchClient() {
+        RestClient restClient = RestClient.builder(new HttpHost(url, port)).build();
+        ElasticsearchTransport transport = new RestClientTransport(restClient, new ElasticSearchJsonpMapper());
+        return new ElasticsearchClient(transport);
+
     }
 }

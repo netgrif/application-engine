@@ -20,6 +20,10 @@ public class LocalDateTimeJsonDeserializer extends JsonDeserializer<LocalDateTim
 
     @Override
     public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        return LocalDateTime.parse(p.getValueAsString(), FORMATTER);
+        String value = p.getValueAsString();
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
+        return LocalDateTime.parse(value, FORMATTER);
     }
 }
