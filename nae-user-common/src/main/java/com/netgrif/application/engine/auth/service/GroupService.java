@@ -284,7 +284,7 @@ public interface GroupService {
      * @param groupIds collection of group IDs
      * @return collection of owner email addresses
      */
-    Page<String> getGroupsOwnerEmails(Collection<String> groupIds, Pageable pageable);
+    List<String> getGroupsOwnerEmails(Collection<String> groupIds);
 
     /**
      * Retrieves the email address of a specified group's owner.

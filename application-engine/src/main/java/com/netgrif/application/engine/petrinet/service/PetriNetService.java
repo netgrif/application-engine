@@ -475,7 +475,7 @@ public class PetriNetService implements IPetriNetService {
                 this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(groupService.getGroupOwnerEmail(criteriaClass.getGroup().get(0))));
             } else {
                 // TODO: pagination?
-                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(groupService.getGroupsOwnerEmails(criteriaClass.getGroup(), Pageable.unpaged())));
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(groupService.getGroupsOwnerEmails(criteriaClass.getGroup())));
             }
         }
         if (criteriaClass.getVersion() != null) {

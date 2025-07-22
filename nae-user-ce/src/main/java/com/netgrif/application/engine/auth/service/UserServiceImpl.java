@@ -28,6 +28,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -213,7 +214,9 @@ public class UserServiceImpl implements UserService {
     public void removeAllByStateAndExpirationDateBeforeForRealms(UserState state, LocalDateTime expirationDate, Collection<String> realmIds) {
         // TODO: delete whole group or change owner of group?
         if(realmIds == null || realmIds.isEmpty()) {
-            removeAllByStateAndExpirationDateBefore(state, expirationDate, null);
+            collectionNameProvider.getCollectionNamesForAllRealm().forEach(collectionName -> {
+                removeAllByStateAndExpirationDateBeforeFromCollection(state, expirationDate, collectionName);
+            });
         } else {
             realmIds.forEach(realmId -> removeAllByStateAndExpirationDateBefore(state, expirationDate, realmId));
         }
@@ -222,6 +225,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, String realmId) {
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
+        removeAllByStateAndExpirationDateBeforeFromCollection(state, expirationDate, collectionName);
+    }
+
+    private void removeAllByStateAndExpirationDateBeforeFromCollection(UserState state, LocalDateTime expirationDate, String collectionName) {
         Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
         Page<User> users;
         do {
@@ -230,9 +237,7 @@ public class UserServiceImpl implements UserService {
             Pageable groupsPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
             Page<Group> groups;
             do { // TODO refactor because this iterates all groups multiple times :(
-                groups = realmId == null || realmId.isBlank()
-                        ? groupService.findAll(groupsPageable)
-                        : groupService.findAllFromRealm(realmId, groupsPageable);
+                groups = groupService.findAllFromRealm(collectionNameProvider.getRealmIdFromCollectionName(collectionName), groupsPageable);
                 groups.forEach(group -> {
                     group.getMemberIds().removeAll(userIds);
                     groupService.save(group);

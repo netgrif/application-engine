@@ -343,8 +343,11 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Page<String> getGroupsOwnerEmails(Collection<String> groupIds, Pageable pageable) {
-        return this.findAllByIds(groupIds, pageable).map(this::getGroupOwnerEmail);
+    public List<String> getGroupsOwnerEmails(Collection<String> groupIds) {
+        return this.findAllByIds(groupIds, Pageable.unpaged())
+                .stream()
+                .map(this::getGroupOwnerEmail)
+                .collect(Collectors.toList());
     }
 
     @Override
