@@ -20,6 +20,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -95,8 +96,7 @@ public class ReindexingTask {
         log.info("Reindexing stale cases: started reindexing after {}", lastRun);
 
         LocalDateTime now = LocalDateTime.now();
-        //BooleanExpression predicate = QCase.case$.lastModified.before(now).and(QCase.case$.lastModified.after(lastRun.minusMinutes(2)));
-        BooleanExpression predicate = QCase.case$.lastModified.isNotNull();
+        BooleanExpression predicate = QCase.case$.lastModified.before(now).and(QCase.case$.lastModified.after(lastRun.minusMinutes(2)));
         LocalDateTime lastRunOld = lastRun;
         lastRun = LocalDateTime.now();
 
@@ -115,13 +115,13 @@ public class ReindexingTask {
 
         query.cursorBatchSize(pageSize);
 
-        //query.addCriteria(Criteria.where("lastModified").lt(now).gt(lastRunOld.minusMinutes(2)));
+        query.addCriteria(Criteria.where("lastModified").lt(now).gt(lastRunOld.minusMinutes(2)));
 
         try (CloseableIterator<Case> cursor = mongoTemplate.stream(query, Case.class)) {
             cursor.stream().forEach(aCase -> {
-                /*if (elasticCaseRepository.countByStringIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
+                if (elasticCaseRepository.countByStringIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
                     return;
-                }*/
+                }
 
                 if (aCase.getPetriNet() == null) {
                     aCase.setPetriNet(petriNetService.get(aCase.getPetriNetObjectId()));
