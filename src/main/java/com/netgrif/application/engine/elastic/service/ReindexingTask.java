@@ -29,7 +29,10 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Component
 @ConditionalOnExpression("'${spring.data.elasticsearch.reindex}'!= 'null'")
@@ -51,8 +54,6 @@ public class ReindexingTask {
     private LocalDateTime lastRun;
     private final IBulkService bulkService;
 
-    private  final IElasticCaseMappingService elasticCaseMappingService;
-
     @Autowired
     public ReindexingTask(
             CaseRepository caseRepository,
@@ -69,8 +70,7 @@ public class ReindexingTask {
             MongoTemplate mongoTemplate,
             PetriNetService petriNetService,
             @Value("${spring.data.elasticsearch.reindexExecutor.caseSize:20}") int pageSize,
-            @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from,
-            IElasticCaseMappingService elasticCaseMappingService) {
+            @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from) {
         this.caseRepository = caseRepository;
         this.taskRepository = taskRepository;
         this.elasticCaseRepository = elasticCaseRepository;
@@ -83,7 +83,6 @@ public class ReindexingTask {
         this.petriNetService = petriNetService;
         this.pageSize = pageSize;
         this.bulkService = bulkService;
-        this.elasticCaseMappingService = elasticCaseMappingService;
 
         lastRun = LocalDateTime.now();
         if (from != null) {
@@ -112,31 +111,52 @@ public class ReindexingTask {
         long numOfPages = ((count / pageSize) + 1);
         log.info("Reindexing {} pages", numOfPages);
         Query query = new Query();
+        AtomicInteger page = new AtomicInteger();
 
         query.cursorBatchSize(pageSize);
 
         query.addCriteria(Criteria.where("lastModified").lt(now).gt(lastRunOld.minusMinutes(2)));
 
+        List<Case> batch = new ArrayList<>(pageSize);
         try (CloseableIterator<Case> cursor = mongoTemplate.stream(query, Case.class)) {
             cursor.stream().forEach(aCase -> {
-                if (elasticCaseRepository.countByStringIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
-                    return;
+                batch.add(aCase);
+
+                if (batch.size() == pageSize) {
+                    page.getAndIncrement();
+                    log.info("Reindexing {} / {}", page, numOfPages);
+
+                    reindexCasesBatch(batch);
+                    batch.clear();
                 }
 
-                if (aCase.getPetriNet() == null) {
-                    aCase.setPetriNet(petriNetService.get(aCase.getPetriNetObjectId()));
-                }
-
-                bulkService.bulkIndexCase(aCase);
             });
         }
-
-        bulkService.indexCases();
-        bulkService.bulkIndexTasks();
     }
 
     public void forceReindexPage(Predicate predicate, int page, long numOfPages) {
         reindexPage(predicate, page, numOfPages, true);
+    }
+
+    private void reindexCasesBatch(List<Case> casesBatch) {
+        List<Case> casesToIndex = casesBatch.stream().filter(it -> elasticCaseRepository.countByStringIdAndLastModified(it.getStringId(), Timestamp.valueOf(it.getLastModified()).getTime()) == 0).collect(Collectors.toList());
+        if (casesToIndex.isEmpty()) {
+            log.info("No cases to reindex");
+            return;
+        }
+
+        casesToIndex.forEach(c -> {
+            if (c.getPetriNet() == null) {
+                c.setPetriNet(petriNetService.get(c.getPetriNetObjectId()));
+            }
+        });
+
+        bulkService.bulkIndexCases(casesToIndex);
+
+        List<String> caseIds = casesToIndex.stream().map(Case::getStringId).collect(Collectors.toList());
+        List<Task> tasksToReindex = taskRepository.findAllByCaseIdIn(caseIds);
+
+        bulkService.bulkIndexTasks(tasksToReindex);
     }
 
     private void reindexPage(Predicate predicate, int page, long numOfPages, boolean forced) {

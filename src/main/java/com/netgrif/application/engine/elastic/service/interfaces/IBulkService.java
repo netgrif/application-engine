@@ -6,8 +6,6 @@ import com.netgrif.application.engine.workflow.domain.Task;
 import java.util.List;
 
 public interface IBulkService {
-    void bulkIndexCase(Case cases);
-    void bulkIndexTasks();
+    void bulkIndexCases(List<Case> cases);
     void bulkIndexTasks(List<Task> tasks);
-    void indexCases();
 }

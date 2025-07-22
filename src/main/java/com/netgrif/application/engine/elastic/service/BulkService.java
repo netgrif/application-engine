@@ -8,7 +8,6 @@ import com.netgrif.application.engine.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.service.interfaces.*;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,71 +44,48 @@ public class BulkService implements IBulkService {
 
     private final IElasticTaskMappingService elasticTaskMappingService;
 
-    private final TaskRepository taskRepository;
-
-    private final List<Case> bulkCases = new ArrayList<>();
-    private final List<String> bulkCaseIds = new ArrayList<>();
-    private List<Task> bulkTasks = new ArrayList<>();
-
-    private BulkRequest.Builder builder = new BulkRequest.Builder();
-
 
     BulkService (@Qualifier("elasticsearchClient") ElasticsearchClient elasticsearchClient,
                  IElasticCaseMappingService elasticCaseMappingService,
-                 IElasticTaskMappingService elasticTaskMappingService,
-                 TaskRepository taskRepository) {
+                 IElasticTaskMappingService elasticTaskMappingService) {
         this.esClient = elasticsearchClient;
         this.elasticCaseMappingService = elasticCaseMappingService;
         this.elasticTaskMappingService = elasticTaskMappingService;
-        this.taskRepository = taskRepository;
     }
 
     /**
-     * Creates elastic upsert operation for given case — if a document exists, it is updated; otherwise, it is created.
-     * calls indexCases if size of case list in cache equals batch size
+     * Performs bulk indexing of a list of {@link Case} objects into the Elasticsearch case index.
+     * Uses upsert semantics — if a document exists, it is updated; otherwise, it is created.
      *
-     * @param aCase the case entities to be indexed
+     * @param cases the list of case entities to be indexed
      */
     @Override
-    public void bulkIndexCase(Case aCase) {
-        if (aCase == null) return;
+    public void bulkIndexCases(List<Case> cases) {
+        BulkRequest.Builder builder = new BulkRequest.Builder();
 
-        bulkCases.add(aCase);
-        bulkCaseIds.add(aCase.getStringId());
+        for (Case c : cases) {
+            try {
+                if (c.getLastModified() == null)
+                    c.setLastModified(LocalDateTime.now());
 
-        try {
-            if (aCase.getLastModified() == null)
-                aCase.setLastModified(LocalDateTime.now());
+                ElasticCase doc = elasticCaseMappingService.transform(c);
 
-            ElasticCase doc = elasticCaseMappingService.transform(aCase);
-
-            builder.operations(op -> op
-                    .update(u -> u
-                            .index(caseIndex)
-                            .id(doc.getStringId())
-                            .action(a -> a
-                                    .doc(doc)
-                                    .docAsUpsert(true)
-                            )
-                    )
-            );
-        } catch (Exception e) {
-            log.error("Failed to prepare bulk operation for case [{}]: {}", aCase.getStringId(), e.getMessage());
+                builder.operations(op -> op
+                        .update(u -> u
+                                .index(caseIndex)
+                                .id(doc.getStringId())
+                                .action(a -> a
+                                        .doc(doc)
+                                        .docAsUpsert(true)
+                                )
+                        )
+                );
+            } catch (Exception e) {
+                log.error("Failed to prepare bulk operation for case [{}]: {}", c.getStringId(), e.getMessage());
+            }
         }
 
-        if (bulkCases.size() == caseBatchSize) {
-            indexCases();
-        }
-    }
-
-    /**
-     * Calls bulkIndexTasks with empty list.
-     *
-     */
-    @Override
-    public void bulkIndexTasks() {
-        bulkIndexTasks(List.of());
-        bulkTasks.clear();
+        executeAndValidate(builder.build());
     }
 
     /**
@@ -122,39 +98,16 @@ public class BulkService implements IBulkService {
     public void bulkIndexTasks(List<Task> tasks) {
         if (tasks == null || tasks.isEmpty()) return;
 
-        tasks.addAll(0, bulkTasks);
         int totalSize = tasks.size();
 
         for (int i = 0; i < totalSize; i += taskBatchSize) {
             int end = Math.min(i + taskBatchSize, totalSize);
             List<Task> batch = tasks.subList(i, end);
 
-            if (batch.size() < taskBatchSize && !tasks.isEmpty()) {
-                bulkTasks = batch;
-                break;
-            }
+            log.info("Reindexing task page {} / {}", i / taskBatchSize, totalSize / taskBatchSize);
 
             indexTaskBatch(batch);
         }
-    }
-
-    /**
-     * Performs bulk indexing of a list of {@link Case} objects from cache into the Elasticsearch case index.
-     * Clears cache lists and recreates {@link BulkRequest.Builder}
-     */
-    @Override
-    public void indexCases() {
-        if (bulkCases.isEmpty()) {
-            return;
-        }
-
-        executeAndValidate(builder.build());
-        List<Task> tasksToReindex = taskRepository.findAllByCaseIdIn(bulkCaseIds);
-        bulkIndexTasks(tasksToReindex);
-
-        bulkCases.clear();
-        bulkCaseIds.clear();
-        this.builder = new BulkRequest.Builder();
     }
 
     private void executeAndValidate(BulkRequest request) {
