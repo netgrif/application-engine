@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.elastic.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -21,11 +20,5 @@ public class CaseField extends DataField {
     public CaseField(List<String> value) {
         super(value.toString());
         this.caseValue = value;
-    }
-
-    @AllArgsConstructor
-    private static class FileNameAndExtension {
-        public String name;
-        public String extension;
     }
 }
