@@ -136,8 +136,8 @@ public class BulkService implements IBulkService {
             List<BulkOperation> left = operations.subList(0, mid);
             List<BulkOperation> right = operations.subList(mid, operations.size());
 
-            executeAndValidate(left);
-            executeAndValidate(right);
+            executeAndValidate(new ArrayList<>(left));
+            executeAndValidate(new ArrayList<>(right));
         }
     }
 
