@@ -40,7 +40,7 @@ public class ReindexingTask {
 
     private static final Logger log = LoggerFactory.getLogger(ReindexingTask.class);
 
-    private final int pageSize;
+    private final int caseBatchSize;
     private final CaseRepository caseRepository;
     private final TaskRepository taskRepository;
     private final ElasticCaseRepository elasticCaseRepository;
@@ -69,7 +69,7 @@ public class ReindexingTask {
             IBulkService bulkService,
             MongoTemplate mongoTemplate,
             PetriNetService petriNetService,
-            @Value("${spring.data.elasticsearch.reindexExecutor.caseSize:20}") int pageSize,
+            @Value("${spring.data.elasticsearch.reindexExecutor.caseSize:20}") int caseBatchSize,
             @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from) {
         this.caseRepository = caseRepository;
         this.taskRepository = taskRepository;
@@ -81,7 +81,7 @@ public class ReindexingTask {
         this.workflowService = workflowService;
         this.mongoTemplate = mongoTemplate;
         this.petriNetService = petriNetService;
-        this.pageSize = pageSize;
+        this.caseBatchSize = caseBatchSize;
         this.bulkService = bulkService;
 
         lastRun = LocalDateTime.now();
@@ -95,7 +95,8 @@ public class ReindexingTask {
         log.info("Reindexing stale cases: started reindexing after {}", lastRun);
 
         LocalDateTime now = LocalDateTime.now();
-        BooleanExpression predicate = QCase.case$.lastModified.before(now).and(QCase.case$.lastModified.after(lastRun.minusMinutes(2)));
+        //BooleanExpression predicate = QCase.case$.lastModified.before(now).and(QCase.case$.lastModified.after(lastRun.minusMinutes(2)));
+        BooleanExpression predicate = QCase.case$.creationDate.isNotNull();
         LocalDateTime lastRunOld = lastRun;
         lastRun = LocalDateTime.now();
 
@@ -108,21 +109,21 @@ public class ReindexingTask {
     }
 
     private void reindexAllPages(long count, LocalDateTime now, LocalDateTime lastRunOld) {
-        long numOfPages = ((count / pageSize) + 1);
+        long numOfPages = ((count / caseBatchSize) + 1);
         log.info("Reindexing {} pages", numOfPages);
         Query query = new Query();
         AtomicInteger page = new AtomicInteger();
 
-        query.cursorBatchSize(pageSize);
+        query.cursorBatchSize(caseBatchSize);
 
-        query.addCriteria(Criteria.where("lastModified").lt(now).gt(lastRunOld.minusMinutes(2)));
+        //query.addCriteria(Criteria.where("lastModified").lt(now).gt(lastRunOld.minusMinutes(2)));
 
-        List<Case> batch = new ArrayList<>(pageSize);
+        List<Case> batch = new ArrayList<>(caseBatchSize);
         try (CloseableIterator<Case> cursor = mongoTemplate.stream(query, Case.class)) {
             cursor.stream().forEach(aCase -> {
                 batch.add(aCase);
 
-                if (batch.size() == pageSize) {
+                if (batch.size() == caseBatchSize) {
                     page.getAndIncrement();
                     log.info("Reindexing {} / {}", page, numOfPages);
 
@@ -139,7 +140,8 @@ public class ReindexingTask {
     }
 
     private void reindexCasesBatch(List<Case> casesBatch) {
-        List<Case> casesToIndex = casesBatch.stream().filter(it -> elasticCaseRepository.countByStringIdAndLastModified(it.getStringId(), Timestamp.valueOf(it.getLastModified()).getTime()) == 0).collect(Collectors.toList());
+        //List<Case> casesToIndex = casesBatch.stream().filter(it -> elasticCaseRepository.countByStringIdAndLastModified(it.getStringId(), Timestamp.valueOf(it.getLastModified()).getTime()) == 0).collect(Collectors.toList());
+        List<Case> casesToIndex = casesBatch;
         if (casesToIndex.isEmpty()) {
             log.info("No cases to reindex");
             return;
@@ -161,7 +163,7 @@ public class ReindexingTask {
 
     private void reindexPage(Predicate predicate, int page, long numOfPages, boolean forced) {
         log.info("Reindexing {} / {}", (page + 1), numOfPages);
-        Page<Case> cases = this.workflowService.search(predicate, PageRequest.of(page, pageSize));
+        Page<Case> cases = this.workflowService.search(predicate, PageRequest.of(page, caseBatchSize));
 
         for (Case aCase : cases) {
             if (forced || elasticCaseRepository.countByStringIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {

@@ -3,6 +3,7 @@ package com.netgrif.application.engine.elastic.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
+import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.service.interfaces.*;
@@ -61,7 +62,7 @@ public class BulkService implements IBulkService {
      */
     @Override
     public void bulkIndexCases(List<Case> cases) {
-        BulkRequest.Builder builder = new BulkRequest.Builder();
+        List<BulkOperation> operations = new ArrayList<>();
 
         for (Case c : cases) {
             try {
@@ -70,7 +71,7 @@ public class BulkService implements IBulkService {
 
                 ElasticCase doc = elasticCaseMappingService.transform(c);
 
-                builder.operations(op -> op
+                operations.add(BulkOperation.of(op -> op
                         .update(u -> u
                                 .index(caseIndex)
                                 .id(doc.getStringId())
@@ -78,14 +79,13 @@ public class BulkService implements IBulkService {
                                         .doc(doc)
                                         .docAsUpsert(true)
                                 )
-                        )
-                );
+                        )));
             } catch (Exception e) {
                 log.error("Failed to prepare bulk operation for case [{}]: {}", c.getStringId(), e.getMessage());
             }
         }
 
-        executeAndValidate(builder.build());
+        executeAndValidate(operations);
     }
 
     /**
@@ -110,13 +110,34 @@ public class BulkService implements IBulkService {
         }
     }
 
-    private void executeAndValidate(BulkRequest request) {
-        try {
-            BulkResponse response = esClient.bulk(request);
+    private void executeAndValidate(List<BulkOperation> operations) {
+        if (operations.isEmpty()) {
+            return;
+        }
 
+        BulkRequest.Builder builder = new BulkRequest.Builder();
+        builder.operations(operations);
+
+        try {
+            BulkResponse response = esClient.bulk(builder.build());
             checkForBulkUpdateFailure(response);
+            log.info("Batch indexed successfully with {} ops", operations.size());
         } catch (Exception e) {
-            log.error("Failed to index bulk {}", e.getMessage(), e);
+            log.warn("Failed for {} ops to index bulk {}", operations.size(), e.getMessage(), e);
+
+            if (operations.size() == 1) {
+                log.error("Single operation failed. Skipping. {}", operations.get(0), e);
+                return;
+            }
+
+            log.warn("Dividing the requirement.");
+
+            int mid = operations.size() / 2;
+            List<BulkOperation> left = operations.subList(0, mid);
+            List<BulkOperation> right = operations.subList(mid, operations.size());
+
+            executeAndValidate(left);
+            executeAndValidate(right);
         }
     }
 
@@ -136,13 +157,14 @@ public class BulkService implements IBulkService {
     }
 
     private void indexTaskBatch(List<Task> tasks) {
-        BulkRequest.Builder requestBuilder = new BulkRequest.Builder();
+
+        List<BulkOperation> operations = new ArrayList<>();
 
         for (Task task : tasks) {
             try {
                 ElasticTask elasticTask = elasticTaskMappingService.transform(task);
 
-                requestBuilder.operations(op -> op
+                operations.add(BulkOperation.of(op -> op
                         .update(u -> u
                                 .index(taskIndex)
                                 .id(elasticTask.getStringId())
@@ -150,13 +172,13 @@ public class BulkService implements IBulkService {
                                         .doc(elasticTask)
                                         .docAsUpsert(true)
                                 )
-                        )
+                        ))
                 );
             } catch (Exception e) {
                 log.error("Failed to create upsert request for task [{}]: {}", task.getStringId(), e.getMessage());
             }
         }
 
-        executeAndValidate(requestBuilder.build());
+        executeAndValidate(operations);
     }
 }
