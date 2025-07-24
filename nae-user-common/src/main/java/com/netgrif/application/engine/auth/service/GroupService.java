@@ -2,6 +2,7 @@ package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Group;
+import org.springframework.data.mongodb.core.query.Query;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -200,6 +201,8 @@ public interface GroupService {
      * @return page of {@link Group}s matching the predicate
      */
     Page<Group> findByPredicate(Predicate predicate, Pageable pageable);
+
+    Page<Group> findByQuery(Query query, Pageable pageable);
 
     /**
      * Assigns an authority to a group.

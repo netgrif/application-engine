@@ -8,7 +8,7 @@ import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundException;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundExceptionCode;
-import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
+import org.springframework.data.mongodb.core.query.Query;
 import com.querydsl.core.types.Predicate;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.util.Pair;
 
 import java.time.LocalDateTime;
@@ -40,6 +41,8 @@ public class GroupServiceImpl implements GroupService {
 
     private PaginationProperties paginationProperties;
 
+    private MongoTemplate mongoTemplate;
+
     @Autowired
     public void setCollectionNameProvider(CollectionNameProvider collectionNameProvider) {
         this.collectionNameProvider = collectionNameProvider;
@@ -48,6 +51,11 @@ public class GroupServiceImpl implements GroupService {
     @Autowired
     public void setGroupRepository(GroupRepository groupRepository) {
         this.groupRepository = groupRepository;
+    }
+
+    @Autowired
+    public void setMongoTemplate(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
     }
 
     @Autowired
@@ -244,6 +252,11 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Page<Group> findByPredicate(Predicate predicate, Pageable pageable) {
         return groupRepository.findAll(predicate, pageable);
+    }
+
+    @Override
+    public Page<Group> findByQuery(Query query, Pageable pageable) {
+        return groupRepository.findAll(query, mongoTemplate, pageable);
     }
 
     @Override

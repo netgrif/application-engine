@@ -2,12 +2,16 @@ package com.netgrif.application.engine.auth.repository;
 
 import com.netgrif.application.engine.objects.auth.domain.Group;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -57,4 +61,17 @@ public interface GroupRepository extends MongoRepository<Group, String>, Queryds
     void removeAllByRealmIdIn(Collection<String> realmIds);
 
     void removeAllByRealmId(String realmId);
+
+    default Page<Group> findAll(Query query, MongoTemplate mongoTemplate, Pageable pageable) {
+        if (query == null) {
+            query = new Query();
+        }
+        List<Group> resultGroupList = mongoTemplate.find(
+                query.with(pageable),
+                Group.class,
+                "group"
+        );
+        long total = mongoTemplate.count(query.limit(-1).skip(-1), Group.class, "group");
+        return new PageImpl<>(resultGroupList, pageable, total);
+    }
 }
