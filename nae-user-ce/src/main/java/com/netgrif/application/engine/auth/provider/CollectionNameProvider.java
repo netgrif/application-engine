@@ -37,7 +37,7 @@ public class CollectionNameProvider {
         if (defaultRealmOptional.isEmpty()) {
             throw new MissingResourceException("Admin realm is not specified.", Realm.class.getName(), "defaultRealm");
         }
-        return USER_MONGO_COLLECTION_PREFIX + defaultRealmOptional.get().getId();
+        return USER_MONGO_COLLECTION_PREFIX + defaultRealmOptional.get().getName();
     }
 
     public Set<String> getCollectionNamesForRealms(Collection<String> realmIds) {
@@ -48,7 +48,7 @@ public class CollectionNameProvider {
     }
 
     public Set<String> getCollectionNamesForAllRealm() {
-        return realmService.getAllRealm(PageableUtils.fullPageRequest()).getContent().stream().map(realm -> USER_MONGO_COLLECTION_PREFIX + realm.getId()).collect(Collectors.toSet());
+        return realmService.getAllRealm(PageableUtils.fullPageRequest()).getContent().stream().map(realm -> USER_MONGO_COLLECTION_PREFIX + realm.getName()).collect(Collectors.toSet());
     }
 
     public String getDefaultRealmCollection() {
@@ -56,6 +56,6 @@ public class CollectionNameProvider {
         if (defaultRealmOptional.isEmpty()) {
             throw new MissingResourceException("Default realm is not specified.", Realm.class.getName(), "defaultRealm");
         }
-        return USER_MONGO_COLLECTION_PREFIX + defaultRealmOptional.get().getId();
+        return USER_MONGO_COLLECTION_PREFIX + defaultRealmOptional.get().getName();
     }
 }

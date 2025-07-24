@@ -36,7 +36,7 @@ public class RealmServiceImpl implements RealmService {
 
     @Override
     public Realm createRealm(Realm createRequest) {
-        Realm realm = new com.netgrif.application.engine.adapter.spring.auth.domain.Realm(createRequest.getId());
+        Realm realm = new com.netgrif.application.engine.adapter.spring.auth.domain.Realm(createRequest.getName());
         realm.setDescription(createRequest.getDescription());
 
         realm.setAdminRealm(createRequest.isAdminRealm());
@@ -55,14 +55,14 @@ public class RealmServiceImpl implements RealmService {
 
     @Override
     public void enableAnonymUser(Realm realm) {
-        anonymousUserRefService.getOrCreateRef(realm.getId());
+        anonymousUserRefService.getOrCreateRef(realm.getName());
         realm.setPublicAccess(true);
         realmRepository.save(realm);
     }
 
     @Override
     public void disableAnonymUser(Realm realm) {
-        anonymousUserRefService.deleteRef(realm.getId());
+        anonymousUserRefService.deleteRef(realm.getName());
         realm.setPublicAccess(false);
         realmRepository.save(realm);
     }
@@ -130,7 +130,7 @@ public class RealmServiceImpl implements RealmService {
     @Override
     public Realm updateRealm(String realmId, Realm update) {
         Realm realm = getRealmById(realmId).orElseThrow(() -> new IllegalArgumentException("Realm with id " + realmId + " not found"));
-        realm.setName(update.getId());
+        realm.setName(update.getName());
         realm.setDescription(update.getDescription());
         realm.setAdminRealm(update.isAdminRealm());
         if (update.isDefaultRealm() && getDefaultRealm().isEmpty()) {

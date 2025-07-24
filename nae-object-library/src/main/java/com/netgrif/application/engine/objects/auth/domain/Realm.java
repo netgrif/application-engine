@@ -18,11 +18,10 @@ public abstract class Realm implements Serializable {
     @Serial
     private static final long serialVersionUID = -162168235241317688L;
 
-    @NotNull
-    private boolean defaultRealm = false;
+    private String name;
 
     @NotNull
-    private String name;
+    private boolean defaultRealm = false;
 
     private String description;
 
@@ -45,10 +44,6 @@ public abstract class Realm implements Serializable {
     private Duration publicSessionTimeout = Duration.ofHours(2);
 
     public Realm() {
-    }
-
-    public String getId() {
-        return name;
     }
 
     public Realm(String name) {
