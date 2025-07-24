@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.auth.repository;
 
+import com.netgrif.application.engine.adapter.spring.auth.domain.Realm;
 import com.netgrif.application.engine.auth.realm.request.RealmSearch;
-import com.netgrif.application.engine.objects.auth.domain.Realm;
 import org.bson.Document;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
