@@ -22,7 +22,7 @@ public class DefaultRealmRunner implements ApplicationEngineStartupRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         if (realmService.getDefaultRealm().isEmpty()) {
-            Realm createRequest = new Realm();
+            Realm createRequest = new com.netgrif.application.engine.adapter.spring.auth.domain.Realm();
             createRequest.setName("Default");
             createRequest.setDescription("Default realm");
             createRequest.setAdminRealm(true);

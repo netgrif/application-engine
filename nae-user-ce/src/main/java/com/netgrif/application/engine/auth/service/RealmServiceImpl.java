@@ -36,7 +36,7 @@ public class RealmServiceImpl implements RealmService {
 
     @Override
     public Realm createRealm(Realm createRequest) {
-        Realm realm = new Realm(createRequest.getName());
+        Realm realm = new com.netgrif.application.engine.adapter.spring.auth.domain.Realm(createRequest.getId());
         realm.setDescription(createRequest.getDescription());
 
         realm.setAdminRealm(createRequest.isAdminRealm());
@@ -130,7 +130,7 @@ public class RealmServiceImpl implements RealmService {
     @Override
     public Realm updateRealm(String realmId, Realm update) {
         Realm realm = getRealmById(realmId).orElseThrow(() -> new IllegalArgumentException("Realm with id " + realmId + " not found"));
-        realm.setName(update.getName());
+        realm.setName(update.getId());
         realm.setDescription(update.getDescription());
         realm.setAdminRealm(update.isAdminRealm());
         if (update.isDefaultRealm() && getDefaultRealm().isEmpty()) {

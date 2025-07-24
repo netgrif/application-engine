@@ -13,12 +13,10 @@ import java.util.List;
 import java.util.Set;
 
 @Data
-public class Realm implements Serializable {
+public abstract class Realm implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -162168235241317688L;
-
-    private String id;
 
     @NotNull
     private boolean defaultRealm = false;
@@ -47,6 +45,10 @@ public class Realm implements Serializable {
     private Duration publicSessionTimeout = Duration.ofHours(2);
 
     public Realm() {
+    }
+
+    public String getId() {
+        return name;
     }
 
     public Realm(String name) {

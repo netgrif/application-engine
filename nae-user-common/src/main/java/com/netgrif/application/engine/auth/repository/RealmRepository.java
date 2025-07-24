@@ -21,6 +21,7 @@ import java.util.Optional;
 @Repository
 public interface RealmRepository extends MongoRepository<Realm, String> {
 
+    @Query("{ '_id': ?0 }")
     Optional<Realm> findByName(String name);
 
     Optional<Realm> findByDefaultRealmTrue();
