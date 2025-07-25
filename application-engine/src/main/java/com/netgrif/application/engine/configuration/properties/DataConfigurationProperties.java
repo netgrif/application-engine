@@ -12,12 +12,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Configuration properties for the application engine's data functionality.
@@ -137,6 +136,8 @@ public class DataConfigurationProperties {
          * Ensures indexes are applied during initialization, if true.
          */
         private Boolean runnerEnsureIndex = true;
+
+        private MultiValueMap<Class<?>, String> indices = new LinkedMultiValueMap<>();
     }
 
     /**
