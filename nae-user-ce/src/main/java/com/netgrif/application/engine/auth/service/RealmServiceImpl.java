@@ -13,6 +13,7 @@ import com.netgrif.application.engine.objects.auth.provider.AuthMethod;
 import com.netgrif.application.engine.objects.auth.provider.AuthMethodConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,6 +46,7 @@ public class RealmServiceImpl implements RealmService {
         this.mongoIndexesConfigurator = mongoIndexesConfigurator;
     }
 
+    @Lazy
     @Autowired
     public void setCollectionNameProvider(CollectionNameProvider collectionNameProvider) {
         this.collectionNameProvider = collectionNameProvider;
