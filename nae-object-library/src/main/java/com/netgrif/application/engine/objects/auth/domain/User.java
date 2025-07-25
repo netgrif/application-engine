@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
+import com.netgrif.application.engine.objects.annotations.Indexed;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.utils.DateUtils;
 import com.querydsl.core.annotations.QueryEntity;
@@ -26,9 +27,11 @@ public abstract class User extends AbstractUser implements RegisteredUser, Seria
     private String realmId;
 
     @Setter
+    @Indexed
     private String username;
 
     @Setter
+    @Indexed
     private String email;
 
     @Setter
@@ -36,13 +39,16 @@ public abstract class User extends AbstractUser implements RegisteredUser, Seria
 
     @Setter
     @NotNull
+    @Indexed
     private String firstName;
 
     @Setter
+    @Indexed
     private String middleName;
 
     @Setter
     @NotNull
+    @Indexed
     private String lastName;
 
     @Setter

@@ -1,7 +1,10 @@
 package com.netgrif.application.engine.auth.service;
 
+import com.netgrif.application.engine.adapter.spring.auth.domain.User;
+import com.netgrif.application.engine.adapter.spring.configuration.MongoIndexesConfigurator;
 import com.netgrif.application.engine.auth.provider.AbstractAuthConfig;
 import com.netgrif.application.engine.auth.provider.AuthMethodProvider;
+import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
 import com.netgrif.application.engine.auth.provider.ProviderRegistry;
 import com.netgrif.application.engine.auth.realm.request.RealmSearch;
 import com.netgrif.application.engine.auth.repository.RealmRepository;
@@ -33,6 +36,19 @@ public class RealmServiceImpl implements RealmService {
     @Autowired
     private AnonymousUserRefService anonymousUserRefService;
 
+    private MongoIndexesConfigurator mongoIndexesConfigurator;
+
+    private CollectionNameProvider collectionNameProvider;
+
+    @Autowired
+    public void setMongoIndexesConfigurator(MongoIndexesConfigurator mongoIndexesConfigurator) {
+        this.mongoIndexesConfigurator = mongoIndexesConfigurator;
+    }
+
+    @Autowired
+    public void setCollectionNameProvider(CollectionNameProvider collectionNameProvider) {
+        this.collectionNameProvider = collectionNameProvider;
+    }
 
     @Override
     public Realm createRealm(Realm createRequest) {
@@ -45,7 +61,15 @@ public class RealmServiceImpl implements RealmService {
             realm.setDefaultRealm(true);
         }
 
-        return realmRepository.save(realm);
+        realm = realmRepository.save(realm);
+        String collectionName = collectionNameProvider.getCollectionNameForRealm(realm.getId());
+
+        if (!mongoTemplate.collectionExists(collectionName)) {
+            mongoTemplate.createCollection(collectionName);
+            mongoIndexesConfigurator.resolveIndexes(collectionName, User.class);
+        }
+
+        return realm;
     }
 
     @Override

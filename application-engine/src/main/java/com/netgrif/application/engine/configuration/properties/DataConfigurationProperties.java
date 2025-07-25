@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -137,7 +136,14 @@ public class DataConfigurationProperties {
          */
         private Boolean runnerEnsureIndex = true;
 
-        private MultiValueMap<Class<?>, String> indices = new LinkedMultiValueMap<>();
+        /**
+         * Multi-value map for MongoDB indexes.
+         * <p>
+         * This property holds a mapping between entity classes and their associated
+         * collection of index definitions. Each entry in the map corresponds to a class
+         * and its set of index configurations for MongoDB.
+         */
+        private MultiValueMap<Class<?>, String> indexes = new LinkedMultiValueMap<>();
     }
 
     /**

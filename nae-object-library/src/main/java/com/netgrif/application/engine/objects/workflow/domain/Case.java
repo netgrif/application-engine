@@ -39,6 +39,7 @@ public abstract class Case implements Serializable {
 
     @NotNull
     @Setter
+    @Indexed
     private ObjectId petriNetObjectId;
 
     @JsonIgnore
@@ -78,6 +79,7 @@ public abstract class Case implements Serializable {
     private List<Field<?>> immediateData;
 
     @Setter
+    @Indexed
     private Author author;
 
     @Setter

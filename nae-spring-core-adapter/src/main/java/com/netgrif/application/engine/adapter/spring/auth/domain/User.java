@@ -9,9 +9,11 @@ import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.querydsl.core.annotations.QueryEntity;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Set;
 
+@Document
 @QueryEntity
 public class User extends com.netgrif.application.engine.objects.auth.domain.User {
 

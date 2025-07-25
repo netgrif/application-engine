@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.objects.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netgrif.application.engine.objects.annotations.Indexed;
 import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
@@ -32,14 +33,17 @@ public abstract class Task implements Serializable {
     private ProcessResourceId _id;
 
     @Getter
+    @Indexed
     private String processId;
 
     @Getter
     @Setter
+    @Indexed
     private String caseId;
 
     @Getter
     @Setter
+    @Indexed
     private String transitionId;
 
     @Getter
@@ -63,6 +67,7 @@ public abstract class Task implements Serializable {
     private Integer priority;
 
     @Setter
+    @Indexed
     private String userId;
 
     @Setter
