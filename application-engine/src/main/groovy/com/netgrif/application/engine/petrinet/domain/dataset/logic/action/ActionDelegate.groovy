@@ -44,6 +44,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.vali
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.objects.petrinet.domain.version.Version
+import com.netgrif.application.engine.objects.utils.MenuItemUtils
 import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome
@@ -56,6 +57,7 @@ import com.netgrif.application.engine.objects.workflow.domain.menu.FilterBody
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemConstants
 import com.netgrif.application.engine.objects.workflow.domain.menu.configurations.TabbedCaseViewBody
+import com.netgrif.application.engine.objects.workflow.domain.menu.configurations.TabbedSingleTaskViewBody
 import com.netgrif.application.engine.objects.workflow.domain.menu.configurations.TabbedTaskViewBody
 import com.netgrif.application.engine.objects.workflow.domain.menu.configurations.ViewBody
 import com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.DashboardItemBody
@@ -926,6 +928,10 @@ class ActionDelegate {
     Case findCase(Closure<Predicate> predicate) {
         QCase qCase = new QCase("case")
         return workflowService.searchOne(predicate(qCase))
+    }
+
+    Case findCase(String stringId) {
+        return workflowService.findOne(stringId)
     }
 
     Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
@@ -2092,6 +2098,85 @@ class ActionDelegate {
         return menuItemService.createMenuItem(body)
     }
 
+    Case getOrCreateMenuItem(MenuItemBody body) {
+        String identifier = MenuItemUtils.sanitize(body.getIdentifier())
+
+        if (menuItemService.existsMenuItem(identifier)) {
+            return menuItemService.findMenuItem(identifier)
+        }
+        return menuItemService.createMenuItem(body)
+    }
+
+    protected static ViewBody createSingleTaskViewBody(MenuItemBody body, String filterQuery, String transitionId, List<String> filterAllowedNets = [],
+                                                       List<String> defaultHeaders = null, String filterType = "Case",
+                                                       String filterVisibility = "private", def filterMetadata = null) {
+        ViewBody caseViewBody = new TabbedCaseViewBody()
+        FilterBody filterBody = new FilterBody()
+        filterBody.setTitle(body.menuName)
+        filterBody.setQuery(filterQuery)
+        filterBody.setType(filterType)
+        filterBody.setAllowedNets(filterAllowedNets)
+        filterBody.setIcon(body.menuIcon)
+        filterBody.setVisibility(filterVisibility)
+        filterBody.setMetadata(filterMetadata as Map<String, Object>)
+        caseViewBody.setFilterBody(filterBody)
+        caseViewBody.setAllowHeaderTableMode(true)
+        caseViewBody.setShowCreateCaseButton(false)
+        caseViewBody.setShowMoreMenu(true)
+
+        TabbedSingleTaskViewBody taskViewBody = new TabbedSingleTaskViewBody()
+        taskViewBody.setTransitionId(transitionId)
+        caseViewBody.setChainedView(taskViewBody)
+
+        FilterBody filterTaskBody = new FilterBody()
+        filterTaskBody.setTitle(body.menuName)
+        filterTaskBody.setQuery("") // TODO case id and transition id
+        filterTaskBody.setType("Task")
+        filterTaskBody.setAllowedNets(filterAllowedNets)
+        filterTaskBody.setIcon(body.menuIcon)
+        filterTaskBody.setVisibility(filterVisibility)
+        filterTaskBody.setMetadata(filterMetadata as Map<String, Object>)
+        taskViewBody.setFilterBody(filterTaskBody)
+
+        return caseViewBody
+    }
+
+    protected static ViewBody createDefaultViewBody(MenuItemBody body, String filterQuery, List<String> filterAllowedNets = [],
+                                                    List<String> defaultHeaders = null, String filterType = "Case",
+                                                    String filterVisibility = "private", def filterMetadata = null) {
+
+        FilterBody filterBody = new FilterBody()
+        filterBody.setTitle(body.menuName)
+        filterBody.setQuery(filterQuery)
+        filterBody.setType(filterType)
+        filterBody.setAllowedNets(filterAllowedNets)
+        filterBody.setIcon(body.menuIcon)
+        filterBody.setVisibility(filterVisibility)
+        filterBody.setMetadata(filterMetadata as Map<String, Object>)
+
+        TabbedTaskViewBody taskViewBody = new TabbedTaskViewBody()
+        taskViewBody.setShowMoreMenu(false)
+        taskViewBody.setViewSearchType("hidden")
+        taskViewBody.setUseDefaultHeaders(false)
+        taskViewBody.setDefaultHeaders(["meta-caseTitleSortable", "meta-title", "meta-user", "meta-assign-date"])
+
+        ViewBody caseViewBody = new TabbedCaseViewBody()
+        caseViewBody.setChainedView(taskViewBody)
+        caseViewBody.setFilterBody(filterBody)
+        caseViewBody.setAllowHeaderTableMode(true)
+        caseViewBody.setShowCreateCaseButton(false)
+        caseViewBody.setShowMoreMenu(true)
+
+        if (defaultHeaders == null) {
+            caseViewBody.setUseDefaultHeaders(false)
+        } else {
+            caseViewBody.setUseDefaultHeaders(true)
+            caseViewBody.setDefaultHeaders(defaultHeaders)
+        }
+
+        return caseViewBody
+    }
+
     protected ViewBody createLegacyMenuItemViews(Case filterCase, List<String> caseDefaultHeaders = null,
                                                  List<String> taskDefaultHeaders = null) {
         FilterBody body = new FilterBody(filterCase)
@@ -2125,21 +2210,21 @@ class ActionDelegate {
         if (path == null || path == MenuItemConstants.PATH_SEPARATOR.value || path.length() == 0) {
             return ""
         }
-        if (path.lastIndexOf(MenuItemConstants.PATH_SEPARATOR.value) == 0) {
-            return path.replace(MenuItemConstants.PATH_SEPARATOR.value, "")
+        if (path.lastIndexOf(MenuItemConstants.PATH_SEPARATOR) == 0) {
+            return path.replace(MenuItemConstants.PATH_SEPARATOR, "")
         }
-        return path.substring(path.lastIndexOf(MenuItemConstants.PATH_SEPARATOR.value))
+        return path.substring(path.lastIndexOf(MenuItemConstants.PATH_SEPARATOR))
     }
 
     protected String parentPath(String path) {
-        if (path == null || path == MenuItemConstants.PATH_SEPARATOR.value || path.length() == 0 || path.lastIndexOf(MenuItemConstants.PATH_SEPARATOR.value) == 0) {
-            return MenuItemConstants.PATH_SEPARATOR.value
+        if (path == null || path == MenuItemConstants.PATH_SEPARATOR || path.length() == 0 || path.lastIndexOf(MenuItemConstants.PATH_SEPARATOR) == 0) {
+            return MenuItemConstants.PATH_SEPARATOR
         }
-        return path.substring(0, path.lastIndexOf(MenuItemConstants.PATH_SEPARATOR.value))
+        return path.substring(0, path.lastIndexOf(MenuItemConstants.PATH_SEPARATOR))
     }
 
     protected boolean hasParent(String path) {
-        if (path == null || path == MenuItemConstants.PATH_SEPARATOR.value || path.length() == 0) {
+        if (path == null || path == MenuItemConstants.PATH_SEPARATOR || path.length() == 0) {
             return false
         }
         return true
@@ -2198,12 +2283,12 @@ class ActionDelegate {
     }
 
     /**
-     * @param node uri node
+     * @param path
      *
-     * @return folder menu item case by provided UriNode
+     * @return folder menu item case by provided path
      * */
-    Case findFolderCase(UriNode node) {
-        return menuItemService.findFolderCase(node)
+    Case findFolderCase(String path) {
+        return menuItemService.findFolderCase(path)
     }
 
     /**
@@ -2325,7 +2410,7 @@ class ActionDelegate {
     }
 
     Map<String, I18nString> collectRolesForPreferenceItem(List<ProcessRole> roles) {
-        return roles.collectEntries { role ->
+        return roles.collectEntries { ProcessRole role ->
             if (role.isGlobal()) {
                 return [(role.importId + ":" + GLOBAL_ROLE), ("$role.name (🌍 Global role)" as String)]
             } else {

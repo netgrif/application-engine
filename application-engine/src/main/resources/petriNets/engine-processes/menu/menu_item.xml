@@ -111,10 +111,9 @@
 		}
 	</function>
 	<function scope="process" name="removeAnyAutoSelectFlagInFolder">
-		{
-			->
-			String query = String.format("processIdentifier:menu_item AND uriNodeId:%s AND dataSet.is_auto_select.booleanValue:true AND NOT stringId:%s",
-					useCase.uriNodeId, useCase.stringId)
+		{ def parentId ->
+			String query = String.format("processIdentifier:menu_item AND dataSet.parentId.textValue:(%s) AND dataSet.is_auto_select.booleanValue:true AND NOT stringId:%s",
+					parentId, useCase.stringId)
 			def itemCase = findCaseElastic(query)
 			if (itemCase == null) {
 				return
@@ -149,7 +148,7 @@
 		</component>
 		<action trigger="get">
 			moveDestUri: f.move_dest_uri;
-
+<!--TODO  skontrolovat-->
 			String uriNodeId = elasticCaseService.findUriNodeId(useCase)
 			def node = uriService.findById(uriNodeId)
 			updateMultichoiceWithCurrentNode(moveDestUri, node)
@@ -164,8 +163,7 @@
 			String corrected = getCorrectedUri(newUri)
 
 			if (corrected == newUri) {
-				def node = uriService.findByUri(newUri)
-				change moveDestUri options { findOptionsBasedOnSelectedNode(node) }
+				change moveDestUri options { findOptionsBasedOnSelectedNode(newUri) }
 			} else {
 				change moveDestUri value { splitUriPath(corrected) }
 			}
@@ -194,10 +192,9 @@
 			String prefixUri = selectedUri.value.join("/")
 			prefixUri = prefixUri.replace("//","/")
 
-			String newUri = prefixUri + uriService.getUriSeparator() + newNodeName.value
-			def newNode = uriService.getOrCreate(newUri, com.netgrif.application.engine.petrinet.domain.UriContentType.CASE)
+			String newUri = prefixUri + "/" + newNodeName.value
 
-			change selectedUri value { splitUriPath(newNode.uriPath) }
+			change selectedUri value { splitUriPath(newUri) }
 
 			change newNodeName value { null }
 		</action>
@@ -252,8 +249,7 @@
 					menu_item_identifier: f.menu_item_identifier;
 
 					change menu_item_identifier value {
-					// TODO refactor
-						def idx = nodePath.value.lastIndexOf(uriService.getUriSeparator())
+						def idx = nodePath.value.lastIndexOf("/")
 						return nodePath.value.substring(idx + 1)
 					}
 				</action>
@@ -435,12 +431,13 @@
 		<desc name="is_auto_select_desc">If selected, the view will be automatically opened</desc>
 		<init>false</init>
 		<action trigger="set">
-			is_auto_select: f.is_auto_select;
+			is_auto_select: f.is_auto_select,
+			parentId: f.parentId;
 
-			if (!is_auto_select.value)
+			if (!is_auto_select.value || parentId.value == null || parentId.value.isEmpty())
 				return
 
-			removeAnyAutoSelectFlagInFolder()
+			removeAnyAutoSelectFlagInFolder(parentId.value[0])
 		</action>
 	</data>
 	<data type="boolean" immediate="true">

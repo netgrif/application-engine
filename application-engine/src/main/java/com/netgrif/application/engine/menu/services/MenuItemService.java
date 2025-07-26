@@ -109,12 +109,16 @@ public class MenuItemService implements IMenuItemService {
                 loggedUser.transformToLoggedUser());
         menuItemCase = workflowService.save(menuItemCase);
 
+        parentItemCase = appendChildCaseIdAndSave(parentItemCase, menuItemCase.getStringId());
 
         Case viewCase = null;
         if (body.hasView()) {
             viewCase = createView(body.getView());
         }
-        ToDataSetOutcome dataSetOutcome = body.toDataSet(parentItemCase.getStringId(), body.getPath(), viewCase);
+
+        String nodePath = createNodePath(body.getPath(), sanitizedIdentifier);
+
+        ToDataSetOutcome dataSetOutcome = body.toDataSet(parentItemCase.getStringId(), nodePath, viewCase);
         menuItemCase = setDataWithExecute(menuItemCase, MenuItemConstants.TRANS_INIT_ID, dataSetOutcome.getDataSet());
         log.debug("Created menu item case [{}] with identifier [{}].", menuItemCase.getStringId(), body.getIdentifier());
         return menuItemCase;
@@ -565,11 +569,11 @@ public class MenuItemService implements IMenuItemService {
     }
 
     protected String createNodePath(String path, String identifier) {
-        String normalized = path.endsWith(MenuItemConstants.PATH_SEPARATOR) && path != MenuItemConstants.PATH_SEPARATOR
-                ? path.substring(0, path.length() - 1)
-                : path;
-        return normalized + MenuItemConstants.PATH_SEPARATOR + identifier;
-
+        if (Objects.equals(path, MenuItemConstants.PATH_SEPARATOR)) {
+            return path + identifier;
+        } else {
+            return path + MenuItemConstants.PATH_SEPARATOR + identifier;
+        }
     }
 
     protected Case getOrCreateFolderItem(String path) throws TransitionNotExecutableException {
@@ -584,6 +588,37 @@ public class MenuItemService implements IMenuItemService {
 
     protected Case getOrCreateFolderRecursive(String path, MenuItemBody body, Case childFolderCase) throws TransitionNotExecutableException {
         IUser loggedUser = userService.getLoggedOrSystem();
+        Case folderCase = findFolderCase(path);
+        if (folderCase != null) {
+            if (childFolderCase != null) {
+                folderCase = appendChildCaseIdAndSave(folderCase, childFolderCase.getStringId());
+            }
+            return folderCase;
+        }
+
+        folderCase = createCase(FilterRunner.MENU_NET_IDENTIFIER, body.getMenuName().getDefaultValue(),
+                loggedUser.transformToLoggedUser());
+
+        ToDataSetOutcome dataSetOutcome = body.toDataSet(null, path, null);
+        if (childFolderCase != null) {
+            appendChildCaseIdInDataSet(folderCase, childFolderCase.getStringId(), dataSetOutcome.getDataSet());
+            initializeParentId(childFolderCase, folderCase.getStringId());
+        }
+
+        if (hasParent(path)) {
+            body = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(new I18nString(nameFromPath(path)), "folder");
+            String parentPath = parentPath(path);
+            Case parentFolderCase = getOrCreateFolderRecursive(parentPath, body, folderCase);
+            dataSetOutcome.putDataSetEntry(MenuItemConstants.FIELD_PARENT_ID, FieldType.CASE_REF, List.of(parentFolderCase.getStringId()));
+
+        }
+        folderCase = setDataWithExecute(folderCase, MenuItemConstants.TRANS_INIT_ID, dataSetOutcome.getDataSet());
+
+        log.trace("Created folder menu item [{}] with identifier [{}]", folderCase.getStringId(), body.getIdentifier());
+        return folderCase;
+    }
+
+    protected Case getOrCreateFolderRecursive2(String path, MenuItemBody body, Case childFolderCase) throws TransitionNotExecutableException {
         Case folderCase = findFolderCase(path);
         if (folderCase != null) {
             if (childFolderCase != null) {
@@ -611,14 +646,6 @@ public class MenuItemService implements IMenuItemService {
         if (newItemTask.isPresent()) {
             setDataWithExecute(folderCase, MenuItemConstants.TRANS_INIT_ID, dataSetOutcome.getDataSet());
         }
-
-//        if (node.getParentId() != null) {
-//            UriNode parentNode = uriService.findById(node.getParentId());
-//            body = new MenuItemBody(new I18nString(parentNode.getName()), DEFAULT_FOLDER_ICON);
-//
-//            Case parentFolderCase = getOrCreateFolderRecursive(parentNode, body, folderCase);
-//            dataSetOutcome.putDataSetEntry(MenuItemConstants.FIELD_PARENT_ID, FieldType.CASE_REF, List.of(parentFolderCase.getStringId()));
-//        }
 
         if (hasParent(path)) {
             body = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(new I18nString(nameFromPath(path)), "folder");

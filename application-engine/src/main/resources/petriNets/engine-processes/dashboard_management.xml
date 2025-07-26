@@ -183,7 +183,7 @@
                     existing_menu_items: f.existing_menu_items,
                     trans: t.configuration;
 
-                    if (existing_menu_items.value == null || !org.bson.types.ObjectId.isValid(existing_menu_items.value)) {
+                    if (existing_menu_items.value == null || existing_menu_items.value == "") {
                         change dashboard_item_taskRef value { [] }
                         make item_divider, hidden on trans when { true }
                         return
@@ -208,7 +208,7 @@
                     dashboard_item_list: f.dashboard_item_list,
                     existing_menu_items: f.existing_menu_items;
 
-                    if (existing_menu_items.value == null || !org.bson.types.ObjectId.isValid(existing_menu_items.value)) {
+                    if (existing_menu_items.value == null || existing_menu_items.value == "") {
                         throw new IllegalArgumentException("No menu item was selected.")
                     }
                     def dashboardItemOptions = dashboard_item_list.options
@@ -247,7 +247,7 @@
                     items_order: f.items_order,
                     existing_menu_items: f.existing_menu_items;
 
-                    if (dashboard_item_list.value == null || !org.bson.types.ObjectId.isValid(dashboard_item_list.value)) {
+                    if (dashboard_item_list.value == null || dashboard_item_list.value == "") {
                         throw new IllegalArgumentException("No menu item was selected.")
                     }
                     def dashboardItemOptions = dashboard_item_list.options

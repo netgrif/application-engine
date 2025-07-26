@@ -159,7 +159,7 @@
 
             boolean containsFilter = filterAutocomplete.value != null &amp;&amp; filterAutocomplete.value != ""
             if (containsFilter) {
-                def filterCase = findCase({it._id.eq(filterAutocomplete.value)})
+                def filterCase = findCase({it._id.eq(new com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId(filterAutocomplete.value))})
                 if (filterCase.dataSet["filter_type"].value != "Task") {
                     throw new IllegalArgumentException("Filter is of wrong type. Only filter of Task type allowed.")
                 }
@@ -191,7 +191,7 @@
                 return
             }
 
-            def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+            def filterCase = findCase({it._id.eq(new com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
             change filterTaskRef value {
                 return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]
             }

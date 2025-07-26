@@ -156,7 +156,7 @@
 
             boolean containsFilter = filterAutocomplete.value != null &amp;&amp; filterAutocomplete.value != ""
             if (containsFilter) {
-                def filterCase = findCase({it._id.eq(filterAutocomplete.value)})
+                def filterCase = findCase({it._id.eq(new com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId(filterAutocomplete.value))})
                 if (filterCase.dataSet["filter_type"].value != "Case") {
                     throw new IllegalArgumentException("Filter is of wrong type. Only filter of Case type allowed.")
                 }
