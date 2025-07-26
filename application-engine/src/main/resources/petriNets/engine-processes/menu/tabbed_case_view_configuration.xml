@@ -386,6 +386,7 @@
         <title/>
         <allowedNets>
             <allowedNet>tabbed_task_view_configuration</allowedNet>
+            <allowedNet>tabbed_single_task_view_configuration</allowedNet>
         </allowedNets>
     </data>
     <data type="taskRef">

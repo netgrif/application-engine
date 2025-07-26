@@ -201,13 +201,12 @@ public class MenuItemService implements IMenuItemService {
     /**
      * Finds menu item by uri and name.
      *
-     * @param path TODO
+     * @param path
      * @param name name of the menu item
      * @return Found menu item case. If not found, null will be returned
      */
     @Override
     public Case findMenuItem(String path, String name) {
-//        TODO skontrolovat
         String query = String.format("processIdentifier:%s AND title.keyword:\"%s\" AND nodePath:\"%s\"",
                 FilterRunner.MENU_NET_IDENTIFIER, name, path);
         return findCase(FilterRunner.MENU_NET_IDENTIFIER, query);
@@ -252,43 +251,41 @@ public class MenuItemService implements IMenuItemService {
     public void moveItem(Case itemCase, String destUri) throws TransitionNotExecutableException {
 //        TODO upravit implementaciu
 
-//        log.debug("Move of menu item case [{}] started. Destination path [{}]", itemCase.getStringId(), destUri);
-//        if (MenuItemUtils.isCyclicNodePath(itemCase, destUri)) {
-//            throw new IllegalArgumentException(String.format("Cyclic path not supported. Destination path: %s", destUri));
-//        }
-//        List<Case> casesToSave = new ArrayList<>();
-//
-//        List<String> parentIdList = MenuItemUtils.getCaseIdsFromCaseRef(itemCase, MenuItemConstants.FIELD_PARENT_ID);
-//        if (parentIdList != null && !parentIdList.isEmpty()) {
-//            Case oldParent = removeChildItemFromParent(parentIdList.get(0), itemCase);
-//            casesToSave.add(oldParent);
-//        }
-//
-//        UriNode destNode = uriService.getOrCreate(destUri, UriContentType.CASE);
-//        Case newParent = getOrCreateFolderItem(destNode.getUriPath());
-//        if (newParent != null) {
-//            itemCase.getDataField(MenuItemConstants.FIELD_PARENT_ID).setValue(List.of(newParent.getStringId()));
-//            appendChildCaseIdInMemory(newParent, itemCase.getStringId());
-//            casesToSave.add(newParent);
-//        } else {
-//            itemCase.getDataField(MenuItemConstants.FIELD_PARENT_ID).setValue(null);
-//        }
-//
-//        itemCase.setUriNodeId(destNode.getStringId());
-//        resolveAndHandleNewNodePath(itemCase, destNode.getUriPath());
-//        casesToSave.add(itemCase);
-//
-//        if (MenuItemUtils.hasFolderChildren(itemCase)) {
-//            List<Case> childrenToSave = updateNodeInChildrenFoldersRecursive(itemCase);
-//            casesToSave.addAll(childrenToSave);
-//        }
-//
-//        for (Case useCase : casesToSave) {
-//            if (useCase != null) {
-//                workflowService.save(useCase);
-//            }
-//        }
-//        log.debug("Moved menu item case [{}]. Destination path was [{}]", itemCase.getStringId(), destUri);
+        log.debug("Move of menu item case [{}] started. Destination path [{}]", itemCase.getStringId(), destUri);
+        if (MenuItemUtils.isCyclicNodePath(itemCase, destUri)) {
+            throw new IllegalArgumentException(String.format("Cyclic path not supported. Destination path: %s", destUri));
+        }
+        List<Case> casesToSave = new ArrayList<>();
+
+        List<String> parentIdList = MenuItemUtils.getCaseIdsFromCaseRef(itemCase, MenuItemConstants.FIELD_PARENT_ID);
+        if (parentIdList != null && !parentIdList.isEmpty()) {
+            Case oldParent = removeChildItemFromParent(parentIdList.get(0), itemCase);
+            casesToSave.add(oldParent);
+        }
+
+        Case newParent = getOrCreateFolderItem(destUri);
+        if (newParent != null) {
+            itemCase.getDataField(MenuItemConstants.FIELD_PARENT_ID).setValue(List.of(newParent.getStringId()));
+            appendChildCaseIdInMemory(newParent, itemCase.getStringId());
+            casesToSave.add(newParent);
+        } else {
+            itemCase.getDataField(MenuItemConstants.FIELD_PARENT_ID).setValue(null);
+        }
+
+        resolveAndHandleNewNodePath(itemCase, destUri);
+        casesToSave.add(itemCase);
+
+        if (MenuItemUtils.hasFolderChildren(itemCase)) {
+            List<Case> childrenToSave = updateNodeInChildrenFoldersRecursive(itemCase);
+            casesToSave.addAll(childrenToSave);
+        }
+
+        for (Case useCase : casesToSave) {
+            if (useCase != null) {
+                workflowService.save(useCase);
+            }
+        }
+        log.debug("Moved menu item case [{}]. Destination path was [{}]", itemCase.getStringId(), destUri);
     }
 
     /**
@@ -323,7 +320,7 @@ public class MenuItemService implements IMenuItemService {
             Case originViewCase = workflowService.findOne(originViewId);
             duplicatedViewCase = duplicateView(originViewCase);
         }
-
+//TODO
         Case duplicated = createCase(FilterRunner.MENU_NET_IDENTIFIER, newTitle.getDefaultValue(),
                 userService.getLoggedOrSystem().transformToLoggedUser());
 //        duplicated.setUriNodeId(originItem.getUriNodeId());
