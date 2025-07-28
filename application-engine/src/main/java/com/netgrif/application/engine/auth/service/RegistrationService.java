@@ -1,28 +1,33 @@
 package com.netgrif.application.engine.auth.service;
 
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
-import com.netgrif.application.engine.objects.auth.domain.RegisteredUser;
+import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Base64;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,7 +35,7 @@ import java.util.stream.Collectors;
 public class RegistrationService implements IRegistrationService {
 
     @Autowired
-    protected BCryptPasswordEncoder bCryptPasswordEncoder;
+    protected PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserService userService;
@@ -43,8 +48,12 @@ public class RegistrationService implements IRegistrationService {
 
     @Autowired
     private SecurityConfigurationProperties.AuthProperties serverAuthProperties;
+
     @Autowired
     private ProcessRoleService processRoleService;
+
+    @Autowired
+    private PaginationProperties paginationProperties;
 
     @Override
     @Transactional
@@ -59,22 +68,30 @@ public class RegistrationService implements IRegistrationService {
     @Scheduled(cron = "0 0 1 * * *")
     public void resetExpiredToken() {
         log.info("Resetting expired user tokens");
-        Page<User> users = userService.findAllByStateAndExpirationDateBefore(UserState.BLOCKED, LocalDateTime.now(), null, Pageable.unpaged());
-        if (users == null || users.isEmpty()) {
-            log.info("There are none expired tokens. Everything is awesome.");
-            return;
-        }
 
-        users.forEach(user -> {
-            user.setToken(null);
-            user.setExpirationDate(null);
-        });
-        userService.saveUsers(users.stream().map(u -> (IUser) u).collect(Collectors.toList()));
+        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<User> users;
+        do {
+            users = userService.findAllByStateAndExpirationDateBefore(UserState.BLOCKED, LocalDateTime.now(), null, pageable);
+            if (users == null || users.isEmpty()) {
+                log.info("There are none expired tokens. Everything is awesome.");
+                return;
+            }
+
+            users.forEach(user -> {
+                user.setToken(null);
+                user.setExpirationDate(null);
+            });
+            userService.saveUsers(users.getContent().stream().map(AbstractUser.class::cast).toList());
+
+            pageable = pageable.next();
+        } while (users.hasNext());
+
         log.info("Reset " + users.getContent().size() + " expired user tokens");
     }
 
     @Override
-    public void changePassword(RegisteredUser user, String newPassword) {
+    public void changePassword(AbstractUser user, String newPassword) {
         user.setPassword(newPassword);
         encodeUserPassword(user);
         userService.saveUser(user, null);
@@ -95,22 +112,22 @@ public class RegistrationService implements IRegistrationService {
     }
 
     @Override
-    public void encodeUserPassword(RegisteredUser user) {
+    public void encodeUserPassword(AbstractUser user) {
         String pass = user.getPassword();
         if (pass == null) {
             throw new IllegalArgumentException("User has no password");
         }
-        user.setPassword(bCryptPasswordEncoder.encode(pass));
+        user.setPassword(passwordEncoder.encode(pass));
     }
 
     @Override
-    public boolean stringMatchesUserPassword(RegisteredUser user, String passwordToCompare) {
-        return bCryptPasswordEncoder.matches(passwordToCompare, user.getPassword());
+    public boolean stringMatchesUserPassword(AbstractUser user, String passwordToCompare) {
+        return passwordEncoder.matches(passwordToCompare, user.getPassword());
     }
 
     @Override
     @Transactional
-    public User createNewUser(NewUserRequest newUser) {
+    public AbstractUser createNewUser(NewUserRequest newUser) {
         User user = (User) userService.findByEmail(newUser.email, null);
         if (user != null) {
             if (user.isActive()) {
@@ -118,7 +135,7 @@ public class RegistrationService implements IRegistrationService {
             }
             log.info("Renewing old user [" + newUser.email + "]");
         } else {
-            user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
+            user = new User();
             user.setEmail(newUser.email);
             user.setUsername(newUser.email);
             log.info("Creating new user [" + newUser.email + "]");
@@ -137,7 +154,7 @@ public class RegistrationService implements IRegistrationService {
 
         if (newUser.groups != null && !newUser.groups.isEmpty()) {
             for (String group : newUser.groups) {
-                groupService.addUser((IUser) user, group);
+                groupService.addUser(user, group);
             }
         }
 
@@ -145,10 +162,10 @@ public class RegistrationService implements IRegistrationService {
     }
 
     @Override
-    public RegisteredUser registerUser(RegistrationRequest registrationRequest) throws InvalidUserTokenException {
+    public AbstractUser registerUser(RegistrationRequest registrationRequest) throws InvalidUserTokenException {
         String email = decodeToken(registrationRequest.token)[0];
         log.info("Registering user " + email);
-        RegisteredUser user = (RegisteredUser) userService.findByEmail(email, null);
+        User user = (User) userService.findByEmail(email, null);
         if (user == null) {
             return null;
         }
@@ -161,11 +178,11 @@ public class RegistrationService implements IRegistrationService {
         user.setExpirationDate(null);
         user.setState(UserState.ACTIVE);
 
-        return (RegisteredUser) userService.saveUser(user, null);
+        return (AbstractUser) userService.saveUser(user, null);
     }
 
     @Override
-    public RegisteredUser resetPassword(String email) {
+    public AbstractUser resetPassword(String email) {
         log.info("Resetting password of " + email);
         User user = (User) userService.findByEmail(email, null);
         if (user == null || !user.isActive()) {
@@ -178,11 +195,11 @@ public class RegistrationService implements IRegistrationService {
         user.setPassword(null);
         user.setToken(generateTokenKey());
         user.setExpirationDate(generateExpirationDate());
-        return (RegisteredUser) userService.saveUser(user, null);
+        return (AbstractUser) userService.saveUser(user, null);
     }
 
     @Override
-    public RegisteredUser recover(String email, String newPassword) {
+    public AbstractUser recover(String email, String newPassword) {
         log.info("Recovering user " + email);
         User user = (User) userService.findByEmail(email, null);
         if (user == null) {
@@ -194,7 +211,7 @@ public class RegistrationService implements IRegistrationService {
         user.setToken(null);
         user.setExpirationDate(null);
 
-        return (RegisteredUser) userService.saveUser(user, null);
+        return (AbstractUser) userService.saveUser(user, null);
     }
 
     @Override

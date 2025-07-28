@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.objects.event.events.task;
 
-import com.netgrif.application.engine.objects.auth.domain.IUser;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome;
@@ -11,11 +11,11 @@ public class CancelTaskEvent extends TaskEvent {
         super(eventOutcome, eventPhase);
     }
 
-    public CancelTaskEvent(CancelTaskEventOutcome eventOutcome, IUser user) {
+    public CancelTaskEvent(CancelTaskEventOutcome eventOutcome, AbstractUser user) {
         super(eventOutcome, user);
     }
 
-    public CancelTaskEvent(CancelTaskEventOutcome outcome, EventPhase eventPhase, IUser user) {
+    public CancelTaskEvent(CancelTaskEventOutcome outcome, EventPhase eventPhase, AbstractUser user) {
         super(outcome, eventPhase, user);
     }
 

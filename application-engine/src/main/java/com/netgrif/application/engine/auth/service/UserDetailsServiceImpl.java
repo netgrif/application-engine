@@ -1,12 +1,11 @@
 package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
-import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.auth.service.interfaces.ILoginAttemptService;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
-import com.netgrif.application.engine.auth.service.interfaces.ILoginAttemptService;
 import com.netgrif.application.engine.objects.event.events.user.UserLoginEvent;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -18,8 +17,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -55,13 +52,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     protected LoggedUserImpl getLoggedUser(String email) throws UsernameNotFoundException {
-        IUser user = userService.findByEmail(email, null);
+        AbstractUser user = userService.findByEmail(email, null);
         if (user == null)
             throw new UsernameNotFoundException("No user was found for login: " + email);
-        if (((User) user).getPassword() == null || user.getState() != UserState.ACTIVE)
+        if (user.getPassword() == null || ((User) user).getState() != UserState.ACTIVE)
             throw new UsernameNotFoundException("User with login " + email + " cannot be logged in!");
 
-        return (LoggedUserImpl) userService.transformToLoggedUser(user);
+        return (LoggedUserImpl) ActorTransformer.toLoggedUser(user);
     }
 
 

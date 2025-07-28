@@ -4,7 +4,7 @@ import com.netgrif.application.engine.objects.auth.domain.Authority;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Service interface for managing {@link Authority} entities.
@@ -42,5 +42,5 @@ public interface AuthorityService {
      * @param pageable the {@link Pageable} object containing pagination information.
      * @return a {@link Page} of {@link Authority} entities.
      */
-    Page<Authority> findAllByIds(List<String> ids, Pageable pageable);
+    Page<Authority> findAllByIds(Collection<String> ids, Pageable pageable);
 }
