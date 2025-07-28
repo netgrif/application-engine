@@ -332,17 +332,14 @@ public class MenuItemService implements IMenuItemService {
             Case originViewCase = workflowService.findOne(originViewId);
             duplicatedViewCase = duplicateView(originViewCase);
         }
-//TODO
         Case duplicated = createCase(FilterRunner.MENU_NET_IDENTIFIER, newTitle.getDefaultValue(),
                 userService.getLoggedOrSystem().transformToLoggedUser());
-//        duplicated.setUriNodeId(originItem.getUriNodeId());
         duplicated.setDataSet(originItem.getDataSet());
         duplicated.setTitle(newTitle.getDefaultValue());
         duplicated = workflowService.save(duplicated);
 
-//        UriNode node = uriService.findById(originItem.getUriNodeId());
-//        String newNodePath = createNodePath(node.getUriPath(), sanitizedIdentifier);
-//        uriService.getOrCreate(newNodePath, UriContentType.CASE);
+        parentPath(String.valueOf(originItem.getDataSet().get(MenuItemConstants.FIELD_NODE_PATH)));
+        String newNodePath = createNodePath(parentPath(String.valueOf(originItem.getDataSet().get(MenuItemConstants.FIELD_NODE_PATH))), sanitizedIdentifier);
 
         Map<String, Map<String, Object>> dataSet = new HashMap<>();
         dataSet.put(MenuItemConstants.FIELD_DUPLICATE_TITLE, Map.of("type", FieldType.I18N.getName(), "value",
@@ -353,8 +350,8 @@ public class MenuItemService implements IMenuItemService {
                 "value", newTitle));
         dataSet.put(MenuItemConstants.FIELD_TAB_NAME, Map.of("type", FieldType.I18N.getName(),
                 "value", newTitle));
-//        dataSet.put(MenuItemConstants.FIELD_NODE_PATH, Map.of("type", FieldType.TEXT.getName(),
-//                "value", newNodePath));
+        dataSet.put(MenuItemConstants.FIELD_NODE_PATH, Map.of("type", FieldType.TEXT.getName(),
+                "value", newNodePath));
         // Must be reset by button, because we have the same dataSet reference between originItem and duplicated
         dataSet.put(MenuItemConstants.FIELD_DUPLICATE_RESET_CHILD_ITEM_IDS, Map.of("type", FieldType.BUTTON.getName(),
                 "value", 0));

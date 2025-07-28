@@ -8,6 +8,11 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.UriContentType
 import com.netgrif.application.engine.objects.petrinet.domain.UriNode
+import com.netgrif.application.engine.objects.utils.MenuItemUtils
+import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemConstants
+import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemView
+import com.netgrif.application.engine.objects.workflow.domain.menu.configurations.TabbedCaseViewConstants
+import com.netgrif.application.engine.objects.workflow.domain.menu.configurations.TabbedTaskViewConstants
 import com.netgrif.application.engine.startup.runner.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.objects.workflow.domain.Case
@@ -103,16 +108,11 @@ class MenuItemApiTest {
 
         Case testFolder = findCasesElastic("processIdentifier:$FilterRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue.keyword:\"/netgrif/test\"", PageRequest.of(0, 1))[0]
         Case netgrifFolder = findCasesElastic("processIdentifier:$FilterRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue.keyword:\"/netgrif\"", PageRequest.of(0, 1))[0]
-        UriNode testNode = uriService.findByUri("/netgrif")
-        UriNode netgrifNode = uriService.getRoot()
         Case rootFolder = findCasesElastic("processIdentifier:$FilterRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue.keyword:\"/\"", PageRequest.of(0, 1))[0]
 
-        assert testFolder != null && testNode != null
-        assert testFolder.uriNodeId == testNode.stringId
         assert testFolder.dataSet[MenuItemConstants.FIELD_PARENT_ID].value == [netgrifFolder.stringId]
         assert (testFolder.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value as ArrayList).contains(item.stringId)
         assert item.dataSet[MenuItemConstants.FIELD_PARENT_ID].value == [testFolder.stringId]
-        assert netgrifFolder.uriNodeId == netgrifNode.stringId
         assert netgrifFolder.dataSet[MenuItemConstants.FIELD_PARENT_ID].value == [rootFolder.stringId]
         assert (netgrifFolder.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value as ArrayList).contains(testFolder.stringId)
         assert rootFolder.dataSet[MenuItemConstants.FIELD_PARENT_ID].value == []
@@ -129,7 +129,7 @@ class MenuItemApiTest {
         Case tabbedCaseViewBeforeChange = workflowService.findOne(tabbedCaseViewIdBeforeChange)
         String tabbedTaskViewIdBeforeChange = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseViewBeforeChange, TabbedCaseViewConstants.FIELD_VIEW_CONFIGURATION_ID)
 
-        def newUri = uriService.getOrCreate("/netgrif/test_new", UriContentType.DEFAULT)
+//        def newUri = uriService.getOrCreate("/netgrif/test_new", UriContentType.DEFAULT)
         caze = setData(caze, [
                 "uri": "/netgrif/test_new",
                 "title": "CHANGED FILTER",
@@ -146,7 +146,7 @@ class MenuItemApiTest {
         assert item.dataSet[MenuItemConstants.FIELD_ALLOWED_ROLES].options.entrySet()[0].key.contains("role_2")
         assert item.dataSet[MenuItemConstants.FIELD_USE_TABBED_VIEW].value == true
         assert item.dataSet[MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE].value == MenuItemView.TABBED_CASE_VIEW.identifier
-        assert item.uriNodeId == newUri.stringId
+//        assert item.uriNodeId == newUri.stringId
 
         assert filter.dataSet["filter"].allowedNets == ["filter"]
         assert filter.dataSet["filter"].filterMetadata["defaultSearchCategories"] == false
@@ -199,9 +199,9 @@ class MenuItemApiTest {
         Case viewCase = workflowService.findOne(viewId)
         Thread.sleep(2000)
 
-        Case folderCase = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId}.textValue:\"/netgrif2\"", PageRequest.of(0, 1))[0]
+        Case folderCase = findCasesElastic("processIdentifier:$FilterRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue:\"/netgrif2\"", PageRequest.of(0, 1))[0]
 
-        ArrayList<String> childIds = folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as ArrayList<String>
+        ArrayList<String> childIds = folderCase.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value as ArrayList<String>
         assert childIds.contains(viewId) && childIds.size() == 2
 
         // cyclic move
@@ -229,18 +229,13 @@ class MenuItemApiTest {
 
         folderCase = findCasesElastic("processIdentifier:$FilterRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue:\"/netgrif/test3/netgrif2\"", PageRequest.of(0, 1))[0]
         assert folderCase != null
-        node = uriService.findByUri("/netgrif/test3")
-        assert node != null
-        assert folderCase.uriNodeId == node.stringId
         assert folderCase.dataSet[MenuItemConstants.FIELD_NODE_PATH].value == "/netgrif/test3/netgrif2"
 
         childIds = folderCase.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value as ArrayList<String>
         assert childIds.size() == 2
 
         folderCase = workflowService.findOne(childIds[0])
-        node = uriService.findByUri("/netgrif/test3/netgrif2")
         assert folderCase.dataSet[MenuItemConstants.FIELD_NODE_PATH].value == "/netgrif/test3/netgrif2/test2"
-        assert folderCase.uriNodeId == node.stringId
 
         viewCase = workflowService.findOne(viewId2)
     }
