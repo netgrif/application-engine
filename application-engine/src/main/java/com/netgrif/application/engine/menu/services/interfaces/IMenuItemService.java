@@ -27,6 +27,8 @@ public interface IMenuItemService {
 
     Case findMenuItem(String identifier);
 
+    Case findMenuItem(String identifier, boolean retry);
+
     Case findMenuItem(String uri, String name);
 
     Case findFolderCase(String path);

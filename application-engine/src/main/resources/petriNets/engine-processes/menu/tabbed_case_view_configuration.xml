@@ -381,9 +381,27 @@
             }
         </action>
     </data>
+    <data type="enumeration_map" immediate="true">
+        <id>chained_view_configuration_type</id>
+        <title name="view_configuration_type">Chained view type</title>
+        <options>
+            <init dynamic="true">menuItemService.getAvailableViewsAsOptions(true, useCase.processIdentifier)</init>
+        </options>
+    </data>
     <data type="caseRef">
         <id>view_configuration_id</id>
         <title/>
+        <action trigger="set">
+            chained_view_configuration_type: f.chained_view_configuration_type,
+            view_configuration_id: f.view_configuration_id;
+
+            if (view_configuration_id.value.isEmpty()) {
+                return
+            }
+
+            def chainedView = workflowService.findOne(view_configuration_id.value[0])
+            change chained_view_configuration_type value { chainedView.processIdentifier }
+        </action>
         <allowedNets>
             <allowedNet>tabbed_task_view_configuration</allowedNet>
             <allowedNet>tabbed_single_task_view_configuration</allowedNet>
@@ -888,6 +906,21 @@
                 <layout>
                     <x>0</x>
                     <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>chained_view_configuration_type</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <offset>0</offset>

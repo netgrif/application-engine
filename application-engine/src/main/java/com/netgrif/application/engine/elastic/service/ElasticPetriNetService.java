@@ -55,6 +55,12 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
         this.elasticsearchConfiguration = elasticsearchConfiguration;
     }
 
+    @Lazy
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
+    }
+
     @Override
     public void index(ElasticPetriNet net) {
         executors.execute(net.getStringId(), () -> {

@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.menu.services;
 
 
+import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
@@ -193,6 +194,11 @@ public class MenuItemService implements IMenuItemService {
      */
     @Override
     public Case findMenuItem(String identifier) {
+        return findMenuItem(identifier, false);
+    }
+
+    @Override
+    public Case findMenuItem(String identifier, boolean retry) {
         String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
                 FilterRunner.MENU_NET_IDENTIFIER, MenuItemConstants.FIELD_IDENTIFIER, identifier);
         return findCase(FilterRunner.MENU_NET_IDENTIFIER, query);
@@ -207,6 +213,7 @@ public class MenuItemService implements IMenuItemService {
      */
     @Override
     public Case findMenuItem(String path, String name) {
+//        TODO retry
         String query = String.format("processIdentifier:%s AND title.keyword:\"%s\" AND nodePath:\"%s\"",
                 FilterRunner.MENU_NET_IDENTIFIER, name, path);
         return findCase(FilterRunner.MENU_NET_IDENTIFIER, query);
@@ -220,6 +227,7 @@ public class MenuItemService implements IMenuItemService {
      */
     @Override
     public Case findFolderCase(String path) {
+//        TODO
         String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
                 FilterRunner.MENU_NET_IDENTIFIER, MenuItemConstants.FIELD_NODE_PATH, path);
         return findCase(FilterRunner.MENU_NET_IDENTIFIER, query);
@@ -233,9 +241,13 @@ public class MenuItemService implements IMenuItemService {
      */
     @Override
     public boolean existsMenuItem(String identifier) {
-        String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
-                FilterRunner.MENU_NET_IDENTIFIER, MenuItemConstants.FIELD_IDENTIFIER, identifier);
-        return countCases(FilterRunner.MENU_NET_IDENTIFIER, query) > 0;
+        //TODO mongo
+        Case menuItem = this.workflowService.searchOne(QCase.case$.processIdentifier.eq("menu_item")
+                .and(QCase.case$.dataSet.get(MenuItemConstants.FIELD_IDENTIFIER).value.eq(identifier)));
+        return menuItem != null;
+//        String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
+//                FilterRunner.MENU_NET_IDENTIFIER, MenuItemConstants.FIELD_IDENTIFIER, identifier);
+//        return countCases(FilterRunner.MENU_NET_IDENTIFIER, query) > 0;
     }
 
     /**
