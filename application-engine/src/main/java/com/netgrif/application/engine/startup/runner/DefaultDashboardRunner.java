@@ -20,7 +20,7 @@ import java.util.Map;
 @RunnerOrder(142)
 @RequiredArgsConstructor
 @ConditionalOnProperty(value = "netgrif.engine.dashboard.enabled", havingValue = "true", matchIfMissing = false)
-class DefaultDashboardRunner implements ApplicationEngineStartupRunner {
+public class DefaultDashboardRunner implements ApplicationEngineStartupRunner {
 
     private final DashboardManagementService dashboardManagementService;
 
