@@ -2207,7 +2207,7 @@ class ActionDelegate {
     }
 
     protected String nameFromPath(String path) {
-        if (path == null || path == MenuItemConstants.PATH_SEPARATOR.value || path.length() == 0) {
+        if (path == null || path == MenuItemConstants.PATH_SEPARATOR || path.length() == 0) {
             return ""
         }
         if (path.lastIndexOf(MenuItemConstants.PATH_SEPARATOR) == 0) {

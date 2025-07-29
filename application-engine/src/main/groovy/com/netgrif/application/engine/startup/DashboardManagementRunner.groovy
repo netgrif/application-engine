@@ -24,7 +24,7 @@ class DashboardManagementRunner implements ApplicationEngineStartupRunner {
 
     @Override
     void run(ApplicationArguments args) throws Exception {
-        helper.importProcess("Petri net for filters", DASHBOARD_MANAGEMENT_NET_IDENTIFIER, DASHBOARD_MANAGEMENT_FILE_NAME)
-        helper.importProcess("Petri net for filter preferences", DASHBOARD_ITEM_NET_IDENTIFIER, DASHBOARD_ITEM_FILE_NAME)
+        helper.importProcess("Petri net for dashboard management", DASHBOARD_MANAGEMENT_NET_IDENTIFIER, DASHBOARD_MANAGEMENT_FILE_NAME)
+        helper.importProcess("Petri net for dashboard items", DASHBOARD_ITEM_NET_IDENTIFIER, DASHBOARD_ITEM_FILE_NAME)
     }
 }
