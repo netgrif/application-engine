@@ -4,8 +4,9 @@ import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
 import com.netgrif.application.engine.auth.service.RealmService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.importer.service.Importer
@@ -29,7 +30,6 @@ import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
 import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles
@@ -101,7 +101,7 @@ class AssignActionTest {
 
         auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
-        importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
+        importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
 //                [org] as Group[],
                 [] as ProcessRole[])
@@ -120,15 +120,15 @@ class AssignActionTest {
 
     private void cleanDatabases() {
         template.db.drop()
-        userService.deleteAll()
+        userService.deleteAllUsers();
         processRoleRepository.deleteAll()
     }
 
     @Test
     void testAssignRoleOnSecondaryNetWhenRoleIsAddedOnPrimaryNet() {
-        IUser user = userService.findByEmail(USER_EMAIL, null)
+        AbstractUser user = userService.findByEmail(USER_EMAIL, null)
 
-        authentication = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(user), USER_PASSWORD, [auths.get("user"), auths.get("admin")] as List<AuthorityImpl>)
+        authentication = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(user), USER_PASSWORD, [auths.get("user"), auths.get("admin")] as List<AuthorityImpl>)
         authentication.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
 
         String roleIdInMainNet = mainNet.getRoles().find { it.value.name.defaultValue == "admin_main" }.key
@@ -146,7 +146,7 @@ class AssignActionTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn()
 
-        IUser updatedUser = userService.findByEmail(USER_EMAIL, null)
+        AbstractUser updatedUser = userService.findByEmail(USER_EMAIL, null)
         Set<ProcessRole> roles = updatedUser.getProcessRoles()
 
         String adminMainId = processRoleRepository.findAllByName_DefaultValue("admin_main", Pageable.ofSize(1))?.first()?.stringId

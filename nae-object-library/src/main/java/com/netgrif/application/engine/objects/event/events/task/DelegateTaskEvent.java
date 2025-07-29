@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.objects.event.events.task;
 
-import com.netgrif.application.engine.objects.auth.domain.IUser;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.DelegateTaskEventOutcome;
@@ -20,12 +20,12 @@ public class DelegateTaskEvent extends TaskEvent {
         this.delegate = delegate;
     }
 
-    public DelegateTaskEvent(DelegateTaskEventOutcome eventOutcome, IUser user, String delegate) {
+    public DelegateTaskEvent(DelegateTaskEventOutcome eventOutcome, AbstractUser user, String delegate) {
         super(eventOutcome, user);
         this.delegate = delegate;
     }
 
-    public DelegateTaskEvent(DelegateTaskEventOutcome eventOutcome, EventPhase eventPhase, IUser user, String delegate) {
+    public DelegateTaskEvent(DelegateTaskEventOutcome eventOutcome, EventPhase eventPhase, AbstractUser user, String delegate) {
         super(eventOutcome,eventPhase, user);
         this.delegate = delegate;
     }

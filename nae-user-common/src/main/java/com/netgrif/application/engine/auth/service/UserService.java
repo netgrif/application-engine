@@ -1,120 +1,401 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
-import com.netgrif.application.engine.objects.auth.domain.Author;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
-import com.netgrif.application.engine.objects.auth.domain.User;
+import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.core.Authentication;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorRef;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
+/**
+ * Service interface for managing user-related operations in the application.
+ * Provides functionality for user CRUD operations, role management, and user authentication.
+ * Supports multi-realm user management and handles both system and regular users.
+ */
 public interface UserService {
 
-    IUser saveUser(IUser user, String realmId);
+    /**
+     * Saves a user in the specified realm.
+     *
+     * @param user the user to be saved
+     * @param realmId the identifier of the realm
+     * @return the saved user
+     */
+    AbstractUser saveUser(AbstractUser user, String realmId);
 
-    IUser saveUser(IUser user);
+    /**
+     * Saves a user without specifying a realm.
+     *
+     * @param user the user to be saved
+     * @return the saved user
+     */
+    AbstractUser saveUser(AbstractUser user);
 
-    List<User> saveUsers(List<IUser> users);
+    /**
+     * Saves multiple users in batch.
+     *
+     * @param users collection of users to be saved
+     * @return list of saved users
+     */
+    List<User> saveUsers(Collection<AbstractUser> users);
 
+    /**
+     * Deletes all users from specified realms.
+     *
+     * @param realmIds collection of realm identifiers
+     */
     void deleteAllUsers(Collection<String> realmIds);
 
-    Optional<IUser> findUserByUsername(String username, String realmName);
+    /**
+     * Deletes all users from the system.
+     */
+    void deleteAllUsers();
 
-    Page<IUser> findAllUsers(String realmName, Pageable pageable);
+    /**
+     * Finds a user by username within a specific realm.
+     *
+     * @param username the username to search for
+     * @param realmName the name of the realm
+     * @return an Optional containing the user if found
+     */
+    Optional<AbstractUser> findUserByUsername(String username, String realmName);
 
-    IUser createUser(String username, String email, String firstName, String lastName, String password, String realmName);
+    Page<AbstractUser> findAllUsersByQuery(Query query, String realmName, Pageable pageable);
 
-    IUser createUser(IUser user, String realmId);
+    /**
+     * Retrieves a paginated list of all users in a specific realm.
+     *
+     * @param realmName the name of the realm
+     * @param pageable pagination information
+     * @return page of users
+     */
+    Page<AbstractUser> findAllUsers(String realmName, Pageable pageable);
 
-    IUser createUserFromThirdParty(String username, String email, String firstName, String lastName, String realmId, String authMethod);
+    /**
+     * Creates a new user with basic information.
+     *
+     * @param username the username
+     * @param email the email address
+     * @param firstName the first name
+     * @param lastName the last name
+     * @param password the password
+     * @param realmName the realm name
+     * @return the created user
+     */
+    AbstractUser createUser(String username, String email, String firstName, String lastName, String password, String realmName);
 
-    void addDefaultRole(IUser user);
+    /**
+     * Creates a new user from an existing user object in a specific realm.
+     *
+     * @param user the user to create
+     * @param realmId the realm identifier
+     * @return the created user
+     */
+    AbstractUser createUser(AbstractUser user, String realmId);
 
-    void addAnonymousAuthorities(IUser user);
+    /**
+     * Creates a user from third-party authentication.
+     *
+     * @param username the username
+     * @param email the email address
+     * @param firstName the first name
+     * @param lastName the last name
+     * @param realmId the realm identifier
+     * @param authMethod the authentication method used
+     * @return the created user
+     */
+    AbstractUser createUserFromThirdParty(String username, String email, String firstName, String lastName, String realmId, String authMethod);
 
+    /**
+     * Adds default role to a user.
+     *
+     * @param user the user to update
+     */
+    void addDefaultRole(AbstractUser user);
+
+    /**
+     * Adds anonymous authorities to a user.
+     *
+     * @param user the user to update
+     */
+    void addAnonymousAuthorities(AbstractUser user);
+
+    /**
+     * Adds all available roles to an admin user.
+     *
+     * @param username the username of the admin
+     */
     void addAllRolesToAdminByUsername(String username);
 
-    void addAnonymousRole(IUser user);
+    /**
+     * Adds anonymous role to a user.
+     *
+     * @param user the user to update
+     */
+    void addAnonymousRole(AbstractUser user);
 
-    IUser findById(String id, String realmId);
+    /**
+     * Finds a user by ID in a specific realm.
+     *
+     * @param id the user identifier
+     * @param realmId the realm identifier
+     * @return the found user
+     */
+    AbstractUser findById(String id, String realmId);
 
-    void deleteUser(IUser user);
+    /**
+     * Deletes a user from the system.
+     *
+     * @param user the user to delete
+     */
+    void deleteUser(AbstractUser user);
 
-    IUser findByAuth(Authentication auth, String realmId);
+    /**
+     * Finds a user by authentication in a specific realm.
+     *
+     * @param auth the authentication object
+     * @param realmId the realm identifier
+     * @return the found user
+     */
+    AbstractUser findByAuth(Authentication auth, String realmId);
 
-    IUser update(IUser user, IUser updatedUser);
+    /**
+     * Updates a user with new information.
+     *
+     * @param user the current user
+     * @param updatedUser the user with updated information
+     * @return the updated user
+     */
+    AbstractUser update(AbstractUser user, AbstractUser updatedUser);
 
-    IUser findByEmail(String email, String realmId);
+    /**
+     * Finds a user by email in a specific realm.
+     *
+     * @param email the email address
+     * @param realmId the realm identifier
+     * @return the found user
+     */
+    AbstractUser findByEmail(String email, String realmId);
 
-    Page<IUser> findAllCoMembers(com.netgrif.application.engine.objects.auth.domain.LoggedUser loggedUser, Pageable pageable);
+    /**
+     * Finds all users by their IDs in a specific realm.
+     *
+     * @param ids collection of user identifiers
+     * @param realmId the realm identifier
+     * @return list of found users
+     */
+    Page<AbstractUser> findAllByIds(Collection<String> ids, String realmId, Pageable pageable);
 
-    Page<IUser> findAllByIds(Collection<String> ids, String realmId, Pageable pageable);
+    /**
+     * Finds all active users with specific process roles.
+     *
+     * @param roleIds collection of process role identifiers
+     * @param pageable pagination information
+     * @return page of users
+     */
+    Page<AbstractUser> findAllActiveByProcessRoles(Collection<ProcessResourceId> roleIds, Pageable pageable, String realmId);
 
-    Page<IUser> findAllActiveByProcessRoles(Set<ProcessResourceId> roleIds, Pageable pageable, String realmId);
+    /**
+     * Finds all users with specific process roles in specific realms.
+     *
+     * @param roleIds collection of process role identifiers
+     * @param realmId realm identifier
+     * @return list of users
+     */
+    Page<AbstractUser> findAllByProcessRoles(Collection<ProcessResourceId> roleIds, String realmId, Pageable pageable);
 
-    Page<IUser> findAllByProcessRoles(Set<ProcessResourceId> roleIds, String realmId, Pageable pageable);
+    /**
+     * Adds default authorities to a user.
+     *
+     * @param user the user to update
+     */
+    void addDefaultAuthorities(AbstractUser user);
 
-    void addDefaultAuthorities(IUser user);
+    /**
+     * Assigns an authority to a user.
+     *
+     * @param userId the user identifier
+     * @param realmId the realm identifier
+     * @param authorityId the authority identifier
+     * @return the updated user
+     */
+    AbstractUser assignAuthority(String userId, String realmId, String authorityId);
 
-    IUser assignAuthority(String userId, String realmId, String authorityId);
+    /**
+     * Gets the currently logged user or system user if no user is logged in.
+     *
+     * @return the logged user or system user
+     */
+    AbstractUser getLoggedOrSystem();
 
-    IUser getLoggedOrSystem();
+    /**
+     * Gets the currently logged user.
+     *
+     * @return the logged user
+     */
+    AbstractUser getLoggedUser();
 
-    IUser getLoggedUser();
+    /**
+     * Gets the system user.
+     *
+     * @return the system user
+     */
+    AbstractUser getSystem();
 
-    IUser getSystem();
+    /**
+     * Gets the logged user from the current security context.
+     *
+     * @return the logged user
+     */
+    LoggedUser getLoggedUserFromContext();
 
-    com.netgrif.application.engine.objects.auth.domain.LoggedUser getLoggedUserFromContext();
+    /**
+     * Adds a process role to a user by ID.
+     *
+     * @param user the user to update
+     * @param id the process role identifier
+     * @return the updated user
+     */
+    AbstractUser addRole(AbstractUser user, ProcessResourceId id);
 
-    IUser addRole(IUser user, ProcessResourceId id);
+    /**
+     * Adds a role to a user by string identifier.
+     *
+     * @param user the user to update
+     * @param roleStringId the role string identifier
+     * @return the updated user
+     */
+    AbstractUser addRole(AbstractUser user, String roleStringId);
 
-    IUser addRole(IUser user, String roleStringId);
+    Page<AbstractUser> findAllCoMembers(LoggedUser loggedUser, Pageable pageable);
 
-    IUser addNegativeProcessRole(IUser user, ProcessResourceId id);
+    /**
+     * Searches for co-members of a principal user.
+     *
+     * @param query the search query
+     * @param principal the principal user
+     * @param pageable pagination information
+     * @return page of matching co-members
+     */
+    Page<AbstractUser> searchAllCoMembers(String query, LoggedUser principal, Pageable pageable);
 
-    IUser addNegativeProcessRole(IUser user, String roleStringId);
+    /**
+     * Advanced search for co-members with role filtering.
+     *
+     * @param query the search query
+     * @param roleIds required role identifiers
+     * @param negateRoleIds excluded role identifiers
+     * @param loggedUser the logged user
+     * @param pageable pagination information
+     * @return page of matching co-members
+     */
+    Page<AbstractUser> searchAllCoMembers(String query, Collection<ProcessResourceId> roleIds,
+            Collection<ProcessResourceId> negateRoleIds, LoggedUser loggedUser, Pageable pageable);
 
-    Page<IUser> searchAllCoMembers(String query, com.netgrif.application.engine.objects.auth.domain.LoggedUser principal, Pageable pageable);
+    /**
+     * Removes specified process roles from a user.
+     *
+     * @param user the user to update
+     * @param processRolesIds collection of process role identifiers to remove
+     * @return the updated user
+     */
+    AbstractUser removeRolesById(AbstractUser user, Collection<ProcessResourceId> processRolesIds);
 
-    Page<IUser> searchAllCoMembers(String query, List<ProcessResourceId> roleIds, List<ProcessResourceId> negateRoleIds, com.netgrif.application.engine.objects.auth.domain.LoggedUser loggedUser, Pageable pageable);
+    /**
+     * Removes specified process roles from a user.
+     *
+     * @param user the user to update
+     * @param processRoles collection of process roles to remove
+     * @return the updated user
+     */
+    AbstractUser removeRoles(AbstractUser user, Collection<ProcessRole> processRoles);
 
-    IUser removeRole(IUser user, ProcessRole role);
+    /**
+     * Removes a specific process role from a user.
+     *
+     * @param user the user to update
+     * @param role the process role to remove
+     * @return the updated user
+     */
+    AbstractUser removeRole(AbstractUser user, ProcessRole role);
 
-    IUser removeRole(IUser user, ProcessResourceId roleId);
+    /**
+     * Removes a process role from a user by role ID.
+     *
+     * @param user the user to update
+     * @param roleId the process role identifier
+     * @return the updated user
+     */
+    AbstractUser removeRole(AbstractUser user, ProcessResourceId roleId);
 
-    IUser removeRole(IUser user, String roleId);
+    /**
+     * Removes a role from a user by string identifier.
+     *
+     * @param user the user to update
+     * @param roleId the role string identifier
+     * @return the updated user
+     */
+    AbstractUser removeRole(AbstractUser user, String roleId);
 
-    IUser removeNegativeProcessRole(IUser user, ProcessRole role);
-
-    IUser removeNegativeProcessRole(IUser user, ProcessResourceId roleId);
-
-    IUser removeNegativeProcessRole(IUser user, String roleId);
-
+    /**
+     * Removes roles associated with a deleted Petri net from users in specified realms.
+     *
+     * @param process the deleted Petri net
+     * @param realmIds collection of realm identifiers
+     */
     void removeRoleOfDeletedPetriNet(PetriNet process, Collection<String> realmIds);
 
-    IUser createSystemUser();
+    /**
+     * Creates a system user.
+     *
+     * @return the created system user
+     */
+    AbstractUser createSystemUser();
 
-    IUser transformToUser(LoggedUserImpl loggedUser);
+    /**
+     * Transforms an actor reference to a user.
+     *
+     * @param author the actor reference to transform
+     * @return the transformed user
+     */
+    AbstractUser transformToUser(ActorRef author);
 
-    LoggedUserImpl transformToLoggedUser(IUser user);
+    /**
+     * Transforms a logged user to a regular user.
+     *
+     * @param loggedUser the logged user to transform
+     * @return the transformed user
+     */
+    AbstractUser transformToUser(LoggedUser loggedUser);
 
-    void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
+    /**
+     * Removes all users with specified state and expiration date before given date in specified realms.
+     *
+     * @param state the user state
+     * @param expirationDate the expiration date
+     * @param realmIds collection of realm identifiers
+     */
+    void removeAllByStateAndExpirationDateBeforeForRealms(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
 
     Page<User> findAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, String realmIds, Pageable pageable);
 
-    IUser transformToUser(Author author);
+    void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime expirationDate, String realmId);
 
-    Author transformToAuthor(IUser user);
-
-    void populateGroups(IUser user);
+    /**
+     * Gets all groups associated with an actor.
+     *
+     * @param actor the actor for which to retrieve groups
+     * @return list of groups
+     */
+    List<Group> getUserGroups(AbstractActor actor);
 }

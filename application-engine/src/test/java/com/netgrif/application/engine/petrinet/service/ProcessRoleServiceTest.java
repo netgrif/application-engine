@@ -20,9 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -68,7 +66,7 @@ class ProcessRoleServiceTest {
     @Test
     void shouldFindAllProcessRolesByPetriNet() throws IOException, MissingPetriNetMetaDataException {
         ImportPetriNetEventOutcome eventOutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
-        List<ProcessRole> roles = processRoleService.findAll(eventOutcome.getNet().getStringId());
+        List<ProcessRole> roles = processRoleService.findAllByNetStringId(eventOutcome.getNet().getStringId());
         assertNotNull(roles);
         assertFalse(roles.isEmpty());
         assertEquals(2, roles.size());
@@ -77,16 +75,16 @@ class ProcessRoleServiceTest {
     }
 
     @Test
-    void shouldGetDefaultRole() {
-        ProcessRole role = processRoleService.defaultRole();
+    void shouldGetGetDefaultRole() {
+        ProcessRole role = processRoleService.getDefaultRole();
         assertNotNull(role);
         assertEquals(ProcessRole.DEFAULT_ROLE, role.getImportId());
         assertEquals(ProcessRole.DEFAULT_ROLE, role.getName().getDefaultValue());
     }
 
     @Test
-    void shouldGetAnonymousRole() {
-        ProcessRole role = processRoleService.anonymousRole();
+    void shouldGetGetAnonymousRole() {
+        ProcessRole role = processRoleService.getAnonymousRole();
         assertNotNull(role);
         assertEquals(ProcessRole.ANONYMOUS_ROLE, role.getName().getDefaultValue());
         assertEquals(ProcessRole.ANONYMOUS_ROLE, role.getImportId());
