@@ -5,7 +5,8 @@ import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.menu.services.interfaces.DashboardItemService;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.objects.utils.MenuItemUtils;
@@ -60,7 +61,7 @@ public class DashboardItemServiceImpl implements DashboardItemService {
             return itemCase;
         }
 
-        LoggedUser loggedUser = userService.getLoggedOrSystem().transformToLoggedUser();
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
         itemCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier(DashboardItemConstants.PROCESS_IDENTIFIER).getStringId(), body.getName().getDefaultValue(), "", loggedUser).getCase();
         ToDataSetOutcome outcome = body.toDataSet();
         itemCase = setDataWithExecute(itemCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());
@@ -104,7 +105,7 @@ public class DashboardItemServiceImpl implements DashboardItemService {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected Case setDataWithExecute(Case useCase, String transId, Map<String, Map<String, Object>> dataSet) throws TransitionNotExecutableException {
-        IUser loggedUser = userService.getLoggedOrSystem();
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
         String taskId = MenuItemUtils.findTaskIdInCase(useCase, transId);
         Task task = taskService.findOne(taskId);
         task = taskService.assignTask(task, loggedUser).getTask();
@@ -117,7 +118,7 @@ public class DashboardItemServiceImpl implements DashboardItemService {
                 .process(Collections.singletonList(new CaseSearchRequest.PetriNet(processIdentifier)))
                 .query(query)
                 .build();
-        Page<Case> resultPage = elasticCaseService.search(java.util.List.of(request), userService.getLoggedOrSystem().transformToLoggedUser(),
+        Page<Case> resultPage = elasticCaseService.search(java.util.List.of(request), ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
                 PageRequest.of(0, 1), Locale.getDefault(), false);
 
         return resultPage.hasContent() ? resultPage.getContent().get(0) : null;

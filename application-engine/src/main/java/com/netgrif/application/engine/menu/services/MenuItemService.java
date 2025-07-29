@@ -6,7 +6,8 @@ import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.menu.services.interfaces.IMenuItemService;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldType;
@@ -55,8 +56,8 @@ public class MenuItemService implements IMenuItemService {
      */
     @Override
     public Case createFilter(FilterBody body) throws TransitionNotExecutableException {
-        IUser loggedUser = userService.getLoggedOrSystem();
-        Case filterCase = createCase(FilterRunner.FILTER_PETRI_NET_IDENTIFIER, body.getTitle().getDefaultValue(), loggedUser.transformToLoggedUser());
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        Case filterCase = createCase(FilterRunner.FILTER_PETRI_NET_IDENTIFIER, body.getTitle().getDefaultValue(),ActorTransformer.toLoggedUser(loggedUser));
         filterCase.setIcon(body.getIcon());
         filterCase = workflowService.save(filterCase);
         ToDataSetOutcome dataSetOutcome = body.toDataSet();
@@ -93,7 +94,7 @@ public class MenuItemService implements IMenuItemService {
     @Override
     public Case createMenuItem(MenuItemBody body) throws TransitionNotExecutableException {
         log.debug("Creation of menu item case with identifier [{}] started.", body.getIdentifier());
-        IUser loggedUser = userService.getLoggedOrSystem();
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
         String sanitizedIdentifier = MenuItemUtils.sanitize(body.getIdentifier());
 
         if (existsMenuItem(sanitizedIdentifier)) {
@@ -107,7 +108,7 @@ public class MenuItemService implements IMenuItemService {
             newName = new I18nString(body.getIdentifier());
         }
         Case menuItemCase = createCase(FilterRunner.MENU_NET_IDENTIFIER, newName.getDefaultValue(),
-                loggedUser.transformToLoggedUser());
+                ActorTransformer.toLoggedUser(loggedUser));
         menuItemCase = workflowService.save(menuItemCase);
 
         parentItemCase = appendChildCaseIdAndSave(parentItemCase, menuItemCase.getStringId());
@@ -135,12 +136,6 @@ public class MenuItemService implements IMenuItemService {
     @Override
     public Case updateMenuItem(Case itemCase, MenuItemBody body) throws TransitionNotExecutableException {
         log.debug("Update of menu item case with identifier [{}] started.", body.getIdentifier());
-//        String actualUriNodeId = uriService.findByUri(body.getUri()).getStringId();
-//        if (!itemCase.getUriNodeId().equals(actualUriNodeId)) {
-//            TODO skontroluj
-//            itemCase.setUriNodeId(actualUriNodeId);
-//            itemCase = workflowService.save(itemCase);
-//        }
 
         Case viewCase = findView(itemCase);
         viewCase = handleView(viewCase, body.getView());
@@ -261,7 +256,6 @@ public class MenuItemService implements IMenuItemService {
      */
     @Override
     public void moveItem(Case itemCase, String destUri) throws TransitionNotExecutableException {
-//        TODO upravit implementaciu
 
         log.debug("Move of menu item case [{}] started. Destination path [{}]", itemCase.getStringId(), destUri);
         if (MenuItemUtils.isCyclicNodePath(itemCase, destUri)) {
@@ -333,7 +327,7 @@ public class MenuItemService implements IMenuItemService {
             duplicatedViewCase = duplicateView(originViewCase);
         }
         Case duplicated = createCase(FilterRunner.MENU_NET_IDENTIFIER, newTitle.getDefaultValue(),
-                userService.getLoggedOrSystem().transformToLoggedUser());
+                ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()));
         duplicated.setDataSet(originItem.getDataSet());
         duplicated.setTitle(newTitle.getDefaultValue());
         duplicated = workflowService.save(duplicated);
@@ -396,7 +390,7 @@ public class MenuItemService implements IMenuItemService {
                 .process(Collections.singletonList(new CaseSearchRequest.PetriNet(processIdentifier)))
                 .query(query)
                 .build();
-        Page<Case> resultPage = elasticCaseService.search(List.of(request), userService.getLoggedOrSystem().transformToLoggedUser(),
+        Page<Case> resultPage = elasticCaseService.search(List.of(request), ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
                 PageRequest.of(0, 1), Locale.getDefault(), false);
 
         return resultPage.hasContent() ? resultPage.getContent().get(0) : null;
@@ -407,7 +401,7 @@ public class MenuItemService implements IMenuItemService {
                 .process(Collections.singletonList(new CaseSearchRequest.PetriNet(processIdentifier)))
                 .query(query)
                 .build();
-        return elasticCaseService.count(List.of(request), userService.getLoggedOrSystem().transformToLoggedUser(),
+        return elasticCaseService.count(List.of(request), ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
                 Locale.getDefault(), false);
     }
 
@@ -420,7 +414,7 @@ public class MenuItemService implements IMenuItemService {
         }
 
         Case duplicatedViewCase = createCase(viewCase.getProcessIdentifier(), viewCase.getTitle(),
-                userService.getLoggedOrSystem().transformToLoggedUser());
+                ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()));
         duplicatedViewCase.setDataSet(viewCase.getDataSet());
         workflowService.save(duplicatedViewCase);
 
@@ -466,9 +460,9 @@ public class MenuItemService implements IMenuItemService {
     }
 
     protected Case createView(ViewBody body) throws TransitionNotExecutableException {
-        IUser loggedUser = userService.getLoggedOrSystem();
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
         Case viewCase = createCase(body.getViewProcessIdentifier(), body.getViewProcessIdentifier(),
-                loggedUser.transformToLoggedUser());
+                ActorTransformer.toLoggedUser(loggedUser));
 
         Case associatedViewCase = null;
         if (body.hasAssociatedView()) {
@@ -593,7 +587,7 @@ public class MenuItemService implements IMenuItemService {
     }
 
     protected Case getOrCreateFolderRecursive(String path, MenuItemBody body, Case childFolderCase) throws TransitionNotExecutableException {
-        IUser loggedUser = userService.getLoggedOrSystem();
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
         Case folderCase = findFolderCase(path);
         if (folderCase != null) {
             if (childFolderCase != null) {
@@ -603,7 +597,7 @@ public class MenuItemService implements IMenuItemService {
         }
 
         folderCase = createCase(FilterRunner.MENU_NET_IDENTIFIER, body.getMenuName().getDefaultValue(),
-                loggedUser.transformToLoggedUser());
+                ActorTransformer.toLoggedUser(loggedUser));
 
         ToDataSetOutcome dataSetOutcome = body.toDataSet(null, path, null);
         if (childFolderCase != null) {
@@ -634,7 +628,7 @@ public class MenuItemService implements IMenuItemService {
             return folderCase;
         }
 
-        folderCase = createCase(FilterRunner.MENU_NET_IDENTIFIER, body.getMenuName().toString(), userService.getLoggedOrSystem().transformToLoggedUser());
+        folderCase = createCase(FilterRunner.MENU_NET_IDENTIFIER, body.getMenuName().toString(), ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()));
         if (childFolderCase != null) {
             folderCase = appendChildCaseIdAndSave(folderCase, childFolderCase.getStringId());
             initializeParentId(childFolderCase, folderCase.getStringId());
@@ -725,7 +719,7 @@ public class MenuItemService implements IMenuItemService {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected Case setDataWithExecute(Case useCase, String transId, Map<String, Map<String, Object>> dataSet) throws TransitionNotExecutableException {
-        IUser loggedUser = userService.getLoggedOrSystem();
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
         String taskId = MenuItemUtils.findTaskIdInCase(useCase, transId);
         Task task = taskService.findOne(taskId);
         task = taskService.assignTask(task, loggedUser).getTask();

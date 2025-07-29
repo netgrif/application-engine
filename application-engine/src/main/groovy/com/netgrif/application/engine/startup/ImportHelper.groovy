@@ -255,7 +255,7 @@ class ImportHelper {
             return Optional.of(filter)
         }
 
-        Optional<PetriNet> filterNet = this.createNet(netFileName, VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
+        Optional<PetriNet> filterNet = this.createNet(netFileName, VersionType.MAJOR, ActorTransformer.toLoggedUser(userService.getSystem()))
 
         if (!filterNet.isPresent()) {
             log.error("Import of ${message} failed!")

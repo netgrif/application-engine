@@ -111,7 +111,9 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
             throw new IllegalArgumentException("Request can not be null!");
         }
         log.debug("Searching for PetriNet query with logged user [{}]", user.getId());
-        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        // TODO: impersonation
+//        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        LoggedUser loggedOrImpersonated = user;
         NativeQuery query = buildQuery(requests, loggedOrImpersonated, pageable, locale, isIntersection);
         List<PetriNet> netPage;
         long total;
