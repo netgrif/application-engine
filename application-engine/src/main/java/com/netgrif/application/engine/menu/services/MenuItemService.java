@@ -15,7 +15,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.throwable.Transiti
 import com.netgrif.application.engine.objects.utils.MenuItemUtils;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
-import com.netgrif.application.engine.objects.workflow.domain.TaskPair;
 import com.netgrif.application.engine.objects.workflow.domain.menu.FilterBody;
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody;
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemConstants;
@@ -618,47 +617,6 @@ public class MenuItemService implements IMenuItemService {
         log.trace("Created folder menu item [{}] with identifier [{}]", folderCase.getStringId(), body.getIdentifier());
         return folderCase;
     }
-
-    protected Case getOrCreateFolderRecursive2(String path, MenuItemBody body, Case childFolderCase) throws TransitionNotExecutableException {
-        Case folderCase = findFolderCase(path);
-        if (folderCase != null) {
-            if (childFolderCase != null) {
-                folderCase = appendChildCaseIdAndSave(folderCase, childFolderCase.getStringId());
-                initializeParentId(childFolderCase, folderCase.getStringId());
-            }
-            return folderCase;
-        }
-
-        folderCase = createCase(MenuProcessRunner.MENU_NET_IDENTIFIER, body.getMenuName().toString(), ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()));
-        if (childFolderCase != null) {
-            folderCase = appendChildCaseIdAndSave(folderCase, childFolderCase.getStringId());
-            initializeParentId(childFolderCase, folderCase.getStringId());
-        } else {
-            folderCase = workflowService.save(folderCase);
-        }
-
-        Optional<TaskPair> newItemTask = folderCase.getTasks().stream().filter(taskPair -> taskPair.getTransition().equals(MenuItemConstants.TRANS_INIT_ID)).findFirst();
-
-        ToDataSetOutcome dataSetOutcome = body.toDataSet(null, path, null);
-        if (childFolderCase != null) {
-            appendChildCaseIdInDataSet(folderCase, childFolderCase.getStringId(), dataSetOutcome.getDataSet());
-        }
-
-        if (newItemTask.isPresent()) {
-            setDataWithExecute(folderCase, MenuItemConstants.TRANS_INIT_ID, dataSetOutcome.getDataSet());
-        }
-
-        if (hasParent(path)) {
-            body = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(new I18nString(nameFromPath(path)), "folder");
-            String parentPath = parentPath(path);
-            getOrCreateFolderRecursive(parentPath, body, folderCase);
-        }
-
-        folderCase = setDataWithExecute(folderCase, MenuItemConstants.TRANS_INIT_ID, dataSetOutcome.getDataSet());
-
-        return folderCase;
-    }
-
 
     private Case initializeParentId(Case childFolderCase, String parentFolderCaseId) {
         childFolderCase.getDataField(MenuItemConstants.FIELD_PARENT_ID).setValue(Collections.singletonList(parentFolderCaseId));
