@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.impersonation.service.interfaces;
 
-import com.netgrif.application.engine.objects.auth.domain.IUser;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
 import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserHasSessionException;
@@ -27,7 +27,7 @@ public interface IImpersonationService {
 
     void onSessionDestroy(LoggedUser impersonator);
 
-    IUser reloadImpersonatedUserRoles(IUser impersonated, String impersonatorId);
+    AbstractUser reloadImpersonatedUserRoles(AbstractUser impersonated, String impersonatorId);
 
-    IUser applyRolesAndAuthorities(IUser impersonated, String impersonatorId, List<Case> configs);
+    AbstractUser applyRolesAndAuthorities(AbstractUser impersonated, String impersonatorId, List<Case> configs);
 }

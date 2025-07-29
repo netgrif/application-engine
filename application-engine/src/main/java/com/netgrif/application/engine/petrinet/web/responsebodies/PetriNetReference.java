@@ -1,8 +1,7 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
 
-import com.netgrif.application.engine.objects.auth.domain.Author;
-import com.netgrif.application.engine.objects.auth.domain.Authority;
+import com.netgrif.application.engine.objects.auth.domain.ActorRef;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldReference;
 import lombok.Data;
@@ -21,7 +20,7 @@ public class PetriNetReference extends Reference {
     private String defaultCaseName;
     private String icon;
     private LocalDateTime createdDate;
-    private Author author;
+    private ActorRef author;
     private List<DataFieldReference> immediateData;
 
 
@@ -37,7 +36,7 @@ public class PetriNetReference extends Reference {
         this.defaultCaseName = defaultCaseName;
     }
 
-    public PetriNetReference(String stringId, String title, String identifier, String version, String initials, String icon, LocalDateTime createdDate, Author author) {
+    public PetriNetReference(String stringId, String title, String identifier, String version, String initials, String icon, LocalDateTime createdDate, ActorRef author) {
         super(stringId, title);
         this.identifier = identifier;
         this.version = version;

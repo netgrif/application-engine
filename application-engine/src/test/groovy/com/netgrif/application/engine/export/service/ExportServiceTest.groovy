@@ -4,6 +4,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest
 import com.netgrif.application.engine.export.service.interfaces.IExportService
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
@@ -77,14 +78,14 @@ class ExportServiceTest {
     @Order(2)
     void testCaseMongoExport() {
         String exportTask = mainCase.tasks.find { it.transition == "t1" }.task
-        taskService.assignTask(userService.transformToLoggedUser(userService.findUserByUsername("super@netgrif.com", null).get()), exportTask)
+        taskService.assignTask(ActorTransformer.toLoggedUser(userService.findUserByUsername("super@netgrif.com", null).get()), exportTask)
         File csvFile = new File("src/test/resources/csv/case_mongo_export.csv")
         assert csvFile.readLines().size() == 11
         String[] headerSplit = csvFile.readLines()[0].split(",")
         assert (headerSplit.contains("immediate_multichoice")
                 && headerSplit.contains("immediate_number")
                 && !headerSplit.contains("text"))
-        taskService.cancelTask(userService.transformToLoggedUser(userService.getLoggedOrSystem()), exportTask)
+        taskService.cancelTask(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()), exportTask)
     }
 
     @Test
@@ -92,21 +93,21 @@ class ExportServiceTest {
     void testCaseElasticExport() {
         Thread.sleep(5000)  //Elastic wait
         String exportTask = mainCase.tasks.find { it.transition == "t2" }.task
-        taskService.assignTask(userService.transformToLoggedUser(userService.findByEmail("super@netgrif.com", null)), exportTask)
+        taskService.assignTask(ActorTransformer.toLoggedUser(userService.findByEmail("super@netgrif.com", null)), exportTask)
         File csvFile = new File("src/test/resources/csv/case_elastic_export.csv")
         assert csvFile.readLines().size() == 11
         String[] headerSplit = csvFile.readLines()[0].split(",")
         assert (headerSplit.contains("text")
                 && !headerSplit.contains("immediate_multichoice")
                 && !headerSplit.contains("immediate_number"))
-        taskService.cancelTask(userService.transformToLoggedUser(userService.getLoggedOrSystem()), exportTask)
+        taskService.cancelTask(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()), exportTask)
     }
 
     @Test
     @Order(4)
     void testTaskMongoExport() {
         String exportTask = mainCase.tasks.find { it.transition == "t3" }.task
-        taskService.assignTask(userService.transformToLoggedUser(userService.findByEmail("super@netgrif.com", null)), exportTask)
+        taskService.assignTask(ActorTransformer.toLoggedUser(userService.findByEmail("super@netgrif.com", null)), exportTask)
         File csvFile = new File("src/test/resources/csv/task_mongo_export.csv")
         assert csvFile.readLines().size() == 11
         String[] headerSplit = csvFile.readLines()[0].split(",")
@@ -114,7 +115,7 @@ class ExportServiceTest {
                 && headerSplit.contains("immediate_number")
                 && headerSplit.contains("text")
                 && !headerSplit.contains("no_export"))
-        taskService.cancelTask(userService.transformToLoggedUser(userService.getLoggedOrSystem()), exportTask)
+        taskService.cancelTask(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()), exportTask)
     }
 
     @Test
@@ -123,14 +124,14 @@ class ExportServiceTest {
     void testTaskElasticExport() {
         Thread.sleep(10000)  //Elastic wait
         String exportTask = mainCase.tasks.find { it.transition == "t4" }.task
-        taskService.assignTask(userService.transformToLoggedUser(userService.findByEmail("super@netgrif.com", null)), exportTask)
+        taskService.assignTask(ActorTransformer.toLoggedUser(userService.findByEmail("super@netgrif.com", null)), exportTask)
         Thread.sleep(20000)  //Elastic wait
 
         def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
         def taskRequest = new ElasticTaskSearchRequest()
         taskRequest.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(processId)] as List
         taskRequest.transitionId = ["t4"] as List
-        actionDelegate.exportTasksToFile([taskRequest],"src/test/resources/csv/task_elastic_export.csv",null, userService.transformToLoggedUser(userService.findByEmail("super@netgrif.com", null)))
+        actionDelegate.exportTasksToFile([taskRequest],"src/test/resources/csv/task_elastic_export.csv",null, ActorTransformer.toLoggedUser(userService.findByEmail("super@netgrif.com", null)))
         File csvFile = new File("src/test/resources/csv/task_elastic_export.csv")
         int pocet = ((taskRepository.count(QTask.task.processId.eq(processId).and(QTask.task.transitionId.eq("t4"))) as int) + 1)
         assert csvFile.readLines().size() == pocet
@@ -139,14 +140,14 @@ class ExportServiceTest {
                 && headerSplit.contains("immediate_number")
                 && !headerSplit.contains("text")
                 && !headerSplit.contains("no_export"))
-        taskService.cancelTask(userService.transformToLoggedUser(userService.findByEmail("super@netgrif.com", null)), exportTask)
+        taskService.cancelTask(ActorTransformer.toLoggedUser(userService.findByEmail("super@netgrif.com", null)), exportTask)
     }
 
     @Test
     void buildDefaultCsvTaskHeaderTest(){
         def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
         String exportTask = mainCase.tasks.find { it.transition == "t4" }.task
-        taskService.assignTask(userService.transformToLoggedUser(userService.findByEmail("super@netgrif.com", null)), exportTask)
+        taskService.assignTask(ActorTransformer.toLoggedUser(userService.findByEmail("super@netgrif.com", null)), exportTask)
         List<Task> task = taskRepository.findAll(QTask.task.processId.eq(processId).and(QTask.task.transitionId.eq("t4")))
         Set<String> header = exportService.buildDefaultCsvTaskHeader(task)
         assert header != null

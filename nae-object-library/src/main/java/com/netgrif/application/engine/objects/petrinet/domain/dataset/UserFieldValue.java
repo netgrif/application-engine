@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.objects.petrinet.domain.dataset;
 
-import com.netgrif.application.engine.objects.auth.domain.IUser;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,19 +14,21 @@ public class UserFieldValue implements Serializable {
     @Serial
     private static final long serialVersionUID = 5228212326436828485L;
     protected String id;
+    protected String realmId;
     protected String firstName;
     protected String lastName;
     protected String username;
 
-    public UserFieldValue(String id, String firstName, String lastName, String username) {
+    public UserFieldValue(String id, String realmId, String firstName, String lastName, String username) {
         this.id = id;
+        this.realmId = realmId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
     }
 
-    public UserFieldValue(IUser user) {
-        this(user.getStringId(), user.getFirstName(), user.getLastName(), user.getUsername());
+    public UserFieldValue(AbstractUser user) {
+        this(user.getStringId(), user.getRealmId(), user.getFirstName(), user.getLastName(), user.getUsername());
     }
 
     public String getFullName() {

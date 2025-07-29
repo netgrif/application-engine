@@ -1,8 +1,9 @@
 package com.netgrif.application.engine.startup.runner;
 
 import com.netgrif.application.engine.configuration.properties.FilterConfigurationProperties;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -428,7 +429,7 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
             return Optional.empty();
         }
 
-        IUser loggedUser = this.userService.getLoggedOrSystem();
+        AbstractUser loggedUser = this.userService.getLoggedOrSystem();
         if (loggedUser.getStringId().equals(this.userService.getSystem().getStringId())) {
             Case filterCase = this.workflowService.searchOne(QCase.case$.processIdentifier.eq("filter").and(QCase.case$.title.eq(title)).and(QCase.case$.author.id.eq(userService.getSystem().getStringId())));
             if (filterCase != null) {
@@ -437,7 +438,7 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
         }
 
         try {
-            Case filterCase = this.workflowService.createCase(filterNet.getStringId(), title, null, (LoggedUser) userService.transformToLoggedUser(loggedUser)).getCase();
+            Case filterCase = this.workflowService.createCase(filterNet.getStringId(), title, null, ActorTransformer.toLoggedUser(loggedUser)).getCase();
             filterCase.setIcon(icon);
             filterCase = this.workflowService.save(filterCase);
             Task newFilterTask = this.taskService.searchOne(QTask.task.transitionId.eq(AUTO_CREATE_TRANSITION).and(QTask.task.caseId.eq(filterCase.getStringId())));

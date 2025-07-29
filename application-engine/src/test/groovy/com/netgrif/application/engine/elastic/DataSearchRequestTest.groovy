@@ -105,16 +105,16 @@ class DataSearchRequestTest {
         def testUser2 = users[1]
         // saving authorities / roles crashes the workflowService (on case save)
         testUser1.processRoles = []
-        testUser1.authorities = []
+        testUser1.authoritySet = []
         testUser2.processRoles = []
-        testUser2.authorities = []
+        testUser2.authoritySet = []
 
         LocalDate date = LocalDate.of(2020, 7, 25);
         Case _case = importHelper.createCase("correct", net.getNet())
         _case.dataSet["number"].value = 7.0 as Double
         _case.dataSet["boolean"].value = true
         _case.dataSet["text"].value = "hello world" as String
-        _case.dataSet["user"].value = new UserFieldValue(testUser1.stringId, testUser1.firstName, testUser1.lastName, testUser1.email)
+        _case.dataSet["user"].value = new UserFieldValue(testUser1.stringId, testUser1.realmId, testUser1.firstName, testUser1.lastName, testUser1.username)
         _case.dataSet["date"].value = date
         _case.dataSet["datetime"].value = date.atTime(13, 37)
         _case.dataSet["enumeration"].value = (_case.petriNet.dataSet["enumeration"] as ChoiceField).choices.find({ it.defaultValue == "Alice" })
@@ -144,8 +144,8 @@ class DataSearchRequestTest {
                 new AbstractMap.SimpleEntry<String, String>("boolean.booleanValue" as String, "true" as String),
                 new AbstractMap.SimpleEntry<String, String>("text" as String, "hello world" as String),
                 new AbstractMap.SimpleEntry<String, String>("text.textValue.keyword" as String, "hello world" as String),
-                new AbstractMap.SimpleEntry<String, String>("user" as String, "${testUser1.name} ${testUser1.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("user.emailValue.keyword" as String, "${testUser1.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("user" as String, "${testUser1.name} ${testUser1.username}" as String),
+                new AbstractMap.SimpleEntry<String, String>("user.usernameValue.keyword" as String, "${testUser1.username}" as String),
                 new AbstractMap.SimpleEntry<String, String>("user.fullNameValue.keyword" as String, "${testUser1.name}" as String),
                 new AbstractMap.SimpleEntry<String, String>("user.userIdValue" as String, "${testUser1.getStringId()}" as String),
                 new AbstractMap.SimpleEntry<String, String>("date.timestampValue" as String, "${Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)).getTime()}" as String),
@@ -188,8 +188,8 @@ class DataSearchRequestTest {
                 new AbstractMap.SimpleEntry<String, String>("fileList.fileExtensionValue.keyword" as String, "pdf" as String),
                 new AbstractMap.SimpleEntry<String, String>("userList" as String, "${testUser1.name} ${testUser1.email}" as String),
                 new AbstractMap.SimpleEntry<String, String>("userList" as String, "${testUser2.name} ${testUser2.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.emailValue.keyword" as String, "${testUser1.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.emailValue.keyword" as String, "${testUser2.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.usernameValue.keyword" as String, "${testUser1.username}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.usernameValue.keyword" as String, "${testUser2.username}" as String),
                 new AbstractMap.SimpleEntry<String, String>("userList.fullNameValue.keyword" as String, "${testUser1.name}" as String),
                 new AbstractMap.SimpleEntry<String, String>("userList.fullNameValue.keyword" as String, "${testUser2.name}" as String),
                 new AbstractMap.SimpleEntry<String, String>("userList.userIdValue" as String, "${testUser1.getStringId()}" as String),

@@ -7,7 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Collection;
+
 import java.util.Optional;
 
 /**
@@ -28,9 +29,9 @@ public interface AuthorityRepository extends MongoRepository<Authority, String> 
     /**
      * Retrieves a paginated list of {@link Authority} entities whose IDs match a given list of {@link ObjectId}s.
      *
-     * @param ids a list of {@link ObjectId}s to search for
+     * @param ids a collection of {@link ObjectId}s to search for
      * @param pageable the pagination information defined by a {@link Pageable} object
      * @return a {@link Page} containing the matching {@link Authority} entities
      */
-    Page<Authority> findAllBy_idIn(List<ObjectId> ids, Pageable pageable);
+    Page<Authority> findAllBy_idIn(Collection<ObjectId> ids, Pageable pageable);
 }

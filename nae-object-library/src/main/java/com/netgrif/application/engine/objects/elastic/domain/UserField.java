@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.objects.elastic.domain;
 
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,32 +14,39 @@ import java.util.stream.IntStream;
 @EqualsAndHashCode(callSuper = true)
 public abstract class UserField extends DataField {
 
-    private String[] emailValue;
+    // TODO JOFO: put group into userField
+    private String[] usernameValue;
 
     private String[] fullNameValue;
 
     private String[] userIdValue;
 
+    private String[] userRealmIdValue;
+
     public UserField(UserMappingData value) {
-        super(String.format("%s %s", value.fullName, value.email));
-        this.emailValue = new String[1];
+        super(String.format("%s %s", value.fullName, value.username));
+        this.usernameValue = new String[1];
         this.fullNameValue = new String[1];
         this.userIdValue = new String[1];
-        this.emailValue[0] = value.email;
+        this.userRealmIdValue = new String[1];
+        this.usernameValue[0] = value.username;
         this.fullNameValue[0] = value.fullName;
         this.userIdValue[0] = value.userId;
+        this.userRealmIdValue[0] = value.userRealmId;
     }
 
     public UserField(UserMappingData[] values) {
         super(new String[values.length]);
-        this.emailValue = new String[values.length];
+        this.usernameValue = new String[values.length];
         this.fullNameValue = new String[values.length];
         this.userIdValue = new String[values.length];
+        this.userRealmIdValue = new String[values.length];
         for (int i = 0; i < values.length; i++) {
-            this.emailValue[i] = values[i].email;
+            this.usernameValue[i] = values[i].username;
             this.fullNameValue[i] = values[i].fullName;
             this.userIdValue[i] = values[i].userId;
-            super.fulltextValue[i] = String.format("%s %s", values[i].fullName, values[i].email);
+            this.userRealmIdValue[i] = values[i].userRealmId;
+            super.fulltextValue[i] = String.format("%s %s", values[i].fullName, values[i].username);
         }
     }
 
@@ -51,14 +57,14 @@ public abstract class UserField extends DataField {
             String[] fullNameSplit = fullName.split(" ", 2);
             String firstName = fullNameSplit.length > 0 ? fullNameSplit[0] : "";
             String lastName = fullNameSplit.length > 1 ? fullNameSplit[1] : "";
-            return new UserFieldValue(userIdValue[0], firstName, lastName, emailValue[0]);
+            return new UserFieldValue(userIdValue[0], userRealmIdValue[0], firstName, lastName, usernameValue[0]);
         } else if (userIdValue != null && userIdValue.length > 1) {
             return IntStream.range(0, userIdValue.length).mapToObj(i -> {
                 String fullName = fullNameValue[i] != null ? fullNameValue[i] : "";
                 String[] fullNameSplit = fullName.split(" ", 2);
                 String firstName = fullNameSplit.length > 0 ? fullNameSplit[0] : "";
                 String lastName = fullNameSplit.length > 1 ? fullNameSplit[1] : "";
-                return new UserFieldValue(userIdValue[i], firstName, lastName, emailValue[i]);
+                return new UserFieldValue(userIdValue[i], userRealmIdValue[i], firstName, lastName, usernameValue[i]);
             }).toList();
         }
         return null;
@@ -67,7 +73,8 @@ public abstract class UserField extends DataField {
     @AllArgsConstructor
     public static class UserMappingData {
         public String userId;
-        public String email;
+        public String userRealmId;
+        public String username;
         public String fullName;
     }
 }

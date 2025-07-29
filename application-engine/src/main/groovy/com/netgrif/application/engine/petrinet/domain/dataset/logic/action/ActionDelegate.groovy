@@ -26,11 +26,11 @@ import com.netgrif.application.engine.integration.modules.ModuleHolder
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
 import com.netgrif.application.engine.mail.interfaces.IMailService
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.menu.services.interfaces.DashboardItemService
 import com.netgrif.application.engine.menu.services.interfaces.DashboardManagementService
 import com.netgrif.application.engine.menu.services.interfaces.IMenuItemService
-import com.netgrif.application.engine.objects.auth.domain.Author
-import com.netgrif.application.engine.objects.auth.domain.IUser
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
@@ -934,41 +934,41 @@ class ActionDelegate {
         return workflowService.findOne(stringId)
     }
 
-    Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
-        return workflowService.createCaseByIdentifier(identifier, title, color, userService.transformToLoggedUser(author), locale, params).getCase()
+    Case createCase(String identifier, String title = null, String color = "", AbstractUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
+        return workflowService.createCaseByIdentifier(identifier, title, color, ActorTransformer.toLoggedUser(author), locale, params).getCase()
     }
 
-    Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
-        CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, userService.transformToLoggedUser(author), params)
+    Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", AbstractUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
+        CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, ActorTransformer.toLoggedUser(author), params)
         this.outcomes.add(outcome)
         return outcome.getCase()
     }
 
-    Task assignTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    Task assignTask(String transitionId, Case aCase = useCase, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        AssignTaskEventOutcome outcome = taskService.assignTask(userService.transformToLoggedUser(user), taskId, params)
+        AssignTaskEventOutcome outcome = taskService.assignTask(ActorTransformer.toLoggedUser(user), taskId, params)
         this.outcomes.add(outcome)
         return outcome.getTask()
     }
 
-    Task assignTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    Task assignTask(Task task, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         return addTaskOutcomeAndReturnTask(taskService.assignTask(task, user, params))
     }
 
-    void assignTasks(List<Task> tasks, IUser assignee = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    void assignTasks(List<Task> tasks, AbstractUser assignee = userService.loggedOrSystem, Map<String, String> params = [:]) {
         this.outcomes.addAll(taskService.assignTasks(tasks, assignee, params))
     }
 
-    Task cancelTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    Task cancelTask(String transitionId, Case aCase = useCase, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        return addTaskOutcomeAndReturnTask(taskService.cancelTask(userService.transformToLoggedUser(user), taskId, params))
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(ActorTransformer.toLoggedUser(user), taskId, params))
     }
 
-    Task cancelTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    Task cancelTask(Task task, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, user, params))
     }
 
-    void cancelTasks(List<Task> tasks, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    void cancelTasks(List<Task> tasks, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         this.outcomes.addAll(taskService.cancelTasks(tasks, user, params))
     }
 
@@ -977,16 +977,16 @@ class ActionDelegate {
         return outcome.getTask()
     }
 
-    void finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    void finishTask(String transitionId, Case aCase = useCase, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        addTaskOutcomeAndReturnTask(taskService.finishTask(userService.transformToLoggedUser(user), taskId, params))
+        addTaskOutcomeAndReturnTask(taskService.finishTask(ActorTransformer.toLoggedUser(user), taskId, params))
     }
 
-    void finishTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    void finishTask(Task task, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         addTaskOutcomeAndReturnTask(taskService.finishTask(task, user, params))
     }
 
-    void finishTasks(List<Task> tasks, IUser finisher = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    void finishTasks(List<Task> tasks, AbstractUser finisher = userService.loggedOrSystem, Map<String, String> params = [:]) {
         this.outcomes.addAll(taskService.finishTasks(tasks, finisher, params))
     }
 
@@ -1016,44 +1016,44 @@ class ActionDelegate {
         refs.find { it.transitionId == transitionId }.stringId
     }
 
-    IUser assignRole(String roleMongoId, IUser user = userService.loggedUser) {
-        IUser actualUser = userService.addRole(user, roleMongoId)
+    AbstractUser assignRole(String roleMongoId, AbstractUser user = userService.loggedUser) {
+        AbstractUser actualUser = userService.addRole(user, roleMongoId)
         return actualUser
     }
 
-    IUser assignRole(String roleId, String netId, IUser user = userService.loggedUser) {
+    AbstractUser assignRole(String roleId, String netId, AbstractUser user = userService.loggedUser) {
         List<PetriNet> nets = petriNetService.getByIdentifier(netId)
         nets.forEach({ net -> user = assignRole(roleId, net, user) })
         return user
     }
 
-    IUser assignRole(String roleId, PetriNet net, IUser user = userService.loggedUser) {
-        IUser actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
+    AbstractUser assignRole(String roleId, PetriNet net, AbstractUser user = userService.loggedUser) {
+        AbstractUser actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         return actualUser
     }
 
-    IUser assignRole(String roleId, String netId, Version version, IUser user = userService.loggedUser) {
+    AbstractUser assignRole(String roleId, String netId, Version version, AbstractUser user = userService.loggedUser) {
         PetriNet net = petriNetService.getPetriNet(netId, version)
         return assignRole(roleId, net, user)
     }
 
-    IUser removeRole(String roleMongoId, IUser user = userService.loggedUser) {
-        IUser actualUser = userService.removeRole(user, roleMongoId)
+    AbstractUser removeRole(String roleMongoId, AbstractUser user = userService.loggedUser) {
+        AbstractUser actualUser = userService.removeRole(user, roleMongoId)
         return actualUser
     }
 
-    IUser removeRole(String roleId, String netId, IUser user = userService.loggedUser) {
+    AbstractUser removeRole(String roleId, String netId, AbstractUser user = userService.loggedUser) {
         List<PetriNet> nets = petriNetService.getByIdentifier(netId)
         nets.forEach({ net -> user = removeRole(roleId, net, user) })
         return user
     }
 
-    IUser removeRole(String roleId, PetriNet net, IUser user = userService.loggedUser) {
-        IUser actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
+    AbstractUser removeRole(String roleId, PetriNet net, AbstractUser user = userService.loggedUser) {
+        AbstractUser actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         return actualUser
     }
 
-    IUser removeRole(String roleId, String netId, Version version, IUser user = userService.loggedUser) {
+    AbstractUser removeRole(String roleId, String netId, Version version, AbstractUser user = userService.loggedUser) {
         PetriNet net = petriNetService.getPetriNet(netId, version)
         return removeRole(roleId, net, user)
     }
@@ -1144,7 +1144,7 @@ class ActionDelegate {
         }
     }
 
-    IUser loggedUser() {
+    AbstractUser loggedUser() {
         return userService.loggedUser
     }
 
@@ -1301,7 +1301,7 @@ class ActionDelegate {
         ]
     }
 
-    def changeUser(IUser user) {
+    def changeUser(AbstractUser user) {
         [email  : { cl ->
             changeUser(user, "email", cl)
         },
@@ -1318,16 +1318,16 @@ class ActionDelegate {
     }
 
     def changeUserByEmail(String email, String attribute, def cl) {
-        IUser user = userService.findUserByUsername(email, null)
+        AbstractUser user = userService.findUserByUsername(email, null)
         changeUser(user, attribute, cl)
     }
 
     def changeUser(String id, String attribute, def cl) {
-        IUser user = userService.findById(id, null)
+        AbstractUser user = userService.findById(id, null)
         changeUser(user, attribute, cl)
     }
 
-    def changeUser(IUser user, String attribute, def cl) {
+    def changeUser(AbstractUser user, String attribute, def cl) {
         if (user == null) {
             log.error("Cannot find user.")
             return
@@ -1351,7 +1351,7 @@ class ActionDelegate {
     }
 
     MessageResource inviteUser(NewUserRequest newUserRequest) {
-        IUser user = registrationService.createNewUser(newUserRequest)
+        AbstractUser user = registrationService.createNewUser(newUserRequest)
         if (user == null)
             return MessageResource.successMessage("Done")
         mailService.sendRegistrationEmail(user)
@@ -1361,27 +1361,27 @@ class ActionDelegate {
     }
 
     void deleteUser(String email) {
-        IUser user = userService.findByEmail(email, null)
+        AbstractUser user = userService.findByEmail(email, null)
         if (user == null)
             log.error("Cannot find user with email [" + email + "]")
         deleteUser(user)
     }
 
-    void deleteUser(IUser user) {
+    void deleteUser(AbstractUser user) {
         List<Task> tasks = taskService.findByUser(new FullPageRequest(), user).toList()
         if (tasks != null && tasks.size() > 0)
             taskService.cancelTasks(tasks, user)
 
         QCase qCase = new QCase("case")
-        List<Case> cases = workflowService.searchAll(qCase.author.eq(user.transformToAuthor())).toList()
+        List<Case> cases = workflowService.searchAll(qCase.author.eq(ActorTransformer.toActorRef(user))).toList()
         if (cases != null)
-            cases.forEach({ aCase -> aCase.setAuthor(Author.createAnonymizedAuthor()) })
+            cases.forEach({ aCase -> aCase.setAuthor(ActorTransformer.anonymizedActorRef()) })
 
         userService.deleteUser(user)
     }
 
-    IUser findUserByEmail(String email) {
-        IUser user = userService.findUserByUsername(email, null)
+    AbstractUser findUserByEmail(String email) {
+        AbstractUser user = userService.findUserByUsername(email, null)
         if (user == null) {
             log.error("Cannot find user with email [" + email + "]")
             return null
@@ -1390,8 +1390,8 @@ class ActionDelegate {
         }
     }
 
-    IUser findUserById(String id) {
-        IUser user = userService.findById(id, null)
+    AbstractUser findUserById(String id) {
+        AbstractUser user = userService.findById(id, null)
         if (user == null) {
             log.error("Cannot find user with id [" + id + "]")
             return null
@@ -1442,7 +1442,7 @@ class ActionDelegate {
     }
 
     File exportCasesToFile(List<CaseSearchRequest> requests, String pathName, ExportDataConfig config = null,
-                           LoggedUser user = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
+                           LoggedUser user = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
                            int pageSize = exportConfiguration.getMongoPageSize(),
                            Locale locale = LocaleContextHolder.getLocale(),
                            Boolean isIntersection = false) {
@@ -1453,7 +1453,7 @@ class ActionDelegate {
     }
 
     OutputStream exportCases(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config = null,
-                             LoggedUser user = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
+                             LoggedUser user = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
                              int pageSize = exportConfiguration.getMongoPageSize(),
                              Locale locale = LocaleContextHolder.getLocale(),
                              Boolean isIntersection = false) {
@@ -1473,7 +1473,7 @@ class ActionDelegate {
     }
 
     File exportTasksToFile(List<ElasticTaskSearchRequest> requests, String pathName, ExportDataConfig config = null,
-                           LoggedUser user = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
+                           LoggedUser user = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
                            int pageSize = exportConfiguration.getMongoPageSize(),
                            Locale locale = LocaleContextHolder.getLocale(),
                            Boolean isIntersection = false) {
@@ -1484,7 +1484,7 @@ class ActionDelegate {
     }
 
     OutputStream exportTasks(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config = null,
-                             LoggedUser user = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
+                             LoggedUser user = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
                              int pageSize = exportConfiguration.getMongoPageSize(),
                              Locale locale = LocaleContextHolder.getLocale(),
                              Boolean isIntersection = false) {
@@ -1505,7 +1505,7 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Case> findCasesElastic(List<CaseSearchRequest> requests, LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
+    Page<Case> findCasesElastic(List<CaseSearchRequest> requests, LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
                                 int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         return elasticCaseService.search(requests, loggedUser, PageRequest.of(page, pageSize), locale, isIntersection)
     }
@@ -1520,7 +1520,7 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Case> findCasesElastic(Map<String, Object> request, LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
+    Page<Case> findCasesElastic(Map<String, Object> request, LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
                                 int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         List<CaseSearchRequest> requests = Collections.singletonList(new CaseSearchRequest(request))
         return findCasesElastic(requests, loggedUser, page, pageSize, locale, isIntersection)
@@ -1536,7 +1536,7 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Task> findTasks(List<ElasticTaskSearchRequest> requests, LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
+    Page<Task> findTasks(List<ElasticTaskSearchRequest> requests, LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
                          int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         return elasticTaskService.search(requests, loggedUser, PageRequest.of(page, pageSize), locale, isIntersection)
     }
@@ -1551,7 +1551,7 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Task> findTasks(Map<String, Object> request, LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
+    Page<Task> findTasks(Map<String, Object> request, LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
                          int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         List<ElasticTaskSearchRequest> requests = Collections.singletonList(new ElasticTaskSearchRequest(request))
         return findTasks(requests, loggedUser, page, pageSize, locale, isIntersection)
@@ -2389,7 +2389,7 @@ class ActionDelegate {
     List<Case> findCasesElastic(String query, Pageable pageable) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
-        List<Case> result = elasticCaseService.search([request], userService.transformToLoggedUser(userService.getSystem()), pageable, LocaleContextHolder.locale, false).content
+        List<Case> result = elasticCaseService.search([request], ActorTransformer.toLoggedUser(userService.getSystem()), pageable, LocaleContextHolder.locale, false).content
         return result
     }
 
@@ -2401,7 +2401,7 @@ class ActionDelegate {
     long countCasesElastic(String query) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
-        return elasticCaseService.count([request], userService.transformToLoggedUser(userService.getSystem()), LocaleContextHolder.locale, false)
+        return elasticCaseService.count([request], ActorTransformer.toLoggedUser(userService.getSystem()), LocaleContextHolder.locale, false)
     }
 
     @Deprecated

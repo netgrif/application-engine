@@ -3,6 +3,8 @@ package com.netgrif.application.engine.startup
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -14,7 +16,7 @@ import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.IUser
+
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
@@ -109,11 +111,11 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = userService.transformToLoggedUser(userService.getSystem())) {
-        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author)
+    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = ActorTransformer.toLoggedUser(userService.getSystem())) {
+        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author, uriNodeId)
     }
 
-    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.transformToLoggedUser(userService.getSystem())) {
+    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = ActorTransformer.toLoggedUser(userService.getSystem())) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
         def outcome = petriNetService.importPetriNet(netStream, release, author)
         PetriNet petriNet = outcome.getNet()
@@ -125,7 +127,7 @@ class ImportHelper {
         return Optional.of(petriNet)
     }
 
-    Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = userService.transformToLoggedUser(userService.getSystem())) {
+    Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = ActorTransformer.toLoggedUser(userService.getSystem())) {
         PetriNet petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
         if (!petriNet) {
             return createNet(filename, release, author)
@@ -173,7 +175,7 @@ class ImportHelper {
         return map
     }
 
-    IUser createUser(User user, Authority[] authorities, ProcessRole[] roles) {
+    AbstractUser createUser(User user, Authority[] authorities, ProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }
         user.state = UserState.ACTIVE
@@ -187,11 +189,11 @@ class ImportHelper {
     }
 
     Case createCase(String title, PetriNet net) {
-        return createCase(title, net, userService.transformToLoggedUser(userService.getSystem()))
+        return createCase(title, net, ActorTransformer.toLoggedUser(userService.getSystem()))
     }
 
     Case createCaseAsSuper(String title, PetriNet net) {
-        return createCase(title, net, superCreator.getLoggedSuper() ?: userService.transformToLoggedUser(userService.getSystem()))
+        return createCase(title, net, superCreator.getLoggedSuper() ?: ActorTransformer.toLoggedUser(userService.getSystem()))
     }
 
     // TODO remove deprecated classes and methods
@@ -205,7 +207,7 @@ class ImportHelper {
     }
 
     AssignTaskEventOutcome assignTaskToSuper(String taskTitle, String caseId) {
-        return assignTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.transformToLoggedUser(userService.getSystem()))
+        return assignTask(taskTitle, caseId, superCreator.loggedSuper ?: ActorTransformer.toLoggedUser(userService.getSystem()))
     }
 
     FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedUser author) {
@@ -213,7 +215,7 @@ class ImportHelper {
     }
 
     FinishTaskEventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
-        return finishTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.transformToLoggedUser(userService.getSystem()))
+        return finishTask(taskTitle, caseId, superCreator.loggedSuper ?: ActorTransformer.toLoggedUser(userService.getSystem()))
     }
 
     CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedUser user) {
@@ -221,7 +223,7 @@ class ImportHelper {
     }
 
     CancelTaskEventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {
-        return cancelTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.transformToLoggedUser(userService.getSystem()))
+        return cancelTask(taskTitle, caseId, superCreator.loggedSuper ?: ActorTransformer.toLoggedUser(userService.getSystem()))
     }
 
     String getTaskId(String taskTitle, String caseId) {
@@ -243,7 +245,7 @@ class ImportHelper {
     }
 
     void updateSuperUser() {
-        superCreator.setAllToSuperUser();
+        superCreator.setAllToSuperUser()
     }
 
     Optional<PetriNet> importProcess(String message, String netIdentifier, String netFileName) {
