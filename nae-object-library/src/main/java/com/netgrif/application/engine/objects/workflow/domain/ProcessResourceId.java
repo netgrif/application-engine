@@ -17,14 +17,14 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
     private static final String CHAR_ARRAY = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final BigInteger CHAR_ARRAY_LENGTH = BigInteger.valueOf(CHAR_ARRAY.length());
     public static final String ID_SEPARATOR = "-";
-    public static final String NULL_SHORT_ID_VALUE = "NULL"; // TODO maybe value "TOTOK" should be more accurate
+    public static final String NONE_SHORT_ID_VALUE = "NONE";
 
     private ObjectId objectId;
     private String shortProcessId;
 
     public ProcessResourceId() {
         this.objectId = new ObjectId();
-        this.shortProcessId = NULL_SHORT_ID_VALUE;
+        this.shortProcessId = NONE_SHORT_ID_VALUE;
     }
 
     public ProcessResourceId(ObjectId processId) {

@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.importer.service;
 
+import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.importer.model.*;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingIconKeyException;
@@ -33,7 +34,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingP
 import com.netgrif.application.engine.petrinet.service.ArcFactory;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.workflow.domain.triggers.Trigger;
@@ -109,7 +109,7 @@ public class Importer {
     protected FieldActionsRunner actionsRunner;
 
     @Autowired
-    protected FileStorageConfiguration fileStorageConfiguration;
+    protected StorageConfigurationProperties fileStorageConfiguration;
 
     @Autowired
     protected ComponentFactory componentFactory;
@@ -172,7 +172,7 @@ public class Importer {
 
     @Transactional
     public Path saveNetFile(PetriNet net, InputStream xmlFile) throws IOException {
-        File savedFile = new File(fileStorageConfiguration.getStorageArchived() + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
+        File savedFile = new File(fileStorageConfiguration.getArchivedPath() + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
         savedFile.getParentFile().mkdirs();
         net.setImportXmlPath(savedFile.getPath());
         copyInputStreamToFile(xmlFile, savedFile);
@@ -1061,7 +1061,7 @@ public class Importer {
         if (shouldInitializeRole(importRole)) {
             role = initRole(importRole);
         } else {
-            role = new ArrayList<>(processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId())).get(0);
+            role = processRoleService.findByImportId(ProcessRole.GLOBAL + importRole.getId());
         }
         role.set_id(new ProcessResourceId(new ObjectId(net.getStringId())));
 
@@ -1071,7 +1071,7 @@ public class Importer {
 
     protected boolean shouldInitializeRole(Role importRole) {
         return importRole.isGlobal() == null || !importRole.isGlobal() ||
-                (importRole.isGlobal() && processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId()).isEmpty());
+                (importRole.isGlobal() && processRoleService.findByImportId(ProcessRole.GLOBAL + importRole.getId()) == null);
     }
 
     protected ProcessRole initRole(Role importRole) {
@@ -1088,6 +1088,8 @@ public class Importer {
             role.setGlobal(importRole.isGlobal());
         } else {
             role.setProcessId(net.getStringId());
+            role.setProcessTitle(net.getTitle());
+            role.setProcessIdentifier(net.getIdentifier());
         }
         return role;
     }

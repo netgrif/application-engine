@@ -11,16 +11,10 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 @Configuration
 @EnableRedisIndexedHttpSession(redisNamespace = "spring:session:${spring.session.redis.namespace}")
 @ConditionalOnProperty(
-        value = "nae.server.security.static.enabled",
+        value = "netgrif.engine.security.static.enabled",
         havingValue = "true"
 )
 public class SessionConfigurationStaticEnabled {
-
-    @Value("${spring.session.redis.host}")
-    private String hostName;
-
-    @Value("${spring.session.redis.port}")
-    private Integer port;
 
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {

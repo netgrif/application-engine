@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.startup.runner;
 
+import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
-import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,20 +19,19 @@ import java.io.File;
 @RequiredArgsConstructor
 class StorageRunner implements ApplicationEngineStartupRunner {
 
-    @Value("${nae.storage.clean}")
-    private boolean cleanStorage;
+    private final StorageConfigurationProperties storageConfigurationProperties;
 
-    private final FileStorageConfiguration fileStorageConfiguration;
+    private final StorageConfigurationProperties fileStorageConfiguration;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("Creating storage folder");
-        File storage = new File(fileStorageConfiguration.getStoragePath() + File.separator + "uploadedModels" + File.separator + "model.txt");
+        File storage = new File(fileStorageConfiguration.getPath() + File.separator + "uploadedModels" + File.separator + "model.txt");
         storage.getParentFile().mkdirs();
 
-        if (cleanStorage) {
+        if (storageConfigurationProperties.isClean()) {
             log.info("Removing files from storage folder and it's sub-folders");
-            purgeDirectory(new File(fileStorageConfiguration.getStoragePath()));
+            purgeDirectory(new File(fileStorageConfiguration.getPath()));
         }
 
         log.info("Creating log folder");

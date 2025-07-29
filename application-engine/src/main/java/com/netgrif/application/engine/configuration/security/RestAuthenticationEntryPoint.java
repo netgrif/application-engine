@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.configuration.security;
 
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
@@ -12,8 +14,12 @@ import java.io.IOException;
 @Component
 public class RestAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
 
-    @Value("x${nae.server.security.realm-name:NAE-Realm}")
-    private String realmName;
+    private SecurityConfigurationProperties properties;
+
+    @Autowired
+    public void setProperties(SecurityConfigurationProperties properties) {
+        this.properties = properties;
+    }
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
@@ -25,7 +31,7 @@ public class RestAuthenticationEntryPoint extends BasicAuthenticationEntryPoint 
 
     @Override
     public void afterPropertiesSet() {
-        setRealmName(realmName);
+        setRealmName(properties.getRealmName());
         super.afterPropertiesSet();
     }
 }

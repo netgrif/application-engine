@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.config.types.PdfBooleanFormat;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDrawer;
@@ -42,13 +42,13 @@ public class PdfDrawer implements IPdfDrawer {
 
     private PDPage currentPage = null;
 
-    private PdfResource resource;
+    private PdfResourceConfigurationProperties resource;
 
     private int marginBottom;
     private int lineHeight, padding;
     private int boxSize;
 
-    public void setupDrawer(PDDocument pdf, PdfResource pdfResource) {
+    public void setupDrawer(PDDocument pdf, PdfResourceConfigurationProperties pdfResource) {
         this.pdf = pdf;
         this.resource = pdfResource;
         this.pageList = new ArrayList<>();

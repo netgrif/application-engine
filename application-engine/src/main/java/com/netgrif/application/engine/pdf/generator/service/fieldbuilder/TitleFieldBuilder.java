@@ -1,12 +1,12 @@
 package com.netgrif.application.engine.pdf.generator.service.fieldbuilder;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfTitleField;
 
 public class TitleFieldBuilder extends FieldBuilder {
 
-    public TitleFieldBuilder(PdfResource resource) {
+    public TitleFieldBuilder(PdfResourceConfigurationProperties resource) {
         super(resource);
     }
 

@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.startup.runner;
 
+import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,8 @@ import org.springframework.data.mongodb.core.mapping.MongoPersistentEntity;
 import org.springframework.data.mongodb.core.mapping.MongoPersistentProperty;
 import org.springframework.stereotype.Component;
 
+import static org.eclipse.jdt.internal.compiler.parser.Parser.name;
+
 @Slf4j
 @Component
 @Profile("!test")
@@ -24,36 +27,20 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MongoDbRunner implements ApplicationEngineStartupRunner {
 
-    @Value("${spring.data.mongodb.database}")
-    private String name;
-
-    @Value("${spring.data.mongodb.host:#{null}}")
-    private String host;
-
-    @Value("${spring.data.mongodb.port:#{null}}")
-    private String port;
-
-    @Value("${spring.data.mongodb.uri:#{null}}")
-    private String uri;
-
-    @Value("${spring.data.mongodb.drop:false}")
-    private boolean dropDatabase;
-
-    @Value("${spring.data.mongodb.runner-ensure-index:true}")
-    private boolean resolveIndexesOnStartup;
+    private final DataConfigurationProperties.MongoProperties mongoProperties;
 
     private final MongoTemplate mongoTemplate;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        if (dropDatabase) {
-            if (host != null && port != null)
-                log.info("Dropping Mongo database {}:{}/{}", host, port, name);
-            else if (uri != null)
-                log.info("Dropping Mongo database {}", uri);
+        if (mongoProperties.getDrop()) {
+            if (mongoProperties.getHost() != null && mongoProperties.getPort() != null)
+                log.info("Dropping Mongo database {}:{}/{}", mongoProperties.getHost(), mongoProperties.getPort(), name);
+            else if (mongoProperties.getUri() != null)
+                log.info("Dropping Mongo database {}", mongoProperties.getUri());
             mongoTemplate.getDb().drop();
         }
-        if (resolveIndexesOnStartup) {
+        if (mongoProperties.getRunnerEnsureIndex()) {
             resolveIndexes();
         }
     }

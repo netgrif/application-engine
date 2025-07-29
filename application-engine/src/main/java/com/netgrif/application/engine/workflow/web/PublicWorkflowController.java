@@ -25,7 +25,7 @@ import java.util.Locale;
 @Slf4j
 @RestController
 @ConditionalOnProperty(
-        value = "nae.public.workflow.web.enabled",
+        value = "netgrif.engine.security.web.public-web.case-enabled",
         havingValue = "true",
         matchIfMissing = true
 )

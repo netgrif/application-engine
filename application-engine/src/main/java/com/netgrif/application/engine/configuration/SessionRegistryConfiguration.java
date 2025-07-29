@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
+import com.netgrif.application.engine.configuration.properties.ImpersonationConfigurationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +12,7 @@ import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 public class SessionRegistryConfiguration {
 
     @Autowired
-    private ImpersonationProperties impersonationProperties;
+    private ImpersonationConfigurationProperties impersonationProperties;
 
     @Bean
     public SpringSessionBackedSessionRegistry<? extends Session> springSessionBackedSessionRegistry(FindByIndexNameSessionRepository<? extends Session> sessionRepository) {
