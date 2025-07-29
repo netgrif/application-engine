@@ -1,9 +1,7 @@
 package com.netgrif.application.engine.auth.service;
 
 
-import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.objects.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
@@ -52,7 +50,7 @@ public class RegistrationServiceTest {
         NewUserRequest request = new NewUserRequest();
         request.email = "test@test.com";
 
-        RegisteredUser user = service.createNewUser(request);
+        User user = (User) service.createNewUser(request);
 
         RegistrationRequest registrationRequest = new RegistrationRequest();
         registrationRequest.token = service.encodeToken(user.getEmail(), user.getToken());

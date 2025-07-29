@@ -1,18 +1,15 @@
 package com.netgrif.application.engine.auth.web.responsebodies;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.web.responsebodies.ProcessRole;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Attribute;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
-import com.netgrif.application.engine.objects.auth.domain.Group;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import lombok.Data;
-import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Data
 public class User {
@@ -36,7 +33,7 @@ public class User {
     private boolean emailVerified;
     protected UserState state;
 
-    public User(IUser user) {
+    public User(AbstractUser user) {
         id = user.getStringId();
         username = user.getUsername();
         realmId = user.getRealmId();
@@ -44,18 +41,20 @@ public class User {
         avatar = user.getAvatar();
         firstName = user.getFirstName();
         lastName = user.getLastName();
-        fullName = user.getFullName();
-        createdAt = user.getCreatedAt();
+        fullName = user.getName();
         attributes = user.getAttributes();
-        enabled = user.isEnabled();
-        emailVerified = user.isEmailVerified();
-        state = user.getState();
+        if (user instanceof com.netgrif.application.engine.objects.auth.domain.User u) {
+            createdAt = u.getCreatedAt();
+            enabled = u.isActive();
+            emailVerified = u.isEmailVerified();
+            state = u.getState();
+        }
     }
 
-    public static User createUser(IUser user) {
+    public static User createUser(AbstractUser user) {
         User result = new User(user);
-        result.setAuthorities(user.getAuthorities());
-        result.setNextGroups(user.getGroups().stream().map(Group::getStringId).collect(Collectors.toSet()));
+        result.setAuthorities(user.getAuthoritySet());
+        result.setNextGroups(user.getGroupIds());
         return result;
     }
 }

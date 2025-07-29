@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -42,7 +42,7 @@ public class AuthorityServiceImpl implements AuthorityService {
     }
 
     @Override
-    public Page<Authority> findAllByIds(List<String> ids, Pageable pageable) {
+    public Page<Authority> findAllByIds(Collection<String> ids, Pageable pageable) {
         return authorityRepository.findAllBy_idIn(ids.stream().map(ObjectId::new).collect(Collectors.toList()), pageable);
     }
 }

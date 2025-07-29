@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.web;
 
 import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
@@ -64,13 +65,13 @@ public class PublicPetriNetController {
     @ResponseBody
     public PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Locale locale) {
         String resolvedIdentifier = Base64.isBase64(identifier) ? new String(Base64.decodeBase64(identifier)) : identifier;
-        return new PetriNetReferenceResource(this.petriNetService.getReference(resolvedIdentifier, this.converter.convert(version), userService.transformToLoggedUser(userService.getLoggedUser()), locale));
+        return new PetriNetReferenceResource(this.petriNetService.getReference(resolvedIdentifier, this.converter.convert(version), ActorTransformer.toLoggedUser(userService.getLoggedUser()), locale));
     }
 
     @Operation(summary = "Search processes")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<PetriNetReferenceResource> searchPetriNets(@RequestBody PetriNetSearch criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
-        Page<PetriNetReference> nets = petriNetService.search(criteria, userService.transformToLoggedUser(userService.getLoggedUser()), pageable, locale);
+        Page<PetriNetReference> nets = petriNetService.search(criteria, ActorTransformer.toLoggedUser(userService.getLoggedUser()), pageable, locale);
 //        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicPetriNetController.class)
 //                .searchPetriNets(criteria, pageable, assembler, locale)).withRel("search");
 //        PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);
@@ -82,7 +83,7 @@ public class PublicPetriNetController {
     @GetMapping(value = "/{netId}/roles", produces = MediaTypes.HAL_JSON_VALUE)
     public ProcessRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
         netId = decodeUrl(netId);
-        return new ProcessRolesResource(roleService.findAll(netId), petriNetService.getPetriNet(netId).getPermissions(), netId, locale);
+        return new ProcessRolesResource(roleService.findAllByNetStringId(netId), petriNetService.getPetriNet(netId).getPermissions(), netId, locale);
     }
 
     @Operation(summary = "Get transactions of process")
@@ -102,6 +103,6 @@ public class PublicPetriNetController {
     @GetMapping(value = "/transitions", produces = MediaTypes.HAL_JSON_VALUE)
     public TransitionReferencesResource getTransitionReferences(@RequestParam List<String> ids, Locale locale) {
         ids.forEach(PetriNetController::decodeUrl);
-        return new TransitionReferencesResource(petriNetService.getTransitionReferences(ids, userService.transformToLoggedUser(userService.getLoggedUser()), locale));
+        return new TransitionReferencesResource(petriNetService.getTransitionReferences(ids, ActorTransformer.toLoggedUser(userService.getLoggedUser()), locale));
     }
 }

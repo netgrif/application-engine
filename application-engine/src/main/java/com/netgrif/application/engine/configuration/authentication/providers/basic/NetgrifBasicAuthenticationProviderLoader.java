@@ -19,7 +19,7 @@ public class NetgrifBasicAuthenticationProviderLoader {
     @Bean("netgrifBasicAuthenticationProvider")
     public NetgrifAuthenticationProvider netgrifBasicAuthenticationProvider() {
         NetgrifBasicAuthenticationProvider netgrifBasicAuthenticationProvider = new NetgrifBasicAuthenticationProvider();
-        netgrifBasicAuthenticationProvider.setPasswordEncoder(passwordEncoder.bCryptPasswordEncoder());
+        netgrifBasicAuthenticationProvider.setPasswordEncoder(passwordEncoder.passwordEncoder());
         return netgrifBasicAuthenticationProvider;
     }
 

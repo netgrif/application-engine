@@ -41,8 +41,4 @@ public interface RealmService {
     AuthMethodConfig<?> updateConfigInRealm(String realmId, AuthMethodConfig<?> config);
 
     void deleteRealm(String realmId);
-
-    void addUserToRealm(String realmId, String userId);
-
-    void removeUserFromRealm(String realmId, String userId);
 }

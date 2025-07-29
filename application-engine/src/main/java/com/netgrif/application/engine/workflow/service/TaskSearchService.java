@@ -26,7 +26,9 @@ public class TaskSearchService extends MongoSearchService<Task> {
     private IPetriNetService petriNetService;
 
     public Predicate buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
-        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        // TODO: impersonation
+//        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        LoggedUser loggedOrImpersonated = user;
         List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, loggedOrImpersonated, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
@@ -60,7 +62,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     protected Predicate buildUserRefQueryConstraint(LoggedUser user) {
-        Predicate userRefConstraints = userRefQuery(user.getId());
+        Predicate userRefConstraints = userRefQuery(user.getStringId());
         return constructPredicateTree(Collections.singletonList(userRefConstraints), BooleanBuilder::or);
     }
 
@@ -74,7 +76,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
-        Predicate userConstraints = viewUsersQuery(user.getId());
+        Predicate userConstraints = viewUsersQuery(user.getStringId());
         return constructPredicateTree(Collections.singletonList(userConstraints), BooleanBuilder::or);
     }
 
@@ -92,7 +94,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     protected Predicate buildNegativeViewUsersQueryConstraint(LoggedUser user) {
-        Predicate userConstraints = negativeViewUsersQuery(user.getId());
+        Predicate userConstraints = negativeViewUsersQuery(user.getStringId());
         return constructPredicateTree(Collections.singletonList(userConstraints), BooleanBuilder::or);
     }
 

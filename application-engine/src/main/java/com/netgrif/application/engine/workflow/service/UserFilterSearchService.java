@@ -3,10 +3,10 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
-import com.netgrif.application.engine.startup.runner.FilterRunner;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
+import com.netgrif.application.engine.startup.runner.FilterRunner;
 import com.netgrif.application.engine.workflow.service.interfaces.IUserFilterSearchService;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -38,7 +38,7 @@ public class UserFilterSearchService implements IUserFilterSearchService {
                                 .transition(Collections.singletonList("view_filter"))
                                 .build()
                 ),
-                (LoggedUser) userService.transformToLoggedUser(userService.getLoggedOrSystem()),
+                ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
                 PageRequest.of(0, 100),
                 LocaleContextHolder.getLocale(),
                 true);

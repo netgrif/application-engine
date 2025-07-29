@@ -154,8 +154,8 @@ public class Importer {
         this.places = new HashMap<>();
         this.fields = new HashMap<>();
         this.transactions = new HashMap<>();
-        this.defaultRole = processRoleService.defaultRole();
-        this.anonymousRole = processRoleService.anonymousRole();
+        this.defaultRole = processRoleService.getDefaultRole();
+        this.anonymousRole = processRoleService.getAnonymousRole();
         this.i18n = new HashMap<>();
         this.actions = new HashMap<>();
         this.actionRefs = new HashMap<>();

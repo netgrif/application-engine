@@ -18,10 +18,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -83,8 +80,8 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         Assert.notNull(predicate, "Predicate must not be null");
         Assert.notNull(pageable, "Pageable must not be null");
 
-        SpringDataMongodbQuery<com.netgrif.application.engine.adapter.spring.auth.domain.User> query = createQuery(predicate, mongoTemplate, collection);
-        return query.fetchPage(pageable).map(User.class::cast);
+        SpringDataMongodbQuery<User> query = createQuery(predicate, mongoTemplate, collection);
+        return query.fetchPage(pageable);
     }
 
     /**
@@ -97,8 +94,12 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
      */
     default Optional<User> findById(ObjectId objectId, MongoTemplate mongoTemplate, String collectionName) {
         return Optional.ofNullable(
-                mongoTemplate.findOne(Query.query(Criteria.where("id").is(objectId)), com.netgrif.application.engine.adapter.spring.auth.domain.User.class, collectionName)
+                mongoTemplate.findOne(Query.query(Criteria.where("id").is(objectId)), User.class, collectionName)
         );
+    }
+
+    default List<User> findAllByIds(Collection<ObjectId> objectIds, MongoTemplate mongoTemplate, String collectionName) {
+        return mongoTemplate.find(Query.query(Criteria.where("id").in(objectIds)), User.class, collectionName);
     }
 
     /**
@@ -111,7 +112,7 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
      */
     default Optional<User> findByUsername(String username, MongoTemplate mongoTemplate, String collectionName) {
         return Optional.ofNullable(
-                mongoTemplate.findOne(Query.query(Criteria.where("username").is(username)), com.netgrif.application.engine.adapter.spring.auth.domain.User.class, collectionName)
+                mongoTemplate.findOne(Query.query(Criteria.where("username").is(username)), User.class, collectionName)
         );
     }
 
@@ -125,7 +126,7 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
      */
     default Optional<User> findByEmail(String email, MongoTemplate mongoTemplate, String collectionName) {
         return Optional.ofNullable(
-                mongoTemplate.findOne(Query.query(Criteria.where("email").is(email)), com.netgrif.application.engine.adapter.spring.auth.domain.User.class, collectionName)
+                mongoTemplate.findOne(Query.query(Criteria.where("email").is(email)), User.class, collectionName)
         );
     }
 
@@ -141,12 +142,18 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         return mongoTemplate.save(user, collectionName);
     }
 
-    /**
-     * Deletes all data from specified collections.
-     *
-     * @param mongoTemplate  the MongoDB template
-     * @param collectionName the names of the collections to clear
-     */
+    default void deleteAllByIdFromCollection(MongoTemplate mongoTemplate, Collection<ObjectId> userIds, String collection) {
+        mongoTemplate.remove(
+                new Query(Criteria.where("id").in(userIds)),
+                User.class,
+                collection
+        );
+    }
+
+    default void deleteAllFromCollection(MongoTemplate mongoTemplate, String collection) {
+        mongoTemplate.remove(new Query(), collection);
+    }
+
     default void deleteAll(MongoTemplate mongoTemplate, Collection<String> collectionName) {
         collectionName.forEach(collection -> mongoTemplate.remove(new Query(), collection));
     }
@@ -209,7 +216,7 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
      */
     default void removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime, MongoTemplate mongoTemplate, Set<String> collectionNames) {
         collectionNames.forEach(collectionName ->
-                mongoTemplate.remove(Query.query(Criteria.where("state").is(state).and("credentials.token.properties.expirationDate").lt(dateTime)), com.netgrif.application.engine.adapter.spring.auth.domain.User.class, collectionName)
+                mongoTemplate.remove(Query.query(Criteria.where("state").is(state).and("credentials.token.properties.expirationDate").lt(dateTime)), User.class, collectionName)
         );
     }
 
@@ -246,15 +253,15 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
     }
 
     /**
-     * Creates a {@link SpringDataMongodbQuery} for {@link com.netgrif.application.engine.adapter.spring.auth.domain.User}.
+     * Creates a {@link SpringDataMongodbQuery} for {@link User}.
      *
      * @param predicate      the filter condition to apply to the query.
      * @param mongoTemplate  the MongoDB template used to execute the query.
      * @param collectionName the name of the collection to query.
      * @return a {@link SpringDataMongodbQuery} configured with the given predicate and collection name.
      */
-    private SpringDataMongodbQuery<com.netgrif.application.engine.adapter.spring.auth.domain.User> createQuery(Predicate predicate, MongoTemplate mongoTemplate, String collectionName) {
-        return new SpringDataMongodbQuery<>(mongoTemplate, com.netgrif.application.engine.adapter.spring.auth.domain.User.class, collectionName).where(predicate);
+    private SpringDataMongodbQuery<User> createQuery(Predicate predicate, MongoTemplate mongoTemplate, String collectionName) {
+        return new SpringDataMongodbQuery<>(mongoTemplate, User.class, collectionName).where(predicate);
     }
 
     /**
@@ -270,12 +277,9 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
     private static PageImpl<User> resolveUserPage(Pageable pageable, MongoTemplate mongoTemplate, String collection, Query query) {
         List<User> resultUserList = mongoTemplate.find(
                         query.with(pageable),
-                        com.netgrif.application.engine.adapter.spring.auth.domain.User.class,
-                        collection)
-                .stream()
-                .map(User.class::cast)
-                .collect(Collectors.toList());
-        long total = mongoTemplate.count(query.limit(-1).skip(-1), com.netgrif.application.engine.adapter.spring.auth.domain.User.class);
+                        User.class,
+                        collection);
+        long total = mongoTemplate.count(query.limit(-1).skip(-1), User.class, collection);
         return new PageImpl<>(resultUserList, pageable, total);
     }
 }

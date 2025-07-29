@@ -111,11 +111,11 @@ class PredefinedRolesPermissionsTest {
     @BeforeEach
     public void before() {
         testHelper.truncateDbs()
-        assert processRoleService.defaultRole() != null
-        DEFAULT_ROLE_ID = processRoleService.defaultRole().stringId
+        assert processRoleService.getDefaultRole() != null
+        DEFAULT_ROLE_ID = processRoleService.getDefaultRole().stringId
         assert DEFAULT_ROLE_ID != null
-        assert processRoleService.anonymousRole() != null
-        ANONYMOUS_ROLE_ID = processRoleService.anonymousRole().stringId
+        assert processRoleService.getAnonymousRole() != null
+        ANONYMOUS_ROLE_ID = processRoleService.getAnonymousRole().stringId
         assert ANONYMOUS_ROLE_ID != null
     }
 

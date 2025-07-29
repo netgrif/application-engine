@@ -1,140 +1,99 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.time.Duration;
-import java.util.*;
+import java.util.Set;
 
+/**
+ * Represents a logged-in user in the application, extending the {@link AbstractUser} class.
+ * This class maintains session-specific information and authentication details for a user
+ * who has successfully logged into the system.
+ * 
+ * @see AbstractUser
+ * @see Serializable
+ */
 @Data
+@Slf4j
+@NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public abstract class LoggedUser implements Serializable {
+@EqualsAndHashCode(callSuper = false)
+public abstract class LoggedUser extends AbstractUser implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 3031325636490953409L;
+    /**
+     * The identifier of the workspace associated with the logged user.
+     */
+    private String workspaceId;
 
-    private String id;
+    /**
+     * The authentication provider origin from which the user was authenticated.
+     */
+    private String providerOrigin;
 
-    private String realmId;
+    /**
+     * Set of Multi-Factor Authentication methods enabled for this user.
+     */
+    private Set<String> mfaMethods;
 
-    private String createMethod;
-
-    private String username;
-
-    private String email;
-
-    private String password;
-
-    private String firstName;
-
-    private String lastName;
-
-    private Set<Authority> authoritySet;
-
-    private Set<Group> groups;
-
-    private boolean enabled;
-
-    private boolean emailVerified;
-
-    private boolean accountNonExpired;
-
-    private boolean accountNonLocked;
-
-    private boolean credentialsNonExpired;
-
-    private LoggedUser impersonated;
-
-    private Set<ProcessRole> processRoles;
-
-    private Set<ProcessRole> negativeProcessRoles;
-
-    private Set<String> mfaMethod;
-
+    /**
+     * The duration after which the user's session will timeout.
+     * This field is marked as transient to prevent serialization.
+     * Default value is 30 minutes.
+     */
     private transient Duration sessionTimeout = Duration.ofMinutes(30);
 
-    private Map<String, Attribute<?>> attributes;
 
-    public LoggedUser(String id, String username, String password, Collection<Authority> authorities, Collection<ProcessRole> processRoles, Collection<ProcessRole> negativeProcessRoles) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.authoritySet = new HashSet<>(authorities);
-        this.processRoles = new HashSet<>(processRoles);
-        this.mfaMethod = new HashSet<>();
-        this.groups = new HashSet<>();
-        this.enabled = true;
-        this.emailVerified = false;
-        this.accountNonExpired = true;
-        this.accountNonLocked = true;
-        this.credentialsNonExpired = true;
-        this.negativeProcessRoles = new HashSet<>(negativeProcessRoles);
+    /**
+     * Constructs a new LoggedUser instance with all attributes.
+     *
+     * @param id The unique identifier as {@link ObjectId}
+     * @param realmId The identifier of the security realm
+     * @param username The user's username
+     * @param firstName The user's first name
+     * @param middleName The user's middle name
+     * @param lastName The user's last name
+     * @param email The user's email address
+     * @param avatar The user's avatar URL
+     * @param workspaceId The identifier of user's workspace
+     * @param providerOrigin The authentication provider origin
+     * @param mfaMethods The set of enabled MFA methods
+     * @param sessionTimeout The duration of session timeout
+     */
+    public LoggedUser(ObjectId id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar, String workspaceId, String providerOrigin, Set<String> mfaMethods, Duration sessionTimeout) {
+        super(id, realmId, username, firstName, middleName, lastName, email, avatar);
+        this.workspaceId = workspaceId;
+        this.providerOrigin = providerOrigin;
+        this.mfaMethods = mfaMethods;
+        this.sessionTimeout = sessionTimeout;
     }
 
-    public LoggedUser(String id, String realmId, String username, String password, Collection<? extends Authority> authorities, Set<Group> groups, Set<ProcessRole> processRoles, Map<String, Attribute<?>> attributes, Set<String> mfaMethod, String firstName, String lastName, Collection<ProcessRole> negativeProcessRoles) {
-        this.id = id;
-        this.realmId = realmId;
-        this.username = username;
-        this.password = password;
-        this.authoritySet = new HashSet<>(authorities);
-        this.groups = new HashSet<>(groups);
-        this.processRoles = new HashSet<>(processRoles);
-        this.attributes = new HashMap<>(attributes);
-        this.mfaMethod = new HashSet<>(mfaMethod);
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.enabled = true;
-        this.emailVerified = false;
-        this.accountNonExpired = true;
-        this.accountNonLocked = true;
-        this.credentialsNonExpired = true;
-        this.negativeProcessRoles = new HashSet<>(negativeProcessRoles);
+    /**
+     * Constructs a new LoggedUser instance with String id and all other attributes.
+     *
+     * @param id The unique identifier as String
+     * @param realmId The identifier of the security realm
+     * @param username The user's username
+     * @param firstName The user's first name
+     * @param middleName The user's middle name
+     * @param lastName The user's last name
+     * @param email The user's email address
+     * @param avatar The user's avatar URL
+     * @param workspaceId The identifier of user's workspace
+     * @param providerOrigin The authentication provider origin
+     * @param mfaMethods The set of enabled MFA methods
+     * @param sessionTimeout The duration of session timeout
+     */
+    public LoggedUser(String id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar, String workspaceId, String providerOrigin, Set<String> mfaMethods, Duration sessionTimeout) {
+        super(id, realmId, username, firstName, middleName, lastName, email, avatar);
+        this.workspaceId = workspaceId;
+        this.providerOrigin = providerOrigin;
+        this.mfaMethods = mfaMethods;
+        this.sessionTimeout = sessionTimeout;
     }
-
-    public boolean isAdmin() {
-        return authoritySet.stream().anyMatch(a -> a.getAuthority().equals(Authority.admin));
-    }
-
-    public void impersonate(LoggedUser toImpersonate) {
-        this.impersonated = toImpersonate;
-    }
-
-    public void clearImpersonated() {
-        this.impersonated = null;
-    }
-
-    public boolean isImpersonating() {
-        return this.impersonated != null;
-    }
-
-    @JsonIgnore
-    public LoggedUser getSelfOrImpersonated() {
-        return this.isImpersonating() ? this.impersonated : this;
-    }
-
-    public String getFullName() {
-        return String.join(" ", firstName, lastName);
-    }
-
-    @Override
-    public String toString() {
-        return "LoggedUser{" +
-                "id=" + id +
-                ", realmId='" + realmId + '\'' +
-                ", username='" + username + '\'' +
-                ", fullName='" + getFullName() + '\'' +
-                ", groups=" + groups +
-                ", impersonated=" + impersonated +
-                '}';
-    }
-
-    public abstract IUser transformToUser();
-
-    public abstract Author transformToAuthor();
 }
