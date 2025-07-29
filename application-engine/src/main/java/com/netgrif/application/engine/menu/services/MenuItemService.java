@@ -332,7 +332,6 @@ public class MenuItemService implements IMenuItemService {
         duplicated.setTitle(newTitle.getDefaultValue());
         duplicated = workflowService.save(duplicated);
 
-        parentPath(String.valueOf(originItem.getDataSet().get(MenuItemConstants.FIELD_NODE_PATH)));
         String newNodePath = createNodePath(parentPath(String.valueOf(originItem.getDataSet().get(MenuItemConstants.FIELD_NODE_PATH))), sanitizedIdentifier);
 
         Map<String, Map<String, Object>> dataSet = new HashMap<>();
