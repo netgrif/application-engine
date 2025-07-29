@@ -6,10 +6,11 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.google.common.collect.Lists;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
 import com.netgrif.application.engine.workflow.domain.FilterDeserializer;
 import com.netgrif.application.engine.objects.workflow.domain.IllegalFilterFileException;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.FilterConfigurationProperties;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -98,13 +99,13 @@ public class FilterImportExportService implements IFilterImportExportService {
     private FilterConfigurationProperties filterProperties;
 
     @Override
-    public void createFilterImport(IUser author) {
-        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER, "Import filters " + author.getFullName(), "", userService.transformToLoggedUser(author));
+    public void createFilterImport(AbstractUser author) {
+        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER, "Import filters " + author.getName(), "", ActorTransformer.toLoggedUser(author));
     }
 
     @Override
-    public void createFilterExport(IUser author) {
-        workflowService.createCaseByIdentifier(EXPORT_NET_IDENTIFIER, "Export filters " + author.getFullName(), "", userService.transformToLoggedUser(author));
+    public void createFilterExport(AbstractUser author) {
+        workflowService.createCaseByIdentifier(EXPORT_NET_IDENTIFIER, "Export filters " + author.getName(), "", ActorTransformer.toLoggedUser(author));
     }
 
     /**

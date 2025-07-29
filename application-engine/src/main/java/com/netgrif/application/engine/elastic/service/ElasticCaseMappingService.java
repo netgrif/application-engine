@@ -233,11 +233,11 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     private UserField.UserMappingData transformUserValue(UserFieldValue user) {
-        return new UserField.UserMappingData(user.getId(), user.getUsername(), buildFullName(user.getFirstName(), user.getLastName()).toString());
+        return new UserField.UserMappingData(user.getId(), user.getRealmId(), user.getUsername(), buildFullName(user.getFirstName(), user.getLastName()).toString());
     }
 
     private UserListField.UserMappingData transformUserListValue(UserFieldValue user) {
-        return new UserListField.UserMappingData(user.getId(), user.getUsername(), buildFullName(user.getFirstName(), user.getLastName()).toString());
+        return new UserListField.UserMappingData(user.getId(), user.getRealmId(), user.getUsername(), buildFullName(user.getFirstName(), user.getLastName()).toString());
     }
 
     private StringBuilder buildFullName(String name, String surname) {

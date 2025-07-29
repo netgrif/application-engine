@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.objects.petrinet.domain;
 
-import com.netgrif.application.engine.objects.auth.domain.Author;
+import com.netgrif.application.engine.objects.auth.domain.ActorRef;
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.reference.Referencable;
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.reference.Type;
@@ -74,7 +74,7 @@ public abstract class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
-    private Author author;
+    private ActorRef author;
 
     @Getter
     @Setter
@@ -174,10 +174,10 @@ public abstract class PetriNet extends PetriNetObject {
         this.creationDate = petriNet.getCreationDate();
         this.places = petriNet.getPlaces().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new Place(e.getValue()), (x, y) -> y, LinkedHashMap::new));
         this.transitions = petriNet.getTransitions().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new Transition(e.getValue()), (x, y) -> y, LinkedHashMap::new));
-        this.arcs = petriNet.getArcs().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream().map(arc -> CopyConstructorUtil.copy(arc.getClass(), arc)).collect(Collectors.toList()), (x, y)->y, LinkedHashMap::new));
+        this.arcs = petriNet.getArcs().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream().map(arc -> CopyConstructorUtil.copy(arc.getClass(), arc)).collect(Collectors.toList()), (x, y) -> y, LinkedHashMap::new));
         this.dataSet = petriNet.getDataSet().entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x,y)->y, LinkedHashMap::new));
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x, y) -> y, LinkedHashMap::new));
         this.roles = petriNet.getRoles();
         this.negativeViewRoles = petriNet.getNegativeViewRoles();
         this.transactions = petriNet.getTransactions();

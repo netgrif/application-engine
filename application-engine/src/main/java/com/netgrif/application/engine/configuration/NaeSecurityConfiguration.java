@@ -175,7 +175,6 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     protected PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
         Authority authority = authorityService.getOrCreate(Authority.anonymous);
-        authority.setUsers(new HashSet<>());
         return new PublicAuthenticationFilter(
                 (ProviderManager) authenticationManager(authenticationManagerBuilder),
                 new AnonymousAuthenticationProvider(ANONYMOUS_USER),

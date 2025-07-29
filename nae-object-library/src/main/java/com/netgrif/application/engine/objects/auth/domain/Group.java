@@ -1,186 +1,172 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
-import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.querydsl.core.annotations.QueryEntity;
 import lombok.Getter;
 import lombok.Setter;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
+/**
+ * Represents a group entity in the authentication system.
+ * Groups can contain members and subgroups, providing hierarchical organization of users.
+ */
+@Getter
 @QueryEntity
-public class Group implements Actor {
+public class Group extends AbstractActor implements Serializable {
 
-    public static final String GROUP = "_group";
-
-    @Getter
-    private ObjectId id;
-
-    @Getter
-    @Setter
-    private String realmId;
-
-    @Getter
+    /**
+     * The unique identifier of the group.
+     */
     @Setter
     private String identifier;
 
+    /**
+     * The display name of the group shown in the user interface.
+     */
     @Setter
-    @Getter
-    private String ownerId;
-
-    @Setter
-    @Getter
-    private String ownerUsername;
-
-    @Setter
-    @Getter
     private String displayName;
 
-    @Getter
+    /**
+     * The unique identifier of the group owner.
+     */
     @Setter
-    private Set<String> memberIds;
+    private String ownerId;
 
-    @Getter
+    /**
+     * The username of the group owner.
+     */
     @Setter
-    private Set<IUser> members;
+    private String ownerUsername;
 
-    @Getter
+    /**
+     * The timestamp when the group was created.
+     */
     @Setter
-    protected Set<Authority> authorities;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Getter
+    /**
+     * The timestamp when the group was last modified.
+     */
     @Setter
-    protected Set<ProcessRole> processRoles;
+    private LocalDateTime modifiedAt = LocalDateTime.now();
 
-    @Getter
-    @Setter
-    protected Set<ProcessRole> negativeProcessRoles;
+    /**
+     * Collection of member IDs belonging to this group.
+     */
+    private Set<String> memberIds = new HashSet<>();
 
-    @Getter
-    @Setter
-    protected Set<String> groupIds;
+    /**
+     * Collection of subgroup IDs belonging to this group.
+     */
+    private Set<String> subgroupIds = new HashSet<>();
 
-    @Getter
-    @Setter
-    @BsonIgnore
-    protected Set<Group> groups;
-
-    private Map<String, Attribute<?>> attributes;
-
+    /**
+     * Protected constructor for creating a new group with a generated ObjectId.
+     */
     protected Group() {
-        id = new ObjectId();
-        authorities = new HashSet<>();
-        processRoles = new HashSet<>();
-        negativeProcessRoles = new HashSet<>();
-        groupIds = new HashSet<>();
-        groups = new HashSet<>();
-        memberIds = new HashSet<>();
-        members = new HashSet<>();
+        this.id = new ObjectId();
     }
 
+    /**
+     * Constructs a new group with a specified ObjectId.
+     * @param id The ObjectId to assign to this group
+     */
     public Group(ObjectId id) {
-        this();
         this.id = id;
     }
 
+    /**
+     * Constructs a new group with specified identifier and realm ID.
+     * @param identifier The unique identifier for the group
+     * @param realmId The ID of the realm this group belongs to
+     */
     public Group(String identifier, String realmId) {
         this();
         this.identifier = identifier;
         this.realmId = realmId;
     }
 
+    /**
+     * Returns the display name of the group.
+     * @return The group's display name
+     */
     @Override
-    public String getStringId() {
-        return id.toString();
+    public String getName() {
+        return this.displayName;
     }
 
+    /**
+     * Returns the full name of the group, which is the same as its display name.
+     * @return The group's display name
+     */
     @Override
-    public void addGroupId(String groupId) {
-        if (groupIds.stream().anyMatch(it -> it.equals(groupId))) {
-            return;
-        }
-        groupIds.add(groupId);
+    public String getFullName() {
+        return this.displayName;
     }
 
-    @Override
-    public void removeGroupId(String groupId) {
-        groupIds.remove(groupId);
-    }
-
-    @Override
-    public void addAuthority(Authority authority) {
-        if (authorities.stream().anyMatch(it -> it.getStringId().equals(authority.getStringId()))) {
-            return;
-        }
-        authorities.add(authority);
-    }
-
-    @Override
-    public void removeAuthority(Authority authority) {
-        authorities.remove(authority);
-    }
-
-    @Override
-    public void addProcessRole(ProcessRole role) {
-        if (processRoles.stream().anyMatch(it -> it.getStringId().equals(role.getStringId()))) {
-            return;
-        }
-        processRoles.add(role);
-    }
-
-    @Override
-    public void removeProcessRole(ProcessRole role) {
-        processRoles.remove(role);
-    }
-
-    @Override
-    public void addNegativeProcessRole(ProcessRole role) {
-        if (negativeProcessRoles.stream().anyMatch(it -> it.getStringId().equals(role.getStringId()))) {
-            return;
-        }
-        negativeProcessRoles.add(role);
-    }
-
-    @Override
-    public void removeNegativeProcessRole(ProcessRole role) {
-        negativeProcessRoles.remove(role);
-    }
-
-    @Override
-    public void setAttribute(String key, Object value, boolean required) {
-        this.attributes.put(key, new Attribute<>(value, required));
-    }
-
-    @Override
-    public Object getAttributeValue(String key) {
-        Attribute<?> attribute = this.attributes.get(key);
-        return attribute != null ? attribute.getValue() : null;
-    }
-
-    @Override
-    public void removeAttribute(String key) {
-        this.attributes.remove(key);
-    }
-
-    @Override
-    public boolean isAttributeSet(String key) {
-        Attribute<?> attribute = this.attributes.get(key);
-        return attribute != null && attribute.getValue() != null;
-    }
-
-    @Override
-    public Attribute<?> getAttribute(String key) {
-        return this.attributes.get(key);
-    }
-
+    /**
+     * Adds a member to the group by their user ID.
+     * @param userId The ID of the user to add as a member
+     */
     public void addMemberId(String userId) {
-        memberIds.add(userId);
+        if (this.memberIds == null) {
+            this.memberIds = new HashSet<>();
+        }
+        this.memberIds.add(userId);
     }
 
+    /**
+     * Removes a member from the group by their user ID.
+     * @param userId The ID of the user to remove from the group
+     */
     public void removeMemberId(String userId) {
-        memberIds.remove(userId);
+        if (this.memberIds == null) {
+            this.memberIds = new HashSet<>();
+        } else {
+            this.memberIds.remove(userId);
+        }
+    }
+
+    /**
+     * Sets the collection of member IDs for this group.
+     * @param memberIds The set of member IDs to assign, or null to create an empty set
+     */
+    public void setMemberIds(Set<String> memberIds) {
+        this.memberIds = memberIds == null ? new HashSet<>() : new HashSet<>(memberIds);
+    }
+
+    /**
+     * Adds a subgroup to this group by its group ID.
+     * @param groupId The ID of the group to add as a subgroup
+     */
+    public void addSubGroupId(String groupId) {
+        if (this.subgroupIds == null) {
+            this.subgroupIds = new HashSet<>();
+        }
+        this.subgroupIds.add(groupId);
+    }
+
+    /**
+     * Removes a subgroup from this group by its group ID.
+     * @param groupId The ID of the group to remove from subgroups
+     */
+    public void removeSubgroupId(String groupId) {
+        if (this.subgroupIds == null) {
+            this.subgroupIds = new HashSet<>();
+        } else {
+            this.subgroupIds.remove(groupId);
+        }
+    }
+
+    /**
+     * Sets the collection of subgroup IDs for this group.
+     * @param subgroupIds The set of subgroup IDs to assign, or null to create an empty set
+     */
+    public void setSubgroupIds(Set<String> subgroupIds) {
+        this.subgroupIds = subgroupIds == null ? new HashSet<>() : new HashSet<>(subgroupIds);
     }
 }

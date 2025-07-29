@@ -89,6 +89,9 @@ class EncryptionTest {
 
     LoggedUser mockLoggedUser() {
         def authorityUser = authorityService.getOrCreate(Authority.user)
-        return new LoggedUserImpl(superCreator.getSuperUser().getStringId(), "super@netgrif.com", "password", [authorityUser] as Set, [] as Set, [] as Set)
+        def superUser = superCreator.getSuperUser();
+        LoggedUser loggedUser = new LoggedUserImpl(superUser.stringId, superUser.realmId, superUser.username, superUser.firstName, superUser.middleName, superUser.lastName, superUser.email, superUser.avatar, null, null, null, null);
+        loggedUser.setAuthoritySet([authorityUser] as Set)
+        return loggedUser
     }
 }

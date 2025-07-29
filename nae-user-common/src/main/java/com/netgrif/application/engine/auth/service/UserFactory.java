@@ -2,8 +2,7 @@ package com.netgrif.application.engine.auth.service;
 
 
 import com.netgrif.application.engine.auth.web.responsebodies.User;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
-import org.springframework.security.core.Authentication;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 
 import java.util.Locale;
 
@@ -13,5 +12,5 @@ public interface UserFactory {
      * @param locale the locale for translations
      * @return a full version of the user response object, that has all of its attributes set
      */
-    User getUser(IUser user, Locale locale);
+    User getUser(AbstractUser user, Locale locale);
 }

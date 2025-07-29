@@ -53,11 +53,13 @@ public abstract class ElasticCase implements Serializable {
 
     private String author;
 
+    private String authorRealm;
+
     private String mongoId;
 
     private String authorName;
 
-    private String authorEmail;
+    private String authorUsername;
 
     private List<ImmediateField> immediateData;
 
@@ -99,8 +101,9 @@ public abstract class ElasticCase implements Serializable {
         creationDate = useCase.getCreationDate();
         creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
         author = useCase.getAuthor().getId();
+        authorRealm = useCase.getAuthor().getRealmId();
         authorName = useCase.getAuthor().getFullName();
-        authorEmail = useCase.getAuthor().getEmail();
+        authorUsername = useCase.getAuthor().getUsername();
         taskIds = useCase.getTasks().stream().map(TaskPair::getTransition).collect(Collectors.toSet());
         taskMongoIds = useCase.getTasks().stream().map(TaskPair::getTask).collect(Collectors.toSet());
         enabledRoles = new HashSet<>(useCase.getEnabledRoles());

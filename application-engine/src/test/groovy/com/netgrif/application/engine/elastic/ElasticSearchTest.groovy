@@ -111,7 +111,7 @@ class ElasticSearchTest {
 //        def org = importHelper.createGroup("Test")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 //        def processRoles = importHelper.getProcessRoles(net.get())
-        def testUser = importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
+        def testUser = importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [net.roles.values().find { it.importId == "process_role" }] as ProcessRole[])
 
@@ -142,7 +142,7 @@ class ElasticSearchTest {
                 "searchByAuthorName"        : [
                         "json": JsonOutput.toJson([
                                 "author": [
-                                        "name": superCreator.superUser.fullName
+                                        "name": superCreator.superUser.name
                                 ]
                         ]),
                         "size": 11

@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
@@ -319,13 +320,15 @@ public class WorkflowService implements IWorkflowService {
     }
 
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user, Map<String, String> params) {
-        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        // TODO: impersonation
+//        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        LoggedUser loggedOrImpersonated = user;
         PetriNet petriNet = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet((com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet) petriNetService.get(new ObjectId(netId)));
 //        int rulesExecuted;
         Case useCase = new com.netgrif.application.engine.adapter.spring.workflow.domain.Case(petriNet);
         useCase.populateDataSet(initValueExpressionEvaluator, params);
         useCase.setColor(color);
-        useCase.setAuthor(loggedOrImpersonated.transformToAuthor());
+        useCase.setAuthor(ActorTransformer.toActorRef(loggedOrImpersonated));
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(makeTitle.apply(useCase));
 

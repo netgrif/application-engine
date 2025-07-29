@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.export.service;
 
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
@@ -101,12 +102,12 @@ public class ExportService implements IExportService {
 
     @Override
     public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile) throws FileNotFoundException {
-        return fillCsvCaseData(requests, outFile, null, userService.transformToLoggedUser(userService.getLoggedOrSystem()), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+        return fillCsvCaseData(requests, outFile, null, ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
     }
 
     @Override
     public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config) throws FileNotFoundException {
-        return fillCsvCaseData(requests, outFile, config,  userService.transformToLoggedUser(userService.getLoggedOrSystem()), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+        return fillCsvCaseData(requests, outFile, config,  ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
     }
 
     @Override
@@ -158,12 +159,12 @@ public class ExportService implements IExportService {
 
     @Override
     public OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile) throws FileNotFoundException {
-        return fillCsvTaskData(requests, outFile, null,  userService.transformToLoggedUser(userService.getLoggedOrSystem()), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+        return fillCsvTaskData(requests, outFile, null,  ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
     }
 
     @Override
     public OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config) throws FileNotFoundException {
-        return fillCsvTaskData(requests, outFile, config,  userService.transformToLoggedUser(userService.getLoggedOrSystem()), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+        return fillCsvTaskData(requests, outFile, config,  ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
     }
 
     @Override
