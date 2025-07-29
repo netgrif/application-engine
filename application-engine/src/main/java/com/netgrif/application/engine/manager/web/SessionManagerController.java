@@ -23,7 +23,7 @@ import java.util.Collection;
 @RestController()
 @RequestMapping("/api/manager/session")
 @ConditionalOnProperty(
-        value = "nae.session.web.enabled",
+        value = "netgrif.engine.security.web.session-enabled",
         havingValue = "true",
         matchIfMissing = true
 )

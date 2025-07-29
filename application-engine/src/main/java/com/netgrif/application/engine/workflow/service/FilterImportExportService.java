@@ -6,12 +6,12 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.google.common.collect.Lists;
-import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
+import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
 import com.netgrif.application.engine.workflow.domain.FilterDeserializer;
 import com.netgrif.application.engine.objects.workflow.domain.IllegalFilterFileException;
 import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.configuration.properties.FilterProperties;
+import com.netgrif.application.engine.configuration.properties.FilterConfigurationProperties;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.objects.workflow.domain.filter.FilterImportExport;
 import com.netgrif.application.engine.objects.workflow.domain.filter.FilterImportExportList;
@@ -92,10 +92,10 @@ public class FilterImportExportService implements IFilterImportExportService {
     private IDataService dataService;
 
     @Autowired
-    private FileStorageConfiguration fileStorageConfiguration;
+    private StorageConfigurationProperties fileStorageConfiguration;
 
     @Autowired
-    private FilterProperties filterProperties;
+    private FilterConfigurationProperties filterProperties;
 
     @Override
     public void createFilterImport(IUser author) {
@@ -320,7 +320,7 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Transactional
     protected FileFieldValue createXML(FilterImportExportList filters) throws IOException {
-        String filePath = fileStorageConfiguration.getStoragePath() + "/filterExport/" + userService.getLoggedUser().getStringId() + "/" + filterProperties.getFileName();
+        String filePath = fileStorageConfiguration.getPath() + "/filterExport/" + userService.getLoggedUser().getStringId() + "/" + filterProperties.getExport().getFileName();
         File f = new File(filePath);
         f.getParentFile().mkdirs();
 
@@ -334,7 +334,7 @@ public class FilterImportExportService implements IFilterImportExportService {
         FileOutputStream fos = new FileOutputStream(f);
         baos.writeTo(fos);
 
-        return new FileFieldValue(filterProperties.getFileName(), filePath);
+        return new FileFieldValue(filterProperties.getExport().getFileName(), filePath);
     }
 
     protected FilterImportExport createExportClass(Case filter) {

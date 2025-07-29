@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.configuration.security.filter;
 
-import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -13,9 +13,9 @@ import java.io.IOException;
 @Slf4j
 public class HostValidationRequestFilter extends OncePerRequestFilter {
 
-    protected SecurityConfigProperties properties;
+    protected SecurityConfigurationProperties properties;
 
-    public HostValidationRequestFilter(SecurityConfigProperties properties) {
+    public HostValidationRequestFilter(SecurityConfigurationProperties properties) {
         this.properties = properties;
     }
 

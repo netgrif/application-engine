@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.configuration.properties.CacheProperties;
+import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
@@ -14,9 +14,9 @@ import org.springframework.context.annotation.Primary;
 @EnableCaching
 public class CacheConfiguration extends CachingConfigurerSupport {
 
-    private final CacheProperties properties;
+    private final CacheConfigurationProperties properties;
 
-    public CacheConfiguration(CacheProperties properties) {
+    public CacheConfiguration(CacheConfigurationProperties properties) {
         this.properties = properties;
     }
 

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.pdf.generator.service;
 
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.*;
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.*;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDataHelper;
@@ -55,7 +55,7 @@ public class PdfDataHelper implements IPdfDataHelper {
 
     @Getter
     @Setter
-    private PdfResource resource;
+    private PdfResourceConfigurationProperties resource;
 
     @Getter
     @Setter
@@ -70,7 +70,7 @@ public class PdfDataHelper implements IPdfDataHelper {
     private int originalCols;
 
     @Override
-    public void setupDataHelper(PdfResource resource) {
+    public void setupDataHelper(PdfResourceConfigurationProperties resource) {
         log.info("Setting up data helper for PDF generator...");
         this.resource = resource;
         this.pdfFields = new ArrayList<>();
@@ -269,7 +269,7 @@ public class PdfDataHelper implements IPdfDataHelper {
         }
     }
 
-    protected void shiftDown(int belowTopY, int cFieldBottomY, PdfField fieldBelow, PdfResource resource) {
+    protected void shiftDown(int belowTopY, int cFieldBottomY, PdfField fieldBelow, PdfResourceConfigurationProperties resource) {
         int currentDiff;
         currentDiff = cFieldBottomY - belowTopY + resource.getPadding();
         fieldBelow.setTopY(belowTopY + currentDiff);

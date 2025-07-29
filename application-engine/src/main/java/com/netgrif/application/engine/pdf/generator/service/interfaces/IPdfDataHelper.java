@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service.interfaces;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.Transition;
@@ -20,7 +20,7 @@ public interface IPdfDataHelper {
 
     void setPdfFields(List<PdfField> fields);
 
-    void setupDataHelper(PdfResource resource);
+    void setupDataHelper(PdfResourceConfigurationProperties resource);
 
     void generateTitleField();
 

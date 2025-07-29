@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.startup.runner;
 
+import com.netgrif.application.engine.configuration.properties.FilterConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
@@ -46,30 +47,29 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
     public static final String FILTER_VISIBILITY_PRIVATE = "private";
     public static final String FILTER_VISIBILITY_PUBLIC = "public";
 
-    @Value("${nae.create.default.filters:false}")
-    private Boolean createDefaultFilters;
-
     private final IPetriNetService petriNetService;
     private final IWorkflowService workflowService;
     private final UserService userService;
     private final ITaskService taskService;
     private final IDataService dataService;
+    private final FilterConfigurationProperties filterConfigurationProperties;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        if (!createDefaultFilters) return;
+        if (!filterConfigurationProperties.isCreateDefaultFilters()) return;
         // All cases
         createCaseFilter("All cases", "assignment", FILTER_VISIBILITY_PUBLIC, "", new ArrayList<String>(),
-                Map.of(
+                new HashMap<>(Map.of(
                         "predicateMetadata", new ArrayList<>(),
-                        "searchCategories", new ArrayList<>()),
+                        "searchCategories", new ArrayList<>())
+                ),
                 Map.of(
                         GERMAN_ISO_3166_CODE, "Alle Fälle",
                         SLOVAK_ISO_3166_CODE, "Všetky prípady"));
 
         // My cases
         createCaseFilter("My cases", "assignment_ind", FILTER_VISIBILITY_PUBLIC, "(author:<<me>>)", new ArrayList<String>(),
-                Map.of(
+                new HashMap<>(Map.of(
                         "predicateMetadata", List.of(List.of(Map.of(
                                 "category", "case_author",
                                 "configuration", Map.of("operator", "equals"),
@@ -79,17 +79,18 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
                                 ))
                         ))),
                         "searchCategories", List.of("case_author")
-                ), Map.of(
+                )),
+                Map.of(
                         GERMAN_ISO_3166_CODE, "Meine Fälle",
                         SLOVAK_ISO_3166_CODE, "Moje prípady"
                 ));
 
         // All tasks
         createTaskFilter("All tasks", "library_add_check", FILTER_VISIBILITY_PUBLIC, "", new ArrayList<String>(),
-                Map.of(
+                new HashMap<>(Map.of(
                         "predicateMetadata", List.of(),
                         "searchCategories", List.of()
-                ),
+                )),
                 Map.of(
                         GERMAN_ISO_3166_CODE, "Alle Aufgaben",
                         SLOVAK_ISO_3166_CODE, "Všetky úlohy"
@@ -97,7 +98,7 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
 
         // My tasks
         createTaskFilter("My tasks", "account_box", FILTER_VISIBILITY_PUBLIC, "(userId:<<me>>)", new ArrayList<String>(),
-                Map.of(
+                new HashMap<>(Map.of(
                         "predicateMetadata", List.of(List.of(Map.of(
                                 "category", "task_assignee",
                                 "configuration", Map.of("operator", "equals"),
@@ -107,7 +108,8 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
                                 ))
                         ))),
                         "searchCategories", List.of("task_assignee")
-                ), Map.of(
+                )),
+                Map.of(
                         GERMAN_ISO_3166_CODE, "Meine Aufgaben",
                         SLOVAK_ISO_3166_CODE, "Moje úlohy"
                 ));

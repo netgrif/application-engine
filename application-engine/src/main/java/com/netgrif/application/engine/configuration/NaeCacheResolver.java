@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.configuration.properties.CacheProperties;
+import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.interceptor.CacheOperationInvocationContext;
@@ -15,9 +15,9 @@ public class NaeCacheResolver implements CacheResolver {
 
     private final CacheManager cacheManager;
 
-    private final CacheProperties cacheProperties;
+    private final CacheConfigurationProperties cacheProperties;
 
-    public NaeCacheResolver(CacheManager cacheManager, CacheProperties cacheProperties) {
+    public NaeCacheResolver(CacheManager cacheManager, CacheConfigurationProperties cacheProperties) {
         this.cacheManager = cacheManager;
         this.cacheProperties = cacheProperties;
     }

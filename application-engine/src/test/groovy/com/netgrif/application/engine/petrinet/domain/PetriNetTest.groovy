@@ -10,6 +10,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.arcs.ReadArc
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.ResetArc
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -18,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.io.Resource
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
@@ -88,7 +91,7 @@ class PetriNetTest {
         def netOptional3 = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
         assert netOptional3.getNet() != null
 
-        def nets = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK)
+        Page<PetriNetReference> nets = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK, Pageable.unpaged())
         assert nets.findAll { it.identifier in [netOptional.getNet().identifier, netOptional3.getNet().identifier] }.size() == 2
         assert nets.find { it.identifier == "new_model" }.version == "1.0.0"
         assert nets.find { it.identifier == "test" }.version == "2.0.0"

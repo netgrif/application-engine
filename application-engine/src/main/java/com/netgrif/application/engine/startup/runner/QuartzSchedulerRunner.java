@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class QuartzSchedulerRunner implements ApplicationEngineStartupRunner {
 
-    @Value("${quartz.scheduler.run:true}")
+    @Value("${netgrif.engine.quartz.scheduler.run:true}")
     private boolean start;
 
     private final Scheduler scheduler;

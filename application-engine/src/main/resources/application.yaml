@@ -1,0 +1,160 @@
+netgrif:
+  engine:
+    main:
+      allow-bean-definition-overriding: true
+      allow-circular-references: true
+      auto-configure-exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+    data:
+      drop: false
+      database-name: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}
+      rest:
+        base-path: /api
+        detection-strategy: annotated
+      mongodb:
+        uri: ${NETGRIF_ENGINE_DATA_MONGODB_URI:mongodb://localhost:27017}
+        auto-index-creation: true
+      elasticsearch:
+        url: ${NETGRIF_ENGINE_DATA_ELASTIC_URL:localhost}
+        port: ${NETGRIF_ENGINE_DATA_ELASTIC_PORT:9300}
+        searchPort: ${NETGRIF_ENGINE_DATA_ELASTIC_SEARCH_PORT:9200}
+        reindex: 0 0 * * * *
+        index:
+          petriNet: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_petrinet
+          case: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_case
+          task: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_taks
+      redis:
+        namespace: nae
+        host: ${NETGRIF_ENGINE_DATA_REDIS_HOST:localhost}
+        port: ${NETGRIF_ENGINE_DATA_REDIS_PORT:6379}
+    jackson:
+      default-property-inclusion: non_null
+      serialization:
+        write-dates-as-timestamps: true
+    servlet:
+      multipart:
+        max-file-size: 50MB
+        max-request-size: 50MB
+    mail:
+      mail-from: ${NETGRIF_ENGINE_MAIL_FROM:test@example.com}
+      default-encoding: UTF-8
+      host: ${NETGRIF_ENGINE_MAIL_HOST:''}
+      port: ${NETGRIF_ENGINE_MAIL_PORT:25}
+      username: ${NETGRIF_ENGINE_MAIL_USERNAME:''}
+      password: ${NETGRIF_ENGINE_MAIL_PASSWORD:''}
+      properties:
+        mail:
+          debug: false
+          smtp:
+            debug: false
+            auth: ${NETGRIF_ENGINE_MAIL_PROPERTIES_MAIL_SMTP_AUTH:false}
+            starttls:
+              enable: ${NETGRIF_ENGINE_MAIL_SMTP_STARTTLS_ENABLE:true}
+              required: ${NETGRIF_ENGINE_MAIL_SMTP_REQUIRED_ENABLE:true}
+      protocol: ${NETGRIF_ENGINE_MAIL_PROTOCOL:smtp}
+      redirect-to:
+        domain: ${NETGRIF_ENGINE_MAIL_REDIRECT_TO_DOMAIN:localhost}
+        port: ${NETGRIF_ENGINE_MAIL_REDIRECT_TO_PORT:4200}
+        ssl: ${NETGRIF_ENGINE_MAIL_REDIRECT_TO_SSL:false}
+    security:
+      csrf: false
+      realm-name: NAE-Realm
+      encryption:
+        password: ${NETGRIF_ENGINE_SECURITY_ENCRYPTION_PASSWORD:password}
+        algorithm: PBEWITHSHA256AND256BITAES-CBC-BCE
+      auth:
+        open-registration: ${NETGRIF_ENGINE_SECURITY_AUTH_OPEN_REGISTRATION:true}
+        token-validity-period: 3
+        minimal-password-length: 8
+        enable-profile-edit: true
+        admin-password: ${NETGRIF_ENGINE_SECURITY_AUTH_ADMIN_PASSWORD:password}
+      static:
+        enabled: false
+      headers:
+        hsts:
+          enable: true
+          include-sub-domains: true
+      limits:
+        login-attempts: 50
+        login-timeout: 1
+        login-timeout-unit: days
+        email-sends-attempts: 2
+        email-block-duration: 1
+        email-block-time-type: days
+      jwt:
+        expiration: 900000
+        algorithm: RSA
+        private-key: file:src/main/resources/certificates/private.der
+      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/api/public/**,/v3/api-docs/public,/manage/**
+      anonymous-exceptions: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/manage/**
+      providers: NetgrifBasicAuthenticationProvider
+    swagger:
+      enabled: false
+    server:
+      port: 8080
+      error:
+        include-stacktrace: never
+    impersonation:
+      enabled: ${NETGRIF_ENGINE_IMPERSONATION_ENABLED:true}
+    pdf:
+      resources:
+        output-folder: storage
+        output-default-name: generated_pdf.pdf
+        template-resource: file:src/main/resources/pdfGenerator/header_template5.pdf
+        font-title-resource: file:src/main/resources/pdfGenerator/fonts/Roboto-Light.ttf
+        font-label-resource: file:src/main/resources/pdfGenerator/fonts/Roboto-Light.ttf
+        font-value-resource: file:src/main/resources/pdfGenerator/fonts/Roboto-Light.ttf
+        check-box-checked-resource: file:src/main/resources/pdfGenerator/img/checkbox_checked.svg
+        check-box-un-checked-resource: file:src/main/resources/pdfGenerator/img/checkbox_unchecked.svg
+        radio-checked-resource: file:src/main/resources/pdfGenerator/img/radio_checked.svg
+        radio-un-checked-resource: file:src/main/resources/pdfGenerator/img/radio_unchecked.svg
+        boolean-checked-resource: file:src/main/resources/pdfGenerator/img/radio_checked.svg
+        boolean-unchecked-resource: file:src/main/resources/pdfGenerator/img/radio_unchecked.svg
+    management:
+      endpoints:
+        web:
+          base-path: /manage
+          path-mapping:
+            prometheus: metric
+          exposure:
+            exclude: shutdown
+      endpoint:
+        health:
+          show-details: when_authorized
+          probes:
+            enabled: 'true'
+        log-file:
+          external-file: log/nae.log
+      info:
+        build:
+          enabled: 'false'
+        env:
+          enabled: 'true'
+    logging:
+      config: classpath:logback.xml
+      file:
+        path: log
+      endpoints: 'true'
+      level:
+        org:
+          springframework:
+            data:
+              elasticsearch:
+                core: info
+              mongodb:
+                core:
+                  MongoTemplate: info
+        com:
+          netgrif:
+            application:
+              engine:
+                elastic:
+                  service: info
+                petrinet:
+                  domain:
+                    dataset:
+                      logic:
+                        action:
+                          FieldActionsRunner: debug
+                          runner:
+                            RoleActionsRunner: debug
+                            CaseFieldsExpressionRunner: debug

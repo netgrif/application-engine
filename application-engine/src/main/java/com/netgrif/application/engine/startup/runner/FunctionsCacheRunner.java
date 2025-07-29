@@ -7,6 +7,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsC
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -21,7 +22,8 @@ public class FunctionsCacheRunner implements ApplicationEngineStartupRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("Namespace function caching started");
-        petriNetService.getAll().forEach(cacheService::cachePetriNetFunctions);
+        // TODO JOFO: unpaged necessary?
+        petriNetService.getAll(Pageable.unpaged()).forEach(cacheService::cachePetriNetFunctions);
     }
 
 }

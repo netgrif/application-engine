@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.domain;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.FieldBuilder;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,12 +14,12 @@ public abstract class PdfSelectionField extends PdfField {
     @Setter
     protected List<String> choices = null;
 
-    public PdfSelectionField(PdfResource resource) {
+    public PdfSelectionField(PdfResourceConfigurationProperties resource) {
         super(resource);
     }
 
     @Override
-    public void countMultiLineHeight(int fontSize, PdfResource resource) {
+    public void countMultiLineHeight(int fontSize, PdfResourceConfigurationProperties resource) {
         int padding = resource.getPadding();
         int lineHeight = resource.getLineHeight();
         int maxLabelLineLength = getMaxLabelLineSize(this.width, fontSize, padding);

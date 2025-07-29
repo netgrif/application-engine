@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.domain;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.FieldBuilder;
 import com.netgrif.application.engine.pdf.generator.service.renderer.Renderer;
 import com.netgrif.application.engine.objects.petrinet.domain.DataGroup;
@@ -87,7 +87,7 @@ public abstract class PdfField implements Comparable<PdfField> {
 
     @Getter
     @Setter
-    protected PdfResource resource;
+    protected PdfResourceConfigurationProperties resource;
 
     @Getter
     @Setter
@@ -99,12 +99,12 @@ public abstract class PdfField implements Comparable<PdfField> {
         dgField = false;
     }
 
-    public PdfField(PdfResource resource) {
+    public PdfField(PdfResourceConfigurationProperties resource) {
         this();
         this.resource = resource;
     }
 
-    public void countMultiLineHeight(int fontSize, PdfResource resource) {
+    public void countMultiLineHeight(int fontSize, PdfResourceConfigurationProperties resource) {
         int padding = resource.getPadding();
         int lineHeight = resource.getLineHeight();
         int maxLabelLineLength = getMaxLabelLineSize(this.width, fontSize, padding);

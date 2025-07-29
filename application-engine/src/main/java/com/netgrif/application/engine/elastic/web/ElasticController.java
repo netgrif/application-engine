@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.elastic.web;
 
+import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.ReindexingTask;
 import com.netgrif.application.engine.workflow.service.CaseSearchService;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,26 +33,43 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/elastic")
 @ConditionalOnProperty(
-        value = "nae.elastic.web.enabled",
+        value = "netgrif.engine.security.web.elastic-enabled",
         havingValue = "true",
         matchIfMissing = true
 )
 @Tag(name = "Elasticsearch")
+@RequiredArgsConstructor
 public class ElasticController {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticController.class.getName());
 
-    @Autowired
     private IWorkflowService workflowService;
 
-    @Autowired
     private CaseSearchService searchService;
 
-    @Autowired
     private ReindexingTask reindexingTask;
 
-    @Value("${spring.data.elasticsearch.reindexExecutor.size:20}")
-    private int pageSize;
+    private DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
+
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
+
+    @Autowired
+    public void setSearchService(CaseSearchService searchService) {
+        this.searchService = searchService;
+    }
+
+    @Autowired
+    public void setReindexingTask(ReindexingTask reindexingTask) {
+        this.reindexingTask = reindexingTask;
+    }
+
+    @Autowired
+    public void setElasticsearchProperties(DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties) {
+        this.elasticsearchProperties = elasticsearchProperties;
+    }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Reindex specified cases",
@@ -69,7 +88,7 @@ public class ElasticController {
             if (count == 0) {
                 log.info("No cases to reindex");
             } else {
-                long numOfPages = (long) ((count / pageSize) + 1);
+                long numOfPages = (long) ((count / elasticsearchProperties.getReindexExecutor().getSize()) + 1);
                 log.info("Reindexing cases: " + numOfPages + " pages");
 
                 for (int page = 0; page < numOfPages; page++) {

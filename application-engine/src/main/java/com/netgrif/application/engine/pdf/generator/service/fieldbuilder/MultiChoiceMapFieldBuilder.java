@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service.fieldbuilder;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfMultiChoiceField;
 import com.netgrif.application.engine.objects.petrinet.domain.DataGroup;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class MultiChoiceMapFieldBuilder extends SelectionFieldBuilder {
 
-    public MultiChoiceMapFieldBuilder(PdfResource resource) {
+    public MultiChoiceMapFieldBuilder(PdfResourceConfigurationProperties resource) {
         super(resource);
     }
 

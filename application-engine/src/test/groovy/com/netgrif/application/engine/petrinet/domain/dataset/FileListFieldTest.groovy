@@ -42,11 +42,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = ApplicationEngine.class
-)
-@TestPropertySource(properties = "nae.storage.minio.enabled=true")
+@SpringBootTest
+@TestPropertySource(properties = "netgrif.engine.storage.minio.enabled=true")
 @AutoConfigureMockMvc
 class FileListFieldTest {
 
@@ -55,7 +52,7 @@ class FileListFieldTest {
     public static final String USER_EMAIL = "super@netgrif.com"
     public static final String MOCK_FILE_NAME = "hello.txt"
 
-    @Value('${admin.password:password}')
+    @Value('${netgrif.engine.security.auth.admin-password:password}')
     private String userPassword
 
     @Autowired
