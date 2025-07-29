@@ -25,6 +25,7 @@ import com.netgrif.application.engine.objects.workflow.domain.menu.configuration
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner;
 import com.netgrif.application.engine.startup.runner.FilterRunner;
+import com.netgrif.application.engine.startup.runner.MenuProcessRunner;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -57,7 +58,7 @@ public class MenuItemService implements IMenuItemService {
     @Override
     public Case createFilter(FilterBody body) throws TransitionNotExecutableException {
         AbstractUser loggedUser = userService.getLoggedOrSystem();
-        Case filterCase = createCase(FilterRunner.FILTER_PETRI_NET_IDENTIFIER, body.getTitle().getDefaultValue(),ActorTransformer.toLoggedUser(loggedUser));
+        Case filterCase = createCase(FilterRunner.FILTER_PETRI_NET_IDENTIFIER, body.getTitle().getDefaultValue(), ActorTransformer.toLoggedUser(loggedUser));
         filterCase.setIcon(body.getIcon());
         filterCase = workflowService.save(filterCase);
         ToDataSetOutcome dataSetOutcome = body.toDataSet();
@@ -107,7 +108,7 @@ public class MenuItemService implements IMenuItemService {
         if (newName == null) {
             newName = new I18nString(body.getIdentifier());
         }
-        Case menuItemCase = createCase(FilterRunner.MENU_NET_IDENTIFIER, newName.getDefaultValue(),
+        Case menuItemCase = createCase(MenuProcessRunner.MENU_NET_IDENTIFIER, newName.getDefaultValue(),
                 ActorTransformer.toLoggedUser(loggedUser));
         menuItemCase = workflowService.save(menuItemCase);
 
@@ -195,8 +196,8 @@ public class MenuItemService implements IMenuItemService {
     @Override
     public Case findMenuItem(String identifier, boolean retry) {
         String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
-                FilterRunner.MENU_NET_IDENTIFIER, MenuItemConstants.FIELD_IDENTIFIER, identifier);
-        return findCase(FilterRunner.MENU_NET_IDENTIFIER, query);
+                MenuProcessRunner.MENU_NET_IDENTIFIER, MenuItemConstants.FIELD_IDENTIFIER, identifier);
+        return findCase(MenuProcessRunner.MENU_NET_IDENTIFIER, query);
     }
 
     /**
@@ -210,8 +211,8 @@ public class MenuItemService implements IMenuItemService {
     public Case findMenuItem(String path, String name) {
 //        TODO retry
         String query = String.format("processIdentifier:%s AND title.keyword:\"%s\" AND nodePath:\"%s\"",
-                FilterRunner.MENU_NET_IDENTIFIER, name, path);
-        return findCase(FilterRunner.MENU_NET_IDENTIFIER, query);
+                MenuProcessRunner.MENU_NET_IDENTIFIER, name, path);
+        return findCase(MenuProcessRunner.MENU_NET_IDENTIFIER, query);
     }
 
     /**
@@ -224,8 +225,8 @@ public class MenuItemService implements IMenuItemService {
     public Case findFolderCase(String path) {
 //        TODO
         String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
-                FilterRunner.MENU_NET_IDENTIFIER, MenuItemConstants.FIELD_NODE_PATH, path);
-        return findCase(FilterRunner.MENU_NET_IDENTIFIER, query);
+                MenuProcessRunner.MENU_NET_IDENTIFIER, MenuItemConstants.FIELD_NODE_PATH, path);
+        return findCase(MenuProcessRunner.MENU_NET_IDENTIFIER, query);
     }
 
     /**
@@ -326,7 +327,7 @@ public class MenuItemService implements IMenuItemService {
             Case originViewCase = workflowService.findOne(originViewId);
             duplicatedViewCase = duplicateView(originViewCase);
         }
-        Case duplicated = createCase(FilterRunner.MENU_NET_IDENTIFIER, newTitle.getDefaultValue(),
+        Case duplicated = createCase(MenuProcessRunner.MENU_NET_IDENTIFIER, newTitle.getDefaultValue(),
                 ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()));
         duplicated.setDataSet(originItem.getDataSet());
         duplicated.setTitle(newTitle.getDefaultValue());
@@ -596,7 +597,7 @@ public class MenuItemService implements IMenuItemService {
             return folderCase;
         }
 
-        folderCase = createCase(FilterRunner.MENU_NET_IDENTIFIER, body.getMenuName().getDefaultValue(),
+        folderCase = createCase(MenuProcessRunner.MENU_NET_IDENTIFIER, body.getMenuName().getDefaultValue(),
                 ActorTransformer.toLoggedUser(loggedUser));
 
         ToDataSetOutcome dataSetOutcome = body.toDataSet(null, path, null);
@@ -628,7 +629,7 @@ public class MenuItemService implements IMenuItemService {
             return folderCase;
         }
 
-        folderCase = createCase(FilterRunner.MENU_NET_IDENTIFIER, body.getMenuName().toString(), ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()));
+        folderCase = createCase(MenuProcessRunner.MENU_NET_IDENTIFIER, body.getMenuName().toString(), ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()));
         if (childFolderCase != null) {
             folderCase = appendChildCaseIdAndSave(folderCase, childFolderCase.getStringId());
             initializeParentId(childFolderCase, folderCase.getStringId());

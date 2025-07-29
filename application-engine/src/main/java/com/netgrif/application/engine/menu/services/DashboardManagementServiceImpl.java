@@ -75,7 +75,7 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
      * Updates an existing dashboard management case with new data.
      *
      * @param managementCase The existing {@link Case} to update.
-     * @param body The {@link DashboardManagementBody} containing updated data.
+     * @param body           The {@link DashboardManagementBody} containing updated data.
      * @return The updated {@link Case} representing the dashboard management.
      */
     @Override

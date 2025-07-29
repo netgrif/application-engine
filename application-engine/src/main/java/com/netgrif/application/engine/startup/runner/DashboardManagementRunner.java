@@ -5,30 +5,28 @@ import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@RunnerOrder(140)
+@RunnerOrder(141)
 @RequiredArgsConstructor
 @ConditionalOnProperty(value = "netgrif.engine.dashboard.enabled", havingValue = "true", matchIfMissing = false)
-public class DashboardRunner implements ApplicationEngineStartupRunner {
+class DashboardManagementRunner implements ApplicationEngineStartupRunner {
 
     private final ImportHelper helper;
 
-    public static final String DASHBOARD_NET_IDENTIFIER = "dashboard";
-    private static final String DASHBOARD_FILE_NAME = "engine-processes/dashboard.xml";
+    public static final String DASHBOARD_MANAGEMENT_NET_IDENTIFIER = "dashboard_management";
+    private static final String DASHBOARD_MANAGEMENT_FILE_NAME = "engine-processes/dashboard_management.xml";
 
-    public static final String DASHBOARD_TILE_NET_IDENTIFIER = "dashboard_tile";
-    private static final String DASHBOARD_TILE_FILE_NAME = "engine-processes/dashboard_tile.xml";
-
+    public static final String DASHBOARD_ITEM_NET_IDENTIFIER = "dashboard_item";
+    private static final String DASHBOARD_ITEM_FILE_NAME = "engine-processes/dashboard_item.xml";
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        helper.importProcess("Petri net for dashboard", DASHBOARD_NET_IDENTIFIER, DASHBOARD_FILE_NAME);
-        helper.importProcess("Petri net for dashboard tile", DASHBOARD_TILE_NET_IDENTIFIER, DASHBOARD_TILE_FILE_NAME);
+        helper.importProcess("Petri net for dashboard management", DASHBOARD_MANAGEMENT_NET_IDENTIFIER, DASHBOARD_MANAGEMENT_FILE_NAME);
+        helper.importProcess("Petri net for dashboard items", DASHBOARD_ITEM_NET_IDENTIFIER, DASHBOARD_ITEM_FILE_NAME);
     }
 }
