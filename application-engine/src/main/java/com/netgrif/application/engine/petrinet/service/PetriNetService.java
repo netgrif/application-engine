@@ -198,7 +198,7 @@ public class PetriNetService implements IPetriNetService {
         PetriNet net = imported.get();
 
         PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
-        if (existingNet != null) {
+        if (existingNet != null && net.getVersion() == null) {
             net.setVersion(existingNet.getVersion());
             net.incrementVersion(releaseType);
         }
