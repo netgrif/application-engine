@@ -248,6 +248,22 @@ class ImportHelper {
         superCreator.setAllToSuperUser()
     }
 
+    Optional<PetriNet> importProcess(String message, String netIdentifier, String netFileName) {
+        PetriNet filter = petriNetService.getNewestVersionByIdentifier(netIdentifier)
+        if (filter != null) {
+            log.info("${message} has already been imported.")
+            return Optional.of(filter)
+        }
+
+        Optional<PetriNet> filterNet = this.createNet(netFileName, VersionType.MAJOR, ActorTransformer.toLoggedUser(userService.getSystem()))
+
+        if (!filterNet.isPresent()) {
+            log.error("Import of ${message} failed!")
+        }
+
+        return filterNet
+    }
+
     static ObjectNode populateDataset(Map<String, Map<String, String>> data) {
         ObjectMapper mapper = new ObjectMapper()
         String json = mapper.writeValueAsString(data)
