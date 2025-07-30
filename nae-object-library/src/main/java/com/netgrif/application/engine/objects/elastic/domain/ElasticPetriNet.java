@@ -12,6 +12,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -28,7 +30,7 @@ public abstract class ElasticPetriNet {
 
     private String stringId;
 
-    private I18nString title;
+    private I18nField title;
 
     private String initials;
 
@@ -41,7 +43,7 @@ public abstract class ElasticPetriNet {
         this.version = net.getVersion();
         this.uriNodeId = net.getUriNodeId();
         this.stringId = net.getStringId();
-        this.title = net.getTitle();
+        this.title = this.transformToField(net.getTitle());
         this.initials = net.getInitials();
         this.creationDate = net.getCreationDate();
     }
@@ -54,4 +56,6 @@ public abstract class ElasticPetriNet {
         this.title = net.getTitle();
         this.initials = net.getInitials();
     }
+
+    protected abstract I18nField transformToField(I18nString field);
 }

@@ -416,7 +416,7 @@
 					entryName: f.entry_name,
 					icon: f.icon_name;
 
-					def filterCase = findCase({it._id.eq(new com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
+					def filterCase = findCase({it._id.objectId.eq(new com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
 
 					change entryDefaultName value {return filterCase.title}
 

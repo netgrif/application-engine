@@ -1,0 +1,55 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>dashboard_import</id>
+    <initials>MEI</initials>
+    <title>Dashboard import</title>
+    <icon>device_hub</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>true</anonymousRole>
+    <transitionRole>false</transitionRole>
+    <processEvents>
+        <event type="upload">
+            <id>new_model_upload</id>
+            <actions phase="post">
+                <action id="1">
+					<![CDATA[
+                    def filterBody = new com.netgrif.application.engine.menu.domain.FilterBody()
+                    filterBody.setTitle(new com.netgrif.application.engine.petrinet.domain.I18nString("Main"))
+                    filterBody.setQuery("_exists_:processIdentifier")
+                    filterBody.setType("Case")
+                    filterBody.setAllowedNets([])
+                    filterBody.setIcon("apps")
+                    filterBody.setVisibility("private")
+                    filterBody.setMetadata([:])
+
+                    def menuItemBody = new com.netgrif.application.engine.menu.domain.MenuItemBody(
+                            "/",
+                            "main",
+                            filterBody.getTitle(),
+                            filterBody.getIcon()
+                    )
+                    def singleTaskViewBody = new com.netgrif.application.engine.menu.domain.configurations.TabbedSingleTaskViewBody()
+                    def ticketViewBody = new com.netgrif.application.engine.menu.domain.configurations.TabbedTicketViewBody()
+                    ticketViewBody.setChainedView(singleTaskViewBody)
+                    menuItemBody.setAutoSelect(true)
+                    menuItemBody.setView(ticketViewBody)
+
+                    def menuItem = createOrIgnoreMenuItem(menuItemBody)
+
+                    def dashboardItemBody = new com.netgrif.application.engine.menu.domain.dashboard.DashboardItemBody("main", menuItem.stringId, "apps", new com.netgrif.application.engine.petrinet.domain.I18nString("Main"), true)
+                    dashboardItemBody.setMenuItems(menuItem.stringId)
+                    dashboardItemBody.setActive(true)
+
+                    def dashboardItem = createDashboardItem(dashboardItemBody)
+
+                    def mainDashboardCase = findDashboardManagement("main_dashboard")
+
+                    def dashboardManagementBody = new com.netgrif.application.engine.menu.domain.dashboard.DashboardManagementBody()
+                    dashboardManagementBody.setDashboardItems([(dashboardItem.stringId): dashboardItem.title])
+
+                    updateDashboardManagement(mainDashboardCase, dashboardManagementBody)
+                    ]]>
+				</action>
+            </actions>
+        </event>
+    </processEvents>
+</document>
