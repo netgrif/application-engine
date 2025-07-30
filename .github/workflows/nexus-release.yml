@@ -26,7 +26,7 @@ jobs:
       - name: Build
         run: mvn clean verify -DskipTests=true
 
-  publish-OSSRH:
+  publish-netgrif-nexus:
     runs-on: ubuntu-latest
     name: Publish to Netgrif Nexus
     needs: build
@@ -44,7 +44,7 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
 
 
-      - name: Set up Maven Central Repository
+      - name: Set up Maven Distribution Repository
         uses: actions/setup-java@v4
         with:
           java-version: 21
