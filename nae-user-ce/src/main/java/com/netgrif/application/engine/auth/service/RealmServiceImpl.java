@@ -146,18 +146,4 @@ public class RealmServiceImpl implements RealmService {
         }
         realmRepository.deleteById(realmId);
     }
-
-    @Override
-    public void addUserToRealm(String realmId, String userId) {
-        Realm realm = getRealmById(realmId).orElseThrow(() -> new IllegalArgumentException("Realm with id " + realmId + " not found"));
-        realm.getUserIds().add(userId);
-        realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
-    }
-
-    @Override
-    public void removeUserFromRealm(String realmId, String userId) {
-        Realm realm = getRealmById(realmId).orElseThrow(() -> new IllegalArgumentException("Realm with id " + realmId + " not found"));
-        realm.getUserIds().remove(userId);
-        realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm)realm);
-    }
 }
