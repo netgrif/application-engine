@@ -65,7 +65,7 @@ public abstract class ElasticViewPermissionService {
     private BoolQuery buildPositiveViewUser(BoolQuery viewPermNotExists, LoggedUser user) {
         BoolQuery.Builder positiveViewUser = new BoolQuery.Builder();
         BoolQuery.Builder positiveViewUserQuery = new BoolQuery.Builder();
-        positiveViewUserQuery.must(termQuery("viewUsers", user.getId())._toQuery());
+        positiveViewUserQuery.must(termQuery("viewUsers", user.getStringId())._toQuery());
         positiveViewUser.should(viewPermNotExists._toQuery());
         positiveViewUser.should(positiveViewUserQuery.build()._toQuery());
         return positiveViewUser.build();
@@ -74,7 +74,7 @@ public abstract class ElasticViewPermissionService {
     private BoolQuery buildNegativeViewUser(LoggedUser user) {
         BoolQuery.Builder negativeViewUser = new BoolQuery.Builder();
         BoolQuery.Builder negativeViewUserQuery = new BoolQuery.Builder();
-        negativeViewUserQuery.should(termQuery("negativeViewUsers", user.getId())._toQuery());
+        negativeViewUserQuery.should(termQuery("negativeViewUsers", user.getStringId())._toQuery());
         negativeViewUser.mustNot(negativeViewUserQuery.build()._toQuery());
         return negativeViewUser.build();
     }

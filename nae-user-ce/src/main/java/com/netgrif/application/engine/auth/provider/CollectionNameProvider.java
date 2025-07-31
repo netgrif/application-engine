@@ -58,4 +58,8 @@ public class CollectionNameProvider {
         }
         return USER_MONGO_COLLECTION_PREFIX + defaultRealmOptional.get().getName();
     }
+
+    public String getRealmIdFromCollectionName(String collectionName) {
+        return collectionName.replaceFirst("^" + USER_MONGO_COLLECTION_PREFIX, "");
+    }
 }

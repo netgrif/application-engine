@@ -46,14 +46,15 @@ public class ImpersonationRequestFilter extends OncePerRequestFilter {
 
     protected void handleImpersonator(LoggedUser loggedUser, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         try {
-            if (!loggedUser.isImpersonating()) {
-                return;
-            }
-            Optional<Impersonator> imp = impersonationService.findImpersonator(loggedUser.getId());
-            if (loggedUser.isImpersonating() && (imp.isEmpty() || !isValid(imp.get()))) {
-                imp.ifPresent(imper -> impersonationService.removeImpersonator(loggedUser.getId()));
-                logout(servletRequest, servletResponse);
-            }
+            // TODO: impersonation
+//            if (!loggedUser.isImpersonating()) {
+//                return;
+//            }
+//            Optional<Impersonator> imp = impersonationService.findImpersonator(loggedUser.getId());
+//            if (loggedUser.isImpersonating() && (imp.isEmpty() || !isValid(imp.get()))) {
+//                imp.ifPresent(imper -> impersonationService.removeImpersonator(loggedUser.getId()));
+//                logout(servletRequest, servletResponse);
+//            }
         } catch (Exception e) {
             log.error("ImpersonationRequestFilter error " + e.getMessage(), e);
         }
@@ -62,7 +63,7 @@ public class ImpersonationRequestFilter extends OncePerRequestFilter {
     protected void handleImpersonated(LoggedUser loggedUser, HttpServletRequest servletRequest) {
         try {
             log.debug("Filtering request " + servletRequest.getRequestURI() + ", " + loggedUser.getUsername());
-            impersonationService.removeImpersonatorByImpersonated(loggedUser.getId());
+            impersonationService.removeImpersonatorByImpersonated(loggedUser.getStringId());
         } catch (Exception e) {
             log.error("Failed to resolve impersonators for " + loggedUser.getUsername() + ", " + e.getMessage(), e);
         }

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.objects.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netgrif.application.engine.objects.auth.domain.Author;
+import com.netgrif.application.engine.objects.auth.domain.ActorRef;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*;
@@ -76,7 +76,7 @@ public abstract class Case implements Serializable {
     private List<Field<?>> immediateData;
 
     @Setter
-    private Author author;
+    private ActorRef author;
 
     @Setter
     @JsonIgnore

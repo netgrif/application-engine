@@ -1,6 +1,9 @@
 package com.netgrif.application.engine.auth
 
 import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
+import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
@@ -12,8 +15,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskAuthoriza
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.IUser
-import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
@@ -60,7 +61,7 @@ class TaskAuthorizationServiceTest {
 
     private PetriNet net
     private PetriNet netWithUserRefs
-    private IUser testUser
+    private AbstractUser testUser
 
     private String userId
 
@@ -166,7 +167,7 @@ class TaskAuthorizationServiceTest {
         this.netWithUserRefs = netWithUserRefs.getNet()
 
         def auths = importHelper.createAuthorities(["user": Authority.user])
-        testUser = importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Role", lastName: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        testUser = importHelper.createUser(new User(firstName: "Role", lastName: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
 //                [org] as Group[],
                 [] as ProcessRole[]
@@ -325,8 +326,8 @@ class TaskAuthorizationServiceTest {
     void testCanAssign() {
         ProcessRole positiveRole = this.net.getRoles().values().find(v -> v.getImportId() == "assign_pos_role")
         userService.addRole(testUser, positiveRole.get_id())
-        Case case_ = workflowService.createCase(net.getStringId(), "Test assign", "", userService.transformToLoggedUser(testUser)).getCase()
-        assert taskAuthorizationService.canCallAssign(userService.transformToLoggedUser(testUser), (new ArrayList<>(case_.getTasks())).get(0).task)
+        Case case_ = workflowService.createCase(net.getStringId(), "Test assign", "", ActorTransformer.toLoggedUser(testUser)).getCase()
+        assert taskAuthorizationService.canCallAssign(ActorTransformer.toLoggedUser(testUser), (new ArrayList<>(case_.getTasks())).get(0).task)
         userService.removeRole(testUser, positiveRole.get_id())
         workflowService.deleteCase(case_.stringId)
     }
@@ -335,15 +336,15 @@ class TaskAuthorizationServiceTest {
     void testCanNotAssign() {
         ProcessRole negativeRole = this.net.getRoles().values().find(v -> v.getImportId() == "assign_neg_role")
         userService.addRole(testUser, negativeRole.get_id())
-        Case case_ = workflowService.createCase(net.getStringId(), "Test assign", "", userService.transformToLoggedUser(testUser)).getCase()
-        assert !taskAuthorizationService.canCallAssign(userService.transformToLoggedUser(testUser), (new ArrayList<>(case_.getTasks())).get(0).task)
+        Case case_ = workflowService.createCase(net.getStringId(), "Test assign", "", ActorTransformer.toLoggedUser(testUser)).getCase()
+        assert !taskAuthorizationService.canCallAssign(ActorTransformer.toLoggedUser(testUser), (new ArrayList<>(case_.getTasks())).get(0).task)
         userService.removeRole(testUser, negativeRole.get_id())
         workflowService.deleteCase(case_.stringId)
     }
 
     @Test
     void testCanAssignWithUsersRef() {
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", userService.transformToLoggedUser(testUser)).getCase()
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", ActorTransformer.toLoggedUser(testUser)).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "assign_pos_ul": [
@@ -354,13 +355,13 @@ class TaskAuthorizationServiceTest {
         workflowService.save(case_)
         sleep(4000)
 
-        assert taskAuthorizationService.canCallAssign(userService.transformToLoggedUser(testUser), taskId)
+        assert taskAuthorizationService.canCallAssign(ActorTransformer.toLoggedUser(testUser), taskId)
         workflowService.deleteCase(case_.stringId)
     }
 
     @Test
     void testCannotAssignWithUsersRef() {
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", userService.transformToLoggedUser(testUser)).getCase()
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", ActorTransformer.toLoggedUser(testUser)).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "assign_neg_ul": [
@@ -371,7 +372,7 @@ class TaskAuthorizationServiceTest {
         workflowService.save(case_)
         sleep(4000)
 
-        assert !taskAuthorizationService.canCallAssign(userService.transformToLoggedUser(testUser), taskId)
+        assert !taskAuthorizationService.canCallAssign(ActorTransformer.toLoggedUser(testUser), taskId)
         workflowService.deleteCase(case_.stringId)
     }
 
@@ -379,7 +380,7 @@ class TaskAuthorizationServiceTest {
     void testCanAssignWithNegRoleAndPosUsersRef() {
         ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "assign_pos_role")
         userService.addRole(testUser, positiveRole.get_id())
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", userService.transformToLoggedUser(testUser)).getCase()
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", ActorTransformer.toLoggedUser(testUser)).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "assign_pos_ul": [
@@ -390,7 +391,7 @@ class TaskAuthorizationServiceTest {
         workflowService.save(case_)
         sleep(4000)
 
-        assert taskAuthorizationService.canCallAssign(userService.transformToLoggedUser(testUser), taskId)
+        assert taskAuthorizationService.canCallAssign(ActorTransformer.toLoggedUser(testUser), taskId)
         userService.removeRole(testUser, positiveRole.get_id())
         workflowService.deleteCase(case_.stringId)
     }
@@ -399,11 +400,11 @@ class TaskAuthorizationServiceTest {
     void testCanFinish() {
         ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "finish_pos_role")
         userService.addRole(testUser, positiveRole.get_id())
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", userService.transformToLoggedUser(testUser)).getCase()
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", ActorTransformer.toLoggedUser(testUser)).getCase()
 
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
-        taskService.assignTask(userService.transformToLoggedUser(testUser), taskId)
-        assert taskAuthorizationService.canCallFinish(userService.transformToLoggedUser(testUser), taskId)
+        taskService.assignTask(ActorTransformer.toLoggedUser(testUser), taskId)
+        assert taskAuthorizationService.canCallFinish(ActorTransformer.toLoggedUser(testUser), taskId)
         userService.removeRole(testUser, positiveRole.get_id())
         workflowService.deleteCase(case_.stringId)
     }
@@ -412,18 +413,18 @@ class TaskAuthorizationServiceTest {
     void testCanNotFinish() {
         ProcessRole negativeRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "finish_neg_role")
         userService.addRole(testUser, negativeRole.get_id())
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", userService.transformToLoggedUser(testUser)).getCase()
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", ActorTransformer.toLoggedUser(testUser)).getCase()
 
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
-        taskService.assignTask(userService.transformToLoggedUser(testUser), taskId)
-        assert !taskAuthorizationService.canCallFinish(userService.transformToLoggedUser(testUser), taskId)
+        taskService.assignTask(ActorTransformer.toLoggedUser(testUser), taskId)
+        assert !taskAuthorizationService.canCallFinish(ActorTransformer.toLoggedUser(testUser), taskId)
         userService.removeRole(testUser, negativeRole.get_id())
         workflowService.deleteCase(case_.stringId)
     }
 
     @Test
     void testCanFinishWithUsersRef() {
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", userService.transformToLoggedUser(testUser)).getCase()
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", ActorTransformer.toLoggedUser(testUser)).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "finish_pos_ul": [
@@ -434,14 +435,14 @@ class TaskAuthorizationServiceTest {
         workflowService.save(case_)
         sleep(4000)
 
-        taskService.assignTask(userService.transformToLoggedUser(testUser), taskId)
-        assert taskAuthorizationService.canCallFinish(userService.transformToLoggedUser(testUser), taskId)
+        taskService.assignTask(ActorTransformer.toLoggedUser(testUser), taskId)
+        assert taskAuthorizationService.canCallFinish(ActorTransformer.toLoggedUser(testUser), taskId)
         workflowService.deleteCase(case_.stringId)
     }
 
     @Test
     void testCannotFinishWithUsersRef() {
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", userService.transformToLoggedUser(testUser)).getCase()
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", ActorTransformer.toLoggedUser(testUser)).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "finish_neg_ul": [
@@ -452,8 +453,8 @@ class TaskAuthorizationServiceTest {
         workflowService.save(case_)
         sleep(4000)
 
-        taskService.assignTask(userService.transformToLoggedUser(testUser), taskId)
-        assert !taskAuthorizationService.canCallFinish(userService.transformToLoggedUser(testUser), taskId)
+        taskService.assignTask(ActorTransformer.toLoggedUser(testUser), taskId)
+        assert !taskAuthorizationService.canCallFinish(ActorTransformer.toLoggedUser(testUser), taskId)
         workflowService.deleteCase(case_.stringId)
     }
 
@@ -461,7 +462,7 @@ class TaskAuthorizationServiceTest {
     void testCanFinishWithNegRoleAndPosUsersRef() {
         ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "finish_pos_role")
         userService.addRole(testUser, positiveRole.get_id())
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", userService.transformToLoggedUser(testUser)).getCase()
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", ActorTransformer.toLoggedUser(testUser)).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "finish_pos_ul": [
@@ -472,8 +473,8 @@ class TaskAuthorizationServiceTest {
         workflowService.save(case_)
         sleep(4000)
 
-        taskService.assignTask(userService.transformToLoggedUser(testUser), taskId)
-        assert taskAuthorizationService.canCallFinish(userService.transformToLoggedUser(testUser), taskId)
+        taskService.assignTask(ActorTransformer.toLoggedUser(testUser), taskId)
+        assert taskAuthorizationService.canCallFinish(ActorTransformer.toLoggedUser(testUser), taskId)
         userService.removeRole(testUser, positiveRole.get_id())
         workflowService.deleteCase(case_.stringId)
     }

@@ -1,20 +1,17 @@
 package com.netgrif.application.engine.orgstructure.groups
 
-import com.netgrif.application.engine.adapter.spring.auth.domain.User
-import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.runner.GroupRunner
-import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.auth.domain.Authority
 import com.netgrif.application.engine.objects.auth.domain.Group
 import com.netgrif.application.engine.objects.auth.domain.QGroup
+import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
-import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.objects.workflow.domain.Case
+import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.runner.GroupRunner
+import com.netgrif.application.engine.utils.FullPageRequest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired

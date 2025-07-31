@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.mail.interfaces;
 
-import com.netgrif.application.engine.objects.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.mail.domain.MailDraft;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import freemarker.template.TemplateException;
 import jakarta.mail.MessagingException;
 
@@ -9,9 +9,9 @@ import java.io.IOException;
 
 public interface IMailService {
 
-    void sendRegistrationEmail(RegisteredUser user) throws IOException, TemplateException, MessagingException;
+    void sendRegistrationEmail(AbstractUser user) throws IOException, TemplateException, MessagingException;
 
-    void sendPasswordResetEmail(RegisteredUser user) throws IOException, TemplateException, MessagingException;
+    void sendPasswordResetEmail(AbstractUser user) throws IOException, TemplateException, MessagingException;
 
     void testConnection();
 

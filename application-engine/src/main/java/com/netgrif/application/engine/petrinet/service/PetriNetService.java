@@ -2,10 +2,12 @@ package com.netgrif.application.engine.petrinet.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.ArcImportReference;
+import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
@@ -198,12 +200,12 @@ public class PetriNetService implements IPetriNetService {
         PetriNet net = imported.get();
 
         PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
-        if (existingNet != null) {
+        if (existingNet != null && net.getVersion() == null) {
             net.setVersion(existingNet.getVersion());
             net.incrementVersion(releaseType);
         }
         processRoleService.saveAll(net.getRoles().values());
-        net.setAuthor(author.transformToAuthor());
+        net.setAuthor(ActorTransformer.toActorRef(author));
         functionCacheService.cachePetriNetFunctions(net);
         Path savedPath = getImporter().saveNetFile(net, new ByteArrayInputStream(xmlCopy.toByteArray()));
         xmlCopy.close();
@@ -449,8 +451,12 @@ public class PetriNetService implements IPetriNetService {
         Query query = new Query();
         Query queryTotal = new Query();
 
-        if (!user.getSelfOrImpersonated().isAdmin())
-            query.addCriteria(getProcessRolesCriteria(user.getSelfOrImpersonated()));
+        // TODO: resolve impersonation
+        if (!user.isAdmin()) {
+            query.addCriteria(getProcessRolesCriteria(user));
+        }
+//        if (!user.getSelfOrImpersonated().isAdmin())
+//            query.addCriteria(getProcessRolesCriteria(user.getSelfOrImpersonated()));
 
         if (criteriaClass.getIdentifier() != null) {
             this.addValueCriteria(query, queryTotal, Criteria.where("identifier").regex(criteriaClass.getIdentifier(), "i"));
@@ -469,21 +475,24 @@ public class PetriNetService implements IPetriNetService {
                 this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(groupService.getGroupOwnerEmail(criteriaClass.getGroup().get(0))));
             } else {
                 // TODO: pagination?
-                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(groupService.getGroupsOwnerEmails(criteriaClass.getGroup(), Pageable.unpaged())));
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(groupService.getGroupsOwnerEmails(criteriaClass.getGroup())));
             }
         }
         if (criteriaClass.getVersion() != null) {
             this.addValueCriteria(query, queryTotal, Criteria.where("version").is(criteriaClass.getVersion()));
         }
         if (criteriaClass.getAuthor() != null) {
-            if (criteriaClass.getAuthor().getEmail() != null) {
-                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(criteriaClass.getAuthor().getEmail()));
+            if (criteriaClass.getAuthor().getIdentifier() != null) {
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.identifier").is(criteriaClass.getAuthor().getIdentifier()));
             }
             if (criteriaClass.getAuthor().getId() != null) {
                 this.addValueCriteria(query, queryTotal, Criteria.where("author.id").is(criteriaClass.getAuthor().getId()));
             }
             if (criteriaClass.getAuthor().getFullName() != null) {
                 this.addValueCriteria(query, queryTotal, Criteria.where("author.fullName").is(criteriaClass.getAuthor().getFullName()));
+            }
+            if (criteriaClass.getAuthor().getRealmId() != null) {
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.realmId").is(criteriaClass.getAuthor().getRealmId()));
             }
         }
         if (criteriaClass.getNegativeViewRoles() != null) {

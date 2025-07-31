@@ -31,6 +31,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.policies.FinishPol
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.ArcFactory;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
@@ -154,8 +155,8 @@ public class Importer {
         this.places = new HashMap<>();
         this.fields = new HashMap<>();
         this.transactions = new HashMap<>();
-        this.defaultRole = processRoleService.defaultRole();
-        this.anonymousRole = processRoleService.anonymousRole();
+        this.defaultRole = processRoleService.getDefaultRole();
+        this.anonymousRole = processRoleService.getAnonymousRole();
         this.i18n = new HashMap<>();
         this.actions = new HashMap<>();
         this.actionRefs = new HashMap<>();
@@ -191,7 +192,10 @@ public class Importer {
         net.setIcon(document.getIcon());
         net.setDefaultRoleEnabled(document.isDefaultRole() != null && document.isDefaultRole());
         net.setAnonymousRoleEnabled(document.isAnonymousRole() != null && document.isAnonymousRole());
-
+        if (document.getVersion() != null && !document.getVersion().isBlank()) {
+            StringToVersionConverter stringToVersionConverter = new StringToVersionConverter();
+            net.setVersion(stringToVersionConverter.convert(document.getVersion()));
+        }
 
         document.getRole().forEach(this::createRole);
         document.getData().forEach(this::createDataSet);

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
@@ -15,7 +15,6 @@ import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchReque
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -37,7 +36,7 @@ public interface ITaskService {
 
     List<Task> findAllById(List<String> ids);
 
-    Page<Task> findByUser(Pageable pageable, IUser user);
+    Page<Task> findByUser(Pageable pageable, AbstractUser user);
 
     Task findById(String id);
 
@@ -49,13 +48,13 @@ public interface ITaskService {
 
     Task searchOne(com.querydsl.core.types.Predicate predicate);
 
-    List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException;
+    List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, AbstractUser user) throws TransitionNotExecutableException;
 
-    List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, IUser user, Map<String, String> params) throws TransitionNotExecutableException;
+    List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, AbstractUser user, Map<String, String> params) throws TransitionNotExecutableException;
 
-    FinishTaskEventOutcome finishTask(Task task, IUser user) throws TransitionNotExecutableException;
+    FinishTaskEventOutcome finishTask(Task task, AbstractUser user) throws TransitionNotExecutableException;
 
-    FinishTaskEventOutcome finishTask(Task task, IUser user, Map<String, String> params) throws TransitionNotExecutableException;
+    FinishTaskEventOutcome finishTask(Task task, AbstractUser user, Map<String, String> params) throws TransitionNotExecutableException;
 
     FinishTaskEventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
@@ -65,13 +64,13 @@ public interface ITaskService {
 
     FinishTaskEventOutcome finishTask(String taskId, Map<String, String> params) throws IllegalArgumentException, TransitionNotExecutableException;
 
-    List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException;
+    List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, AbstractUser user) throws TransitionNotExecutableException;
 
-    List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, IUser user, Map<String, String> params) throws TransitionNotExecutableException;
+    List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, AbstractUser user, Map<String, String> params) throws TransitionNotExecutableException;
 
-    AssignTaskEventOutcome assignTask(Task task, IUser user) throws TransitionNotExecutableException;
+    AssignTaskEventOutcome assignTask(Task task, AbstractUser user) throws TransitionNotExecutableException;
 
-    AssignTaskEventOutcome assignTask(Task task, IUser user, Map<String, String> params) throws TransitionNotExecutableException;
+    AssignTaskEventOutcome assignTask(Task task, AbstractUser user, Map<String, String> params) throws TransitionNotExecutableException;
 
     AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException, TaskNotFoundException;
 
@@ -81,13 +80,13 @@ public interface ITaskService {
 
     AssignTaskEventOutcome assignTask(String taskId, Map<String, String> params) throws TransitionNotExecutableException;
 
-    List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, IUser user);
+    List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, AbstractUser user);
 
-    List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, IUser user, Map<String, String> params);
+    List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, AbstractUser user, Map<String, String> params);
 
-    CancelTaskEventOutcome cancelTask(Task task, IUser user);
+    CancelTaskEventOutcome cancelTask(Task task, AbstractUser user);
 
-    CancelTaskEventOutcome cancelTask(Task task, IUser user, Map<String, String> params);
+    CancelTaskEventOutcome cancelTask(Task task, AbstractUser user, Map<String, String> params);
 
     CancelTaskEventOutcome cancelTask(LoggedUser loggedUser, String taskId);
 

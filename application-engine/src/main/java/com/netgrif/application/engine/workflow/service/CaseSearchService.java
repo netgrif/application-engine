@@ -42,10 +42,15 @@ public class CaseSearchService extends MongoSearchService<Case> {
     public static final String PETRINET_IDENTIFIER = "identifier";
     public static final String PETRINET_ID = "id";
     public static final String PETRINET = "petriNet";
+
     public static final String AUTHOR = "author";
     public static final String AUTHOR_ID = "id";
-    public static final String AUTHOR_EMAIL = "email";
+    public static final String AUTHOR_DISPLAYNAME = "displayName";
+    public static final String AUTHOR_IDENTIFIER = "identifier";
+    public static final String AUTHOR_REALM = "realmId";
     public static final String AUTHOR_NAME = "name";
+    public static final String AUTHOR_USERNAME = "username";
+
     public static final String TRANSITION = "transition";
     public static final String FULLTEXT = "fullText";
     public static final String CASE_ID = "stringId";
@@ -56,10 +61,10 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     public Predicate buildQuery(Map<String, Object> requestQuery, LoggedUser user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
-        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+//        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
 
         if (requestQuery.containsKey(PETRINET)) {
-            builder.and(petriNet(requestQuery.get(PETRINET), loggedOrImpersonated, locale));
+            builder.and(petriNet(requestQuery.get(PETRINET), user, locale));
         }
         if (requestQuery.containsKey(AUTHOR)) {
             builder.and(author(requestQuery.get(AUTHOR)));
@@ -83,17 +88,17 @@ public class CaseSearchService extends MongoSearchService<Case> {
             builder.and(caseId(requestQuery.get(CASE_ID)));
         }
         if (requestQuery.containsKey(GROUP)) {
-            Predicate groupPredicate = group(requestQuery.get(GROUP), loggedOrImpersonated, locale);
+            Predicate groupPredicate = group(requestQuery.get(GROUP), user, locale);
             if (groupPredicate != null) {
                 builder.and(groupPredicate);
             } else {
                 return null;
             }
         }
-        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
+        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(user));
+        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(user));
+        permissionConstraints.or(buildViewUserQueryConstraint(user));
+        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(user));
         builder.and(permissionConstraints);
         return builder;
     }
@@ -108,7 +113,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
-        Predicate roleConstraints = viewUserQuery(user.getId());
+        Predicate roleConstraints = viewUserQuery(user.getStringId());
         return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
     }
 
@@ -126,7 +131,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     protected Predicate buildNegativeViewUsersQueryConstraint(LoggedUser user) {
-        Predicate roleConstraints = negativeViewUserQuery(user.getId());
+        Predicate roleConstraints = negativeViewUserQuery(user.getStringId());
         return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
     }
 
@@ -173,15 +178,21 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     private static BooleanExpression authorObject(HashMap<String, Object> query) {
-        if (query.containsKey(AUTHOR_EMAIL))
-            return QCase.case$.author.email.equalsIgnoreCase((String) query.get(AUTHOR_EMAIL));
-        else if (query.containsKey(AUTHOR_NAME))
-            return QCase.case$.author.fullName.equalsIgnoreCase((String) query.get(AUTHOR_NAME));
-        else if (query.containsKey(AUTHOR_ID)) {
+        if (query.containsKey(AUTHOR_NAME)) {
+            return QCase.case$.author.displayName.equalsIgnoreCase((String) query.get(AUTHOR_NAME));
+        } else if (query.containsKey(AUTHOR_ID)) {
             String searchValue = "";
             if (query.get(AUTHOR_ID) instanceof String)
                 searchValue = (String) query.get(AUTHOR_ID);
             return QCase.case$.author.id.eq(searchValue);
+        } else if (query.containsKey(AUTHOR_DISPLAYNAME)) {
+            return QCase.case$.author.displayName.equalsIgnoreCase((String) query.get(AUTHOR_DISPLAYNAME));
+        } else if (query.containsKey(AUTHOR_IDENTIFIER)) {
+            return QCase.case$.author.identifier.equalsIgnoreCase((String) query.get(AUTHOR_IDENTIFIER));
+        } else if (query.containsKey(AUTHOR_USERNAME)) {
+            return QCase.case$.author.identifier.equalsIgnoreCase((String) query.get(AUTHOR_USERNAME));
+        } else if (query.containsKey(AUTHOR_REALM)) {
+            return QCase.case$.author.realmId.equalsIgnoreCase((String) query.get(AUTHOR_REALM));
         }
         return null;
     }
@@ -279,8 +290,8 @@ public class CaseSearchService extends MongoSearchService<Case> {
         List<BooleanExpression> predicates = new ArrayList<>();
         predicates.add(QCase.case$.visualId.startsWithIgnoreCase(searchPhrase));
         predicates.add(QCase.case$.title.containsIgnoreCase(searchPhrase));
-        predicates.add(QCase.case$.author.fullName.containsIgnoreCase(searchPhrase));
-        predicates.add(QCase.case$.author.email.containsIgnoreCase(searchPhrase));
+        predicates.add(QCase.case$.author.displayName.containsIgnoreCase(searchPhrase));
+        predicates.add(QCase.case$.author.identifier.containsIgnoreCase(searchPhrase));
 
         try {
             LocalDateTime creation = FieldFactory.parseDateTime(searchPhrase);
@@ -354,7 +365,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (query instanceof List) {
             processQuery.setGroup((List<String>) query);
         } else if (query instanceof String) {
-            processQuery.setGroup(new ArrayList<String>(Arrays.asList((String) query)));
+            processQuery.setGroup(new ArrayList<>(Arrays.asList((String) query)));
         }
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
         if (groupProcesses.size() == 0)

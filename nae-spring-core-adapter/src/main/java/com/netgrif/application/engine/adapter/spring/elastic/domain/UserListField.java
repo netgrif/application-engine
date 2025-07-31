@@ -20,8 +20,8 @@ public class UserListField extends com.netgrif.application.engine.objects.elasti
 
     @Override
     @Field(type = Text)
-    public String[] getEmailValue() {
-        return super.getEmailValue();
+    public String[] getUsernameValue() {
+        return super.getUsernameValue();
     }
 
     @Override
@@ -34,5 +34,11 @@ public class UserListField extends com.netgrif.application.engine.objects.elasti
     @Field(type = Text)
     public String[] getUserIdValue() {
         return super.getUserIdValue();
+    }
+
+    @Override
+    @Field(type = Text)
+    public String[] getUserRealmIdValue() {
+        return super.getUserRealmIdValue();
     }
 }

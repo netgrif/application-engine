@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.objects.auth.domain.IUser;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
@@ -24,9 +25,9 @@ public class SystemUserRunner implements ApplicationEngineStartupRunner {
 
     private final UserService userService;
 
-    private IUser systemUser;
+    private AbstractUser systemUser;
 
-    public IUser createSystemUser() {
+    public AbstractUser createSystemUser() {
         return userService.createSystemUser();
     }
 
@@ -35,7 +36,7 @@ public class SystemUserRunner implements ApplicationEngineStartupRunner {
             log.warn("System user is null");
             return null;
         }
-        return (LoggedUser) userService.transformToLoggedUser(this.systemUser);
+        return ActorTransformer.toLoggedUser(systemUser);
     }
 
     @Override
