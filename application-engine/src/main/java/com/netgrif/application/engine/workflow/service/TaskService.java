@@ -969,7 +969,7 @@ public class TaskService implements ITaskService {
     }
 
     protected AbstractUser getUserFromLoggedUser(LoggedUser loggedUser) {
-        AbstractUser user = userService.findById(loggedUser.getStringId(), null);
+        AbstractUser user = userService.findById(loggedUser.getStringId(), loggedUser.getRealmId());
         // TODO: impersonation
 //        AbstractUser fromLogged = userService.transformToUser((LoggedUserImpl) loggedUser);
 //        user.setImpersonated(fromLogged.getImpersonated());
