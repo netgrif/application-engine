@@ -6,9 +6,6 @@ import org.springframework.data.annotation.Id;
 @QueryEntity
 public class Realm extends com.netgrif.application.engine.objects.auth.domain.Realm {
 
-    public Realm() {
-    }
-
     public Realm(String name) {
         super(name);
     }
