@@ -7,6 +7,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.files.StorageResolverService;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.workflow.domain.FilterDeserializer;
 import com.netgrif.application.engine.workflow.domain.IllegalMenuFileException;
 import com.netgrif.application.engine.workflow.service.interfaces.IMenuImportExportService;
@@ -263,7 +264,7 @@ public class MenuImportExportService implements IMenuImportExportService {
                 petriNetService.getNewestVersionByIdentifier("preference_filter_item").getStringId(),
                 item.getEntryName() + "_" + menuIdentifier,
                 "",
-                userService.transformToLoggedUser(userService.getSystem())
+                ActorTransformer.toLoggedUser(userService.getSystem())
         ).getCase();
 
         QTask qTask = new QTask("task");
@@ -299,7 +300,7 @@ public class MenuImportExportService implements IMenuImportExportService {
     protected FileFieldValue createXML(MenuAndFilters menuAndFilters, String parentId, FileField fileField) throws IOException {
         FileFieldValue ffv = new FileFieldValue();
         try {
-            ffv.setName("menu_" + userService.getLoggedUser().getFullName().replaceAll("\\s+", "") + ".xml");
+            ffv.setName("menu_" + userService.getLoggedUser().getName().replaceAll("\\s+", "") + ".xml");
             ffv.setPath(storageResolverService.resolve(fileField.getStorageType()).getPath(parentId, fileField.getImportId(), ffv.getName()));
             File f = new File(ffv.getPath());
             XmlMapper xmlMapper = new XmlMapper();

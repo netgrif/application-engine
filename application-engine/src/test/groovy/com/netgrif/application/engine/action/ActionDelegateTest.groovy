@@ -5,9 +5,9 @@ import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties
-import com.netgrif.application.engine.objects.auth.domain.IUser
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
@@ -77,12 +77,12 @@ class ActionDelegateTest {
         String mail = "test@netgrif.com";
         MessageResource messageResource = actionDelegate.inviteUser(mail)
         assert messageResource.getContent().success
-        IUser user = userService.findByEmail(mail, null)
+        AbstractUser user = userService.findByEmail(mail, null)
         assert user != null
         MimeMessage[] messages = smtpServer.getReceivedMessages()
         assert messages
         actionDelegate.deleteUser(mail)
-        IUser user2 = userService.findByEmail(mail, null)
+        AbstractUser user2 = userService.findByEmail(mail, null)
         assert user2 == null
         smtpServer.stop()
     }

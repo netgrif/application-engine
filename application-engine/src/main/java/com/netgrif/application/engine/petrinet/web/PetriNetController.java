@@ -1,22 +1,20 @@
 package com.netgrif.application.engine.petrinet.web;
 
 import com.netgrif.application.engine.AsyncRunner;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetImportReference;
-import com.netgrif.application.engine.petrinet.web.responsebodies.ProcessRolesResource;
-import com.netgrif.application.engine.petrinet.web.responsebodies.TransitionReferencesResource;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.importer.service.Importer;
-import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
+import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
-import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
@@ -25,6 +23,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +35,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,7 +46,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -68,6 +69,9 @@ public class PetriNetController {
 
     @Autowired
     private IPetriNetService service;
+
+    @Autowired
+    private IElasticPetriNetService elasticService;
 
     @Autowired
     private ProcessRoleService roleService;
@@ -162,7 +166,7 @@ public class PetriNetController {
     @GetMapping(value = "/{netId}/roles", produces = MediaTypes.HAL_JSON_VALUE)
     public ProcessRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
         netId = decodeUrl(netId);
-        return new ProcessRolesResource(roleService.findAll(netId), service.getPetriNet(decodeUrl(netId)).getPermissions(), netId, locale);
+        return new ProcessRolesResource(roleService.findAllByNetStringId(netId), service.getPetriNet(decodeUrl(netId)).getPermissions(), netId, locale);
     }
 
     @Operation(summary = "Get transactions of process", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -191,6 +195,23 @@ public class PetriNetController {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         Page<PetriNetReference> nets = service.search(criteria, user, pageable, locale);
         return ResponseEntity.ok(new PageImpl<>(nets.stream().map(PetriNetReferenceResource::new).toList(), pageable, nets.getTotalElements()));
+    }
+
+    @Operation(summary = "Search elastic processes", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PostMapping(value = "/search_elastic", produces = MediaTypes.HAL_JSON_VALUE)
+    public @ResponseBody
+    PagedModel<PetriNetReferenceResource> searchElasticPetriNets(@RequestBody PetriNetSearch criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
+        LoggedUser user = (LoggedUser) auth.getPrincipal();
+        // TODO: add Merge Filters and its operations
+
+        Page<PetriNetReference> nets = elasticService.search(criteria, user, pageable, locale, false);
+        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
+                .searchElasticPetriNets(criteria, auth, pageable, assembler, locale)).withRel("search_elastic");
+
+//        TODO doriesit linky pista ich zakomentoval
+        PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);
+        PetriNetReferenceResourceAssembler.buildLinks(resources);
+        return resources;
     }
 
     @PreAuthorize("@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId)")

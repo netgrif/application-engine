@@ -40,7 +40,7 @@ public class TokenServiceTest {
 
     @Test
     public void removeExpired() throws Exception {
-        User expired = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
+        User expired = new User();
         expired.setUsername("test1@test.com");
         expired.setEmail("test1@test.com");
         expired.setPassword("password");
@@ -49,7 +49,7 @@ public class TokenServiceTest {
         expired.setState(UserState.INACTIVE);
         userService.saveUser(expired, null);
 
-        User expired2 = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
+        User expired2 = new User();
         expired2.setUsername("test2@test.com");
         expired2.setEmail("test2@test.com");
         expired2.setPassword("password");
@@ -64,7 +64,7 @@ public class TokenServiceTest {
 
     @Test
     public void authorizeToken() throws Exception {
-        User expired = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
+        User expired = new User();
         expired.setToken("token3");
         expired.setUsername("test3@test.com");
         expired.setEmail("test3@test.com");

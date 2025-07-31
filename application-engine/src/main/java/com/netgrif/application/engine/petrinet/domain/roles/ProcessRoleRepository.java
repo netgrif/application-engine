@@ -29,7 +29,6 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
      */
     Optional<ProcessRole> findByImportId(String importId);
 
-
     /**
      * Finds a paginated list of all {@link ProcessRole} entities associated with a specific process ID.
      *

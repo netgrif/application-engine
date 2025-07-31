@@ -1,64 +1,34 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Slf4j
 @Component
 @RunnerOrder(140)
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "netgrif.engine.dashboard.enabled", matchIfMissing = false)
+@ConditionalOnProperty(value = "netgrif.engine.dashboard.enabled", havingValue = "true", matchIfMissing = false)
 public class DashboardRunner implements ApplicationEngineStartupRunner {
 
+    private final ImportHelper helper;
+
     public static final String DASHBOARD_NET_IDENTIFIER = "dashboard";
-    public static final String DASHBOARD_TILE_NET_IDENTIFIER = "dashboard_tile";
-    private static final String DASHBOARD_TILE_FILE_NAME = "engine-processes/dashboard_tile.xml";
     private static final String DASHBOARD_FILE_NAME = "engine-processes/dashboard.xml";
 
-    private final IPetriNetService petriNetService;
-    private final ImportHelper helper;
-    private final SystemUserRunner systemCreator;
+    public static final String DASHBOARD_TILE_NET_IDENTIFIER = "dashboard_tile";
+    private static final String DASHBOARD_TILE_FILE_NAME = "engine-processes/dashboard_tile.xml";
+
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        createDashboardNet();
-        createDashboardTileNet();
+        helper.importProcess("Petri net for dashboard", DASHBOARD_NET_IDENTIFIER, DASHBOARD_FILE_NAME);
+        helper.importProcess("Petri net for dashboard tile", DASHBOARD_TILE_NET_IDENTIFIER, DASHBOARD_TILE_FILE_NAME);
     }
-
-    public Optional<PetriNet> createDashboardNet() {
-        return importProcess("Petri net for filters", DASHBOARD_NET_IDENTIFIER, DASHBOARD_FILE_NAME);
-    }
-
-    public Optional<PetriNet> createDashboardTileNet() {
-        return importProcess("Petri net for filter preferences", DASHBOARD_TILE_NET_IDENTIFIER, DASHBOARD_TILE_FILE_NAME);
-    }
-
-    public Optional<PetriNet> importProcess(final String message, String netIdentifier, String netFileName) {
-        PetriNet filter = petriNetService.getNewestVersionByIdentifier(netIdentifier);
-        if (filter != null) {
-            log.info("{} has already been imported.", message);
-            return Optional.of(filter);
-        }
-
-        Optional<PetriNet> filterNet = helper.createNet(netFileName, VersionType.MAJOR, systemCreator.getLoggedSystem());
-
-        if (filterNet.isEmpty()) {
-            log.error("Import of {} failed!", message);
-        }
-
-        return filterNet;
-    }
-
-
 }

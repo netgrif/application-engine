@@ -2,19 +2,20 @@ package com.netgrif.application.engine.impersonation.service;
 
 import com.netgrif.application.engine.configuration.properties.ImpersonationConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.DataField;
+import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -52,13 +53,13 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     protected ProcessRoleService processRoleService;
 
     @Override
-    public Page<IUser> getConfiguredImpersonationUsers(String query, LoggedUser impersonator, Pageable pageable) {
+    public Page<AbstractUser> getConfiguredImpersonationUsers(String query, LoggedUser impersonator, Pageable pageable) {
         if (impersonator.isAdmin()) {
             return userService.searchAllCoMembers(query, null, null, impersonator, pageable);
 
         } else {
-            Page<Case> cases = searchConfigs(impersonator.getId(), pageable);
-            List<IUser> users = cases.getContent().stream()
+            Page<Case> cases = searchConfigs(impersonator.getStringId(), pageable);
+            List<AbstractUser> users = cases.getContent().stream()
                     .map(c -> ((UserFieldValue) c.getDataSet().get("impersonated").getValue()).getId())
                     .distinct()
                     .map(id -> userService.findById(id, null))
@@ -70,13 +71,13 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     @Override
     public boolean canImpersonate(LoggedUser impersonator, String configId) {
         Case config = getConfig(configId);
-        return isValidAndContainsUser(config, impersonator.getId());
+        return isValidAndContainsUser(config, impersonator.getStringId());
     }
 
     @Override
     public boolean canImpersonateUser(LoggedUser impersonator, String userId) {
-        IUser impersonated = userService.findById(userId, null);
-        return impersonator.isAdmin() || !searchConfigs(impersonator.getId(), impersonated.getStringId()).isEmpty();
+        AbstractUser impersonated = userService.findById(userId, null);
+        return impersonator.isAdmin() || !searchConfigs(impersonator.getStringId(), impersonated.getStringId()).isEmpty();
     }
 
     @Override
@@ -91,27 +92,27 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     }
 
     @Override
-    public List<Authority> getAuthorities(List<Case> configs, IUser impersonated) {
+    public List<Authority> getAuthorities(Collection<Case> configs, AbstractUser impersonated) {
         if (configs.isEmpty()) {
             return new ArrayList<>();
         }
         Set<String> authIds = extractSetFromField(configs, "impersonated_authorities");
         return authorityService.findAllByIds(new ArrayList<>(authIds), Pageable.unpaged()).stream()
-                .filter(configAuth -> impersonated.getAuthorities().stream().anyMatch(userAuth -> userAuth.getStringId().equals(configAuth.getStringId())))
+                .filter(configAuth -> impersonated.getAuthoritySet().stream().anyMatch(userAuth -> userAuth.getStringId().equals(configAuth.getStringId())))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ProcessRole> getRoles(List<Case> configs, IUser impersonated) {
+    public List<ProcessRole> getRoles(Collection<Case> configs, AbstractUser impersonated) {
         List<ProcessRole> impersonatedRoles = new ArrayList<>();
-        impersonatedRoles.add(processRoleService.defaultRole());
+        impersonatedRoles.add(processRoleService.getDefaultRole());
         if (configs.isEmpty()) {
             return impersonatedRoles;
         }
         Set<String> roleIds = extractSetFromField(configs, "impersonated_roles");
         impersonatedRoles.addAll((processRoleService.findByIds(roleIds)).stream()
                 .filter(configRole -> impersonated.getProcessRoles().stream().anyMatch(userRole -> userRole.getStringId().equals(configRole.getStringId())))
-                .collect(Collectors.toList()));
+                .toList());
         return impersonatedRoles;
     }
 
@@ -156,7 +157,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     }
 
     protected Page<Case> findCases(CaseSearchRequest request, Pageable pageable) {
-        return elasticCaseService.search(Collections.singletonList(request), userService.transformToLoggedUser(userService.getSystem()), pageable, Locale.getDefault(), false);
+        return elasticCaseService.search(Collections.singletonList(request), ActorTransformer.toLoggedUser(userService.getSystem()), pageable, Locale.getDefault(), false);
     }
 
     protected boolean isValidAndContainsUser(Case config, String id) {
@@ -179,7 +180,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
         return first.isBefore(second) || first.equals(second);
     }
 
-    protected Set<String> extractSetFromField(List<Case> cases, String fieldId) {
+    protected Set<String> extractSetFromField(Collection<Case> cases, String fieldId) {
         return cases.stream()
                 .map(caze -> getMultichoiceValue(caze.getDataField(fieldId)))
                 .flatMap(List::stream)

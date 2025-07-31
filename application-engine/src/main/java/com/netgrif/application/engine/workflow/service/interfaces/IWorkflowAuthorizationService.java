@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
-import com.netgrif.application.engine.objects.auth.domain.IUser;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRolePermission;
@@ -12,7 +12,7 @@ public interface IWorkflowAuthorizationService {
 
     boolean canCallCreate(LoggedUser user, String netId);
 
-    Boolean userHasAtLeastOneRolePermission(IUser user, PetriNet net, ProcessRolePermission... permissions);
+    Boolean userHasAtLeastOneRolePermission(AbstractUser user, PetriNet net, ProcessRolePermission... permissions);
 
-    Boolean userHasUserListPermission(IUser user, Case useCase, ProcessRolePermission... permissions);
+    Boolean userHasUserListPermission(AbstractUser user, Case useCase, ProcessRolePermission... permissions);
 }

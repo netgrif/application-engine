@@ -2,7 +2,7 @@ package com.netgrif.application.engine.objects.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.objects.annotations.Indexed;
-import com.netgrif.application.engine.objects.auth.domain.IUser;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
@@ -75,7 +75,7 @@ public abstract class Task implements Serializable {
 
     @Getter
     @Setter
-    private IUser user;
+    private AbstractUser user;
 
     @Setter
     private List<Trigger> triggers = new LinkedList<>();

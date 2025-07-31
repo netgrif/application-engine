@@ -105,10 +105,10 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private LoggedUser createAnonymousUser() {
-        User anonymousUser = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
+        User anonymousUser = new User();
         anonymousUser.setState(UserState.ACTIVE);
         anonymousUser = (User) userService.saveUser(anonymousUser, null);
-        return userService.transformToLoggedUser(anonymousUser);
+        return ActorTransformer.toLoggedUser(anonymousUser);
     }
 
     private boolean isPublicApi(String path) {

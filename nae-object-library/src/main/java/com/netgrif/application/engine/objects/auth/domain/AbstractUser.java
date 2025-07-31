@@ -1,106 +1,221 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
-import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
-import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
-@Setter
-@Getter
-public abstract class AbstractUser implements IUser, Serializable {
+/**
+ * Abstract base class for user entities in the system.
+ * Extends AbstractActor to inherit authentication and authorization capabilities.
+ */
+@Data
+@Slf4j
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public abstract class AbstractUser extends AbstractActor {
 
-    @Serial
-    private static final long serialVersionUID = 341922197277508726L;
-
+    /**
+     * Username used for authentication and identification
+     */
     @NotNull
-    protected UserState state;
+    protected String username;
 
-    protected Set<Authority> authorities;
+    /**
+     * User's first/given name
+     */
+    @NotNull
+    protected String firstName;
 
-    protected Set<ProcessRole> processRoles;
+    /**
+     * User's middle name (optional)
+     */
+    protected String middleName;
 
-    protected Set<ProcessRole> negativeProcessRoles;
+    /**
+     * User's last/family name
+     */
+    @NotNull
+    protected String lastName;
 
-    protected Set<String> groupIds;
+    /**
+     * User's email address
+     */
+    protected String email;
 
-    @BsonIgnore
-    protected Set<Group> groups;
+    /**
+     * URL or identifier of user's avatar image
+     */
+    protected String avatar;
 
-    @BsonIgnore
-    protected IUser impersonated;
-
-    public AbstractUser() {
-        authorities = new HashSet<>();
-        groupIds = new HashSet<>();
-        groups = new HashSet<>();
-        processRoles = new HashSet<>();
-        negativeProcessRoles = new HashSet<>();
+    /**
+     * Constructs a new user with Object ID.
+     *
+     * @param id         MongoDB ObjectId of the user
+     * @param realmId    Security realm identifier
+     * @param username   User's login name
+     * @param firstName  User's first name
+     * @param middleName User's middle name
+     * @param lastName   User's last name
+     * @param email      User's email address
+     * @param avatar     User's avatar URL/identifier
+     */
+    public AbstractUser(ObjectId id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar) {
+        super(id, realmId);
+        this.username = username;
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.lastName = lastName;
+        this.email = email;
+        this.avatar = avatar;
     }
 
-    public void addAuthority(Authority authority) {
-        if (authorities.stream().anyMatch(it -> it.get_id().equals(authority.get_id())))
-            return;
-        authorities.add(authority);
+    /**
+     * Constructs a new user with String ID.
+     *
+     * @param id         String representation of MongoDB ObjectId
+     * @param realmId    Security realm identifier
+     * @param username   User's login name
+     * @param firstName  User's first name
+     * @param middleName User's middle name
+     * @param lastName   User's last name
+     * @param email      User's email address
+     * @param avatar     User's avatar URL/identifier
+     */
+    public AbstractUser(String id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar) {
+        super(id, realmId);
+        this.username = username;
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.lastName = lastName;
+        this.email = email;
+        this.avatar = avatar;
     }
 
+    /**
+     * Gets the user's password.
+     *
+     * @return the user's password
+     */
+    public abstract String getPassword();
+
+    /**
+     * Sets the user's password.
+     *
+     * @param password new password to set
+     */
+    public abstract void setPassword(String password);
+
+    /**
+     * Sets a credential for the user.
+     *
+     * @param key        credential identifier
+     * @param credential credential value object
+     */
+    public void setCredential(String key, Credential<?> credential) {
+    }
+
+    /**
+     * Sets a credential with specified parameters.
+     *
+     * @param type    credential type
+     * @param value   credential value
+     * @param order   credential priority order
+     * @param enabled whether credential is enabled
+     */
+    public void setCredential(String type, String value, int order, boolean enabled) {
+    }
+
+    /**
+     * Activates Multi-Factor Authentication for the user.
+     *
+     * @param type   MFA type identifier
+     * @param secret MFA secret key
+     */
+    public void activateMFA(String type, String secret) {
+    }
+
+    /**
+     * Activates Multi-Factor Authentication with enabled state.
+     *
+     * @param type    MFA type identifier
+     * @param secret  MFA secret key
+     * @param enabled whether MFA should be enabled
+     */
+    public void activateMFA(String type, String secret, boolean enabled) {
+    }
+
+    /**
+     * Checks if a credential is enabled.
+     *
+     * @param type credential type to check
+     * @return true if credential is enabled, false otherwise
+     */
+    public boolean isCredentialEnabled(String type) {
+        return false;
+    }
+
+    /**
+     * Gets a credential by its type.
+     *
+     * @param type credential type
+     * @return credential object or null if not found
+     */
+    public Credential<?> getCredential(String type) {
+        return null;
+    }
+
+    /**
+     * Disables a credential by its type.
+     *
+     * @param type credential type to disable
+     */
+    public void disableCredential(String type) {
+    }
+
+    /**
+     * Sets a property for a specific credential.
+     *
+     * @param type  credential type
+     * @param key   property key
+     * @param value property value
+     */
+    public void setCredentialProperty(String type, String key, Object value) {
+    }
+
+    /**
+     * Gets a property value from a credential.
+     *
+     * @param type credential type
+     * @param key  property key
+     * @return property value or null if not found
+     */
+    public Object getCredentialProperty(String type, String key) {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * Returns user's first and last name concatenated.
+     */
     @Override
-    public void removeAuthority(Authority authority) {
-        authorities.remove(authority);
+    public String getName() {
+        return String.join(" ", firstName, lastName).trim();
     }
 
-    public void addProcessRole(ProcessRole role) {
-        if (processRoles.stream().anyMatch(it -> it.getStringId().equals(role.getStringId())))
-            return;
-        processRoles.add(role);
-    }
-
-    public void removeProcessRole(ProcessRole role) {
-        processRoles.remove(role);
-    }
-
-    public void addNegativeProcessRole(ProcessRole role) {
-        if (negativeProcessRoles.stream().anyMatch(it -> it.getStringId().equals(role.getStringId())))
-            return;
-        negativeProcessRoles.add(role);
-    }
-
-    public void removeNegativeProcessRole(ProcessRole role) {
-        negativeProcessRoles.remove(role);
-    }
-
-    public void addGroup(Group group) {
-        this.groupIds.add(group.getStringId());
-        this.groups.add(group);
-    }
-
+    /**
+     * {@inheritDoc}
+     * Returns user's full name including middle name if present.
+     */
     @Override
-    public void removeGroupId(String groupId) {
-        this.groupIds.remove(groupId);
-    }
-
-    public void removeGroup(Group group) {
-        this.groupIds.remove(group.getStringId());
-        this.groups.remove(group);
-    }
-
-    public boolean isActive() {
-        return UserState.ACTIVE.equals(state) || UserState.BLOCKED.equals(state);
-    }
-
-    @Override
-    public boolean isImpersonating() {
-        return this.impersonated != null;
-    }
-
-    @Override
-    public IUser getSelfOrImpersonated() {
-        return isImpersonating() ? this.impersonated : this;
+    public String getFullName() {
+        return String.join(" ", firstName,
+                middleName != null && !middleName.isEmpty() ? middleName : "",
+                lastName).trim();
     }
 }

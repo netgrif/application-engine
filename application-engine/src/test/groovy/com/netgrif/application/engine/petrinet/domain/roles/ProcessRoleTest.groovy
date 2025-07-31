@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.roles
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.objects.auth.domain.Authority
+import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
@@ -93,7 +94,7 @@ class ProcessRoleTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         def processRoles = userProcessRoleRepository.findAllByProcessId(netId)
-        importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [processRoles.find {
                     it.getStringId() == net.getNet().roles.values().find {
@@ -101,11 +102,11 @@ class ProcessRoleTest {
                     }.stringId
                 }] as ProcessRole[])
 
-        importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_PERFORM, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_PERFORM, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [processRoles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
 
-        importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_BOTH, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_BOTH, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [processRoles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "View" }.stringId },
                  processRoles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
