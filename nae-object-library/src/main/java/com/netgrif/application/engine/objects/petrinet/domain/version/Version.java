@@ -52,6 +52,17 @@ public class Version implements Serializable {
         }
     }
 
+    public int compareTo(Version other) {
+        if (this.major != other.major) {
+            return Long.compare(this.major, other.major);
+        }
+        if (this.minor != other.minor) {
+            return Long.compare(this.minor, other.minor);
+        }
+        return Long.compare(this.patch, other.patch);
+    }
+
+
     @Override
     public Version clone() {
         Version clone = new Version();

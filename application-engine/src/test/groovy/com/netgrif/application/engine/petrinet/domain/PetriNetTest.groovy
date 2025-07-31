@@ -52,6 +52,12 @@ class PetriNetTest {
     @Value("classpath:net_import_1.xml")
     private Resource netResource2
 
+    @Value("classpath:net_clone2.xml")
+    private Resource netResource3
+
+    @Value("classpath:net_clone3.xml")
+    private Resource netResource4
+
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
@@ -96,4 +102,42 @@ class PetriNetTest {
         assert nets.find { it.identifier == "new_model" }.version == "1.0.0"
         assert nets.find { it.identifier == "test" }.version == "2.0.0"
     }
+
+    @Test
+    void testVersion() {
+        def zeroImport = petriNetService.importPetriNet(netResource3.inputStream, VersionType.PATCH, superCreator.loggedSuper)
+        assert zeroImport.getNet() != null
+        assert zeroImport.getNet().version.toString() == "0.0.1"
+
+        def firstImport = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        assert firstImport.getNet() != null
+        assert firstImport.getNet().version.toString() == "1.0.0"
+
+        def secondImport = petriNetService.importPetriNet(netResource.inputStream, VersionType.MINOR, superCreator.loggedSuper)
+        assert secondImport.getNet().version.toString() == "1.1.0"
+
+        def thirdImport = petriNetService.importPetriNet(netResource.inputStream, VersionType.PATCH, superCreator.loggedSuper)
+        assert thirdImport.getNet().version.toString() == "1.1.1"
+
+        def lastImport = petriNetService.importPetriNet(netResource4.inputStream, VersionType.PATCH, superCreator.loggedSuper)
+        assert lastImport.getNet().version.toString() == "3.1.1"
+
+        Page<PetriNetReference> nets = petriNetService.getByIdentifier(zeroImport.getNet().identifier, Pageable.unpaged())
+        assert nets.getSize() == 5
+    }
+
+
+    @Test
+    void testVersioningConflicts() {
+        def zeroImport = petriNetService.importPetriNet(netResource3.inputStream, VersionType.PATCH, superCreator.loggedSuper)
+        assert zeroImport.getNet() != null
+        assert zeroImport.getNet().version.toString() == "0.0.1"
+
+        try {
+            petriNetService.importPetriNet(netResource3.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        } catch (Exception e) {
+            assert e.getMessage() == "Provided Petri net version is already present in the system"
+        }
+    }
+
 }
