@@ -22,6 +22,8 @@ public class ProcessRole {
 
     private String netStringId;
 
+    private boolean global;
+
     /**
      * The constructor doesn't set attributes regarding the Petri net.
      *
@@ -32,5 +34,6 @@ public class ProcessRole {
         name = role.getLocalisedName(locale);
         description = role.getDescription();
         importId = role.getImportId();
+        global = role.isGlobal();
     }
 }
