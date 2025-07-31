@@ -36,7 +36,7 @@ public class RealmServiceImpl implements RealmService {
 
     @Override
     public Realm createRealm(Realm createRequest) {
-        if (realmRepository.findByName(createRequest.getName()).isPresent()) {
+        if (realmRepository.existsById(createRequest.getName())) {
             throw new IllegalArgumentException("Realm with name " + createRequest.getName() + " already exists");
         }
         Realm realm = new com.netgrif.application.engine.adapter.spring.auth.domain.Realm(createRequest.getName());
