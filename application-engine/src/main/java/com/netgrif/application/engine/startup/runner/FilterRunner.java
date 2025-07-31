@@ -20,10 +20,10 @@ public class FilterRunner implements ApplicationEngineStartupRunner {
     public static final String FILTER_PETRI_NET_IDENTIFIER = "filter";
 
     private static final String EXPORT_FILTER_FILE_NAME = "engine-processes/export_filters.xml";
-    private static final String EXPORT_NET_IDENTIFIER = "export_filters";
+    public static final String EXPORT_NET_IDENTIFIER = "export_filters";
 
     private static final String IMPORT_FILTER_FILE_NAME = "engine-processes/import_filters.xml";
-    private static final String IMPORT_NET_IDENTIFIER = "import_filters";
+    public static final String IMPORT_NET_IDENTIFIER = "import_filters";
 
 
     @Override
