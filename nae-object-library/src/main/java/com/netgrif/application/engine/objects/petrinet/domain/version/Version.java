@@ -11,7 +11,7 @@ import static com.netgrif.application.engine.objects.petrinet.domain.VersionType
 
 @Data
 @AllArgsConstructor
-public class Version implements Serializable {
+public class Version implements Serializable, Comparable<Version> {
 
     /**
      * @deprecated since 6.0.3 - please use {@link #LATEST} instead
