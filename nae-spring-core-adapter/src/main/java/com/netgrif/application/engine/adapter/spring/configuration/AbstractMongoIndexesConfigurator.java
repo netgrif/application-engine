@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Slf4j
-public abstract class MongoIndexesConfigurator {
+public abstract class AbstractMongoIndexesConfigurator {
 
     private final MongoTemplate mongoTemplate;
     private final MappingContext<? extends MongoPersistentEntity<?>, MongoPersistentProperty> mappingContext;
     private final IndexResolver resolver;
 
-    public MongoIndexesConfigurator(MongoTemplate mongoTemplate) {
+    public AbstractMongoIndexesConfigurator(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
         this.mappingContext = mongoTemplate.getConverter().getMappingContext();
         this.resolver = new MongoPersistentEntityIndexResolver(mappingContext);

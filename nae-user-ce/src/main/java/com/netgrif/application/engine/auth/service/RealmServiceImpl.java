@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.adapter.spring.auth.domain.User;
-import com.netgrif.application.engine.adapter.spring.configuration.MongoIndexesConfigurator;
+import com.netgrif.application.engine.adapter.spring.configuration.AbstractMongoIndexesConfigurator;
 import com.netgrif.application.engine.auth.provider.AbstractAuthConfig;
 import com.netgrif.application.engine.auth.provider.AuthMethodProvider;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
@@ -9,6 +8,7 @@ import com.netgrif.application.engine.auth.provider.ProviderRegistry;
 import com.netgrif.application.engine.auth.realm.request.RealmSearch;
 import com.netgrif.application.engine.auth.repository.RealmRepository;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
+import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.provider.AuthMethod;
 import com.netgrif.application.engine.objects.auth.provider.AuthMethodConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -37,12 +37,12 @@ public class RealmServiceImpl implements RealmService {
     @Autowired
     private AnonymousUserRefService anonymousUserRefService;
 
-    private MongoIndexesConfigurator mongoIndexesConfigurator;
+    private AbstractMongoIndexesConfigurator mongoIndexesConfigurator;
 
     private CollectionNameProvider collectionNameProvider;
 
     @Autowired
-    public void setMongoIndexesConfigurator(MongoIndexesConfigurator mongoIndexesConfigurator) {
+    public void setMongoIndexesConfigurator(AbstractMongoIndexesConfigurator mongoIndexesConfigurator) {
         this.mongoIndexesConfigurator = mongoIndexesConfigurator;
     }
 

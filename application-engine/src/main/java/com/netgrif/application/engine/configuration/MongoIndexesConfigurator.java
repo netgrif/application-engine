@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
+import com.netgrif.application.engine.adapter.spring.configuration.AbstractMongoIndexesConfigurator;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -8,7 +9,7 @@ import org.springframework.util.MultiValueMap;
 
 @Slf4j
 @Component
-public class MongoIndexesConfigurator extends com.netgrif.application.engine.adapter.spring.configuration.MongoIndexesConfigurator {
+public class MongoIndexesConfigurator extends AbstractMongoIndexesConfigurator {
 
     private final DataConfigurationProperties.MongoProperties mongoProperties;
 
