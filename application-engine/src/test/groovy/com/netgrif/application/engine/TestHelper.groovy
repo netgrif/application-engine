@@ -69,6 +69,9 @@ class TestHelper {
     private FinisherRunner finisherRunner
 
     @Autowired
+    private MenuProcessRunner menuProcessRunner
+
+    @Autowired
     private ImpersonationRunner impersonationRunner
 
     @Autowired
@@ -100,6 +103,7 @@ class TestHelper {
         systemUserRunner.run()
         groupRunner.run()
         filterRunner.run()
+        menuProcessRunner.run()
         impersonationRunner.run()
         superCreator.run()
         finisherRunner.run()

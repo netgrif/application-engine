@@ -183,6 +183,7 @@ public class Importer {
     @Transactional
     protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
         net = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet();
+        net.setVersion(null);
 
         documentValidator.checkConflictingAttributes(document, document.getUsersRef(), document.getUserRef(), "usersRef", "userRef");
         documentValidator.checkDeprecatedAttributes(document);

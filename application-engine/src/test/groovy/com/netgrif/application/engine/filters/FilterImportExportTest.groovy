@@ -9,6 +9,7 @@ import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldValue
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.runner.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
@@ -46,9 +47,6 @@ class FilterImportExportTest {
 
     public static final String DUMMY_USER_MAIL = "dummy@netgrif.com"
     public static final String DUMMY_USER_PASSWORD = "password"
-
-    private static final String EXPORT_NET_IDENTIFIER = "export_filters"
-    private static final String IMPORT_NET_IDENTIFIER = "import_filters"
 
     private static final int DEFAULT_FILTERS_SIZE = 5
     private static final String[] FILTERS_TO_EXPORT = ["My cases", "My tasks", "Test filter"]
@@ -96,6 +94,9 @@ class FilterImportExportTest {
     @Autowired
     private IDataService dataService
 
+    @Autowired
+    private PetriNetService petriNetService
+
     private Authentication userAuth
     private User dummyUser
     private Case importCase
@@ -109,17 +110,16 @@ class FilterImportExportTest {
         dummyUser = createDummyUser()
         userAuth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(dummyUser), DUMMY_USER_PASSWORD)
         SecurityContextHolder.getContext().setAuthentication(userAuth)
-
-        Optional<PetriNet> importNet = this.filterRunner.createImportFiltersNet()
-        Optional<PetriNet> exportNet = this.filterRunner.createExportFiltersNet()
+        Optional<PetriNet> importNet = petriNetService.findByImportId(this.filterRunner.IMPORT_NET_IDENTIFIER)
+        Optional<PetriNet> exportNet = petriNetService.findByImportId(this.filterRunner.EXPORT_NET_IDENTIFIER)
         assert importNet.isPresent()
         assert exportNet.isPresent()
 
         importCase = this.workflowService.searchOne(
-                QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER) & QCase.case$.author.identifier.eq(DUMMY_USER_MAIL)
+                QCase.case$.processIdentifier.eq(this.filterRunner.IMPORT_NET_IDENTIFIER) & QCase.case$.author.identifier.eq(DUMMY_USER_MAIL)
         )
         exportCase = this.workflowService.searchOne(
-                QCase.case$.processIdentifier.eq(EXPORT_NET_IDENTIFIER) & QCase.case$.author.identifier.eq(DUMMY_USER_MAIL)
+                QCase.case$.processIdentifier.eq(this.filterRunner.EXPORT_NET_IDENTIFIER) & QCase.case$.author.identifier.eq(DUMMY_USER_MAIL)
         )
         assert importCase != null
         assert exportCase != null
