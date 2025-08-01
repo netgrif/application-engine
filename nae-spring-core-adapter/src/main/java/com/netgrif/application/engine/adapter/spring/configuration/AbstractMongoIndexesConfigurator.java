@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.MongoPersistentProperty;
 import org.springframework.util.MultiValueMap;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -42,7 +43,11 @@ public abstract class AbstractMongoIndexesConfigurator {
     public void resolveIndexes(String collectionName, Class<?> collectionType) {
         IndexOperations indexOps = mongoTemplate.indexOps(collectionName);
         log.info("Ensuring existence of indexes for {}", collectionType.getSimpleName());
-        List<IndexDefinition> indexDefinitions = StreamSupport.stream(resolver.resolveIndexFor(collectionType).spliterator(), false).collect(Collectors.toList());
+        List<IndexDefinition> indexDefinitions = new ArrayList<>();
+        Document document = collectionName.getClass().getAnnotation(Document.class);
+        if (document != null) {
+            indexDefinitions.addAll(StreamSupport.stream(resolver.resolveIndexFor(collectionType).spliterator(), false).toList());
+        }
         addAnnotatedFields(collectionType, indexDefinitions);
         addConfiguredFields(collectionType, indexDefinitions);
         indexDefinitions.forEach(indexOps::ensureIndex);
