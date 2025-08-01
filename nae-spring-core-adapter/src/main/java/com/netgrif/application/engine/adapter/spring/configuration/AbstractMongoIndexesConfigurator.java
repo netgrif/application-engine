@@ -44,7 +44,7 @@ public abstract class AbstractMongoIndexesConfigurator {
         IndexOperations indexOps = mongoTemplate.indexOps(collectionName);
         log.info("Ensuring existence of indexes for {}", collectionType.getSimpleName());
         List<IndexDefinition> indexDefinitions = new ArrayList<>();
-        Document document = collectionName.getClass().getAnnotation(Document.class);
+        Document document = collectionType.getAnnotation(Document.class);
         if (document != null) {
             indexDefinitions.addAll(StreamSupport.stream(resolver.resolveIndexFor(collectionType).spliterator(), false).toList());
         }
