@@ -18,6 +18,7 @@ import com.netgrif.application.engine.startup.runner.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
+import com.netgrif.application.engine.startup.runner.MenuProcessRunner
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -107,9 +108,9 @@ class MenuItemApiTest {
         assert tabbedTaskView.dataSet[TabbedTaskViewConstants.FIELD_VIEW_FILTER_CASE].value == []
         assert tabbedTaskView.dataSet[TabbedTaskViewConstants.FIELD_DEFAULT_HEADERS].value == "meta-title,meta-title"
 
-        Case testFolder = findCasesElastic("processIdentifier:$FilterRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue.keyword:\"/netgrif/test\"", PageRequest.of(0, 1))[0]
-        Case netgrifFolder = findCasesElastic("processIdentifier:$FilterRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue.keyword:\"/netgrif\"", PageRequest.of(0, 1))[0]
-        Case rootFolder = findCasesElastic("processIdentifier:$FilterRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue.keyword:\"/\"", PageRequest.of(0, 1))[0]
+        Case testFolder = findCasesElastic("processIdentifier:$MenuProcessRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue.keyword:\"/netgrif/test\"", PageRequest.of(0, 1))[0]
+        Case netgrifFolder = findCasesElastic("processIdentifier:$MenuProcessRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue.keyword:\"/netgrif\"", PageRequest.of(0, 1))[0]
+        Case rootFolder = findCasesElastic("processIdentifier:$MenuProcessRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue.keyword:\"/\"", PageRequest.of(0, 1))[0]
 
         assert testFolder.dataSet[MenuItemConstants.FIELD_PARENT_ID].value == [netgrifFolder.stringId]
         assert (testFolder.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value as ArrayList).contains(item.stringId)
@@ -200,7 +201,7 @@ class MenuItemApiTest {
         Case viewCase = workflowService.findOne(viewId)
         Thread.sleep(2000)
 
-        Case folderCase = findCasesElastic("processIdentifier:$FilterRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue:\"/netgrif2\"", PageRequest.of(0, 1))[0]
+        Case folderCase = findCasesElastic("processIdentifier:$MenuProcessRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue:\"/netgrif2\"", PageRequest.of(0, 1))[0]
 
         ArrayList<String> childIds = folderCase.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value as ArrayList<String>
         assert childIds.contains(viewId) && childIds.size() == 2
@@ -224,11 +225,11 @@ class MenuItemApiTest {
         ])
         Thread.sleep(2000)
 
-        folderCase = findCasesElastic("processIdentifier:$FilterRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue:\"/netgrif/test3\"", PageRequest.of(0, 1))[0]
-        Case folderCase2 = findCasesElastic("processIdentifier:$FilterRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue:\"/netgrif\"", PageRequest.of(0, 1))[0]
+        folderCase = findCasesElastic("processIdentifier:$MenuProcessRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue:\"/netgrif/test3\"", PageRequest.of(0, 1))[0]
+        Case folderCase2 = findCasesElastic("processIdentifier:$MenuProcessRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue:\"/netgrif\"", PageRequest.of(0, 1))[0]
         assert folderCase != null && folderCase.dataSet[MenuItemConstants.FIELD_PARENT_ID].value == [folderCase2.stringId]
 
-        folderCase = findCasesElastic("processIdentifier:$FilterRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue:\"/netgrif/test3/netgrif2\"", PageRequest.of(0, 1))[0]
+        folderCase = findCasesElastic("processIdentifier:$MenuProcessRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue:\"/netgrif/test3/netgrif2\"", PageRequest.of(0, 1))[0]
         assert folderCase != null
         assert folderCase.dataSet[MenuItemConstants.FIELD_NODE_PATH].value == "/netgrif/test3/netgrif2"
 
@@ -321,7 +322,7 @@ class MenuItemApiTest {
         Case leafItemCase = getMenuItem(apiCase)
 
         sleep(2000)
-        Case testFolder = findCasesElastic("processIdentifier:$FilterRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue:\"/netgrif/test\"", PageRequest.of(0, 1))[0]
+        Case testFolder = findCasesElastic("processIdentifier:$MenuProcessRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue:\"/netgrif/test\"", PageRequest.of(0, 1))[0]
         String netgrifFolderId = (testFolder.dataSet[MenuItemConstants.FIELD_PARENT_ID].value as ArrayList<String>)[0]
 
         Case netgrifFolder = workflowService.findOne(netgrifFolderId)

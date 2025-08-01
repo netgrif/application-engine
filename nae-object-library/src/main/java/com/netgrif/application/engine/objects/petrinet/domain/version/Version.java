@@ -11,7 +11,7 @@ import static com.netgrif.application.engine.objects.petrinet.domain.VersionType
 
 @Data
 @AllArgsConstructor
-public class Version implements Serializable {
+public class Version implements Serializable, Comparable<Version> {
 
     /**
      * @deprecated since 6.0.3 - please use {@link #LATEST} instead
@@ -51,6 +51,17 @@ public class Version implements Serializable {
             patch += 1;
         }
     }
+
+    public int compareTo(Version other) {
+        if (this.major != other.major) {
+            return Long.compare(this.major, other.major);
+        }
+        if (this.minor != other.minor) {
+            return Long.compare(this.minor, other.minor);
+        }
+        return Long.compare(this.patch, other.patch);
+    }
+
 
     @Override
     public Version clone() {
