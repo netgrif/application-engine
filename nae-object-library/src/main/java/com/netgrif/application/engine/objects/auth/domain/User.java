@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
+import com.netgrif.application.engine.objects.annotations.Indexed;
+import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.utils.DateUtils;
 import com.querydsl.core.annotations.QueryEntity;
 import lombok.AllArgsConstructor;
