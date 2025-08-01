@@ -20,17 +20,17 @@ public class FilterRunner implements ApplicationEngineStartupRunner {
     public static final String FILTER_PETRI_NET_IDENTIFIER = "filter";
 
     private static final String EXPORT_FILTER_FILE_NAME = "engine-processes/export_filters.xml";
-    private static final String EXPORT_NET_IDENTIFIER = "export_filters";
+    public static final String EXPORT_NET_IDENTIFIER = "export_filters";
 
     private static final String IMPORT_FILTER_FILE_NAME = "engine-processes/import_filters.xml";
-    private static final String IMPORT_NET_IDENTIFIER = "import_filters";
+    public static final String IMPORT_NET_IDENTIFIER = "import_filters";
 
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        helper.importProcess("Petri net for filters", FILTER_PETRI_NET_IDENTIFIER, FILTER_FILE_NAME);
-        helper.importProcess("Petri net for importing filters", IMPORT_NET_IDENTIFIER, IMPORT_FILTER_FILE_NAME);
-        helper.importProcess("Petri net for exporting filters", EXPORT_NET_IDENTIFIER, EXPORT_FILTER_FILE_NAME);
+        helper.importProcessOnce("Petri net for filters", FILTER_PETRI_NET_IDENTIFIER, FILTER_FILE_NAME);
+        helper.importProcessOnce("Petri net for importing filters", IMPORT_NET_IDENTIFIER, IMPORT_FILTER_FILE_NAME);
+        helper.importProcessOnce("Petri net for exporting filters", EXPORT_NET_IDENTIFIER, EXPORT_FILTER_FILE_NAME);
     }
 
 }
