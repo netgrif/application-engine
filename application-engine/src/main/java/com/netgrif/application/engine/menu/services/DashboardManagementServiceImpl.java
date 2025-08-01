@@ -56,9 +56,8 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
     @Override
     public Case createDashboardManagement(DashboardManagementBody body) throws TransitionNotExecutableException {
         Case managementCase;
-        MenuItemUtils.sanitize(body.getId());
 
-        managementCase = findDashboardManagement(body.getId());
+        managementCase = findDashboardManagement(MenuItemUtils.sanitize(body.getId()));
         if (managementCase != null) {
             log.info("Dashboard management with id:{} already exists", body.getId());
             return managementCase;
@@ -80,7 +79,6 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
      */
     @Override
     public Case updateDashboardManagement(Case managementCase, DashboardManagementBody body) throws TransitionNotExecutableException {
-        MenuItemUtils.sanitize(body.getId());
         addReferencedMenuItems(body);
         ToDataSetOutcome outcome = body.toDataSet();
         managementCase = setDataWithExecute(managementCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());

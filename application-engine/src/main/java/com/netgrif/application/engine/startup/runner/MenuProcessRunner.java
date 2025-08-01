@@ -28,7 +28,7 @@ public class MenuProcessRunner implements ApplicationEngineStartupRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        helper.importProcess("Petri net for filter preferences", MENU_NET_IDENTIFIER, MENU_ITEM_FILE_NAME);
+        helper.importProcessOnce("Petri net for filter preferences", MENU_NET_IDENTIFIER, MENU_ITEM_FILE_NAME);
         createConfigurationNets();
     }
 
@@ -37,7 +37,7 @@ public class MenuProcessRunner implements ApplicationEngineStartupRunner {
                 .map(view -> {
                     String processIdentifier = view.getIdentifier() + "_configuration";
                     String filePath = String.format("engine-processes/menu/%s.xml", processIdentifier);
-                    return helper.importProcess(
+                    return helper.importProcessOnce(
                             String.format("Petri net for %s", processIdentifier),
                             processIdentifier,
                             filePath

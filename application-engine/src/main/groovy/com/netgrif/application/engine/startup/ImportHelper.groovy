@@ -248,7 +248,7 @@ class ImportHelper {
         superCreator.setAllToSuperUser()
     }
 
-    Optional<PetriNet> importProcess(String message, String netIdentifier, String netFileName) {
+    Optional<PetriNet> importProcessOnce(String message, String netIdentifier, String netFileName) {
         PetriNet filter = petriNetService.getNewestVersionByIdentifier(netIdentifier)
         if (filter != null) {
             log.info("${message} has already been imported.")
