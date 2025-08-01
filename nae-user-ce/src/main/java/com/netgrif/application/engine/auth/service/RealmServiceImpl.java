@@ -67,8 +67,14 @@ public class RealmServiceImpl implements RealmService {
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realm.getId());
 
         if (!mongoTemplate.collectionExists(collectionName)) {
-            mongoTemplate.createCollection(collectionName);
-            mongoIndexesConfigurator.resolveIndexes(collectionName, User.class);
+            try {
+                mongoTemplate.createCollection(collectionName);
+                mongoIndexesConfigurator.resolveIndexes(collectionName, User.class);
+            } catch (Exception e) {
+                log.error("Error occurred while creating collection for realm {}", realm.getId(), e);
+                realmRepository.delete(realm);
+                throw new RuntimeException("Error occurred while creating collection for realm " + realm.getId(), e);
+            }
         }
 
         return realm;
