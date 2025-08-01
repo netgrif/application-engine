@@ -57,7 +57,7 @@ public class RealmServiceImpl implements RealmService {
         if (realmRepository.existsById(createRequest.getName())) {
             throw new IllegalArgumentException("Realm with name " + createRequest.getName() + " already exists");
         }
-        Realm realm = new com.netgrif.application.engine.adapter.spring.auth.domain.Realm(createRequest.getName());
+        com.netgrif.application.engine.adapter.spring.auth.domain.Realm realm = new com.netgrif.application.engine.adapter.spring.auth.domain.Realm(createRequest.getName());
         realm.setDescription(createRequest.getDescription());
         realm.setAdminRealm(createRequest.isAdminRealm());
 
@@ -65,7 +65,7 @@ public class RealmServiceImpl implements RealmService {
             realm.setDefaultRealm(true);
         }
 
-        realm = realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
+        realm = realmRepository.save(realm);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realm.getName());
 
         if (!mongoTemplate.collectionExists(collectionName)) {
@@ -79,7 +79,7 @@ public class RealmServiceImpl implements RealmService {
             }
         }
 
-        return realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
+        return realmRepository.save(realm);
     }
 
     @Override
