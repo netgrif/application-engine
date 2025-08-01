@@ -11,8 +11,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
-import static org.eclipse.jdt.internal.compiler.parser.Parser.name;
-
 @Slf4j
 @Component
 @Profile("!test")
@@ -30,7 +28,7 @@ public class MongoDbRunner implements ApplicationEngineStartupRunner {
     public void run(ApplicationArguments args) throws Exception {
         if (mongoProperties.getDrop()) {
             if (mongoProperties.getHost() != null && mongoProperties.getPort() != null)
-                log.info("Dropping Mongo database {}:{}/{}", mongoProperties.getHost(), mongoProperties.getPort(), name);
+                log.info("Dropping Mongo database {}:{}/{}", mongoProperties.getHost(), mongoProperties.getPort(), mongoProperties.getDatabase());
             else if (mongoProperties.getUri() != null)
                 log.info("Dropping Mongo database {}", mongoProperties.getUri());
             mongoTemplate.getDb().drop();
