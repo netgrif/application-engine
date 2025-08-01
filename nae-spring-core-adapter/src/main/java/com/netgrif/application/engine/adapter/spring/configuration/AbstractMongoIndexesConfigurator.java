@@ -15,7 +15,6 @@ import org.springframework.util.MultiValueMap;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Slf4j
@@ -32,11 +31,12 @@ public abstract class AbstractMongoIndexesConfigurator {
     }
 
     public abstract MultiValueMap<Class<?>, String> getIndexes();
+    public abstract List<Class<?>> getEntityIndexBlacklist();
 
     public void resolveIndexes() {
         mappingContext.getPersistentEntities()
                 .stream()
-                .filter(it -> it.isAnnotationPresent(Document.class))
+                .filter(it -> it.isAnnotationPresent(Document.class) && !getEntityIndexBlacklist().contains(it.getType()))
                 .forEach(mongoPersistentEntity -> resolveIndexes(mongoPersistentEntity.getCollection(), mongoPersistentEntity.getType()));
     }
 

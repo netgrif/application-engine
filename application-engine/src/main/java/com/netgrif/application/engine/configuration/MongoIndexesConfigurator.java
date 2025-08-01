@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 
+import java.util.List;
+
 @Slf4j
 @Component
 public class MongoIndexesConfigurator extends AbstractMongoIndexesConfigurator {
@@ -22,5 +24,10 @@ public class MongoIndexesConfigurator extends AbstractMongoIndexesConfigurator {
     @Override
     public MultiValueMap<Class<?>, String> getIndexes() {
         return mongoProperties.getIndexes();
+    }
+
+    @Override
+    public List<Class<?>> getEntityIndexBlacklist() {
+        return List.of();
     }
 }
