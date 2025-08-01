@@ -200,10 +200,19 @@ public class PetriNetService implements IPetriNetService {
         PetriNet net = imported.get();
 
         PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
-        if (existingNet != null && net.getVersion() == null) {
-            net.setVersion(existingNet.getVersion());
-            net.incrementVersion(releaseType);
+
+        if (existingNet != null) {
+            if (existingNet.getVersion().equals(net.getVersion())) {
+                throw new IllegalArgumentException("Provided Petri net version is already present in the system");
+            }
+            if (net.getVersion() == null) {
+                net.setVersion(existingNet.getVersion());
+                net.incrementVersion(releaseType);
+            }
+        } else if (net.getVersion() == null) {
+            net.setVersion(new Version());
         }
+
         processRoleService.saveAll(net.getRoles().values());
         net.setAuthor(ActorTransformer.toActorRef(author));
         functionCacheService.cachePetriNetFunctions(net);
@@ -357,8 +366,8 @@ public class PetriNetService implements IPetriNetService {
             GroupOperation groupByIdentifier = Aggregation.group("identifier").max("version").as("version");
             Aggregation aggregation;
             if (pageable == null || pageable.isUnpaged()) {
-                 aggregation = Aggregation.newAggregation(
-                         groupByIdentifier
+                aggregation = Aggregation.newAggregation(
+                        groupByIdentifier
                 );
             } else {
                 aggregation = Aggregation.newAggregation(

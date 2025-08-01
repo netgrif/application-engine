@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.adapter.spring.elastic.domain;
 
+import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -9,6 +10,9 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 
@@ -58,5 +62,13 @@ public class ElasticPetriNet extends com.netgrif.application.engine.objects.elas
     @Override
     public LocalDateTime getCreationDate() {
         return super.getCreationDate();
+    }
+
+    protected I18nField transformToField(I18nString field) {
+        Set<String> keys =  field.getTranslations().keySet();
+        Set<String> values = new HashSet<>(field.getTranslations().values());
+        HashMap<String, String> translations = new HashMap<>(field.getTranslations());
+        values.add(field.getDefaultValue());
+        return new I18nField(keys, values, translations);
     }
 }
