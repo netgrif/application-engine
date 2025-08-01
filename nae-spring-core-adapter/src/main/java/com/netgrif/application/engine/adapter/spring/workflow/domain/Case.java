@@ -11,10 +11,12 @@ import com.querydsl.core.annotations.QueryEntity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Document
 @QueryEntity
 public class Case extends com.netgrif.application.engine.objects.workflow.domain.Case {
 

@@ -8,10 +8,12 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.querydsl.core.annotations.QueryEntity;
 import lombok.Getter;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.*;
 
 @Getter
+@Document
 @QueryEntity
 public class PetriNet extends com.netgrif.application.engine.objects.petrinet.domain.PetriNet {
 
