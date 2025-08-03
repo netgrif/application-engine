@@ -8,28 +8,21 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Represents a security realm in the authentication system.
- * A realm is a security context that contains authentication methods, user IDs, 
+ * A realm is a security context that contains authentication methods, user IDs,
  * and security settings for a group of users.
  */
 @Data
-public class Realm implements Serializable {
+public abstract class Realm implements Serializable {
 
     /**
      * Serial version UID for serialization support.
      */
     @Serial
     private static final long serialVersionUID = -162168235241317688L;
-
-    /**
-     * The unique identifier of the realm.
-     */
-    private String id;
 
     /**
      * Indicates whether this realm is the default realm in the system.
@@ -97,14 +90,8 @@ public class Realm implements Serializable {
     private Duration publicSessionTimeout = Duration.ofHours(2);
 
     /**
-     * Constructs a new empty Realm instance.
-     */
-    public Realm() {
-    }
-
-    /**
      * Constructs a new Realm instance with the specified name.
-     * 
+     *
      * @param name the name of the realm
      */
     public Realm(String name) {
@@ -113,7 +100,7 @@ public class Realm implements Serializable {
 
     /**
      * Adds an authentication method configuration to this realm.
-     * 
+     *
      * @param authMethodConfig the authentication method configuration to add
      */
     public void addAuthMethod(AuthMethodConfig<?> authMethodConfig) {
@@ -122,7 +109,7 @@ public class Realm implements Serializable {
 
     /**
      * Removes an authentication method configuration from this realm.
-     * 
+     *
      * @param authMethodConfig the authentication method configuration to remove
      */
     public void removeAuthMethod(AuthMethodConfig<?> authMethodConfig) {

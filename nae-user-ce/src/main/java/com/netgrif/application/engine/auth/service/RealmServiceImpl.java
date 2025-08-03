@@ -54,9 +54,11 @@ public class RealmServiceImpl implements RealmService {
 
     @Override
     public Realm createRealm(Realm createRequest) {
-        Realm realm = new Realm(createRequest.getName());
+        if (realmRepository.existsById(createRequest.getName())) {
+            throw new IllegalArgumentException("Realm with name " + createRequest.getName() + " already exists");
+        }
+        com.netgrif.application.engine.adapter.spring.auth.domain.Realm realm = new com.netgrif.application.engine.adapter.spring.auth.domain.Realm(createRequest.getName());
         realm.setDescription(createRequest.getDescription());
-
         realm.setAdminRealm(createRequest.isAdminRealm());
 
         if (createRequest.isDefaultRealm() && getDefaultRealm().isEmpty()) {
@@ -64,69 +66,69 @@ public class RealmServiceImpl implements RealmService {
         }
 
         realm = realmRepository.save(realm);
-        String collectionName = collectionNameProvider.getCollectionNameForRealm(realm.getId());
+        String collectionName = collectionNameProvider.getCollectionNameForRealm(realm.getName());
 
         if (!mongoTemplate.collectionExists(collectionName)) {
             try {
                 mongoTemplate.createCollection(collectionName);
                 mongoIndexesConfigurator.resolveIndexes(collectionName, User.class);
             } catch (Exception e) {
-                log.error("Error occurred while creating collection for realm {}", realm.getId(), e);
+                log.error("Error occurred while creating collection for realm {}", realm.getName(), e);
                 realmRepository.delete(realm);
-                throw new RuntimeException("Error occurred while creating collection for realm " + realm.getId(), e);
+                throw new RuntimeException("Error occurred while creating collection for realm " + realm.getName(), e);
             }
         }
 
-        return realm;
+        return realmRepository.save(realm);
     }
 
     @Override
     public Page<Realm> search(RealmSearch nodeProbe, Pageable pageable) {
-        return realmRepository.searchRealms(nodeProbe, pageable, mongoTemplate);
+        return realmRepository.searchRealms(nodeProbe, pageable, mongoTemplate).map(Realm.class::cast);
     }
 
     @Override
     public void enableAnonymUser(Realm realm) {
-        anonymousUserRefService.getOrCreateRef(realm.getId());
+        anonymousUserRefService.getOrCreateRef(realm.getName());
         realm.setPublicAccess(true);
-        realmRepository.save(realm);
+        realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
     }
 
     @Override
     public void disableAnonymUser(Realm realm) {
-        anonymousUserRefService.deleteRef(realm.getId());
+        anonymousUserRefService.deleteRef(realm.getName());
         realm.setPublicAccess(false);
-        realmRepository.save(realm);
+        realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
     }
 
     @Override
     public Optional<Realm> getDefaultRealm() {
-        return realmRepository.findByDefaultRealmTrue();
+        return realmRepository.findByDefaultRealmTrue().map(Realm.class::cast);
     }
 
     @Override
     public Optional<Realm> getAdminRealm() {
-        return realmRepository.findAdminRealm();
+        return realmRepository.findAdminRealm().map(Realm.class::cast);
     }
 
     @Override
     public Page<Realm> getAllRealm(Pageable pageable) {
-        return realmRepository.findAll(pageable == null ? PageRequest.of(0, Integer.MAX_VALUE, Sort.unsorted()) : pageable);
+        return realmRepository.findAll(pageable == null ? PageRequest.of(0, Integer.MAX_VALUE, Sort.unsorted()) : pageable).map(Realm.class::cast);
     }
 
     @Override
     public Page<Realm> getSmallRealm(Pageable pageable) {
-        return realmRepository.findAllSmall(pageable == null ? PageRequest.of(0, Integer.MAX_VALUE, Sort.unsorted()) : pageable);
+        return realmRepository.findAllSmall(pageable == null ? PageRequest.of(0, Integer.MAX_VALUE, Sort.unsorted()) : pageable).map(Realm.class::cast);
     }
 
     @Override
     public Optional<Realm> getRealmById(String id) {
-        return (id == null || id.isEmpty()) ? Optional.empty() : realmRepository.findById(id);
+        return (id == null || id.isEmpty()) ? Optional.empty() : realmRepository.findById(id).map(Realm.class::cast);
     }
 
     @Override
     public Optional<Realm> getRealmByName(String name) {
-        return (name == null || name.isEmpty()) ? Optional.empty() : realmRepository.findByName(name);
+        return (name == null || name.isEmpty()) ? Optional.empty() : realmRepository.findByName(name).map(Realm.class::cast);
     }
 
     @Override
@@ -139,7 +141,7 @@ public class RealmServiceImpl implements RealmService {
         AuthMethod<C> authMethod = provider.createAuthMethod(config);
         Realm realm = getRealmById(realmId).orElseThrow(() -> new IllegalArgumentException("Realm with id " + realmId + " not found"));
         realm.addAuthMethod(config);
-        realmRepository.save(realm);
+        realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
 
         return (T) authMethod;
     }
@@ -153,7 +155,7 @@ public class RealmServiceImpl implements RealmService {
 
         if (configToRemove.isPresent()) {
             realm.removeAuthMethod(configToRemove.get());
-            realmRepository.save(realm);
+            realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
         } else {
             throw new IllegalArgumentException("Provider with id " + providerId + " not found in realm " + realmId);
         }
@@ -168,7 +170,7 @@ public class RealmServiceImpl implements RealmService {
         if (update.isDefaultRealm() && getDefaultRealm().isEmpty()) {
             realm.setDefaultRealm(true);
         }
-        return realmRepository.save(realm);
+        return realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
     }
 
     @Override

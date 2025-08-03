@@ -412,7 +412,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
                 Pageable usersPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
                 Page<AbstractUser> users;
                 do {
-                    users = this.userService.findAllByProcessRoles(new HashSet<>(deletedRoleIds), realm.getId(), usersPageable);
+                    users = this.userService.findAllByProcessRoles(new HashSet<>(deletedRoleIds), realm.getName(), usersPageable);
 
                     for (AbstractUser user : users) {
                         log.info("[" + net.getStringId() + "]: Removing deleted roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString() + " from user " + user.getFullName() + " with id " + user.getStringId());
