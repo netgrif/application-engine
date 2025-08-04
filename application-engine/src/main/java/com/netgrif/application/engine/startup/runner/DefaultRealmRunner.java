@@ -25,7 +25,7 @@ public class DefaultRealmRunner implements ApplicationEngineStartupRunner {
             return;
         }
 
-        Realm createRequest = new Realm();
+        Realm createRequest = new com.netgrif.application.engine.adapter.spring.auth.domain.Realm("Default");
         createRequest.setName("Default");
         createRequest.setDescription("Default realm");
         createRequest.setAdminRealm(true);

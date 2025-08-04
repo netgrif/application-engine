@@ -9,9 +9,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Represents a security realm in the authentication system.
@@ -19,18 +17,13 @@ import java.util.Set;
  * and security settings for a group of users.
  */
 @Data
-public class Realm implements Serializable {
+public abstract class Realm implements Serializable {
 
     /**
      * Serial version UID for serialization support.
      */
     @Serial
     private static final long serialVersionUID = -162168235241317688L;
-
-    /**
-     * The unique identifier of the realm.
-     */
-    private String id;
 
     /**
      * Indicates whether this realm is the default realm in the system.
@@ -109,12 +102,6 @@ public class Realm implements Serializable {
      */
     @Positive
     private int maxSessionsAllowed = 1;
-
-    /**
-     * Constructs a new empty Realm instance.
-     */
-    public Realm() {
-    }
 
     /**
      * Constructs a new Realm instance with the specified name.
