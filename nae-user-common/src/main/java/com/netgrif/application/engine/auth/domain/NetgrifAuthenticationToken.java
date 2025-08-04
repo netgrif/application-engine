@@ -8,19 +8,19 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 @Getter
 public class NetgrifAuthenticationToken extends UsernamePasswordAuthenticationToken {
 
-    private final String realmId;
+    private final String realmName;
     private final Realm realm;
 
-    public NetgrifAuthenticationToken(Object principal, Object credentials, String realmId) {
+    public NetgrifAuthenticationToken(Object principal, Object credentials, String realmName) {
         super(principal, credentials);
-        this.realmId = realmId;
+        this.realmName = realmName;
         this.realm = null;
     }
 
     public NetgrifAuthenticationToken(Object principal, Object credentials, Realm realm) {
         super(principal, credentials);
         this.realm = realm;
-        this.realmId = realm != null ? realm.getId() : null;
+        this.realmName = realm != null ? realm.getName() : null;
     }
 
 }

@@ -192,7 +192,7 @@ public class RealmServiceImpl implements RealmService {
         configToUpdate.setOrder(config.getOrder());
         configToUpdate.setConfiguration(config.getConfiguration());
 
-        realmRepository.save(realm);
+        realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
 
         return configToUpdate;
     }
