@@ -132,18 +132,15 @@ public class RealmServiceImpl implements RealmService {
     }
 
     @Override
-    public <C extends AbstractAuthConfig, T extends AuthMethod<C>> T addProvider(String realmId, AuthMethodConfig<C> config) {
+    public <C extends AbstractAuthConfig> Realm addProvider(String realmId, AuthMethodConfig<C> config) {
         AuthMethodProvider<C> provider = (AuthMethodProvider<C>) providerRegistry.getProvider(config.getType());
         if (provider == null) {
             throw new IllegalArgumentException("Provider type " + config.getType() + " not found");
         }
 
-        AuthMethod<C> authMethod = provider.createAuthMethod(config);
         Realm realm = getRealmById(realmId).orElseThrow(() -> new IllegalArgumentException("Realm with id " + realmId + " not found"));
         realm.addAuthMethod(config);
-        realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
-
-        return (T) authMethod;
+        return realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
     }
 
     @Override
