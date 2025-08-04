@@ -171,6 +171,33 @@ public class RealmServiceImpl implements RealmService {
     }
 
     @Override
+    public AuthMethodConfig<?> updateConfigInRealm(String realmId, AuthMethodConfig<?> config) {
+        if (config == null) {
+            throw new IllegalArgumentException("Authentication config not provided");
+        }
+
+        Realm realm = getRealmById(realmId).orElseThrow(() -> new IllegalArgumentException("Realm with id " + realmId + " not found"));
+        Optional<AuthMethodConfig<?>> configToUpdateOpt = realm.getAuthMethods().stream()
+                .filter(realmConfig -> realmConfig.getId().equals(config.getId()))
+                .findFirst();
+
+        if (configToUpdateOpt.isEmpty()) {
+            throw new IllegalArgumentException("Authentication config with id " + config.getId() + " not found in realm " + realmId);
+        }
+
+        AuthMethodConfig configToUpdate = configToUpdateOpt.get();
+        configToUpdate.setName(config.getName());
+        configToUpdate.setDescription(config.getDescription());
+        configToUpdate.setEnabled(config.isEnabled());
+        configToUpdate.setOrder(config.getOrder());
+        configToUpdate.setConfiguration(config.getConfiguration());
+
+        realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
+
+        return configToUpdate;
+    }
+
+    @Override
     public void deleteRealm(String realmId) {
         if (!realmRepository.existsById(realmId)) {
             throw new IllegalArgumentException("Realm with id " + realmId + " not found");

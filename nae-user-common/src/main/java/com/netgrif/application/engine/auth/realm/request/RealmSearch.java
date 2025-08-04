@@ -7,5 +7,7 @@ public record RealmSearch(String id,
                           Boolean adminRealm,
                           Boolean enableBlocking,
                           Integer maxFailedAttempts,
-                          Integer blockDurationMinutes) {
+                          Integer blockDurationMinutes,
+                          Boolean enableLimitSessions,
+                          Integer maxSessionsAllowed) {
 }

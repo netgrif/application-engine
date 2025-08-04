@@ -38,5 +38,7 @@ public interface RealmService {
 
     Realm updateRealm(String realmId, Realm update);
 
+    AuthMethodConfig<?> updateConfigInRealm(String realmId, AuthMethodConfig<?> config);
+
     void deleteRealm(String realmId);
 }

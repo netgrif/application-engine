@@ -54,6 +54,16 @@ public class AuthMethodConfigDeserializer extends StdDeserializer<AuthMethodConf
             config.setEnabled(enabledNode.asBoolean());
         }
 
+        JsonNode descNode = node.get("description");
+        if (descNode != null) {
+            config.setDescription(descNode.asText());
+        }
+
+        JsonNode orderNode = node.get("order");
+        if (orderNode != null) {
+            config.setOrder(orderNode.asInt());
+        }
+
         config.setType(type);
         config.setRealmId(realmID);
 

@@ -2,6 +2,7 @@ package com.netgrif.application.engine.objects.auth.domain;
 
 import com.netgrif.application.engine.objects.auth.provider.AuthMethodConfig;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.io.Serial;
@@ -88,6 +89,19 @@ public abstract class Realm implements Serializable {
      * Default value is 2 hours.
      */
     private Duration publicSessionTimeout = Duration.ofHours(2);
+
+    /**
+     * If true, the realm has enabled limit of maximum allowed sessions
+     * per user
+     */
+    private boolean enableLimitSessions = false;
+
+    /**
+     * Maximum allowed sessions per user. Attribute {@link #enableLimitSessions}
+     * must be enabled.
+     */
+    @Positive
+    private int maxSessionsAllowed = 1;
 
     /**
      * Constructs a new Realm instance with the specified name.
