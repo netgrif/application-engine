@@ -9,8 +9,8 @@ import com.netgrif.application.engine.auth.realm.request.RealmSearch;
 import com.netgrif.application.engine.auth.repository.RealmRepository;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
 import com.netgrif.application.engine.objects.auth.domain.User;
-import com.netgrif.application.engine.objects.auth.provider.AuthMethod;
 import com.netgrif.application.engine.objects.auth.provider.AuthMethodConfig;
+import com.netgrif.application.engine.objects.auth.provider.RealmUpdate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -195,6 +196,65 @@ public class RealmServiceImpl implements RealmService {
         realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
 
         return configToUpdate;
+    }
+
+    @Override
+    public AuthMethodConfig<?> partialUpdateConfigInRealm(String realmId, String providerId, RealmUpdate updates) {
+        if (updates == null || (updates.getConfiguration() == null &&
+                updates.getEnabled() == null &&
+                updates.getName() == null &&
+                updates.getDescription() == null &&
+                updates.getOrder() == null)) {
+            throw new IllegalArgumentException("No update data provided");
+        }
+
+        Realm realm = getRealmById(realmId)
+                .orElseThrow(() -> new IllegalArgumentException("Realm with id " + realmId + " not found"));
+
+        Optional<AuthMethodConfig<?>> configToUpdateOpt = realm.getAuthMethods().stream()
+                .filter(existing -> existing.getId().equals(providerId))
+                .findFirst();
+
+        if (configToUpdateOpt.isEmpty()) {
+            throw new IllegalArgumentException("Authentication config with id " + providerId + " not found in realm " + realmId);
+        }
+
+        AuthMethodConfig<?> existingConfig = configToUpdateOpt.get();
+
+        if (updates.getName() != null) {
+            existingConfig.setName(updates.getName());
+        }
+
+        if (updates.getDescription() != null) {
+            existingConfig.setDescription(updates.getDescription());
+        }
+
+        if (updates.getEnabled() != null) {
+            existingConfig.setEnabled(updates.getEnabled());
+        }
+
+        if (updates.getOrder() != null) {
+            existingConfig.setOrder(updates.getOrder());
+        }
+
+        Map<String, Object> configUpdates = updates.getConfiguration();
+        Object targetConfig = existingConfig.getConfiguration();
+
+        if (targetConfig != null && configUpdates != null) {
+            for (Map.Entry<String, Object> entry : configUpdates.entrySet()) {
+                try {
+                    var field = targetConfig.getClass().getDeclaredField(entry.getKey());
+                    field.setAccessible(true);
+                    field.set(targetConfig, entry.getValue());
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    log.warn("Skipped field '{}' due to error: {}", entry.getKey(), e.getMessage());
+                }
+            }
+        }
+
+        realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
+
+        return existingConfig;
     }
 
     @Override
