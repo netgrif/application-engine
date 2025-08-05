@@ -161,13 +161,27 @@ public class RealmServiceImpl implements RealmService {
 
     @Override
     public Realm updateRealm(String realmId, Realm update) {
-        Realm realm = getRealmById(realmId).orElseThrow(() -> new IllegalArgumentException("Realm with id " + realmId + " not found"));
-        realm.setName(update.getName());
+        Realm realm = getRealmById(realmId)
+                .orElseThrow(() -> new IllegalArgumentException("Realm with id " + realmId + " not found"));
+
         realm.setDescription(update.getDescription());
-        realm.setAdminRealm(update.isAdminRealm());
-        if (update.isDefaultRealm() && getDefaultRealm().isEmpty()) {
-            realm.setDefaultRealm(true);
+        realm.setEnableBlocking(update.isEnableBlocking());
+        realm.setMaxFailedAttempts(update.getMaxFailedAttempts());
+        realm.setBlockDurationMinutes(update.getBlockDurationMinutes());
+        realm.setPublicAccess(update.isPublicAccess());
+        realm.setSessionTimeout(update.getSessionTimeout());
+        realm.setPublicSessionTimeout(update.getPublicSessionTimeout());
+        realm.setEnableLimitSessions(update.isEnableLimitSessions());
+        realm.setMaxSessionsAllowed(update.getMaxSessionsAllowed());
+
+        if (update.isDefaultRealm()) {
+            if (!realm.isDefaultRealm() && getDefaultRealm().isEmpty()) {
+                realm.setDefaultRealm(true);
+            }
+        } else {
+            realm.setDefaultRealm(false);
         }
+
         return realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
     }
 
