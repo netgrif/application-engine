@@ -21,7 +21,6 @@ import java.util.Map;
  * Same as the PredicateArray class, this one needs to be converted into map object
  * when importing filter.
  */
-@EqualsAndHashCode
 @NoArgsConstructor
 @Getter
 @Setter

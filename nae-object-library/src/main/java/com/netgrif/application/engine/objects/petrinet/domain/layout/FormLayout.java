@@ -1,10 +1,12 @@
 package com.netgrif.application.engine.objects.petrinet.domain.layout;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class FormLayout extends Layout {
 
     private String type;

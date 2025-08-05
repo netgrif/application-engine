@@ -6,12 +6,14 @@ import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class SetDataEventOutcome extends TaskEventOutcome {
 
     private Map<String, ChangedField> changedFields = new HashMap<>();

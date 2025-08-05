@@ -39,18 +39,22 @@ public class DashboardManagementBody {
     /**
      * should dashboard toolbar contains menu with options.
      */
+    @Builder.Default
     private boolean simpleDashboard = false;
     /**
      * should dashboard toolbar menu with profile.
      */
+    @Builder.Default
     private boolean profileDashboard = false;
     /**
      * should dashboard toolbar contains menu with language selection
      */
+    @Builder.Default
     private boolean languageDashboard = false;
     /**
      * should dashboard toolbar contains logout button.
      */
+    @Builder.Default
     private boolean logoutDashboard = false;
 
 

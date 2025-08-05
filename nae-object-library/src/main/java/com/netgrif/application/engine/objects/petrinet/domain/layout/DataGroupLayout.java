@@ -2,10 +2,12 @@ package com.netgrif.application.engine.objects.petrinet.domain.layout;
 
 import com.netgrif.application.engine.objects.importer.model.DataGroup;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class DataGroupLayout extends FormLayout {
 
     public DataGroupLayout(Integer rows, Integer cols, String type, String hideEmptyRows, String compactDirection) {

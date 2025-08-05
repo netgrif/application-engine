@@ -34,7 +34,7 @@ public class Plugin implements Serializable {
     private boolean active;
 
     /**
-     * Map of {@link EntryPoint}, key of the map is equivalent to {@link EntryPoint#getName()}
+     * Map of {@link EntryPoint}, key of the map is equivalent to EntryPoint.getName
      * */
     private Map<String, EntryPoint> entryPoints;
 

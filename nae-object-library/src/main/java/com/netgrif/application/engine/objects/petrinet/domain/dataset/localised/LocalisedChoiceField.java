@@ -3,6 +3,7 @@ package com.netgrif.application.engine.objects.petrinet.domain.dataset.localised
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.ChoiceField;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.LinkedList;
@@ -12,6 +13,7 @@ import java.util.Set;
 
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class LocalisedChoiceField extends LocalisedField {
 
     protected List<String> choices;

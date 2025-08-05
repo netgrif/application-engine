@@ -3,11 +3,13 @@ package com.netgrif.application.engine.objects.petrinet.domain.layout;
 import com.netgrif.application.engine.objects.importer.model.Transition;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class TaskLayout extends FormLayout {
 
     private Integer offset;

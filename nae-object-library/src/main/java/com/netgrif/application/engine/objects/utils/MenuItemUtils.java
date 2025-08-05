@@ -51,7 +51,7 @@ public class MenuItemUtils {
     }
 
     /**
-     * This method is mainly used for {@link IMenuItemService#moveItem(Case, String)}
+     * This method is mainly used for IMenuItemService.moveItem(Case, String)
      *
      * @param folderItem case instance of folder menu item
      * @param destUri    path of the uri node

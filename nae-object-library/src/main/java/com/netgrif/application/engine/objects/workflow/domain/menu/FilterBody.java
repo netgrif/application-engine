@@ -47,7 +47,7 @@ public class FilterBody {
     }
 
     /**
-     * Transforms attributes into dataSet for {@link IDataService#setData}
+     * Transforms attributes into dataSet for IDataService.setData
      *
      * @return {@link ToDataSetOutcome} object with dataSet
      * */

@@ -119,7 +119,7 @@ public class MenuItemBody {
     }
 
     /**
-     * Transforms attributes into dataSet for {@link IDataService#setData}
+     * Transforms attributes into dataSet for IDataService.setData
      *
      * @return {@link ToDataSetOutcome} object with dataSet
      */
@@ -128,7 +128,7 @@ public class MenuItemBody {
     }
 
     /**
-     * Transforms attributes into dataSet for {@link IDataService#setData}
+     * Transforms attributes into dataSet for IDataService.setData
      *
      * @param viewCase case instance of view. If provided, caseRef and taskRef are initialized
      * @return {@link ToDataSetOutcome} object with dataSet
@@ -138,7 +138,7 @@ public class MenuItemBody {
     }
 
     /**
-     * Transforms attributes into dataSet for {@link IDataService#setData}
+     * Transforms attributes into dataSet for IDataService.setData
      *
      * @param parentId identifier of parent menu item instance
      * @param nodePath uri, that represents the menu item (f.e.: "/myItem1/myItem2")

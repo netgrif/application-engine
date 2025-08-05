@@ -19,7 +19,6 @@ import java.util.Map;
  * Same as the FilterMetadataExport class, this one needs to be converted into
  * map object while importing filter too.
  */
-@EqualsAndHashCode
 @NoArgsConstructor
 @Getter
 @Setter

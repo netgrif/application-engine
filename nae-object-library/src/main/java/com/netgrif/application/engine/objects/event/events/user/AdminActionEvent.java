@@ -2,8 +2,11 @@ package com.netgrif.application.engine.objects.event.events.user;
 
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class AdminActionEvent extends UserEvent {
 
     private String code;

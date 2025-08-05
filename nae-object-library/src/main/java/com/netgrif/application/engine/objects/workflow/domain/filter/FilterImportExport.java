@@ -17,7 +17,6 @@ import java.util.Objects;
  * This class holds all information about one filter, so filter can be fully build from this class.
  * This class is represented by <filter> tag in exported xml file.
  */
-@EqualsAndHashCode
 @NoArgsConstructor
 @Getter
 @Setter

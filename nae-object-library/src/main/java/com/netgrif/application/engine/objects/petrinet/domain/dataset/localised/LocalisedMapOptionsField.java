@@ -3,6 +3,7 @@ package com.netgrif.application.engine.objects.petrinet.domain.dataset.localised
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.MapOptionsField;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class LocalisedMapOptionsField<DV> extends LocalisedField {
 
     private Map<String, String> options;

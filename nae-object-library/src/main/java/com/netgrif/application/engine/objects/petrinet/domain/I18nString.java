@@ -96,6 +96,11 @@ public class I18nString implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+        return this.key != null ? this.key.hashCode() : (this.defaultValue != null ? this.defaultValue.hashCode() : 0);
+    }
+
+    @Override
     public I18nString clone() {
         I18nString clone = new I18nString();
         clone.setKey(this.key);

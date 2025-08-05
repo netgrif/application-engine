@@ -2,10 +2,12 @@ package com.netgrif.application.engine.objects.petrinet.domain.events;
 
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.stream.Collectors;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class ProcessEvent extends BaseEvent {
 
     private ProcessEventType type;

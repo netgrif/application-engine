@@ -2,10 +2,12 @@ package com.netgrif.application.engine.objects.petrinet.domain.dataset.localised
 
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.DateTimeField;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Locale;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class LocalisedDateTimeField extends LocalisedField {
 
     private String minDate;
