@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.objects.auth.domain.Authority;
+import com.netgrif.application.engine.objects.auth.dto.AuthoritySearchDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -43,4 +44,14 @@ public interface AuthorityService {
      * @return a {@link Page} of {@link Authority} entities.
      */
     Page<Authority> findAllByIds(Collection<String> ids, Pageable pageable);
+
+
+    /**
+     * Searches for {@link Authority} entities based on the specified query criteria, with pagination support.
+     *
+     * @param searchDto the {@link AuthoritySearchDto} containing search criteria such as filters or keywords.
+     * @param pageable the {@link Pageable} object containing pagination information.
+     * @return a {@link Page} of {@link Authority} entities matching the search criteria.
+     */
+    Page<Authority> search(AuthoritySearchDto searchDto, Pageable pageable);
 }
