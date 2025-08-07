@@ -1,8 +1,7 @@
 package com.netgrif.application.engine.elastic.service;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import com.google.common.collect.ImmutableList;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
@@ -357,11 +356,13 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
             return;
         }
 
+        TermsQueryField processIds = new TermsQueryField.Builder()
+                .value(request.process.stream().map(process -> process.identifier).map(FieldValue::of).collect(Collectors.toList()))
+                .build();
+
         BoolQuery.Builder processQuery = new BoolQuery.Builder();
-        for (PetriNet process : request.process) {
-            if (process.identifier != null) {
-                processQuery.should(termQuery("processId", process.identifier)._toQuery());
-            }
+        if (!processIds.value().isEmpty()) {
+            processQuery.should(QueryBuilders.terms(term -> term.field("processId").terms(processIds)));
         }
 
         query.filter(processQuery.build()._toQuery());
@@ -451,15 +452,15 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         PetriNetSearch processQuery = new PetriNetSearch();
         processQuery.setGroup(request.group);
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
-        if (groupProcesses.size() == 0)
+        if (groupProcesses.isEmpty()) {
             return true;
-
-        BoolQuery.Builder groupProcessQuery = new BoolQuery.Builder();
-        for (PetriNetReference process : groupProcesses) {
-            groupProcessQuery.should(termQuery("processId", process.getStringId())._toQuery());
         }
+        TermsQueryField stringIds = new TermsQueryField.Builder()
+                .value(groupProcesses.stream().map(PetriNetReference::getStringId).map(FieldValue::of).collect(Collectors.toList()))
+                .build();
 
-        query.filter(groupProcessQuery.build()._toQuery());
+        query.filter(QueryBuilders.terms(term -> term.field("processId").terms(stringIds)));
+
         return false;
     }
 }

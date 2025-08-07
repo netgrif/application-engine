@@ -1,7 +1,10 @@
 package com.netgrif.application.engine.elastic.service;
 
+import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
@@ -22,8 +25,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.autoconfigure.metrics.export.elastic.ElasticProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -40,11 +41,10 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.springframework.data.elasticsearch.client.elc.Queries.matchQuery;
 import static org.springframework.data.elasticsearch.client.elc.Queries.termQuery;
-
-//import static org.elasticsearch.index.query.QueryBuilders.*;
 
 @Service
 @RequiredArgsConstructor
@@ -180,7 +180,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             return null;
         } else if (!isIntersection) {
             singleQueries = singleQueries.stream().filter(Objects::nonNull).collect(Collectors.toList());
-            if (singleQueries.size() == 0) {
+            if (singleQueries.isEmpty()) {
                 // all queries result in an empty set => the entire result is an empty set
                 return null;
             }
@@ -214,10 +214,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
         // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
 
-        if (resultAlwaysEmpty)
-            return null;
-        else
-            return query;
+        return resultAlwaysEmpty ? null : query;
     }
 
     protected void buildPetriNetQuery(CaseSearchRequest request, LoggedUser user, BoolQuery.Builder query) {
@@ -225,15 +222,31 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             return;
         }
 
-        BoolQuery.Builder petriNetQuery = new BoolQuery.Builder();
+        Set<String> identifiersSet = new HashSet<>();
+        Set<String> processIdsSet = new HashSet<>();
 
-        for (CaseSearchRequest.PetriNet process : request.process) {
-            if (process.identifier != null) {
-                petriNetQuery.should(termQuery("processIdentifier", process.identifier)._toQuery());
+        request.process.forEach(p -> {
+            if (p.identifier != null) {
+                identifiersSet.add(p.identifier);
             }
-            if (process.processId != null) {
-                petriNetQuery.should(termQuery("processId", process.processId)._toQuery());
+            if (p.processId != null) {
+                processIdsSet.add(p.processId);
             }
+        });
+        TermsQueryField identifiers = new TermsQueryField.Builder()
+                .value(identifiersSet.stream().map(FieldValue::of).collect(Collectors.toList()))
+                .build();
+
+        TermsQueryField processIds = new TermsQueryField.Builder()
+                .value(processIdsSet.stream().map(FieldValue::of).collect(Collectors.toList()))
+                .build();
+
+        BoolQuery.Builder petriNetQuery = new BoolQuery.Builder();
+        if (!identifiers.value().isEmpty()) {
+            petriNetQuery.should(QueryBuilders.terms(term -> term.field("processIdentifier").terms(identifiers)));
+        }
+        if (!processIds.value().isEmpty()) {
+            petriNetQuery.should(QueryBuilders.terms(term -> term.field("processId").terms(processIds)));
         }
 
         query.filter(petriNetQuery.build()._toQuery());
@@ -307,12 +320,11 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             return;
         }
 
-        BoolQuery.Builder taskQuery = new BoolQuery.Builder();
-        for (String taskImportId : request.transition) {
-            taskQuery.should(termQuery("taskIds", taskImportId)._toQuery());
-        }
+        TermsQueryField taskIds = new TermsQueryField.Builder()
+                .value(request.transition.stream().map(FieldValue::of).collect(Collectors.toList()))
+                .build();
 
-        query.filter(taskQuery.build()._toQuery());
+        query.filter(QueryBuilders.terms(term -> term.field("taskIds").terms(taskIds)));
     }
 
     /**
@@ -338,12 +350,11 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             return;
         }
 
-        BoolQuery.Builder roleQuery = new BoolQuery.Builder();
-        for (String roleId : request.role) {
-            roleQuery.should(termQuery("enabledRoles", roleId)._toQuery());
-        }
+        TermsQueryField roleIds = new TermsQueryField.Builder()
+                .value(request.role.stream().map(FieldValue::of).collect(Collectors.toList()))
+                .build();
 
-        query.filter(roleQuery.build()._toQuery());
+        query.filter(QueryBuilders.terms(term -> term.field("enabledRoles").terms(roleIds)));
     }
 
     /**
@@ -434,9 +445,11 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             return;
         }
 
-        BoolQuery.Builder caseIdQuery = new BoolQuery.Builder();
-        request.stringId.forEach(caseId -> caseIdQuery.should(termQuery("stringId", caseId)._toQuery()));
-        query.filter(caseIdQuery.build()._toQuery());
+        TermsQueryField stringIds = new TermsQueryField.Builder()
+                .value(request.stringId.stream().map(FieldValue::of).collect(Collectors.toList()))
+                .build();
+
+        query.filter(QueryBuilders.terms(term -> term.field("stringId").terms(stringIds)));
     }
 
     protected void buildUriNodeIdQuery(CaseSearchRequest request, BoolQuery.Builder query) {
@@ -444,9 +457,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             return;
         }
 
-        BoolQuery.Builder caseIdQuery = new BoolQuery.Builder();
-        caseIdQuery.should(termQuery("uriNodeId", request.uriNodeId)._toQuery());
-        query.filter(caseIdQuery.build()._toQuery());
+        query.filter(termQuery("uriNodeId", request.uriNodeId)._toQuery());
     }
 
     /**
@@ -475,14 +486,15 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         PetriNetSearch processQuery = new PetriNetSearch();
         processQuery.setGroup(request.group);
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
-        if (groupProcesses.size() == 0)
+        if (groupProcesses.isEmpty()) {
             return true;
+        }
 
-        BoolQuery.Builder groupQuery = new BoolQuery.Builder();
-        groupProcesses.stream().map(PetriNetReference::getIdentifier)
-                .map(netIdentifier -> termQuery("processIdentifier", netIdentifier))
-                .forEach(termQuery -> groupQuery.should(termQuery._toQuery()));
-        query.filter(groupQuery.build()._toQuery());
+        TermsQueryField stringIds = new TermsQueryField.Builder()
+                .value(groupProcesses.stream().map(PetriNetReference::getIdentifier).map(FieldValue::of).collect(Collectors.toList()))
+                .build();
+
+        query.filter(QueryBuilders.terms(term -> term.field("processIdentifier").terms(stringIds)));
         return false;
     }
 
