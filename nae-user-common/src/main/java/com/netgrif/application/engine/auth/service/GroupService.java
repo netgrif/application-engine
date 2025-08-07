@@ -2,6 +2,7 @@ package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Group;
+import com.netgrif.application.engine.objects.auth.dto.GroupSearchDto;
 import org.springframework.data.mongodb.core.query.Query;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
@@ -296,4 +297,14 @@ public interface GroupService {
      * @return email address of the group owner
      */
     String getGroupOwnerEmail(String groupId);
+
+
+    /**
+     * Searches for groups based on the provided search criteria and pageable details.
+     *
+     * @param searchDto the search criteria encapsulated in a {@link GroupSearchDto}
+     * @param pageable pagination information for the results
+     * @return a page of {@link Group} objects that match the search criteria
+     */
+    Page<Group> search(GroupSearchDto searchDto, Pageable pageable);
 }

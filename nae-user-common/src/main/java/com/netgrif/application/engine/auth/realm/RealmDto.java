@@ -6,5 +6,7 @@ public record RealmDto(String name,
                        Boolean adminRealm,
                        Boolean enableBlocking,
                        Integer maxFailedAttempts,
-                       Integer blockDurationMinutes) {
+                       Integer blockDurationMinutes,
+                       Boolean enableLimitSessions,
+                       Integer maxSessionsAllowed) {
 }

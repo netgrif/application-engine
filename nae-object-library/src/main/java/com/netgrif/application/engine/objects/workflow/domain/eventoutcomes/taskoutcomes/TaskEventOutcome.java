@@ -6,11 +6,13 @@ import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.CaseEventOutcome;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public abstract class TaskEventOutcome extends CaseEventOutcome {
 
     @Getter

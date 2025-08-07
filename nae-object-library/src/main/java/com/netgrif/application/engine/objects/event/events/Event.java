@@ -7,15 +7,18 @@ import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.EventObject;
 
+@Getter
 public abstract class Event extends EventObject {
     @Serial
     private static final long serialVersionUID = -9102232475981679124L;
-    @Getter
     private EventPhase eventPhase;
-    @Getter
     protected LocalDateTime time;
 
     protected static final String MISSING_IDENTIFIER = "NULL";
+
+    public Event() {
+        this(null);
+    }
 
     public Event(Object source) {
         super(source);

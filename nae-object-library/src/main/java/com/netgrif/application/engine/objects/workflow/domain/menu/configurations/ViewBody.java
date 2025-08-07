@@ -47,7 +47,7 @@ public abstract class ViewBody {
     }
 
     /**
-     * Transforms data of this class into {@link ToDataSetOutcome}, which contains prepared data for the {@link IDataService#setData}
+     * Transforms data of this class into {@link ToDataSetOutcome}, which contains prepared data for the IDataService.setData
      *
      * @return {@link ToDataSetOutcome} object containing dataSet
      * */
@@ -56,7 +56,7 @@ public abstract class ViewBody {
     };
 
     /**
-     * Transforms data of this class into {@link ToDataSetOutcome}, which contains prepared data for the {@link IDataService#setData}
+     * Transforms data of this class into {@link ToDataSetOutcome}, which contains prepared data for the IDataService.setData
      *
      * @param associatedViewCase case instance of associated view. If provided, caseRef and taskRef are initialized.
      * @param filterCase case instance of filter. If provided, caseRef is initialized

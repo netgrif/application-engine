@@ -17,6 +17,8 @@ public class AuthMethodConfig<T> implements Serializable {
     private boolean enabled;
     private T configuration;
     private String realmId;
+    /// lower number has bigger priority
+    private int order;
 
     public AuthMethodConfig() {
         if (this.id == null) {

@@ -4,10 +4,12 @@ import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class DelegateTaskEventOutcome extends TaskEventOutcome {
 
     public DelegateTaskEventOutcome() {

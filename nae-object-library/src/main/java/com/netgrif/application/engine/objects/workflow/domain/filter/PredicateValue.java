@@ -3,7 +3,6 @@ package com.netgrif.application.engine.objects.workflow.domain.filter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,9 +14,8 @@ import java.util.Map;
 
 /**
  * Class holds values of some search predicates (mainly searching for author).
- * Values can be integer of author id or other search predicate as a text (<<me>>).
+ * Values can be integer of author id or other search predicate as a text.
  */
-@EqualsAndHashCode
 @NoArgsConstructor
 @Getter
 @Setter
@@ -39,12 +37,12 @@ public class PredicateValue extends DoubleValueHolder {
                     break;
                 case "value":
                     List<?> list = (List<?>) v;
-                    if (list.get(0) instanceof String) {
+                    if (list.getFirst() instanceof String) {
                         stringValues = new ArrayList<>();
                         for (Object val : list) {
                             stringValues.add((String) val);
                         }
-                    } else if (list.get(0) instanceof Integer || list.get(0) instanceof Double || list.get(0) instanceof Float) {
+                    } else if (list.getFirst() instanceof Integer || list.getFirst() instanceof Double || list.getFirst() instanceof Float) {
                         doubleValues = new ArrayList<>();
                         for (Object val : list) {
                             doubleValues.add(convertObjectToDouble(val));

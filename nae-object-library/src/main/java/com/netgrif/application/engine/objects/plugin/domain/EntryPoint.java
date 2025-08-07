@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Domain class for entry points. Entry points are beans annotated with {@link com.netgrif.plugin.core.annotations.EntryPoint}
+ * Domain class for entry points. Entry points are beans annotated with com.netgrif.plugin.core.annotations.EntryPoint
  * annotation. These beans contain methods, that can be run from server where the plugin is registered.
  * */
 @Data
@@ -23,7 +23,7 @@ public class EntryPoint implements Serializable {
     private String pluginName;
 
     /**
-     * Map of {@link Method}, key of the map is equivalent to {@link Method#getName()}
+     * Map of {@link Method}, key of the map is equivalent to Method.getName
      * */
     private Map<String, Method> methods;
 

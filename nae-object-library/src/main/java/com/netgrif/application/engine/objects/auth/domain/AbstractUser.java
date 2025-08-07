@@ -200,7 +200,6 @@ public abstract class AbstractUser extends AbstractActor {
     }
 
     /**
-     * {@inheritDoc}
      * Returns user's first and last name concatenated.
      */
     @Override
@@ -209,7 +208,6 @@ public abstract class AbstractUser extends AbstractActor {
     }
 
     /**
-     * {@inheritDoc}
      * Returns user's full name including middle name if present.
      */
     @Override

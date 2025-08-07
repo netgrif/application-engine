@@ -3,7 +3,6 @@ package com.netgrif.application.engine.objects.workflow.domain.filter;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +17,6 @@ import java.util.Objects;
  * <filters> tag is followed by list of <filter> tags.
  * Whole schema for the xml file is on the path: resources/petriNets/filter_export_schema.xsd
  */
-@EqualsAndHashCode
 @Getter
 @Setter
 @JacksonXmlRootElement(localName = "filters")

@@ -18,7 +18,6 @@ import java.util.*;
  * values as objects
  * This structure needs to be recreated when importing filter by method getMapObject().
  */
-@EqualsAndHashCode
 @NoArgsConstructor
 @Getter
 @Setter

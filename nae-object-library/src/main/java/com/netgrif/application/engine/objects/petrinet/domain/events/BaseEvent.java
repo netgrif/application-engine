@@ -4,10 +4,12 @@ import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.Imported;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class BaseEvent extends Imported {
 
     private String id;

@@ -6,8 +6,11 @@ import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
 import com.netgrif.application.engine.auth.repository.GroupRepository;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Group;
+import com.netgrif.application.engine.objects.auth.dto.GroupSearchDto;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundException;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundExceptionCode;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import com.querydsl.core.types.Predicate;
 import lombok.Getter;
@@ -366,6 +369,26 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public String getGroupOwnerEmail(String groupId) {
         return this.getGroupOwnerEmail(findById(groupId));
+    }
+
+    @Override
+    public Page<Group> search(GroupSearchDto searchDto, Pageable pageable) {
+        List<Criteria> filters = new ArrayList<>();
+        if (searchDto.getFullText() != null && !searchDto.getFullText().isBlank()) {
+            Criteria criteria = new Criteria().orOperator(
+                    Criteria.where("identifier").regex(searchDto.getFullText(), "i"),
+                    Criteria.where("displayName").regex(searchDto.getFullText(), "i"),
+                    Criteria.where("ownerUsername").regex(searchDto.getFullText(), "i")
+            );
+            filters.add(criteria);
+        }
+        if (searchDto.getRealmId() != null && !searchDto.getRealmId().isBlank())  {
+            filters.add(Criteria.where("realmId").regex(searchDto.getRealmId(), "i"));
+        }
+        Query query = Query.query(filters.isEmpty() ? new Criteria() : new Criteria().andOperator(filters.toArray(new Criteria[0])));
+        long count = mongoTemplate.count(query, Group.class);
+        List<Group> groups = mongoTemplate.find(query.with(pageable), Group.class);
+        return new PageImpl<>(groups, pageable, count);
     }
 
     protected String getGroupOwnerEmail(Group groupCase) {

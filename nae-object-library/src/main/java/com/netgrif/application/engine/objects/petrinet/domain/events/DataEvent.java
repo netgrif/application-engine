@@ -2,6 +2,7 @@ package com.netgrif.application.engine.objects.petrinet.domain.events;
 
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 
 @Data
 @Slf4j
+@EqualsAndHashCode(callSuper = true)
 public class DataEvent extends BaseEvent {
 
     private DataEventType type;

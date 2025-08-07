@@ -4,10 +4,12 @@ import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public abstract class PetriNetEventOutcome extends EventOutcome {
 
     private PetriNet net;
