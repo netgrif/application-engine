@@ -312,6 +312,15 @@ public class ElasticIndexService implements IElasticIndexService {
         }
     }
 
+
+    /**
+     * Performs bulk indexing of cases and tasks into Elasticsearch.
+     *
+     * @param indexAll      if true, indexes all cases and tasks, regardless of modification time
+     * @param after         the time after which cases and tasks should be considered for reindexing
+     * @param caseBatchSize number of cases to process per batch. If null, defaults from Elasticsearch properties
+     * @param taskBatchSize number of tasks to process per batch. If null, defaults from Elasticsearch properties
+     */
     @Override
     public void bulkIndex(boolean indexAll, LocalDateTime after, Integer caseBatchSize, Integer taskBatchSize) {
         log.info("Reindexing stale cases: started reindexing after {}", after);
@@ -339,6 +348,16 @@ public class ElasticIndexService implements IElasticIndexService {
         log.info("Reindexing stale cases: end");
     }
 
+    /**
+     * Reindexes queried cases and tasks into Elasticsearch in batches.
+     *
+     * @param count         total number of cases to reindex
+     * @param now           current timestamp for filtering cases
+     * @param after         reindexing cases modified after this time
+     * @param indexAll      when true, reindexes all cases
+     * @param caseBatchSize batch size for cases
+     * @param taskBatchSize batch size for tasks
+     */
     private void reindexQueried(long count, LocalDateTime now, LocalDateTime after, boolean indexAll, int caseBatchSize, int taskBatchSize) {
         long numOfPages = ((count / caseBatchSize) + 1);
         log.info("Reindexing {} pages", numOfPages);
@@ -376,6 +395,12 @@ public class ElasticIndexService implements IElasticIndexService {
         }
     }
 
+    /**
+     * Reindexes tasks into Elasticsearch in batches corresponding to the provided case IDs.
+     *
+     * @param caseIds       list of case IDs whose tasks need to be reindexed
+     * @param taskBatchSize size of the batch for tasks
+     */
     private void bulkIndexTasks(List<String> caseIds, int taskBatchSize) {
         if (caseIds == null || caseIds.isEmpty()) {
             return;
@@ -404,6 +429,11 @@ public class ElasticIndexService implements IElasticIndexService {
         }
     }
 
+    /**
+     * Prepares the case object by ensuring necessary dependencies and last modified timestamp are set.
+     *
+     * @param useCase case object to prepare
+     */
     private void prepareCase(Case useCase) {
         if (useCase.getPetriNet() == null) {
             useCase.setPetriNet(petriNetService.get(useCase.getPetriNetObjectId()));
@@ -413,6 +443,12 @@ public class ElasticIndexService implements IElasticIndexService {
         }
     }
 
+    /**
+     * Prepares a bulk operation for indexing or updating a case in Elasticsearch.
+     *
+     * @param doc        transformed ElasticCase object
+     * @param operations collection of BulkOperations to add this operation to
+     */
     private void prepareCaseBulkOperation(ElasticCase doc, List<BulkOperation> operations) {
         try {
             operations.add(BulkOperation.of(op -> op
@@ -429,6 +465,12 @@ public class ElasticIndexService implements IElasticIndexService {
         }
     }
 
+    /**
+     * Prepares a bulk operation for indexing or updating a task in Elasticsearch.
+     *
+     * @param doc        transformed ElasticTask object
+     * @param operations collection of BulkOperations to add this operation to
+     */
     private void prepareTaskBulkOperation(ElasticTask doc, List<BulkOperation> operations) {
         try {
             operations.add(BulkOperation.of(op -> op
@@ -446,6 +488,11 @@ public class ElasticIndexService implements IElasticIndexService {
         }
     }
 
+    /**
+     * Executes the bulk operations and validates the results, retrying on partial failures.
+     *
+     * @param operations list of bulk operations to execute
+     */
     private void executeAndValidate(List<BulkOperation> operations) {
         if (operations.isEmpty()) {
             return;
@@ -479,6 +526,12 @@ public class ElasticIndexService implements IElasticIndexService {
         }
     }
 
+    /**
+     * Checks the results of a bulk indexing operation for failures.
+     *
+     * @param response the BulkResponse from Elasticsearch
+     * @throws ElasticsearchException if there are failures in the bulk response
+     */
     private void checkForBulkUpdateFailure(BulkResponse response) {
         Map<String, String> failedDocuments = new HashMap<>();
         response.items().forEach(item -> {
