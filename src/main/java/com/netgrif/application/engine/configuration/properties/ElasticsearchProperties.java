@@ -6,6 +6,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.validation.constraints.Min;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,8 +78,10 @@ public class ElasticsearchProperties {
 
     @Data
     public static class BatchProperties {
+        @Min(1)
         private int caseBatchSize;
 
+        @Min(1)
         private int taskBatchSize;
     }
 }
