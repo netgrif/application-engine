@@ -108,6 +108,7 @@ public class ElasticCase {
      * @param useCase the data object that should be turned into elasticsearch data object
      */
     public ElasticCase(Case useCase) {
+        id = useCase.getStringId();
         stringId = useCase.getStringId();
         uriNodeId = useCase.getUriNodeId();
         mongoId = useCase.getStringId();   //TODO: Duplication

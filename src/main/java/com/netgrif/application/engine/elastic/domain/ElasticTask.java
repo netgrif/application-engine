@@ -105,6 +105,7 @@ public class ElasticTask {
     private Map<String, String> tags;
 
     public ElasticTask(Task task) {
+        this.id = task.getStringId();
         this.stringId = task.getStringId();
         this.processId = task.getProcessId();
         this.taskId = task.getStringId();

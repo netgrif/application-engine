@@ -55,7 +55,7 @@ public class ReindexingTask {
             IWorkflowService workflowService,
             @Value("${spring.data.elasticsearch.reindexExecutor.size:20}") int pageSize,
             @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from,
-            ElasticIndexService elasticIndexService) {
+            IElasticIndexService elasticIndexService) {
         this.taskRepository = taskRepository;
         this.elasticCaseRepository = elasticCaseRepository;
         this.elasticCaseService = elasticCaseService;

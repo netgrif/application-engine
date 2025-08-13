@@ -8,12 +8,13 @@ import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
+import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticTask;
+import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import com.netgrif.application.engine.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
@@ -65,7 +66,9 @@ public class ElasticIndexService implements IElasticIndexService {
 
     private final ElasticsearchProperties elasticsearchProperties;
 
-    private final CaseRepository caseRepository;
+    private final ElasticCaseRepository elasticCaseRepository;
+
+    private final ElasticTaskRepository elasticTaskRepository;
 
     private final PetriNetService petriNetService;
 
@@ -366,8 +369,14 @@ public class ElasticIndexService implements IElasticIndexService {
             while (cursor.hasNext()) {
                 Case aCase = cursor.next();
                 prepareCase(aCase);
-                ElasticCase doc = caseMappingService.transform(aCase);
-                prepareCaseBulkOperation(doc, caseOperations);
+                ElasticCase elasticCase = caseMappingService.transform(aCase);
+                ElasticCase savedCase = elasticCaseRepository.findByStringId(aCase.getStringId());
+                if (savedCase == null) {
+                    savedCase = elasticCase;
+                } else {
+                    savedCase.update(elasticCase);
+                }
+                prepareCaseBulkOperation(savedCase, caseOperations);
                 caseIds.add(aCase.getStringId());
 
                 if (++currentBatchSize == caseBatchSize || !cursor.hasNext()) {
@@ -404,7 +413,13 @@ public class ElasticIndexService implements IElasticIndexService {
             while (cursor.hasNext()) {
                 Task task = cursor.next();
                 ElasticTask elasticTask = taskMappingService.transform(task);
-                prepareTaskBulkOperation(elasticTask, taskOperations);
+                ElasticTask savedTask = elasticTaskRepository.findByStringId(task.getStringId());
+                if (savedTask == null) {
+                    savedTask = elasticTask;
+                } else {
+                    savedTask.update(elasticTask);
+                }
+                prepareTaskBulkOperation(savedTask, taskOperations);
 
                 if (++currentBatchSize == taskBatchSize || !cursor.hasNext()) {
                     log.info("Reindexing task page {} / {}", page, numOfPages);
@@ -442,7 +457,7 @@ public class ElasticIndexService implements IElasticIndexService {
             operations.add(BulkOperation.of(op -> op
                     .update(u -> u
                             .index(elasticsearchProperties.getIndex().get("case"))
-                            .id(doc.getStringId())
+                            .id(doc.getId())
                             .action(a -> a
                                     .doc(doc)
                                     .docAsUpsert(true)
@@ -464,7 +479,7 @@ public class ElasticIndexService implements IElasticIndexService {
             operations.add(BulkOperation.of(op -> op
                     .update(u -> u
                             .index(elasticsearchProperties.getIndex().get("task"))
-                            .id(doc.getStringId())
+                            .id(doc.getId())
                             .action(a -> a
                                     .doc(doc)
                                     .docAsUpsert(true)

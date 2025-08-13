@@ -6,6 +6,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ public class ElasticsearchProperties {
 
     private List<String> defaultSearchFilters = new ArrayList<>();
 
+    @Valid
     private BatchProperties batch = new BatchProperties();
 
     @PostConstruct
@@ -79,9 +81,9 @@ public class ElasticsearchProperties {
     @Data
     public static class BatchProperties {
         @Min(1)
-        private int caseBatchSize;
+        private int caseBatchSize = 5000;
 
         @Min(1)
-        private int taskBatchSize;
+        private int taskBatchSize = 20000;
     }
 }
