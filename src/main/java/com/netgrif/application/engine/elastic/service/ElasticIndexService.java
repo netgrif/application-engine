@@ -12,10 +12,8 @@ import com.netgrif.application.engine.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import com.netgrif.application.engine.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
@@ -343,7 +341,7 @@ public class ElasticIndexService implements IElasticIndexService {
 
         long count = mongoTemplate.count(query, Case.class);
         if (count > 0) {
-            reindexQueried(query, count, now, after, indexAll, caseBatchSize, taskBatchSize);
+            reindexQueried(query, count, caseBatchSize, taskBatchSize);
         }
         log.info("Reindexing stale cases: end");
     }
@@ -352,13 +350,10 @@ public class ElasticIndexService implements IElasticIndexService {
      * Reindexes queried cases and tasks into Elasticsearch in batches.
      *
      * @param count         total number of cases to reindex
-     * @param now           current timestamp for filtering cases
-     * @param after         reindexing cases modified after this time
-     * @param indexAll      when true, reindexes all cases
      * @param caseBatchSize batch size for cases
      * @param taskBatchSize batch size for tasks
      */
-    private void reindexQueried(org.springframework.data.mongodb.core.query.Query query, long count, LocalDateTime now, LocalDateTime after, boolean indexAll, int caseBatchSize, int taskBatchSize) {
+    private void reindexQueried(org.springframework.data.mongodb.core.query.Query query, long count, int caseBatchSize, int taskBatchSize) {
         long numOfPages = ((count / caseBatchSize) + 1);
         log.info("Reindexing {} pages", numOfPages);
 
