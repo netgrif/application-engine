@@ -333,17 +333,17 @@ public class ElasticIndexService implements IElasticIndexService {
             taskBatchSize = elasticsearchProperties.getBatch().getTaskBatchSize();
         }
 
-        BooleanExpression predicate;
+        org.springframework.data.mongodb.core.query.Query query;
         if (indexAll || after == null) {
-            predicate = QCase.case$.lastModified.before(now);
+            query = org.springframework.data.mongodb.core.query.Query.query(Criteria.where("lastModified").lt(now));
             log.info("Reindexing stale cases: force all");
         } else {
-            predicate = QCase.case$.lastModified.before(now).and(QCase.case$.lastModified.after(after.minusMinutes(2)));
+            query = org.springframework.data.mongodb.core.query.Query.query(Criteria.where("lastModified").lt(now).gt(after.minusMinutes(2)));
         }
 
-        long count = caseRepository.count(predicate);
+        long count = mongoTemplate.count(query, Case.class);
         if (count > 0) {
-            reindexQueried(count, now, after, indexAll, caseBatchSize, taskBatchSize);
+            reindexQueried(query, count, now, after, indexAll, caseBatchSize, taskBatchSize);
         }
         log.info("Reindexing stale cases: end");
     }
@@ -358,18 +358,11 @@ public class ElasticIndexService implements IElasticIndexService {
      * @param caseBatchSize batch size for cases
      * @param taskBatchSize batch size for tasks
      */
-    private void reindexQueried(long count, LocalDateTime now, LocalDateTime after, boolean indexAll, int caseBatchSize, int taskBatchSize) {
+    private void reindexQueried(org.springframework.data.mongodb.core.query.Query query, long count, LocalDateTime now, LocalDateTime after, boolean indexAll, int caseBatchSize, int taskBatchSize) {
         long numOfPages = ((count / caseBatchSize) + 1);
         log.info("Reindexing {} pages", numOfPages);
 
-        org.springframework.data.mongodb.core.query.Query query;
-        if (indexAll) {
-            query = org.springframework.data.mongodb.core.query.Query.query(Criteria.where("lastModified").lt(now));
-        } else {
-            query = org.springframework.data.mongodb.core.query.Query.query(Criteria.where("lastModified").lt(now).gt(after.minusMinutes(2)));
-        }
         query.cursorBatchSize(caseBatchSize);
-
         long page = 1, currentBatchSize = 0;
         List<BulkOperation> caseOperations = new ArrayList<>();
         List<String> caseIds = new ArrayList<>();
