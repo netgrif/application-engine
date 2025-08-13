@@ -2,6 +2,8 @@ package com.netgrif.application.engine.elastic.web;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.ReindexingTask;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
+import com.netgrif.application.engine.elastic.web.requestbodies.IndexParams;
 import com.netgrif.application.engine.workflow.service.CaseSearchService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
@@ -20,10 +22,7 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Locale;
 import java.util.Map;
@@ -48,6 +47,9 @@ public class ElasticController {
 
     @Autowired
     private ReindexingTask reindexingTask;
+
+    @Autowired
+    private IElasticIndexService indexService;
 
     @Value("${spring.data.elasticsearch.reindexExecutor.size:20}")
     private int pageSize;
@@ -86,15 +88,19 @@ public class ElasticController {
         }
     }
 
-    //@PreAuthorize("hasRole('ADMIN')")
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
-    @PostMapping(value = "/index/cursor", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MessageResource cursorAllReindex() {
+    @Operation(summary = "Reindex all or stale cases with bulk index",
+            description = "Reindex all or stale cases (specified by IndexParams.indexAll param) with bulk index. Caller must have the ADMIN role",
+            security = {@SecurityRequirement(name = "BasicAuth")})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
+    })
+    @PostMapping(value = "/reindex/bulk", produces = MediaType.APPLICATION_JSON_VALUE)
+    public MessageResource bulkIndex(@RequestParam(required = false) IndexParams indexParams) {
         try {
-
-            reindexingTask.reindex();
+            indexService.bulkIndex(indexParams.isIndexAll(), null, indexParams.getCaseBatchSize(), indexParams.getTaskBatchSize());
             return MessageResource.successMessage("Success");
-
         } catch (Exception e) {
             log.error("Could not index: ", e);
             return MessageResource.errorMessage(e.getMessage());

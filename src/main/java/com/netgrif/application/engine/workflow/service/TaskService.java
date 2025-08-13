@@ -36,7 +36,6 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.*;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
-import com.netgrif.application.engine.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.application.engine.workflow.domain.triggers.TimeTrigger;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
