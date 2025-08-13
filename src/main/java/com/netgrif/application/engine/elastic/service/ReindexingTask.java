@@ -3,13 +3,11 @@ package com.netgrif.application.engine.elastic.service;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.service.interfaces.*;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +31,6 @@ public class ReindexingTask {
     private static final Logger log = LoggerFactory.getLogger(ReindexingTask.class);
 
     private int pageSize;
-    private CaseRepository caseRepository;
     private TaskRepository taskRepository;
     private ElasticCaseRepository elasticCaseRepository;
     private IElasticCaseService elasticCaseService;
@@ -47,7 +44,6 @@ public class ReindexingTask {
 
     @Autowired
     public ReindexingTask(
-            CaseRepository caseRepository,
             TaskRepository taskRepository,
             ElasticCaseRepository elasticCaseRepository,
             @Qualifier("reindexingTaskElasticCaseService")
@@ -60,7 +56,6 @@ public class ReindexingTask {
             @Value("${spring.data.elasticsearch.reindexExecutor.size:20}") int pageSize,
             @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from,
             ElasticIndexService elasticIndexService) {
-        this.caseRepository = caseRepository;
         this.taskRepository = taskRepository;
         this.elasticCaseRepository = elasticCaseRepository;
         this.elasticCaseService = elasticCaseService;
