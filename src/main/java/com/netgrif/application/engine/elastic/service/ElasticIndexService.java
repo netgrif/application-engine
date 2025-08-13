@@ -15,7 +15,7 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
-import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
@@ -318,13 +318,13 @@ public class ElasticIndexService implements IElasticIndexService {
         LocalDateTime now = LocalDateTime.now();
 
         if (caseBatchSize == null) {
-            caseBatchSize = elasticsearchProperties.getIndexProperties().getCaseBatchSize();
+            caseBatchSize = elasticsearchProperties.getBatch().getCaseBatchSize();
         }
         if (taskBatchSize == null) {
-            taskBatchSize = elasticsearchProperties.getIndexProperties().getTaskBatchSize();
+            taskBatchSize = elasticsearchProperties.getBatch().getTaskBatchSize();
         }
 
-        Predicate predicate;
+        BooleanExpression predicate;
         if (indexAll || after == null) {
             predicate = QCase.case$.lastModified.before(now);
             log.info("Reindexing stale cases: force all");
@@ -417,7 +417,7 @@ public class ElasticIndexService implements IElasticIndexService {
         try {
             operations.add(BulkOperation.of(op -> op
                     .update(u -> u
-                            .index(elasticsearchProperties.getIndexProperties().getCaseIndex())
+                            .index(elasticsearchProperties.getIndex().get("case"))
                             .id(doc.getStringId())
                             .action(a -> a
                                     .doc(doc)
@@ -433,7 +433,7 @@ public class ElasticIndexService implements IElasticIndexService {
         try {
             operations.add(BulkOperation.of(op -> op
                     .update(u -> u
-                            .index(elasticsearchProperties.getIndexProperties().getTaskIndex())
+                            .index(elasticsearchProperties.getIndex().get("task"))
                             .id(doc.getStringId())
                             .action(a -> a
                                     .doc(doc)

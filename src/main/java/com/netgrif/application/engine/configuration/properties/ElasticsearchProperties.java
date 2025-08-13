@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.configuration.properties;
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -54,7 +53,7 @@ public class ElasticsearchProperties {
 
     private List<String> defaultSearchFilters = new ArrayList<>();
 
-    private IndexProperties indexProperties = new IndexProperties();
+    private BatchProperties batch = new BatchProperties();
 
     @PostConstruct
     public void init() {
@@ -77,11 +76,7 @@ public class ElasticsearchProperties {
     }
 
     @Data
-    public static class IndexProperties {
-        private String taskIndex;
-
-        private String caseIndex;
-
+    public static class BatchProperties {
         private int caseBatchSize;
 
         private int taskBatchSize;
