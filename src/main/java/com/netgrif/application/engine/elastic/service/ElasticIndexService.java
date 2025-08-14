@@ -494,10 +494,11 @@ public class ElasticIndexService implements IElasticIndexService {
      */
     private void prepareCaseBulkOperation(ElasticCase doc, List<UpdateRequest> operations) {
         try {
+            String json = objectMapper.writeValueAsString(doc);
             UpdateRequest updateRequest = new UpdateRequest()
                     .id(doc.getId() == null ? doc.getStringId() : doc.getId())
-                    .doc(objectMapper.writeValueAsString(doc), XContentType.JSON)
-                    .upsert(objectMapper.writeValueAsString(doc), XContentType.JSON)
+                    .doc(json, XContentType.JSON)
+                    .upsert(json, XContentType.JSON)
                     .index(elasticsearchProperties.getIndex().get("case"));
             operations.add(updateRequest);
         } catch (Exception e) {
@@ -513,10 +514,11 @@ public class ElasticIndexService implements IElasticIndexService {
      */
     private void prepareTaskBulkOperation(ElasticTask doc, List<UpdateRequest> operations) {
         try {
+            String json = objectMapper.writeValueAsString(doc);
             UpdateRequest updateRequest = new UpdateRequest()
                     .id(doc.getId() == null ? doc.getStringId() : doc.getId())
-                    .doc(objectMapper.writeValueAsString(doc), XContentType.JSON)
-                    .upsert(objectMapper.writeValueAsString(doc), XContentType.JSON)
+                    .doc(json, XContentType.JSON)
+                    .upsert(json, XContentType.JSON)
                     .index(elasticsearchProperties.getIndex().get("task"));
             operations.add(updateRequest);
         } catch (Exception e) {
