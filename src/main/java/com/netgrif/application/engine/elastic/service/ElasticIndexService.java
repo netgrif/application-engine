@@ -425,7 +425,7 @@ public class ElasticIndexService implements IElasticIndexService {
                     existingTask = elasticTaskRepository.findByStringId(task.getStringId());
                 } catch (InvalidDataAccessApiUsageException ignored) {
                     log.debug("[{}]: Task \"{}\" has duplicates, will reindex.", task.getStringId(), task.getTitle());
-                    elasticCaseRepository.deleteAllByStringId(task.getStringId());
+                    elasticTaskRepository.deleteAllByStringId(task.getStringId());
                 }
                 if (existingTask == null) {
                     existingTask = elasticTask;
