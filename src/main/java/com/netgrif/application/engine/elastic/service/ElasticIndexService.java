@@ -28,6 +28,7 @@ import org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.elasticsearch.xcontent.XContentType;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Setting;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -370,13 +371,19 @@ public class ElasticIndexService implements IElasticIndexService {
                 Case aCase = cursor.next();
                 prepareCase(aCase);
                 ElasticCase elasticCase = caseMappingService.transform(aCase);
-                ElasticCase savedCase = elasticCaseRepository.findByStringId(aCase.getStringId());
-                if (savedCase == null) {
-                    savedCase = elasticCase;
-                } else {
-                    savedCase.update(elasticCase);
+                ElasticCase existingCase = null;
+                try {
+                    existingCase = elasticCaseRepository.findByStringId(aCase.getStringId());
+                } catch (InvalidDataAccessApiUsageException ignored) {
+                    log.debug("[{}]: Case \"{}\" has duplicates, will reindex.", aCase.getStringId(), aCase.getTitle());
+                    elasticCaseRepository.deleteAllByStringId(aCase.getStringId());
                 }
-                prepareCaseBulkOperation(savedCase, caseOperations);
+                if (existingCase == null) {
+                    existingCase = elasticCase;
+                } else {
+                    existingCase.update(elasticCase);
+                }
+                prepareCaseBulkOperation(existingCase, caseOperations);
                 caseIds.add(aCase.getStringId());
 
                 if (++currentBatchSize == caseBatchSize || !cursor.hasNext()) {
@@ -413,13 +420,19 @@ public class ElasticIndexService implements IElasticIndexService {
             while (cursor.hasNext()) {
                 Task task = cursor.next();
                 ElasticTask elasticTask = taskMappingService.transform(task);
-                ElasticTask savedTask = elasticTaskRepository.findByStringId(task.getStringId());
-                if (savedTask == null) {
-                    savedTask = elasticTask;
-                } else {
-                    savedTask.update(elasticTask);
+                ElasticTask existingTask = null;
+                try {
+                    existingTask = elasticTaskRepository.findByStringId(task.getStringId());
+                } catch (InvalidDataAccessApiUsageException ignored) {
+                    log.debug("[{}]: Task \"{}\" has duplicates, will reindex.", task.getStringId(), task.getTitle());
+                    elasticCaseRepository.deleteAllByStringId(task.getStringId());
                 }
-                prepareTaskBulkOperation(savedTask, taskOperations);
+                if (existingTask == null) {
+                    existingTask = elasticTask;
+                } else {
+                    existingTask.update(elasticTask);
+                }
+                prepareTaskBulkOperation(existingTask, taskOperations);
 
                 if (++currentBatchSize == taskBatchSize || !cursor.hasNext()) {
                     log.info("Reindexing task page {} / {}", page, numOfPages);
