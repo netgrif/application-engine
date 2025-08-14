@@ -35,6 +35,10 @@ public class ElasticsearchProperties {
 
     private String url;
 
+    private String username;
+
+    private String password;
+
     private Map<String, String> index;
 
     private boolean analyzerEnabled = false;
