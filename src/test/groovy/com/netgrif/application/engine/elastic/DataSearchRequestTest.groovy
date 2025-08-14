@@ -158,7 +158,7 @@ class DataSearchRequestTest {
                 new AbstractMap.SimpleEntry<String, String>("user.emailValue.keyword" as String, "${testUser1.email}" as String),
                 new AbstractMap.SimpleEntry<String, String>("user.fullNameValue.keyword" as String, "${testUser1.fullName}" as String),
                 new AbstractMap.SimpleEntry<String, String>("user.userIdValue" as String, "${testUser1.getId()}" as String),
-                new AbstractMap.SimpleEntry<String, String>("date.timestampValue" as String, "${Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)).getTime()}" as String),
+                new AbstractMap.SimpleEntry<String, String>("date.timestampValue" as String, "${Timestamp.valueOf(LocalDateTime.of(date, LocalTime.MIDNIGHT)).getTime()}" as String),
                 new AbstractMap.SimpleEntry<String, String>("datetime.timestampValue" as String, "${Timestamp.valueOf(date.atTime(13, 37)).getTime()}" as String),
                 new AbstractMap.SimpleEntry<String, String>("enumeration" as String, "Alice" as String),
                 new AbstractMap.SimpleEntry<String, String>("enumeration" as String, "Alica" as String),
