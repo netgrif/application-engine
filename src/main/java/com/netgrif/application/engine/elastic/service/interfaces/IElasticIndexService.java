@@ -1,10 +1,12 @@
 package com.netgrif.application.engine.elastic.service.interfaces;
 
+import com.querydsl.core.types.Predicate;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.SearchScrollHits;
 import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.query.Query;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +33,6 @@ public interface IElasticIndexService {
 
     <T> String index(Class<T> clazz, T source, String... placeholders);
 
-    boolean bulkIndex(List<?> list, Class<?> clazz, String... placeholders);
-
     SearchScrollHits<?> scrollFirst(Query query, Class<?> clazz, String... placeholders);
 
     SearchScrollHits<?> scroll(String scrollId, Class<?> clazz, String... placeholders);
@@ -42,4 +42,6 @@ public interface IElasticIndexService {
     void applySettings(HashMap<String, Object> settingMap, Class<?> clazz);
 
     void clearScrollHits(List<String> scrollIds);
+
+    void bulkIndex(boolean indexAll, LocalDateTime lastRun, Integer caseBatchSize, Integer taskBatchSize);
 }

@@ -1,9 +1,21 @@
 package com.netgrif.application.engine.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.configuration.properties.UriProperties;
+import com.netgrif.application.engine.elastic.serializer.LocalDateTimeJsonDeserializer;
+import com.netgrif.application.engine.elastic.serializer.LocalDateTimeJsonSerializer;
 import com.netgrif.application.engine.workflow.service.CaseEventHandler;
+import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -11,14 +23,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 
+import java.time.LocalDateTime;
+
 @Configuration
+@RequiredArgsConstructor
 public class ElasticsearchConfiguration {
-
-    @Value("${spring.data.elasticsearch.url}")
-    private String url;
-
-    @Value("${spring.data.elasticsearch.searchport}")
-    private int port;
 
     @Value("${spring.data.elasticsearch.index.petriNet}")
     private String petriNetIndex;
@@ -32,11 +41,9 @@ public class ElasticsearchConfiguration {
     @Value("${spring.data.elasticsearch.reindex}")
     private String cron;
 
-    private final UriProperties uriProperties;
+    private final ElasticsearchProperties elasticsearchProperties;
 
-    public ElasticsearchConfiguration(UriProperties uriProperties) {
-        this.uriProperties = uriProperties;
-    }
+    private final UriProperties uriProperties;
 
     @Bean
     public String springElasticsearchReindex() {
@@ -65,9 +72,18 @@ public class ElasticsearchConfiguration {
 
     @Bean
     public RestHighLevelClient client() {
-
-        return new RestHighLevelClient(
-                RestClient.builder(new HttpHost(url, port, "http")));
+        RestClientBuilder builder = RestClient.builder(new HttpHost(elasticsearchProperties.getUrl(), elasticsearchProperties.getSearchPort()));
+        if (hasCredentials()) {
+            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(AuthScope.ANY,
+                    new UsernamePasswordCredentials(
+                            elasticsearchProperties.getUsername(),
+                            elasticsearchProperties.getPassword()
+                    )
+            );
+            builder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
+        }
+        return new RestHighLevelClient(builder);
     }
 
     @Bean
@@ -78,5 +94,23 @@ public class ElasticsearchConfiguration {
     @Bean
     public CaseEventHandler caseEventHandler() {
         return new CaseEventHandler();
+    }
+
+    @Bean(name = "elasticCaseObjectMapper")
+    public ObjectMapper configureMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeJsonSerializer());
+        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeJsonDeserializer());
+
+        mapper.registerModule(javaTimeModule);
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        return mapper;
+    }
+
+    private boolean hasCredentials() {
+        return elasticsearchProperties.getUsername() != null && !elasticsearchProperties.getUsername().isBlank() &&
+                elasticsearchProperties.getPassword() != null && !elasticsearchProperties.getPassword().isBlank();
     }
 }

@@ -1,9 +1,5 @@
 package com.netgrif.application.engine.elastic.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
@@ -18,6 +14,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -56,8 +53,6 @@ public class ElasticCase {
 
     private String title;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     private LocalDateTime creationDate;
 
@@ -121,7 +116,7 @@ public class ElasticCase {
         processId = useCase.getPetriNetId();
         visualId = useCase.getVisualId();
         title = useCase.getTitle();
-        creationDate = useCase.getCreationDate();
+        creationDate = useCase.getCreationDate().truncatedTo(ChronoUnit.MILLIS);
         creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
         author = useCase.getAuthor().getId();
         authorName = useCase.getAuthor().getFullName();

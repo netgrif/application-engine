@@ -6,6 +6,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +35,10 @@ public class ElasticsearchProperties {
 
     private String url;
 
+    private String username;
+
+    private String password;
+
     private Map<String, String> index;
 
     private boolean analyzerEnabled = false;
@@ -53,6 +59,9 @@ public class ElasticsearchProperties {
 
     private List<String> defaultSearchFilters = new ArrayList<>();
 
+    @Valid
+    private BatchProperties batch = new BatchProperties();
+
     @PostConstruct
     public void init() {
         indexSettings.putIfAbsent("max_result_window", 10000000);
@@ -71,5 +80,14 @@ public class ElasticsearchProperties {
 
     public Map<String, Object> getClassSpecificSettings(String className) {
         return classSpecificIndexSettings.getOrDefault(className, new HashMap<>());
+    }
+
+    @Data
+    public static class BatchProperties {
+        @Min(1)
+        private int caseBatchSize = 5000;
+
+        @Min(1)
+        private int taskBatchSize = 20000;
     }
 }
