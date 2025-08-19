@@ -116,17 +116,17 @@ public class ElasticTaskQueueManager {
         log.debug("Indexing task [{}] in thread [{}]", task.getTaskId(), Thread.currentThread().getName());
         com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask elasticTask = null;
         try {
-            elasticTask = repository.findByStringId(task.getStringId());
+            elasticTask = repository.findByStringId(task.getId());
             if (elasticTask == null) {
                 elasticTask = repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask) task);
             } else {
                 elasticTask.update(task);
                 elasticTask = repository.save(elasticTask);
             }
-            log.debug("[{}]: Task \"{}\" [{}] indexed", task.getCaseId(), task.getTitle(), task.getStringId());
+            log.debug("[{}]: Task \"{}\" [{}] indexed", task.getCaseId(), task.getTitle(), task.getId());
         } catch (InvalidDataAccessApiUsageException e) {
             log.debug("[{}]: Task \"{}\" has duplicates, will be reindexed", task.getCaseId(), task.getTitle());
-            repository.deleteAllByStringId(task.getStringId());
+            repository.deleteAllByStringId(task.getId());
             repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask) task);
             log.debug("[{}]: Task \"{}\" indexed", task.getCaseId(), task.getTitle());
         } catch (RuntimeException e) {

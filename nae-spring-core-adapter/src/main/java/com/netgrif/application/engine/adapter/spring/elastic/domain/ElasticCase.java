@@ -39,11 +39,6 @@ public class ElasticCase extends com.netgrif.application.engine.objects.elastic.
     }
 
     @Field(type = Keyword)
-    public String getStringId() {
-        return super.getStringId();
-    }
-
-    @Field(type = Keyword)
     public String getProcessIdentifier() {
         return super.getProcessIdentifier();
     }
@@ -66,11 +61,6 @@ public class ElasticCase extends com.netgrif.application.engine.objects.elastic.
     @Field(type = Keyword)
     public String getAuthorRealm() {
         return super.getAuthorRealm();
-    }
-
-    @Field(type = Keyword)
-    public String getMongoId() {
-        return super.getMongoId();
     }
 
     @Field(type = Keyword)

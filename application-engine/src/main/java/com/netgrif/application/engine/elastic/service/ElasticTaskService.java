@@ -150,7 +150,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         if (query != null) {
             SearchHits<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask> hits = elasticsearchTemplate.search(query, com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask.class, IndexCoordinates.of(elasticsearchProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.TASK_INDEX)));
             Page<ElasticTask> indexedTasks = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
-            taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getStringId).collect(Collectors.toList()));
+            taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getId).collect(Collectors.toList()));
             total = indexedTasks.getTotalElements();
         } else {
             taskPage = Collections.emptyList();

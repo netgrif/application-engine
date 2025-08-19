@@ -108,7 +108,7 @@ public class Task {
     }
 
     public Task(ElasticTask entity) {
-        _id = new ProcessResourceId(entity.getStringId());
+        _id = new ProcessResourceId(entity.getId());
         caseId = entity.getCaseId();
         transitionId = entity.getTransitionId();
         title = entity.getTitle().getDefaultValue();

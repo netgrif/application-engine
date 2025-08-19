@@ -2,10 +2,7 @@ package com.netgrif.application.engine.elastic.service;
 
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
+import com.netgrif.application.engine.elastic.service.interfaces.*;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
@@ -37,7 +34,6 @@ public class ReindexingTask {
     private static final Logger log = LoggerFactory.getLogger(ReindexingTask.class);
 
     private int pageSize;
-    private CaseRepository caseRepository;
     private TaskRepository taskRepository;
     private ElasticCaseRepository elasticCaseRepository;
     private IElasticCaseService elasticCaseService;
@@ -47,10 +43,10 @@ public class ReindexingTask {
     private IWorkflowService workflowService;
     private DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
     private LocalDateTime lastRun;
+    private IElasticIndexService elasticIndexService;
 
     @Autowired
     public ReindexingTask(
-            CaseRepository caseRepository,
             TaskRepository taskRepository,
             ElasticCaseRepository elasticCaseRepository,
             @Qualifier("reindexingTaskElasticCaseService")
@@ -60,8 +56,8 @@ public class ReindexingTask {
             IElasticCaseMappingService caseMappingService,
             IElasticTaskMappingService taskMappingService,
             IWorkflowService workflowService,
-            DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties) {
-        this.caseRepository = caseRepository;
+            DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties,
+            IElasticIndexService elasticIndexService) {
         this.taskRepository = taskRepository;
         this.elasticCaseRepository = elasticCaseRepository;
         this.elasticCaseService = elasticCaseService;
@@ -71,6 +67,7 @@ public class ReindexingTask {
         this.workflowService = workflowService;
         this.elasticsearchProperties = elasticsearchProperties;
         this.pageSize = elasticsearchProperties.getReindexExecutor().getSize();
+        this.elasticIndexService = elasticIndexService;
 
         lastRun = LocalDateTime.now();
         if (this.elasticsearchProperties.getReindexFrom() != null) {
@@ -82,24 +79,9 @@ public class ReindexingTask {
     public void reindex() {
         log.info("Reindexing stale cases: started reindexing after " + lastRun);
 
-        BooleanExpression predicate = QCase.case$.lastModified.before(LocalDateTime.now()).and(QCase.case$.lastModified.after(lastRun.minusMinutes(2)));
-
-        lastRun = LocalDateTime.now();
-        long count = caseRepository.count(predicate);
-        if (count > 0) {
-            reindexAllPages(predicate, count);
-        }
+        elasticIndexService.bulkIndex(false, lastRun, null, null);
 
         log.info("Reindexing stale cases: end");
-    }
-
-    private void reindexAllPages(BooleanExpression predicate, long count) {
-        long numOfPages = ((count / pageSize) + 1);
-        log.info("Reindexing " + numOfPages + " pages");
-
-        for (int page = 0; page < numOfPages; page++) {
-            reindexPage(predicate, page, numOfPages, false);
-        }
     }
 
     public void forceReindexPage(Predicate predicate, int page, long numOfPages) {

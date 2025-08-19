@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.configuration.properties;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import javax.validation.Valid;
 import java.time.Duration;
 import java.util.*;
 
@@ -155,7 +157,12 @@ public class DataConfigurationProperties {
         /**
          * Hostname for the Elasticsearch server.
          */
-        private String url = "localhost";
+        private List<String> url = List.of("localhost");
+
+        /**
+         * Indicates if SSL is enabled for Elasticsearch communication.
+         */
+        private boolean ssl = false;
 
         /**
          * Port for connecting to Elasticsearch transport client.
@@ -166,6 +173,21 @@ public class DataConfigurationProperties {
          * Port for accessing the Elasticsearch HTTP client.
          */
         private int searchPort = 9200;
+
+        /**
+         * The username used for authenticating with the Elasticsearch server.
+         */
+        private String username = null;
+
+        /**
+         * The password used for authenticating with the Elasticsearch server.
+         */
+        private String password = null;
+
+        /**
+         * The authentication token for the Elasticsearch server, when using token-based authentication.
+         */
+        private String token = null;
 
         /**
          * Command to trigger a reindexing job.
@@ -241,6 +263,15 @@ public class DataConfigurationProperties {
          * Properties for configuring priority indexing and searches.
          */
         private PriorityProperties priority = new PriorityProperties();
+
+
+        /**
+         * Batch-related configuration properties for Elasticsearch operations.
+         * These properties control the batch size for cases and tasks during
+         * bulk operations to optimize performance and resource usage.
+         */
+        @Valid
+        private BatchProperties batch = new BatchProperties();
 
         public static final String PETRI_NET_INDEX = "petriNet";
 
@@ -333,6 +364,30 @@ public class DataConfigurationProperties {
                     "authorEmail^1",
                     "visualId.keyword^2"
             );
+        }
+
+        /**
+         * Configuration properties for batch operations in Elasticsearch.
+         * This class specifies the batch sizes for cases and tasks when performing
+         * bulk operations like indexing or updating. These values are used to
+         * control and optimize resource consumption during high-load processes.
+         */
+        @Data
+        public static class BatchProperties {
+
+            /**
+             * Default batch size for cases during Elasticsearch bulk operations.
+             * This value must be at least 1. The default is 5000.
+             */
+            @Min(1)
+            private int caseBatchSize = 5000;
+
+            /**
+             * Default batch size for tasks during Elasticsearch bulk operations.
+             * This value must be at least 1. The default is 20000.
+             */
+            @Min(1)
+            private int taskBatchSize = 20000;
         }
     }
     

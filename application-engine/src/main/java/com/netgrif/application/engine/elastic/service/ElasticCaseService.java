@@ -103,22 +103,22 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     @Override
     public void index(ElasticCase useCase) {
-        executors.execute(useCase.getStringId(), () -> {
+        executors.execute(useCase.getId(), () -> {
             try {
-                com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase elasticCase = repository.findByStringId(useCase.getStringId());
+                com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase elasticCase = repository.findByStringId(useCase.getId());
                 if (elasticCase == null) {
                     repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase) useCase);
                 } else {
                     elasticCase.update(useCase);
                     repository.save(elasticCase);
                 }
-                log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
+                log.debug("[" + useCase.getId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
                 publisher.publishEvent(new IndexCaseEvent(useCase));
             } catch (InvalidDataAccessApiUsageException ignored) {
-                log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" has duplicates, will be reindexed");
-                repository.deleteAllByStringId(useCase.getStringId());
+                log.debug("[" + useCase.getId() + "]: Case \"" + useCase.getTitle() + "\" has duplicates, will be reindexed");
+                repository.deleteAllByStringId(useCase.getId());
                 repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase) useCase);
-                log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
+                log.debug("[" + useCase.getId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
             }
         });
     }
@@ -144,7 +144,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         if (query != null) {
             SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, IndexCoordinates.of(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX)));
             Page<ElasticCase> indexedCases = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
-            casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
+            casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getId).collect(Collectors.toList()));
             total = indexedCases.getTotalElements();
             log.debug("Found [{}] total elements of page [{}]", casePage.size(), pageable.getPageNumber());
         } else {
