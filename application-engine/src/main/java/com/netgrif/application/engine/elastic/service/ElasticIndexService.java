@@ -1,8 +1,10 @@
 package com.netgrif.application.engine.elastic.service;
 
-
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.AcknowledgedResponse;
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import co.elastic.clients.elasticsearch._types.ErrorCause;
+import co.elastic.clients.elasticsearch._types.ErrorResponse;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
@@ -13,7 +15,10 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMap
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
+import com.netgrif.application.engine.objects.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
+import com.netgrif.application.engine.objects.workflow.domain.Task;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -29,7 +34,6 @@ import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.util.CloseableIterator;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -50,6 +54,7 @@ public class ElasticIndexService implements IElasticIndexService {
     private final MongoTemplate mongoTemplate;
     private final IElasticCaseMappingService caseMappingService;
     private final IElasticTaskMappingService taskMappingService;
+    private final IPetriNetService petriNetService;
     private final DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
 
     @Override
@@ -337,26 +342,26 @@ public class ElasticIndexService implements IElasticIndexService {
         long page = 1, currentBatchSize = 0;
         List<BulkOperation> caseOperations = new ArrayList<>();
         List<String> caseIds = new ArrayList<>();
+        Iterator<Case> cursor = mongoTemplate.stream(query, Case.class).iterator();
 
-        try (CloseableIterator<Case> cursor = mongoTemplate.stream(query, Case.class)) {
-            while (cursor.hasNext()) {
-                Case aCase = cursor.next();
-                prepareCase(aCase);
-                ElasticCase doc = caseMappingService.transform(aCase);
-                prepareCaseBulkOperation(doc, caseOperations);
-                caseIds.add(aCase.getStringId());
+        while (cursor.hasNext()) {
+            Case aCase = cursor.next();
+            prepareCase(aCase);
+            ElasticCase doc = caseMappingService.transform(aCase);
+            prepareCaseBulkOperation(doc, caseOperations);
+            caseIds.add(aCase.getStringId());
 
-                if (++currentBatchSize == caseBatchSize || !cursor.hasNext()) {
-                    log.info("Reindexing case page {} / {}", page, numOfPages);
-                    executeAndValidate(caseOperations);
-                    bulkIndexTasks(caseIds, taskBatchSize);
-                    caseOperations.clear();
-                    caseIds.clear();
-                    currentBatchSize = 0;
-                    page++;
-                }
+            if (++currentBatchSize == caseBatchSize || !cursor.hasNext()) {
+                log.info("Reindexing case page {} / {}", page, numOfPages);
+                executeAndValidate(caseOperations);
+                bulkIndexTasks(caseIds, taskBatchSize);
+                caseOperations.clear();
+                caseIds.clear();
+                currentBatchSize = 0;
+                page++;
             }
         }
+
     }
 
     /**
@@ -375,20 +380,19 @@ public class ElasticIndexService implements IElasticIndexService {
 
         long page = 1, currentBatchSize = 0;
         List<BulkOperation> taskOperations = new ArrayList<>();
+        Iterator<Task> cursor = mongoTemplate.stream(query, Task.class).iterator();
 
-        try (CloseableIterator<Task> cursor = mongoTemplate.stream(query, Task.class)) {
-            while (cursor.hasNext()) {
-                Task task = cursor.next();
-                ElasticTask elasticTask = taskMappingService.transform(task);
-                prepareTaskBulkOperation(elasticTask, taskOperations);
+        while (cursor.hasNext()) {
+            Task task = cursor.next();
+            ElasticTask elasticTask = taskMappingService.transform(task);
+            prepareTaskBulkOperation(elasticTask, taskOperations);
 
-                if (++currentBatchSize == taskBatchSize || !cursor.hasNext()) {
-                    log.info("Reindexing task page {} / {}", page, numOfPages);
-                    executeAndValidate(taskOperations);
-                    taskOperations.clear();
-                    currentBatchSize = 0;
-                    page++;
-                }
+            if (++currentBatchSize == taskBatchSize || !cursor.hasNext()) {
+                log.info("Reindexing task page {} / {}", page, numOfPages);
+                executeAndValidate(taskOperations);
+                taskOperations.clear();
+                currentBatchSize = 0;
+                page++;
             }
         }
     }
@@ -418,14 +422,14 @@ public class ElasticIndexService implements IElasticIndexService {
             operations.add(BulkOperation.of(op -> op
                     .update(u -> u
                             .index(elasticsearchProperties.getIndex().get("case"))
-                            .id(doc.getStringId())
+                            .id(doc.getId())
                             .action(a -> a
                                     .doc(doc)
                                     .docAsUpsert(true)
                             )
                     )));
         } catch (Exception e) {
-            log.error("Failed to prepare bulk operation for case [{}]: {}", doc.getStringId(), e.getMessage());
+            log.error("Failed to prepare bulk operation for case [{}]: {}", doc.getId(), e.getMessage());
         }
     }
 
@@ -440,7 +444,7 @@ public class ElasticIndexService implements IElasticIndexService {
             operations.add(BulkOperation.of(op -> op
                     .update(u -> u
                             .index(elasticsearchProperties.getIndex().get("task"))
-                            .id(doc.getStringId())
+                            .id(doc.getId())
                             .action(a -> a
                                     .doc(doc)
                                     .docAsUpsert(true)
@@ -448,7 +452,7 @@ public class ElasticIndexService implements IElasticIndexService {
                     ))
             );
         } catch (Exception e) {
-            log.error("Failed to prepare bulk operation for task [{}]: {}", doc.getStringId(), e.getMessage());
+            log.error("Failed to prepare bulk operation for task [{}]: {}", doc.getId(), e.getMessage());
         }
     }
 
@@ -505,7 +509,9 @@ public class ElasticIndexService implements IElasticIndexService {
         });
 
         if (!failedDocuments.isEmpty()) {
-            throw new ElasticsearchException("Bulk indexing has failures. Use ElasticsearchException.getFailedDocuments() for details [{}]", failedDocuments);
+            String message = "Bulk indexing has failures. Use ElasticsearchException.getFailedDocuments() for details [" + failedDocuments.values() + "]";
+            throw new ElasticsearchException(message,
+                    ErrorResponse.of(builder -> builder.error(ErrorCause.of(errorCauseBuilder -> errorCauseBuilder.reason(message)))));
         }
     }
 
