@@ -15,7 +15,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.time.Duration;
 import java.util.*;
 
