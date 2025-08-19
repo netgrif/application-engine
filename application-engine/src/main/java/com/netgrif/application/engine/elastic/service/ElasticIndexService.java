@@ -10,12 +10,16 @@ import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import co.elastic.clients.elasticsearch.indices.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticTask;
+import com.netgrif.application.engine.objects.elastic.serializer.LocalDateTimeJsonDeserializer;
+import com.netgrif.application.engine.objects.elastic.serializer.LocalDateTimeJsonSerializer;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -44,7 +48,6 @@ import java.util.*;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class ElasticIndexService implements IElasticIndexService {
 
     private static final String PLACEHOLDERS = "petriNetIndex, caseIndex, taskIndex";
@@ -56,6 +59,27 @@ public class ElasticIndexService implements IElasticIndexService {
     private final IElasticTaskMappingService taskMappingService;
     private final IPetriNetService petriNetService;
     private final DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
+    private final ObjectMapper objectMapper;
+
+    public ElasticIndexService(ApplicationContext context,
+                               ElasticsearchTemplate elasticsearchTemplate,
+                               ElasticsearchClient elasticsearchClient,
+                               MongoTemplate mongoTemplate,
+                               IElasticCaseMappingService caseMappingService,
+                               IElasticTaskMappingService taskMappingService,
+                               IPetriNetService petriNetService,
+                               DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties) {
+        this.context = context;
+        this.elasticsearchTemplate = elasticsearchTemplate;
+        this.elasticsearchClient = elasticsearchClient;
+        this.mongoTemplate = mongoTemplate;
+        this.caseMappingService = caseMappingService;
+        this.taskMappingService = taskMappingService;
+        this.petriNetService = petriNetService;
+        this.elasticsearchProperties = elasticsearchProperties;
+        this.objectMapper = new ObjectMapper();
+        configureObjectMapper();
+    }
 
     @Override
     public boolean indexExists(String indexName) {
@@ -588,6 +612,14 @@ public class ElasticIndexService implements IElasticIndexService {
             indexName = String.format(indexName, placeholders);
         }
         return indexName;
+    }
+
+    private void configureObjectMapper() {
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeJsonSerializer());
+        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeJsonDeserializer());
+        objectMapper.registerModule(javaTimeModule);
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
 }
