@@ -2762,12 +2762,15 @@ class ActionDelegate {
 
     String resolveStoragePath(Case aCase, String fileFieldId, String fileName) {
         Optional<Field<?>> storageFieldOptional = aCase.getPetriNet().getField(fileFieldId)
-        if (storageFieldOptional.isPresent()) {
-            StorageField<?> storageField = storageFieldOptional.get() as StorageField
-            IStorageService storageService = storageResolverService.resolve(storageField.storageType)
-            return storageService.getPath(aCase.stringId, fileFieldId, fileName)
-        } else {
-            throw new IllegalArgumentException("Field with name [%s] does not exists on Petri Net [%s]".formatted(fileFieldId, aCase.getPetriNetId()))
-        }
+        if (storageFieldOptional.isEmpty()) {
+                throw new IllegalArgumentException("Field with id [%s] does not exist on Petri Net [%s]".formatted(fileFieldId, aCase.getPetriNetId()))
+            }
+        Field<?> field = storageFieldOptional.get()
+        if (!(field instanceof StorageField)) {
+                throw new IllegalArgumentException("Field with id [%s] is not a StorageField on Petri Net [%s]".formatted(fileFieldId, aCase.getPetriNetId()))
+            }
+        StorageField<?> storageField = (StorageField<?>) field
+        IStorageService storageService = storageResolverService.resolve(storageField.storageType)
+        return storageService.getPath(aCase.stringId, fileFieldId, fileName)
     }
 }
