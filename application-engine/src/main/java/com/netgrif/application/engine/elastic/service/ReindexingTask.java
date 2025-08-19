@@ -4,18 +4,14 @@ import com.netgrif.application.engine.configuration.properties.DataConfiguration
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.service.interfaces.*;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
-import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,7 +19,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -93,7 +88,7 @@ public class ReindexingTask {
         Page<Case> cases = this.workflowService.search(predicate, PageRequest.of(page, pageSize));
 
         for (Case aCase : cases) {
-            if (forced || elasticCaseRepository.countByStringIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
+            if (forced || elasticCaseRepository.countByIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
                 elasticCaseService.indexNow(this.caseMappingService.transform(aCase));
                 List<Task> tasks = taskRepository.findAllByCaseId(aCase.getStringId());
                 for (Task task : tasks) {

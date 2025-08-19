@@ -22,8 +22,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.autoconfigure.metrics.export.elastic.ElasticProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -88,7 +86,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     @Override
     public void remove(String caseId) {
         executors.execute(caseId, () -> {
-            repository.deleteAllByStringId(caseId);
+            repository.deleteAllById(caseId);
             log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
         });
     }
@@ -105,10 +103,11 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     public void index(ElasticCase useCase) {
         executors.execute(useCase.getId(), () -> {
             try {
-                com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase elasticCase = repository.findByStringId(useCase.getId());
-                if (elasticCase == null) {
+                Optional<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> elasticCaseOptional = repository.findById(useCase.getId());
+                if (elasticCaseOptional.isEmpty()) {
                     repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase) useCase);
                 } else {
+                    com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase elasticCase = elasticCaseOptional.get();
                     elasticCase.update(useCase);
                     repository.save(elasticCase);
                 }
@@ -116,7 +115,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                 publisher.publishEvent(new IndexCaseEvent(useCase));
             } catch (InvalidDataAccessApiUsageException ignored) {
                 log.debug("[" + useCase.getId() + "]: Case \"" + useCase.getTitle() + "\" has duplicates, will be reindexed");
-                repository.deleteAllByStringId(useCase.getId());
+                repository.deleteAllById(useCase.getId());
                 repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase) useCase);
                 log.debug("[" + useCase.getId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
             }

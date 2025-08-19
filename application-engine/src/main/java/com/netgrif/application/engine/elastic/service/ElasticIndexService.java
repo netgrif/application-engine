@@ -511,7 +511,9 @@ public class ElasticIndexService implements IElasticIndexService {
         if (!failedDocuments.isEmpty()) {
             String message = "Bulk indexing has failures. Use ElasticsearchException.getFailedDocuments() for details [" + failedDocuments.values() + "]";
             throw new ElasticsearchException(message,
-                    ErrorResponse.of(builder -> builder.error(ErrorCause.of(errorCauseBuilder -> errorCauseBuilder.reason(message)))));
+                    ErrorResponse.of(builder -> builder
+                            .error(ErrorCause.of(errorCauseBuilder -> errorCauseBuilder.reason(message)))
+                            .status(response.items().getFirst().status())));
         }
     }
 

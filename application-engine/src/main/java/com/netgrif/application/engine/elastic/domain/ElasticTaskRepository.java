@@ -9,11 +9,9 @@ import java.util.List;
 @Repository
 public interface ElasticTaskRepository extends ElasticsearchRepository<ElasticTask, String> {
 
-    ElasticTask findByStringId(String stringId);
-
     ElasticTask findByTaskId(String taskId);
 
-    void deleteAllByStringId(String taskId);
+    void deleteAllById(String taskId);
 
     ElasticTask deleteAllByTaskId(String taskId);
 
