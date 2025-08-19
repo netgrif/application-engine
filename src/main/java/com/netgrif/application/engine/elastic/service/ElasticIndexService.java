@@ -2,11 +2,15 @@ package com.netgrif.application.engine.elastic.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository;
+import com.netgrif.application.engine.elastic.serializer.LocalDateTimeJsonDeserializer;
+import com.netgrif.application.engine.elastic.serializer.LocalDateTimeJsonSerializer;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import com.netgrif.application.engine.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -25,7 +29,6 @@ import org.elasticsearch.client.indices.CloseIndexRequest;
 import org.elasticsearch.client.indices.CloseIndexResponse;
 import org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.elasticsearch.xcontent.XContentType;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -90,9 +93,7 @@ public class ElasticIndexService implements IElasticIndexService {
                                PetriNetService petriNetService,
                                MongoTemplate mongoTemplate,
                                ElasticCaseMappingService caseMappingService,
-                               ElasticTaskMappingService taskMappingService,
-                               @Qualifier("elasticCaseObjectMapper")
-                               ObjectMapper objectMapper) {
+                               ElasticTaskMappingService taskMappingService) {
         this.context = context;
         this.elasticsearchTemplate = elasticsearchTemplate;
         this.elasticsearchClient = elasticsearchClient;
@@ -104,7 +105,8 @@ public class ElasticIndexService implements IElasticIndexService {
         this.mongoTemplate = mongoTemplate;
         this.caseMappingService = caseMappingService;
         this.taskMappingService = taskMappingService;
-        this.objectMapper = objectMapper;
+        this.objectMapper = new ObjectMapper();
+        configureMapper();
     }
 
     @Override
@@ -656,4 +658,11 @@ public class ElasticIndexService implements IElasticIndexService {
         return indexName;
     }
 
+    private void configureMapper() {
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeJsonSerializer());
+        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeJsonDeserializer());
+        objectMapper.registerModule(javaTimeModule);
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
 }

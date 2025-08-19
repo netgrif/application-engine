@@ -1,12 +1,7 @@
 package com.netgrif.application.engine.configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.configuration.properties.UriProperties;
-import com.netgrif.application.engine.elastic.serializer.LocalDateTimeJsonDeserializer;
-import com.netgrif.application.engine.elastic.serializer.LocalDateTimeJsonSerializer;
 import com.netgrif.application.engine.workflow.service.CaseEventHandler;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHost;
@@ -22,8 +17,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
-
-import java.time.LocalDateTime;
 
 @Configuration
 @RequiredArgsConstructor
@@ -94,19 +87,6 @@ public class ElasticsearchConfiguration {
     @Bean
     public CaseEventHandler caseEventHandler() {
         return new CaseEventHandler();
-    }
-
-    @Bean(name = "elasticCaseObjectMapper")
-    public ObjectMapper configureMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeJsonSerializer());
-        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeJsonDeserializer());
-
-        mapper.registerModule(javaTimeModule);
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        return mapper;
     }
 
     private boolean hasCredentials() {
