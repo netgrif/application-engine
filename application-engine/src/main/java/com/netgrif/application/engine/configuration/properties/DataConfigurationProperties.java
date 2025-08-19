@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.boot.autoconfigure.data.rest.RepositoryRestProperties;
 import org.springframework.boot.autoconfigure.session.RedisSessionProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -177,16 +178,19 @@ public class DataConfigurationProperties {
         /**
          * The username used for authenticating with the Elasticsearch server.
          */
+        @ToString.Exclude
         private String username = null;
 
         /**
          * The password used for authenticating with the Elasticsearch server.
          */
+        @ToString.Exclude
         private String password = null;
 
         /**
          * The authentication token for the Elasticsearch server, when using token-based authentication.
          */
+        @ToString.Exclude
         private String token = null;
 
         /**
