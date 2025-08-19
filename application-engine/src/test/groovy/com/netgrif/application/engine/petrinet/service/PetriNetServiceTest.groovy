@@ -111,7 +111,6 @@ class PetriNetServiceTest {
         assert petriNetRepository.count() == processCount + 1
         PetriNet testNet = testNetOptional.getNet()
         Thread.sleep(5000)
-        ElasticPetriNet elasticTestNet = elasticPetriNetRepository.findByStringId(testNet.stringId)
         assert petriNetRepository.findById(testNet.stringId).get().uriNodeId == null
         importHelper.createCase("Case 1", testNet)
 
@@ -132,7 +131,7 @@ class PetriNetServiceTest {
         petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
         assert petriNetRepository.count() == processCount
         Thread.sleep(5000)
-        assert elasticPetriNetRepository.findByStringId(testNet.stringId) == null
+        assert elasticPetriNetRepository.findById(testNet.stringId).isPresent()
         assert caseRepository.findAllByProcessIdentifier(testNetOptional.getNet().getImportId()).size() == 0
         assert taskRepository.count() == taskCount
         assert processRoleRepository.count() == processRoleCount

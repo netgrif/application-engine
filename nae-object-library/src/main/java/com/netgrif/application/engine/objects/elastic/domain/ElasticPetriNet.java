@@ -12,11 +12,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public abstract class ElasticPetriNet {
 
@@ -28,7 +25,6 @@ public abstract class ElasticPetriNet {
 
     private String uriNodeId;
 
-    private String stringId;
 
     private I18nField title;
 
@@ -38,11 +34,15 @@ public abstract class ElasticPetriNet {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime creationDate;
 
+    public ElasticPetriNet() {
+        this.id = new Object().toString();
+    }
+
     public ElasticPetriNet(PetriNet net) {
+        this.id = net.getStringId();
         this.identifier = net.getIdentifier();
         this.version = net.getVersion();
         this.uriNodeId = net.getUriNodeId();
-        this.stringId = net.getStringId();
         this.title = this.transformToField(net.getTitle());
         this.initials = net.getInitials();
         this.creationDate = net.getCreationDate();

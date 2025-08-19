@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.adapter.spring.elastic.domain;
 
 import com.netgrif.application.engine.objects.workflow.domain.Case;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
@@ -16,9 +15,12 @@ import java.util.Set;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Flattened;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 
-@NoArgsConstructor
 @Document(indexName = "#{@elasticCaseIndex}")
 public class ElasticCase extends com.netgrif.application.engine.objects.elastic.domain.ElasticCase {
+
+    public ElasticCase() {
+        super();
+    }
 
     public ElasticCase(Case useCase) {
         super(useCase);

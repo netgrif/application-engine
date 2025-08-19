@@ -149,7 +149,7 @@ class ProcessRoleTest {
                 .andExpect(jsonPath('$.outcome.acase.petriNetId', CoreMatchers.is(netId)))
                 .andReturn()
         def response = parseResult(result)
-        caseId = response.outcome.acase.stringId
+        caseId = response.outcome.acase.getId
     }
 
     def searchTasks(String title, int expected) {

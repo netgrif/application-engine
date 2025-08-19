@@ -191,7 +191,7 @@ class ElasticTaskTest {
         ElasticTask task = new com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask()
         task.setTaskId("TestTask")
         task.setTitle(new I18nString("START"))
-        task.setStringId("TestTask")
+        task.setId("TestTask")
         elasticTaskService.index(task)
 
         ExecutorService executorService = Executors.newFixedThreadPool(3)
@@ -204,7 +204,7 @@ class ElasticTaskTest {
                     ElasticTask taskParallel = new com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask()
                     taskParallel.setTaskId("TestTask")
                     task.setTitle(new I18nString("START" + index))
-                    taskParallel.setStringId("TestTask")
+                    taskParallel.setId("TestTask")
                     Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(taskParallel)
                     ElasticTask result = resultFuture.get()
                     assert result != null
@@ -246,7 +246,7 @@ class ElasticTaskTest {
                     ElasticTask taskParallel = new com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask()
                     taskParallel.setTaskId("TestTask"+ index)
                     task.setTitle(new I18nString("START"))
-                    taskParallel.setStringId("TestTask"+index)
+                    taskParallel.setId("TestTask"+index)
                     Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(taskParallel)
                     ElasticTask result = resultFuture.get()
                     assert result != null

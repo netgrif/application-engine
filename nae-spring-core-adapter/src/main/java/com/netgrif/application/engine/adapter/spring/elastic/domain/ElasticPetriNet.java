@@ -16,9 +16,12 @@ import java.util.Set;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 
-@NoArgsConstructor
 @Document(indexName = "#{@elasticPetriNetIndex}")
 public class ElasticPetriNet extends com.netgrif.application.engine.objects.elastic.domain.ElasticPetriNet {
+
+    public ElasticPetriNet() {
+        super();
+    }
 
     public ElasticPetriNet(PetriNet net) {
         super(net);
@@ -44,12 +47,6 @@ public class ElasticPetriNet extends com.netgrif.application.engine.objects.elas
     @Override
     public String getUriNodeId() {
         return super.getUriNodeId();
-    }
-
-    @Field(type = Keyword)
-    @Override
-    public String getStringId() {
-        return super.getStringId();
     }
 
     @Field(type = Keyword)
