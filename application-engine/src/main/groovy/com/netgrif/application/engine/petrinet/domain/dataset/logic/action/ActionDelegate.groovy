@@ -1150,7 +1150,7 @@ class ActionDelegate {
         FileFieldValue fieldValue = new FileFieldValue()
         fieldValue.setName(filename)
         if (!storagePath) {
-            storagePath = storagePath(targetCase, targetFieldId, filename)
+            storagePath = resolveStoragePath(targetCase, targetFieldId, filename)
         }
         fieldValue.setPath(storagePath)
         if (targetCase.stringId == useCase.stringId) {
@@ -1181,7 +1181,7 @@ class ActionDelegate {
         if (pdfResource.getOutputFolder()) {
             storagePath = pdfResource.getOutputFolder() + File.separator + targetCase.stringId + "-" + targetFileFieldId + "-" + filename
         } else {
-            storagePath = storagePath(targetCase, targetFileFieldId, filename)
+            storagePath = resolveStoragePath(targetCase, targetFileFieldId, filename)
         }
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
