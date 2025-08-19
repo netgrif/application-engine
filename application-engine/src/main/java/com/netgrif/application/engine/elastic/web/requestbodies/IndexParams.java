@@ -2,6 +2,8 @@ package com.netgrif.application.engine.elastic.web.requestbodies;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * Represents the parameters to configure the indexing operation.
  * This class allows customization of batch sizes for cases and tasks,
@@ -24,4 +26,10 @@ public class IndexParams {
      * Specifies the batch size for tasks during indexing. Default is {@code 20000}.
      */
     private Integer taskBatchSize = 20000;
+
+
+    /**
+     * Specifies the date, from which to consider lastModifiedDate property of cases.
+     */
+    private LocalDateTime lastRun = null;
 }

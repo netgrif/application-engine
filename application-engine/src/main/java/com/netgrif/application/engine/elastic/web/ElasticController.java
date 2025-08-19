@@ -125,7 +125,7 @@ public class ElasticController {
     @PostMapping(value = "/reindex/bulk", produces = MediaType.APPLICATION_JSON_VALUE)
     public MessageResource bulkReindex(IndexParams indexParams) {
         try {
-            indexService.bulkIndex(indexParams.isIndexAll(), null, indexParams.getCaseBatchSize(), indexParams.getTaskBatchSize());
+            indexService.bulkIndex(indexParams.isIndexAll(), indexParams.getLastRun(), indexParams.getCaseBatchSize(), indexParams.getTaskBatchSize());
             return MessageResource.successMessage("Success");
         } catch (Exception e) {
             log.error("Could not index: ", e);
