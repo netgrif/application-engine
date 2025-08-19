@@ -140,7 +140,7 @@ public class ElasticTaskQueueManager {
         log.debug("Remove task [{}] in thread [{}]", task.getTaskId(), Thread.currentThread().getName());
         try {
             log.debug("[{}]: Task \"{}\" [{}] removed", task.getCaseId(), task.getTitle(), task.getId());
-            return repository.deleteAllByTaskId(task.getTaskId());
+            return repository.deleteAllByTaskId(task.getId());
         } catch (RuntimeException e) {
             log.error("Elastic executor was killed before finish: {}", e.getMessage());
         }
