@@ -1,13 +1,7 @@
 package com.netgrif.application.engine.configuration;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.configuration.properties.UriProperties;
-import com.netgrif.application.engine.elastic.serializer.LocalDateTimeJsonDeserializer;
-import com.netgrif.application.engine.elastic.serializer.LocalDateTimeJsonSerializer;
 import com.netgrif.application.engine.workflow.service.CaseEventHandler;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHost;
@@ -18,15 +12,11 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
-
-import java.time.LocalDateTime;
 
 @Configuration
 @RequiredArgsConstructor
