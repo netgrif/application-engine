@@ -36,39 +36,32 @@ public class FileFieldValue implements Serializable {
         return new FileFieldValue(parts[0], parts[1]);
     }
 
+
+    /**
+     * Deprecated. Use {@link com.netgrif.application.engine.files.interfaces.IStorageService#getPath(String, String, String)} instead.
+     *
+     * @param caseId          the ID of the case
+     * @param fieldId         the ID of the field
+     * @param storageProvider optional storage provider name, can be null
+     * @return empty string (method is deprecated and not functional)
+     */
+    @Deprecated
     public String getPath(String caseId, String fieldId, String storageProvider) {
-//        IStorageService storageService;
-//        if (storageProvider != null) {
-//            storageService = (IStorageService) ApplicationContextProvider.invokeMethod("getBean", new Object[]{storageProvider});
-//        } else {
-//            storageService = (IStorageService) ApplicationContextProvider.invokeMethod("getBean", new Object[]{"localStorageService"});
-//        }
-//
-//        return ((String) (storageService.invokeMethod("getPath", new Object[]{caseId, fieldId, getName()})));
         return "";
     }
 
+    /**
+     * Deprecated. Use {@link com.netgrif.application.engine.files.interfaces.IStorageService#getPath(String, String)} instead.
+     *
+     * @param caseId  the ID of the case
+     * @param fieldId the ID of the field
+     * @return empty string (method is deprecated and not functional)
+     */
+    @Deprecated
     public String getPath(String caseId, String fieldId) {
         return getPath(caseId, fieldId, null);
     }
 
-    public String getPreviewPath(String caseId, String fieldId, boolean isRemote, String storageProvider) {
-//        IStorageService storageService;
-//        if (isRemote && storageProvider == null) {
-//            return caseId + "-" + fieldId + "-" + getName() + ".file_preview";
-//        } else if (storageProvider != null) {
-//            storageService = (IStorageService) ApplicationContextProvider.invokeMethod("getBean", new Object[]{storageProvider});
-//        } else {
-//            storageService = (IStorageService) ApplicationContextProvider.invokeMethod("getBean", new Object[]{"localStorageService"});
-//        }
-//
-//        return ((String) (storageService.invokeMethod("getPreviewPath", new Object[]{caseId, fieldId, getName()})));
-        return "";
-    }
-
-    public String getPreviewPath(String caseId, String fieldId, boolean isRemote) {
-        return getPreviewPath(caseId, fieldId, isRemote, null);
-    }
 
     @Override
     public String toString() {
