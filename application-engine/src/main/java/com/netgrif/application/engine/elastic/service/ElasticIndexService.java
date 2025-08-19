@@ -23,7 +23,6 @@ import com.netgrif.application.engine.objects.elastic.serializer.LocalDateTimeJs
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
@@ -45,6 +44,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -359,30 +359,32 @@ public class ElasticIndexService implements IElasticIndexService {
      * @param taskBatchSize batch size for tasks
      */
     private void reindexQueried(org.springframework.data.mongodb.core.query.Query query, long count, int caseBatchSize, int taskBatchSize) {
-        long numOfPages = ((count / caseBatchSize) + 1);
+        long numOfPages = Math.max(1, Math.ceilDiv(count, (long) caseBatchSize));
         log.info("Reindexing {} pages", numOfPages);
 
         query.cursorBatchSize(caseBatchSize);
         long page = 1, currentBatchSize = 0;
         List<BulkOperation> caseOperations = new ArrayList<>();
         List<String> caseIds = new ArrayList<>();
-        Iterator<Case> cursor = mongoTemplate.stream(query, Case.class).iterator();
 
-        while (cursor.hasNext()) {
-            Case aCase = cursor.next();
-            prepareCase(aCase);
-            ElasticCase doc = caseMappingService.transform(aCase);
-            prepareCaseBulkOperation(doc, caseOperations);
-            caseIds.add(aCase.getStringId());
+        try (Stream<Case> cursorStream = mongoTemplate.stream(query, Case.class)) {
+            Iterator<Case> cursor = cursorStream.iterator();
+            while (cursor.hasNext()) {
+                Case aCase = cursor.next();
+                prepareCase(aCase);
+                ElasticCase doc = caseMappingService.transform(aCase);
+                prepareCaseBulkOperation(doc, caseOperations);
+                caseIds.add(aCase.getStringId());
 
-            if (++currentBatchSize == caseBatchSize || !cursor.hasNext()) {
-                log.info("Reindexing case page {} / {}", page, numOfPages);
-                executeAndValidate(caseOperations);
-                bulkIndexTasks(caseIds, taskBatchSize);
-                caseOperations.clear();
-                caseIds.clear();
-                currentBatchSize = 0;
-                page++;
+                if (++currentBatchSize == caseBatchSize || !cursor.hasNext()) {
+                    log.info("Reindexing case page {} / {}", page, numOfPages);
+                    executeAndValidate(caseOperations);
+                    bulkIndexTasks(caseIds, taskBatchSize);
+                    caseOperations.clear();
+                    caseIds.clear();
+                    currentBatchSize = 0;
+                    page++;
+                }
             }
         }
 
@@ -400,23 +402,25 @@ public class ElasticIndexService implements IElasticIndexService {
         }
         org.springframework.data.mongodb.core.query.Query query = org.springframework.data.mongodb.core.query.Query.query(Criteria.where("caseId").in(caseIds)).cursorBatchSize(taskBatchSize);
         long totalSize = mongoTemplate.count(query, Task.class);
-        long numOfPages = ((totalSize / taskBatchSize) + 1);
+        long numOfPages = Math.max(1, Math.ceilDiv(totalSize, (long) taskBatchSize));
 
         long page = 1, currentBatchSize = 0;
         List<BulkOperation> taskOperations = new ArrayList<>();
-        Iterator<Task> cursor = mongoTemplate.stream(query, Task.class).iterator();
 
-        while (cursor.hasNext()) {
-            Task task = cursor.next();
-            ElasticTask elasticTask = taskMappingService.transform(task);
-            prepareTaskBulkOperation(elasticTask, taskOperations);
+        try (Stream<Task> cursorStream = mongoTemplate.stream(query, Task.class)) {
+            Iterator<Task> cursor = cursorStream.iterator();
+            while (cursor.hasNext()) {
+                Task task = cursor.next();
+                ElasticTask elasticTask = taskMappingService.transform(task);
+                prepareTaskBulkOperation(elasticTask, taskOperations);
 
-            if (++currentBatchSize == taskBatchSize || !cursor.hasNext()) {
-                log.info("Reindexing task page {} / {}", page, numOfPages);
-                executeAndValidate(taskOperations);
-                taskOperations.clear();
-                currentBatchSize = 0;
-                page++;
+                if (++currentBatchSize == taskBatchSize || !cursor.hasNext()) {
+                    log.info("Reindexing task page {} / {}", page, numOfPages);
+                    executeAndValidate(taskOperations);
+                    taskOperations.clear();
+                    currentBatchSize = 0;
+                    page++;
+                }
             }
         }
     }
