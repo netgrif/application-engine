@@ -35,11 +35,11 @@ public class ElasticTaskQueueManager {
 
 
     public Future<ElasticTask> scheduleOperation(ElasticTaskJob task) {
-        if (task.getTask().getTaskId() == null) {
+        if (task.getTask().getId() == null) {
             throw new IllegalArgumentException("Task id cannot be null");
         }
 
-        String taskId = task.getTaskId();
+        String taskId = task.getTask().getId();
         log.debug("Scheduling operation for task: {}", taskId);
 
         CompletableFuture<ElasticTask> future = new CompletableFuture<>();
