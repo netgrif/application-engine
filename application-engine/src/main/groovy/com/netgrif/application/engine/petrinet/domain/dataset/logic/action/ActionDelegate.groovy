@@ -20,6 +20,8 @@ import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearc
 import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
+import com.netgrif.application.engine.files.IStorageResolverService
+import com.netgrif.application.engine.files.interfaces.IStorageService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.integration.modules.ModuleHolder
@@ -35,7 +37,6 @@ import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.Transition
-import com.netgrif.application.engine.objects.petrinet.domain.UriNode
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.FieldBehavior
@@ -163,9 +164,6 @@ class ActionDelegate {
     @Autowired
     InitValueExpressionEvaluator initValueExpressionEvaluator
 
-//    @Autowired
-//    RuleRepository ruleRepository
-
     @Autowired
     Scheduler scheduler
 
@@ -196,9 +194,6 @@ class ActionDelegate {
     @Autowired
     IImpersonationService impersonationService
 
-//    @Autowired
-//    IHistoryService historyService
-
     @Autowired
     SecurityConfigurationProperties.WebProperties webProperties
 
@@ -210,6 +205,9 @@ class ActionDelegate {
 
     @Autowired
     DashboardItemService dashboardItemService
+
+    @Autowired
+    IStorageResolverService storageResolverService
 
     FrontendActionOutcome Frontend
 
@@ -1152,7 +1150,7 @@ class ActionDelegate {
         FileFieldValue fieldValue = new FileFieldValue()
         fieldValue.setName(filename)
         if (!storagePath) {
-            storagePath = fieldValue.getPath(targetCase.stringId, targetFieldId)
+            storagePath = resolveStoragePath(targetCase, targetFieldId, filename)
         }
         fieldValue.setPath(storagePath)
         if (targetCase.stringId == useCase.stringId) {
@@ -1183,7 +1181,7 @@ class ActionDelegate {
         if (pdfResource.getOutputFolder()) {
             storagePath = pdfResource.getOutputFolder() + File.separator + targetCase.stringId + "-" + targetFileFieldId + "-" + filename
         } else {
-            storagePath = new FileFieldValue(filename, "").getPath(targetCase.stringId, targetFileFieldId)
+            storagePath = resolveStoragePath(targetCase, targetFileFieldId, filename)
         }
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
@@ -2760,5 +2758,19 @@ class ActionDelegate {
         Task task = taskService.findOne(taskId)
         Case taskCase = workflowService.findOne(task.caseId)
         return taskCase.getPetriNet().getDataSet().get(fieldId)
+    }
+
+    String resolveStoragePath(Case aCase, String fileFieldId, String fileName) {
+        Optional<Field<?>> storageFieldOptional = aCase.getPetriNet().getField(fileFieldId)
+        if (storageFieldOptional.isEmpty()) {
+                throw new IllegalArgumentException("Field with id [%s] does not exist on Petri Net [%s]".formatted(fileFieldId, aCase.getPetriNetId()))
+            }
+        Field<?> field = storageFieldOptional.get()
+        if (!(field instanceof StorageField)) {
+                throw new IllegalArgumentException("Field with id [%s] is not a StorageField on Petri Net [%s]".formatted(fileFieldId, aCase.getPetriNetId()))
+            }
+        StorageField<?> storageField = (StorageField<?>) field
+        IStorageService storageService = storageResolverService.resolve(storageField.storageType)
+        return storageService.getPath(aCase.stringId, fileFieldId, fileName)
     }
 }

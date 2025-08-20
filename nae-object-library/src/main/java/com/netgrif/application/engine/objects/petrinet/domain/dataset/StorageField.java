@@ -18,10 +18,6 @@ public abstract class StorageField<T> extends Field<T> {
     }
 
     public String getStorageType() {
-//        if (storage == null) {
-//            return ((String) (LocalStorageService.LOCAL_TYPE));
-//        }
-
         return storage.getType();
     }
 
