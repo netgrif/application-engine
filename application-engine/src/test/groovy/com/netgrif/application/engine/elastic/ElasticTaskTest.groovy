@@ -127,8 +127,8 @@ class ElasticTaskTest {
     @Test
     void testRemoveTaskByProcess() throws Exception {
         ElasticTask task = new com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask()
-        task.setId("TestTask1")
-        task.setTaskId("TestTask1")
+        task.setId("TestTask")
+        task.setTaskId("TestTask")
         task.setTitle(new I18nString("Test"))
         task.setProcessId("Process")
 
@@ -136,13 +136,13 @@ class ElasticTaskTest {
         ElasticTask result = resultFuture.get()
         assert  result
 
-        ElasticTask indexedTask = elasticTaskRepository.findByTaskId("TestTask1")
+        ElasticTask indexedTask = elasticTaskRepository.findByTaskId("TestTask")
         assert indexedTask != null
         CountDownLatch latch = new CountDownLatch(1)
         elasticTaskService.removeByPetriNetId("Process")
 
         latch.await(10, TimeUnit.SECONDS)
-        ElasticTask deletedTask = elasticTaskRepository.findByTaskId("TestTask1")
+        ElasticTask deletedTask = elasticTaskRepository.findByTaskId("TestTask")
         assert deletedTask == null
     }
 
@@ -163,9 +163,9 @@ class ElasticTaskTest {
             executorService.submit(() -> {
                 try {
                     ElasticTask taskParallel = new com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask()
-                    task.setId("TestTask" + index)
-                    task.setTaskId("TestTask" + index)
-                    task.setTitle(new I18nString("START" + index))
+                    taskParallel.setId("TestTask" + index)
+                    taskParallel.setTaskId("TestTask" + index)
+                    taskParallel.setTitle(new I18nString("START" + index))
                     taskParallel.setProcessId("TestProcess")
                     Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(taskParallel)
                     ElasticTask result = resultFuture.get()
@@ -206,9 +206,9 @@ class ElasticTaskTest {
             executorService.submit(() -> {
                 try {
                     ElasticTask taskParallel = new com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask()
-                    task.setId("TestTask" + index)
-                    task.setTaskId("TestTask" + index)
-                    task.setTitle(new I18nString("START" + index))
+                    taskParallel.setId("TestTask" + index)
+                    taskParallel.setTaskId("TestTask" + index)
+                    taskParallel.setTitle(new I18nString("START" + index))
                     Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(taskParallel)
                     ElasticTask result = resultFuture.get()
                     assert result != null
@@ -237,6 +237,7 @@ class ElasticTaskTest {
         int pocetOpakovani = 1000
         ElasticTask task = new com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask()
         task.setId("TestTask")
+        task.setTaskId("TestTask")
         task.setTitle(new I18nString("START"))
         elasticTaskService.index(task)
 
@@ -248,9 +249,9 @@ class ElasticTaskTest {
             executorService.submit(() -> {
                 try {
                     ElasticTask taskParallel = new com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask()
-                    task.setId("TestTask" + index)
-                    task.setTaskId("TestTask" + index)
-                    task.setTitle(new I18nString("START"))
+                    taskParallel.setId("TestTask" + index)
+                    taskParallel.setTaskId("TestTask" + index)
+                    taskParallel.setTitle(new I18nString("START"))
                     Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(taskParallel)
                     ElasticTask result = resultFuture.get()
                     assert result != null

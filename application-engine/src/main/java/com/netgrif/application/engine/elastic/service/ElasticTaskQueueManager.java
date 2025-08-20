@@ -129,7 +129,7 @@ public class ElasticTaskQueueManager {
             log.debug("[{}]: Task \"{}\" has duplicates, will be reindexed", task.getCaseId(), task.getTitle());
             repository.deleteAllById(task.getId());
             elasticTask = repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask) task);
-            log.debug("[{}]: Task \"{}\" indexed", task.getCaseId(), task.getTitle());
+            log.debug("[{}]: Task \"{}\" [{}] indexed after duplicate cleanup", task.getCaseId(), task.getTitle(), task.getId());
         } catch (RuntimeException e) {
             log.error("Elastic executor was killed before finish: {}", e.getMessage());
         }
