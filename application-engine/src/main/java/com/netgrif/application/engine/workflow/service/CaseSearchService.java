@@ -142,10 +142,8 @@ public class CaseSearchService extends MongoSearchService<Case> {
     public Predicate petriNet(Object query, LoggedUser user, Locale locale) {
         List<PetriNetReference> allowedNets = petriNetService.getReferencesByUsersProcessRoles(user, locale);
         if (query instanceof ArrayList) {
-            BooleanBuilder builder = new BooleanBuilder();
-            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof HashMap).map(q -> petriNetObject((HashMap<String, String>) q, allowedNets)).collect(Collectors.toList());
-            expressions.forEach(builder::or);
-            return builder;
+            List<Predicate> expressions = (List<Predicate>) ((ArrayList) query).stream().filter(q -> q instanceof HashMap).map(q -> petriNetObject((HashMap<String, String>) q, allowedNets)).collect(Collectors.toList());
+            return constructPredicateTree(expressions, BooleanBuilder::or);
         } else if (query instanceof HashMap) {
             return petriNetObject((HashMap<String, String>) query, allowedNets);
         }
@@ -346,10 +344,8 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     public Predicate caseId(Object query) {
         if (query instanceof ArrayList) {
-            BooleanBuilder builder = new BooleanBuilder();
-            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof String).map(q -> caseIdString((String) q)).collect(Collectors.toList());
-            expressions.forEach(builder::or);
-            return builder;
+            List<Predicate> expressions = (List<Predicate>) ((ArrayList) query).stream().filter(q -> q instanceof String).map(q -> caseIdString((String) q)).collect(Collectors.toList());
+            return constructPredicateTree(expressions, BooleanBuilder::or);
         } else if (query instanceof String) {
             return caseIdString((String) query);
         }
@@ -371,9 +367,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (groupProcesses.size() == 0)
             return null;
 
-        List<BooleanExpression> processQueries = groupProcesses.stream().map(PetriNetReference::getIdentifier).map(QCase.case$.processIdentifier::eq).collect(Collectors.toList());
-        BooleanBuilder builder = new BooleanBuilder();
-        processQueries.forEach(builder::or);
-        return builder;
+        List<Predicate> processQueries = groupProcesses.stream().map(PetriNetReference::getIdentifier).map(QCase.case$.processIdentifier::eq).collect(Collectors.toList());
+        return constructPredicateTree(processQueries, BooleanBuilder::or);
     }
 }
