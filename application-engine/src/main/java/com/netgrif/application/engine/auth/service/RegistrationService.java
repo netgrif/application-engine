@@ -13,6 +13,7 @@ import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +32,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Service
 public class RegistrationService implements IRegistrationService {
 
     @Autowired
