@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public abstract class ElasticTask {
 
@@ -75,10 +76,6 @@ public abstract class ElasticTask {
     private String finishPolicy;
 
     private Map<String, String> tags;
-
-    public ElasticTask() {
-        this.id = new Object().toString();
-    }
 
     public ElasticTask(Task task) {
         this.id = task.getStringId();

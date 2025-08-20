@@ -5,7 +5,7 @@ import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.bson.types.ObjectId;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public abstract class ElasticCase implements Serializable {
 
@@ -76,10 +77,6 @@ public abstract class ElasticCase implements Serializable {
     private Set<String> negativeViewUsers;
 
     private Map<String, String> tags;
-
-    public ElasticCase() {
-        this.id = new ObjectId().toString();
-    }
 
     public ElasticCase(Case useCase) {
         id = useCase.getStringId();

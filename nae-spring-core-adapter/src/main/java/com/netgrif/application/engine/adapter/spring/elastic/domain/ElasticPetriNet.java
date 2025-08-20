@@ -16,12 +16,9 @@ import java.util.Set;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 
+@NoArgsConstructor
 @Document(indexName = "#{@elasticPetriNetIndex}")
 public class ElasticPetriNet extends com.netgrif.application.engine.objects.elastic.domain.ElasticPetriNet {
-
-    public ElasticPetriNet() {
-        super();
-    }
 
     public ElasticPetriNet(PetriNet net) {
         super(net);

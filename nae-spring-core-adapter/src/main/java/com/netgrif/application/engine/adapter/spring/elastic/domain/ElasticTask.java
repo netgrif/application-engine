@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.adapter.spring.elastic.domain;
 
 import com.netgrif.application.engine.objects.workflow.domain.Task;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -14,13 +15,9 @@ import java.util.Set;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Flattened;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 
-
+@NoArgsConstructor
 @Document(indexName = "#{@elasticTaskIndex}")
 public class ElasticTask extends com.netgrif.application.engine.objects.elastic.domain.ElasticTask {
-
-    public ElasticTask() {
-        super();
-    }
 
     public ElasticTask(Task task) {
         super(task);
