@@ -264,7 +264,7 @@ class InsuranceTest {
 //                .andExpect(jsonPath('$.outcome.aCase.petriNetId', CoreMatchers.is(netId)))
                 .andReturn()
         def response = parseResult(result)
-        caseId = response.outcome.aCase.stringId
+        caseId = response.outcome.aCase.id
     }
 
     def searchTasks(String title, int expected) {

@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.elastic.web;
 
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
+import com.netgrif.application.engine.elastic.web.requestbodies.IndexParams;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.ReindexingTask;
 import com.netgrif.application.engine.workflow.service.CaseSearchService;
@@ -51,6 +53,8 @@ public class ElasticController {
 
     private DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
 
+    private IElasticIndexService indexService;
+
     @Autowired
     public void setWorkflowService(IWorkflowService workflowService) {
         this.workflowService = workflowService;
@@ -71,6 +75,11 @@ public class ElasticController {
         this.elasticsearchProperties = elasticsearchProperties;
     }
 
+    @Autowired
+    public void setIndexService(IElasticIndexService indexService) {
+        this.indexService = indexService;
+    }
+
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Reindex specified cases",
             description = "Caller must have the ADMIN role",
@@ -88,16 +97,35 @@ public class ElasticController {
             if (count == 0) {
                 log.info("No cases to reindex");
             } else {
-                long numOfPages = (long) ((count / elasticsearchProperties.getReindexExecutor().getSize()) + 1);
+                long numOfPages = (count / elasticsearchProperties.getReindexExecutor().getSize()) + 1;
                 log.info("Reindexing cases: " + numOfPages + " pages");
 
                 for (int page = 0; page < numOfPages; page++) {
-                    log.info("Indexing page " + (page + 1));
+                    log.info("Indexing page {}", page + 1);
                     Predicate predicate = searchService.buildQuery(searchBody, user, locale);
                     reindexingTask.forceReindexPage(predicate, page, numOfPages);
                 }
             }
 
+            return MessageResource.successMessage("Success");
+        } catch (Exception e) {
+            log.error("Could not index: ", e);
+            return MessageResource.errorMessage(e.getMessage());
+        }
+    }
+
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Operation(summary = "Reindex all or stale cases with bulk index",
+            description = "Reindex all or stale cases (specified by IndexParams.indexAll param) with bulk index. Caller must have the ADMIN role",
+            security = {@SecurityRequirement(name = "BasicAuth")})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
+    })
+    @PostMapping(value = "/reindex/bulk", produces = MediaType.APPLICATION_JSON_VALUE)
+    public MessageResource bulkReindex(IndexParams indexParams) {
+        try {
+            indexService.bulkIndex(indexParams.isIndexAll(), indexParams.getLastRun(), indexParams.getCaseBatchSize(), indexParams.getTaskBatchSize());
             return MessageResource.successMessage("Success");
         } catch (Exception e) {
             log.error("Could not index: ", e);

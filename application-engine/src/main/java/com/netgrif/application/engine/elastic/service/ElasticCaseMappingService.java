@@ -257,11 +257,11 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
                      dateField, com.netgrif.application.engine.objects.petrinet.domain.dataset.DateField netField) {
         if (dateField.getValue() instanceof LocalDate) {
             LocalDate date = (LocalDate) dateField.getValue();
-            return formatDateField(LocalDateTime.of(date, LocalTime.NOON));
+            return formatDateField(LocalDateTime.of(date, LocalTime.MIDNIGHT));
         } else if (dateField.getValue() instanceof Date) {
 //            log.warn(String.format("DateFields should have LocalDate values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
             LocalDateTime transformed = this.transformDateValueField(dateField);
-            return formatDateField(LocalDateTime.of(transformed.toLocalDate(), LocalTime.NOON));
+            return formatDateField(LocalDateTime.of(transformed.toLocalDate(), LocalTime.MIDNIGHT));
         } else {
             // TODO throw error?
             log.error(String.format("Unsupported DateField value type (%s)! Skipping indexation...", dateField.getValue().getClass().getCanonicalName()));

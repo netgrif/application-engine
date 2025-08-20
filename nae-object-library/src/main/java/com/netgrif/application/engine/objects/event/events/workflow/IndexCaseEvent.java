@@ -16,6 +16,6 @@ public class IndexCaseEvent extends Event {
 
     @Override
     public String getMessage() {
-        return "IndexCaseEvent: Case [" + elasticCase.getStringId() + "] indexed";
+        return "IndexCaseEvent: Case [" + elasticCase.getId() + "] indexed";
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import jakarta.annotation.PreDestroy;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.*;
 
@@ -34,7 +35,7 @@ public class ElasticTaskQueueManager {
 
 
     public Future<ElasticTask> scheduleOperation(ElasticTaskJob task) {
-        if (task.getTask().getTaskId() == null) {
+        if (task.getTaskId() == null) {
             throw new IllegalArgumentException("Task id cannot be null");
         }
 
@@ -111,24 +112,24 @@ public class ElasticTaskQueueManager {
         elasticTaskExecutor.shutdown();
     }
 
-
     private ElasticTask indexTaskWorker(ElasticTask task) {
         log.debug("Indexing task [{}] in thread [{}]", task.getTaskId(), Thread.currentThread().getName());
         com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask elasticTask = null;
         try {
-            elasticTask = repository.findByStringId(task.getStringId());
-            if (elasticTask == null) {
+            Optional<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask> elasticTaskOptional = repository.findById(task.getId());
+            if (elasticTaskOptional.isEmpty()) {
                 elasticTask = repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask) task);
             } else {
+                elasticTask = elasticTaskOptional.get();
                 elasticTask.update(task);
                 elasticTask = repository.save(elasticTask);
             }
-            log.debug("[{}]: Task \"{}\" [{}] indexed", task.getCaseId(), task.getTitle(), task.getStringId());
+            log.debug("[{}]: Task \"{}\" [{}] indexed", task.getCaseId(), task.getTitle(), task.getId());
         } catch (InvalidDataAccessApiUsageException e) {
             log.debug("[{}]: Task \"{}\" has duplicates, will be reindexed", task.getCaseId(), task.getTitle());
-            repository.deleteAllByStringId(task.getStringId());
-            repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask) task);
-            log.debug("[{}]: Task \"{}\" indexed", task.getCaseId(), task.getTitle());
+            repository.deleteAllById(task.getId());
+            elasticTask = repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask) task);
+            log.debug("[{}]: Task \"{}\" [{}] indexed after duplicate cleanup", task.getCaseId(), task.getTitle(), task.getId());
         } catch (RuntimeException e) {
             log.error("Elastic executor was killed before finish: {}", e.getMessage());
         }
@@ -138,7 +139,7 @@ public class ElasticTaskQueueManager {
     private ElasticTask removeTaskWorker(ElasticTask task) {
         log.debug("Remove task [{}] in thread [{}]", task.getTaskId(), Thread.currentThread().getName());
         try {
-            log.debug("[{}]: Task \"{}\" [{}] removed", task.getCaseId(), task.getTitle(), task.getStringId());
+            log.debug("[{}]: Task \"{}\" [{}] removed", task.getCaseId(), task.getTitle(), task.getTaskId());
             return repository.deleteAllByTaskId(task.getTaskId());
         } catch (RuntimeException e) {
             log.error("Elastic executor was killed before finish: {}", e.getMessage());

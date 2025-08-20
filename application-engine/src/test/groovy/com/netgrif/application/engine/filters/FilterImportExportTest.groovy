@@ -338,7 +338,7 @@ class FilterImportExportTest {
                         "((creationDateSortable:[1631138400000 TO 1631224800000}) OR (creationDateSortable:[1631138400000 TO 1631311200000})) AND " +
                         "((creationDateSortable:[1631184360000 TO 1631184420000}) OR (creationDateSortable:[1631184360000 TO 1631270820000})) AND " +
                         "(processIdentifier:6139e51308215f25b0a498c2_all_data) AND ((taskIds:1) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) AND " +
-                        "((author:<<me>>) OR (!(author:7))) AND (visualId:*asdad*) AND (stringId:*asdasd*))", ["all_data", "test_net"],
+                        "((author:<<me>>) OR (!(author:7))) AND (visualId:*asdad*) AND (id:*asdasd*))", ["all_data", "test_net"],
                 ["predicateMetadata": [
                         [[
                                  "category"     : "case_dataset",

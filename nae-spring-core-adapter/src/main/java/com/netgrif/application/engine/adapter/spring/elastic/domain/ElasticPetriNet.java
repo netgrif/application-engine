@@ -48,12 +48,6 @@ public class ElasticPetriNet extends com.netgrif.application.engine.objects.elas
 
     @Field(type = Keyword)
     @Override
-    public String getStringId() {
-        return super.getStringId();
-    }
-
-    @Field(type = Keyword)
-    @Override
     public String getInitials() {
         return super.getInitials();
     }

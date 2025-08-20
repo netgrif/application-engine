@@ -21,8 +21,6 @@ public abstract class ElasticTask {
 
     private String id;
 
-    private String stringId;
-
     private String processId;
 
     private String caseId;
@@ -80,7 +78,7 @@ public abstract class ElasticTask {
     private Map<String, String> tags;
 
     public ElasticTask(Task task) {
-        this.stringId = task.getStringId();
+        this.id = task.getStringId();
         this.processId = task.getProcessId();
         this.taskId = task.getStringId();
         this.caseId = task.getCaseId();

@@ -2,23 +2,16 @@ package com.netgrif.application.engine.elastic.service;
 
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
+import com.netgrif.application.engine.elastic.service.interfaces.*;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
-import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +19,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,7 +29,6 @@ public class ReindexingTask {
     private static final Logger log = LoggerFactory.getLogger(ReindexingTask.class);
 
     private int pageSize;
-    private CaseRepository caseRepository;
     private TaskRepository taskRepository;
     private ElasticCaseRepository elasticCaseRepository;
     private IElasticCaseService elasticCaseService;
@@ -47,10 +38,10 @@ public class ReindexingTask {
     private IWorkflowService workflowService;
     private DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
     private LocalDateTime lastRun;
+    private IElasticIndexService elasticIndexService;
 
     @Autowired
     public ReindexingTask(
-            CaseRepository caseRepository,
             TaskRepository taskRepository,
             ElasticCaseRepository elasticCaseRepository,
             @Qualifier("reindexingTaskElasticCaseService")
@@ -60,8 +51,8 @@ public class ReindexingTask {
             IElasticCaseMappingService caseMappingService,
             IElasticTaskMappingService taskMappingService,
             IWorkflowService workflowService,
-            DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties) {
-        this.caseRepository = caseRepository;
+            DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties,
+            IElasticIndexService elasticIndexService) {
         this.taskRepository = taskRepository;
         this.elasticCaseRepository = elasticCaseRepository;
         this.elasticCaseService = elasticCaseService;
@@ -71,6 +62,7 @@ public class ReindexingTask {
         this.workflowService = workflowService;
         this.elasticsearchProperties = elasticsearchProperties;
         this.pageSize = elasticsearchProperties.getReindexExecutor().getSize();
+        this.elasticIndexService = elasticIndexService;
 
         lastRun = LocalDateTime.now();
         if (this.elasticsearchProperties.getReindexFrom() != null) {
@@ -82,24 +74,9 @@ public class ReindexingTask {
     public void reindex() {
         log.info("Reindexing stale cases: started reindexing after " + lastRun);
 
-        BooleanExpression predicate = QCase.case$.lastModified.before(LocalDateTime.now()).and(QCase.case$.lastModified.after(lastRun.minusMinutes(2)));
-
-        lastRun = LocalDateTime.now();
-        long count = caseRepository.count(predicate);
-        if (count > 0) {
-            reindexAllPages(predicate, count);
-        }
+        elasticIndexService.bulkIndex(false, lastRun, null, null);
 
         log.info("Reindexing stale cases: end");
-    }
-
-    private void reindexAllPages(BooleanExpression predicate, long count) {
-        long numOfPages = ((count / pageSize) + 1);
-        log.info("Reindexing " + numOfPages + " pages");
-
-        for (int page = 0; page < numOfPages; page++) {
-            reindexPage(predicate, page, numOfPages, false);
-        }
     }
 
     public void forceReindexPage(Predicate predicate, int page, long numOfPages) {
@@ -111,7 +88,7 @@ public class ReindexingTask {
         Page<Case> cases = this.workflowService.search(predicate, PageRequest.of(page, pageSize));
 
         for (Case aCase : cases) {
-            if (forced || elasticCaseRepository.countByStringIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
+            if (forced || elasticCaseRepository.countByIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
                 elasticCaseService.indexNow(this.caseMappingService.transform(aCase));
                 List<Task> tasks = taskRepository.findAllByCaseId(aCase.getStringId());
                 for (Task task : tasks) {

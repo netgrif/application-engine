@@ -84,7 +84,7 @@ class ReindexTest {
 
         savedCase.forEach(it -> {
             CaseSearchRequest request = new CaseSearchRequest()
-            request.query = "stringId:\"" + it.getStringId() + "\""
+            request.query = "id:\"" + it.getStringId() + "\""
             List<Case> result = elasticCaseService.search(Collections.singletonList(request), superCreator.getLoggedSuper(), PageRequest.of(0, 10), LocaleContextHolder.getLocale(), false).getContent()
             assert result.size() == 1
         })

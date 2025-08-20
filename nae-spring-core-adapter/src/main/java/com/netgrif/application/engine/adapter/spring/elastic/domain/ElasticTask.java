@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.adapter.spring.elastic.domain;
 
-import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -32,12 +31,6 @@ public class ElasticTask extends com.netgrif.application.engine.objects.elastic.
     @Override
     public String getId() {
         return super.getId();
-    }
-
-    @Field(type = Keyword)
-    @Override
-    public String getStringId() {
-        return super.getStringId();
     }
 
     @Field(type = Keyword)

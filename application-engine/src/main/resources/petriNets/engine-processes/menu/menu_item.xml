@@ -112,7 +112,7 @@
 	</function>
 	<function scope="process" name="removeAnyAutoSelectFlagInFolder">
 		{ def parentId ->
-			String query = String.format("processIdentifier:menu_item AND dataSet.parentId.textValue:(%s) AND dataSet.is_auto_select.booleanValue:true AND NOT stringId:%s",
+			String query = String.format("processIdentifier:menu_item AND dataSet.parentId.textValue:(%s) AND dataSet.is_auto_select.booleanValue:true AND NOT id:%s",
 					parentId, useCase.stringId)
 			def itemCase = findCaseElastic(query)
 			if (itemCase == null) {

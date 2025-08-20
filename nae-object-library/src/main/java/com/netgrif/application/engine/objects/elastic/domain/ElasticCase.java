@@ -1,22 +1,17 @@
 package com.netgrif.application.engine.objects.elastic.domain;
 
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.ImmediateField;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,8 +30,6 @@ public abstract class ElasticCase implements Serializable {
 
     private Long lastModified;
 
-    private String stringId;
-
     private String visualId;
 
     private String processIdentifier;
@@ -45,8 +38,6 @@ public abstract class ElasticCase implements Serializable {
 
     private String title;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime creationDate;
 
     private Long creationDateSortable;
@@ -54,8 +45,6 @@ public abstract class ElasticCase implements Serializable {
     private String author;
 
     private String authorRealm;
-
-    private String mongoId;
 
     private String authorName;
 
@@ -89,16 +78,14 @@ public abstract class ElasticCase implements Serializable {
 
     private Map<String, String> tags;
 
-
     public ElasticCase(Case useCase) {
-        stringId = useCase.getStringId();
-        mongoId = useCase.getStringId();   //TODO: Duplication
+        id = useCase.getStringId();
         lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
         processIdentifier = useCase.getProcessIdentifier();
         processId = useCase.getPetriNetId();
         visualId = useCase.getVisualId();
         title = useCase.getTitle();
-        creationDate = useCase.getCreationDate();
+        creationDate = useCase.getCreationDate().truncatedTo(ChronoUnit.MILLIS);
         creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
         author = useCase.getAuthor().getId();
         authorRealm = useCase.getAuthor().getRealmId();

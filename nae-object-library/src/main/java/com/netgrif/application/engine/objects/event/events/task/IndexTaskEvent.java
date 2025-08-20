@@ -15,6 +15,6 @@ public class IndexTaskEvent extends Event {
     }
 
     public String getMessage() {
-        return "IndexTaskEvent: Task [" + task.getStringId() + "] indexed";
+        return "IndexTaskEvent: Task [" + task.getId() + "] indexed";
     }
 }

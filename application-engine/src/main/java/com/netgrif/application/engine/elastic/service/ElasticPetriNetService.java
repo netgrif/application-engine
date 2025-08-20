@@ -63,21 +63,22 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
 
     @Override
     public void index(ElasticPetriNet net) {
-        executors.execute(net.getStringId(), () -> {
+        executors.execute(net.getId(), () -> {
             try {
-                com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticPetriNet elasticPetriNet = repository.findByStringId(net.getStringId());
-                if (elasticPetriNet == null) {
+                Optional<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticPetriNet> elasticPetriNetOptional = repository.findById(net.getId());
+                if (elasticPetriNetOptional.isEmpty()) {
                     repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticPetriNet) net);
                 } else {
-                    elasticPetriNet.update(net);
-                    repository.save(elasticPetriNet);
+                    com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticPetriNet elasticNet = elasticPetriNetOptional.get();
+                    elasticNet.update(net);
+                    repository.save(elasticNet);
                 }
-                log.debug("[" + net.getStringId() + "]: PetriNet \"" + net.getTitle() + "\" indexed");
+                log.debug("[" + net.getId() + "]: PetriNet \"" + net.getTitle() + "\" indexed");
             } catch (InvalidDataAccessApiUsageException ignored) {
-                log.debug("[" + net.getStringId() + "]: PetriNet \"" + net.getTitle() + "\" has duplicates, will be reindexed");
-                repository.deleteAllByStringId(net.getStringId());
+                log.debug("[" + net.getId() + "]: PetriNet \"" + net.getTitle() + "\" has duplicates, will be reindexed");
+                repository.deleteAllById(net.getId());
                 repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticPetriNet) net);
-                log.debug("[" + net.getStringId() + "]: PetriNet \"" + net.getTitle() + "\" indexed");
+                log.debug("[" + net.getId() + "]: PetriNet \"" + net.getTitle() + "\" indexed");
             }
         });
     }
@@ -90,7 +91,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
     @Override
     public void remove(String id) {
         executors.execute(id, () -> {
-            repository.deleteAllByStringId(id);
+            repository.deleteAllById(id);
             log.info("[" + id + "]: PetriNet \"" + id + "\" deleted");
         });
     }
@@ -120,7 +121,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
         if (query != null) {
             SearchHits<ElasticPetriNet> hits = template.search(query, ElasticPetriNet.class, IndexCoordinates.of(elasticsearchConfiguration.elasticPetriNetIndex()));
             Page<ElasticPetriNet> indexedNets = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
-            netPage = petriNetService.findAllById(indexedNets.get().map(ElasticPetriNet::getStringId).collect(Collectors.toList()));
+            netPage = petriNetService.findAllById(indexedNets.get().map(ElasticPetriNet::getId).collect(Collectors.toList()));
             total = indexedNets.getTotalElements();
             log.debug("Found [{}] total elements of page [{}]", netPage.size(), pageable.getPageNumber());
         } else {

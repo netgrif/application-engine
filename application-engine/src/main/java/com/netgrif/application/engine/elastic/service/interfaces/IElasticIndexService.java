@@ -5,6 +5,7 @@ import org.springframework.data.elasticsearch.core.SearchScrollHits;
 import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.query.Query;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,7 @@ public interface IElasticIndexService {
 
     boolean indexExists(String indexName);
 
-    boolean bulkIndex(List<?> list, Class<?> clazz, String... placeholders);
+    void bulkIndex(boolean indexAll, LocalDateTime lastRun, Integer caseBatchSize, Integer taskBatchSize);
 
     boolean createIndex(Class<?> clazz, String... placeholders);
 

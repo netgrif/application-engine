@@ -3,6 +3,8 @@ package com.netgrif.application.engine.adapter.spring.elastic.domain;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 
+import java.util.List;
+
 import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
 @NoArgsConstructor
@@ -23,4 +25,9 @@ public class CaseField extends com.netgrif.application.engine.objects.elastic.do
         return super.allowedNets;
     }
 
+    @Override
+    @Field(type = Text)
+    public List<String> getCaseValue() {
+        return super.getCaseValue();
+    }
 }
