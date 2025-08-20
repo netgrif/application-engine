@@ -149,7 +149,7 @@ class WorkflowAuthorizationServiceTest {
                 .andExpect(status().isOk())
                 .andReturn()
         def response = parseResult(result)
-        String userCaseId1 = response.outcome.aCase.getId
+        String userCaseId1 = response.outcome.aCase.id
 
         result = mvc.perform(post(CREATE_CASE_URL)
                 .content(body)
@@ -158,7 +158,7 @@ class WorkflowAuthorizationServiceTest {
                 .andExpect(status().isOk())
                 .andReturn()
         response = parseResult(result)
-        String userCaseId2 = response.outcome.aCase.getId
+        String userCaseId2 = response.outcome.aCase.id
 
         result = mvc.perform(post(CREATE_CASE_URL)
                 .content(body)
@@ -167,7 +167,7 @@ class WorkflowAuthorizationServiceTest {
                 .andExpect(status().isOk())
                 .andReturn()
         response = parseResult(result)
-        String otherUserCaseId = response.outcome.acase.getId
+        String otherUserCaseId = response.outcome.aCase.id
 
         /* TODO: momentalne vracia 200 OK, ma User vediet zmazat case ktory vytvoril Admin?
         mvc.perform(delete(DELETE_CASE_URL + otherUserCaseId)
