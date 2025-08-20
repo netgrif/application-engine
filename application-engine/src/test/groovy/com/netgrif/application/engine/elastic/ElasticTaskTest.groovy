@@ -127,8 +127,8 @@ class ElasticTaskTest {
     @Test
     void testRemoveTaskByProcess() throws Exception {
         ElasticTask task = new com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask()
-        task.setId("TestTask")
-        task.setTaskId("TestTask")
+        task.setId("TestTask1")
+        task.setTaskId("TestTask1")
         task.setTitle(new I18nString("Test"))
         task.setProcessId("Process")
 
@@ -136,13 +136,13 @@ class ElasticTaskTest {
         ElasticTask result = resultFuture.get()
         assert  result
 
-        ElasticTask indexedTask = elasticTaskRepository.findByTaskId("TestTask")
+        ElasticTask indexedTask = elasticTaskRepository.findByTaskId("TestTask1")
         assert indexedTask != null
         CountDownLatch latch = new CountDownLatch(1)
         elasticTaskService.removeByPetriNetId("Process")
 
         latch.await(10, TimeUnit.SECONDS)
-        ElasticTask deletedTask = elasticTaskRepository.findByTaskId("TestTask")
+        ElasticTask deletedTask = elasticTaskRepository.findByTaskId("TestTask1")
         assert deletedTask == null
     }
 

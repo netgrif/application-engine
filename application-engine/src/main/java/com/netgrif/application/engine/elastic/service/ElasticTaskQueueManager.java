@@ -35,11 +35,11 @@ public class ElasticTaskQueueManager {
 
 
     public Future<ElasticTask> scheduleOperation(ElasticTaskJob task) {
-        if (task.getTask().getId() == null) {
+        if (task.getTaskId() == null) {
             throw new IllegalArgumentException("Task id cannot be null");
         }
 
-        String taskId = task.getTask().getId();
+        String taskId = task.getTaskId();
         log.debug("Scheduling operation for task: {}", taskId);
 
         CompletableFuture<ElasticTask> future = new CompletableFuture<>();
@@ -128,7 +128,7 @@ public class ElasticTaskQueueManager {
         } catch (InvalidDataAccessApiUsageException e) {
             log.debug("[{}]: Task \"{}\" has duplicates, will be reindexed", task.getCaseId(), task.getTitle());
             repository.deleteAllById(task.getId());
-            repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask) task);
+            elasticTask = repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask) task);
             log.debug("[{}]: Task \"{}\" indexed", task.getCaseId(), task.getTitle());
         } catch (RuntimeException e) {
             log.error("Elastic executor was killed before finish: {}", e.getMessage());
