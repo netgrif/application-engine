@@ -36,9 +36,10 @@ public class FileFieldValue implements Serializable {
         return new FileFieldValue(parts[0], parts[1]);
     }
 
-
+    //todo: remove in later release
     /**
      * Deprecated. Use {@link com.netgrif.application.engine.files.interfaces.IStorageService#getPath(String, String, String)} instead.
+     * This will be removed in future releases.
      *
      * @param caseId          the ID of the case
      * @param fieldId         the ID of the field
@@ -50,8 +51,10 @@ public class FileFieldValue implements Serializable {
         return "";
     }
 
+    //todo: remove in later release
     /**
-     * Deprecated. Use {@link com.netgrif.application.engine.files.interfaces.IStorageService#getPath(String, String)} instead.
+     * Deprecated. Use {@link com.netgrif.application.engine.files.interfaces.IStorageService#getPath(String, String)} instead. This will be removed
+     * in later release.
      *
      * @param caseId  the ID of the case
      * @param fieldId the ID of the field
