@@ -1,4 +1,4 @@
-    package com.netgrif.application.engine.configuration;
+package com.netgrif.application.engine.configuration;
 
 import co.elastic.clients.json.JsonpMapper;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
@@ -18,7 +18,7 @@ import org.springframework.data.elasticsearch.support.HttpHeaders;
 import java.time.LocalDateTime;
 import java.util.List;
 
-    @Configuration
+@Configuration
 @EnableElasticsearchRepositories(excludeFilters = {
         @ComponentScan.Filter(
                 type = FilterType.REGEX,
@@ -97,7 +97,7 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
 
     private boolean hasCredentials() {
         return elasticsearchProperties.getUsername() != null && !elasticsearchProperties.getUsername().isBlank() &&
-            elasticsearchProperties.getPassword() != null && !elasticsearchProperties.getPassword().isBlank();
+                elasticsearchProperties.getPassword() != null && !elasticsearchProperties.getPassword().isBlank();
     }
 
     private boolean hasToken() {
