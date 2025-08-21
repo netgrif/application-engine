@@ -3,6 +3,7 @@ package com.netgrif.application.engine.elastic.service;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
 import com.netgrif.application.engine.configuration.ElasticsearchConfiguration;
+import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
@@ -42,22 +43,22 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
 
     private final Executor executors;
 
-    private IPetriNetService petriNetService;
+    private final IPetriNetService petriNetService;
 
     private final ElasticsearchTemplate template;
 
-    protected ElasticsearchConfiguration elasticsearchConfiguration;
+    private final DataConfigurationProperties.ElasticsearchProperties elasticProperties;
 
-    public ElasticPetriNetService(ElasticPetriNetRepository repository, Executor executors, ElasticsearchTemplate template, ElasticsearchConfiguration elasticsearchConfiguration) {
+    public ElasticPetriNetService(ElasticPetriNetRepository repository,
+                                  Executor executors,
+                                  ElasticsearchTemplate template,
+                                  DataConfigurationProperties.ElasticsearchProperties elasticProperties,
+                                  @Lazy
+                                  IPetriNetService petriNetService) {
         this.repository = repository;
         this.executors = executors;
         this.template = template;
-        this.elasticsearchConfiguration = elasticsearchConfiguration;
-    }
-
-    @Lazy
-    @Autowired
-    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.elasticProperties = elasticProperties;
         this.petriNetService = petriNetService;
     }
 
@@ -119,7 +120,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
         List<PetriNet> netPage;
         long total;
         if (query != null) {
-            SearchHits<ElasticPetriNet> hits = template.search(query, ElasticPetriNet.class, IndexCoordinates.of(elasticsearchConfiguration.elasticPetriNetIndex()));
+            SearchHits<ElasticPetriNet> hits = template.search(query, ElasticPetriNet.class, IndexCoordinates.of(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX)));
             Page<ElasticPetriNet> indexedNets = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             netPage = petriNetService.findAllById(indexedNets.get().map(ElasticPetriNet::getId).collect(Collectors.toList()));
             total = indexedNets.getTotalElements();
