@@ -45,8 +45,6 @@ public abstract class ElasticTask {
 
     private String userRealmId;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime startDate;
 
     private String transactionId;

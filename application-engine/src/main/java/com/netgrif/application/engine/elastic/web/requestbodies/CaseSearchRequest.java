@@ -45,6 +45,13 @@ public class CaseSearchRequest implements Serializable {
     public String query;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+    public List<String> id;
+
+    /**
+     * @deprecated since 7.0.0 Please use {@link #id} instead. Will be removed in future releases.
+     */
+    @Deprecated(since = "7.0.0")
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> stringId;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
