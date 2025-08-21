@@ -1,6 +1,7 @@
-package com.netgrif.application.engine.objects.petrinet.domain.dataset;
+package com.netgrif.application.engine.objects.elastic.domain;
 
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import lombok.Data;
 
 import java.io.Serial;
@@ -14,7 +15,7 @@ public class ImmediateField implements Serializable {
 
     private String stringId;
     private I18nString name;
-    private FieldType type;
+    private String type;
 
     public ImmediateField() {
     }
@@ -22,6 +23,6 @@ public class ImmediateField implements Serializable {
     public ImmediateField(Field<?> field) {
         this.stringId = field.getStringId();
         this.name = field.getName();
-        this.type = field.getType();
+        this.type = field.getType().getName();
     }
 }

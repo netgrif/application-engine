@@ -424,33 +424,39 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     /**
-     * Case with stringId "5cb07b6ff05be15f0b972c36"
+     * Case with id "5cb07b6ff05be15f0b972c36"
      * <pre>
      * {
-     *     "stringId": "5cb07b6ff05be15f0b972c36"
+     *     "id": "5cb07b6ff05be15f0b972c36"
      * }
      * </pre>
      * <p>
-     * Cases with stringId "5cb07b6ff05be15f0b972c36" OR "5cb07b6ff05be15f0b972c31"
+     * Cases with id "5cb07b6ff05be15f0b972c36" OR "5cb07b6ff05be15f0b972c31"
      * <pre>
      * {
-     *     "stringId" [
+     *     "id" [
      *         "5cb07b6ff05be15f0b972c36",
      *         "5cb07b6ff05be15f0b972c31"
      *     ]
      * }
      * </pre>
      */
+
     protected void buildCaseIdQuery(CaseSearchRequest request, BoolQuery.Builder query) {
-        if (request.stringId == null || request.stringId.isEmpty()) {
+        List<String> validIds = Stream.concat(
+                Optional.ofNullable(request.stringId).orElse(Collections.emptyList()).stream(),
+                Optional.ofNullable(request.id).orElse(Collections.emptyList()).stream()
+        ).toList();
+
+        if (validIds.isEmpty()) {
             return;
         }
 
-        TermsQueryField stringIds = new TermsQueryField.Builder()
-                .value(request.stringId.stream().map(FieldValue::of).collect(Collectors.toList()))
+        TermsQueryField ids = new TermsQueryField.Builder()
+                .value(validIds.stream().map(FieldValue::of).collect(Collectors.toList()))
                 .build();
 
-        query.filter(QueryBuilders.terms(term -> term.field("stringId").terms(stringIds)));
+        query.filter(QueryBuilders.terms(term -> term.field("_id").terms(ids)));
     }
 
     protected void buildUriNodeIdQuery(CaseSearchRequest request, BoolQuery.Builder query) {

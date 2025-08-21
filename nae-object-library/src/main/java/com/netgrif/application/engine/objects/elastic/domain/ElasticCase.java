@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.objects.elastic.domain;
 
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.ImmediateField;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
