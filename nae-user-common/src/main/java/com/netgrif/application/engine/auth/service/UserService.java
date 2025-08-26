@@ -398,4 +398,14 @@ public interface UserService {
      * @return list of groups
      */
     List<Group> getUserGroups(AbstractActor actor);
+
+    /**
+     * Resets password for user.
+     *
+     * @param user user
+     * @param newPassword new password
+     * @param oldPassword old password
+     * @return the updated user
+     */
+    AbstractUser changePassword(AbstractUser user, String newPassword, String oldPassword);
 }

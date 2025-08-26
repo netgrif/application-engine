@@ -4,12 +4,14 @@ import com.netgrif.application.engine.adapter.spring.petrinet.web.responsebodies
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Attribute;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
+import com.netgrif.application.engine.objects.auth.domain.Credential;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 public class User {
@@ -34,6 +36,14 @@ public class User {
     protected UserState state;
 
     public User(AbstractUser user) {
+        Attribute<Set<String>> enabledCredentialsAttribute = new Attribute<>();
+        enabledCredentialsAttribute.setValue(user.getCredentials()
+                .values().stream()
+                .filter(Credential::isEnabled)
+                .map(Credential::getType)
+                .collect(Collectors.toSet()));
+        enabledCredentialsAttribute.setRequired(true);
+
         id = user.getStringId();
         username = user.getUsername();
         realmId = user.getRealmId();
@@ -43,6 +53,7 @@ public class User {
         lastName = user.getLastName();
         fullName = user.getName();
         attributes = user.getAttributes();
+        attributes.put("enabledCredentials", enabledCredentialsAttribute);
         if (user instanceof com.netgrif.application.engine.objects.auth.domain.User u) {
             createdAt = u.getCreatedAt();
             enabled = u.isActive();

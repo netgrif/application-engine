@@ -1,8 +1,6 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
-import com.netgrif.application.engine.objects.annotations.Indexed;
-import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.utils.DateUtils;
 import com.querydsl.core.annotations.QueryEntity;
 import lombok.AllArgsConstructor;
@@ -42,9 +40,6 @@ public class User extends AbstractUser implements Serializable {
     /** Timestamp of the last modification to the user */
     private LocalDateTime modifiedAt = LocalDateTime.now();
 
-    /** Map containing user's credentials with credential type as key */
-    private Map<String, Credential<?>> credentials = new HashMap<>();
-
     /**
      * Default constructor initializing a new User with a generated ObjectId
      * and empty maps for attributes and credentials
@@ -52,7 +47,6 @@ public class User extends AbstractUser implements Serializable {
     public User() {
         this.id = new ObjectId();
         this.attributes = new HashMap<>();
-        this.credentials = new HashMap<>();
     }
 
     /**

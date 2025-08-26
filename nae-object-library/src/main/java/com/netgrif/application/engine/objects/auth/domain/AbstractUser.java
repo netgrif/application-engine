@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * Abstract base class for user entities in the system.
@@ -54,6 +57,11 @@ public abstract class AbstractUser extends AbstractActor {
     protected String avatar;
 
     /**
+     * Map containing user's credentials with credential type as key
+     */
+    protected Map<String, Credential<?>> credentials = new HashMap<>();
+
+    /**
      * Constructs a new user with Object ID.
      *
      * @param id         MongoDB ObjectId of the user
@@ -73,6 +81,7 @@ public abstract class AbstractUser extends AbstractActor {
         this.lastName = lastName;
         this.email = email;
         this.avatar = avatar;
+        this.credentials = new HashMap<>();
     }
 
     /**
@@ -95,6 +104,7 @@ public abstract class AbstractUser extends AbstractActor {
         this.lastName = lastName;
         this.email = email;
         this.avatar = avatar;
+        this.credentials = new HashMap<>();
     }
 
     /**
