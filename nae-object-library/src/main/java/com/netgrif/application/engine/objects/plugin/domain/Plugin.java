@@ -6,11 +6,13 @@ import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * Domain class that represent the given plugin
- * */
+ *
+ */
 @Data
 public class Plugin implements Serializable {
 
@@ -35,15 +37,19 @@ public class Plugin implements Serializable {
 
     /**
      * Map of {@link EntryPoint}, key of the map is equivalent to EntryPoint.getName
-     * */
+     *
+     */
     private Map<String, EntryPoint> entryPoints;
+
+    private Map<String, String> metadata;
 
     public Plugin() {
         entryPoints = new HashMap<>();
+        metadata = new LinkedHashMap<>();
     }
 
     @Builder
-    public Plugin(String identifier, String name, String version, String description, String url, int restPort, int grpcPort, Map<String, EntryPoint> entryPoints, boolean active) {
+    public Plugin(String identifier, String name, String version, String description, String url, int restPort, int grpcPort, Map<String, EntryPoint> entryPoints, boolean active, Map<String, String> metadata) {
         this.identifier = identifier;
         this.name = name;
         this.version = version;
@@ -53,5 +59,6 @@ public class Plugin implements Serializable {
         this.grpcPort = grpcPort;
         this.entryPoints = entryPoints;
         this.active = active;
+        this.metadata = metadata;
     }
 }
