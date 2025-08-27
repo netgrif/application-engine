@@ -265,7 +265,7 @@ public class UserServiceImpl implements UserService {
         canUpdatePassword(user, newPassword);
 
         if (!verifyPasswords(user, oldPassword)) {
-            log.error("Confirmation password does not equal");
+            throw new IllegalArgumentException("Old password does not match.");
         }
 
         log.trace("Setting password for user [{}]", user.getUsername());
@@ -645,8 +645,7 @@ public class UserServiceImpl implements UserService {
         }
 
         log.trace("Verifying password for user [{}]", user.getUsername());
-        String hashedPassword = passwordEncoder.encode(password);
-        return Objects.equals(user.getPassword(), hashedPassword);
+        return passwordEncoder.matches(password, user.getPassword());
     }
 
     protected void canUpdatePassword(AbstractUser user, String password) {

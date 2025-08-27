@@ -39,8 +39,10 @@ public class User {
         Attribute<Set<String>> enabledCredentialsAttribute = new Attribute<>();
         enabledCredentialsAttribute.setValue(user.getCredentials()
                 .values().stream()
+                .filter(java.util.Objects::nonNull)
                 .filter(Credential::isEnabled)
                 .map(Credential::getType)
+                .filter(java.util.Objects::nonNull)
                 .collect(Collectors.toSet()));
         enabledCredentialsAttribute.setRequired(true);
 
@@ -52,7 +54,9 @@ public class User {
         firstName = user.getFirstName();
         lastName = user.getLastName();
         fullName = user.getName();
-        attributes = user.getAttributes();
+        attributes = user.getAttributes() != null
+                ? new java.util.HashMap<>(user.getAttributes())
+                : new java.util.HashMap<>();
         attributes.put("enabledCredentials", enabledCredentialsAttribute);
         if (user instanceof com.netgrif.application.engine.objects.auth.domain.User u) {
             createdAt = u.getCreatedAt();
