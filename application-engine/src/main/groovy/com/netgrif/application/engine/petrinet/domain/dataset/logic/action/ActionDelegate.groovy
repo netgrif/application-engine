@@ -90,6 +90,7 @@ import org.springframework.core.io.FileSystemResource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import com.netgrif.application.engine.objects.utils.Nullable;
 
 import java.time.ZoneId
 import java.util.stream.Collectors
