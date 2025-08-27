@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
+import com.netgrif.application.engine.objects.auth.domain.enums.UserType;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -54,6 +55,11 @@ public abstract class AbstractUser extends AbstractActor {
     protected String avatar;
 
     /**
+     * Boolean that marks user as internal
+     */
+    protected UserType type;
+
+    /**
      * Constructs a new user with Object ID.
      *
      * @param id         MongoDB ObjectId of the user
@@ -64,8 +70,9 @@ public abstract class AbstractUser extends AbstractActor {
      * @param lastName   User's last name
      * @param email      User's email address
      * @param avatar     User's avatar URL/identifier
+     * @param type       User's type defined by enumeration value
      */
-    public AbstractUser(ObjectId id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar) {
+    protected AbstractUser(ObjectId id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar, UserType type) {
         super(id, realmId);
         this.username = username;
         this.firstName = firstName;
@@ -73,6 +80,7 @@ public abstract class AbstractUser extends AbstractActor {
         this.lastName = lastName;
         this.email = email;
         this.avatar = avatar;
+        this.type = type;
     }
 
     /**
@@ -86,8 +94,9 @@ public abstract class AbstractUser extends AbstractActor {
      * @param lastName   User's last name
      * @param email      User's email address
      * @param avatar     User's avatar URL/identifier
+     * @param type       User's type defined by enumeration value
      */
-    public AbstractUser(String id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar) {
+    protected AbstractUser(String id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar, UserType type) {
         super(id, realmId);
         this.username = username;
         this.firstName = firstName;
@@ -95,6 +104,7 @@ public abstract class AbstractUser extends AbstractActor {
         this.lastName = lastName;
         this.email = email;
         this.avatar = avatar;
+        this.type = type;
     }
 
     /**

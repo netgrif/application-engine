@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
+import com.netgrif.application.engine.objects.auth.domain.enums.UserType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -64,9 +65,10 @@ public abstract class LoggedUser extends AbstractUser implements Serializable {
      * @param providerOrigin The authentication provider origin
      * @param mfaMethods The set of enabled MFA methods
      * @param sessionTimeout The duration of session timeout
+     * @param isInternal Boolean flag marking user as internal
      */
-    public LoggedUser(ObjectId id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar, String workspaceId, String providerOrigin, Set<String> mfaMethods, Duration sessionTimeout) {
-        super(id, realmId, username, firstName, middleName, lastName, email, avatar);
+    protected LoggedUser(ObjectId id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar, String workspaceId, String providerOrigin, Set<String> mfaMethods, Duration sessionTimeout, UserType type) {
+        super(id, realmId, username, firstName, middleName, lastName, email, avatar, type);
         this.workspaceId = workspaceId;
         this.providerOrigin = providerOrigin;
         this.mfaMethods = mfaMethods;
@@ -88,9 +90,10 @@ public abstract class LoggedUser extends AbstractUser implements Serializable {
      * @param providerOrigin The authentication provider origin
      * @param mfaMethods The set of enabled MFA methods
      * @param sessionTimeout The duration of session timeout
+     * @param isInternal Boolean flag marking user as internal
      */
-    public LoggedUser(String id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar, String workspaceId, String providerOrigin, Set<String> mfaMethods, Duration sessionTimeout) {
-        super(id, realmId, username, firstName, middleName, lastName, email, avatar);
+    protected LoggedUser(String id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar, String workspaceId, String providerOrigin, Set<String> mfaMethods, Duration sessionTimeout, UserType type) {
+        super(id, realmId, username, firstName, middleName, lastName, email, avatar, type);
         this.workspaceId = workspaceId;
         this.providerOrigin = providerOrigin;
         this.mfaMethods = mfaMethods;

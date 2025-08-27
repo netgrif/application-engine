@@ -104,11 +104,16 @@ public abstract class Realm implements Serializable {
     private int maxSessionsAllowed = 1;
 
     /**
+     * List of domains allowed in realm
+     */
+    private List<String> domains = new ArrayList<>();
+
+    /**
      * Constructs a new Realm instance with the specified name.
      *
      * @param name the name of the realm
      */
-    public Realm(String name) {
+    protected Realm(String name) {
         this.name = name;
     }
 

@@ -5,6 +5,7 @@ import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Attribute;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
+import com.netgrif.application.engine.objects.auth.domain.enums.UserType;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -32,6 +33,7 @@ public class User {
     private boolean enabled;
     private boolean emailVerified;
     protected UserState state;
+    private UserType type;
 
     public User(AbstractUser user) {
         id = user.getStringId();
@@ -43,6 +45,7 @@ public class User {
         lastName = user.getLastName();
         fullName = user.getName();
         attributes = user.getAttributes();
+        type = user.getType();
         if (user instanceof com.netgrif.application.engine.objects.auth.domain.User u) {
             createdAt = u.getCreatedAt();
             enabled = u.isActive();

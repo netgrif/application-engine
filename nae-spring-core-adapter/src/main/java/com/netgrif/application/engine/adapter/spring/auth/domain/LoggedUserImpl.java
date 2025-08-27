@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.adapter.spring.auth.domain;
 
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.auth.domain.enums.UserType;
 import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.security.core.GrantedAuthority;
@@ -41,9 +42,9 @@ public class LoggedUserImpl extends LoggedUser implements UserDetails {
      */
     public LoggedUserImpl(ObjectId id, String realmId, String username, String firstName, String middleName, String lastName,
                          String email, String avatar, String workspaceId, String providerOrigin, Set<String> mfaMethods,
-                         Duration sessionTimeout) {
+                         Duration sessionTimeout, UserType type) {
         super(id, realmId, username, firstName, middleName, lastName, email, avatar, workspaceId, providerOrigin,
-                mfaMethods, sessionTimeout);
+                mfaMethods, sessionTimeout, type);
     }
 
     /**
@@ -64,9 +65,9 @@ public class LoggedUserImpl extends LoggedUser implements UserDetails {
      */
     public LoggedUserImpl(String id, String realmId, String username, String firstName, String middleName, String lastName,
                          String email, String avatar, String workspaceId, String providerOrigin, Set<String> mfaMethods,
-                         Duration sessionTimeout) {
+                         Duration sessionTimeout, UserType type) {
         super(id, realmId, username, firstName, middleName, lastName, email, avatar, workspaceId, providerOrigin,
-                mfaMethods, sessionTimeout);
+                mfaMethods, sessionTimeout, type);
     }
 
     /**

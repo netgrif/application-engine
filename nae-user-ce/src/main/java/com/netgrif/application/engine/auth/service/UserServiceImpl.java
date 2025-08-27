@@ -9,6 +9,7 @@ import com.netgrif.application.engine.auth.repository.UserRepository;
 import com.netgrif.application.engine.objects.auth.constants.UserConstants;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
+import com.netgrif.application.engine.objects.auth.domain.enums.UserType;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
@@ -28,9 +29,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -58,6 +60,8 @@ public class UserServiceImpl implements UserService {
     private AbstractUser systemUser;
 
     private PaginationProperties paginationProperties;
+
+    private RealmService realmService;
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
@@ -112,6 +116,11 @@ public class UserServiceImpl implements UserService {
         this.paginationProperties = paginationProperties;
     }
 
+    @Autowired
+    public void setRealmService(RealmService realmService) {
+        this.realmService = realmService;
+    }
+
     @Override
     public AbstractUser saveUser(AbstractUser user, String realmId) {
         user.setRealmId(realmId);
@@ -132,7 +141,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> saveUsers(Collection<AbstractUser> users) {
-        return users.stream().map(u -> (User) this.saveUser(u)).collect(Collectors.toList());
+        return users.stream().map(u -> (User) this.saveUser(u)).toList();
     }
 
     @Override
@@ -185,6 +194,7 @@ public class UserServiceImpl implements UserService {
         filterImportExportService.createFilterImport(user);
         filterImportExportService.createFilterExport(user);
 
+        user.setType(resolveUserType(user.getEmail(), realmId));
         if (groupConfigurationProperties.isDefaultEnabled())
             groupService.create(user);
 
@@ -194,6 +204,31 @@ public class UserServiceImpl implements UserService {
         user = userRepository.saveUser(((User) user), mongoTemplate, collectionName);
         log.info("User [{}] successfully created in realm [{}]", user.getUsername(), realmId);
         return user;
+    }
+
+    protected UserType resolveUserType(String userMail, String realmId) {
+        if (userMail == null || userMail.isEmpty() || realmId == null || realmId.isEmpty()) {
+            return UserType.INTERNAL;
+        }
+        Realm realm = realmService.getRealmById(realmId).orElse(null);
+        if (realm == null) {
+//            todo correct assumption?
+            return UserType.INTERNAL;
+        }
+        if (realm.isAdminRealm()) {
+//            todo correct assumption?
+            return UserType.SYSTEM;
+        }
+        List<String> realmDomains = realm.getDomains();
+        if (realmDomains == null || realmDomains.isEmpty()) {
+            return UserType.INTERNAL;
+        }
+        Pattern pattern = Pattern.compile("\\b(%s)\\b".formatted(String.join("|", realmDomains)), Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(userMail.split("@")[1].trim());
+        if (matcher.find()) {
+            return UserType.INTERNAL;
+        }
+        return UserType.EXTERNAL;
     }
 
     // TODO JOFO: auth methods no longer exists ... use credentials?
@@ -213,10 +248,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void removeAllByStateAndExpirationDateBeforeForRealms(UserState state, LocalDateTime expirationDate, Collection<String> realmIds) {
         // TODO: delete whole group or change owner of group?
-        if(realmIds == null || realmIds.isEmpty()) {
-            collectionNameProvider.getCollectionNamesForAllRealm().forEach(collectionName -> {
-                removeAllByStateAndExpirationDateBeforeFromCollection(state, expirationDate, collectionName);
-            });
+        if (realmIds == null || realmIds.isEmpty()) {
+            collectionNameProvider.getCollectionNamesForAllRealm().forEach(collectionName -> removeAllByStateAndExpirationDateBeforeFromCollection(state, expirationDate, collectionName));
         } else {
             realmIds.forEach(realmId -> removeAllByStateAndExpirationDateBefore(state, expirationDate, realmId));
         }
@@ -530,9 +563,7 @@ public class UserServiceImpl implements UserService {
             Page<AbstractUser> users;
             do {
                 users = findAllByProcessRoles(petriNet.getRoles().values().stream().map(ProcessRole::get_id).collect(Collectors.toSet()), collection, pageable);
-                users.forEach(u -> {
-                    petriNet.getRoles().forEach((k, role) -> removeRole(u, role.get_id()));
-                });
+                users.forEach(u -> petriNet.getRoles().forEach((k, role) -> removeRole(u, role.get_id())));
                 pageable = pageable.next();
             } while (users.hasNext());
         });
@@ -549,6 +580,7 @@ public class UserServiceImpl implements UserService {
             system.setFirstName(UserConstants.SYSTEM_USER_NAME);
             system.setLastName(UserConstants.SYSTEM_USER_SURNAME);
             system.setState(UserState.ACTIVE);
+            system.setType(UserType.SYSTEM);
             saveUser(system);
         }
         return system;
