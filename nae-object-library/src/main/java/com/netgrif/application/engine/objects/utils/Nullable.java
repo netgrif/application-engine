@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.objects.utils;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -20,6 +21,9 @@ import java.util.stream.Stream;
  */
 public final class Nullable<T> implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 8683452581122892189L;
+    
     private static final Nullable<?> EMPTY = new Nullable<>(null);
 
     private final T value;
