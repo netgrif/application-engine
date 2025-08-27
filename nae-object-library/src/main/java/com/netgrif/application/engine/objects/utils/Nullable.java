@@ -23,8 +23,6 @@ public final class Nullable<T> implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 8683452581122892189L;
-    
-    private static final Nullable<?> EMPTY = new Nullable<>(null);
 
     private final T value;
 
@@ -58,9 +56,7 @@ public final class Nullable<T> implements Serializable {
      * @return an empty {@code Nullable} instance
      */
     public static <T> Nullable<T> empty() {
-        @SuppressWarnings("unchecked")
-        Nullable<T> EMPTY = (Nullable<T>) Nullable.EMPTY;
-        return EMPTY;
+        return new Nullable<>(null);
     }
 
     /**
@@ -95,7 +91,7 @@ public final class Nullable<T> implements Serializable {
     /**
      * Performs the given action with the value if it is present, otherwise executes the provided empty action.
      *
-     * @param action the {@code Consumer} to be executed if the value is present; must not be null
+     * @param action      the {@code Consumer} to be executed if the value is present; must not be null
      * @param emptyAction the {@code Runnable} to be executed if the value is not present; must not be null
      */
     public void ifPresentOrElse(Consumer<? super T> action, Runnable emptyAction) {
@@ -122,7 +118,7 @@ public final class Nullable<T> implements Serializable {
      *
      * @param predicate the predicate used to evaluate the contained value; must be non-null
      * @return this {@code Nullable} instance if the value satisfies the predicate,
-     *         or an empty {@code Nullable} instance otherwise
+     * or an empty {@code Nullable} instance otherwise
      */
     public Nullable<T> filter(Predicate<? super T> predicate) {
         Objects.requireNonNull(predicate);
@@ -137,10 +133,10 @@ public final class Nullable<T> implements Serializable {
      * Transforms the value contained in this {@code Nullable} instance using the provided mapping function.
      * If this {@code Nullable} instance is empty, an empty {@code Nullable} instance is returned.
      *
-     * @param <U> the type of the value produced by the mapping function
+     * @param <U>    the type of the value produced by the mapping function
      * @param mapper the function to apply to the value; must not be null
      * @return a {@code Nullable} instance containing the value produced by applying the mapping function,
-     *         or an empty {@code Nullable} instance if this instance is empty
+     * or an empty {@code Nullable} instance if this instance is empty
      */
     public <U> Nullable<U> map(Function<? super T, ? extends U> mapper) {
         Objects.requireNonNull(mapper);
@@ -156,7 +152,7 @@ public final class Nullable<T> implements Serializable {
      * and returns the {@code Nullable} instance produced by the mapping function. If this instance is empty,
      * an empty {@code Nullable} is returned.
      *
-     * @param <U> the type of the value contained in the resulting {@code Nullable} instance
+     * @param <U>    the type of the value contained in the resulting {@code Nullable} instance
      * @param mapper the mapping function to apply to the value if it is present; must not be null
      * @return a {@code Nullable} instance produced by applying the mapping function to the value,
      * or an empty {@code Nullable} if this instance is empty
@@ -179,7 +175,7 @@ public final class Nullable<T> implements Serializable {
      * @param supplier the {@code Supplier} providing an alternative {@code Nullable} instance
      *                 if this instance is empty; must not be {@code null}
      * @return this {@code Nullable} instance if it contains a value, or the {@code Nullable} instance
-     *         provided by the supplier if this instance is empty
+     * provided by the supplier if this instance is empty
      * @throws NullPointerException if the supplier is {@code null} or the {@code Nullable} instance
      *                              provided by the supplier is {@code null}
      */
@@ -225,7 +221,7 @@ public final class Nullable<T> implements Serializable {
      * @param supplier a {@code Supplier} to provide an alternative value
      *                 if the current instance holds no value; must not be {@code null}
      * @return the value contained in this instance if present, or the value
-     *         obtained from the supplied {@code Supplier} if the instance is empty
+     * obtained from the supplied {@code Supplier} if the instance is empty
      * @throws NullPointerException if the provided supplier is {@code null}
      */
     public T orElseGet(Supplier<? extends T> supplier) {
@@ -250,10 +246,10 @@ public final class Nullable<T> implements Serializable {
      * Returns the value held by this instance if it is present, otherwise throws an exception
      * supplied by the provided {@code Supplier}.
      *
-     * @param <X> the type of the exception to be thrown
+     * @param <X>               the type of the exception to be thrown
      * @param exceptionSupplier the supplier that provides the exception to be thrown if no value is present; must not be null
      * @return the value held by this instance if it is present
-     * @throws X if no value is present
+     * @throws X                    if no value is present
      * @throws NullPointerException if the {@code exceptionSupplier} is null
      */
     public <X extends Throwable> T orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
@@ -271,7 +267,7 @@ public final class Nullable<T> implements Serializable {
      *
      * @param obj the object to be compared for equality with this {@code Nullable} instance
      * @return {@code true} if the specified object is equal to this {@code Nullable} instance,
-     *         {@code false} otherwise
+     * {@code false} otherwise
      */
     @Override
     public boolean equals(Object obj) {
@@ -303,9 +299,7 @@ public final class Nullable<T> implements Serializable {
      */
     @Override
     public String toString() {
-        return value != null
-                ? ("Nullable[" + value + "]")
-                : "Nullable.empty";
+        return value != null ? value.toString() : "";
     }
 
 }
