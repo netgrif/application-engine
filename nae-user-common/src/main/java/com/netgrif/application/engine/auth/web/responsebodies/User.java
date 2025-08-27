@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 @Data
 public class User {
+    public static final String ATTR_ENABLED_CREDENTIALS = "enabledCredentials";
 
     private String id;
     private String username;
@@ -57,7 +58,7 @@ public class User {
         attributes = user.getAttributes() != null
                 ? new java.util.HashMap<>(user.getAttributes())
                 : new java.util.HashMap<>();
-        attributes.put("enabledCredentials", enabledCredentialsAttribute);
+        attributes.put(ATTR_ENABLED_CREDENTIALS, enabledCredentialsAttribute);
         if (user instanceof com.netgrif.application.engine.objects.auth.domain.User u) {
             createdAt = u.getCreatedAt();
             enabled = u.isActive();
