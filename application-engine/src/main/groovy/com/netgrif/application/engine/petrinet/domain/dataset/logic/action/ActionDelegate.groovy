@@ -90,7 +90,7 @@ import org.springframework.core.io.FileSystemResource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import com.netgrif.application.engine.objects.utils.Nullable;
+import com.netgrif.application.engine.objects.utils.Nullable
 
 import java.time.ZoneId
 import java.util.stream.Collectors
@@ -906,6 +906,10 @@ class ActionDelegate {
 
     def orsr(Closure find, String ico) {
         return find?.call(ico)
+    }
+
+    <T> Nullable<T> nullable(T value) {
+        return Nullable.of(value)
     }
 
     Object get(String key) { map[key] }
@@ -2764,12 +2768,12 @@ class ActionDelegate {
     String resolveStoragePath(Case aCase, String fileFieldId, String fileName) {
         Optional<Field<?>> storageFieldOptional = aCase.getPetriNet().getField(fileFieldId)
         if (storageFieldOptional.isEmpty()) {
-                throw new IllegalArgumentException("Field with id [%s] does not exist on Petri Net [%s]".formatted(fileFieldId, aCase.getPetriNetId()))
-            }
+            throw new IllegalArgumentException("Field with id [%s] does not exist on Petri Net [%s]".formatted(fileFieldId, aCase.getPetriNetId()))
+        }
         Field<?> field = storageFieldOptional.get()
         if (!(field instanceof StorageField)) {
-                throw new IllegalArgumentException("Field with id [%s] is not a StorageField on Petri Net [%s]".formatted(fileFieldId, aCase.getPetriNetId()))
-            }
+            throw new IllegalArgumentException("Field with id [%s] is not a StorageField on Petri Net [%s]".formatted(fileFieldId, aCase.getPetriNetId()))
+        }
         StorageField<?> storageField = (StorageField<?>) field
         IStorageService storageService = storageResolverService.resolve(storageField.storageType)
         return storageService.getPath(aCase.stringId, fileFieldId, fileName)
