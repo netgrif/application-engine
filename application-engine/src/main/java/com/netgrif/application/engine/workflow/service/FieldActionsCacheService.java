@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.configuration.properties.RunnerConfigurationProperties;
-import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap;
+import com.netgrif.application.engine.configuration.CacheMapKeys;
 import com.netgrif.application.engine.event.IGroovyShellFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.Function;
@@ -14,33 +13,26 @@ import groovy.lang.Closure;
 import groovy.lang.GroovyShell;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class FieldActionsCacheService implements IFieldActionsCacheService {
 
-    private final RunnerConfigurationProperties.FieldRunnerProperties properties;
+    private final CacheManager cacheManager;
 
     private IPetriNetService petriNetService;
 
-    private Map<String, Closure> actionsCache;
-    private Map<String, List<CachedFunction>> namespaceFunctionsCache;
-    private Map<String, CachedFunction> functionsCache;
     private final GroovyShell shell;
 
-    public FieldActionsCacheService(RunnerConfigurationProperties.FieldRunnerProperties properties, IGroovyShellFactory shellFactory) {
-        this.properties = properties;
-        this.actionsCache = new MaxSizeHashMap<>(properties.getActionCacheSize());
-        this.functionsCache = new MaxSizeHashMap<>(properties.getFunctionsCacheSize());
-        this.namespaceFunctionsCache = new MaxSizeHashMap<>(properties.getNamespaceCacheSize());
+    public FieldActionsCacheService(CacheManager cacheManager, IGroovyShellFactory shellFactory) {
+        this.cacheManager = cacheManager;
         this.shell = shellFactory.getGroovyShell();
     }
 
@@ -60,39 +52,51 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
                 .map(function -> CachedFunction.build(shell, function))
                 .collect(Collectors.toList());
 
+        Cache namespaceFunctionsCache = cacheManager.getCache(CacheMapKeys.NAMESPACE_FUNCTIONS);
+
         if (!functions.isEmpty()) {
             evaluateCachedFunctions(functions);
             namespaceFunctionsCache.put(petriNet.getIdentifier(), functions);
         } else {
-            namespaceFunctionsCache.remove(petriNet.getIdentifier());
+            namespaceFunctionsCache.evictIfPresent(petriNet.getIdentifier());
         }
     }
 
     @Override
     public void reloadCachedFunctions(PetriNet petriNet) {
-        namespaceFunctionsCache.remove(petriNet.getIdentifier());
+        cacheManager.getCache(CacheMapKeys.NAMESPACE_FUNCTIONS).evictIfPresent(petriNet.getIdentifier());
         cachePetriNetFunctions(petriNetService.getNewestVersionByIdentifier(petriNet.getIdentifier()));
     }
 
     @Override
     public Closure getCompiledAction(Action action, boolean shouldRewriteCachedActions) {
         String stringId = action.getId().toString();
-        if (shouldRewriteCachedActions || !actionsCache.containsKey(stringId)) {
-            Closure code = (Closure) shell.evaluate("{-> " + action.getDefinition() + "}");
-            actionsCache.put(stringId, code);
+        Cache actionsCache = cacheManager.getCache(CacheMapKeys.ACTIONS);
+        Object nativeActionsCache = actionsCache.getNativeCache();
+
+        if (nativeActionsCache instanceof Map<?, ?> map) {
+            if (shouldRewriteCachedActions || map.containsKey(stringId) ) {
+                Closure code = (Closure) shell.evaluate("{-> " + action.getDefinition() + "}");
+                actionsCache.put(stringId, code);
+            }
         }
-        return actionsCache.get(stringId);
+        return (Closure) actionsCache.get(stringId).get();
     }
 
     @Override
     public List<CachedFunction> getCachedFunctions(List<com.netgrif.application.engine.objects.petrinet.domain.Function> functions) {
         List<CachedFunction> cachedFunctions = new ArrayList<>(functions.size());
-        functions.forEach(function -> {
-            if (!functionsCache.containsKey(function.getStringId())) {
-                functionsCache.put(function.getStringId(), CachedFunction.build(shell, function));
-            }
-            cachedFunctions.add(functionsCache.get(function.getStringId()));
-        });
+        Cache functionsCache = cacheManager.getCache(CacheMapKeys.FUNCTIONS);
+        Object nativeFunctionsCache = functionsCache.getNativeCache();
+
+        if (nativeFunctionsCache instanceof Map<?, ?> map) {
+            functions.forEach(function -> {
+                if (!map.containsKey(function.getStringId())) {
+                    functionsCache.put(function.getStringId(), CachedFunction.build(shell, function));
+                }
+                cachedFunctions.add((CachedFunction) functionsCache.get(function.getStringId()).get());
+            });
+        }
         return cachedFunctions;
     }
 
@@ -135,21 +139,21 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public Map<String, List<CachedFunction>> getNamespaceFunctionCache() {
-        return new HashMap<>(namespaceFunctionsCache);
+        return new HashMap<>((Map) cacheManager.getCache(CacheMapKeys.NAMESPACE_FUNCTIONS).getNativeCache());
     }
 
     @Override
     public void clearActionCache() {
-        this.actionsCache = new MaxSizeHashMap<>(properties.getActionCacheSize());
+        cacheManager.getCache(CacheMapKeys.ACTIONS).clear();
     }
 
     @Override
     public void clearNamespaceFunctionCache() {
-        this.namespaceFunctionsCache = new MaxSizeHashMap<>(properties.getNamespaceCacheSize());
+        cacheManager.getCache(CacheMapKeys.NAMESPACE_FUNCTIONS).clear();
     }
 
     @Override
     public void clearFunctionCache() {
-        this.functionsCache = new MaxSizeHashMap<>(properties.getFunctionsCacheSize());
+        cacheManager.getCache(CacheMapKeys.FUNCTIONS).clear();
     }
 }
