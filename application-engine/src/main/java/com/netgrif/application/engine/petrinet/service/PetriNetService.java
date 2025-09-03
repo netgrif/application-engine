@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
+import com.netgrif.application.engine.objects.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.ArcImportReference;
 import com.netgrif.application.engine.objects.auth.domain.Group;
@@ -17,10 +18,6 @@ import com.netgrif.application.engine.objects.event.events.petrinet.ProcessDelet
 import com.netgrif.application.engine.objects.event.events.petrinet.ProcessDeployEvent;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.auth.service.GroupService;
-import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
-import com.netgrif.application.engine.objects.petrinet.domain.Transition;
-import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
@@ -558,6 +555,19 @@ public class PetriNetService implements IPetriNetService {
         });
     }
 
+    @Override
+    public Function findByFunctionId(String functionId) {
+        Query query = new Query();
+
+        query.addCriteria(Criteria.where("functions._id").is(new ObjectId(functionId)));
+
+        PetriNet petriNet = mongoTemplate.findOne(query, PetriNet.class, "petriNet");
+
+        Optional<Function> optionalFunction = petriNet.getFunctions().stream().filter(function -> function.getObjectId().toString().equals(functionId)).findFirst();
+
+        return optionalFunction.orElse(null);
+    }
+
     protected <T> T requireNonNull(T obj, Object... item) {
         if (obj == null) {
             if (item.length > 0) {
@@ -567,4 +577,5 @@ public class PetriNetService implements IPetriNetService {
         }
         return obj;
     }
+
 }

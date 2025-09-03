@@ -1,10 +1,7 @@
 package com.netgrif.application.engine.petrinet.service.interfaces;
 
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
-import com.netgrif.application.engine.objects.petrinet.domain.Transition;
-import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
+import com.netgrif.application.engine.objects.petrinet.domain.*;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingIconKeyException;
@@ -335,4 +332,15 @@ public interface IPetriNetService {
      * @return a {@link PetriNetImportReference} linking the PetriNet
      */
     PetriNetImportReference getNetFromCase(String caseId);
+
+
+    /**
+     * Finds and returns a single function subdocument from the {@code petriNet} collection
+     * by its nested {@code functions._id}.
+     *
+     * @param functionId the string form of the function's ObjectId (24-hex)
+     * @return the matching {@code Function} subdocument, or {@code null} if not found
+     * @throws IllegalArgumentException if {@code functionId} is not a valid ObjectId
+     */
+    Function findByFunctionId(String functionId);
 }

@@ -3,7 +3,9 @@ package com.netgrif.application.engine.configuration;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.configuration.properties.RunnerConfigurationProperties;
 import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.CachedFunction;
+import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import groovy.lang.Closure;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -17,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -24,10 +27,16 @@ import java.util.stream.Collectors;
 public class CacheConfiguration extends CachingConfigurerSupport {
     private final RunnerConfigurationProperties.FieldRunnerProperties fieldRunnerProperties;
     private final CacheConfigurationProperties properties;
+    private final IFieldActionsCacheService fieldActionsCacheService;
 
-    public CacheConfiguration(RunnerConfigurationProperties.FieldRunnerProperties fieldRunnerProperties, CacheConfigurationProperties properties) {
+    private final IPetriNetService petriNetService;
+
+
+    public CacheConfiguration(RunnerConfigurationProperties.FieldRunnerProperties fieldRunnerProperties, CacheConfigurationProperties properties, IFieldActionsCacheService fieldActionsCacheService, IPetriNetService petriNetService) {
         this.fieldRunnerProperties = fieldRunnerProperties;
         this.properties = properties;
+        this.fieldActionsCacheService = fieldActionsCacheService;
+        this.petriNetService = petriNetService;
     }
 
     @Bean
@@ -40,28 +49,31 @@ public class CacheConfiguration extends CachingConfigurerSupport {
                 .collect(Collectors.toCollection(ArrayList::new));
 
 
-        java.util.function.Supplier<java.util.Map<String, Closure>> actionsFactory = () -> new MaxSizeHashMap<>(fieldRunnerProperties.getActionCacheSize());
+        Supplier<Map<String, Closure>> actionsFactory = () -> new MaxSizeHashMap<>(fieldRunnerProperties.getActionCacheSize());
 
-        caches.add(new GenericMapCache<>(
+        caches.add(new ActionsMapCache(
                 CacheMapKeys.ACTIONS,
-                Closure.class,
-                actionsFactory
+                actionsFactory,
+                fieldActionsCacheService,
+                petriNetService
         ));
 
-        java.util.function.Supplier<java.util.Map<String, CachedFunction>> functionsFactory = () -> new MaxSizeHashMap<>(fieldRunnerProperties.getFunctionsCacheSize());
+        Supplier<Map<String, CachedFunction>> functionsFactory = () -> new MaxSizeHashMap<>(fieldRunnerProperties.getFunctionsCacheSize());
 
-        caches.add(new GenericMapCache<>(
+        caches.add(new FunctionsMapCache(
                 CacheMapKeys.FUNCTIONS,
-                CachedFunction.class,
-                functionsFactory
+                functionsFactory,
+                fieldActionsCacheService,
+                petriNetService
         ));
 
-        java.util.function.Supplier<java.util.Map<String, java.util.List<CachedFunction>>> nsFactory = () -> new MaxSizeHashMap<>(fieldRunnerProperties.getNamespaceCacheSize());
+        Supplier<Map<String, List<CachedFunction>>> nsFactory = () -> new MaxSizeHashMap<>(fieldRunnerProperties.getNamespaceCacheSize());
 
-        caches.add(new GenericMapCache<>(
+        caches.add(new FunctionsNamespaceMapCache(
                 CacheMapKeys.NAMESPACE_FUNCTIONS,
-                List.class,
-                nsFactory
+                nsFactory,
+                fieldActionsCacheService,
+                petriNetService
         ));
 
         SimpleCacheManager cacheManager = new SimpleCacheManager();

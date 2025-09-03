@@ -63,9 +63,14 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     }
 
     @Override
+    public void reloadCachedFunctions(String petriNetId) {
+        cacheManager.getCache(CacheMapKeys.NAMESPACE_FUNCTIONS).evictIfPresent(petriNetId);
+        cachePetriNetFunctions(petriNetService.getNewestVersionByIdentifier(petriNetId));
+    }
+
+    @Override
     public void reloadCachedFunctions(PetriNet petriNet) {
-        cacheManager.getCache(CacheMapKeys.NAMESPACE_FUNCTIONS).evictIfPresent(petriNet.getIdentifier());
-        cachePetriNetFunctions(petriNetService.getNewestVersionByIdentifier(petriNet.getIdentifier()));
+        this.reloadCachedFunctions(petriNet.getIdentifier());
     }
 
     @Override
@@ -75,7 +80,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
         Object nativeActionsCache = actionsCache.getNativeCache();
 
         if (nativeActionsCache instanceof Map<?, ?> map) {
-            if (shouldRewriteCachedActions || map.containsKey(stringId) ) {
+            if (shouldRewriteCachedActions || !map.containsKey(stringId) ) {
                 Closure code = (Closure) shell.evaluate("{-> " + action.getDefinition() + "}");
                 actionsCache.put(stringId, code);
             }
@@ -84,7 +89,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     }
 
     @Override
-    public List<CachedFunction> getCachedFunctions(List<com.netgrif.application.engine.objects.petrinet.domain.Function> functions) {
+    public List<CachedFunction> getCachedFunctions(List<Function> functions) {
         List<CachedFunction> cachedFunctions = new ArrayList<>(functions.size());
         Cache functionsCache = cacheManager.getCache(CacheMapKeys.FUNCTIONS);
         Object nativeFunctionsCache = functionsCache.getNativeCache();
