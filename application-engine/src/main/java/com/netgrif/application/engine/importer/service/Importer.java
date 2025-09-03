@@ -43,6 +43,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.xml.bind.JAXBContext;
@@ -1066,7 +1067,7 @@ public class Importer {
         if (shouldInitializeRole(importRole)) {
             role = initRole(importRole);
         } else {
-            role = processRoleService.findByImportId(ProcessRole.GLOBAL + importRole.getId());
+            role = processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId(), Pageable.ofSize(1)).getContent().getFirst();
         }
         role.set_id(new ProcessResourceId(new ObjectId(net.getStringId())));
 
@@ -1076,7 +1077,7 @@ public class Importer {
 
     protected boolean shouldInitializeRole(Role importRole) {
         return importRole.isGlobal() == null || !importRole.isGlobal() ||
-                (importRole.isGlobal() && processRoleService.findByImportId(ProcessRole.GLOBAL + importRole.getId()) == null);
+                (importRole.isGlobal() && processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId(), Pageable.ofSize(1)).getContent().isEmpty());
     }
 
     protected ProcessRole initRole(Role importRole) {
