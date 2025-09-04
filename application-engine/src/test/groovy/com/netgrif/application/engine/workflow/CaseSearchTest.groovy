@@ -3,6 +3,7 @@ package com.netgrif.application.engine.workflow
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
+import com.netgrif.application.engine.objects.auth.constants.UserConstants
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -165,7 +166,7 @@ class CaseSearchTest {
         mvc.perform(post("/api/workflow/case/search2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(request)
-                .with(httpBasic("super@netgrif.com", userPassword))
+                .with(httpBasic(UserConstants.ADMIN_USER_USERNAME, userPassword))
                 .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
