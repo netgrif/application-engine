@@ -23,4 +23,20 @@ public class CachedFunction {
                 .function(function)
                 .build();
     }
+
+    public static CachedFunction copyOf(GroovyShell shell, CachedFunction cachedFunction) {
+        if (cachedFunction == null) {
+            return null;
+        }
+
+        Closure code = (Closure) shell.evaluate(cachedFunction.getFunction().getDefinition());
+        if (code == null) {
+            throw new IllegalArgumentException("Non compilable function");
+        }
+
+        return CachedFunction.builder()
+                .code(code)
+                .function(new Function(cachedFunction.getFunction()))
+                .build();
+    }
 }

@@ -1,10 +1,12 @@
 package com.netgrif.application.engine.configuration;
 
+import com.netgrif.application.engine.objects.petrinet.domain.Function;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.CachedFunction;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.support.SimpleValueWrapper;
 
 import java.util.List;
 import java.util.Map;
@@ -20,26 +22,32 @@ public class FunctionsNamespaceMapCache extends GenericMapCache {
     public ValueWrapper get(Object key) {
         String stringKey = String.valueOf(key);
 
-        Object valueObject = map.get(stringKey);
+        Object valueObject = map().get(stringKey);
         if (valueObject != null) {
-            return new org.springframework.cache.support.SimpleValueWrapper(valueObject);
+            return new SimpleValueWrapper(List.copyOf((List<CachedFunction>) valueObject));
         }
         PetriNet petriNet = petriNetService.getPetriNet(stringKey);
         fieldActionsCacheService.cachePetriNetFunctions(petriNet);
-        return new org.springframework.cache.support.SimpleValueWrapper(map.get(stringKey));
+        return new SimpleValueWrapper(List.copyOf((List<CachedFunction>) map().get(stringKey)));
     }
 
     public <T> T get(Object key, Class<T> type) {
         String stringKey = String.valueOf(key);
-        Object valueObject = map.get(stringKey);
+        Object valueObject = map().get(stringKey);
 
         if (valueObject != null) {
-            return type.cast(valueObject);
+            return type.cast(List.copyOf((List<CachedFunction>) valueObject));
         }
 
         PetriNet petriNet = petriNetService.getPetriNet(stringKey);
         fieldActionsCacheService.cachePetriNetFunctions(petriNet);
-        return type.cast(map.get(stringKey));
+        return type.cast(List.copyOf((List<CachedFunction>) map().get(stringKey)));
 
+    }
+
+    @Override
+    public void put(Object key, Object value) {
+        String k = String.valueOf(key);
+        map().put(k, List.copyOf((List<CachedFunction>) value));
     }
 }

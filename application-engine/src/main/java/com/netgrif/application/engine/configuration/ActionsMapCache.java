@@ -4,6 +4,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import groovy.lang.Closure;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.support.SimpleValueWrapper;
 
 import java.util.Map;
 
@@ -15,27 +16,27 @@ public class ActionsMapCache extends GenericMapCache {
     }
 
     @Override
-    public ValueWrapper get(Object key) {
+    public synchronized ValueWrapper get(Object key) {
         String stringKey = String.valueOf(key);
 
-        Object valueObject = map.get(stringKey);
+        Object valueObject = map().get(stringKey);
         if (valueObject != null) {
-            return new org.springframework.cache.support.SimpleValueWrapper(valueObject);
+            return new SimpleValueWrapper(valueObject);
         }
         fieldActionsCacheService.reloadCachedFunctions(stringKey);
-        return new org.springframework.cache.support.SimpleValueWrapper(map.get(stringKey));
+        return new SimpleValueWrapper(map().get(stringKey));
     }
 
-    public <T> T get(Object key, Class<T> type) {
+    public synchronized <T> T get(Object key, Class<T> type) {
         String stringKey = String.valueOf(key);
-        Object valueObject = map.get(stringKey);
+        Object valueObject = map().get(stringKey);
 
         if (valueObject != null) {
             return type.cast(valueObject);
         }
 
         fieldActionsCacheService.reloadCachedFunctions(stringKey);
-        return type.cast(map.get(stringKey));
+        return type.cast(map().get(stringKey));
 
     }
 }
