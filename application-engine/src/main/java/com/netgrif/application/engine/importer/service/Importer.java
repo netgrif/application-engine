@@ -1091,8 +1091,10 @@ public class Importer {
             role.setName(toI18NString(importRole.getName()));
         }
         if (importRole.isGlobal() != null && importRole.isGlobal()) {
+            role.set_id(new ProcessResourceId(new ObjectId()));
             role.setGlobal(importRole.isGlobal());
         } else {
+            role.set_id(new ProcessResourceId(new ObjectId(net.getStringId())));
             role.setProcessId(net.getStringId());
             role.setProcessTitle(net.getTitle());
             role.setProcessIdentifier(net.getIdentifier());
