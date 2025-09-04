@@ -29,7 +29,21 @@ public class ElasticCase extends com.netgrif.application.engine.objects.elastic.
     }
 
     @Id
+    @Field(type = Keyword)
     public String getId() {
+        return super.getId();
+    }
+
+    @Field(type = Keyword)
+    public String getTitle() { return super.getTitle(); }
+
+    @Field(type = Keyword)
+    public String getVisualId() {
+        return super.getVisualId();
+    }
+
+    @Field(type = FieldType.Keyword)
+    public String getCaseId() {
         return super.getId();
     }
 
