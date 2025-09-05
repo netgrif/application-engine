@@ -57,6 +57,7 @@ public class UserServiceImpl implements UserService {
 
     private AbstractUser systemUser;
 
+    @Getter
     private PaginationProperties paginationProperties;
 
     @Autowired

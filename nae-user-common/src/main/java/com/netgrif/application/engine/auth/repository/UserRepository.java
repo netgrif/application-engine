@@ -56,10 +56,6 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         throw new UnsupportedOperationException("This method is not supported. Use 'UserRepository.findAll(Predicate, Pageable, MongoTemplate, Collection<String>)' instead.'");
     }
 
-    default long countAll(String collection, MongoTemplate mongoTemplate) {
-        return mongoTemplate.count(new Query(), User.class, collection);
-    }
-
     /**
      * Throws an exception since this method is not supported.
      * Use {@link #deleteAll(MongoTemplate, Collection)} instead.

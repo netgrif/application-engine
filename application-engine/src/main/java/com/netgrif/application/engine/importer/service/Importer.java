@@ -43,11 +43,13 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
@@ -1066,9 +1068,8 @@ public class Importer {
         if (shouldInitializeRole(importRole)) {
             role = initRole(importRole);
         } else {
-            role = processRoleService.findByImportId(ProcessRole.GLOBAL + importRole.getId());
+            role = processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId(), Pageable.ofSize(1)).getContent().getFirst();
         }
-        role.set_id(new ProcessResourceId(new ObjectId(net.getStringId())));
 
         net.addRole(role);
         roles.put(importRole.getId(), role);
@@ -1076,7 +1077,7 @@ public class Importer {
 
     protected boolean shouldInitializeRole(Role importRole) {
         return importRole.isGlobal() == null || !importRole.isGlobal() ||
-                (importRole.isGlobal() && processRoleService.findByImportId(ProcessRole.GLOBAL + importRole.getId()) == null);
+                (importRole.isGlobal() && processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId(), Pageable.ofSize(1)).getContent().isEmpty());
     }
 
     protected ProcessRole initRole(Role importRole) {
@@ -1090,8 +1091,10 @@ public class Importer {
             role.setName(toI18NString(importRole.getName()));
         }
         if (importRole.isGlobal() != null && importRole.isGlobal()) {
+            role.set_id(new ProcessResourceId(new ObjectId()));
             role.setGlobal(importRole.isGlobal());
         } else {
+            role.set_id(new ProcessResourceId(new ObjectId(net.getStringId())));
             role.setProcessId(net.getStringId());
             role.setProcessTitle(net.getTitle());
             role.setProcessIdentifier(net.getIdentifier());
