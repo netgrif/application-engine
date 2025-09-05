@@ -49,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
@@ -1069,7 +1070,6 @@ public class Importer {
         } else {
             role = processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId(), Pageable.ofSize(1)).getContent().getFirst();
         }
-        role.set_id(new ProcessResourceId(new ObjectId(net.getStringId())));
 
         net.addRole(role);
         roles.put(importRole.getId(), role);
