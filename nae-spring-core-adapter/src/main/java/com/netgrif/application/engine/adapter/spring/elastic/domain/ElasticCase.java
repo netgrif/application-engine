@@ -7,14 +7,12 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 
-import static org.springframework.data.elasticsearch.annotations.FieldType.Flattened;
-import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
+import static org.springframework.data.elasticsearch.annotations.FieldType.*;
 
 @NoArgsConstructor
 @Document(indexName = "#{@elasticCaseIndex}")
@@ -35,14 +33,16 @@ public class ElasticCase extends com.netgrif.application.engine.objects.elastic.
     }
 
     @Field(type = Keyword)
-    public String getTitle() { return super.getTitle(); }
+    public String getTitle() {
+        return super.getTitle();
+    }
 
     @Field(type = Keyword)
     public String getVisualId() {
         return super.getVisualId();
     }
 
-    @Field(type = FieldType.Keyword)
+    @Field(type = Keyword)
     public String getCaseId() {
         return super.getId();
     }
@@ -62,7 +62,7 @@ public class ElasticCase extends com.netgrif.application.engine.objects.elastic.
         return super.getProcessId();
     }
 
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    @Field(type = Date, format = DateFormat.date_hour_minute_second_millis)
     public LocalDateTime getCreationDate() {
         return super.getCreationDate();
     }
