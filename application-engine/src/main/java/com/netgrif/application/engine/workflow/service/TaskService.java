@@ -924,15 +924,27 @@ public class TaskService implements ITaskService {
 
     @Override
     public void delete(List<Task> tasks, String caseId) {
-        workflowService.removeTasksFromCase(tasks, caseId);
-        log.info("[" + caseId + "]: Tasks of case are being deleted");
+        delete(tasks, caseId, false);
+    }
+
+    @Override
+    public void delete(List<Task> tasks, String caseId, boolean force) {
+        if (!force) {
+            workflowService.removeTasksFromCase(tasks, caseId);
+        }
+        log.info("[{}]: Tasks of case are being deleted", caseId);
         taskRepository.deleteAll(tasks);
         tasks.forEach(t -> elasticTaskService.remove(t.getStringId()));
     }
 
     @Override
     public void deleteTasksByCase(String caseId) {
-        delete(taskRepository.findAllByCaseId(caseId), caseId);
+        deleteTasksByCase(caseId, false);
+    }
+
+    @Override
+    public void deleteTasksByCase(String caseId, boolean force) {
+        delete(taskRepository.findAllByCaseId(caseId), caseId, force);
     }
 
     @Override

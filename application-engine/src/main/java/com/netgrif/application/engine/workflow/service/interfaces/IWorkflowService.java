@@ -55,9 +55,15 @@ public interface IWorkflowService {
 
     DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params);
 
+    DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params, boolean force);
+
     DeleteCaseEventOutcome deleteCase(Case useCase);
 
+    DeleteCaseEventOutcome deleteCase(Case useCase, boolean force);
+
     void deleteInstancesOfPetriNet(PetriNet net);
+
+    void deleteInstancesOfPetriNet(PetriNet net, boolean force);
 
     void updateMarking(Case useCase);
 
