@@ -523,29 +523,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void removeRoleOfDeletedPetriNet(PetriNet petriNet) {
-        String defaultRealm = collectionNameProvider.getDefaultRealmCollection();
-        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-        Page<AbstractUser> users;
-        do {
-            users = findAllByProcessRoles(petriNet.getRoles().values().stream().map(ProcessRole::get_id).collect(Collectors.toSet()), defaultRealm, pageable);
-            users.forEach(u -> {
-                petriNet.getRoles().forEach((k, role) -> removeRole(u, role.get_id()));
-            });
-            pageable = pageable.next();
-        } while (users.hasNext());
+        removeRoleOfDeletedPetriNet(new HashSet<>(petriNet.getRoles().values()));
     }
 
     @Override
     public void removeRoleOfDeletedPetriNet(Set<ProcessRole> petriNetRoles) {
-        String defaultRealm = collectionNameProvider.getDefaultRealmCollection();
+        String defaultRealmCollection = collectionNameProvider.getDefaultRealmCollection();
         Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Collection<ProcessResourceId> roleIds = petriNetRoles.stream().map(ProcessRole::get_id).collect(Collectors.toSet());
         Page<AbstractUser> users;
         do {
-            users = findAllByProcessRoles(petriNetRoles.stream().map(ProcessRole::get_id).collect(Collectors.toSet()), defaultRealm, pageable);
-            users.forEach(u -> {
-                petriNetRoles.forEach(role -> removeRole(u, role.get_id()));
-            });
-        }while (users.hasNext());
+            users = searchUsersByRoleIds(roleIds, defaultRealmCollection, pageable);
+            users.getContent().forEach(u -> removeRoles(u, petriNetRoles));
+            pageable = pageable.next();
+        } while (users.hasNext());
     }
 
     @Override
