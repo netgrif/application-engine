@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
+import com.netgrif.application.engine.objects.auth.constants.UserConstants;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
@@ -52,13 +53,13 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
         authorities.add(adminAuthority);
         authorities.add(systemAuthority);
 
-        Optional<AbstractUser> superUser = userService.findUserByUsername(SUPER_ADMIN_EMAIL, null);
+        Optional<AbstractUser> superUser = userService.findUserByUsername(UserConstants.ADMIN_USER_USERNAME, null);
         if (superUser.isEmpty()) {
             User user = new User();
-            user.setFirstName("Admin");
-            user.setLastName("Netgrif");
-            user.setUsername(SUPER_ADMIN_EMAIL);
-            user.setEmail(SUPER_ADMIN_EMAIL);
+            user.setFirstName(UserConstants.ADMIN_USER_FIRST_NAME);
+            user.setLastName(UserConstants.ADMIN_USER_LAST_NAME);
+            user.setUsername(UserConstants.ADMIN_USER_USERNAME);
+            user.setEmail(UserConstants.ADMIN_USER_EMAIL);
             PasswordCredential passwordCredential = new PasswordCredential(securityProperties.getAuth().getAdminPassword(), 0, true);
             user.setCredential("password", passwordCredential);
             user.setState(UserState.ACTIVE);

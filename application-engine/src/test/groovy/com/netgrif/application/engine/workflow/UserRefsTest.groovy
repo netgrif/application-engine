@@ -63,7 +63,7 @@ class UserRefsTest {
         userIds = new ArrayList<>()
         10.times {
             def _case = importHelper.createCase("$it" as String, it % 2 == 0 ? net : net)
-            String id = userService.findUserByUsername(userEmails[it % 2], null).get().stringId
+            String id = userService.findByEmail(userEmails[it % 2], null).stringId
             String taskId = (new ArrayList<>(_case.getTasks())).get(0).task
             _case = dataService.setData(taskId, ImportHelper.populateDataset([
                     "user_list_1": [

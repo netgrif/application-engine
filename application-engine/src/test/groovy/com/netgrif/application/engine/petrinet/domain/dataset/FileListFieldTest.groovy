@@ -6,6 +6,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
+import com.netgrif.application.engine.objects.auth.constants.UserConstants
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
@@ -107,7 +108,7 @@ class FileListFieldTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
-        def adminUser = importHelper.createUser(new User(firstName: "Admin", lastName: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        def adminUser = importHelper.createUser(new User(firstName: "Admin", lastName: "User", username: UserConstants.ADMIN_USER_USERNAME, email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("admin")] as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])
@@ -168,7 +169,7 @@ class FileListFieldTest {
     void getFileByCaseAndName() {
         Case useCase = uploadTestFile()
 
-        AbstractUser user = userService.findUserByUsername(USER_EMAIL, null).get()
+        AbstractUser user = userService.findUserByUsername(UserConstants.ADMIN_USER_USERNAME, null).get()
         assert user != null
 
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), ActorTransformer.toLoggedUser(user))
@@ -193,7 +194,7 @@ class FileListFieldTest {
 
     private Case uploadTestFile() {
         PetriNet net = getNet()
-        AbstractUser user = userService.findUserByUsername(USER_EMAIL, null).get()
+        AbstractUser user = userService.findUserByUsername(UserConstants.ADMIN_USER_USERNAME, null).get()
         assert user != null
         Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", ActorTransformer.toLoggedUser(user)).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), ActorTransformer.toLoggedUser(user))

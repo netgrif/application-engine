@@ -565,6 +565,15 @@ public class UserServiceImpl implements UserService {
         return findById(loggedUser.getStringId(), loggedUser.getRealmId());
     }
 
+    @Override
+    public void updateAdminWithRoles(Collection<ProcessRole> roles) {
+        log.info("Assigning [{}] roles to admin user(s)", roles != null ? roles.size() : 0);
+        User admin = (User) findByEmail(UserConstants.ADMIN_USER_EMAIL, null);
+        admin.setProcessRoles(new HashSet<>(roles));
+        saveUser(admin);
+        log.debug("Admin [{}] now has [{}] process roles", admin.getUsername(), admin.getProcessRoles().size());
+    }
+
     protected User initializeNewUser(String username, String email, String firstName, String lastName, String password, String realmId) {
         log.trace("Initializing new user [{}] in realm [{}]", username, realmId);
         User user = new User();

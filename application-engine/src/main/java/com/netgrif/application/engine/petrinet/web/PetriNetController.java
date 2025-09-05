@@ -223,14 +223,14 @@ public class PetriNetController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements")
     })
     @DeleteMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource deletePetriNet(@PathVariable("id") String processId, Authentication auth) {
+    public MessageResource deletePetriNet(@PathVariable("id") String processId, @RequestParam(required = false) boolean force, Authentication auth) {
         String decodedProcessId = decodeUrl(processId);
         if (Objects.equals(decodedProcessId, "")) {
             log.error("Deleting Petri net [" + processId + "] failed: could not decode process ID from URL");
             return MessageResource.errorMessage("Deleting Petri net " + processId + " failed!");
         }
         LoggedUser user = (LoggedUser) auth.getPrincipal();
-        asyncRunner.execute(() -> this.service.deletePetriNet(decodedProcessId, user));
+        asyncRunner.execute(() -> this.service.deletePetriNet(decodedProcessId, user, force));
         return MessageResource.successMessage("Petri net " + decodedProcessId + " is being deleted");
     }
 
