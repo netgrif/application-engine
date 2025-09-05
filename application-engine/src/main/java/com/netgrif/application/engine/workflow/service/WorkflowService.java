@@ -392,33 +392,51 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params) {
+        return deleteCase(useCase, params, false);
+    }
 
-        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty(), params));
-        publisher.publishEvent(new DeleteCaseEvent(outcome, EventPhase.PRE));
-        useCase = ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("default")).apply(new DeleteCaseEvent(outcome, EventPhase.PRE));;
+    @Override
+    public DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params, boolean force) {
+        DeleteCaseEventOutcome outcome = null;
+        if (!force) {
+            outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty(), params));
+            publisher.publishEvent(new DeleteCaseEvent(outcome, EventPhase.PRE));
+            useCase = ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("default")).apply(new DeleteCaseEvent(outcome, EventPhase.PRE));
+        }
         log.info("[" + useCase.getStringId() + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
 
         taskService.deleteTasksByCase(useCase.getStringId());
         repository.delete(useCase);
-
-        outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty(), params));
-        addMessageToOutcome(useCase.getPetriNet(), CaseEventType.DELETE, outcome);
-        ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("noContext")).apply(new DeleteCaseEvent(outcome, EventPhase.POST));
-        publisher.publishEvent(new DeleteCaseEvent(outcome, EventPhase.POST));
+        if (!force) {
+            outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty(), params));
+            addMessageToOutcome(useCase.getPetriNet(), CaseEventType.DELETE, outcome);
+            ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("noContext")).apply(new DeleteCaseEvent(outcome, EventPhase.POST));
+            publisher.publishEvent(new DeleteCaseEvent(outcome, EventPhase.POST));
+        }
         return outcome;
     }
 
     @Override
     public DeleteCaseEventOutcome deleteCase(Case useCase) {
+       return deleteCase(useCase, false);
+    }
+
+    @Override
+    public DeleteCaseEventOutcome deleteCase(Case useCase, boolean force) {
         return deleteCase(useCase, new HashMap<>());
     }
 
     @Override
     public void deleteInstancesOfPetriNet(PetriNet net) {
+        deleteInstancesOfPetriNet(net, false);
+    }
+
+    @Override
+    public void deleteInstancesOfPetriNet(PetriNet net, boolean force) {
         log.info("[" + net.getStringId() + "]: User " + userService.getLoggedOrSystem().getStringId() + " is deleting all cases and tasks of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
         List<Case> cases = this.searchAll(QCase.case$.petriNetObjectId.eq(net.getObjectId())).getContent();
         if (!cases.isEmpty()) {
-            cases.forEach(this::deleteCase);
+            cases.forEach(aCase -> deleteCase(aCase, new HashMap<>(), force));
         }
     }
 
