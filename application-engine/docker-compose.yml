@@ -53,7 +53,7 @@ services:
       - MINIO_DEFAULT_BUCKETS=default
 
 #  kibana:
-#    image: docker.elastic.co/kibana/kibana:8.10.4
+#    image: docker.elastic.co/kibana/kibana:8.15.3
 #    environment:
 #      - ELASTICSEARCH_HOSTS=http://docker-elastic:9200
 #    depends_on:
