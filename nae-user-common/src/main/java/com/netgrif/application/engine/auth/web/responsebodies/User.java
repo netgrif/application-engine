@@ -38,14 +38,16 @@ public class User {
 
     public User(AbstractUser user) {
         Attribute<Set<String>> enabledCredentialsAttribute = new Attribute<>();
-        enabledCredentialsAttribute.setValue(user.getCredentials()
-                .values().stream()
-                .filter(java.util.Objects::nonNull)
-                .filter(Credential::isEnabled)
-                .map(Credential::getType)
-                .filter(java.util.Objects::nonNull)
-                .collect(Collectors.toSet()));
-        enabledCredentialsAttribute.setRequired(true);
+        if (user instanceof com.netgrif.application.engine.objects.auth.domain.User userr) {
+            enabledCredentialsAttribute.setValue(userr.getCredentials()
+                    .values().stream()
+                    .filter(java.util.Objects::nonNull)
+                    .filter(Credential::isEnabled)
+                    .map(Credential::getType)
+                    .filter(java.util.Objects::nonNull)
+                    .collect(Collectors.toSet()));
+            enabledCredentialsAttribute.setRequired(true);
+        }
 
         id = user.getStringId();
         username = user.getUsername();

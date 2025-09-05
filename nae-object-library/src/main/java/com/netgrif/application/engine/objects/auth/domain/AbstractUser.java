@@ -8,9 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 
-import java.util.HashMap;
-import java.util.Map;
-
 
 /**
  * Abstract base class for user entities in the system.
@@ -52,14 +49,9 @@ public abstract class AbstractUser extends AbstractActor {
     protected String email;
 
     /**
-     * URL or identifier of user's avatar image
+     * URL or identifier of the user's avatar image
      */
     protected String avatar;
-
-    /**
-     * Map containing user's credentials with credential type as key
-     */
-    protected Map<String, Credential<?>> credentials = new HashMap<>();
 
     /**
      * Constructs a new user with Object ID.
@@ -81,7 +73,6 @@ public abstract class AbstractUser extends AbstractActor {
         this.lastName = lastName;
         this.email = email;
         this.avatar = avatar;
-        this.credentials = new HashMap<>();
     }
 
     /**
@@ -104,7 +95,6 @@ public abstract class AbstractUser extends AbstractActor {
         this.lastName = lastName;
         this.email = email;
         this.avatar = avatar;
-        this.credentials = new HashMap<>();
     }
 
     /**
@@ -151,7 +141,7 @@ public abstract class AbstractUser extends AbstractActor {
     }
 
     /**
-     * Activates Multi-Factor Authentication with enabled state.
+     * Activates Multi-Factor Authentication with the enabled state.
      *
      * @param type    MFA type identifier
      * @param secret  MFA secret key
@@ -164,7 +154,7 @@ public abstract class AbstractUser extends AbstractActor {
      * Checks if a credential is enabled.
      *
      * @param type credential type to check
-     * @return true if credential is enabled, false otherwise
+     * @return true if the credential is enabled, false otherwise
      */
     public boolean isCredentialEnabled(String type) {
         return false;
@@ -210,7 +200,7 @@ public abstract class AbstractUser extends AbstractActor {
     }
 
     /**
-     * Returns user's first and last name concatenated.
+     * Returns a user's first and last name concatenated.
      */
     @Override
     public String getName() {
@@ -218,7 +208,7 @@ public abstract class AbstractUser extends AbstractActor {
     }
 
     /**
-     * Returns user's full name including middle name if present.
+     * Returns the user's full name including middle name if present.
      */
     @Override
     public String getFullName() {
