@@ -111,7 +111,7 @@ class FileFieldTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
-        def adminUser = importHelper.createUser(new User(firstName: "Admin", lastName: "User", username: UserConstants.ADMIN_USER_USERNAME, email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        def adminUser = importHelper.createUser(new User(firstName: "Admin", lastName: "User", username: UserConstants.ADMIN_USER_USERNAME, email: UserConstants.ADMIN_USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("admin")] as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])

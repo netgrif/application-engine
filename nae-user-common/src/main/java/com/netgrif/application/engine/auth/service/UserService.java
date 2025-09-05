@@ -406,5 +406,5 @@ public interface UserService {
      *
      * @param roles collection of process roles to assign to admin users
      */
-    default void updateAdminWithRoles(Collection<ProcessRole> roles) {}
+    void updateAdminWithRoles(Collection<ProcessRole> roles);
 }
