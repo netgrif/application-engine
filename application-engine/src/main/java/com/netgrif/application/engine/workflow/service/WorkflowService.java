@@ -418,12 +418,12 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public DeleteCaseEventOutcome deleteCase(Case useCase) {
-       return deleteCase(useCase, false);
+        return deleteCase(useCase, false);
     }
 
     @Override
     public DeleteCaseEventOutcome deleteCase(Case useCase, boolean force) {
-        return deleteCase(useCase, new HashMap<>());
+        return deleteCase(useCase, new HashMap<>(), force);
     }
 
     @Override
