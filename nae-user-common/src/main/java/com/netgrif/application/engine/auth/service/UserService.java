@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Service interface for managing user-related operations in the application.
@@ -351,9 +352,15 @@ public interface UserService {
      * Removes roles associated with a deleted Petri net from users in specified realms.
      *
      * @param process the deleted Petri net
-     * @param realmIds collection of realm identifiers
      */
-    void removeRoleOfDeletedPetriNet(PetriNet process, Collection<String> realmIds);
+    void removeRoleOfDeletedPetriNet(PetriNet process);
+
+    /**
+     * Removes roles associated with a deleted Petri net from users in specified realms.
+     *
+     * @param petriNetRoles roles of deleted Petri net
+     */
+    void removeRoleOfDeletedPetriNet(Set<ProcessRole> petriNetRoles);
 
     /**
      * Creates a system user.

@@ -28,7 +28,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -213,7 +212,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void removeAllByStateAndExpirationDateBeforeForRealms(UserState state, LocalDateTime expirationDate, Collection<String> realmIds) {
         // TODO: delete whole group or change owner of group?
-        if(realmIds == null || realmIds.isEmpty()) {
+        if (realmIds == null || realmIds.isEmpty()) {
             collectionNameProvider.getCollectionNamesForAllRealm().forEach(collectionName -> {
                 removeAllByStateAndExpirationDateBeforeFromCollection(state, expirationDate, collectionName);
             });
@@ -523,19 +522,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void removeRoleOfDeletedPetriNet(PetriNet petriNet, Collection<String> realmIds) {
-        Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
-        collectionNames.forEach(collection -> {
-            Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-            Page<AbstractUser> users;
-            do {
-                users = findAllByProcessRoles(petriNet.getRoles().values().stream().map(ProcessRole::get_id).collect(Collectors.toSet()), collection, pageable);
-                users.forEach(u -> {
-                    petriNet.getRoles().forEach((k, role) -> removeRole(u, role.get_id()));
-                });
-                pageable = pageable.next();
-            } while (users.hasNext());
-        });
+    public void removeRoleOfDeletedPetriNet(PetriNet petriNet) {
+        String defaultRealm = collectionNameProvider.getDefaultRealmCollection();
+        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<AbstractUser> users;
+        do {
+            users = findAllByProcessRoles(petriNet.getRoles().values().stream().map(ProcessRole::get_id).collect(Collectors.toSet()), defaultRealm, pageable);
+            users.forEach(u -> {
+                petriNet.getRoles().forEach((k, role) -> removeRole(u, role.get_id()));
+            });
+            pageable = pageable.next();
+        } while (users.hasNext());
+    }
+
+    @Override
+    public void removeRoleOfDeletedPetriNet(Set<ProcessRole> petriNetRoles) {
+        String defaultRealm = collectionNameProvider.getDefaultRealmCollection();
+        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<AbstractUser> users;
+        do {
+            users = findAllByProcessRoles(petriNetRoles.stream().map(ProcessRole::get_id).collect(Collectors.toSet()), defaultRealm, pageable);
+            users.forEach(u -> {
+                petriNetRoles.forEach(role -> removeRole(u, role.get_id()));
+            });
+        }while (users.hasNext());
     }
 
     @Override
