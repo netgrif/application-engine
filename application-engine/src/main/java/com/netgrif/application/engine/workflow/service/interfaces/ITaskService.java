@@ -112,7 +112,11 @@ public interface ITaskService {
 
     void delete(List<Task> tasks, String caseId);
 
+    void delete(List<Task> tasks, String caseId, boolean force);
+
     void deleteTasksByCase(String caseId);
+
+    void deleteTasksByCase(String caseId, boolean force);
 
     void deleteTasksByPetriNetId(String petriNetId);
 
