@@ -593,7 +593,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private <T> Page<AbstractUser> changeType(Page<T> users, Pageable pageable) {
-        return new PageImpl<>(changeType(new HashSet<>(users.getContent())), pageable, users.getTotalElements());
+        return new PageImpl<>(changeType(new LinkedHashSet<>(users.getContent())), pageable, users.getTotalElements());
     }
 
     private <T> List<AbstractUser> changeType(Collection<T> users) {
