@@ -213,7 +213,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void removeAllByStateAndExpirationDateBeforeForRealms(UserState state, LocalDateTime expirationDate, Collection<String> realmIds) {
         // TODO: delete whole group or change owner of group?
-        if(realmIds == null || realmIds.isEmpty()) {
+        if (realmIds == null || realmIds.isEmpty()) {
             collectionNameProvider.getCollectionNamesForAllRealm().forEach(collectionName -> {
                 removeAllByStateAndExpirationDateBeforeFromCollection(state, expirationDate, collectionName);
             });
@@ -562,6 +562,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public AbstractUser transformToUser(LoggedUser loggedUser) {
         return findById(loggedUser.getStringId(), loggedUser.getRealmId());
+    }
+
+    @Override
+    public void updateAdminWithRoles(Collection<ProcessRole> roles) {
+        log.info("Assigning [{}] roles to admin user(s)", roles != null ? roles.size() : 0);
+        User admin = (User) findByEmail(UserConstants.ADMIN_USER_EMAIL, null);
+        admin.setProcessRoles(new HashSet<>(roles));
+        saveUser(admin);
+        log.debug("Admin [{}] now has [{}] process roles", admin.getUsername(), admin.getProcessRoles().size());
     }
 
     protected User initializeNewUser(String username, String email, String firstName, String lastName, String password, String realmId) {
