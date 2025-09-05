@@ -268,7 +268,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Old password does not match.");
         }
 
-        log.trace("Setting password for user [{}]", user.getUsername());
+        log.debug("Setting password for user [{}]", user.getUsername());
         user.setPassword(passwordEncoder.encode(newPassword));
         return saveUser(user);
     }

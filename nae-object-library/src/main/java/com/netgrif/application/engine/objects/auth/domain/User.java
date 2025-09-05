@@ -51,7 +51,7 @@ public class User extends AbstractUser implements Serializable {
     /**
      * Map containing user's credentials with credential type as key
      */
-    private Map<String, Credential<?>> credentials;
+    private Map<String, Credential<?>> credentials = new HashMap<>();
 
     /**
      * Default constructor initializing a new User with a generated ObjectId
@@ -376,6 +376,6 @@ public class User extends AbstractUser implements Serializable {
      * @return true if the user state is ACTIVE, false otherwise
      */
     public boolean isActive() {
-        return this.state.equals(UserState.ACTIVE);
+        return this.state == UserState.ACTIVE;
     }
 }

@@ -39,13 +39,15 @@ public class User {
     public User(AbstractUser user) {
         Attribute<Set<String>> enabledCredentialsAttribute = new Attribute<>();
         if (user instanceof com.netgrif.application.engine.objects.auth.domain.User userr) {
-            enabledCredentialsAttribute.setValue(userr.getCredentials()
-                    .values().stream()
-                    .filter(java.util.Objects::nonNull)
-                    .filter(Credential::isEnabled)
-                    .map(Credential::getType)
-                    .filter(java.util.Objects::nonNull)
-                    .collect(Collectors.toSet()));
+            Map<String, Credential<?>> credentials = userr.getCredentials();
+            enabledCredentialsAttribute.setValue(
+                    (credentials == null ? java.util.Map.<String, Credential<?>>of() : credentials)
+                            .values().stream()
+                            .filter(java.util.Objects::nonNull)
+                            .filter(Credential::isEnabled)
+                            .map(Credential::getType)
+                            .filter(java.util.Objects::nonNull)
+                            .collect(Collectors.toSet()));
             enabledCredentialsAttribute.setRequired(true);
         }
 
@@ -56,11 +58,13 @@ public class User {
         avatar = user.getAvatar();
         firstName = user.getFirstName();
         lastName = user.getLastName();
-        fullName = user.getName();
+        fullName = user.getFullName();
         attributes = user.getAttributes() != null
                 ? new java.util.HashMap<>(user.getAttributes())
                 : new java.util.HashMap<>();
-        attributes.put(ATTR_ENABLED_CREDENTIALS, enabledCredentialsAttribute);
+        if (enabledCredentialsAttribute.getValue() != null) {
+            attributes.put(ATTR_ENABLED_CREDENTIALS, enabledCredentialsAttribute);
+        }
         if (user instanceof com.netgrif.application.engine.objects.auth.domain.User u) {
             createdAt = u.getCreatedAt();
             enabled = u.isActive();
