@@ -51,7 +51,7 @@ public class User extends AbstractUser implements Serializable {
     /**
      * Map containing user's credentials with credential type as key
      */
-    protected Map<String, Credential<?>> credentials;
+    private Map<String, Credential<?>> credentials;
 
     /**
      * Default constructor initializing a new User with a generated ObjectId
