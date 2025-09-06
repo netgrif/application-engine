@@ -38,8 +38,8 @@ public class User {
 
     public User(AbstractUser user) {
         Attribute<Set<String>> enabledCredentialsAttribute = new Attribute<>();
-        if (user instanceof com.netgrif.application.engine.objects.auth.domain.User userr) {
-            Map<String, Credential<?>> credentials = userr.getCredentials();
+        if (user instanceof com.netgrif.application.engine.objects.auth.domain.User domainUser) {
+            Map<String, Credential<?>> credentials = domainUser.getCredentials();
             enabledCredentialsAttribute.setValue(
                     (credentials == null ? java.util.Map.<String, Credential<?>>of() : credentials)
                             .values().stream()
@@ -62,7 +62,7 @@ public class User {
         attributes = user.getAttributes() != null
                 ? new java.util.HashMap<>(user.getAttributes())
                 : new java.util.HashMap<>();
-        if (enabledCredentialsAttribute.getValue() != null) {
+        if (enabledCredentialsAttribute.getValue() != null && !enabledCredentialsAttribute.getValue().isEmpty()) {
             attributes.put(ATTR_ENABLED_CREDENTIALS, enabledCredentialsAttribute);
         }
         if (user instanceof com.netgrif.application.engine.objects.auth.domain.User u) {
