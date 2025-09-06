@@ -4,9 +4,7 @@ import com.netgrif.application.engine.objects.workflow.domain.Case;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.*;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -32,7 +30,11 @@ public class ElasticCase extends com.netgrif.application.engine.objects.elastic.
         return super.getId();
     }
 
-    @Field(type = Keyword)
+    @MultiField(
+            mainField = @Field(type = Text),
+            otherFields = {
+                    @InnerField(suffix = "keyword", type = Keyword)
+            })
     public String getTitle() {
         return super.getTitle();
     }
@@ -77,7 +79,11 @@ public class ElasticCase extends com.netgrif.application.engine.objects.elastic.
         return super.getAuthorRealm();
     }
 
-    @Field(type = Keyword)
+    @MultiField(
+            mainField = @Field(type = Text),
+            otherFields = {
+                    @InnerField(suffix = "keyword", type = Keyword)
+            })
     public String getAuthorName() {
         return super.getAuthorName();
     }
