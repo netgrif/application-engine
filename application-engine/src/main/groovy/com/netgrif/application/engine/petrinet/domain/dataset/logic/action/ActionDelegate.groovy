@@ -2271,7 +2271,7 @@ class ActionDelegate {
      * @return found filter instance. Can be null
      */
     Case findFilter(String name) {
-        return findCaseElastic("processIdentifier:$FilterRunner.FILTER_PETRI_NET_IDENTIFIER AND title.keyword:\"$name\"" as String)
+        return findCaseElastic("processIdentifier:$FilterRunner.FILTER_PETRI_NET_IDENTIFIER AND title:\"$name\"" as String)
     }
 
     /**
