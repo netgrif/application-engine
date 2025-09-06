@@ -1,8 +1,6 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
-import com.netgrif.application.engine.objects.annotations.Indexed;
-import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.utils.DateUtils;
 import com.querydsl.core.annotations.QueryEntity;
 import lombok.AllArgsConstructor;
@@ -30,19 +28,29 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(callSuper = false)
 public class User extends AbstractUser implements Serializable {
 
-    /** Flag indicating whether the user's email has been verified */
+    /**
+     * Flag indicating whether the user's email has been verified
+     */
     private boolean emailVerified;
 
-    /** Current state of the user (e.g., ACTIVE, INACTIVE) */
+    /**
+     * Current state of the user (e.g., ACTIVE, INACTIVE)
+     */
     private UserState state;
 
-    /** Timestamp when the user was created */
+    /**
+     * Timestamp when the user was created
+     */
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    /** Timestamp of the last modification to the user */
+    /**
+     * Timestamp of the last modification to the user
+     */
     private LocalDateTime modifiedAt = LocalDateTime.now();
 
-    /** Map containing user's credentials with credential type as key */
+    /**
+     * Map containing user's credentials with credential type as key
+     */
     private Map<String, Credential<?>> credentials = new HashMap<>();
 
     /**
@@ -57,6 +65,7 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Constructor creating a User with a specified ObjectId
+     *
      * @param id The ObjectId to be assigned to the user
      */
     public User(ObjectId id) {
@@ -66,6 +75,7 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Retrieves the user's authentication token from credentials
+     *
      * @return The token string if present, null otherwise
      */
     public String getToken() {
@@ -75,6 +85,7 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Sets the user's authentication token
+     *
      * @param token The token string to be stored
      */
     public void setToken(String token) {
@@ -84,6 +95,7 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Retrieves the encoded password from credentials
+     *
      * @return The encoded password string if present, null otherwise
      */
     @Override
@@ -97,6 +109,7 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Sets the user's password (should be already encoded)
+     *
      * @param password The encoded password string to store
      */
     @Override
@@ -107,6 +120,7 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Sets the expiration date for the user's token
+     *
      * @param expirationDate LocalDateTime when the token should expire
      */
     public void setExpirationDate(LocalDateTime expirationDate) {
@@ -122,6 +136,7 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Retrieves the token expiration date
+     *
      * @return LocalDateTime of token expiration if present, null otherwise
      */
     public LocalDateTime getExpirationDate() {
@@ -138,6 +153,7 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Checks if a specific credential type is enabled
+     *
      * @param type The credential type to check
      * @return true if the credential exists and is enabled, false otherwise
      */
@@ -149,6 +165,7 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Returns a set of enabled MFA method names
+     *
      * @return Set of strings representing enabled MFA methods
      */
     public Set<String> getEnabledMFAMethods() {
@@ -166,6 +183,7 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Disables a specific credential type
+     *
      * @param type The credential type to disable
      */
     @Override
@@ -177,7 +195,8 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Activates an MFA method with the given secret (enabled by default)
-     * @param type The MFA type to activate
+     *
+     * @param type   The MFA type to activate
      * @param secret The secret key for the MFA method
      */
     @Override
@@ -187,8 +206,9 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Activates an MFA method with the given secret and enabled state
-     * @param type The MFA type to activate
-     * @param secret The secret key for the MFA method
+     *
+     * @param type    The MFA type to activate
+     * @param secret  The secret key for the MFA method
      * @param enabled Whether the MFA method should be enabled
      * @throws IllegalArgumentException if type or secret is null or empty
      */
@@ -206,8 +226,9 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Sets a property for a specific credential type
-     * @param type The credential type
-     * @param key The property key
+     *
+     * @param type  The credential type
+     * @param key   The property key
      * @param value The property value (must be Serializable)
      */
     @Override
@@ -227,8 +248,9 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Retrieves a property value for a specific credential type
+     *
      * @param type The credential type
-     * @param key The property key
+     * @param key  The property key
      * @return The property value if found, null otherwise
      */
     @Override
@@ -239,6 +261,7 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Checks if a specific credential type exists
+     *
      * @param type The credential type to check
      * @return true if the credential exists, false otherwise
      */
@@ -248,6 +271,7 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Retrieves a credential by its type
+     *
      * @param type The credential type
      * @return The Credential object if found, null otherwise
      */
@@ -258,7 +282,8 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Sets the entire credentials map
-     * @param credentials The new credentials map (null creates empty map)
+     *
+     * @param credentials The new credentials map (null creates an empty map)
      */
     public void setCredentials(Map<String, Credential<?>> credentials) {
         this.credentials = credentials == null ? new HashMap<>() : new HashMap<>(credentials);
@@ -266,9 +291,10 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Creates and sets a new string credential
-     * @param type The credential type
-     * @param value The credential value
-     * @param order The credential order
+     *
+     * @param type    The credential type
+     * @param value   The credential value
+     * @param order   The credential order
      * @param enabled Whether the credential should be enabled
      */
     @Override
@@ -279,7 +305,8 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Sets a credential with the given key
-     * @param key The credential key
+     *
+     * @param key        The credential key
      * @param credential The credential object to set
      */
     @Override
@@ -292,6 +319,7 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Gets the value of a credential by its key
+     *
      * @param key The credential key
      * @return The credential value if found, null otherwise
      */
@@ -305,6 +333,7 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Removes a credential by its key
+     *
      * @param key The credential key to remove
      */
     public void removeCredential(String key) {
@@ -317,8 +346,9 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Checks if a credential is set and has a value
+     *
      * @param key The credential key to check
-     * @return true if credential exists and has a value, false otherwise
+     * @return true if a credential exists and has a value, false otherwise
      */
     public boolean isCredentialSet(String key) {
         if (this.credentials == null) {
@@ -330,6 +360,7 @@ public class User extends AbstractUser implements Serializable {
 
     /**
      * Gets all credential keys
+     *
      * @return Set of credential keys, empty set if no credentials exist
      */
     public Set<String> getCredentialsKeys() {
@@ -340,10 +371,11 @@ public class User extends AbstractUser implements Serializable {
     }
 
     /**
-     * Checks if the user is in ACTIVE state
-     * @return true if user state is ACTIVE, false otherwise
+     * Checks if the user is in an ACTIVE state
+     *
+     * @return true if the user state is ACTIVE, false otherwise
      */
     public boolean isActive() {
-        return this.state.equals(UserState.ACTIVE);
+        return this.state == UserState.ACTIVE;
     }
 }

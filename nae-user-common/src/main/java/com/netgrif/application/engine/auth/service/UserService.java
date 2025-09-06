@@ -414,4 +414,14 @@ public interface UserService {
      * @param roles collection of process roles to assign to admin users
      */
     void updateAdminWithRoles(Collection<ProcessRole> roles);
+
+    /**
+     * Resets password for user.
+     *
+     * @param user user
+     * @param newPassword new password
+     * @param oldPassword old password
+     * @return the updated user
+     */
+    AbstractUser changePassword(AbstractUser user, String newPassword, String oldPassword);
 }

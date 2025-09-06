@@ -261,6 +261,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public AbstractUser changePassword(AbstractUser user, String newPassword, String oldPassword) {
+        canUpdatePassword(user, newPassword);
+
+        if (!verifyPasswords(user, oldPassword)) {
+            throw new IllegalArgumentException("Old password does not match.");
+        }
+
+        log.debug("Setting password for user [{}]", user.getUsername());
+        user.setPassword(passwordEncoder.encode(newPassword));
+        return saveUser(user);
+    }
+
+    @Override
     public void addDefaultAuthorities(AbstractUser user) {
         log.trace("Assigning default authorities to user [{}]", user.getUsername());
         if (user.getAuthoritySet().isEmpty()) {
@@ -637,4 +650,22 @@ public class UserServiceImpl implements UserService {
         user.getAuthoritySet().addAll(getUserGroups(user).stream().map(Group::getAuthoritySet).flatMap(Set::stream).collect(Collectors.toSet()));
     }
 
+    private boolean verifyPasswords(AbstractUser user, String password) {
+        if (password == null) {
+            throw new IllegalArgumentException("confirmation password is not set");
+        }
+
+        log.trace("Verifying password for user [{}]", user.getUsername());
+        return passwordEncoder.matches(password, user.getPassword());
+    }
+
+    protected void canUpdatePassword(AbstractUser user, String password) {
+        if (!user.isCredentialEnabled("password")) {
+            throw new RuntimeException("Password does not exists or authorization is not enabled");
+        }
+
+        if (password == null) {
+            throw new IllegalArgumentException("Password is not set");
+        }
+    }
 }
