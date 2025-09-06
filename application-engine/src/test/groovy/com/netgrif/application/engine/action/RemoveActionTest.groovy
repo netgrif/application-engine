@@ -3,6 +3,7 @@ package com.netgrif.application.engine.action
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.objects.auth.constants.UserConstants
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.Authority
 
@@ -116,7 +117,7 @@ class RemoveActionTest {
     @Disabled(" GroovyRuntime Could not find matching")
     void addAndRemoveRole() {
         AbstractUser user = userService.findByEmail(USER_EMAIL, null)
-        auth = new UsernamePasswordAuthenticationToken("super@netgrif.com", "password")
+        auth = new UsernamePasswordAuthenticationToken(UserConstants.ADMIN_USER_USERNAME, "password")
 
         String adminRoleId = petriNet.getRoles().find { it.value.name.defaultValue == "admin" }.key
 

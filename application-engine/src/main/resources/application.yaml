@@ -159,4 +159,4 @@ netgrif:
                             RoleActionsRunner: debug
                             CaseFieldsExpressionRunner: debug
     actions:
-      imports: com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody,com.netgrif.application.engine.objects.petrinet.domain.I18nString,com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.DashboardManagementBody,com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.DashboardItemBody
+      imports: com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody,com.netgrif.application.engine.objects.petrinet.domain.I18nString,com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.DashboardManagementBody,com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.DashboardItemBody,com.netgrif.application.engine.objects.utils.Nullable

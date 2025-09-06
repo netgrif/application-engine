@@ -399,6 +399,15 @@ public interface UserService {
      */
     List<Group> getUserGroups(AbstractActor actor);
 
+
+    /**
+     * Assigns the provided process roles to all admin users in the system, updating their current set of roles.
+     * Behavior: roles are added (union) and duplicates are ignored; no existing roles are removed.
+     *
+     * @param roles collection of process roles to assign to admin users
+     */
+    void updateAdminWithRoles(Collection<ProcessRole> roles);
+
     /**
      * Resets password for user.
      *
