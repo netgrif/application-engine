@@ -13,7 +13,9 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
@@ -32,7 +34,11 @@ import java.util.List;
 @EnableMethodSecurity
 @EnableAspectJAutoProxy
 @ConfigurationPropertiesScan
-@EnableMongoRepositories("com.netgrif")
+@EnableMongoRepositories(basePackages = {"com.netgrif"}, excludeFilters = {
+        @ComponentScan.Filter(
+                type = FilterType.REGEX,
+                pattern = "com\\.netgrif\\.application\\.engine\\.module\\.eventlog\\..*"
+        )})
 @SpringBootApplication(
         exclude = {DataSourceAutoConfiguration.class},
         scanBasePackages = {"com.netgrif"})
