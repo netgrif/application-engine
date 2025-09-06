@@ -28,7 +28,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -524,19 +523,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void removeRoleOfDeletedPetriNet(PetriNet petriNet, Collection<String> realmIds) {
-        Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
-        collectionNames.forEach(collection -> {
-            Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-            Page<AbstractUser> users;
-            do {
-                users = findAllByProcessRoles(petriNet.getRoles().values().stream().map(ProcessRole::get_id).collect(Collectors.toSet()), collection, pageable);
-                users.forEach(u -> {
-                    petriNet.getRoles().forEach((k, role) -> removeRole(u, role.get_id()));
-                });
-                pageable = pageable.next();
-            } while (users.hasNext());
-        });
+    public void removeRoleOfDeletedPetriNet(PetriNet petriNet) {
+        removeRoleOfDeletedPetriNet(new HashSet<>(petriNet.getRoles().values()));
+    }
+
+    @Override
+    public void removeRoleOfDeletedPetriNet(Set<ProcessRole> petriNetRoles) {
+        String defaultRealmCollection = collectionNameProvider.getDefaultRealmCollection();
+        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Collection<ProcessResourceId> roleIds = petriNetRoles.stream().map(ProcessRole::get_id).collect(Collectors.toSet());
+        Page<AbstractUser> users;
+        do {
+            users = searchUsersByRoleIds(roleIds, defaultRealmCollection, pageable);
+            users.getContent().forEach(u -> removeRoles(u, petriNetRoles));
+            pageable = pageable.next();
+        } while (users.hasNext());
     }
 
     @Override
