@@ -4,8 +4,8 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSer
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.LongStream;
 
 @Component
 public class CaseEventHandler extends AbstractMongoEventListener<Case> {
@@ -29,14 +28,25 @@ public class CaseEventHandler extends AbstractMongoEventListener<Case> {
     @Autowired
     private FieldFactory fieldFactory;
 
+    @Autowired
+    private IWorkflowService workflowService;
+
     @Override
     public void onAfterConvert(AfterConvertEvent<Case> event) {
         Case useCase = event.getSource();
+        workflowService.setPetriNet(useCase);
         List<Field<?>> immediateFields = new ArrayList<>();
-        useCase.getImmediateDataFields().forEach(fieldId ->
-                immediateFields.add(fieldFactory.buildImmediateField(useCase, fieldId))
-        );
-        useCase.setImmediateData(immediateFields);
+        if (useCase.getImmediateDataFields() != null) {
+            useCase.getImmediateDataFields().forEach(fieldId -> {
+                try {
+                    immediateFields.add(fieldFactory.buildImmediateField(useCase, fieldId));
+                } catch (Exception e) {
+                    log.error("Could not build immediate field for case {} and field {}", useCase.getStringId(), fieldId, e);
+                }
+            }
+            );
+            useCase.setImmediateData(immediateFields);
+        }
     }
 
     @Override
