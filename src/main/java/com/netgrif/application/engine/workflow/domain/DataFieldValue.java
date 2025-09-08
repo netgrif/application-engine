@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.workflow.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.netgrif.application.engine.petrinet.converter.DataFieldValueSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonSerialize(using = DataFieldValueSerializer.class)
 public class DataFieldValue<T> {
 
     private T value;

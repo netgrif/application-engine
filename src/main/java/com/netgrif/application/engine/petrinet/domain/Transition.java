@@ -49,6 +49,8 @@ public class Transition extends Node {
         events = new HashMap<>();
         processRolePermissions = new AccessPermissions<>();
         caseRolePermissions = new AccessPermissions<>();
+        // TODO: release/8.0.0 check if correct here
+        layoutContainer = new LayoutContainer();
     }
 
     public void setDataRefBehavior(Field<?> field, DataFieldBehavior behavior) {

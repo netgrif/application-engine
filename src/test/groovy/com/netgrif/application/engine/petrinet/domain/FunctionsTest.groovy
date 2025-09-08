@@ -108,7 +108,7 @@ class FunctionsTest {
                 .authorId(superCreator.getLoggedSuper().activeActorId)
                 .build()
         Case aCase = workflowService.createCase(createCaseParams).getCase()
-        dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet(["createUser": new BooleanField(rawValue: true)] as Map<String, Field<?>>),
+        dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet(["createUser": new BooleanField(rawValue: true)] as LinkedHashMap<String, Field<?>>),
                 superCreator.getLoggedSuper().activeActorId))
 
         Optional<Identity> identityOpt = identityService.findByUsername("test@test.com")
@@ -135,7 +135,7 @@ class FunctionsTest {
                 .authorId(superCreator.getLoggedSuper().activeActorId)
                 .build()
         Case aCase = workflowService.createCase(createCaseParams).getCase()
-        dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet((["enum": new EnumerationField(rawValue: new I18nString("ano"))] as Map<String, Field<?>>)),
+        dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet((["enum": new EnumerationField(rawValue: new I18nString("ano"))] as LinkedHashMap<String, Field<?>>)),
                 superCreator.getLoggedSuper().activeActorId))
         aCase = workflowService.findOne(aCase.getStringId())
 
@@ -171,7 +171,7 @@ class FunctionsTest {
                     .authorId(superCreator.getLoggedSuper().activeActorId)
                     .build()
             Case aCase = workflowService.createCase(createCaseParams).getCase()
-            dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet((["number": new NumberField(rawValue: 20d)] as Map<String, Field<?>>)),
+            dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet((["number": new NumberField(rawValue: 20d)] as LinkedHashMap<String, Field<?>>)),
                     superCreator.getLoggedSuper().activeActorId))
         })
     }
@@ -196,14 +196,14 @@ class FunctionsTest {
                     .authorId(superCreator.getLoggedSuper().activeActorId)
                     .build()
             Case aCase = workflowService.createCase(createCaseParams).getCase()
-            dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet((["text": new TextField(rawValue: "20")] as Map<String, Field<?>>)),
+            dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet((["text": new TextField(rawValue: "20")] as LinkedHashMap<String, Field<?>>)),
                     superCreator.getLoggedSuper().activeActorId))
 
             functionTestNet = petriNetService.importProcess(new ImportProcessParams(functionTestNetResourceV2.inputStream, VersionType.MAJOR,
                     superCreator.getLoggedSuper().activeActorId)).getProcess()
             assert functionTestNet
 
-            dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet((["text": new TextField(rawValue: "20")] as Map<String, Field<?>>)),
+            dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet((["text": new TextField(rawValue: "20")] as LinkedHashMap<String, Field<?>>)),
                     superCreator.getLoggedSuper().activeActorId))
         })
     }
@@ -221,7 +221,7 @@ class FunctionsTest {
                     .authorId(superCreator.getLoggedSuper().activeActorId)
                     .build()
             Case aCase = workflowService.createCase(createCaseParams).getCase()
-            dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet((["number3": new NumberField(rawValue: 20d)] as Map<String, Field<?>>)),
+            dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet((["number3": new NumberField(rawValue: 20d)] as LinkedHashMap<String, Field<?>>)),
                     superCreator.getLoggedSuper().activeActorId))
         })
     }
@@ -242,7 +242,7 @@ class FunctionsTest {
                 .authorId(superCreator.getLoggedSuper().activeActorId)
                 .build()
         Case aCase = workflowService.createCase(createCaseParams).getCase()
-        dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet((["number": new NumberField(rawValue: 20d)] as Map<String, Field<?>>)),
+        dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet((["number": new NumberField(rawValue: 20d)] as LinkedHashMap<String, Field<?>>)),
                 superCreator.getLoggedSuper().activeActorId))
         aCase = workflowService.findOne(aCase.getStringId())
 
@@ -252,7 +252,7 @@ class FunctionsTest {
                 superCreator.getLoggedSuper().activeActorId)).getProcess()
         assert functionResNet
 
-        dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet((["number": new NumberField(rawValue: 20d)] as Map<String, Field<?>>)),
+        dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet((["number": new NumberField(rawValue: 20d)] as LinkedHashMap<String, Field<?>>)),
                 superCreator.getLoggedSuper().activeActorId))
         aCase = workflowService.findOne(aCase.getStringId())
 
@@ -280,7 +280,7 @@ class FunctionsTest {
                 .authorId(superCreator.getLoggedSuper().activeActorId)
                 .build()
         Case aCase = workflowService.createCase(createCaseParams).getCase()
-        dataService.setData(new SetDataParams(aCase.getTaskStringId("t0"), new DataSet((["updateOtherField": new BooleanField(rawValue: true)] as Map<String, Field<?>>)),
+        dataService.setData(new SetDataParams(aCase.getTaskStringId("t0"), new DataSet((["updateOtherField": new BooleanField(rawValue: true)] as LinkedHashMap<String, Field<?>>)),
                 superCreator.getLoggedSuper().activeActorId))
 
         aCase = workflowService.findOne(aCase.stringId)
@@ -317,7 +317,7 @@ class FunctionsTest {
                 .authorId(superCreator.getLoggedSuper().activeActorId)
                 .build()
         Case aCase = workflowService.createCase(createCaseParams).getCase()
-        dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet((["number": new NumberField(rawValue: 20d)] as Map<String, Field<?>>)),
+        dataService.setData(new SetDataParams(aCase.getTaskStringId("t1"), new DataSet((["number": new NumberField(rawValue: 20d)] as LinkedHashMap<String, Field<?>>)),
                 superCreator.getLoggedSuper().activeActorId))
         aCase = workflowService.findOne(aCase.getStringId())
         NumberField numberField2 = aCase.dataSet.get("number2") as NumberField

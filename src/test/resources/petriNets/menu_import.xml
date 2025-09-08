@@ -1,0 +1,29 @@
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+	<id>menu_import</id>
+    <version>1.0.0</version>
+	<title>Menu import</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<processEvents>
+		<event type="upload">
+			<id>new_model_upload</id>
+			<actions phase="post">
+				<action id="2">
+					<![CDATA[
+
+					def me = "<<me>>"
+					def createFilters = []
+					def landingPath = "/"
+
+					def processIdentifiersGeneric = []
+
+					createMnuItem("first", landingPath, "processIdentifier:first", "group", "First", ["first"])
+//					createMnuItem("second", landingPath, "processIdentifier:second", "group", "Second", ["second"])
+
+					]]>
+				</action>
+			</actions>
+		</event>
+	</processEvents>
+</process>

@@ -237,20 +237,6 @@
         </xs:restriction>
     </xs:simpleType>
     <!-- ===== INNER ELEMENTS ===== -->
-    <xs:simpleType name="template">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="material"/>
-            <xs:enumeration value="netgrif"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="appearance">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="standard"/>
-            <xs:enumeration value="outline"/>
-            <xs:enumeration value="fill"/>
-            <xs:enumeration value="legacy"/>
-        </xs:restriction>
-    </xs:simpleType>
     <xs:complexType name="breakpoint">
         <xs:sequence>
             <xs:element type="nonNegativeInteger" name="x"/>

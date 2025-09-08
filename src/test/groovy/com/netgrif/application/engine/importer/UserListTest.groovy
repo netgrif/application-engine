@@ -87,7 +87,7 @@ class UserListTest {
         User user = userService.findById(superCreator.getLoggedSuper().activeActorId).get()
         dataService.setData(new SetDataParams(task.stringId, new DataSet([
                 "users_1": new UserListField(rawValue: new UserListFieldValue(new UserFieldValue(user)))
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
+        ] as LinkedHashMap<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
 
         Role caseRole = roleService.findCaseRoleByCaseIdAndImportId(caseOpt.get().stringId, "users_1")
         assert taskService.findById(task.stringId).caseRolePermissions.containsKey(caseRole.stringId)

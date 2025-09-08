@@ -254,7 +254,7 @@ class TaskApiTest {
         helper.setTaskData(TASK_GETTER_TASK, case1.stringId, new DataSet([
                 (DATA_TEXT)  : new TextField(rawValue: "text"),
                 (DATA_NUMBER): new NumberField(rawValue: 13)
-        ] as Map<String, Field<?>>))
+        ] as LinkedHashMap<String, Field<?>>))
 
         Case control = helper.createCase("Control case", net)
         helper.assignTaskToSuper(TASK_GETTER_TASK, control.stringId)

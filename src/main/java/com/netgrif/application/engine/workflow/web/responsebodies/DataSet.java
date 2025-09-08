@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data
@@ -15,10 +16,10 @@ public class DataSet {
     /**
      * Field import ID: dataField
      */
-    private Map<String, Field<?>> fields;
+    private LinkedHashMap<String, Field<?>> fields;
 
     public DataSet() {
-        this.fields = new HashMap<>();
+        this.fields = new LinkedHashMap<>();
     }
 
     public Field<?> get(String fieldId) {

@@ -108,7 +108,7 @@ class SetDataOnButtonTest {
 //                "button_0": new ButtonField(rawValue: 42),
 //                "button_1": new ButtonField(rawValue: 42),
 //                "button_2": new ButtonField(rawValue: 42)
-//        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId())
+//        ] as LinkedHashMap<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId())
 //
 //        testCase = workflowService.findOne(testCase.getStringId())
 //

@@ -14,6 +14,7 @@ import com.netgrif.application.engine.manager.service.interfaces.ISessionManager
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.security.service.SecurityContextService;
+import com.netgrif.application.engine.startup.SystemUserRunner;
 import com.netgrif.application.engine.transaction.NaeTransaction;
 import com.netgrif.application.engine.workflow.domain.CaseParams;
 import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams;
@@ -31,7 +32,10 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,17 +46,26 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
     private final BCryptPasswordEncoder passwordEncoder;
     private final SecurityContextService securityContextService;
     private final IUserService userService;
+    private final SystemUserRunner systemUserRunner;
 
-    public IdentityService(BCryptPasswordEncoder passwordEncoder, SecurityContextService securityContextService,
-                           @Lazy IDataService dataService, @Lazy IWorkflowService workflowService,
-                           @Lazy IElasticCaseSearchService elasticCaseSearchService, @Lazy IUserService userService,
-                           SystemCaseFactoryRegistry systemCaseFactoryRegistry, @Lazy ISessionManagerService sessionManagerService,
-                           MongoTransactionManager mongoTransactionManager) {
+    public IdentityService(
+            BCryptPasswordEncoder passwordEncoder,
+            SecurityContextService securityContextService,
+            @Lazy IDataService dataService,
+            @Lazy IWorkflowService workflowService,
+            @Lazy IElasticCaseSearchService elasticCaseSearchService,
+            @Lazy IUserService userService,
+            SystemCaseFactoryRegistry systemCaseFactoryRegistry,
+            @Lazy ISessionManagerService sessionManagerService,
+            MongoTransactionManager mongoTransactionManager,
+            @Lazy SystemUserRunner systemUserRunner
+    ) {
         super(sessionManagerService, dataService, workflowService, systemCaseFactoryRegistry, elasticCaseSearchService,
                 mongoTransactionManager);
         this.passwordEncoder = passwordEncoder;
         this.securityContextService = securityContextService;
         this.userService = userService;
+        this.systemUserRunner = systemUserRunner;
     }
 
     /**
@@ -62,16 +75,27 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
      */
     @Override
     public LoggedIdentity getLoggedIdentity() {
-        return sessionManagerService.getLoggedIdentity();
+        LoggedIdentity identity = sessionManagerService.getLoggedIdentity();
+        if (identity == null) {
+            User systemUser = systemUserRunner.getSystemUser();
+            identity = LoggedIdentity.with()
+                    .fullName(systemUser.getFullName())
+                    .identityId(systemUser.getStringId())
+                    .activeActorId(systemUser.getStringId())
+                    .username(systemUser.getEmail())
+                    .password("")
+                    .build();
+        }
+        return identity;
     }
 
     /**
      * Finds identity by username data field.
      *
      * @param username username of the identity. If provided null, empty optional is returned
-     *
      * @return If the identity exists, it's returned. If not, an empty optional is returned
-     * */
+     *
+     */
     @Override
     public Optional<Identity> findByUsername(String username) {
         if (username == null) {
@@ -84,9 +108,9 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
      * Finds identity by provided {@link LoggedIdentity}
      *
      * @param loggedIdentity logged identity used to find the identity. If provided null, empty optional is returned
-     *
      * @return If the identity exists, it's returned. If not, an empty optional is returned
-     * */
+     *
+     */
     @Override
     public Optional<Identity> findByLoggedIdentity(LoggedIdentity loggedIdentity) {
         if (loggedIdentity == null) {
@@ -104,9 +128,9 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
      * Checks if the identity exists by username data field
      *
      * @param username username of the identity. If provided null, empty optional is returned
-     *
      * @return True if the identity exists, else false.
-     * */
+     *
+     */
     @Override
     public boolean existsByUsername(String username) {
         if (username == null) {
@@ -119,9 +143,9 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
      * Finds all actor ids of the identity
      *
      * @param id The id of the identity. If provided null, empty set is returned
-     *
      * @return Set of actor ids of the identity. Otherwise, an empty set is returned
-     * */
+     *
+     */
     @Override
     public Set<String> findActorIds(String id) {
         Optional<Identity> identityOpt = findById(id);
@@ -136,12 +160,12 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
     /**
      * Find all identities with matched state, that are expired.
      *
-     * @param state state of the identity. If provided null, empty list is returned
+     * @param state    state of the identity. If provided null, empty list is returned
      * @param dateTime expiration date time threshold. The identity is considered expired if the expiration date is
      *                 before this value. If provided null, empty list is returned
-     *
      * @return List of all identities, that match the requirements. Otherwise, an empty list is returned.
-     * */
+     *
+     */
     @Override
     public List<Identity> findAllByStateAndExpirationDateBefore(IdentityState state, LocalDateTime dateTime) {
         if (state == null || dateTime == null) {
@@ -156,9 +180,9 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
      * Creates identity based on params. Password is encoded. User is created from the identity parameters.
      *
      * @param identityParams Parameters, that are used to create the identity. At least username must be provided.
-     *
      * @return Created identity with the User (as {@link Identity#getMainActorId()}). Cannot be null.
-     * */
+     *
+     */
     @Override
     public Identity createWithDefaultUser(IdentityParams identityParams) {
         validateAndFixCreateParams(identityParams);
@@ -191,7 +215,8 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
      * @param params Parameters for creating identity. Password will be encoded before creation.
      * @return Created identity with encoded password
      * @throws IllegalArgumentException if parameters validation fails
-     * */
+     *
+     */
     @Override
     public Identity encodePasswordAndCreate(IdentityParams params) {
         encodePassword(params);
@@ -202,10 +227,11 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
      * Updates existing identity with provided parameters and encodes new password.
      *
      * @param identity Identity to be updated
-     * @param params Parameters containing updates. Password will be encoded before update.
+     * @param params   Parameters containing updates. Password will be encoded before update.
      * @return Updated identity with newly encoded password
      * @throws IllegalArgumentException if identity or parameters validation fails
-     * */
+     *
+     */
     @Override
     public Identity encodePasswordAndUpdate(Identity identity, IdentityParams params) {
         encodePassword(params);
@@ -216,10 +242,11 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
      * Adds a single additional actor to the identity.
      *
      * @param identity Identity to which the actor will be added
-     * @param actorId ID of the actor to be added as additional actor
+     * @param actorId  ID of the actor to be added as additional actor
      * @return Updated identity with new additional actor
      * @throws IllegalArgumentException if identity or actorId is null
-     * */
+     *
+     */
     @Override
     public Identity addAdditionalActor(Identity identity, String actorId) {
         if (identity == null) {
@@ -239,7 +266,8 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
      * @param actorIds Set of actor IDs to be added as additional actors
      * @return Updated identity with new additional actors
      * @throws IllegalArgumentException if identity is null or actorIds is null or empty
-     * */
+     *
+     */
     @Override
     public Identity addAdditionalActors(Identity identity, Set<String> actorIds) {
         if (identity == null) {
@@ -265,11 +293,12 @@ public class IdentityService extends CrudSystemCaseService<Identity> implements 
     /**
      * Removes all identities in given state that expired before specified date.
      *
-     * @param state State of identities to be removed
+     * @param state    State of identities to be removed
      * @param dateTime Date threshold - identities expired before this date will be removed
      * @return List of all removed identities
      * @throws IllegalArgumentException if state or dateTime is null
-     * */
+     *
+     */
     @Override
     public List<Identity> removeAllByStateAndExpirationDateBefore(IdentityState state, LocalDateTime dateTime) {
         if (state == null || dateTime == null) {

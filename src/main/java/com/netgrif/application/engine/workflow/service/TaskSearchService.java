@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.domain.State;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -13,15 +11,14 @@ import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TaskSearchService extends MongoSearchService<Task> {
-
-    private final IPetriNetService petriNetService;
-    private final IRoleAssignmentService roleAssignmentService;
 
     public Predicate buildQuery(List<TaskSearchRequest> requests, String actorId, Locale locale, Boolean isIntersection) {
         List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, actorId, locale)).collect(Collectors.toList());
@@ -142,7 +139,8 @@ public class TaskSearchService extends MongoSearchService<Task> {
                         BooleanBuilder::or)
         );
     }
-//
+
+    //
 //    private void buildRoleQuery(TaskSearchRequest request, BooleanBuilder query) {
 //        if (request.role == null || request.role.isEmpty()) {
 //            return;

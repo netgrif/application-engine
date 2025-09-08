@@ -43,7 +43,7 @@ class DynamicEnumerationTest extends EngineTest {
 
         def dataSet = new DataSet([
                 "autocomplete": new EnumerationField(rawValue: new I18nString("Case"))
-        ] as Map<String, Field<?>>)
+        ] as LinkedHashMap<String, Field<?>>)
         dataService.setData(new SetDataParams(task.stringId, dataSet, superCreator.getLoggedSuper().activeActorId))
 
         def caseOpt = caseRepository.findById(aCase.stringId)

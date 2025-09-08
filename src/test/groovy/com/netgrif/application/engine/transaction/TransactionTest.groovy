@@ -121,7 +121,7 @@ class TransactionTest {
     void testBasicTransaction() {
         Case useCase = importHelper.createCase("test", testProcess)
         useCase = dataService.setData(new SetDataParams(useCase, new DataSet(["testBasicTransaction": new ButtonField(rawValue: 1)]
-                as Map<String, Field<?>>), superCreator.getLoggedSuper().activeActorId)).case
+                as LinkedHashMap<String, Field<?>>), superCreator.getLoggedSuper().activeActorId)).case
 
         assert findAllByIdentifier("transaction_test").size() == 4
 
@@ -390,7 +390,7 @@ class TransactionTest {
     private Case createTestCaseAndSetButton(String title, String buttonFieldId) {
         Case useCase = importHelper.createCase(title, testProcess)
         return dataService.setData(new SetDataParams(useCase, new DataSet([(buttonFieldId): new ButtonField(rawValue: 1)]
-                as Map<String, Field<?>>), superCreator.getLoggedSuper().activeActorId)).getCase()
+                as LinkedHashMap<String, Field<?>>), superCreator.getLoggedSuper().activeActorId)).getCase()
     }
 
     private Case findCaseByTitle(String title) {

@@ -294,7 +294,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
                 (FILTER_TYPE_FIELD_ID): new EnumerationMapField(rawValue: filterType),
                 (FILTER_VISIBILITY_FIELD_ID): new EnumerationMapField(rawValue: filterVisibility),
                 (FILTER_FIELD_ID): new FilterField(rawValue: filterQuery, allowedNets: allowedNets, filterMetadata: filterMetadata)
-        ] as Map<String, Field<?>>)
+        ] as LinkedHashMap<String, Field<?>>)
 
         if (originId != null) {
             dataSet.put(viewOrigin ? FILTER_ORIGIN_VIEW_ID_FIELD_ID : FILTER_PARENT_CASE_ID_FIELD_ID, new TextField(rawValue: originId))
@@ -305,7 +305,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
         if (isImported) {
             this.dataService.setData(new SetDataParams(newFilterTask, new DataSet([
                     (IS_IMPORTED): new NumberField(rawValue: 1)
-            ] as Map<String, Field<?>>), actorId))
+            ] as LinkedHashMap<String, Field<?>>), actorId))
         }
 
         I18nString translatedTitle = new I18nString(title)

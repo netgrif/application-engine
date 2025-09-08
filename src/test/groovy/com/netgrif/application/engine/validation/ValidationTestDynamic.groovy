@@ -82,7 +82,7 @@ class ValidationTestDynamic {
                 (VALIDATION_NAME_FIELD_ID): new TextField(rawValue: name),
                 (VALIDATION_VALIDATION_TYPE_FIELD_ID): new MultichoiceMapField(rawValue: ["server"]),
                 (VALIDATION_DEFINITION_GROOVY_FIELD_ID): new TextField(rawValue: validationDefinitionGroovy)
-        ] as Map<String, Field<?>>))
+        ] as LinkedHashMap<String, Field<?>>))
         assert outcome != null
 
         validationTask = importHelper.finishTaskAsSuper("Init", validationCase.stringId).getTask()
@@ -197,7 +197,7 @@ class ValidationTestDynamic {
 
         SetDataEventOutcome outcome = importHelper.setTaskData("Init", validationCase.stringId, new DataSet([
                 (VALIDATION_VALIDATION_TYPE_FIELD_ID): new MultichoiceMapField(rawValue: ["client"]),
-        ] as Map<String, Field<?>>))
+        ] as LinkedHashMap<String, Field<?>>))
         assert outcome != null
         assert outcome.case.dataSet.get(VALIDATION_DEFINITION_GROOVY_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).hidden
         assert outcome.case.dataSet.get(VALIDATION_NUM_ARGUMENTS_GROOVY_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).hidden
@@ -210,7 +210,7 @@ class ValidationTestDynamic {
 
         outcome = importHelper.setTaskData("Init", validationCase.stringId, new DataSet([
                 (VALIDATION_VALIDATION_TYPE_FIELD_ID): new MultichoiceMapField(rawValue: ["server"]),
-        ] as Map<String, Field<?>>))
+        ] as LinkedHashMap<String, Field<?>>))
         assert outcome != null
         assert outcome.case.dataSet.get(VALIDATION_DEFINITION_GROOVY_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).editable
         assert outcome.case.dataSet.get(VALIDATION_NUM_ARGUMENTS_GROOVY_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).editable
@@ -223,7 +223,7 @@ class ValidationTestDynamic {
 
         outcome = importHelper.setTaskData("Init", validationCase.stringId, new DataSet([
                 (VALIDATION_VALIDATION_TYPE_FIELD_ID): new MultichoiceMapField(rawValue: ["server", "client"]),
-        ] as Map<String, Field<?>>))
+        ] as LinkedHashMap<String, Field<?>>))
         assert outcome != null
         assert outcome.case.dataSet.get(VALIDATION_DEFINITION_GROOVY_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).editable
         assert outcome.case.dataSet.get(VALIDATION_NUM_ARGUMENTS_GROOVY_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).editable
@@ -238,7 +238,7 @@ class ValidationTestDynamic {
                 (VALIDATION_NAME_FIELD_ID): new TextField(rawValue: "test"),
                 (VALIDATION_VALIDATION_TYPE_FIELD_ID): new MultichoiceMapField(rawValue: ["server"]),
                 (VALIDATION_DEFINITION_GROOVY_FIELD_ID): new TextField(rawValue: "-> field.rawValue == 1")
-        ] as Map<String, Field<?>>))
+        ] as LinkedHashMap<String, Field<?>>))
         assert outcome != null
 
         validationTask = importHelper.finishTaskAsSuper("Init", validationCase.stringId).getTask()
@@ -285,7 +285,7 @@ class ValidationTestDynamic {
                 (VALIDATION_NAME_FIELD_ID): new TextField(rawValue: "test"),
                 (VALIDATION_VALIDATION_TYPE_FIELD_ID): new MultichoiceMapField(rawValue: ["server"]),
                 (VALIDATION_DEFINITION_GROOVY_FIELD_ID): new TextField(rawValue: null)
-        ] as Map<String, Field<?>>))
+        ] as LinkedHashMap<String, Field<?>>))
         assert outcome != null
 
         validationTask = importHelper.finishTaskAsSuper("Init", validationCase.stringId).getTask()
@@ -301,7 +301,7 @@ class ValidationTestDynamic {
 
         outcome = importHelper.setTaskData("Detail", validationCase.stringId, new DataSet([
                 (VALIDATION_DEFINITION_GROOVY_FIELD_ID): new TextField(rawValue: "-> field.rawValue == 1")
-        ] as Map<String, Field<?>>))
+        ] as LinkedHashMap<String, Field<?>>))
         assert outcome != null
 
         validationTask = importHelper.finishTaskAsSuper("Activate", validationCase.stringId).getTask()

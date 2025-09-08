@@ -78,7 +78,7 @@ class CaseFieldTest {
         importHelper.assignTaskToSuper(ALLOWED_NETS_TASK_TITLE, aCase.stringId)
         SetDataEventOutcome changed1 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, new DataSet([
                 "setVal": new BooleanField(rawValue: true)
-        ] as Map<String,Field<?>>))
+        ] as LinkedHashMap<String, Field<?>>))
 
         SetDataEventOutcome setDataEventOutcome1 = changed1.outcomes.first().outcomes.first().outcomes.first() as SetDataEventOutcome
         assert setDataEventOutcome1.changedFields.fields.containsKey(CASE_FIELD_ID)
@@ -98,7 +98,7 @@ class CaseFieldTest {
 
         SetDataEventOutcome changed2 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, new DataSet([
                 "setNull": new BooleanField(rawValue: true)
-        ] as Map<String,Field<?>>))
+        ] as LinkedHashMap<String,Field<?>>))
 
         SetDataEventOutcome setDataEventOutcome2 = changed2.outcomes.first().outcomes.first().outcomes.first() as SetDataEventOutcome
         assert setDataEventOutcome2.changedFields.fields.containsKey(CASE_FIELD_ID)
@@ -135,7 +135,7 @@ class CaseFieldTest {
         importHelper.assignTaskToSuper(ALLOWED_NETS_TASK_TITLE, aCase.stringId)
         importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, new DataSet([
                 "setVal": new BooleanField(rawValue: true)
-        ] as Map<String,Field<?>>))
+        ] as LinkedHashMap<String, Field<?>>))
 
         aCase = workflowService.findAllById([aCase.stringId]).get(0)
 
@@ -148,7 +148,7 @@ class CaseFieldTest {
 
         SetDataEventOutcome changed2 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, new DataSet([
                 "setNull": new BooleanField(rawValue: true)
-        ] as Map<String,Field<?>>))
+        ] as LinkedHashMap<String, Field<?>>))
 
         aCase = workflowService.findAllById([aCase.stringId]).get(0)
 
@@ -174,7 +174,7 @@ class CaseFieldTest {
 
         importHelper.setTaskData(CHANGE_VALUE_TASK_TITLE, aCase.stringId, new DataSet([
                 "addExisting": new BooleanField(rawValue: true)
-        ] as Map<String,Field<?>>))
+        ] as LinkedHashMap<String, Field<?>>))
 
         def caseOpt = caseRepository.findById(aCase.stringId)
         assert caseOpt.isPresent()
@@ -185,7 +185,7 @@ class CaseFieldTest {
 
         importHelper.setTaskData(CHANGE_VALUE_TASK_TITLE, aCase.stringId, new DataSet([
                 "addNew": new BooleanField(rawValue: true)
-        ] as Map<String,Field<?>>))
+        ] as LinkedHashMap<String, Field<?>>))
 
         caseOpt = caseRepository.findById(aCase.stringId)
         assert caseOpt.isPresent()
@@ -201,7 +201,7 @@ class CaseFieldTest {
 
         importHelper.setTaskData(CHANGE_VALUE_TASK_TITLE, aCase.stringId, new DataSet([
                 "addInvalidNet": new BooleanField(rawValue: true)
-        ] as Map<String,Field<?>>))
+        ] as LinkedHashMap<String, Field<?>>))
 
         caseOpt = caseRepository.findById(aCase.stringId)
         assert caseOpt.isPresent()

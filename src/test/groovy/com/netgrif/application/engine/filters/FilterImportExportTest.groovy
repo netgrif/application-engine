@@ -157,12 +157,12 @@ class FilterImportExportTest {
             this.dataService.setData(new SetDataParams(filterTask, new DataSet([
                     (VISIBILITY_FIELD): new EnumerationMapField(rawValue: FILTER_VISIBILITY_PRIVATE),
                     (NEW_TITLE_FIELD) : new TextField(rawValue: this.workflowService.findOne(filterTask.caseId).title + " new")
-            ] as Map<String, Field<?>>), dummyIdentity.toSession().activeActorId))
+            ] as LinkedHashMap<String, Field<?>>), dummyIdentity.toSession().activeActorId))
         })
         Task importTask = this.taskService.searchOne(QTask.task.caseId.eq(importCase.stringId) & QTask.task.transitionId.eq("importFilter"))
         this.dataService.setData(new SetDataParams(importTask, new DataSet([
                 (IMPORTED_FILTERS_FIELD): new TaskField(rawValue: importedTasksIds)
-        ] as Map<String, Field<?>>), dummyIdentity.toSession().activeActorId))
+        ] as LinkedHashMap<String, Field<?>>), dummyIdentity.toSession().activeActorId))
         this.taskService.finishTask(new TaskParams(importTask, dummyIdentity.toSession().activeActorId))
         Thread.sleep(1000)
         filterCases = this.userFilterSearchService.autocompleteFindFilters("")

@@ -89,7 +89,7 @@ class FilterApiTest {
                 "type"                  : new TextField(rawValue: "Case"),
                 "icon"                  : new TextField(rawValue: ""),
                 "create_filter_and_menu": new ButtonField(rawValue: 0)
-        ] as Map<String, Field<?>>)
+        ] as LinkedHashMap<String, Field<?>>)
         dataService.setData(new SetDataParams(caze.getTaskStringId("t1"), dataSet, superCreator.getLoggedSuper().getActiveActorId()))
         caze = workflowService.findOne(caze.stringId)
         Case item = getMenuItem(caze)
@@ -113,7 +113,7 @@ class FilterApiTest {
         Case filter = getFilter(caze)
         DataSet dataSet = new DataSet([
                 "delete_filter_and_menu": new ButtonField(rawValue: 0)
-        ] as Map<String, Field<?>>)
+        ] as LinkedHashMap<String, Field<?>>)
         dataService.setData(new SetDataParams(caze.getTaskStringId("t1"), dataSet, superCreator.getLoggedSuper().getActiveActorId()))
         workflowService.findOne(caze.stringId)
 
@@ -132,7 +132,7 @@ class FilterApiTest {
 
         DataSet dataSet = new DataSet([
                 "find_filter": new ButtonField(rawValue: 0)
-        ] as Map<String, Field<?>>)
+        ] as LinkedHashMap<String, Field<?>>)
         dataService.setData(new SetDataParams(caze.getTaskStringId("t1"), dataSet, superCreator.getLoggedSuper().getActiveActorId()))
         caze = workflowService.findOne(caze.stringId)
         assert caze.dataSet.get("found_filter").rawValue == filter.stringId
@@ -149,7 +149,7 @@ class FilterApiTest {
                 "identifier"            : new TextField(rawValue: "new_menu_item"),
                 "icon"                  : new TextField(rawValue: "device_hub"),
                 "create_filter_and_menu": new ButtonField(rawValue: 0)
-        ] as Map<String, Field<?>>)
+        ] as LinkedHashMap<String, Field<?>>)
         dataService.setData(new SetDataParams(caze.getTaskStringId("t1"), dataSet, superCreator.getLoggedSuper().getActiveActorId()))
         caze = workflowService.findOne(caze.stringId)
         return caze

@@ -73,7 +73,7 @@ class ChoiceFieldTest {
         helper.assignTaskToSuper(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
         helper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, new DataSet([
                 "bool": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>))
+        ] as LinkedHashMap<String, Field<?>>))
         List<DataRef> fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
         choices = ((EnumerationField) fields.find { it.field.title.defaultValue == "Enum" }.field).choices
 
@@ -84,7 +84,7 @@ class ChoiceFieldTest {
 
         helper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, new DataSet([
                 "bool": new BooleanField(rawValue: false)
-        ] as Map<String, Field<?>>))
+        ] as LinkedHashMap<String, Field<?>>))
 
         fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
         choices = ((EnumerationField) fields.find { it.field.title.defaultValue == "Enum" }.field).choices
@@ -96,7 +96,7 @@ class ChoiceFieldTest {
 
         helper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, new DataSet([
                 "bool": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>))
+        ] as LinkedHashMap<String, Field<?>>))
 
         fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
         choices = ((EnumerationField) fields.find { it.field.title.defaultValue == "Enum" }.field).choices

@@ -63,7 +63,7 @@ class ChangeBehaviorTest extends EngineTest {
 
         dataService.setData(new SetDataParams(mainTask.stringId, new DataSet([
                 "boolean_0": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
+        ] as LinkedHashMap<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_0_FIELD_ID).rawValue == true
@@ -86,7 +86,7 @@ class ChangeBehaviorTest extends EngineTest {
 
         dataService.setData(new SetDataParams(mainTask.stringId, new DataSet([
                 "boolean_1": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
+        ] as LinkedHashMap<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_1_FIELD_ID).rawValue == true
@@ -112,7 +112,7 @@ class ChangeBehaviorTest extends EngineTest {
 
         dataService.setData(new SetDataParams(mainTask.stringId, new DataSet([
                 "boolean_2": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
+        ] as LinkedHashMap<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_2_FIELD_ID).rawValue == true
@@ -133,7 +133,7 @@ class ChangeBehaviorTest extends EngineTest {
 
         dataService.setData(new SetDataParams(mainTask.stringId, new DataSet([
                 "boolean_3": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
+        ] as LinkedHashMap<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_3_FIELD_ID).rawValue == true
@@ -154,7 +154,7 @@ class ChangeBehaviorTest extends EngineTest {
 
         dataService.setData(new SetDataParams(mainTask.stringId, new DataSet([
                 "boolean_0": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
+        ] as LinkedHashMap<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_0_FIELD_ID).rawValue == true
@@ -163,7 +163,7 @@ class ChangeBehaviorTest extends EngineTest {
 
         dataService.setData(new SetDataParams(mainTask.stringId, new DataSet([
                 "boolean_0": new BooleanField(rawValue: false)
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
+        ] as LinkedHashMap<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId()))
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_0_FIELD_ID).rawValue == false

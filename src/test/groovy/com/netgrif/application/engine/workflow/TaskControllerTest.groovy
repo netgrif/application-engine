@@ -184,7 +184,7 @@ class TaskControllerTest {
 //        String userId = userService.findByEmail(DUMMY_USER_MAIL).getStringId()
 //        dataService.setData(task.stringId, new DataSet([
 //                "performable_users": new UserListField(rawValue: new UserListFieldValue(dataService.makeUserFieldValue(userId)))
-//        ] as Map<String, Field<?>>))
+//        ] as LinkedHashMap<String, Field<?>>))
     }
 
     void findTask() {

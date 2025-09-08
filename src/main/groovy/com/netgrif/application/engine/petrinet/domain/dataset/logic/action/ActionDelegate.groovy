@@ -38,6 +38,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.rules.domain.RuleRepository
 import com.netgrif.application.engine.startup.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.FilterRunner
+import com.netgrif.application.engine.startup.SystemUserRunner
 import com.netgrif.application.engine.transaction.NaeTransaction
 import com.netgrif.application.engine.validations.interfaces.IValidationService
 import com.netgrif.application.engine.workflow.domain.*
@@ -84,7 +85,7 @@ import java.util.stream.Collectors
 @SuppressWarnings(["GrMethodMayBeStatic", "GroovyUnusedDeclaration"])
 class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
-    private static final String FILTER_FIELD_I18N_FILTER_NAME = "i18n_filter_name"
+    static final String FILTER_FIELD_I18N_FILTER_NAME = "i18n_filter_name"
 
     public static final String PREFERENCE_ITEM_FIELD_NEW_FILTER_ID = "new_filter_id"
     public static final String PREFERENCE_ITEM_FIELD_REMOVE_OPTION = "remove_option"
@@ -99,10 +100,10 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     static final String TRANSITIONS = "transitions"
 
     @Value('${nae.mail.from}')
-    private String mailFrom
+    String mailFrom
 
     @Value('${nae.create.default.filters:false}')
-    private Boolean createDefaultFilters
+    Boolean createDefaultFilters
 
     @Autowired
     FieldFactory fieldFactory
@@ -196,6 +197,9 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     @Autowired
     IAllActorService allActorService
+
+    @Autowired
+    SystemUserRunner systemUserRunner
 
     FrontendActionOutcome Frontend
 
@@ -336,7 +340,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         }
     }
 
-    private DataFieldBehavior getOrCreateBehavior(String fieldId, String transitionId) {
+    DataFieldBehavior getOrCreateBehavior(String fieldId, String transitionId) {
         DataFieldBehavior dataFieldBehavior = useCase.dataSet.get(fieldId).behaviors.get(transitionId)
         if (dataFieldBehavior == null) {
             dataFieldBehavior = new DataFieldBehavior()
@@ -553,7 +557,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     SetDataEventOutcome setData(Field<?> field, Map changes, LoggedIdentity identity = identityService.loggedIdentity) {
         SetDataEventOutcome outcome = dataService.setData(new SetDataParams(useCase, new DataSet([
                 (field.stringId): field.class.newInstance(changes)
-        ] as Map<String, Field<?>>), identity.activeActorId))
+        ] as LinkedHashMap<String, Field<?>>), identity.activeActorId))
         this.outcomes.add(outcome)
         updateCase()
         return outcome
@@ -630,7 +634,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         addTaskOutcomes(task, dataSet)
     }
 
-    private addTaskOutcomes(Task task, DataSet dataSet) {
+    void addTaskOutcomes(Task task, DataSet dataSet) {
         this.outcomes.add(taskService.assignTask(new TaskParams(task.stringId)))
         this.outcomes.add(dataService.setData(new SetDataParams(task.stringId, dataSet, identityService.loggedIdentity.activeActorId)))
         this.outcomes.add(taskService.finishTask(new TaskParams(task.stringId)))
@@ -877,7 +881,17 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     LoggedIdentity getLoggedOrSystem() {
         // todo: release/8.0.0 system has no identity
         LoggedIdentity identity = identityService.getLoggedIdentity()
-        return identity ?: identityService.getLoggedSystemIdentity()
+        if (identity == null) {
+            User systemUser = systemUserRunner.systemUser
+            identity = LoggedIdentity.with()
+                    .fullName(systemUser.getFullName())
+                    .identityId(systemUser.getStringId())
+                    .activeActorId(systemUser.getStringId())
+                    .username(systemUser.getEmail())
+                    .password("")
+                    .build();
+        }
+        return identity
     }
 
     Task assignTask(String transitionId, Case aCase = useCase, LoggedIdentity assignee = identityService.loggedIdentity,
@@ -930,7 +944,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         this.outcomes.addAll(taskService.cancelTasks(tasks, assignee.activeActorId, params))
     }
 
-    private Task addTaskOutcomeAndReturnTask(TaskEventOutcome outcome) {
+    Task addTaskOutcomeAndReturnTask(TaskEventOutcome outcome) {
         this.outcomes.add(outcome)
         updateCase()
         return outcome.getTask()
@@ -1072,7 +1086,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return setData(task, dataSet)
     }
 
-    private SetDataEventOutcome addSetDataOutcomeToOutcomes(SetDataEventOutcome outcome) {
+    SetDataEventOutcome addSetDataOutcomeToOutcomes(SetDataEventOutcome outcome) {
         this.outcomes.add(outcome)
         updateCase()
         return outcome
@@ -1122,7 +1136,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(getDataParams)))
     }
 
-    private List<DataRef> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome) {
+    List<DataRef> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome) {
         this.outcomes.add(outcome)
         return outcome.getData()
     }
@@ -1151,7 +1165,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
             String taskId = targetCase.getTaskStringId(targetTransitionId)
             DataSet dataSet = new DataSet([
                     (targetFieldId): new FileField(rawValue: fieldValue)
-            ] as Map<String, Field<?>>)
+            ] as LinkedHashMap<String, Field<?>>)
             setData(taskId, dataSet)
         }
     }
@@ -1480,7 +1494,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
                                 "inheritAllowedNets"     : false
                         ]
                 )
-        ] as Map<String, Field<?>>)
+        ] as LinkedHashMap<String, Field<?>>)
         setData(newFilterTask, dataSet)
         finishTask(newFilterTask)
         return workflowService.findOne(filterCase.stringId)
@@ -1724,13 +1738,13 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return folder
     }
 
-    private Case appendChildCaseIdAndSave(Case folderCase, String childItemCaseId) {
+    Case appendChildCaseIdAndSave(Case folderCase, String childItemCaseId) {
         folderCase = appendChildCaseId(folderCase, childItemCaseId)
         return workflowService.save(folderCase)
     }
 
 
-    private List<Case> updateNodeInChildrenFoldersRecursive(Case parentFolder) {
+    List<Case> updateNodeInChildrenFoldersRecursive(Case parentFolder) {
         List<String> childItemIds = parentFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as List<String>
         if (childItemIds == null || childItemIds.isEmpty()) {
             return new ArrayList<Case>()
@@ -1751,7 +1765,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return casesToSave
     }
 
-    private Case resolveAndHandleNewNodePath(Case folderItem, String destUri) {
+    Case resolveAndHandleNewNodePath(Case folderItem, String destUri) {
         String newNodePath = resolveNewNodePath(folderItem, destUri)
         UriNode newNode = uriService.getOrCreate(newNodePath, UriContentType.CASE)
         folderItem.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId).rawValue = newNode.uriPath
@@ -1765,20 +1779,20 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return getOrCreateFolderRecursive(node, body)
     }
 
-    private String resolveNewNodePath(Case folderItem, String destUri) {
+    String resolveNewNodePath(Case folderItem, String destUri) {
         return destUri +
                 uriService.getUriSeparator() +
                 folderItem.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_IDENTIFIER.attributeId).rawValue as String
     }
 
-    private Case removeChildItemFromParent(String folderId, Case childItem) {
+    Case removeChildItemFromParent(String folderId, Case childItem) {
         Case parentFolder = workflowService.findOne(folderId)
         (parentFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId).rawValue as List).remove(childItem.stringId)
         parentFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_HAS_CHILDREN.attributeId).rawValue = hasChildren(parentFolder)
         workflowService.save(parentFolder)
     }
 
-    private boolean isCyclicNodePath(Case folderItem, String destUri) {
+    boolean isCyclicNodePath(Case folderItem, String destUri) {
         String oldNodePath = folderItem.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId).rawValue
         return destUri.contains(oldNodePath)
     }
@@ -1801,7 +1815,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     // TODO: release/8.0.0: missing test
-    private void updateMenuItemRoles(Case item, Closure cl, String roleFieldId) {
+    void updateMenuItemRoles(Case item, Closure cl, String roleFieldId) {
         item = workflowService.findOne(item.stringId)
         def roles = cl()
         MultichoiceMapField dataField = item.dataSet.get(roleFieldId) as MultichoiceMapField
@@ -1880,7 +1894,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return workflowService.findOne(menuItemCase.stringId)
     }
 
-    private Case appendChildCaseId(Case folderCase, String childItemCaseId) {
+    Case appendChildCaseId(Case folderCase, String childItemCaseId) {
         List<String> childIds = folderCase.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId).rawValue as ArrayList<String>
         if (childIds == null) {
             folderCase.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId).rawValue = [childItemCaseId] as ArrayList
@@ -1893,12 +1907,12 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return folderCase
     }
 
-    private boolean hasChildren(Case folderItem) {
+    boolean hasChildren(Case folderItem) {
         List<String> children = (folderItem.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId) as CaseField).rawValue
         return children != null && children.size() > 0
     }
 
-    private Case initializeParentId(Case childFolderCase, String parentFolderCaseId) {
+    Case initializeParentId(Case childFolderCase, String parentFolderCaseId) {
         childFolderCase.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId).rawValue = [parentFolderCaseId] as ArrayList
         return workflowService.save(childFolderCase)
     }
@@ -2010,29 +2024,29 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     List<Case> findCasesElastic(String query, Pageable pageable) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
-        List<Case> result = elasticCaseService.search([request], identityService.getLoggedIdentity().activeActorId, pageable, LocaleContextHolder.locale, false).content
+        List<Case> result = elasticCaseService.search([request], getLoggedOrSystem().activeActorId, pageable, LocaleContextHolder.locale, false).content
         return result
     }
 
     long countCasesElastic(String query) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
-        return elasticCaseService.count([request], identityService.getLoggedIdentity().activeActorId, LocaleContextHolder.locale, false)
+        return elasticCaseService.count([request], getLoggedOrSystem().activeActorId, LocaleContextHolder.locale, false)
     }
 
     @Deprecated
-    private Case findMenuItemByUriNameProcessAndGroup(String uri, String name, Case orgGroup) {
+    Case findMenuItemByUriNameProcessAndGroup(String uri, String name, Case orgGroup) {
         return findMenuItem(uri, name)
     }
 
-    private Map<String, I18nString> collectRolesForPreferenceItem(List<String> roleImportIds) {
+    Map<String, I18nString> collectRolesForPreferenceItem(List<String> roleImportIds) {
         List<ProcessRole> roles = roleService.findAllProcessRolesByImportIds(roleImportIds as Set<String>)
         return roles.collectEntries { role ->
             return [(role.importId), role.title]
         }
     }
 
-    private void updateFilter(Case filter, DataSet dataSet) {
+    void updateFilter(Case filter, DataSet dataSet) {
         setData(DefaultFiltersRunner.DETAILS_TRANSITION, filter, dataSet)
     }
 
@@ -2370,5 +2384,12 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         Task task = taskService.findOne(taskId)
         Case taskCase = workflowService.findOne(task.caseId)
         return taskCase.getProcess().getDataSet().get(fieldId)
+    }
+
+    Case createMnuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets) {
+        Case filterCase = createFilter(title, query, "Case", allowedNets, icon, DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, null)
+        MenuItemBody body = new MenuItemBody(uri, id, new I18nString(title), icon)
+        body.filter = filterCase
+        createMenuItem(body)
     }
 }

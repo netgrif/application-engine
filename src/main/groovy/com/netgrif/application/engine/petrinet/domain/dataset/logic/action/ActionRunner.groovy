@@ -40,7 +40,11 @@ abstract class ActionRunner {
         if (!actionsCache) {
             actionsCache = new HashMap<>()
         }
-        log.debug("Action: $action")
+        log.info("Action '${action.importId}' of case '${useCase?.title}' task '${task?.isPresent() ? task?.get()?.transitionId : "null"}': $action")
+        if (action.getSetDataType() == SetDataType.VALUE && useCase != null && changes != null && changes.getValue() == null) {
+            log.info("Action type is VALUE but Field value null, skip")
+            return []
+        }
         def code = getActionCode(action, functions, useCase)
         try {
             code.init(action, useCase, task, changes, this, params)
@@ -55,7 +59,7 @@ abstract class ActionRunner {
                 code()
             }
         } catch (Exception e) {
-            log.error("Action: $action.definition")
+            log.error("Action $action.importId of case ${useCase?.title} failed with ${e.getMessage()}: $action.definition")
             throw e
         }
         return ((ActionDelegate) code.delegate).outcomes

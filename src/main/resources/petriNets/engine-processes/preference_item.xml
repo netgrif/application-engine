@@ -37,7 +37,7 @@
         <event type="delete">
             <id>preference_item_delete</id>
             <actions phase="pre">
-                <action id="0">
+                <action id="case_delete">
 					<![CDATA[
                     removeItemChildCases(useCase)
                     ]]>
@@ -140,7 +140,7 @@
 <!--        <event type="set">-->
 <!--            <id>add_allowed_roles_set</id>-->
 <!--            <actions phase="post">-->
-<!--                <action id="action_8">-->
+<!--                <action id="add_allowed_roles_set">-->
 <!--					<![CDATA[-->
 <!--                    change allowed_roles options {return configurableMenuService.addSelectedRoles(allowed_roles, processes_available, roles_available)}-->
 <!--                    change roles_available value {[]}-->
@@ -159,7 +159,7 @@
 <!--        <event type="set">-->
 <!--            <id>add_banned_roles_set</id>-->
 <!--            <actions phase="post">-->
-<!--                <action id="action_10">-->
+<!--                <action id="add_banned_roles_set">-->
 <!--					<![CDATA[-->
 <!--                    change banned_roles options {return configurableMenuService.addSelectedRoles(banned_roles, processes_available, roles_available)}-->
 <!--                    change roles_available value {[]}-->
@@ -179,7 +179,7 @@
         <event type="set">
             <id>additional_filter_autocomplete_selection_set</id>
             <actions phase="post">
-                <action id="action_23">
+                <action id="additional_filter_autocomplete_selection_set">
 					<![CDATA[
                     updateFilterAutocompleteOptions(additional_filter_autocomplete_selection, selected_additional_filter_preview, additional_filter_case, update_additional_filter, task_view_settings, true)
                     ]]>
@@ -189,7 +189,7 @@
         <event type="get">
             <id>additional_filter_autocomplete_selection_get</id>
             <actions phase="pre">
-                <action id="action_24">
+                <action id="additional_filter_autocomplete_selection_get">
 					<![CDATA[
                     updateFilterAutocompleteOptions(additional_filter_autocomplete_selection, selected_additional_filter_preview, additional_filter_case, update_additional_filter, task_view_settings, true)
                     ]]>
@@ -203,7 +203,7 @@
         <event type="set">
             <id>additional_filter_case_set</id>
             <actions phase="post">
-                <action id="action_27">
+                <action id="additional_filter_case_set">
 					<![CDATA[
                     if (additional_filter_case.rawValue[0] == null) {
                         make merge_filters,hidden on task_view_settings when { true }
@@ -247,7 +247,7 @@
         <event type="set">
             <id>case_banned_nets_in_creation_set</id>
             <actions phase="post">
-                <action id="action_19">
+                <action id="case_banned_nets_in_creation_set">
 					<![CDATA[
                     String trimmed = case_banned_nets_in_creation.rawValue?.replaceAll("\\s","")
                     if (case_banned_nets_in_creation.rawValue != trimmed) {
@@ -265,7 +265,7 @@
         <event type="set">
             <id>case_default_headers_set</id>
             <actions phase="post">
-                <action id="action_22">
+                <action id="case_default_headers_set">
 					<![CDATA[
                     String trimmed = case_default_headers.rawValue?.replaceAll("\\s","")
                     if (case_default_headers.rawValue != trimmed) {
@@ -298,7 +298,7 @@
         <event type="set">
             <id>case_headers_mode_set</id>
             <actions phase="post">
-                <action id="action_20">
+                <action id="case_headers_mode_set">
 					<![CDATA[
                     updateOptionsBasedOnValue(case_headers_default_mode, case_headers_mode, case_headers_options_holder)
                     ]]>
@@ -308,7 +308,7 @@
         <event type="get">
             <id>case_headers_mode_get</id>
             <actions phase="pre">
-                <action id="action_21">
+                <action id="case_headers_mode_get">
 					<![CDATA[
                     updateOptionsBasedOnValue(case_headers_default_mode, case_headers_mode, case_headers_options_holder)
                     ]]>
@@ -381,7 +381,7 @@
         <event type="set">
             <id>create_case_button_icon_set</id>
             <actions phase="post">
-                <action id="action_18">
+                <action id="create_case_button_icon_set">
 					<![CDATA[
                     if (create_case_button_icon.rawValue == "") {
                         change create_case_button_icon_preview value {"""<span></span>"""}
@@ -430,7 +430,7 @@
         <event type="set">
             <id>duplicate_reset_childItemIds_set</id>
             <actions phase="post">
-                <action id="action_3">
+                <action id="duplicate_reset_childItemIds_set">
 					<![CDATA[
                     change childItemIds value { [] }
                     change hasChildren value { false }
@@ -453,7 +453,7 @@
         <event type="set">
             <id>filter_autocomplete_selection_set</id>
             <actions phase="post">
-                <action id="action_14">
+                <action id="filter_autocomplete_selection_set">
 					<![CDATA[
                     updateFilterAutocompleteOptions(filter_autocomplete_selection, selected_filter_preview, filter_case, update_filter, item_settings, false)
                     make update_filter,hidden on item_settings when { use_custom_view.rawValue }
@@ -464,7 +464,7 @@
         <event type="get">
             <id>filter_autocomplete_selection_get</id>
             <actions phase="pre">
-                <action id="action_15">
+                <action id="filter_autocomplete_selection_get">
 					<![CDATA[
                     updateFilterAutocompleteOptions(filter_autocomplete_selection, selected_filter_preview, filter_case, update_filter, item_settings, false)
                     make update_filter,hidden on item_settings when { use_custom_view.rawValue }
@@ -479,7 +479,7 @@
         <event type="set">
             <id>filter_case_set</id>
             <actions phase="post">
-                <action id="action_17">
+                <action id="filter_case_set">
 					<![CDATA[
                     if (filter_case.rawValue == null || filter_case.rawValue == []) {
                         return
@@ -535,7 +535,7 @@
         <event type="set">
             <id>menu_icon_set</id>
             <actions phase="post">
-                <action id="action_5">
+                <action id="menu_icon_set">
 					<![CDATA[
                     if (menu_icon.rawValue == "") {
                         change menu_icon_preview value {"""<span></span>"""}
@@ -567,8 +567,9 @@
         <event type="set">
             <id>menu_name_set</id>
             <actions phase="post">
-                <action id="action_6">
+                <action id="menu_name_set">
 					<![CDATA[
+                    // TODO: release/8.0.0 changeCaseProperty "title" about { name.value }
                     change menu_name_as_visible options { [(menu_name.rawValue.defaultValue): menu_name.rawValue] }
                     change menu_name_as_visible value { menu_name.rawValue.defaultValue }
                     ]]>
@@ -599,7 +600,7 @@
         <event type="set">
             <id>move_add_node_set</id>
             <actions phase="post">
-                <action id="action_2">
+                <action id="move_add_node_set">
 					<![CDATA[
                     if (move_dest_uri_new_node.rawValue == null || move_dest_uri_new_node.rawValue == "") {
                         return
@@ -625,7 +626,7 @@
         <event type="get">
             <id>move_dest_uri_get</id>
             <actions phase="pre">
-                <action id="action_0">
+                <action id="move_dest_uri_get">
 					<![CDATA[
                     String uriNodeId = elasticCaseService.findUriNodeId(useCase)
                     def node = uriService.findById(uriNodeId)
@@ -637,7 +638,7 @@
         <event type="set">
             <id>move_dest_uri_set</id>
             <actions phase="post">
-                <action id="action_1">
+                <action id="move_dest_uri_set">
 					<![CDATA[
                     String newUri = move_dest_uri.rawValue.join("/")
                     newUri = newUri.replace("//","/")
@@ -672,7 +673,7 @@
         <event type="set">
             <id>nodePath_set</id>
             <actions phase="post">
-                <action id="action_4">
+                <action id="nodePath_set">
 					<![CDATA[
                     change menu_item_identifier value {
                         def idx = nodePath.rawValue.lastIndexOf(uriService.getUriSeparator())
@@ -696,7 +697,7 @@
         <event type="set">
             <id>order_down_set</id>
             <actions phase="post">
-                <action id="action_31">
+                <action id="order_down_set">
 					<![CDATA[
                     def parentCase = workflowService.findOne(parentId.rawValue[0])
                     def taskId = useCase.tasks.find { it.transition == "row_for_ordering" }.task
@@ -740,7 +741,7 @@
         <event type="set">
             <id>order_up_set</id>
             <actions phase="post">
-                <action id="action_32">
+                <action id="order_up_set">
 					<![CDATA[
                     def parentCase = workflowService.findOne(parentId.rawValue[0])
                     def taskId = useCase.tasks.find { it.transition == "row_for_ordering" }.task
@@ -788,7 +789,7 @@
 <!--        <event type="get">-->
 <!--            <id>processes_available_get</id>-->
 <!--            <actions phase="pre">-->
-<!--                <action id="action_12">-->
+<!--                <action id="processes_available_get">-->
 <!--					<![CDATA[-->
 <!--                    change processes_available options { return configurableMenuService.getNetsByAuthorAsMapOptions(identity(), org.springframework.context.i18n.LocaleContextHolder.locale) }-->
 <!--                    ]]>-->
@@ -798,7 +799,7 @@
 <!--        <event type="set">-->
 <!--            <id>processes_available_set</id>-->
 <!--            <actions phase="post">-->
-<!--                <action id="action_13">-->
+<!--                <action id="processes_available_set">-->
 <!--					<![CDATA[-->
 <!--                    if (processes_available.rawValue != null) {-->
 <!--                        change roles_available options { return configurableMenuService.getAvailableRolesFromNet(processes_available, allowed_roles, banned_roles) }-->
@@ -821,7 +822,7 @@
         <event type="set">
             <id>remove_additional_filter_set</id>
             <actions phase="post">
-                <action id="action_26">
+                <action id="remove_additional_filter_set">
 					<![CDATA[
                     change additional_filter_case value { [] }
                     ]]>
@@ -837,7 +838,7 @@
 <!--        <event type="set">-->
 <!--            <id>remove_allowed_roles_set</id>-->
 <!--            <actions phase="post">-->
-<!--                <action id="action_9">-->
+<!--                <action id="remove_allowed_roles_set">-->
 <!--					<![CDATA[-->
 <!--                    change allowed_roles options {return configurableMenuService.removeSelectedRoles(allowed_roles)}-->
 <!--                    change allowed_roles value {[]}-->
@@ -857,7 +858,7 @@
 <!--        <event type="set">-->
 <!--            <id>remove_banned_roles_set</id>-->
 <!--            <actions phase="post">-->
-<!--                <action id="action_11">-->
+<!--                <action id="remove_banned_roles_set">-->
 <!--					<![CDATA[-->
 <!--                    change banned_roles options { return configurableMenuService.removeSelectedRoles(banned_roles) }-->
 <!--                    change banned_roles value { [] }-->
@@ -893,7 +894,7 @@
         <event type="set">
             <id>tab_icon_set</id>
             <actions phase="post">
-                <action id="action_7">
+                <action id="tab_icon_set">
 					<![CDATA[
                     if (tab_icon.rawValue == "") {
                         change tab_icon_preview value {"""<span></span>"""}
@@ -931,7 +932,7 @@
         <event type="set">
             <id>task_default_headers_set</id>
             <actions phase="post">
-                <action id="action_30">
+                <action id="task_default_headers_set">
 					<![CDATA[
                     String trimmed = task_default_headers.rawValue?.replaceAll("\\s","")
                     if (task_default_headers.rawValue != trimmed) {
@@ -962,7 +963,7 @@
         <event type="set">
             <id>task_headers_mode_set</id>
             <actions phase="post">
-                <action id="action_28">
+                <action id="task_headers_mode_set">
 					<![CDATA[
                     updateOptionsBasedOnValue(task_headers_default_mode, task_headers_mode, task_headers_options_holder)
                     ]]>
@@ -972,7 +973,7 @@
         <event type="get">
             <id>task_headers_mode_get</id>
             <actions phase="pre">
-                <action id="action_29">
+                <action id="task_headers_mode_get">
 					<![CDATA[
                     updateOptionsBasedOnValue(case_headers_default_mode, case_headers_mode, case_headers_options_holder)
                     ]]>
@@ -1031,11 +1032,15 @@
         <event type="set">
             <id>update_additional_filter_set</id>
             <actions phase="post">
-                <action id="action_25">
+                <action id="update_additional_filter_set" type="value">
 					<![CDATA[
-                    change additional_filter_case value { [additional_filter_autocomplete_selection.rawValue] }
-                    change additional_filter_autocomplete_selection value { "" }
-                    make update_additional_filter,visible on task_view_settings when { true }
+                    // TODO: release/8.0.0
+                    if (fieldChanges.value != null) {
+                        change additional_filter_case value { [additional_filter_autocomplete_selection.rawValue] }
+
+                        change additional_filter_autocomplete_selection value { "" }
+                        make update_additional_f ilter,visible on task_view_settings when { true }
+                    }
                     ]]>
 				</action>
             </actions>
@@ -1051,7 +1056,7 @@
         <event type="set">
             <id>update_filter_set</id>
             <actions phase="post">
-                <action id="action_16">
+                <action id="update_filter_set">
 					<![CDATA[
                     change filter_case value { [filter_autocomplete_selection.rawValue] }
                     change filter_autocomplete_selection value { "" }
@@ -1367,7 +1372,7 @@
                     <event type="set">
                         <id>case_is_header_mode_changeable_set</id>
                         <actions phase="post">
-                            <action id="action_39">
+                            <action id="case_view_settings:case_is_header_mode_changeable_set">
 								<![CDATA[
                                 make case_headers_mode,editable on case_is_header_case_headers_mode_changeable when { case_is_header_case_headers_mode_changeable.rawValue }
                                 make case_headers_mode,required on case_is_header_case_headers_mode_changeable when { case_is_header_case_headers_mode_changeable.rawValue }
@@ -1439,7 +1444,7 @@
                     <event type="set">
                         <id>use_case_default_headers_set</id>
                         <actions phase="post">
-                            <action id="action_40">
+                            <action id="case_view_settings:use_case_default_headers_set">
 								<![CDATA[
                                 make case_default_headers,editable on use_case_default_case_default_headers_case_default_case_default_headers when { use_case_default_case_default_headers.rawValue }
                                 make case_default_headers,visible on use_case_default_case_default_headers_case_default_case_default_headers when { !use_case_default_case_default_headers.rawValue }
@@ -1492,10 +1497,10 @@
                     <event type="set">
                         <id>set_event_0</id>
                         <actions phase="post">
-                            <action id="action_38">
+                            <action id="change_filter:new_filter_id_set">
 								<![CDATA[
                                 change filter_case value { [new_filter_id.rawValue] }
-                                def filterCase = findCase({it._id.eq(filter_case.rawValue[0])})
+                                def filterCase = findCase(filter_case.rawValue[0])
                                 change current_filter_preview value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
                                 ]]>
 							</action>
@@ -1537,7 +1542,7 @@
                     <event type="get">
                         <id>childItemForms_get</id>
                         <actions phase="pre">
-                            <action id="action_43">
+                            <action id="children_order:childItemForms_get">
 								<![CDATA[
                                 def orderedTaskIds = childItemIds.rawValue?.collect { id -> workflowService.findOne(id).tasks.find { it.transition == "row_for_ordering" }.task }
                                 change childItemForms value { orderedTaskIds }
@@ -1604,7 +1609,7 @@
         <event type="finish">
             <id>finish</id>
             <actions phase="pre">
-                <action id="action_37">
+                <action id="duplicate_item_finish_pre">
 					<![CDATA[
                     duplicateMenuItem(useCase, duplicate_new_title.rawValue, duplicate_view_identifier.rawValue)
                     ]]>
@@ -1639,12 +1644,12 @@
                     <event type="set">
                         <id>filter_case_set</id>
                         <actions phase="post">
-                            <action id="action_33">
+                            <action id="initialize:filter_case_set">
 								<![CDATA[
                                 if (filter_case.rawValue == null || filter_case.rawValue == []) {
                                     return
                                 }
-                                def filterCase = findCase({it._id.eq(filter_case.rawValue[0])})
+                                def filterCase = findCase(filter_case.rawValue[0])
                                 if (!menu_name.rawValue) {
                                     change menu_name value {return filterCase.dataSet["i18n_filter_name"].rawValue}
                                 }
@@ -1766,7 +1771,7 @@
                     <event type="set">
                         <id>use_tab_icon_set</id>
                         <actions phase="post">
-                            <action id="action_34">
+                            <action id="item_settings:use_tab_icon_set">
 								<![CDATA[
                                 make tab_icon_preview,visible on this when { use_tab_icon.rawValue }
                                 make tab_icon,editable on this when { use_tab_icon.rawValue }
@@ -1818,7 +1823,7 @@
                     <event type="set">
                         <id>use_custom_view_set</id>
                         <actions phase="post">
-                            <action id="action_35">
+                            <action id="item_settings:use_custom_view_set">
 								<![CDATA[
                                 make custom_view_selector,editable on this when { use_custom_view.rawValue }
                                 make custom_view_selector,visible on this when { !use_custom_view.rawValue }
@@ -2157,7 +2162,7 @@
         <event type="finish">
             <id>finish</id>
             <actions phase="pre">
-                <action id="action_36">
+                <action id="move_item_finish_pre">
 					<![CDATA[
                     if (move_dest_uri.rawValue == null || move_dest_uri.rawValue == []) {
                         throw new IllegalArgumentException("URI must not be empty!")
@@ -2292,7 +2297,7 @@
                     <event type="set">
                         <id>task_is_header_mode_changeable_set</id>
                         <actions phase="post">
-                            <action id="action_41">
+                            <action id="task_view_settings:task_is_header_mode_changeable_set">
 								<![CDATA[
                                 make task_headers_mode,editable on task_is_header_task_headers_mode_changeable when { task_is_header_task_headers_mode_changeable.rawValue }
                                 make task_headers_mode,required on task_is_header_task_headers_mode_changeable when { task_is_header_task_headers_mode_changeable.rawValue }
@@ -2364,7 +2369,7 @@
                     <event type="set">
                         <id>use_task_default_headers_set</id>
                         <actions phase="post">
-                            <action id="action_42">
+                            <action id="task_view_settings:use_task_default_headers_set">
 								<![CDATA[
                                 make task_default_headers,editable on use_task_default_task_default_headers_task_default_task_default_headers when { use_task_default_task_default_headers.rawValue }
                                 make task_default_headers,visible on use_task_default_task_default_headers_task_default_task_default_headers when { !use_task_default_task_default_headers.rawValue }

@@ -1,0 +1,35 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>menu_import_cpq</id>
+    <initials>MEI</initials>
+    <title>Menu import CPQ</title>
+    <icon>device_hub</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>true</anonymousRole>
+    <transitionRole>false</transitionRole>
+    <processEvents>
+        <event type="upload">
+            <id>new_model_upload</id>
+            <actions phase="post">
+                <action id="2">
+					<![CDATA[
+                    def me = "<<me>>"
+                    def createFilters = []
+                    def cpqPath = "/cpq"
+                    def landingPath = "/landing_page"
+
+                    def processIdentifiersGeneric = [
+                            "cpq_business_case",
+                            "cpq_quote",
+                            "cpq_product",
+                            "cpq_discount",
+                            "cpq_customer",
+                    ]
+
+                    def menuItemCustomer = createOrUpdateMenuItem("cpq_customer", landingPath, "Case", "processIdentifier:cpq_customer", "group", "Zákazníci", ["cpq_customer"])
+
+                    ]]>
+				</action>
+            </actions>
+        </event>
+    </processEvents>
+</document>

@@ -87,7 +87,7 @@ class UserRefsTest {
             String taskId = _case.getTaskStringId("t1")
             dataService.setData(new SetDataParams(taskId, new DataSet([
                     "user_list_1": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(actorId)]))
-            ] as Map<String, Field<?>>), superCreator.getLoggedSuper().activeActorId)).getCase()
+            ] as LinkedHashMap<String, Field<?>>), superCreator.getLoggedSuper().activeActorId)).getCase()
             actorIds.add(actorId)
         }
     }

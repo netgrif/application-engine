@@ -7,8 +7,10 @@ services:
     hostname: 127.0.0.1
     ports:
       - "27017:27017"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     healthcheck:
-      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'host.docker.internal:27017'}]}) }" | mongosh --port 27017 --quiet
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}) }" | mongosh --port 27017 --quiet
       interval: 5s
       timeout: 30s
       retries: 10
@@ -54,3 +56,8 @@ services:
 #      - docker-elastic
 #    ports:
 #      - "5601:5601"
+
+
+volumes:
+  mongo1_data:
+  mongo1_config:

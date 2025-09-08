@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.manager.service;
 
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
+import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.security.service.SecurityContextService;
 import com.netgrif.application.engine.startup.SystemUserRunner;
@@ -27,6 +28,7 @@ public class SessionManagerService implements ISessionManagerService {
     protected final SessionRegistry sessionRegistry;
     protected final SecurityContextService securityContextService;
     protected final SystemUserRunner systemUserRunner;
+    public static LoggedIdentity systemIdentity = null;
 
     protected final String redisUsernameKey;
 
@@ -48,10 +50,28 @@ public class SessionManagerService implements ISessionManagerService {
      */
     @Override
     public LoggedIdentity getLoggedIdentity() {
-        if (securityContextService.isAuthenticatedPrincipalLoggedIdentity()) {
-            return (LoggedIdentity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!securityContextService.isAuthenticatedPrincipalLoggedIdentity()) {
+            return getSystemIdentity();
         }
-        return null;
+        return (LoggedIdentity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    public LoggedIdentity getSystemIdentity() {
+        if (systemIdentity != null) {
+            return systemIdentity;
+        }
+        if (systemUserRunner == null || systemUserRunner.getSystemUser() == null) {
+            return null;
+        }
+        User systemUser = systemUserRunner.getSystemUser();
+        systemIdentity = LoggedIdentity.with()
+                .fullName(systemUser.getFullName())
+                .identityId(systemUser.getStringId())
+                .activeActorId(systemUser.getStringId())
+                .username(systemUser.getEmail())
+                .password("")
+                .build();
+        return systemIdentity;
     }
 
     /**

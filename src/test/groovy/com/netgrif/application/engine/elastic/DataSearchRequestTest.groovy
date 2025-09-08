@@ -145,7 +145,7 @@ class DataSearchRequestTest {
         assert actionTrigger != null
         dataService.setData(new SetDataParams(actionTrigger, new DataSet([
                 "testActionTrigger": new TextField(rawValue: "random value")
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().activeActorId))
+        ] as LinkedHashMap<String, Field<?>>), superCreator.getLoggedSuper().activeActorId))
 
         10.times {
 //            todo: release/8.0.0 created case already contains modified values -> problem with field cloning
