@@ -135,6 +135,11 @@
             <artifactId>nae-user-ce</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.netgrif</groupId>
+            <artifactId>nae-spring-core-adapter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Loader -->
         <dependency>

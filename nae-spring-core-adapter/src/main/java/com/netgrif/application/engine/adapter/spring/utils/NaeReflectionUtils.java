@@ -1,10 +1,15 @@
 package com.netgrif.application.engine.adapter.spring.utils;
 
-import org.springframework.aop.support.AopUtils;
+import org.springframework.aop.framework.AopProxyUtils;
 
 import java.util.List;
+import java.util.Objects;
 
-public class ReflectionUtils {
+public final class NaeReflectionUtils {
+
+    private NaeReflectionUtils() {
+        throw new IllegalStateException("No instances. Utility class");
+    }
 
     /**
      * Resolves and returns the {@code Class} object for the given input object.
@@ -12,13 +17,14 @@ public class ReflectionUtils {
      * If the input object is an AOP proxy, the target class of the proxy is returned.
      * Otherwise, the class of the object is returned.
      *
-     * @param <T> the type of the input object
+     * @param <T>    the type of the input object
      * @param object the object for which the {@code Class} needs to be resolved
-     * @return the {@code Class} object corresponding to the input object
+     * @return the {@code Class} object corresponding to the input object or null if null value provided
      */
     public static <T> Class<?> resolveClass(T object) {
+        if (object == null) return null;
         if (object instanceof Class) return (Class<?>) object;
-        else return AopUtils.isAopProxy(object) ? AopUtils.getTargetClass(object) : object.getClass();
+        return AopProxyUtils.ultimateTargetClass(object);
     }
 
     /**
@@ -37,14 +43,15 @@ public class ReflectionUtils {
         if (list.isEmpty()) return -1;
         if (clazz == null) return list.indexOf(null);
         for (int i = 0; i < list.size(); i++) {
-            if (resolveClass(list.get(i)).equals(clazz)) {
+            I item = list.get(i);
+            if (item == null) continue;
+            Class<?> itemClass = resolveClass(item);
+            if (Objects.equals(itemClass, clazz)) {
                 return i;
             }
         }
         return -1;
     }
-
-
 
 
 }

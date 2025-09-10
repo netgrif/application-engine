@@ -14,8 +14,8 @@ import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.function.Function;
 
-import static com.netgrif.application.engine.adapter.spring.utils.ReflectionUtils.indexOfClass;
-import static com.netgrif.application.engine.adapter.spring.utils.ReflectionUtils.resolveClass;
+import static com.netgrif.application.engine.adapter.spring.utils.NaeReflectionUtils.indexOfClass;
+import static com.netgrif.application.engine.adapter.spring.utils.NaeReflectionUtils.resolveClass;
 
 @Slf4j
 @Component
