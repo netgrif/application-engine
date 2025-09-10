@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-import static com.netgrif.application.engine.startup.ApplicationRunnerOrderResolver.resolveClass;
+import static com.netgrif.application.engine.adapter.spring.utils.NaeReflectionUtils.resolveClass;
 
 @Slf4j
 @Component
