@@ -555,19 +555,6 @@ public class PetriNetService implements IPetriNetService {
         });
     }
 
-    @Override
-    public Function findByFunctionId(String functionId) {
-        Query query = new Query();
-
-        query.addCriteria(Criteria.where("functions._id").is(new ObjectId(functionId)));
-
-        PetriNet petriNet = mongoTemplate.findOne(query, PetriNet.class, "petriNet");
-
-        Optional<Function> optionalFunction = petriNet.getFunctions().stream().filter(function -> function.getObjectId().toString().equals(functionId)).findFirst();
-
-        return optionalFunction.orElse(null);
-    }
-
     protected <T> T requireNonNull(T obj, Object... item) {
         if (obj == null) {
             if (item.length > 0) {

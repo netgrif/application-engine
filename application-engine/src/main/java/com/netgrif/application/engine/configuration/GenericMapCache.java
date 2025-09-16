@@ -12,13 +12,13 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public class GenericMapCache<V> implements Cache {
     private final String name;
-    protected Class<?> valueType;
+    private final Class<V> valueType;
     private final java.util.function.Supplier<Map<String, V>> mapFactory;
     private final AtomicReference<Map<String, V>> atomicMapRef;
 
     private final ConcurrentHashMap<String, Object> locks = new ConcurrentHashMap<>();
 
-    public GenericMapCache(String name, Class<?> valueType, java.util.function.Supplier<Map<String, V>> mapFactory) {
+    public GenericMapCache(String name, Class<V> valueType, java.util.function.Supplier<Map<String, V>> mapFactory) {
         this.name = name;
         this.valueType = valueType;
         this.mapFactory = mapFactory;
@@ -30,7 +30,6 @@ public class GenericMapCache<V> implements Cache {
     @Override public Object getNativeCache() { return Map.copyOf(map()); }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> T get(Object key, Callable<T> loader) {
         final String stringKey = String.valueOf(key);
 
@@ -57,7 +56,7 @@ public class GenericMapCache<V> implements Cache {
                 return (T) value;
             }
         } catch (Exception ex) {
-            throw new ValueRetrievalException(stringKey, loader, ex);
+            throw new Cache.ValueRetrievalException(stringKey, loader, ex);
         } finally {
             locks.remove(stringKey, lock);
         }
@@ -66,13 +65,8 @@ public class GenericMapCache<V> implements Cache {
     @Override
     public synchronized ValueWrapper get(Object key) {
         String stringKey = String.valueOf(key);
-
         Object valueObject = map().get(stringKey);
-        if (valueObject != null) {
-            return new SimpleValueWrapper(valueObject);
-        }
-
-        return new SimpleValueWrapper(null);
+        return valueObject != null ? new SimpleValueWrapper(valueObject) : null;
     }
 
     @Override
@@ -101,14 +95,14 @@ public class GenericMapCache<V> implements Cache {
     @Override
     public synchronized void clear() {
         this.atomicMapRef.set(mapFactory.get());
-        log.info("{} cache cleared", this.getName());
     }
 
-    protected Map<String, V> map() {
+    private Map<String, V> map() {
         return atomicMapRef.get();
     }
 
-    protected V safeCast(Object object) {
+    @SuppressWarnings("unchecked")
+    private V safeCast(Object object) {
         if (object == null) {
             return null;
         }

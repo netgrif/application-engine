@@ -332,15 +332,4 @@ public interface IPetriNetService {
      * @return a {@link PetriNetImportReference} linking the PetriNet
      */
     PetriNetImportReference getNetFromCase(String caseId);
-
-
-    /**
-     * Finds and returns a single function subdocument from the {@code petriNet} collection
-     * by its nested {@code functions._id}.
-     *
-     * @param functionId the string form of the function's ObjectId (24-hex)
-     * @return the matching {@code Function} subdocument, or {@code null} if not found
-     * @throws IllegalArgumentException if {@code functionId} is not a valid ObjectId
-     */
-    Function findByFunctionId(String functionId);
 }
