@@ -1,10 +1,8 @@
 package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
-import org.springframework.security.core.parameters.P;
+import org.springframework.cache.support.SimpleValueWrapper;
 
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -12,24 +10,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
-public abstract class GenericMapCache<V> implements Cache {
+public class GenericMapCache<V> implements Cache {
     private final String name;
     protected Class<?> valueType;
     private final java.util.function.Supplier<Map<String, V>> mapFactory;
     private final AtomicReference<Map<String, V>> atomicMapRef;
 
     private final ConcurrentHashMap<String, Object> locks = new ConcurrentHashMap<>();
-    protected final IFieldActionsCacheService fieldActionsCacheService;
 
-    protected final IPetriNetService petriNetService;
-
-    public GenericMapCache(String name, Class<?> valueType, java.util.function.Supplier<Map<String, V>> mapFactory, IFieldActionsCacheService fieldActionsCacheService, IPetriNetService petriNetService) {
+    public GenericMapCache(String name, Class<?> valueType, java.util.function.Supplier<Map<String, V>> mapFactory) {
         this.name = name;
         this.valueType = valueType;
         this.mapFactory = mapFactory;
         this.atomicMapRef = new AtomicReference<>(mapFactory.get());
-        this.fieldActionsCacheService = fieldActionsCacheService;
-        this.petriNetService = petriNetService;
     }
 
     @Override public String getName() { return name; }
@@ -68,6 +61,31 @@ public abstract class GenericMapCache<V> implements Cache {
         } finally {
             locks.remove(stringKey, lock);
         }
+    }
+
+    @Override
+    public synchronized ValueWrapper get(Object key) {
+        String stringKey = String.valueOf(key);
+
+        Object valueObject = map().get(stringKey);
+        if (valueObject != null) {
+            return new SimpleValueWrapper(valueObject);
+        }
+
+        return new SimpleValueWrapper(null);
+    }
+
+    @Override
+    public synchronized <T> T get(Object key, Class<T> type) {
+        String stringKey = String.valueOf(key);
+        Object valueObject = map().get(stringKey);
+
+        if (valueObject != null) {
+            return type.cast(valueObject);
+        }
+
+        return type.cast(null);
+
     }
 
     @Override

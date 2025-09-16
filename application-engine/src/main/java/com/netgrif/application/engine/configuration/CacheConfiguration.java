@@ -3,10 +3,7 @@ package com.netgrif.application.engine.configuration;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.configuration.properties.RunnerConfigurationProperties;
 import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap;
-import com.netgrif.application.engine.event.IGroovyShellFactory;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.CachedFunction;
-import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import groovy.lang.Closure;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -28,16 +25,10 @@ import java.util.stream.Collectors;
 public class CacheConfiguration extends CachingConfigurerSupport {
     private final RunnerConfigurationProperties.FieldRunnerProperties fieldRunnerProperties;
     private final CacheConfigurationProperties properties;
-    private final IFieldActionsCacheService fieldActionsCacheService;
-    private final IPetriNetService petriNetService;
-    private final IGroovyShellFactory groovyShellFactory;
 
-    public CacheConfiguration(RunnerConfigurationProperties.FieldRunnerProperties fieldRunnerProperties, CacheConfigurationProperties properties, IFieldActionsCacheService fieldActionsCacheService, IPetriNetService petriNetService, IGroovyShellFactory shellFactory) {
+    public CacheConfiguration(RunnerConfigurationProperties.FieldRunnerProperties fieldRunnerProperties, CacheConfigurationProperties properties) {
         this.fieldRunnerProperties = fieldRunnerProperties;
         this.properties = properties;
-        this.fieldActionsCacheService = fieldActionsCacheService;
-        this.petriNetService = petriNetService;
-        this.groovyShellFactory = shellFactory;
     }
 
     @Bean
@@ -53,32 +44,19 @@ public class CacheConfiguration extends CachingConfigurerSupport {
         Supplier<Map<String, Closure>> actionsFactory =
                 () -> Collections.synchronizedMap(new MaxSizeHashMap<>(fieldRunnerProperties.getActionCacheSize()));
 
-        caches.add(new ActionsMapCache(
+        caches.add(new GenericMapCache<>(
                 CacheMapKeys.ACTIONS,
-                actionsFactory,
-                fieldActionsCacheService,
-                petriNetService
+                Closure.class,
+                actionsFactory
         ));
 
         Supplier<Map<String, CachedFunction>> functionsFactory =
                 () -> Collections.synchronizedMap(new MaxSizeHashMap<>(fieldRunnerProperties.getFunctionsCacheSize()));
 
-        caches.add(new FunctionsMapCache(
+        caches.add(new GenericMapCache<>(
                 CacheMapKeys.FUNCTIONS,
-                functionsFactory,
-                fieldActionsCacheService,
-                petriNetService,
-                groovyShellFactory
-        ));
-
-        Supplier<Map<String, List<CachedFunction>>> nsFactory =
-                () -> Collections.synchronizedMap(new MaxSizeHashMap<>(fieldRunnerProperties.getNamespaceCacheSize()));
-
-        caches.add(new FunctionsNamespaceMapCache(
-                CacheMapKeys.NAMESPACE_FUNCTIONS,
-                nsFactory,
-                fieldActionsCacheService,
-                petriNetService
+                CachedFunction.class,
+                functionsFactory
         ));
 
         SimpleCacheManager cacheManager = new SimpleCacheManager();

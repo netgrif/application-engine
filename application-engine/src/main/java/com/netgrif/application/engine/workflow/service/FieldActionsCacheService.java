@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.configuration.CacheMapKeys;
+import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.event.IGroovyShellFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.Function;
@@ -25,13 +26,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FieldActionsCacheService implements IFieldActionsCacheService {
 
+    private final CacheConfigurationProperties properties;
     private final CacheManager cacheManager;
 
     private IPetriNetService petriNetService;
 
     private final GroovyShell shell;
 
-    public FieldActionsCacheService(CacheManager cacheManager, IGroovyShellFactory shellFactory) {
+    public FieldActionsCacheService(CacheConfigurationProperties properties, CacheManager cacheManager, IGroovyShellFactory shellFactory) {
+        this.properties = properties;
         this.cacheManager = cacheManager;
         this.shell = shellFactory.getGroovyShell();
     }
@@ -52,7 +55,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
                 .map(function -> CachedFunction.build(shell, function))
                 .collect(Collectors.toList());
 
-        Cache namespaceFunctionsCache = cacheManager.getCache(CacheMapKeys.NAMESPACE_FUNCTIONS);
+        Cache namespaceFunctionsCache = cacheManager.getCache(properties.getNamespaceFunctions());
 
         if (!functions.isEmpty()) {
             evaluateCachedFunctions(functions);
@@ -64,7 +67,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public void reloadCachedFunctions(String petriNetId) {
-        cacheManager.getCache(CacheMapKeys.NAMESPACE_FUNCTIONS).evictIfPresent(petriNetId);
+        cacheManager.getCache(properties.getNamespaceFunctions()).evictIfPresent(petriNetId);
         cachePetriNetFunctions(petriNetService.getNewestVersionByIdentifier(petriNetId));
     }
 
@@ -144,7 +147,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public Map<String, List<CachedFunction>> getNamespaceFunctionCache() {
-        return new HashMap<>((Map) cacheManager.getCache(CacheMapKeys.NAMESPACE_FUNCTIONS).getNativeCache());
+        return new HashMap<>((Map) cacheManager.getCache(properties.getNamespaceFunctions()).getNativeCache());
     }
 
     @Override
@@ -154,7 +157,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public void clearNamespaceFunctionCache() {
-        cacheManager.getCache(CacheMapKeys.NAMESPACE_FUNCTIONS).clear();
+        cacheManager.getCache(properties.getNamespaceFunctions()).clear();
     }
 
     @Override
