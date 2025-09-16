@@ -45,7 +45,6 @@ public class User {
         lastName = user.getLastName();
         fullName = user.getName();
         attributes = user.getAttributes();
-        type = user.getType();
         if (user instanceof com.netgrif.application.engine.objects.auth.domain.User u) {
             createdAt = u.getCreatedAt();
             enabled = u.isActive();

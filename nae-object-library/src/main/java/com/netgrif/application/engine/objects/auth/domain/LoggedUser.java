@@ -65,7 +65,7 @@ public abstract class LoggedUser extends AbstractUser implements Serializable {
      * @param providerOrigin The authentication provider origin
      * @param mfaMethods The set of enabled MFA methods
      * @param sessionTimeout The duration of session timeout
-     * @param isInternal Boolean flag marking user as internal
+     * @param type Type of user, defined in {@link UserType}
      */
     protected LoggedUser(ObjectId id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar, String workspaceId, String providerOrigin, Set<String> mfaMethods, Duration sessionTimeout, UserType type) {
         super(id, realmId, username, firstName, middleName, lastName, email, avatar, type);
@@ -90,7 +90,7 @@ public abstract class LoggedUser extends AbstractUser implements Serializable {
      * @param providerOrigin The authentication provider origin
      * @param mfaMethods The set of enabled MFA methods
      * @param sessionTimeout The duration of session timeout
-     * @param isInternal Boolean flag marking user as internal
+     * @param type Type of user, defined in {@link UserType}
      */
     protected LoggedUser(String id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar, String workspaceId, String providerOrigin, Set<String> mfaMethods, Duration sessionTimeout, UserType type) {
         super(id, realmId, username, firstName, middleName, lastName, email, avatar, type);

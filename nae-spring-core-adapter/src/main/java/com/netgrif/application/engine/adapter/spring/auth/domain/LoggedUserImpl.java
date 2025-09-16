@@ -39,6 +39,7 @@ public class LoggedUserImpl extends LoggedUser implements UserDetails {
      * @param providerOrigin The authentication provider's origin
      * @param mfaMethods Set of enabled Multi-Factor Authentication methods
      * @param sessionTimeout Duration after which the user's session times out
+     * @param type Type of user, defined in {@link UserType}
      */
     public LoggedUserImpl(ObjectId id, String realmId, String username, String firstName, String middleName, String lastName,
                          String email, String avatar, String workspaceId, String providerOrigin, Set<String> mfaMethods,
@@ -62,6 +63,7 @@ public class LoggedUserImpl extends LoggedUser implements UserDetails {
      * @param providerOrigin The authentication provider's origin
      * @param mfaMethods Set of enabled Multi-Factor Authentication methods
      * @param sessionTimeout Duration after which the user's session times out
+     * @param type Type of user, defined in {@link UserType}
      */
     public LoggedUserImpl(String id, String realmId, String username, String firstName, String middleName, String lastName,
                          String email, String avatar, String workspaceId, String providerOrigin, Set<String> mfaMethods,

@@ -6,6 +6,7 @@ import com.netgrif.application.engine.adapter.spring.workflow.service.FilterImpo
 import com.netgrif.application.engine.auth.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
 import com.netgrif.application.engine.auth.repository.UserRepository;
+import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.objects.auth.constants.UserConstants;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
@@ -57,11 +58,13 @@ public class UserServiceImpl implements UserService {
 
     private GroupConfigurationProperties groupConfigurationProperties;
 
-    private AbstractUser systemUser;
+    private User systemUser;
 
     private PaginationProperties paginationProperties;
 
     private RealmService realmService;
+
+    private static final String EMPTY_VALUE_STRING = "EMPTY_VALUE";
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
@@ -122,33 +125,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AbstractUser saveUser(AbstractUser user, String realmId) {
+    public User saveUser(User user, String realmId) {
         user.setRealmId(realmId);
         return saveUser(user);
     }
 
     @Override
-    public AbstractUser saveUser(AbstractUser user) {
+    public User saveUser(User user) {
         log.debug("Saving user [{}] in realm with id [{}]", user.getUsername(), user.getRealmId());
-        if (user instanceof User u) {
-            u.setModifiedAt(LocalDateTime.now());
-        }
+        user.setModifiedAt(LocalDateTime.now());
         String collectionName = collectionNameProvider.getCollectionNameForRealm(user.getRealmId());
-        user = userRepository.saveUser((User) user, mongoTemplate, collectionName);
+        user = userRepository.saveUser(user, mongoTemplate, collectionName);
         log.trace("User [{}] saved in collection [{}]", user.getUsername(), collectionName);
         return user;
     }
 
     @Override
-    public List<User> saveUsers(Collection<AbstractUser> users) {
-        return users.stream().map(u -> (User) this.saveUser(u)).toList();
+    public List<User> saveUsers(Collection<User> users) {
+        return users.stream().map(this::saveUser).toList();
     }
 
     @Override
-    public Optional<AbstractUser> findUserByUsername(String username, String realmId) {
+    public Optional<User> findUserByUsername(String username, String realmId) {
         log.debug("Finding user by username [{}] in realm [{}]", username, realmId);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
-        Optional<AbstractUser> userOpt = userRepository.findByUsername(username, mongoTemplate, collectionName).map(user -> (AbstractUser) user);
+        Optional<User> userOpt = userRepository.findByUsername(username, mongoTemplate, collectionName);
         if (userOpt.isPresent()) {
             log.debug("User [{}] found in realm [{}]", username, realmId);
         } else {
@@ -158,7 +159,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<AbstractUser> findAllUsersByQuery(Query query, String realmName, Pageable pageable) {
+    public Page<User> findAllUsersByQuery(Query query, String realmName, Pageable pageable) {
         log.trace("Retrieving all users in realm [{}]", realmName);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmName);
         Page<User> users = userRepository.findAllByQuery(query, pageable, mongoTemplate, collectionName);
@@ -167,7 +168,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<AbstractUser> findAllUsers(String realmName, Pageable pageable) {
+    public Page<User> findAllUsers(String realmName, Pageable pageable) {
         log.trace("Retrieving all users in realm [{}]", realmName);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmName);
         Page<User> users = userRepository.findAllByQuery(new Query(), pageable, mongoTemplate, collectionName);
@@ -176,59 +177,38 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AbstractUser createUser(String username, String email, String firstName, String lastName, String rawPassword, String realmId) {
+    public User createUser(String username, String email, String firstName, String lastName, String rawPassword, String realmId) {
         User user = initializeNewUser(username, email, firstName, lastName, rawPassword, realmId);
         return createUser(user, realmId);
     }
 
     @Override
-    public AbstractUser createUser(AbstractUser user, String realmId) {
+    public User createUser(User user, String realmId) {
         log.info("Creating user [{}] in realm [{}]", user.getUsername(), realmId);
         addDefaultAuthorities(user);
         addDefaultRole(user);
         setPassword(user, user.getPassword());
 
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
-        user = userRepository.saveUser(((User) user), mongoTemplate, collectionName);
+        user.setType(resolveUserType(user.getEmail(), null));
+        user = userRepository.saveUser(user, mongoTemplate, collectionName);
 
         filterImportExportService.createFilterImport(user);
         filterImportExportService.createFilterExport(user);
 
-        user.setType(resolveUserType(user.getEmail(), realmId));
         if (groupConfigurationProperties.isDefaultEnabled())
             groupService.create(user);
 
         if (groupConfigurationProperties.isSystemEnabled())
             groupService.addUserToDefaultSystemGroup(user);
 
-        user = userRepository.saveUser(((User) user), mongoTemplate, collectionName);
+        user = userRepository.saveUser(user, mongoTemplate, collectionName);
         log.info("User [{}] successfully created in realm [{}]", user.getUsername(), realmId);
         return user;
     }
 
     protected UserType resolveUserType(String userMail, String realmId) {
-        if (userMail == null || userMail.isEmpty() || realmId == null || realmId.isEmpty()) {
-            return UserType.INTERNAL;
-        }
-        Realm realm = realmService.getRealmById(realmId).orElse(null);
-        if (realm == null) {
-//            todo correct assumption?
-            return UserType.INTERNAL;
-        }
-        if (realm.isAdminRealm()) {
-//            todo correct assumption?
-            return UserType.SYSTEM;
-        }
-        List<String> realmDomains = realm.getDomains();
-        if (realmDomains == null || realmDomains.isEmpty()) {
-            return UserType.INTERNAL;
-        }
-        Pattern pattern = Pattern.compile("\\b(%s)\\b".formatted(String.join("|", realmDomains)), Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(userMail.split("@")[1].trim());
-        if (matcher.find()) {
-            return UserType.INTERNAL;
-        }
-        return UserType.EXTERNAL;
+        return UserType.INTERNAL;
     }
 
     // TODO JOFO: auth methods no longer exists ... use credentials?
@@ -294,7 +274,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addDefaultAuthorities(AbstractUser user) {
+    public void addDefaultAuthorities(User user) {
         log.trace("Assigning default authorities to user [{}]", user.getUsername());
         if (user.getAuthoritySet().isEmpty()) {
             Set<Authority> authorities = new HashSet<>();
@@ -307,14 +287,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addDefaultRole(AbstractUser user) {
+    public void addDefaultRole(User user) {
         log.trace("Assigning default role to user [{}]", user.getUsername());
         user.addProcessRole(processRoleService.getDefaultRole());
         saveUser(user);
     }
 
     @Override
-    public void addAnonymousAuthorities(AbstractUser user) {
+    public void addAnonymousAuthorities(User user) {
         log.trace("Assigning anonymous authorities to user [{}]", user.getUsername());
         if (user.getAuthoritySet().isEmpty()) {
             Set<Authority> authorities = new HashSet<>();
@@ -329,11 +309,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void addAllRolesToAdminByUsername(String username) {
         String collectionName = collectionNameProvider.getAdminRealmCollection();
-        Optional<AbstractUser> userOptional = userRepository.findByUsername(username, mongoTemplate, collectionName).map(user -> user);
+        Optional<User> userOptional = userRepository.findByUsername(username, mongoTemplate, collectionName).map(user -> user);
         if (userOptional.isEmpty()) {
             throw new IllegalArgumentException("Admin user with username [%s] cannot be found.".formatted(username));
         }
-        AbstractUser user = userOptional.get();
+        User user = userOptional.get();
 
         Page<ProcessRole> processRoles = processRoleService.findAll(Pageable.unpaged());
         user.getProcessRoles().addAll(processRoles.getContent());
@@ -342,13 +322,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addAnonymousRole(AbstractUser user) {
+    public void addAnonymousRole(User user) {
         log.trace("Assigning anonymous role to user [{}]", user.getUsername());
         user.addProcessRole(processRoleService.getAnonymousRole());
     }
 
     @Override
-    public AbstractUser findById(String id, String realmId) {
+    public User findById(String id, String realmId) {
         log.debug("Finding user by ID [{}]", id);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
         Optional<User> userOpt = userRepository.findById(new ObjectId(id), mongoTemplate, collectionName);
@@ -356,7 +336,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(AbstractUser user) {
+    public void deleteUser(User user) {
         log.warn("Deleting user [{}]", user.getUsername());
         String collectionName = collectionNameProvider.getCollectionNameForRealm(user.getRealmId());
         groupService.findAllByIds(user.getGroupIds(), Pageable.unpaged()).forEach(group -> {
@@ -382,35 +362,70 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AbstractUser findByAuth(Authentication auth, String realmId) {
+    public User findByAuth(Authentication auth, String realmId) {
         return findByEmail(auth.getName(), realmId);
     }
 
     @Override
-    public AbstractUser update(AbstractUser user, AbstractUser updatedUser) {
+    public User update(User user, User updatedUser) {
         log.debug("Updating user with ID [{}]", user.getStringId());
         UserMapper userMapper = new UserMapperImpl();
-        userMapper.update((User) user, (User) updatedUser);
+        userMapper.update(user, updatedUser);
         return saveUser(user);
     }
 
     @Override
-    public AbstractUser findByEmail(String email, String realmId) {
+    public User update(String userId, String realmId, UpdateUserRequest userUpdate) {
+        if(userId == null) {
+            log.info("Cannot update user, userId is null");
+            return null;
+        }
+        User user = findById(userId, realmId);
+        if(user == null) {
+            log.info("User with id [{}] does not exist", userId);
+            return null;
+        }
+        return this.update(user, userUpdate);
+    }
+
+    @Override
+    public User update(User user, UpdateUserRequest userUpdate) {
+        log.info("Updating user with id [{}]", user.getStringId());
+        user.setAvatar(resolveUserUpdateValue(user.getAvatar(), userUpdate.getAvatar()));
+        user.setFirstName(resolveUserUpdateValue(user.getFirstName(), userUpdate.getFirstName()));
+        user.setMiddleName(resolveUserUpdateValue(user.getMiddleName(), userUpdate.getMiddleName()));
+        user.setLastName(resolveUserUpdateValue(user.getLastName(), userUpdate.getLastName()));
+        user.setEmail(resolveUserUpdateValue(user.getEmail(), userUpdate.getEmail()));
+        if(userUpdate.getUserType() != null) {
+            user.setType(userUpdate.getUserType());
+        }
+        return saveUser(user);
+    }
+
+    private String resolveUserUpdateValue(String oldValue, String newValue) {
+        if(newValue != null) {
+            return newValue.equals(EMPTY_VALUE_STRING) ? null : newValue;
+        }
+        return oldValue;
+    }
+
+    @Override
+    public User findByEmail(String email, String realmId) {
         log.debug("Finding user by email [{}]", email);
         Optional<User> userOpt = userRepository.findByEmail(email, mongoTemplate, collectionNameProvider.getCollectionNameForRealm(realmId));
         return userOpt.orElse(null);
     }
 
     @Override
-    public Page<AbstractUser> findAllCoMembers(LoggedUser loggedUser, Pageable pageable) {
+    public Page<User> findAllCoMembers(LoggedUser loggedUser, Pageable pageable) {
         return this.searchAllCoMembers(null, loggedUser, pageable);
     }
 
     @Override
-    public Page<AbstractUser> searchAllCoMembers(String query, LoggedUser loggedUser, Pageable pageable) {
-//        AbstractUser user = this.findById(loggedUser.getSelfOrImpersonated().getId(), loggedUser.getSelfOrImpersonated().getRealmId());
+    public Page<User> searchAllCoMembers(String query, LoggedUser loggedUser, Pageable pageable) {
+//        User user = this.findById(loggedUser.getSelfOrImpersonated().getId(), loggedUser.getSelfOrImpersonated().getRealmId());
         // TODO: impersonation
-        AbstractUser user = this.findById(loggedUser.getStringId(), loggedUser.getRealmId());
+        User user = this.findById(loggedUser.getStringId(), loggedUser.getRealmId());
         BooleanExpression predicate = buildPredicate(user, query);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(loggedUser.getRealmId());
         Page<User> users = userRepository.findAllByQuery(predicate, pageable, mongoTemplate, collectionName);
@@ -418,14 +433,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<AbstractUser> searchAllCoMembers(String query, Collection<ProcessResourceId> roleIds, Collection<ProcessResourceId> negateRoleIds, LoggedUser loggedUser, Pageable pageable) {
+    public Page<User> searchAllCoMembers(String query, Collection<ProcessResourceId> roleIds, Collection<ProcessResourceId> negateRoleIds, LoggedUser loggedUser, Pageable pageable) {
         if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty())) {
             return searchAllCoMembers(query, loggedUser, pageable);
         }
 
-//        AbstractUser user = this.findById(loggedUser.getSelfOrImpersonated().getId(), loggedUser.getSelfOrImpersonated().getRealmId());
+//        User user = this.findById(loggedUser.getSelfOrImpersonated().getId(), loggedUser.getSelfOrImpersonated().getRealmId());
         // TODO: impersonation
-        AbstractUser user = this.findById(loggedUser.getStringId(), loggedUser.getRealmId());
+        User user = this.findById(loggedUser.getStringId(), loggedUser.getRealmId());
         BooleanExpression predicate = buildPredicate(user, query);
         if (roleIds != null && !roleIds.isEmpty()) {
             predicate = predicate.and(QUser.user.processRoles.any()._id.in(roleIds));
@@ -440,7 +455,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<AbstractUser> findAllByIds(Collection<String> ids, String realmId, Pageable pageable) {
+    public Page<User> findAllByIds(Collection<String> ids, String realmId, Pageable pageable) {
         log.debug("Finding users by collection of IDs [{}]", ids);
         String collection = collectionNameProvider.getCollectionNameForRealm(realmId);
         Page<User> users = userRepository.findAllByIds(ids.stream().map(ObjectId::new).toList(), pageable, mongoTemplate, collection);
@@ -448,33 +463,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<AbstractUser> findAllActiveByProcessRoles(Collection<ProcessResourceId> roleIds, Pageable pageable, String realmId) {
+    public Page<User> findAllActiveByProcessRoles(Collection<ProcessResourceId> roleIds, Pageable pageable, String realmId) {
         String collection = collectionNameProvider.getCollectionNameForRealm(realmId);
         Page<User> users = userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, roleIds, pageable, mongoTemplate, collection);
         return changeType(users, users.getPageable());
     }
 
     @Override
-    public Page<AbstractUser> findAllByProcessRoles(Collection<ProcessResourceId> roleIds, String realmId, Pageable pageable) {
+    public Page<User> findAllByProcessRoles(Collection<ProcessResourceId> roleIds, String realmId, Pageable pageable) {
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
         return searchUsersByRoleIds(roleIds, collectionName, pageable);
     }
 
-    protected Page<AbstractUser> searchUsersByRoleIds(Collection<ProcessResourceId> roleIds, String collectionName, Pageable pageable) {
+    protected Page<User> searchUsersByRoleIds(Collection<ProcessResourceId> roleIds, String collectionName, Pageable pageable) {
         Page<User> users = userRepository.findAllByProcessRoles__idIn(roleIds, pageable, mongoTemplate, collectionName);
         return changeType(users, users.getPageable());
     }
 
     @Override
-    public AbstractUser assignAuthority(String userId, String realmId, String authorityId) {
-        AbstractUser user = findById(userId, realmId);
+    public User assignAuthority(String userId, String realmId, String authorityId) {
+        User user = findById(userId, realmId);
         Authority authority = authorityService.getOne(authorityId);
         user.addAuthority(authority);
         return saveUser(user, realmId);
     }
 
     @Override
-    public AbstractUser getLoggedOrSystem() {
+    public User getLoggedOrSystem() {
         try {
             if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof String) {
                 return getSystem();
@@ -486,10 +501,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AbstractUser getLoggedUser() {
+    public User getLoggedUser() {
         LoggedUser loggedUser = getLoggedUserFromContext();
-        Optional<AbstractUser> userOptional = findUserByUsername(loggedUser.getUsername(), loggedUser.getRealmId());
-        AbstractUser user = userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] in realm [%s] is not present in the system.".formatted(loggedUser.getUsername(), loggedUser.getRealmId())));
+        Optional<User> userOptional = findUserByUsername(loggedUser.getUsername(), loggedUser.getRealmId());
+        User user = userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] in realm [%s] is not present in the system.".formatted(loggedUser.getUsername(), loggedUser.getRealmId())));
         // TODO: impersonation
 //        if (loggedUser.isImpersonating()) {
 //            IUser impersonated = transformToUser((LoggedUserImpl) loggedUser.getImpersonated());
@@ -501,7 +516,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AbstractUser getSystem() {
+    public User getSystem() {
         if (systemUser == null) {
             systemUser = createSystemUser();
         }
@@ -515,43 +530,43 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AbstractUser addRole(AbstractUser user, ProcessResourceId roleStringId) {
+    public User addRole(User user, ProcessResourceId roleStringId) {
         ProcessRole role = processRoleService.findById(roleStringId);
         user.addProcessRole(role);
         return saveUser(user, user.getRealmId());
     }
 
     @Override
-    public AbstractUser addRole(AbstractUser user, String roleString) {
+    public User addRole(User user, String roleString) {
         return this.addRole(user, new ProcessResourceId(roleString));
     }
 
     @Override
-    public AbstractUser removeRolesById(AbstractUser user, Collection<ProcessResourceId> processRolesIds) {
+    public User removeRolesById(User user, Collection<ProcessResourceId> processRolesIds) {
         Set<ProcessRole> processRoles = new HashSet<>(processRoleService.findAllByIds(processRolesIds));
         return removeRoles(user, processRoles);
     }
 
     @Override
-    public AbstractUser removeRoles(AbstractUser user, Collection<ProcessRole> processRoles) {
+    public User removeRoles(User user, Collection<ProcessRole> processRoles) {
         processRoles.forEach(user::removeProcessRole);
         return saveUser(user);
     }
 
     @Override
-    public AbstractUser removeRole(AbstractUser user, ProcessRole role) {
+    public User removeRole(User user, ProcessRole role) {
         user.removeProcessRole(role);
         return saveUser(user);
     }
 
     @Override
-    public AbstractUser removeRole(AbstractUser user, ProcessResourceId roleStringId) {
+    public User removeRole(User user, ProcessResourceId roleStringId) {
         ProcessRole role = processRoleService.findById(roleStringId);
         return removeRole(user, role);
     }
 
     @Override
-    public AbstractUser removeRole(AbstractUser user, String roleString) {
+    public User removeRole(User user, String roleString) {
         return this.removeRole(user, new ProcessResourceId(roleString));
     }
 
@@ -560,7 +575,7 @@ public class UserServiceImpl implements UserService {
         Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
         collectionNames.forEach(collection -> {
             Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-            Page<AbstractUser> users;
+            Page<User> users;
             do {
                 users = findAllByProcessRoles(petriNet.getRoles().values().stream().map(ProcessRole::get_id).collect(Collectors.toSet()), collection, pageable);
                 users.forEach(u -> petriNet.getRoles().forEach((k, role) -> removeRole(u, role.get_id())));
@@ -570,8 +585,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AbstractUser createSystemUser() {
-        User system = (User) findByEmail(UserConstants.SYSTEM_USER_EMAIL, null);
+    public User createSystemUser() {
+        User system = findByEmail(UserConstants.SYSTEM_USER_EMAIL, null);
         if (system == null) {
             system = new User();
             system.setUsername(UserConstants.SYSTEM_USER_EMAIL);
@@ -587,12 +602,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AbstractUser transformToUser(ActorRef author) {
+    public User transformToUser(ActorRef author) {
         return findById(author.getId(), author.getRealmId());
     }
 
     @Override
-    public AbstractUser transformToUser(LoggedUser loggedUser) {
+    public User transformToUser(LoggedUser loggedUser) {
         return findById(loggedUser.getStringId(), loggedUser.getRealmId());
     }
 
@@ -612,28 +627,28 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    protected void setPassword(AbstractUser user, String password) {
+    protected void setPassword(User user, String password) {
         log.trace("Setting password for user [{}]", user.getUsername());
         String hashedPassword = passwordEncoder.encode(password);
         user.setPassword(hashedPassword);
         log.debug("Password set for user [{}]", user.getUsername());
     }
 
-    protected void setDisablePassword(AbstractUser user) {
+    protected void setDisablePassword(User user) {
         user.setPassword("N/A");
         log.debug("Password N/A set for user [{}]", user.getUsername());
     }
 
-    private <T> Page<AbstractUser> changeType(Page<T> users, Pageable pageable) {
+    private <T> Page<User> changeType(Page<T> users, Pageable pageable) {
         return new PageImpl<>(changeType(new HashSet<>(users.getContent())), pageable, users.getTotalElements());
     }
 
-    private <T> List<AbstractUser> changeType(Collection<T> users) {
-        return users.stream().map(AbstractUser.class::cast).toList();
+    private <T> List<User> changeType(Collection<T> users) {
+        return users.stream().map(User.class::cast).toList();
     }
 
-    private BooleanExpression buildPredicate(AbstractUser user, String query) {
-        AbstractUser system = this.getSystem();
+    private BooleanExpression buildPredicate(User user, String query) {
+        User system = this.getSystem();
         BooleanExpression predicate = QUser.user
                 .groupIds.any().in(user.getGroupIds())
                 .and(QUser.user.id.ne(new ObjectId(system.getStringId())))
@@ -650,11 +665,11 @@ public class UserServiceImpl implements UserService {
         return predicate;
     }
 
-    private void resolveRelatedAuthorities(AbstractUser user) {
+    private void resolveRelatedAuthorities(User user) {
         user.getAuthoritySet().addAll(getUserGroups(user).stream().map(Group::getAuthoritySet).flatMap(Set::stream).collect(Collectors.toSet()));
     }
 
-    private void resolveRelatedProcessRoles(AbstractUser user) {
+    private void resolveRelatedProcessRoles(User user) {
         user.getAuthoritySet().addAll(getUserGroups(user).stream().map(Group::getAuthoritySet).flatMap(Set::stream).collect(Collectors.toSet()));
     }
 

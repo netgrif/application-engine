@@ -100,7 +100,7 @@ public class UserController {
             log.error("Realm with id [{}] not found", realmId);
             return ResponseEntity.badRequest().build();
         }
-        Page<AbstractUser> users = userService.findAllUsers(realmId, pageable);
+        Page<com.netgrif.application.engine.objects.auth.domain.User> users = userService.findAllUsers(realmId, pageable);
         return ResponseEntity.ok(changeToResponse(users, pageable, locale));
     }
 
@@ -138,7 +138,7 @@ public class UserController {
     public ResponseEntity<Page<User>> search(@RequestBody UserSearchRequestBody query, Pageable pageable, Authentication auth, Locale locale) {
         List<ProcessResourceId> roles = query.getRoles() == null ? null : query.getRoles().stream().map(ProcessResourceId::new).toList();
         List<ProcessResourceId> negativeRoles = query.getNegativeRoles() == null ? null : query.getNegativeRoles().stream().map(ProcessResourceId::new).toList();
-        Page<AbstractUser> users = userService.searchAllCoMembers(query.getFulltext(),
+        Page<com.netgrif.application.engine.objects.auth.domain.User> users = userService.searchAllCoMembers(query.getFulltext(),
                 roles,
                 negativeRoles,
                 (LoggedUser) auth.getPrincipal(), pageable);
@@ -218,7 +218,7 @@ public class UserController {
     })
     public ResponseEntity<ResponseMessage> assignRolesToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
         try {
-            AbstractUser user = userService.findById(userId, realmId);
+            com.netgrif.application.engine.objects.auth.domain.User user = userService.findById(userId, realmId);
             processRoleService.assignRolesToUser(user, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()), (LoggedUser) auth.getPrincipal());
             log.info("Process roles {} assigned to user with id [{}]", roleIds, userId);
             return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Selected roles assigned to user " + userId));
@@ -325,11 +325,11 @@ public class UserController {
         }
     }
 
-    private Page<User> changeToResponse(Page<AbstractUser> users, Pageable pageable, Locale locale) {
+    private Page<User> changeToResponse(Page<com.netgrif.application.engine.objects.auth.domain.User> users, Pageable pageable, Locale locale) {
         return new PageImpl<>(changeType(users.getContent(), locale), pageable, users.getTotalElements());
     }
 
-    public List<User> changeType(List<AbstractUser> users, Locale locale) {
+    public List<User> changeType(List<com.netgrif.application.engine.objects.auth.domain.User> users, Locale locale) {
         return users.stream().map(u -> userFactory.getUser(u, locale)).toList();
     }
 

@@ -80,7 +80,7 @@ public class PublicUserController {
     public ResponseEntity<Page<User>> search(@RequestBody UserSearchRequestBody query, Pageable pageable, Authentication auth) {
         List<ProcessResourceId> roles = query.getRoles() == null ? null : query.getRoles().stream().map(ProcessResourceId::new).toList();
         List<ProcessResourceId> negativeRoles = query.getNegativeRoles() == null ? null : query.getNegativeRoles().stream().map(ProcessResourceId::new).toList();
-        Page<AbstractUser> users = userService.searchAllCoMembers(query.getFulltext(),
+        Page<com.netgrif.application.engine.objects.auth.domain.User> users = userService.searchAllCoMembers(query.getFulltext(),
                 roles,
                 negativeRoles,
                 (LoggedUser) auth.getPrincipal(), pageable);
@@ -127,11 +127,11 @@ public class PublicUserController {
         }
     }
 
-    private Page<User> changeToResponse(Page<AbstractUser> users, Pageable pageable) {
+    private Page<User> changeToResponse(Page<com.netgrif.application.engine.objects.auth.domain.User> users, Pageable pageable) {
         return new PageImpl<>(changeType(users.getContent()), pageable, users.getTotalElements());
     }
 
-    public List<User> changeType(List<AbstractUser> users) {
+    public List<User> changeType(List<com.netgrif.application.engine.objects.auth.domain.User> users) {
         return users.stream().map(User::createUser).toList();
     }
 

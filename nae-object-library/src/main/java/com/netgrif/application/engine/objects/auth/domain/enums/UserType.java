@@ -4,6 +4,6 @@ public enum UserType {
 
     INTERNAL,
     EXTERNAL,
-    ANONYMOUS,
-    SYSTEM
+    SYSTEM,
+    ANONYMOUS
 }

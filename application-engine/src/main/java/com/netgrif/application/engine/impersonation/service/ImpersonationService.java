@@ -1,10 +1,7 @@
 package com.netgrif.application.engine.impersonation.service;
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl;
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
-import com.netgrif.application.engine.objects.auth.domain.Authority;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.ImpersonationConfigurationProperties;
 import com.netgrif.application.engine.objects.event.RunPhase;
@@ -58,7 +55,7 @@ public class ImpersonationService implements IImpersonationService {
             throw new IllegalArgumentException("Impersonation is not enabled in app properties");
         }
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
-        AbstractUser impersonated = userService.findById(impersonatedId, null);
+        User impersonated = userService.findById(impersonatedId, null);
 
         List<Case> configs = impersonationAuthorizationService.searchConfigs(loggedUser.getStringId(), impersonated.getStringId());
         LoggedUser impersonatedLogged = ActorTransformer.toLoggedUser(applyRolesAndAuthorities(impersonated, loggedUser.getStringId(), configs));
@@ -73,7 +70,7 @@ public class ImpersonationService implements IImpersonationService {
         }
         Case config = impersonationAuthorizationService.getConfig(configId);
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
-        AbstractUser impersonated = userService.findById(impersonationAuthorizationService.getImpersonatedUserId(config), null);
+        User impersonated = userService.findById(impersonationAuthorizationService.getImpersonatedUserId(config), null);
 
         LoggedUser impersonatedLogged = ActorTransformer.toLoggedUser(applyRolesAndAuthorities(impersonated, loggedUser.getStringId(), Collections.singletonList(config)));
         return doImpersonate(loggedUser, impersonatedLogged, Collections.singletonList(config));
@@ -143,7 +140,7 @@ public class ImpersonationService implements IImpersonationService {
     }
 
     @Override
-    public AbstractUser reloadImpersonatedUserRoles(AbstractUser impersonated, String impersonatorId) {
+    public User reloadImpersonatedUserRoles(User impersonated, String impersonatorId) {
         Optional<Impersonator> context = impersonatorRepository.findByImpersonatedId(impersonated.getStringId());
         if (context.isPresent()) {
             List<Case> configs = context.get().getConfigIds().stream()
@@ -155,7 +152,7 @@ public class ImpersonationService implements IImpersonationService {
     }
 
     @Override
-    public AbstractUser applyRolesAndAuthorities(AbstractUser impersonated, String impersonatorId, List<Case> configs) {
+    public User applyRolesAndAuthorities(User impersonated, String impersonatorId, List<Case> configs) {
         if ((Boolean) userService.findById(impersonatorId, null).getAuthoritySet().contains(new AuthorityImpl(Authority.admin))) {
             return impersonated;
         }

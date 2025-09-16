@@ -4,22 +4,22 @@ import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
 import com.netgrif.application.engine.auth.repository.GroupRepository;
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Group;
+import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.dto.GroupSearchDto;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundException;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundExceptionCode;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import com.querydsl.core.types.Predicate;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.util.Pair;
 
 import java.time.LocalDateTime;
@@ -89,7 +89,7 @@ public class GroupServiceImpl implements GroupService {
         }
         if (group.getMemberIds() != null) {
             Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-            Page<AbstractUser> members;
+            Page<User> members;
             do {
                 members = userService.findAllByIds(group.getMemberIds(), group.getRealmId(), pageable);
                 log.debug("Removing group [{}] from members [{}]", group.getStringId(), members);
@@ -164,7 +164,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group create(AbstractUser groupOwner) {
+    public Group create(User groupOwner) {
         log.info("Creating default group for owner: [{}]", groupOwner.getStringId());
         Page<Group> userGroups = groupRepository.findByOwnerId(groupOwner.getStringId(), Pageable.ofSize(1));
         if (!userGroups.isEmpty() && !Objects.equals(groupOwner.getStringId(), userService.getSystem().getStringId())) {
@@ -174,7 +174,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group create(String identifier, String title, AbstractUser groupOwner) {
+    public Group create(String identifier, String title, User groupOwner) {
         log.info("Creating default group for user: [{}]", groupOwner.getStringId());
         Group group = new Group(identifier, groupOwner.getRealmId());
         group.setOwnerId(groupOwner.getStringId());
@@ -187,7 +187,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group getDefaultUserGroup(AbstractUser user) {
+    public Group getDefaultUserGroup(User user) {
         String errorMessage = "Default user group for user [%s] does not exist.".formatted(user.getUsername());
         // TODO: optimize - use ownerId + groupIdentifier == username (no need for iteration)
         Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
@@ -206,7 +206,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void addUserToDefaultSystemGroup(AbstractUser user) {
+    public void addUserToDefaultSystemGroup(User user) {
         log.info("Adding user [{}] to default group", user.getStringId());
         addUser(user, getDefaultSystemGroup());
     }
@@ -218,18 +218,18 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group addUser(String userId, Group group, String realmId) {
-        AbstractUser user = userService.findById(userId, realmId);
+        User user = userService.findById(userId, realmId);
         return addUser(user, group);
     }
 
     @Override
-    public Group addUser(AbstractUser user, String groupIdentifier) {
+    public Group addUser(User user, String groupIdentifier) {
         Group group = findByIdentifier(groupIdentifier).orElseThrow(() -> new IllegalArgumentException("Group with identifier [%s] not found. ".formatted(groupIdentifier)));
         return addUser(user, group);
     }
 
     @Override
-    public Group addUser(AbstractUser user, Group group) {
+    public Group addUser(User user, Group group) {
         log.info("Adding user [{}] to group [{}]", user.getStringId(), group.getStringId());
         user.addGroupId(group.getStringId());
         group.addMemberId(user.getStringId());
@@ -238,13 +238,13 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group removeUser(AbstractUser user, String groupIdentifier) {
+    public Group removeUser(User user, String groupIdentifier) {
         Group group = findByIdentifier(groupIdentifier).orElseThrow(() -> new IllegalArgumentException("Group with identifier [%s] not found. ".formatted(groupIdentifier)));
         return removeUser(user, group);
     }
 
     @Override
-    public Group removeUser(AbstractUser user, Group group) {
+    public Group removeUser(User user, Group group) {
         log.info("Removing user [{}] from group [{}]", user.getStringId(), group.getStringId());
         user.removeGroupId(group.getStringId());
         group.removeMemberId(user.getStringId());
@@ -382,7 +382,7 @@ public class GroupServiceImpl implements GroupService {
             );
             filters.add(criteria);
         }
-        if (searchDto.getRealmId() != null && !searchDto.getRealmId().isBlank())  {
+        if (searchDto.getRealmId() != null && !searchDto.getRealmId().isBlank()) {
             filters.add(Criteria.where("realmId").regex(searchDto.getRealmId(), "i"));
         }
         Query query = Query.query(filters.isEmpty() ? new Criteria() : new Criteria().andOperator(filters.toArray(new Criteria[0])));
