@@ -60,6 +60,7 @@ public class UserServiceImpl implements UserService {
 
     private User systemUser;
 
+    @Getter
     private PaginationProperties paginationProperties;
 
     private RealmService realmService;
@@ -271,6 +272,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<Group> getUserGroups(AbstractActor actor) {
         return groupService.findAllByIds(actor.getGroupIds(), Pageable.unpaged()).stream().toList();
+    }
+
+    @Override
+    public AbstractUser changePassword(AbstractUser user, String newPassword, String oldPassword) {
+        canUpdatePassword(user, newPassword);
+
+        if (!verifyPasswords(user, oldPassword)) {
+            throw new IllegalArgumentException("Old password does not match.");
+        }
+
+        log.debug("Setting password for user [{}]", user.getUsername());
+        user.setPassword(passwordEncoder.encode(newPassword));
+        return saveUser(user);
     }
 
     @Override
@@ -571,17 +585,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void removeRoleOfDeletedPetriNet(PetriNet petriNet, Collection<String> realmIds) {
-        Set<String> collectionNames = collectionNameProvider.getCollectionNamesForRealms(realmIds);
-        collectionNames.forEach(collection -> {
-            Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-            Page<User> users;
-            do {
-                users = findAllByProcessRoles(petriNet.getRoles().values().stream().map(ProcessRole::get_id).collect(Collectors.toSet()), collection, pageable);
-                users.forEach(u -> petriNet.getRoles().forEach((k, role) -> removeRole(u, role.get_id())));
-                pageable = pageable.next();
-            } while (users.hasNext());
-        });
+    public void removeRoleOfDeletedPetriNet(PetriNet petriNet) {
+        removeRoleOfDeletedPetriNet(new HashSet<>(petriNet.getRoles().values()));
+    }
+
+    @Override
+    public void removeRoleOfDeletedPetriNet(Set<ProcessRole> petriNetRoles) {
+        String defaultRealmCollection = collectionNameProvider.getDefaultRealmCollection();
+        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Collection<ProcessResourceId> roleIds = petriNetRoles.stream().map(ProcessRole::get_id).collect(Collectors.toSet());
+        Page<AbstractUser> users;
+        do {
+            users = searchUsersByRoleIds(roleIds, defaultRealmCollection, pageable);
+            users.getContent().forEach(u -> removeRoles(u, petriNetRoles));
+            pageable = pageable.next();
+        } while (users.hasNext());
     }
 
     @Override
@@ -609,6 +627,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public User transformToUser(LoggedUser loggedUser) {
         return findById(loggedUser.getStringId(), loggedUser.getRealmId());
+    }
+
+    @Override
+    public void updateAdminWithRoles(Collection<ProcessRole> roles) {
+        log.info("Assigning [{}] roles to admin user(s)", roles != null ? roles.size() : 0);
+        User admin = (User) findByEmail(UserConstants.ADMIN_USER_EMAIL, null);
+        admin.setProcessRoles(new HashSet<>(roles));
+        saveUser(admin);
+        log.debug("Admin [{}] now has [{}] process roles", admin.getUsername(), admin.getProcessRoles().size());
     }
 
     protected User initializeNewUser(String username, String email, String firstName, String lastName, String password, String realmId) {
@@ -640,7 +667,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private <T> Page<User> changeType(Page<T> users, Pageable pageable) {
-        return new PageImpl<>(changeType(new HashSet<>(users.getContent())), pageable, users.getTotalElements());
+        return new PageImpl<>(changeType(new LinkedHashSet<>(users.getContent())), pageable, users.getTotalElements());
     }
 
     private <T> List<User> changeType(Collection<T> users) {
@@ -673,4 +700,22 @@ public class UserServiceImpl implements UserService {
         user.getAuthoritySet().addAll(getUserGroups(user).stream().map(Group::getAuthoritySet).flatMap(Set::stream).collect(Collectors.toSet()));
     }
 
+    private boolean verifyPasswords(AbstractUser user, String password) {
+        if (password == null) {
+            throw new IllegalArgumentException("confirmation password is not set");
+        }
+
+        log.trace("Verifying password for user [{}]", user.getUsername());
+        return passwordEncoder.matches(password, user.getPassword());
+    }
+
+    protected void canUpdatePassword(AbstractUser user, String password) {
+        if (!user.isCredentialEnabled("password")) {
+            throw new RuntimeException("Password does not exists or authorization is not enabled");
+        }
+
+        if (password == null) {
+            throw new IllegalArgumentException("Password is not set");
+        }
+    }
 }

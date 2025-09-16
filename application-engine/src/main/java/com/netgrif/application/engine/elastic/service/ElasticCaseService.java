@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.elastic.service;
 
 import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.mapping.FieldType;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
@@ -138,7 +139,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         // TODO: impersonation
 //        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
         LoggedUser loggedOrImpersonated = user;
-        pageable = resolveUnmappedSortAttributes(pageable);
+//        pageable = resolveUnmappedSortAttributes(pageable);
         NativeQuery query = buildQuery(requests, loggedOrImpersonated, pageable, locale, isIntersection);
         List<Case> casePage;
         long total;
@@ -190,11 +191,22 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         BinaryOperator<BoolQuery.Builder> reductionOperation = isIntersection ? (a, b) -> a.must(b.build()._toQuery()) : (a, b) -> a.should(b.build()._toQuery());
         BoolQuery.Builder query = singleQueries.stream().reduce(new BoolQuery.Builder(), reductionOperation);
 
-        NativeQueryBuilder builder = new NativeQueryBuilder();
-        return builder
+        NativeQueryBuilder builder = new NativeQueryBuilder()
                 .withQuery(query.build()._toQuery())
-                .withPageable(pageable)
-                .build();
+                .withPageable(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
+
+        for (org.springframework.data.domain.Sort.Order o : pageable.getSort()) {
+            builder.withSort(s -> s.field(f -> f
+                    .field(o.getProperty())
+                    .order(o.isAscending()
+                            ? co.elastic.clients.elasticsearch._types.SortOrder.Asc
+                            : co.elastic.clients.elasticsearch._types.SortOrder.Desc)
+                    .unmappedType(FieldType.Keyword)
+                    .missing("_last")
+            ));
+        }
+
+        return builder.build();
     }
 
     protected BoolQuery.Builder buildSingleQuery(CaseSearchRequest request, LoggedUser user, Locale locale) {

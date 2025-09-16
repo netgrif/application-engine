@@ -64,7 +64,9 @@ public class Case extends com.netgrif.application.engine.objects.workflow.domain
         return super.getEnabledRoles();
     }
 
+
     @Override
+    @Transient
     public List<Field<?>> getImmediateData() {
         return super.getImmediateData();
     }

@@ -8,12 +8,14 @@ import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.function.Function;
+
+import static com.netgrif.application.engine.adapter.spring.utils.NaeReflectionUtils.indexOfClass;
+import static com.netgrif.application.engine.adapter.spring.utils.NaeReflectionUtils.resolveClass;
 
 @Slf4j
 @Component
@@ -54,11 +56,6 @@ public class ApplicationRunnerOrderResolver {
         return new SortedRunners<>(ordered.values().stream().flatMap(List::stream).toList(), unresolved);
     }
 
-    public static <T> Class<?> resolveClass(T object) {
-        if (object instanceof Class) return (Class<?>) object;
-        else return AopUtils.isAopProxy(object) ? AopUtils.getTargetClass(object) : object.getClass();
-    }
-
     @Getter
     public static class SortedRunners<T> {
         private final List<T> sorted;
@@ -91,7 +88,6 @@ public class ApplicationRunnerOrderResolver {
          * @return {@code true} if all unresolved runners have been successfully sorted and the unresolved list is empty;
          * {@code false} otherwise.
          */
-
         public boolean resolveAllRunners() {
             sortUnresolvedRunners();
             replaced.values().forEach(this::removeRunner);
@@ -169,29 +165,6 @@ public class ApplicationRunnerOrderResolver {
                 changed = true;
             }
             return changed;
-        }
-
-        /**
-         * Returns the index of the first occurrence of the specified class in the given list.
-         * If the list contains an element whose class matches the specified class, the index of that element is returned.
-         * If the specified class is {@code null}, the method returns the index of the first {@code null} element in the list.
-         * If the list is {@code null} or empty, or if the class is not found, the method returns {@code -1}.
-         *
-         * @param <I>   the type of elements in the list
-         * @param list  the list to search for the specified class
-         * @param clazz the class to search for in the list
-         * @return the index of the first occurrence of the specified class in the list, or {@code -1} if the class is not found
-         */
-        public static <I> int indexOfClass(List<I> list, Class<?> clazz) {
-            if (list == null) return -1;
-            if (list.isEmpty()) return -1;
-            if (clazz == null) return list.indexOf(null);
-            for (int i = 0; i < list.size(); i++) {
-                if (resolveClass(list.get(i)).equals(clazz)) {
-                    return i;
-                }
-            }
-            return -1;
         }
 
     }

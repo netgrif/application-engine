@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Service interface for managing user-related operations in the application.
@@ -369,9 +370,15 @@ public interface UserService {
      * Removes roles associated with a deleted Petri net from users in specified realms.
      *
      * @param process the deleted Petri net
-     * @param realmIds collection of realm identifiers
      */
-    void removeRoleOfDeletedPetriNet(PetriNet process, Collection<String> realmIds);
+    void removeRoleOfDeletedPetriNet(PetriNet process);
+
+    /**
+     * Removes roles associated with a deleted Petri net from users in specified realms.
+     *
+     * @param petriNetRoles roles of deleted Petri net
+     */
+    void removeRoleOfDeletedPetriNet(Set<ProcessRole> petriNetRoles);
 
     /**
      * Creates a system user.
@@ -416,4 +423,23 @@ public interface UserService {
      * @return list of groups
      */
     List<Group> getUserGroups(AbstractActor actor);
+
+
+    /**
+     * Assigns the provided process roles to all admin users in the system, updating their current set of roles.
+     * Behavior: roles are added (union) and duplicates are ignored; no existing roles are removed.
+     *
+     * @param roles collection of process roles to assign to admin users
+     */
+    void updateAdminWithRoles(Collection<ProcessRole> roles);
+
+    /**
+     * Resets password for user.
+     *
+     * @param user user
+     * @param newPassword new password
+     * @param oldPassword old password
+     * @return the updated user
+     */
+    AbstractUser changePassword(AbstractUser user, String newPassword, String oldPassword);
 }

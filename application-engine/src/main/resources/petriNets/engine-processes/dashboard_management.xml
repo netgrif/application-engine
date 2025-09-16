@@ -8,6 +8,12 @@
     <transitionRole>false</transitionRole>
 
     <roleRef>
+        <id>default</id>
+        <caseLogic>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
         <id>system</id>
         <caseLogic>
             <create>true</create>
