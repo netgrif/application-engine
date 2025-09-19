@@ -35,6 +35,10 @@ public class Plugin implements Serializable {
 
     private boolean active;
 
+    private boolean isHealthCheckEnabled;
+
+    private String healthCheckUrl;
+
     /**
      * Map of {@link EntryPoint}, key of the map is equivalent to EntryPoint.getName
      *
@@ -49,7 +53,10 @@ public class Plugin implements Serializable {
     }
 
     @Builder
-    public Plugin(String identifier, String name, String version, String description, String url, int restPort, int grpcPort, Map<String, EntryPoint> entryPoints, boolean active, Map<String, String> metadata) {
+    public Plugin(String identifier, String name, String version, String description, String url, int restPort,
+                  int grpcPort, Map<String, EntryPoint> entryPoints, boolean active, Map<String, String> metadata,
+                  boolean isHealthCheckEnabled, String healthCheckUrl
+    ) {
         this.identifier = identifier;
         this.name = name;
         this.version = version;
@@ -60,5 +67,7 @@ public class Plugin implements Serializable {
         this.entryPoints = entryPoints;
         this.active = active;
         this.metadata = metadata;
+        this.isHealthCheckEnabled = isHealthCheckEnabled;
+        this.healthCheckUrl = healthCheckUrl;
     }
 }
