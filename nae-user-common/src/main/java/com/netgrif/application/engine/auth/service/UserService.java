@@ -441,5 +441,5 @@ public interface UserService {
      * @param oldPassword old password
      * @return the updated user
      */
-    AbstractUser changePassword(AbstractUser user, String newPassword, String oldPassword);
+    User changePassword(User user, String newPassword, String oldPassword);
 }

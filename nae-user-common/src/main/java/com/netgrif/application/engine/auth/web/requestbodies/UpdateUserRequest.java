@@ -19,7 +19,7 @@ public class UpdateUserRequest implements Serializable {
     public String middleName;
     public String lastName;
     public String email;
-    public UserType userType;
+    public UserType type;
 
     public UpdateUserRequest() {
     }
@@ -32,7 +32,7 @@ public class UpdateUserRequest implements Serializable {
                 ", middleName='" + middleName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
-                ", userType='" + userType + '\'' +
+                ", type='" + type + '\'' +
                 '}';
     }
 }

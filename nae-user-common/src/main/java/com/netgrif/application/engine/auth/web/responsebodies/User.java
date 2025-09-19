@@ -64,6 +64,7 @@ public class User {
         attributes = user.getAttributes() != null
                 ? new java.util.HashMap<>(user.getAttributes())
                 : new java.util.HashMap<>();
+        type = user.getType();
         if (enabledCredentialsAttribute.getValue() != null && !enabledCredentialsAttribute.getValue().isEmpty()) {
             attributes.put(ATTR_ENABLED_CREDENTIALS, enabledCredentialsAttribute);
         }

@@ -136,6 +136,7 @@ public class UserServiceImpl implements UserService {
         log.debug("Saving user [{}] in realm with id [{}]", user.getUsername(), user.getRealmId());
         user.setModifiedAt(LocalDateTime.now());
         String collectionName = collectionNameProvider.getCollectionNameForRealm(user.getRealmId());
+        user.setType(resolveUserType(user.getEmail(), user.getRealmId()));
         user = userRepository.saveUser(user, mongoTemplate, collectionName);
         log.trace("User [{}] saved in collection [{}]", user.getUsername(), collectionName);
         return user;
@@ -189,10 +190,7 @@ public class UserServiceImpl implements UserService {
         addDefaultAuthorities(user);
         addDefaultRole(user);
         setPassword(user, user.getPassword());
-
-        String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
-        user.setType(resolveUserType(user.getEmail(), null));
-        user = userRepository.saveUser(user, mongoTemplate, collectionName);
+        user = this.saveUser(user, realmId);;
 
         filterImportExportService.createFilterImport(user);
         filterImportExportService.createFilterExport(user);
@@ -203,7 +201,7 @@ public class UserServiceImpl implements UserService {
         if (groupConfigurationProperties.isSystemEnabled())
             groupService.addUserToDefaultSystemGroup(user);
 
-        user = userRepository.saveUser(user, mongoTemplate, collectionName);
+        user = this.saveUser(user, realmId);
         log.info("User [{}] successfully created in realm [{}]", user.getUsername(), realmId);
         return user;
     }
@@ -275,7 +273,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AbstractUser changePassword(AbstractUser user, String newPassword, String oldPassword) {
+    public User changePassword(User user, String newPassword, String oldPassword) {
         canUpdatePassword(user, newPassword);
 
         if (!verifyPasswords(user, oldPassword)) {
@@ -410,8 +408,8 @@ public class UserServiceImpl implements UserService {
         user.setMiddleName(resolveUserUpdateValue(user.getMiddleName(), userUpdate.getMiddleName()));
         user.setLastName(resolveUserUpdateValue(user.getLastName(), userUpdate.getLastName()));
         user.setEmail(resolveUserUpdateValue(user.getEmail(), userUpdate.getEmail()));
-        if(userUpdate.getUserType() != null) {
-            user.setType(userUpdate.getUserType());
+        if(userUpdate.getType() != null) {
+            user.setType(userUpdate.getType());
         }
         return saveUser(user);
     }
@@ -594,7 +592,7 @@ public class UserServiceImpl implements UserService {
         String defaultRealmCollection = collectionNameProvider.getDefaultRealmCollection();
         Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
         Collection<ProcessResourceId> roleIds = petriNetRoles.stream().map(ProcessRole::get_id).collect(Collectors.toSet());
-        Page<AbstractUser> users;
+        Page<User> users;
         do {
             users = searchUsersByRoleIds(roleIds, defaultRealmCollection, pageable);
             users.getContent().forEach(u -> removeRoles(u, petriNetRoles));
