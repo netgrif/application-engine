@@ -330,6 +330,11 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
+    public Page<PetriNet> findAllByRoleId(String roleId, Pageable pageable) {
+        return repository.findAllByRoleId(roleId, pageable);
+    }
+
+    @Override
     public Page<PetriNet> getAll(Pageable pageable) {
         Page<PetriNet> nets = repository.findAll(pageable);
         nets.forEach(PetriNet::initializeArcs);
