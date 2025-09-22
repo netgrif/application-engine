@@ -28,6 +28,7 @@ import com.netgrif.application.engine.startup.runner.MenuProcessRunner;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -194,9 +195,9 @@ public class MenuItemService implements IMenuItemService {
 
     @Override
     public Case findMenuItem(String identifier, boolean retry) {
-        String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
-                MenuProcessRunner.MENU_NET_IDENTIFIER, MenuItemConstants.FIELD_IDENTIFIER, identifier);
-        return findCase(MenuProcessRunner.MENU_NET_IDENTIFIER, query);
+        return findCase(QCase.case$.processIdentifier
+                .eq(MenuProcessRunner.MENU_NET_IDENTIFIER)
+                .and(QCase.case$.dataSet.get(MenuItemConstants.FIELD_IDENTIFIER).value.eq(identifier)));
     }
 
     /**
@@ -208,10 +209,10 @@ public class MenuItemService implements IMenuItemService {
      */
     @Override
     public Case findMenuItem(String path, String name) {
-//        TODO retry
-        String query = String.format("processIdentifier:%s AND title.keyword:\"%s\" AND nodePath:\"%s\"",
-                MenuProcessRunner.MENU_NET_IDENTIFIER, name, path);
-        return findCase(MenuProcessRunner.MENU_NET_IDENTIFIER, query);
+        return findCase(QCase.case$.processIdentifier
+                .eq(MenuProcessRunner.MENU_NET_IDENTIFIER)
+                .and(QCase.case$.title.eq(name))
+                .and(QCase.case$.dataSet.get(MenuItemConstants.FIELD_NODE_PATH).value.eq(path)));
     }
 
     /**
@@ -223,9 +224,9 @@ public class MenuItemService implements IMenuItemService {
     @Override
     public Case findFolderCase(String path) {
 //        TODO
-        String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
-                MenuProcessRunner.MENU_NET_IDENTIFIER, MenuItemConstants.FIELD_NODE_PATH, path);
-        return findCase(MenuProcessRunner.MENU_NET_IDENTIFIER, query);
+        return findCase(QCase.case$.processIdentifier
+                .eq(MenuProcessRunner.MENU_NET_IDENTIFIER)
+                .and(QCase.case$.dataSet.get(MenuItemConstants.FIELD_NODE_PATH).value.eq(path)));
     }
 
     /**
@@ -382,6 +383,10 @@ public class MenuItemService implements IMenuItemService {
         parentFolder.getDataField(MenuItemConstants.FIELD_CHILD_ITEM_IDS).setValue(childIds);
         parentFolder.getDataField(MenuItemConstants.FIELD_HAS_CHILDREN).setValue(MenuItemUtils.hasFolderChildren(parentFolder));
         return workflowService.save(parentFolder);
+    }
+
+    protected Case findCase(Predicate predicate) {
+        return workflowService.searchOne(predicate);
     }
 
     protected Case findCase(String processIdentifier, String query) {

@@ -3,10 +3,12 @@ package com.netgrif.application.engine.integration.modules
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
 import com.netgrif.application.engine.startup.ApplicationEngineFinishRunner
 import com.netgrif.application.engine.startup.annotation.RunnerOrder
+import com.netgrif.application.engine.adapter.spring.utils.NaeReflectionUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.core.annotation.AnnotatedElementUtils
 import org.springframework.stereotype.Component
 
 /**
@@ -75,7 +77,8 @@ class ModuleServiceInjector implements ApplicationEngineFinishRunner {
     private Map<String, Map<String, Object>> groupServicesByModule(Map<String, Object> services) {
         Map<String, Map<String, Object>> grouped = [(DEFAULT_KEY): [:]]
         services.each { entry ->
-            ModuleService[] annotations = entry.value.getClass().getAnnotationsByType(ModuleService.class)
+            Class serviceClass = NaeReflectionUtils.resolveClass(entry.value)
+            ModuleService[] annotations = serviceClass.getAnnotationsByType(ModuleService.class)
             if (annotations.length == 0) throw new IllegalStateException("Module Service bean must have @ModuleService annotations")
             ModuleService annotation = annotations[0]
             if (annotation.value().isBlank()) {
