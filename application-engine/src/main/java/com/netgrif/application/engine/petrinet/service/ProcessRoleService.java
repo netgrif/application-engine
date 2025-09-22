@@ -465,6 +465,10 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
             log.info("No role with id [{}] found", roleId);
             return;
         }
+        if (!processRole.isGlobal()) {
+            log.warn("Role with id [{}] is not global, skipping deletion", roleId);
+            return;
+        }
         log.info("Initiating deletion of global role with import ID [{}] and object ID [{}]", processRole.getImportId(), processRole.getStringId());
         Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
         Page<Realm> realms;
