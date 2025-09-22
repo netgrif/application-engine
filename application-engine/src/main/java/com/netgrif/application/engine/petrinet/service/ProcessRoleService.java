@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.service;
 
+import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleNotGlobalException;
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
@@ -466,8 +467,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
             return;
         }
         if (!processRole.isGlobal()) {
-            log.warn("Role with id [{}] is not global, skipping deletion", roleId);
-            return;
+            throw new RoleNotGlobalException("Role with id [%s] is not global.".formatted(roleId));
         }
         log.info("Initiating deletion of global role with import ID [{}] and object ID [{}]", processRole.getImportId(), processRole.getStringId());
         Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
