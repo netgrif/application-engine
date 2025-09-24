@@ -15,6 +15,8 @@ import groovy.lang.GroovyShell;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -30,14 +33,15 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     private final RunnerConfigurationProperties.FieldRunnerProperties properties;
 
     private IPetriNetService petriNetService;
-
+    private MongoTemplate mongoTemplate;
     private Map<String, Closure> actionsCache;
     private Map<String, List<CachedFunction>> namespaceFunctionsCache;
     private Map<String, CachedFunction> functionsCache;
     private final GroovyShell shell;
 
-    public FieldActionsCacheService(RunnerConfigurationProperties.FieldRunnerProperties properties, IGroovyShellFactory shellFactory) {
+    public FieldActionsCacheService(RunnerConfigurationProperties.FieldRunnerProperties properties, IGroovyShellFactory shellFactory, MongoTemplate mongoTemplate) {
         this.properties = properties;
+        this.mongoTemplate = mongoTemplate;
         this.actionsCache = new MaxSizeHashMap<>(properties.getActionCacheSize());
         this.functionsCache = new MaxSizeHashMap<>(properties.getFunctionsCacheSize());
         this.namespaceFunctionsCache = new MaxSizeHashMap<>(properties.getNamespaceCacheSize());
@@ -94,6 +98,21 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
             cachedFunctions.add(functionsCache.get(function.getStringId()));
         });
         return cachedFunctions;
+    }
+
+    @Override
+    public void cacheAllPetriNetsFunctions() {
+        Query query = new Query().cursorBatchSize(500);
+        try (Stream<PetriNet> stream = mongoTemplate.query(PetriNet.class).matching(query).stream()) {
+            stream.forEach(petriNet -> {
+                if (petriNet == null) return;
+                try {
+                    this.cachePetriNetFunctions(petriNet);
+                } catch (Exception e) {
+                    log.warn("Failed to cache functions for PetriNet id={}", petriNet.getStringId(), e);
+                }
+            });
+        }
     }
 
     @Override
