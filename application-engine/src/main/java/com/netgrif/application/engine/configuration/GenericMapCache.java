@@ -63,7 +63,7 @@ public class GenericMapCache<V> implements Cache {
     }
 
     @Override
-    public synchronized ValueWrapper get(Object key) {
+    public ValueWrapper get(Object key) {
         String stringKey = String.valueOf(key);
         Object valueObject = map().get(stringKey);
         return valueObject != null ? new SimpleValueWrapper(valueObject) : null;
@@ -73,13 +73,7 @@ public class GenericMapCache<V> implements Cache {
     public synchronized <T> T get(Object key, Class<T> type) {
         String stringKey = String.valueOf(key);
         Object valueObject = map().get(stringKey);
-
-        if (valueObject != null) {
-            return type.cast(valueObject);
-        }
-
-        return type.cast(null);
-
+        return valueObject != null ? type.cast(valueObject) : null;
     }
 
     @Override

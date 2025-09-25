@@ -5,6 +5,7 @@ import com.netgrif.application.engine.configuration.properties.RunnerConfigurati
 import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap;
 import com.netgrif.application.engine.workflow.domain.CachedFunction;
 import groovy.lang.Closure;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
@@ -22,14 +23,10 @@ import java.util.stream.Collectors;
 
 @Configuration
 @EnableCaching
+@RequiredArgsConstructor
 public class CacheConfiguration extends CachingConfigurerSupport {
     private final RunnerConfigurationProperties.FieldRunnerProperties fieldRunnerProperties;
     private final CacheConfigurationProperties properties;
-
-    public CacheConfiguration(RunnerConfigurationProperties.FieldRunnerProperties fieldRunnerProperties, CacheConfigurationProperties properties) {
-        this.fieldRunnerProperties = fieldRunnerProperties;
-        this.properties = properties;
-    }
 
     @Bean
     @Primary

@@ -55,7 +55,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
                 .map(function -> CachedFunction.build(shell, function))
                 .collect(Collectors.toList());
 
-        Cache namespaceFunctionsCache = cacheManager.getCache(properties.getNamespaceFunctions());
+        Cache namespaceFunctionsCache = getRequiredCache(properties.getNamespaceFunctions());
 
         if (!functions.isEmpty()) {
             evaluateCachedFunctions(functions);
@@ -67,7 +67,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public void reloadCachedFunctions(String petriNetId) {
-        cacheManager.getCache(properties.getNamespaceFunctions()).evictIfPresent(petriNetId);
+        getRequiredCache(properties.getNamespaceFunctions()).evictIfPresent(petriNetId);
         cachePetriNetFunctions(petriNetService.getNewestVersionByIdentifier(petriNetId));
     }
 
@@ -79,7 +79,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     @Override
     public Closure getCompiledAction(Action action, boolean shouldRewriteCachedActions) {
         String stringId = action.getId().toString();
-        Cache actionsCache = cacheManager.getCache(CacheMapKeys.ACTIONS);
+        Cache actionsCache = getRequiredCache(CacheMapKeys.ACTIONS);
         Object nativeActionsCache = actionsCache.getNativeCache();
 
         if (nativeActionsCache instanceof Map<?, ?> map) {
@@ -94,7 +94,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     @Override
     public List<CachedFunction> getCachedFunctions(List<Function> functions) {
         List<CachedFunction> cachedFunctions = new ArrayList<>(functions.size());
-        Cache functionsCache = cacheManager.getCache(CacheMapKeys.FUNCTIONS);
+        Cache functionsCache = getRequiredCache(CacheMapKeys.FUNCTIONS);
         Object nativeFunctionsCache = functionsCache.getNativeCache();
 
         if (nativeFunctionsCache instanceof Map<?, ?> map) {
@@ -147,21 +147,29 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public Map<String, List<CachedFunction>> getNamespaceFunctionCache() {
-        return new HashMap<>((Map) cacheManager.getCache(properties.getNamespaceFunctions()).getNativeCache());
+        return new HashMap<>((Map) getRequiredCache(properties.getNamespaceFunctions()).getNativeCache());
     }
 
     @Override
     public void clearActionCache() {
-        cacheManager.getCache(CacheMapKeys.ACTIONS).clear();
+        getRequiredCache(CacheMapKeys.ACTIONS).clear();
     }
 
     @Override
     public void clearNamespaceFunctionCache() {
-        cacheManager.getCache(properties.getNamespaceFunctions()).clear();
+        getRequiredCache(properties.getNamespaceFunctions()).clear();
     }
 
     @Override
     public void clearFunctionCache() {
-        cacheManager.getCache(CacheMapKeys.FUNCTIONS).clear();
+        getRequiredCache(CacheMapKeys.FUNCTIONS).clear();
+    }
+
+    private Cache getRequiredCache(String name) {
+        Cache cache = cacheManager.getCache(name);
+        if (cache == null) {
+            throw new IllegalStateException("Cache '" + name + "' is not configured");
+        }
+        return cache;
     }
 }
