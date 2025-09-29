@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.service;
 
+import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleNotFoundException;
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleNotGlobalException;
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.service.GroupService;
@@ -463,8 +464,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     public void deleteGlobalRole(String roleId, LoggedUser loggedUser) {
         ProcessRole processRole = this.findById(roleId);
         if (processRole == null) {
-            log.info("No role with id [{}] found", roleId);
-            return;
+            throw new RoleNotFoundException("Role with id [%s] not found.".formatted(roleId));
         }
         if (!processRole.isGlobal()) {
             throw new RoleNotGlobalException("Role with id [%s] is not global.".formatted(roleId));
