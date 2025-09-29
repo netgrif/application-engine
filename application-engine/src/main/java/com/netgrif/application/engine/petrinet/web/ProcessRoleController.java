@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +29,7 @@ public class ProcessRoleController {
 
     private final ProcessRoleService processRoleService;
 
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Delete global role",
             security = {@SecurityRequirement(name = "X-Auth-Token")})
     @ApiResponses(value = {
@@ -41,7 +43,7 @@ public class ProcessRoleController {
         try {
             LoggedUser user = (LoggedUser) auth.getPrincipal();
             processRoleService.deleteGlobalRole(id, user);
-        } catch (RoleNotGlobalException | RoleNotFoundException e) {
+        } catch (RoleNotGlobalException | RoleNotFoundException | IllegalArgumentException e) {
             String message = "Error when deleting global role [%s]".formatted(id);
             log.error(message, e);
             return ResponseEntity.badRequest().body(e.getMessage());
