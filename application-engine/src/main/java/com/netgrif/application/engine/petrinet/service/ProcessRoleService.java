@@ -525,6 +525,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
                 removeRoleFromTasks(useCase.getStringId(), processRole);
                 workflowService.save(useCase);
             });
+            pageable = pageable.next();
         } while (casePage.hasNext());
     }
 
