@@ -27,7 +27,7 @@ public class WorkerConcurrentCacheManager extends ConcurrentMapCacheManager {
     @Override
     protected Cache createConcurrentMapCache(String name) {
         Cache base = super.createConcurrentMapCache(name);
-        if (readOnlyCacheNames.contains(name)) {
+        if (readOnlyCacheNames != null && readOnlyCacheNames.contains(name)) {
             return new ReadOnlyCache(base);
         }
         return base;
