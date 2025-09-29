@@ -469,6 +469,9 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         if (!processRole.isGlobal()) {
             throw new RoleNotGlobalException("Role with id [%s] is not global.".formatted(roleId));
         }
+        if (ProcessRole.DEFAULT_ROLE.equals(processRole.getImportId()) || ProcessRole.ANONYMOUS_ROLE.equals(processRole.getImportId())) {
+            throw new IllegalArgumentException("Deleting core roles (DEFAULT/ANONYMOUS) is forbidden.");
+        }
         log.info("Initiating deletion of global role with import ID [{}] and object ID [{}]", processRole.getImportId(), processRole.getStringId());
         Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
         Page<Realm> realms;
