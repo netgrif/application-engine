@@ -501,9 +501,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         do {
             petriNetPage = petriNetService.findAllByRoleId(processRole.getStringId(), pageable);
             petriNetPage.forEach(petriNet -> {
-                petriNet.getTransitions().values().forEach(transition -> {
-                    transition.getRoles().remove(processRole.getStringId());
-                });
+                petriNet.getTransitions().values().forEach(transition -> transition.getRoles().remove(processRole.getStringId()));
                 petriNet.getRoles().remove(processRole.getStringId());
                 removeRoleFromCases(petriNet.getStringId(), processRole);
                 petriNetService.save(petriNet);
@@ -544,7 +542,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
             return;
         }
         Set<ProcessResourceId> newRoles = user.getProcessRoles().stream()
-                .filter(role -> !role.getStringId().equals(processRole.getStringId()) && !role.isGlobal())
+                .filter(role -> !role.getStringId().equals(processRole.getStringId()))
                 .map(ProcessRole::get_id)
                 .collect(Collectors.toSet());
         this.assignRolesToUser(user, newRoles, loggedUser);
