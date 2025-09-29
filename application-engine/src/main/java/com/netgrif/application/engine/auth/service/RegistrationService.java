@@ -117,7 +117,8 @@ public class RegistrationService implements IRegistrationService {
 
     @Override
     public boolean stringMatchesUserPassword(User user, String passwordToCompare) {
-        return passwordEncoder.matches(passwordToCompare, user.getPassword());
+        String encoded = user.getPassword();
+        return encoded != null && passwordEncoder.matches(passwordToCompare, encoded);
     }
 
     @Override

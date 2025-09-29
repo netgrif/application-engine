@@ -46,7 +46,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
         createSuperUser();
     }
 
-    private AbstractUser createSuperUser() {
+    private User createSuperUser() {
         Authority adminAuthority = authorityService.getOrCreate(Authority.admin);
         Authority systemAuthority = authorityService.getOrCreate(Authority.systemAdmin);
         Set<Authority> authorities = new HashSet<>();

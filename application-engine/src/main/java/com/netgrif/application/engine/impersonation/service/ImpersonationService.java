@@ -153,7 +153,7 @@ public class ImpersonationService implements IImpersonationService {
 
     @Override
     public User applyRolesAndAuthorities(User impersonated, String impersonatorId, List<Case> configs) {
-        if ((Boolean) userService.findById(impersonatorId, null).getAuthoritySet().contains(new AuthorityImpl(Authority.admin))) {
+        if (userService.findById(impersonatorId, null).isAdmin()) {
             return impersonated;
         }
         List<Authority> authorities = impersonationAuthorizationService.getAuthorities(configs, impersonated);
