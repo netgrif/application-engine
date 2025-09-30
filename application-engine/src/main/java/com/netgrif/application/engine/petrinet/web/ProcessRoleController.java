@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.web;
 
+import com.netgrif.application.engine.adapter.spring.common.web.responsebodies.ResponseMessage;
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleNotFoundException;
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleNotGlobalException;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -38,19 +41,29 @@ public class ProcessRoleController {
             @ApiResponse(responseCode = "200", description = "Global role was deleted successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid role id"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "404", description = "Role not found"),
+            @ApiResponse(responseCode = "409", description = "Role is not global"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping(value = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> deleteGlobalRole(@PathVariable("id") String id, Authentication auth) {
+    public ResponseEntity<ResponseMessage> deleteGlobalRole(@PathVariable("id") String id, Authentication auth) {
         try {
             LoggedUser user = (LoggedUser) auth.getPrincipal();
             processRoleService.deleteGlobalRole(id, user);
-        } catch (RoleNotGlobalException | RoleNotFoundException | IllegalArgumentException e) {
+        } catch (RoleNotFoundException e) {
             String message = "Error when deleting global role [%s]".formatted(id);
             log.error(message, e);
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.status(404).body(ResponseMessage.createErrorMessage(e.getMessage()));
+        } catch (RoleNotGlobalException e) {
+            String message = "Error when deleting global role [%s]".formatted(id);
+            log.error(message, e);
+            return ResponseEntity.status(409).body(ResponseMessage.createErrorMessage(e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            String message = "Error when deleting global role [%s]".formatted(id);
+            log.error(message, e);
+            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage(e.getMessage()));
         }
-        return ResponseEntity.ok("Global role was deleted successfully");
+        return ResponseEntity.ok(ResponseMessage.createErrorMessage("Global role was deleted successfully"));
     }
 
 }
