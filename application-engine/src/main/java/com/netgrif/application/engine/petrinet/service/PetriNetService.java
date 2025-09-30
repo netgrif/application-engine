@@ -523,19 +523,25 @@ public class PetriNetService implements IPetriNetService {
     @Override
     @Transactional
     public void deletePetriNet(String processId, LoggedUser loggedUser) {
+        deletePetriNet(processId, loggedUser, false);
+    }
+
+    @Override
+    @Transactional
+    public void deletePetriNet(String processId, LoggedUser loggedUser, boolean force) {
         Optional<PetriNet> petriNetOptional = repository.findById(processId);
-        if (!petriNetOptional.isPresent()) {
+        if (petriNetOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find process with id [" + processId + "]");
         }
 
         PetriNet petriNet = petriNetOptional.get();
-        log.info("[" + processId + "]: Initiating deletion of Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
+        log.info("[{}]: Initiating deletion of Petri net {} version {}", processId, petriNet.getIdentifier(), petriNet.getVersion().toString());
 
-        userService.removeRoleOfDeletedPetriNet(petriNet, null);
-        workflowService.deleteInstancesOfPetriNet(petriNet);
+        userService.removeRoleOfDeletedPetriNet(petriNet);
+        workflowService.deleteInstancesOfPetriNet(petriNet, force);
         processRoleService.deleteRolesOfNet(petriNet, loggedUser);
 
-        log.info("[" + processId + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
+        log.info("[{}]: User [{}] is deleting Petri net {} version {}", processId, userService.getLoggedOrSystem().getStringId(), petriNet.getIdentifier(), petriNet.getVersion().toString());
         publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.PRE));
         repository.deleteBy_id(petriNet.getObjectId());
         evictCache(petriNet);

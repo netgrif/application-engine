@@ -309,6 +309,15 @@ public interface IPetriNetService {
     void deletePetriNet(String id, LoggedUser loggedUser);
 
     /**
+     * Deletes a PetriNet by its ID.
+     *
+     * @param id the ID of the PetriNet to delete
+     * @param loggedUser the user requesting the deletion
+     * @param force whether to force the deletion without running events
+     */
+    void deletePetriNet(String id, LoggedUser loggedUser, boolean force);
+
+    /**
      * Runs the specified set of actions on a PetriNet.
      *
      * @param actions the actions to execute

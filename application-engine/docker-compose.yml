@@ -39,10 +39,11 @@ services:
     ports:
       - "6379:6379"
   minio:
-    image: docker.io/bitnami/minio:2022
+    image: minio/minio:RELEASE.2022-12-12T19-27-27Z
     ports:
       - '9000:9000'
       - '9001:9001'
+    command: server /data --console-address ":9001"
     networks:
       - minionetwork
     volumes:
@@ -53,7 +54,7 @@ services:
       - MINIO_DEFAULT_BUCKETS=default
 
 #  kibana:
-#    image: docker.elastic.co/kibana/kibana:8.10.4
+#    image: docker.elastic.co/kibana/kibana:8.15.3
 #    environment:
 #      - ELASTICSEARCH_HOSTS=http://docker-elastic:9200
 #    depends_on:

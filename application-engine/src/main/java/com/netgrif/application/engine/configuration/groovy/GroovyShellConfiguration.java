@@ -8,6 +8,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 @Configuration
 public class GroovyShellConfiguration {
 
@@ -18,6 +20,7 @@ public class GroovyShellConfiguration {
     @ConditionalOnMissingBean
     public ImportCustomizer importCustomizer() {
         ImportCustomizer importCustomizer = new ImportCustomizer();
+        importCustomizer.addStarImports(getDefaultEngineImports());
         importCustomizer.addImports(actionsProperties.getImports().toArray(new String[0]));
         importCustomizer.addStarImports(actionsProperties.getStarImports().toArray(new String[0]));
         importCustomizer.addStaticStars(actionsProperties.getStaticStarImports().toArray(new String[0]));
@@ -31,5 +34,15 @@ public class GroovyShellConfiguration {
         configuration.addCompilationCustomizers(importCustomizer());
         return configuration;
     }
+
+
+    protected String[] getDefaultEngineImports() {
+        return new String[]{
+                "com.netgrif.application.engine.objects",
+                "com.netgrif.application.engine.adapter.spring",
+                "java.time"
+        };
+    }
+
 
 }

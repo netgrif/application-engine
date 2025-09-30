@@ -83,6 +83,8 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return this.transformCaseFieldField(caseField, (com.netgrif.application.engine.objects.petrinet.domain.dataset.CaseField) netField);
         } else if (netField instanceof com.netgrif.application.engine.objects.petrinet.domain.dataset.FilterField) {
             return this.transformFilterFieldField(caseField, (com.netgrif.application.engine.objects.petrinet.domain.dataset.FilterField) netField);
+        } else if (netField instanceof com.netgrif.application.engine.objects.petrinet.domain.dataset.StringCollectionField) {
+            return this.transformStringCollectionField(caseField, (com.netgrif.application.engine.objects.petrinet.domain.dataset.StringCollectionField) netField);
         } else {
             String string = caseField.getValue().toString();
             if (string == null)
@@ -125,6 +127,14 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         String[] allowedNets = dataField.getAllowedNets().toArray(new String[0]);
         Map<String, Object> filterMetadata = dataField.getFilterMetadata();
         return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.FilterField(dataField.getValue().toString(),allowedNets, filterMetadata));
+    }
+
+    protected Optional<DataField> transformStringCollectionField(com.netgrif.application.engine.objects.workflow.domain.DataField dataField, com.netgrif.application.engine.objects.petrinet.domain.dataset.StringCollectionField netField) {
+        if (dataField.getValue() != null && dataField.getValue() instanceof Collection && !((Collection<?>) dataField.getValue()).isEmpty()) {
+            String[] values = ((Collection<?>) dataField.getValue()).toArray(new String[0]);
+            return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.StringCollectionField(values));
+        }
+        return Optional.empty();
     }
 
     protected Optional<DataField> transformEnumerationMapField

@@ -49,7 +49,7 @@ public abstract class AbstractUser extends AbstractActor {
     protected String email;
 
     /**
-     * URL or identifier of user's avatar image
+     * URL or identifier of the user's avatar image
      */
     protected String avatar;
 
@@ -141,7 +141,7 @@ public abstract class AbstractUser extends AbstractActor {
     }
 
     /**
-     * Activates Multi-Factor Authentication with enabled state.
+     * Activates Multi-Factor Authentication with the enabled state.
      *
      * @param type    MFA type identifier
      * @param secret  MFA secret key
@@ -154,7 +154,7 @@ public abstract class AbstractUser extends AbstractActor {
      * Checks if a credential is enabled.
      *
      * @param type credential type to check
-     * @return true if credential is enabled, false otherwise
+     * @return true if the credential is enabled, false otherwise
      */
     public boolean isCredentialEnabled(String type) {
         return false;
@@ -200,7 +200,7 @@ public abstract class AbstractUser extends AbstractActor {
     }
 
     /**
-     * Returns user's first and last name concatenated.
+     * Returns a user's first and last name concatenated.
      */
     @Override
     public String getName() {
@@ -208,7 +208,7 @@ public abstract class AbstractUser extends AbstractActor {
     }
 
     /**
-     * Returns user's full name including middle name if present.
+     * Returns the user's full name including middle name if present.
      */
     @Override
     public String getFullName() {

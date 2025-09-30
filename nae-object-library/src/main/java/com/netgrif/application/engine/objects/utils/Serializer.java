@@ -1,8 +1,13 @@
 package com.netgrif.application.engine.objects.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 
 public final class Serializer {
+
+    private static final Logger logger = LoggerFactory.getLogger(Serializer.class);
 
     /**
      * Method deserializes bytes into object
@@ -12,11 +17,15 @@ public final class Serializer {
      * @return Deserialized object
      * */
     public static Object deserialize(byte[] bytes)  {
+        if (bytes == null || bytes.length == 0) {
+            return null;
+        }
         try (ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
              ObjectInputStream in = new ObjectInputStream(bis)) {
             return in.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            logger.error("Failed to deserialize object", e);
+            return null;
         }
     }
 
