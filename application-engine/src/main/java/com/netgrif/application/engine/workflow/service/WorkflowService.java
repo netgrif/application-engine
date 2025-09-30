@@ -497,6 +497,17 @@ public class WorkflowService implements IWorkflowService {
         return options;
     }
 
+    @Override
+    public void setPetriNet(Case useCase) {
+        PetriNet model = useCase.getPetriNet();
+        if (model == null) {
+            model = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet((com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet) petriNetService.get(new ObjectId(useCase.getPetriNetId())));
+            useCase.setPetriNet(model);
+        }
+        model.initializeTokens(useCase.getActivePlaces());
+        model.initializeArcs(useCase.getDataSet());
+    }
+
     private void resolveTaskRefs(Case useCase) {
         useCase.getPetriNet().getDataSet().values().stream().filter(f -> f instanceof TaskField).map(TaskField.class::cast).forEach(field -> {
             if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty() && useCase.getDataField(field.getStringId()).getValue() != null &&
@@ -606,16 +617,6 @@ public class WorkflowService implements IWorkflowService {
         }
 
         return encryptedDataSet;
-    }
-
-    private void setPetriNet(Case useCase) {
-        PetriNet model = useCase.getPetriNet();
-        if (model == null) {
-            model = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet((com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet) petriNetService.get(new ObjectId(useCase.getPetriNetId())));
-            useCase.setPetriNet(model);
-        }
-        model.initializeTokens(useCase.getActivePlaces());
-        model.initializeArcs(useCase.getDataSet());
     }
 
     private EventOutcome addMessageToOutcome(PetriNet net, CaseEventType type, EventOutcome outcome) {

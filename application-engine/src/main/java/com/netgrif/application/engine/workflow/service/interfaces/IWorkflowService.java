@@ -82,4 +82,6 @@ public interface IWorkflowService {
     boolean removeTasksFromCase(List<Task> tasks, Case useCase);
 
     Page<Case> search(Predicate predicate, Pageable pageable);
+
+    void setPetriNet(Case useCase);
 }
