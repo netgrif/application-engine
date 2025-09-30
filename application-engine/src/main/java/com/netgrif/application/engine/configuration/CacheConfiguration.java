@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.configuration.cache.CacheMapKeys;
 import com.netgrif.application.engine.configuration.cache.WorkerConcurrentCacheManager;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import org.springframework.cache.CacheManager;
@@ -11,7 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import java.util.List;
+import java.util.Set;
+
 
 @Configuration
 @EnableCaching
@@ -27,7 +27,7 @@ public class CacheConfiguration extends CachingConfigurerSupport {
     @Primary
     @Override
     public CacheManager cacheManager() {
-        return new WorkerConcurrentCacheManager(List.of(CacheMapKeys.NAMESPACE_FUNCTIONS), properties.getAllCaches().toArray(String[]::new));
+        return new WorkerConcurrentCacheManager(Set.of(properties.getNamespaceFunctions()), properties.getAllCaches().toArray(String[]::new));
     }
 
     @Bean

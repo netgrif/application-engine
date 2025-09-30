@@ -3,25 +3,29 @@ package com.netgrif.application.engine.configuration.cache;
 import org.springframework.cache.Cache;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 public class WorkerConcurrentCacheManager extends ConcurrentMapCacheManager {
-    private List<String> readOnlyCacheNames;
+    private final Set<String> readOnlyCacheNames;
 
     public WorkerConcurrentCacheManager() {
         super();
-        this.readOnlyCacheNames = new ArrayList<>();
+        this.readOnlyCacheNames = Set.of();
     }
 
-    public WorkerConcurrentCacheManager(List<String> readOnlyCacheNames) {
+    public WorkerConcurrentCacheManager(Set<String> readOnlyCacheNames) {
         super();
-        this.readOnlyCacheNames = readOnlyCacheNames;
+        this.readOnlyCacheNames = Set.copyOf(
+                Objects.requireNonNull(readOnlyCacheNames, "readOnlyCacheNames must not be null.")
+        );
     }
 
-    public WorkerConcurrentCacheManager(List<String> readOnlyCacheNames, String... cacheNames) {
+    public WorkerConcurrentCacheManager(Set<String> readOnlyCacheNames, String... cacheNames) {
         super(cacheNames);
-        this.readOnlyCacheNames = readOnlyCacheNames;
+        this.readOnlyCacheNames = Set.copyOf(
+                Objects.requireNonNull(readOnlyCacheNames, "readOnlyCacheNames must not be null.")
+        );
     }
 
     @Override
