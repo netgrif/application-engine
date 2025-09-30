@@ -68,7 +68,7 @@ public class ProcessRoleController {
             log.error(message, e);
             return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage(e.getMessage()));
         }
-        return ResponseEntity.ok(ResponseMessage.createErrorMessage("Global role was deleted successfully"));
+        return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Global role was deleted successfully"));
     }
 
 }
