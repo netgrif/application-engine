@@ -5,6 +5,7 @@ import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleN
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -32,6 +33,7 @@ public class ProcessRoleController {
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Delete global role",
             security = {@SecurityRequirement(name = "X-Auth-Token")})
+    @Parameter(name = "id", description = "Id of the global role to be deleted", required = true, example = "GcdIZcAPUc6jh7i2-68d683f80dc9384aa6791a64")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Global role was deleted successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid role id"),
