@@ -5,6 +5,8 @@ import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
 import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.files.minio.MinIoHostInfo
+import com.netgrif.application.engine.files.minio.StorageConfigurationProperties
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.objects.auth.constants.UserConstants
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
@@ -21,6 +23,9 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest
+import io.minio.BucketExistsArgs
+import io.minio.MakeBucketArgs
+import io.minio.MinioClient
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -64,6 +69,10 @@ class FileListFieldTest {
     public static final String USER_EMAIL = "super@netgrif.com"
     public static final String MOCK_FILE_NAME = "hello.txt"
 
+    public static final String BUCKET = "default"
+
+    static MinioClient mc;
+
     @Value('${netgrif.engine.security.auth.admin-password:password}')
     private String userPassword
 
@@ -97,9 +106,26 @@ class FileListFieldTest {
 
     private Authentication auth
 
+    @Autowired
+    private StorageConfigurationProperties.MinIoStorageProperties MinIoStorageProperties
+
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
+
+        MinIoHostInfo hostInfo = MinIoStorageProperties.getHosts("host_1")
+
+        mc = MinioClient.builder()
+                .endpoint(hostInfo.host)
+                .credentials(hostInfo.user, hostInfo.password)
+                .build();
+
+        boolean exists = mc.bucketExists(BucketExistsArgs.builder().bucket(BUCKET).build());
+        if (!exists) {
+            mc.makeBucket(MakeBucketArgs.builder().bucket(BUCKET).build());
+        }
+
+
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
