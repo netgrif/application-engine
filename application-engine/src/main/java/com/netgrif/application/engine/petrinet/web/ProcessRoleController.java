@@ -3,6 +3,7 @@ package com.netgrif.application.engine.petrinet.web;
 import com.netgrif.application.engine.adapter.spring.common.web.responsebodies.ResponseMessage;
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleNotFoundException;
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleNotGlobalException;
+import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleReferencedException;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,6 +59,10 @@ public class ProcessRoleController {
             String message = "Error when deleting global role [%s]".formatted(id);
             log.error(message, e);
             return ResponseEntity.status(409).body(ResponseMessage.createErrorMessage(e.getMessage()));
+        } catch (RoleReferencedException e) {
+            String message = "Error when deleting global role [%s]".formatted(id);
+            log.error(message, e);
+            return ResponseEntity.status(400).body(ResponseMessage.createErrorMessage(e.getMessage()));
         } catch (IllegalArgumentException e) {
             String message = "Error when deleting global role [%s]".formatted(id);
             log.error(message, e);

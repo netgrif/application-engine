@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.service;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleNotFoundException;
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleNotGlobalException;
+import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleReferencedException;
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
@@ -472,6 +473,9 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         if (ProcessRole.DEFAULT_ROLE.equals(processRole.getImportId()) || ProcessRole.ANONYMOUS_ROLE.equals(processRole.getImportId())) {
             throw new IllegalArgumentException("Deleting core roles (DEFAULT/ANONYMOUS) is forbidden.");
         }
+        if (isRoleReferenced(processRole)) {
+            throw new RoleReferencedException("Role with id [%s] is referenced by other processes. Please delete or update the process before deleting.".formatted(roleId));
+        }
         log.info("Initiating deletion of global role with import ID [{}] and object ID [{}]", processRole.getImportId(), processRole.getStringId());
         Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
         Page<Realm> realms;
@@ -491,49 +495,13 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
             realmPageable = realmPageable.next();
         } while (realms.hasNext());
         log.info("Deleting global role with import ID [{}] and object ID [{}]", processRole.getImportId(), processRole.getStringId());
-        removeRoleFromProcesses(processRole);
         this.processRoleRepository.delete(processRole);
     }
 
-    protected void removeRoleFromProcesses(ProcessRole processRole) {
+    protected boolean isRoleReferenced(ProcessRole processRole) {
         Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-        Page<PetriNet> petriNetPage;
-        do {
-            petriNetPage = petriNetService.findAllByRoleId(processRole.getStringId(), pageable);
-            petriNetPage.forEach(petriNet -> {
-                petriNet.getTransitions().values().forEach(transition -> transition.getRoles().remove(processRole.getStringId()));
-                petriNet.getRoles().remove(processRole.getStringId());
-                removeRoleFromCases(petriNet.getStringId(), processRole);
-                petriNetService.save(petriNet);
-            });
-            pageable = pageable.next();
-        } while (petriNetPage.hasNext());
-    }
-
-    protected void removeRoleFromCases(String petriNetId, ProcessRole processRole) {
-        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-        Page<Case> casePage;
-        do {
-            casePage = workflowService.search(QCase.case$.petriNetObjectId.eq(new ObjectId(petriNetId)), pageable);
-            casePage.forEach(useCase -> {
-                useCase.getEnabledRoles().remove(processRole.getStringId());
-                useCase.getPermissions().remove(processRole.getStringId());
-                useCase.getViewRoles().remove(processRole.getStringId());
-                useCase.getNegativeViewRoles().remove(processRole.getStringId());
-                removeRoleFromTasks(useCase.getStringId(), processRole);
-                workflowService.save(useCase);
-            });
-            pageable = pageable.next();
-        } while (casePage.hasNext());
-    }
-
-    protected void removeRoleFromTasks(String caseId, ProcessRole processRole) {
-        taskService.findAllByCase(caseId).forEach(task -> {
-            task.getRoles().remove(processRole.getStringId());
-            task.getViewRoles().remove(processRole.getStringId());
-            task.getNegativeViewRoles().remove(processRole.getStringId());
-            taskService.save(task);
-        });
+        Page<PetriNet> petriNetPage = petriNetService.findAllByRoleId(processRole.getStringId(), pageable);
+        return petriNetPage.getTotalElements() > 0;
     }
 
     private void removeRoleFromUser(AbstractUser user, ProcessRole processRole, LoggedUser loggedUser) {
