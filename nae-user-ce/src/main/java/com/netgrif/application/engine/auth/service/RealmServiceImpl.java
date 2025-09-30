@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.auth.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netgrif.application.engine.adapter.spring.configuration.AbstractMongoIndexesConfigurator;
 import com.netgrif.application.engine.auth.provider.AbstractAuthConfig;
 import com.netgrif.application.engine.auth.provider.AuthMethodProvider;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -34,6 +37,9 @@ public class RealmServiceImpl implements RealmService {
 
     @Autowired
     private MongoTemplate mongoTemplate;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private AnonymousUserRefService anonymousUserRefService;
@@ -254,20 +260,15 @@ public class RealmServiceImpl implements RealmService {
         Map<String, Object> configUpdates = updates.getConfiguration();
         Object targetConfig = existingConfig.getConfiguration();
 
-        if (targetConfig != null && configUpdates != null) {
-            for (Map.Entry<String, Object> entry : configUpdates.entrySet()) {
-                try {
-                    var field = targetConfig.getClass().getDeclaredField(entry.getKey());
-                    field.setAccessible(true);
-                    field.set(targetConfig, entry.getValue());
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    log.warn("Skipped field '{}' due to error: {}", entry.getKey(), e.getMessage());
-                }
+        if (targetConfig != null && configUpdates != null && !configUpdates.isEmpty()) {
+            try {
+                JsonNode patchNode = objectMapper.valueToTree(configUpdates);
+                objectMapper.readerForUpdating(targetConfig).readValue(patchNode);
+            } catch (IOException e) {
+                throw new IllegalArgumentException("Failed to apply configuration patch", e);
             }
         }
-
         realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
-
         return existingConfig;
     }
 
