@@ -14,7 +14,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.objects.event.events.workflow.IndexCaseEvent;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;

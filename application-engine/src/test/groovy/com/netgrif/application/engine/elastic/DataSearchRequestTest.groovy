@@ -6,7 +6,7 @@ import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
-import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
+import com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.ChoiceField
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldValue

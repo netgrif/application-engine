@@ -2,7 +2,7 @@ package com.netgrif.application.engine.workflow.web;
 
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
+import com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.objects.workflow.domain.Case;

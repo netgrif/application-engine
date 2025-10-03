@@ -10,7 +10,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.domain.ElasticTaskJob;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
-import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
+import com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.application.engine.objects.event.events.task.IndexTaskEvent;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;

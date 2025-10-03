@@ -2,7 +2,7 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.startup.runner.FilterRunner;

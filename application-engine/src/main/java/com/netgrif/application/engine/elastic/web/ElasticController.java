@@ -2,7 +2,7 @@ package com.netgrif.application.engine.elastic.web;
 
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
-import com.netgrif.application.engine.elastic.web.requestbodies.IndexParams;
+import com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.IndexParams;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.ReindexingTask;
 import com.netgrif.application.engine.workflow.service.CaseSearchService;

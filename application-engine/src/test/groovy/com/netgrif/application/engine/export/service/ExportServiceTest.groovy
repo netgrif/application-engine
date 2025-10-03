@@ -2,7 +2,7 @@ package com.netgrif.application.engine.export.service
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.UserService
-import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest
+import com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.ElasticTaskSearchRequest
 import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.objects.auth.constants.UserConstants
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer

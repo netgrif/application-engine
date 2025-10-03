@@ -183,7 +183,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="responsebodies/CountResponse.html" title="class in com.netgrif.application.engine.workflow.web.responsebodies">CountResponse</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#count(com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.security.core.Authentication,java.util.Locale)">count</a></span>&#8203;(<a href="../../elastic/web/requestbodies/singleaslist/SingleCaseSearchRequestAsList.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies.singleaslist">SingleCaseSearchRequestAsList</a>&nbsp;searchBody,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#count(com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.security.core.Authentication,java.util.Locale)">count</a></span>&#8203;(<a href="../../elastic/web/requestbodies/singleaslist/SingleCaseSearchRequestAsList.html" title="class in com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist">SingleCaseSearchRequestAsList</a>&nbsp;searchBody,
      <a href="../domain/MergeFilterOperation.html" title="enum in com.netgrif.application.engine.workflow.domain">MergeFilterOperation</a>&nbsp;operation,
      org.springframework.security.core.Authentication&nbsp;auth,
      java.util.Locale&nbsp;locale)</code></th>
@@ -250,7 +250,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i10" class="altColor">
 <td class="colFirst"><code>org.springframework.hateoas.PagedModel&lt;<a href="responsebodies/CaseResource.html" title="class in com.netgrif.application.engine.workflow.web.responsebodies">CaseResource</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#search(com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.data.domain.Pageable,org.springframework.data.web.PagedResourcesAssembler,org.springframework.security.core.Authentication,java.util.Locale)">search</a></span>&#8203;(<a href="../../elastic/web/requestbodies/singleaslist/SingleCaseSearchRequestAsList.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies.singleaslist">SingleCaseSearchRequestAsList</a>&nbsp;searchBody,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#search(com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.data.domain.Pageable,org.springframework.data.web.PagedResourcesAssembler,org.springframework.security.core.Authentication,java.util.Locale)">search</a></span>&#8203;(<a href="../../elastic/web/requestbodies/singleaslist/SingleCaseSearchRequestAsList.html" title="class in com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist">SingleCaseSearchRequestAsList</a>&nbsp;searchBody,
       <a href="../domain/MergeFilterOperation.html" title="enum in com.netgrif.application.engine.workflow.domain">MergeFilterOperation</a>&nbsp;operation,
       org.springframework.data.domain.Pageable&nbsp;pageable,
       org.springframework.data.web.PagedResourcesAssembler&lt;<a href="../domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;assembler,
@@ -359,7 +359,7 @@ public&nbsp;org.springframework.hateoas.PagedModel&lt;<a href="responsebodies/Ca
                                                                     org.springframework.data.web.PagedResourcesAssembler&lt;<a href="../domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;assembler)</pre>
 </li>
 </ul>
-<a id="search(com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.data.domain.Pageable,org.springframework.data.web.PagedResourcesAssembler,org.springframework.security.core.Authentication,java.util.Locale)">
+<a id="search(com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.data.domain.Pageable,org.springframework.data.web.PagedResourcesAssembler,org.springframework.security.core.Authentication,java.util.Locale)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -369,7 +369,7 @@ public&nbsp;org.springframework.hateoas.PagedModel&lt;<a href="responsebodies/Ca
              consumes="application/json",
              produces="application/hal+json")
 public&nbsp;org.springframework.hateoas.PagedModel&lt;<a href="responsebodies/CaseResource.html" title="class in com.netgrif.application.engine.workflow.web.responsebodies">CaseResource</a>&gt;&nbsp;search&#8203;(@RequestBody
-                                                                   <a href="../../elastic/web/requestbodies/singleaslist/SingleCaseSearchRequestAsList.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies.singleaslist">SingleCaseSearchRequestAsList</a>&nbsp;searchBody,
+                                                                   <a href="../../elastic/web/requestbodies/singleaslist/SingleCaseSearchRequestAsList.html" title="class in com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist">SingleCaseSearchRequestAsList</a>&nbsp;searchBody,
                                                                    @RequestParam(defaultValue="OR")
                                                                    <a href="../domain/MergeFilterOperation.html" title="enum in com.netgrif.application.engine.workflow.domain">MergeFilterOperation</a>&nbsp;operation,
                                                                    org.springframework.data.domain.Pageable&nbsp;pageable,
@@ -395,7 +395,7 @@ public&nbsp;org.springframework.hateoas.PagedModel&lt;<a href="responsebodies/Ca
                                                                         java.util.Locale&nbsp;locale)</pre>
 </li>
 </ul>
-<a id="count(com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.security.core.Authentication,java.util.Locale)">
+<a id="count(com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.security.core.Authentication,java.util.Locale)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -405,7 +405,7 @@ public&nbsp;org.springframework.hateoas.PagedModel&lt;<a href="responsebodies/Ca
              consumes="application/json",
              produces="application/json")
 public&nbsp;<a href="responsebodies/CountResponse.html" title="class in com.netgrif.application.engine.workflow.web.responsebodies">CountResponse</a>&nbsp;count&#8203;(@RequestBody
-                           <a href="../../elastic/web/requestbodies/singleaslist/SingleCaseSearchRequestAsList.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies.singleaslist">SingleCaseSearchRequestAsList</a>&nbsp;searchBody,
+                           <a href="../../elastic/web/requestbodies/singleaslist/SingleCaseSearchRequestAsList.html" title="class in com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist">SingleCaseSearchRequestAsList</a>&nbsp;searchBody,
                            @RequestParam(defaultValue="OR")
                            <a href="../domain/MergeFilterOperation.html" title="enum in com.netgrif.application.engine.workflow.domain">MergeFilterOperation</a>&nbsp;operation,
                            org.springframework.security.core.Authentication&nbsp;auth,

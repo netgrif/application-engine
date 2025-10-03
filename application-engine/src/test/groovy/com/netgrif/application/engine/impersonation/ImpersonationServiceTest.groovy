@@ -4,7 +4,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
-import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
+import com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser

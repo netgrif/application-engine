@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.export.service.interfaces;
 
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
-import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
+import com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.application.engine.export.domain.ExportDataConfig;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.Task;

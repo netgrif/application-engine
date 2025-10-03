@@ -157,8 +157,8 @@
             <id>export</id>
             <actions phase="post">
                 <action id="action_1">
-                    def request = new com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest()
-                    request.process = [new com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest.PetriNet("export_test")]
+                    def request = new com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.CaseSearchRequest()
+                    request.process = [new com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.CaseSearchRequest.PetriNet("export_test")]
                     def config = new com.netgrif.application.engine.export.domain.ExportDataConfig()
                     config.setDataToExport(["text"] as LinkedHashSet)
                     config.setStandardCharsets(java.nio.charset.StandardCharsets.UTF_8)

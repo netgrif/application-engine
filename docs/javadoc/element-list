@@ -36,7 +36,7 @@ com.netgrif.application.engine.elastic.service.executors
 com.netgrif.application.engine.elastic.service.interfaces
 com.netgrif.application.engine.elastic.web
 com.netgrif.application.engine.elastic.web.requestbodies
-com.netgrif.application.engine.elastic.web.requestbodies.singleaslist
+com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist
 com.netgrif.application.engine.event
 com.netgrif.application.engine.event.events
 com.netgrif.application.engine.event.events.user

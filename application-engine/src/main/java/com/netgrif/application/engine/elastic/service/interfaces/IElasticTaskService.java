@@ -2,7 +2,7 @@ package com.netgrif.application.engine.elastic.service.interfaces;
 
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticTask;
-import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
+import com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

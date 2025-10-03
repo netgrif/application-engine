@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
-import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
+import com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;

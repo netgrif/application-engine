@@ -227,7 +227,7 @@ extends <a href="AbstractTaskController.html" title="class in com.netgrif.applic
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="responsebodies/CountResponse.html" title="class in com.netgrif.application.engine.workflow.web.responsebodies">CountResponse</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#count(com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.security.core.Authentication,java.util.Locale)">count</a></span>&#8203;(<a href="../../elastic/web/requestbodies/singleaslist/SingleElasticTaskSearchRequestAsList.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies.singleaslist">SingleElasticTaskSearchRequestAsList</a>&nbsp;query,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#count(com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.security.core.Authentication,java.util.Locale)">count</a></span>&#8203;(<a href="../../elastic/web/requestbodies/singleaslist/SingleElasticTaskSearchRequestAsList.html" title="class in com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist">SingleElasticTaskSearchRequestAsList</a>&nbsp;query,
      <a href="../domain/MergeFilterOperation.html" title="enum in com.netgrif.application.engine.workflow.domain">MergeFilterOperation</a>&nbsp;operation,
      org.springframework.security.core.Authentication&nbsp;auth,
      java.util.Locale&nbsp;locale)</code></th>
@@ -368,9 +368,9 @@ extends <a href="AbstractTaskController.html" title="class in com.netgrif.applic
 </tr>
 <tr id="i20" class="altColor">
 <td class="colFirst"><code>org.springframework.hateoas.PagedModel&lt;<a href="responsebodies/LocalisedTaskResource.html" title="class in com.netgrif.application.engine.workflow.web.responsebodies">LocalisedTaskResource</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#searchElastic(org.springframework.security.core.Authentication,org.springframework.data.domain.Pageable,com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.data.web.PagedResourcesAssembler,java.util.Locale)">searchElastic</a></span>&#8203;(org.springframework.security.core.Authentication&nbsp;auth,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#searchElastic(org.springframework.security.core.Authentication,org.springframework.data.domain.Pageable,com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.data.web.PagedResourcesAssembler,java.util.Locale)">searchElastic</a></span>&#8203;(org.springframework.security.core.Authentication&nbsp;auth,
              org.springframework.data.domain.Pageable&nbsp;pageable,
-             <a href="../../elastic/web/requestbodies/singleaslist/SingleElasticTaskSearchRequestAsList.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies.singleaslist">SingleElasticTaskSearchRequestAsList</a>&nbsp;searchBody,
+             <a href="../../elastic/web/requestbodies/singleaslist/SingleElasticTaskSearchRequestAsList.html" title="class in com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist">SingleElasticTaskSearchRequestAsList</a>&nbsp;searchBody,
              <a href="../domain/MergeFilterOperation.html" title="enum in com.netgrif.application.engine.workflow.domain">MergeFilterOperation</a>&nbsp;operation,
              org.springframework.data.web.PagedResourcesAssembler&lt;<a href="../domain/Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&gt;&nbsp;assembler,
              java.util.Locale&nbsp;locale)</code></th>
@@ -648,7 +648,7 @@ public&nbsp;org.springframework.hateoas.PagedModel&lt;<a href="responsebodies/Lo
 </dl>
 </li>
 </ul>
-<a id="searchElastic(org.springframework.security.core.Authentication,org.springframework.data.domain.Pageable,com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.data.web.PagedResourcesAssembler,java.util.Locale)">
+<a id="searchElastic(org.springframework.security.core.Authentication,org.springframework.data.domain.Pageable,com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.data.web.PagedResourcesAssembler,java.util.Locale)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -660,18 +660,18 @@ public&nbsp;org.springframework.hateoas.PagedModel&lt;<a href="responsebodies/Lo
 public&nbsp;org.springframework.hateoas.PagedModel&lt;<a href="responsebodies/LocalisedTaskResource.html" title="class in com.netgrif.application.engine.workflow.web.responsebodies">LocalisedTaskResource</a>&gt;&nbsp;searchElastic&#8203;(org.springframework.security.core.Authentication&nbsp;auth,
                                                                                    org.springframework.data.domain.Pageable&nbsp;pageable,
                                                                                    @RequestBody
-                                                                                   <a href="../../elastic/web/requestbodies/singleaslist/SingleElasticTaskSearchRequestAsList.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies.singleaslist">SingleElasticTaskSearchRequestAsList</a>&nbsp;searchBody,
+                                                                                   <a href="../../elastic/web/requestbodies/singleaslist/SingleElasticTaskSearchRequestAsList.html" title="class in com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist">SingleElasticTaskSearchRequestAsList</a>&nbsp;searchBody,
                                                                                    @RequestParam(defaultValue="OR")
                                                                                    <a href="../domain/MergeFilterOperation.html" title="enum in com.netgrif.application.engine.workflow.domain">MergeFilterOperation</a>&nbsp;operation,
                                                                                    org.springframework.data.web.PagedResourcesAssembler&lt;<a href="../domain/Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&gt;&nbsp;assembler,
                                                                                    java.util.Locale&nbsp;locale)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="AbstractTaskController.html#searchElastic(org.springframework.security.core.Authentication,org.springframework.data.domain.Pageable,com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.data.web.PagedResourcesAssembler,java.util.Locale)">searchElastic</a></code>&nbsp;in class&nbsp;<code><a href="AbstractTaskController.html" title="class in com.netgrif.application.engine.workflow.web">AbstractTaskController</a></code></dd>
+<dd><code><a href="AbstractTaskController.html#searchElastic(org.springframework.security.core.Authentication,org.springframework.data.domain.Pageable,com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.data.web.PagedResourcesAssembler,java.util.Locale)">searchElastic</a></code>&nbsp;in class&nbsp;<code><a href="AbstractTaskController.html" title="class in com.netgrif.application.engine.workflow.web">AbstractTaskController</a></code></dd>
 </dl>
 </li>
 </ul>
-<a id="count(com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.security.core.Authentication,java.util.Locale)">
+<a id="count(com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.security.core.Authentication,java.util.Locale)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -681,14 +681,14 @@ public&nbsp;org.springframework.hateoas.PagedModel&lt;<a href="responsebodies/Lo
              consumes="application/json",
              produces="application/json")
 public&nbsp;<a href="responsebodies/CountResponse.html" title="class in com.netgrif.application.engine.workflow.web.responsebodies">CountResponse</a>&nbsp;count&#8203;(@RequestBody
-                           <a href="../../elastic/web/requestbodies/singleaslist/SingleElasticTaskSearchRequestAsList.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies.singleaslist">SingleElasticTaskSearchRequestAsList</a>&nbsp;query,
+                           <a href="../../elastic/web/requestbodies/singleaslist/SingleElasticTaskSearchRequestAsList.html" title="class in com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist">SingleElasticTaskSearchRequestAsList</a>&nbsp;query,
                            @RequestParam(defaultValue="OR")
                            <a href="../domain/MergeFilterOperation.html" title="enum in com.netgrif.application.engine.workflow.domain">MergeFilterOperation</a>&nbsp;operation,
                            org.springframework.security.core.Authentication&nbsp;auth,
                            java.util.Locale&nbsp;locale)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="AbstractTaskController.html#count(com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.security.core.Authentication,java.util.Locale)">count</a></code>&nbsp;in class&nbsp;<code><a href="AbstractTaskController.html" title="class in com.netgrif.application.engine.workflow.web">AbstractTaskController</a></code></dd>
+<dd><code><a href="AbstractTaskController.html#count(com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,org.springframework.security.core.Authentication,java.util.Locale)">count</a></code>&nbsp;in class&nbsp;<code><a href="AbstractTaskController.html" title="class in com.netgrif.application.engine.workflow.web">AbstractTaskController</a></code></dd>
 </dl>
 </li>
 </ul>

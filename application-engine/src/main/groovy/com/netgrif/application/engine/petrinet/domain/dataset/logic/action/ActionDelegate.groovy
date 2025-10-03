@@ -15,8 +15,8 @@ import com.netgrif.application.engine.configuration.properties.MailConfiguration
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
-import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
-import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest
+import com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.CaseSearchRequest
+import com.netgrif.application.engine.adapter.spring.elastic.web.requestbodies.ElasticTaskSearchRequest
 import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
