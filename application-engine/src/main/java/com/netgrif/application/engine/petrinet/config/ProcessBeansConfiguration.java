@@ -11,6 +11,8 @@ import com.netgrif.application.engine.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +33,9 @@ public class ProcessBeansConfiguration {
                                                  ISecurityContextService securityContextService,
                                                  @Lazy GroupService groupService,
                                                  @Lazy RealmService realmService,
-                                                 @Lazy PaginationProperties paginationProperties
+                                                 @Lazy PaginationProperties paginationProperties,
+                                                 @Lazy IWorkflowService workflowService,
+                                                 @Lazy ITaskService taskService
                                                  ) {
         return new com.netgrif.application.engine.petrinet.service.ProcessRoleService(
                 processRoleRepository,
@@ -43,7 +47,9 @@ public class ProcessBeansConfiguration {
                 securityContextService,
                 groupService,
                 realmService,
-                paginationProperties
+                paginationProperties,
+                workflowService,
+                taskService
         );
     }
 

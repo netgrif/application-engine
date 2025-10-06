@@ -344,4 +344,14 @@ public interface IPetriNetService {
      * @return a {@link PetriNetImportReference} linking the PetriNet
      */
     PetriNetImportReference getNetFromCase(String caseId);
+
+
+    /**
+     * Retrieves a paginated list of {@link PetriNet} objects associated with a specific role ID.
+     *
+     * @param roleId   the ID of the role to filter the PetriNets by
+     * @param pageable the pagination information
+     * @return a {@link Page} of {@link PetriNet} objects matching the role ID
+     */
+    Page<PetriNet> findAllByRoleId(String roleId, Pageable pageable);
 }
