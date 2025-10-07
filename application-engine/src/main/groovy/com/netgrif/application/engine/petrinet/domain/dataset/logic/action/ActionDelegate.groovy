@@ -2427,11 +2427,7 @@ class ActionDelegate {
         Map<String, PetriNet> temp = [:]
         return roles.collectEntries { entry ->
             if (entry.value == GLOBAL_ROLE) {
-                Set<ProcessRole> findGlobalRole = processRoleService.findAllByImportId(ProcessRole.GLOBAL + entry.key)
-                if (findGlobalRole == null || findGlobalRole.isEmpty()) {
-                    return
-                }
-                ProcessRole role = findGlobalRole.find { it.isGlobal() }
+                ProcessRole role = processRoleService.findAllByImportId(ProcessRole.GLOBAL + entry.key, Pageable.ofSize(1)).getContent().getFirst()
                 if (role == null) {
                     return
                 }
