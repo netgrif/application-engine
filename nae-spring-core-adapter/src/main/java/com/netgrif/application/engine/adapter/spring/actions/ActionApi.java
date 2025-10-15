@@ -15,32 +15,31 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public interface ActionApi {
 
-    GetDataEventOutcome getData(String taskId, Map<String, String> params);
+    GetDataEventOutcome getData(String taskId, HashMap<String, String> params);
 
-    SetDataEventOutcome setData(String taskId, Map<String, Map<String, String>> dataSet, Map<String, String> params) throws JsonProcessingException;
+    SetDataEventOutcome setData(String taskId, HashMap<String, HashMap<String, String>> dataSet, HashMap<String, String> params) throws JsonProcessingException;
 
-    Page<Case> searchCases(Predicate predicate, Pageable pageable);
+    Page<Case> searchCases(String processIdentifier, Predicate predicate, Pageable pageable);
 
     Page<Case> searchCases(List<String> elasticStringQueries, Pageable pageable, Boolean isIntersection);
 
-    CreateCaseEventOutcome createCase(String netId, String title, String color, Map<String, String> params);
+    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, HashMap<String, String> params);
 
-    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, Map<String, String> params);
+    DeleteCaseEventOutcome deleteCase(String caseId, HashMap<String, String> params);
 
-    DeleteCaseEventOutcome deleteCase(String caseId, Map<String, String> params);
-
-    Page<Task> searchTasks(Predicate predicate, Pageable pageable);
+    Page<Task> searchTasks(String processIdentifier, Predicate predicate, Pageable pageable);
 
     Page<Task> searchTasks(List<String> elasticStringQueries, Pageable pageable, Boolean isIntersection);
 
-    AssignTaskEventOutcome assignTask(String taskId, String userId, String realmId, Map<String, String> params) throws TransitionNotExecutableException;
+    AssignTaskEventOutcome assignTask(String taskId, String username, String realmId, HashMap<String, String> params) throws TransitionNotExecutableException;
 
-    CancelTaskEventOutcome cancelTask(String taskId, String userId, String realmId, Map<String, String> params);
+    CancelTaskEventOutcome cancelTask(String taskId, String username, String realmId, HashMap<String, String> params);
 
-    FinishTaskEventOutcome finishTask(String taskId, String userId, String realmId, Map<String, String> params) throws TransitionNotExecutableException;
+    FinishTaskEventOutcome finishTask(String taskId, String username, String realmId, HashMap<String, String> params) throws TransitionNotExecutableException;
 }

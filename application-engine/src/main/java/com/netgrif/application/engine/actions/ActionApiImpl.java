@@ -32,9 +32,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public class ActionApiImpl implements ActionApi {
@@ -51,33 +49,38 @@ public class ActionApiImpl implements ActionApi {
 
     private IElasticTaskService elasticTaskService;
 
-    public void setDataService(@Autowired IDataService dataService) {
+    @Autowired
+    public void setDataService(IDataService dataService) {
         this.dataService = dataService;
     }
 
-    public void setTaskService(@Autowired ITaskService taskService) {
+    @Autowired
+    public void setTaskService(ITaskService taskService) {
         this.taskService = taskService;
     }
 
-    public void setWorkflowService(@Autowired IWorkflowService workflowService) {
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
         this.workflowService = workflowService;
     }
 
-    public void setElasticCaseService(@Autowired IElasticCaseService elasticCaseService) {
+    @Autowired
+    public void setElasticCaseService(IElasticCaseService elasticCaseService) {
         this.elasticCaseService = elasticCaseService;
     }
 
-    public void setUserService(@Autowired UserService userService) {
+    @Autowired
+    public void setUserService(UserService userService) {
         this.userService = userService;
     }
 
     @Override
-    public GetDataEventOutcome getData(String taskId, Map<String, String> params) {
+    public GetDataEventOutcome getData(String taskId, HashMap<String, String> params) {
         return dataService.getData(taskId, params);
     }
 
     @Override
-    public SetDataEventOutcome setData(String taskId, Map<String, Map<String, String>> dataSet, Map<String, String> params) throws JsonProcessingException {
+    public SetDataEventOutcome setData(String taskId, HashMap<String, HashMap<String, String>> dataSet, HashMap<String, String> params) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(dataSet);
         ObjectNode values = (ObjectNode) mapper.readTree(json);
@@ -85,7 +88,7 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
-    public Page<Case> searchCases(Predicate predicate, Pageable pageable) {
+    public Page<Case> searchCases(String processIdentifier, Predicate predicate, Pageable pageable) {
         return workflowService.search(predicate, pageable);
     }
 
@@ -98,26 +101,19 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, Map<String, String> params) {
-        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
-        Locale locale = LocaleContextHolder.getLocale();
-        return workflowService.createCase(netId, title, color, loggedUser, locale, params);
-    }
-
-    @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, Map<String, String> params) {
+    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, HashMap<String, String> params) {
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
         Locale locale = LocaleContextHolder.getLocale();
         return workflowService.createCaseByIdentifier(identifier, title, color, loggedUser, locale, params);
     }
 
     @Override
-    public DeleteCaseEventOutcome deleteCase(String caseId, Map<String, String> params) {
+    public DeleteCaseEventOutcome deleteCase(String caseId, HashMap<String, String> params) {
         return workflowService.deleteCase(caseId, params);
     }
 
     @Override
-    public Page<Task> searchTasks(Predicate predicate, Pageable pageable) {
+    public Page<Task> searchTasks(String processIdentifier, Predicate predicate, Pageable pageable) {
         return taskService.search(predicate, pageable);
     }
 
@@ -130,23 +126,26 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
-    public AssignTaskEventOutcome assignTask(String taskId, String userId, String realmId, Map<String, String> params) throws TransitionNotExecutableException {
+    public AssignTaskEventOutcome assignTask(String taskId, String username, String realmId, HashMap<String, String> params) throws TransitionNotExecutableException {
         Task task = taskService.findOne(taskId);
-        AbstractUser user = userService.findById(userId, realmId);
+        Optional<AbstractUser> userOptional = userService.findUserByUsername(username, realmId);
+        AbstractUser user = userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] and realm ID [%s] not found".formatted(username, realmId)));
         return taskService.assignTask(task, user, params);
     }
 
     @Override
-    public CancelTaskEventOutcome cancelTask(String taskId, String userId, String realmId, Map<String, String> params) {
+    public CancelTaskEventOutcome cancelTask(String taskId, String username, String realmId, HashMap<String, String> params) {
         Task task = taskService.findOne(taskId);
-        AbstractUser user = userService.findById(userId, realmId);
+        Optional<AbstractUser> userOptional = userService.findUserByUsername(username, realmId);
+        AbstractUser user = userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] and realm ID [%s] not found".formatted(username, realmId)));
         return taskService.cancelTask(task, user, params);
     }
 
     @Override
-    public FinishTaskEventOutcome finishTask(String taskId, String userId, String realmId, Map<String, String> params) throws TransitionNotExecutableException {
+    public FinishTaskEventOutcome finishTask(String taskId, String username, String realmId, HashMap<String, String> params) throws TransitionNotExecutableException {
         Task task = taskService.findOne(taskId);
-        AbstractUser user = userService.findById(userId, realmId);
+        Optional<AbstractUser> userOptional = userService.findUserByUsername(username, realmId);
+        AbstractUser user = userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] and realm ID [%s] not found".formatted(username, realmId)));
         return taskService.finishTask(task, user, params);
     }
 }

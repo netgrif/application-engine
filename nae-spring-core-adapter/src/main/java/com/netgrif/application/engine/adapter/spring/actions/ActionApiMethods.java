@@ -7,7 +7,6 @@ public enum ActionApiMethods {
     GET_DATA("getData"),
     SET_DATA("setData"),
     SEARCH_CASES("searchCases"),
-    CREATE_CASE("createCase"),
     CREATE_CASE_BY_IDENTIFIER("createCaseByIdentifier"),
     DELETE_CASE("deleteCase"),
     SEARCH_TASKS("searchTasks"),
