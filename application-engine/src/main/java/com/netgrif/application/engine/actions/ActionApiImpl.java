@@ -12,6 +12,7 @@ import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearc
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.auth.dto.AuthPrincipalDto;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
@@ -93,16 +94,16 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
-    public Page<Case> searchCases(List<String> elasticStringQueries, Pageable pageable, Boolean isIntersection) {
+    public Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection) {
         List<CaseSearchRequest> caseSearchRequests = elasticStringQueries.stream().map(query -> CaseSearchRequest.builder().query(query).build()).toList();
-        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
         Locale locale = LocaleContextHolder.getLocale();
         return elasticCaseService.search(caseSearchRequests, loggedUser, pageable, locale, isIntersection);
     }
 
     @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, HashMap<String, String> params) {
-        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
+    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, AuthPrincipalDto authPrincipalDto, HashMap<String, String> params) {
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
         Locale locale = LocaleContextHolder.getLocale();
         return workflowService.createCaseByIdentifier(identifier, title, color, loggedUser, locale, params);
     }
@@ -118,34 +119,36 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
-    public Page<Task> searchTasks(List<String> elasticStringQueries, Pageable pageable, Boolean isIntersection) {
+    public Page<Task> searchTasks(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection) {
         List<ElasticTaskSearchRequest> taskSearchRequests = elasticStringQueries.stream().map(query -> ElasticTaskSearchRequest.builder().query(query).build()).toList();
-        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
         Locale locale = LocaleContextHolder.getLocale();
         return elasticTaskService.search(taskSearchRequests, loggedUser, pageable, locale, isIntersection);
     }
 
     @Override
-    public AssignTaskEventOutcome assignTask(String taskId, String username, String realmId, HashMap<String, String> params) throws TransitionNotExecutableException {
+    public AssignTaskEventOutcome assignTask(String taskId, AuthPrincipalDto authPrincipalDto, HashMap<String, String> params) throws TransitionNotExecutableException {
         Task task = taskService.findOne(taskId);
-        Optional<AbstractUser> userOptional = userService.findUserByUsername(username, realmId);
-        AbstractUser user = userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] and realm ID [%s] not found".formatted(username, realmId)));
+        AbstractUser user = resolveAbstractUser(authPrincipalDto);
         return taskService.assignTask(task, user, params);
     }
 
     @Override
-    public CancelTaskEventOutcome cancelTask(String taskId, String username, String realmId, HashMap<String, String> params) {
+    public CancelTaskEventOutcome cancelTask(String taskId, AuthPrincipalDto authPrincipalDto, HashMap<String, String> params) {
         Task task = taskService.findOne(taskId);
-        Optional<AbstractUser> userOptional = userService.findUserByUsername(username, realmId);
-        AbstractUser user = userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] and realm ID [%s] not found".formatted(username, realmId)));
+        AbstractUser user = resolveAbstractUser(authPrincipalDto);
         return taskService.cancelTask(task, user, params);
     }
 
     @Override
-    public FinishTaskEventOutcome finishTask(String taskId, String username, String realmId, HashMap<String, String> params) throws TransitionNotExecutableException {
+    public FinishTaskEventOutcome finishTask(String taskId, AuthPrincipalDto authPrincipalDto, HashMap<String, String> params) throws TransitionNotExecutableException {
         Task task = taskService.findOne(taskId);
-        Optional<AbstractUser> userOptional = userService.findUserByUsername(username, realmId);
-        AbstractUser user = userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] and realm ID [%s] not found".formatted(username, realmId)));
+        AbstractUser user = resolveAbstractUser(authPrincipalDto);
         return taskService.finishTask(task, user, params);
+    }
+
+    private AbstractUser resolveAbstractUser(AuthPrincipalDto authPrincipalDto) {
+        Optional<AbstractUser> userOptional = userService.findUserByUsername(authPrincipalDto.getUsername(), authPrincipalDto.getRealmId());
+        return userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] and realm ID [%s] not found".formatted(authPrincipalDto.getUsername(), authPrincipalDto.getRealmId())));
     }
 }

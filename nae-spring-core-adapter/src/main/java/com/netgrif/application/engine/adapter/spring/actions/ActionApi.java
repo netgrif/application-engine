@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.adapter.spring.actions;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.netgrif.application.engine.objects.auth.dto.AuthPrincipalDto;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
@@ -17,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public interface ActionApi {
 
@@ -27,19 +27,19 @@ public interface ActionApi {
 
     Page<Case> searchCases(String processIdentifier, Predicate predicate, Pageable pageable);
 
-    Page<Case> searchCases(List<String> elasticStringQueries, Pageable pageable, Boolean isIntersection);
+    Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection);
 
-    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, HashMap<String, String> params);
+    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, AuthPrincipalDto authPrincipalDto, HashMap<String, String> params);
 
     DeleteCaseEventOutcome deleteCase(String caseId, HashMap<String, String> params);
 
     Page<Task> searchTasks(String processIdentifier, Predicate predicate, Pageable pageable);
 
-    Page<Task> searchTasks(List<String> elasticStringQueries, Pageable pageable, Boolean isIntersection);
+    Page<Task> searchTasks(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection);
 
-    AssignTaskEventOutcome assignTask(String taskId, String username, String realmId, HashMap<String, String> params) throws TransitionNotExecutableException;
+    AssignTaskEventOutcome assignTask(String taskId, AuthPrincipalDto authPrincipalDto, HashMap<String, String> params) throws TransitionNotExecutableException;
 
-    CancelTaskEventOutcome cancelTask(String taskId, String username, String realmId, HashMap<String, String> params);
+    CancelTaskEventOutcome cancelTask(String taskId, AuthPrincipalDto authPrincipalDto, HashMap<String, String> params);
 
-    FinishTaskEventOutcome finishTask(String taskId, String username, String realmId, HashMap<String, String> params) throws TransitionNotExecutableException;
+    FinishTaskEventOutcome finishTask(String taskId, AuthPrincipalDto authPrincipalDto, HashMap<String, String> params) throws TransitionNotExecutableException;
 }
