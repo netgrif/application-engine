@@ -90,7 +90,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     public void remove(String caseId) {
         executors.execute(caseId, () -> {
             repository.deleteAllById(caseId);
-            log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
+            log.info("[{}]: Case \"{}\" deleted", caseId, caseId);
         });
     }
 
@@ -98,7 +98,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     public void removeByPetriNetId(String processId) {
         executors.execute(processId, () -> {
             repository.deleteAllByProcessId(processId);
-            log.info("[" + processId + "]: All cases of Petri Net with id \"" + processId + "\" deleted");
+            log.info("[{}]: All cases of Petri Net with id \"{}\" deleted", processId, processId);
         });
     }
 
@@ -114,13 +114,13 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                     elasticCase.update(useCase);
                     repository.save(elasticCase);
                 }
-                log.debug("[" + useCase.getId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
+                log.debug("[{}]: Case \"{}\" indexed", useCase.getId(), useCase.getTitle());
                 publisher.publishEvent(new IndexCaseEvent(useCase));
             } catch (InvalidDataAccessApiUsageException ignored) {
-                log.debug("[" + useCase.getId() + "]: Case \"" + useCase.getTitle() + "\" has duplicates, will be reindexed");
+                log.debug("[{}]: Case \"{}\" has duplicates, will be reindexed", useCase.getId(), useCase.getTitle());
                 repository.deleteAllById(useCase.getId());
                 repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase) useCase);
-                log.debug("[" + useCase.getId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
+                log.debug("[{}]: Case \"{}\" indexed", useCase.getId(), useCase.getTitle());
             }
         });
     }

@@ -190,10 +190,10 @@ public class ElasticIndexService implements IElasticIndexService {
         try {
             String indexName = getIndexName(clazz, placeholders);
             if (this.indexExists(indexName)) {
-                log.warn("Index: " + indexName + " has been deleted!");
+                log.warn("Index: {} has been deleted!", indexName);
                 return elasticsearchTemplate.indexOps(IndexCoordinates.of(indexName)).delete();
             } else {
-                log.warn("Index: " + indexName + " not found!");
+                log.warn("Index: {} not found!", indexName);
             }
         } catch (Exception e) {
             log.error("deleteIndex: ", e);
