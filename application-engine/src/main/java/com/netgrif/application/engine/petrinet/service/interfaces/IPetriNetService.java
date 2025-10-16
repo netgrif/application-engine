@@ -10,6 +10,8 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.acti
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.objects.petrinet.domain.version.Version;
+import com.netgrif.application.engine.petrinet.params.DeletePetriNetParams;
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetImportReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
@@ -68,47 +70,17 @@ public interface IPetriNetService {
     }
 
     /**
-     * Imports a PetriNet from XML input. 
-     * 
-     * @param xmlFile the input stream of the XML file
-     * @param releaseType the type of release
-     * @param user the user performing the import
-     * @return an {@link ImportPetriNetEventOutcome} representing the result
-     * @throws IOException if an I/O error occurs
-     * @throws MissingPetriNetMetaDataException if metadata is incomplete
-     * @throws MissingIconKeyException if an icon key is missing
-     * @deprecated Use {@link #importPetriNet(InputStream, VersionType, LoggedUser)} instead.
-     */
-    @Deprecated
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
-
-    /**
      * Imports a PetriNet from XML input.
+     * todo javadoc
      *
-     * @param xmlFile the input stream of the XML file
-     * @param releaseType the type of release {@link VersionType}
-     * @param user the user performing the import
+     * @param importPetriNetParams additional parameters
      * @return an {@link ImportPetriNetEventOutcome} representing the result
      * @throws IOException if an I/O error occurs
      * @throws MissingPetriNetMetaDataException if metadata is incomplete
      * @throws MissingIconKeyException if an icon key is missing
      */
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
-
-
-    /**
-     * Imports a PetriNet from XML input.
-     *
-     * @param xmlFile the input stream of the XML file
-     * @param releaseType the type of release {@link VersionType}
-     * @param user the user performing the import
-     * @param params additional parameters
-     * @return an {@link ImportPetriNetEventOutcome} representing the result
-     * @throws IOException if an I/O error occurs
-     * @throws MissingPetriNetMetaDataException if metadata is incomplete
-     * @throws MissingIconKeyException if an icon key is missing
-     */
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+    ImportPetriNetEventOutcome importPetriNet(ImportPetriNetParams importPetriNetParams) throws IOException,
+            MissingPetriNetMetaDataException, MissingIconKeyException;
 
     /**
      * Saves a PetriNet object.
@@ -305,20 +277,9 @@ public interface IPetriNetService {
 
     /**
      * Deletes a PetriNet by its ID.
-     *
-     * @param id the ID of the PetriNet to delete
-     * @param loggedUser the user requesting the deletion
+     * todo javadoc
      */
-    void deletePetriNet(String id, LoggedUser loggedUser);
-
-    /**
-     * Deletes a PetriNet by its ID.
-     *
-     * @param id the ID of the PetriNet to delete
-     * @param loggedUser the user requesting the deletion
-     * @param force whether to force the deletion without running events
-     */
-    void deletePetriNet(String id, LoggedUser loggedUser, boolean force);
+    void deletePetriNet(DeletePetriNetParams deletePetriNetParams);
 
     /**
      * Runs the specified set of actions on a PetriNet.

@@ -13,6 +13,8 @@ import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingI
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
+import com.netgrif.application.engine.petrinet.params.DeletePetriNetParams;
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
@@ -109,7 +111,11 @@ public class PetriNetController {
             Authentication auth, Locale locale) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
             VersionType release = releaseType == null ? VersionType.MAJOR : VersionType.valueOf(releaseType.trim().toUpperCase());
-            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(multipartFile.getInputStream(), release, (LoggedUser) auth.getPrincipal());
+            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(ImportPetriNetParams.with()
+                    .xmlFile(multipartFile.getInputStream())
+                    .releaseType(release)
+                    .author((LoggedUser) auth.getPrincipal())
+                    .build());
             return EventOutcomeWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully",
                     LocalisedEventOutcomeFactory.from(importPetriNetOutcome, locale));
         } catch (IOException | IllegalArgumentException e) {
@@ -230,7 +236,11 @@ public class PetriNetController {
             return MessageResource.errorMessage("Deleting Petri net " + processId + " failed!");
         }
         LoggedUser user = (LoggedUser) auth.getPrincipal();
-        asyncRunner.execute(() -> this.service.deletePetriNet(decodedProcessId, user, force));
+        asyncRunner.execute(() -> this.service.deletePetriNet(DeletePetriNetParams.with()
+                .petriNetId(decodedProcessId)
+                .loggedUser(user)
+                .force(force)
+                .build()));
         return MessageResource.successMessage("Petri net " + decodedProcessId + " is being deleted");
     }
 

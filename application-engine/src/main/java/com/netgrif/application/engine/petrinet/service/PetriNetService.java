@@ -5,14 +5,14 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
+import com.netgrif.application.engine.petrinet.params.DeletePetriNetParams;
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.ArcImportReference;
-import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
-import com.netgrif.application.engine.objects.event.events.Event;
 import com.netgrif.application.engine.objects.event.events.petrinet.ProcessDeleteEvent;
 import com.netgrif.application.engine.objects.event.events.petrinet.ProcessDeployEvent;
 import com.netgrif.application.engine.importer.service.Importer;
@@ -20,7 +20,6 @@ import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.objects.petrinet.domain.Transition;
-import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
@@ -59,7 +58,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -82,9 +80,6 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     protected StorageConfigurationProperties fileStorageConfiguration;
 
-//    @Autowired
-//    protected IRuleEngine ruleEngine;
-
     @Autowired
     protected IWorkflowService workflowService;
 
@@ -97,9 +92,6 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     protected FieldActionsRunner actionsRunner;
 
-//    @Autowired(required = false)
-//    protected ILdapGroupRefService ldapGroupService;
-
     @Autowired
     protected IFieldActionsCacheService functionCacheService;
 
@@ -108,9 +100,6 @@ public class PetriNetService implements IPetriNetService {
 
     @Autowired
     protected IEventService eventService;
-
-//    @Autowired
-//    protected IHistoryService historyService;
 
     @Autowired
     protected CacheManager cacheManager;
@@ -177,29 +166,20 @@ public class PetriNetService implements IPetriNetService {
         return self.get(petriNetIds.stream().map(ObjectId::new).collect(Collectors.toList()));
     }
 
-    @Override
-    @Deprecated
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author);
-    }
+    public ImportPetriNetEventOutcome importPetriNet(ImportPetriNetParams importPetriNetParams) throws IOException,
+            MissingPetriNetMetaDataException, MissingIconKeyException {
+        fillAndValidateAttributes(importPetriNetParams);
 
-    @Override
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, releaseType, author, new HashMap<>());
-    }
-
-    @Override
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
         ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
-        IOUtils.copy(xmlFile, xmlCopy);
+        IOUtils.copy(importPetriNetParams.getXmlFile(), xmlCopy);
         Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(xmlCopy.toByteArray()));
         if (imported.isEmpty()) {
             return outcome;
         }
         PetriNet net = imported.get();
 
-        PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
+        PetriNet existingNet = self.getNewestVersionByIdentifier(net.getIdentifier());
 
         if (existingNet != null) {
             if (existingNet.getVersion().equals(net.getVersion())) {
@@ -207,31 +187,29 @@ public class PetriNetService implements IPetriNetService {
             }
             if (net.getVersion() == null) {
                 net.setVersion(existingNet.getVersion());
-                net.incrementVersion(releaseType);
+                net.incrementVersion(importPetriNetParams.getReleaseType());
             }
         } else if (net.getVersion() == null) {
             net.setVersion(new Version());
         }
 
         processRoleService.saveAll(net.getRoles().values());
-        net.setAuthor(ActorTransformer.toActorRef(author));
+        net.setAuthor(ActorTransformer.toActorRef(importPetriNetParams.getAuthor()));
         functionCacheService.cachePetriNetFunctions(net);
         Path savedPath = getImporter().saveNetFile(net, new ByteArrayInputStream(xmlCopy.toByteArray()));
         xmlCopy.close();
-        log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully and saved in a folder: " + savedPath.toString());
+        log.info("Petri net {} ({} v{}) imported successfully and saved in a folder: {}", net.getTitle(), net.getInitials(),
+                net.getVersion(), savedPath);
 
-        outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
+        outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(),
+                importPetriNetParams.getParams()));
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.PRE));
         save(net);
-        outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params));
+        outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(),
+                importPetriNetParams.getParams()));
         outcome.setNet(imported.get());
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
         return outcome;
-    }
-
-    protected void evaluateRules(Event event) {
-        publisher.publishEvent(event);
-
     }
 
     @Override
@@ -243,7 +221,7 @@ public class PetriNetService implements IPetriNetService {
         try {
             elasticPetriNetService.indexNow(this.petriNetMappingService.transform(petriNet));
         } catch (Exception e) {
-            log.error("Indexing failed [" + petriNet.getStringId() + "]", e);
+            log.error("Indexing failed [{}]", petriNet.getStringId(), e);
         }
 
         return Optional.of(petriNet);
@@ -286,7 +264,8 @@ public class PetriNetService implements IPetriNetService {
     @Override
     @Cacheable(value = "petriNetNewest", unless = "#result == null")
     public PetriNet getNewestVersionByIdentifier(String identifier) {
-        List<PetriNet> nets = repository.findByIdentifier(identifier, PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
+        List<PetriNet> nets = repository.findByIdentifier(identifier, PageRequest.of(0, 1,
+                Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
         if (nets.isEmpty()) {
             return null;
         }
@@ -345,10 +324,11 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public FileSystemResource getFile(String netId, String title) {
-        if (title == null || title.length() == 0) {
+        if (title == null || title.isEmpty()) {
             Query query = Query.query(Criteria.where("_id").is(new ObjectId(netId)));
             query.fields().include("_id").include("title");
-            List<com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet> nets = mongoTemplate.find(query, com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class);
+            List<com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet> nets = mongoTemplate.find(query,
+                    com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class);
             if (nets.isEmpty())
                 return null;
             title = nets.getFirst().getTitle().getDefaultValue();
@@ -373,9 +353,7 @@ public class PetriNetService implements IPetriNetService {
             GroupOperation groupByIdentifier = Aggregation.group("identifier").max("version").as("version");
             Aggregation aggregation;
             if (pageable == null || pageable.isUnpaged()) {
-                aggregation = Aggregation.newAggregation(
-                        groupByIdentifier
-                );
+                aggregation = Aggregation.newAggregation(groupByIdentifier);
             } else {
                 aggregation = Aggregation.newAggregation(
                         groupByIdentifier,
@@ -388,7 +366,8 @@ public class PetriNetService implements IPetriNetService {
             List<PetriNetReference> referenceList = results.stream()
                     .map(doc -> {
                         Document versionDoc = doc.get("version", Document.class);
-                        Version refVersion = new Version(versionDoc.getLong("major"), versionDoc.getLong("minor"), versionDoc.getLong("patch"));
+                        Version refVersion = new Version(versionDoc.getLong("major"), versionDoc.getLong("minor"),
+                                versionDoc.getLong("patch"));
                         return getReference(doc.getString("_id"), refVersion, user, locale);
                     })
                     .collect(Collectors.toList());
@@ -417,12 +396,14 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public List<PetriNetReference> getReferencesByUsersProcessRoles(LoggedUser user, Locale locale) {
         Query query = Query.query(getProcessRolesCriteria(user));
-        return mongoTemplate.find(query, com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class).stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
+        return mongoTemplate.find(query, com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class).stream()
+                .map(net -> transformToReference(net, locale))
+                .collect(Collectors.toList());
     }
 
     @Override
     public PetriNetReference getReference(String identifier, Version version, LoggedUser user, Locale locale) {
-        PetriNet net = version == null ? getNewestVersionByIdentifier(identifier) : getPetriNet(identifier, version);
+        PetriNet net = version == null ? self.getNewestVersionByIdentifier(identifier) : self.getPetriNet(identifier, version);
         return net != null ? transformToReference(net, locale) : new PetriNetReference();
     }
 
@@ -431,8 +412,8 @@ public class PetriNetService implements IPetriNetService {
         Iterable<PetriNet> nets = get(netIds);
         List<TransitionReference> references = new ArrayList<>();
 
-        nets.forEach(net -> references.addAll(net.getTransitions().entrySet().stream()
-                .map(entry -> transformToReference(net, entry.getValue(), locale)).collect(Collectors.toList())));
+        nets.forEach(net -> references.addAll(net.getTransitions().values().stream()
+                .map(transition -> transformToReference(net, transition, locale)).toList()));
 
         return references;
     }
@@ -448,9 +429,9 @@ public class PetriNetService implements IPetriNetService {
                 .forEach(transition -> {
                     Transition trans;
                     if ((trans = net.getTransition(transition.getStringId())) != null) {
-                        dataRefs.addAll(trans.getDataSet().entrySet().stream()
-                                .map(entry -> transformToReference(net, trans, net.getDataSet().get(entry.getKey()), locale))
-                                .collect(Collectors.toList()));
+                        dataRefs.addAll(trans.getDataSet().keySet().stream()
+                                .map(fieldId -> transformToReference(net, trans, net.getDataSet().get(fieldId), locale))
+                                .toList());
                     }
                 }));
 
@@ -459,7 +440,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public Optional<PetriNet> findByImportId(String id) {
-        return Optional.of(repository.findByImportId(id));
+        return Optional.ofNullable(repository.findByImportId(id));
     }
 
     @Override
@@ -515,41 +496,40 @@ public class PetriNetService implements IPetriNetService {
             this.addValueCriteria(query, queryTotal, Criteria.where("negativeViewRoles").in(criteriaClass.getNegativeViewRoles()));
         }
         if (criteriaClass.getTags() != null) {
-            criteriaClass.getTags().entrySet().forEach(stringStringEntry -> this.addValueCriteria(query, queryTotal, Criteria.where("tags." + stringStringEntry.getKey()).is(stringStringEntry.getValue())));
+            criteriaClass.getTags().forEach((tagKey, tagValue) ->
+                    this.addValueCriteria(query, queryTotal, Criteria.where("tags." + tagKey).is(tagValue)));
         }
 
         query.with(pageable);
-        List<com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet> nets = mongoTemplate.find(query, com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class);
-        return new PageImpl<>(nets.stream().map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()), pageable, mongoTemplate.count(queryTotal, com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class));
+        List<com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet> nets = mongoTemplate.find(query,
+                com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class);
+        return new PageImpl<>(nets.stream().map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()),
+                pageable, mongoTemplate.count(queryTotal, com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class));
     }
 
-    private void addValueCriteria(Query query, Query queryTotal, Criteria criteria) {
+    protected void addValueCriteria(Query query, Query queryTotal, Criteria criteria) {
         query.addCriteria(criteria);
         queryTotal.addCriteria(criteria);
     }
 
     @Override
     @Transactional
-    public void deletePetriNet(String processId, LoggedUser loggedUser) {
-        deletePetriNet(processId, loggedUser, false);
-    }
-
-    @Override
-    @Transactional
-    public void deletePetriNet(String processId, LoggedUser loggedUser, boolean force) {
-        Optional<PetriNet> petriNetOptional = repository.findById(processId);
+    public void deletePetriNet(DeletePetriNetParams deletePetriNetParams) {
+        Optional<PetriNet> petriNetOptional = repository.findById(deletePetriNetParams.getPetriNetId());
         if (petriNetOptional.isEmpty()) {
-            throw new IllegalArgumentException("Could not find process with id [" + processId + "]");
+            throw new IllegalArgumentException("Could not find process with id [" + deletePetriNetParams.getPetriNetId() + "]");
         }
 
         PetriNet petriNet = petriNetOptional.get();
-        log.info("[{}]: Initiating deletion of Petri net {} version {}", processId, petriNet.getIdentifier(), petriNet.getVersion().toString());
+        log.info("[{}]: Initiating deletion of Petri net {} version {}", deletePetriNetParams.getPetriNetId(),
+                petriNet.getIdentifier(), petriNet.getVersion().toString());
 
         userService.removeRoleOfDeletedPetriNet(petriNet);
-        workflowService.deleteInstancesOfPetriNet(petriNet, force);
-        processRoleService.deleteRolesOfNet(petriNet, loggedUser);
+        workflowService.deleteInstancesOfPetriNet(petriNet, deletePetriNetParams.isForce());
+        processRoleService.deleteRolesOfNet(petriNet, deletePetriNetParams.getLoggedUser());
 
-        log.info("[{}]: User [{}] is deleting Petri net {} version {}", processId, userService.getLoggedOrSystem().getStringId(), petriNet.getIdentifier(), petriNet.getVersion().toString());
+        log.info("[{}]: User [{}] is deleting Petri net {} version {}", deletePetriNetParams.getPetriNetId(),
+                userService.getLoggedOrSystem().getStringId(), petriNet.getIdentifier(), petriNet.getVersion().toString());
         publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.PRE));
         repository.deleteBy_id(petriNet.getObjectId());
         evictCache(petriNet);
@@ -557,14 +537,14 @@ public class PetriNetService implements IPetriNetService {
         publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.POST));
     }
 
-    private Criteria getProcessRolesCriteria(LoggedUser user) {
+    protected Criteria getProcessRolesCriteria(LoggedUser user) {
         return new Criteria().orOperator(user.getProcessRoles().stream()
                 .map(role -> Criteria.where("permissions." + role).exists(true)).toArray(Criteria[]::new));
     }
 
     @Override
     public void runActions(List<Action> actions, PetriNet petriNet) {
-        log.info("Running actions of net [" + petriNet.getStringId() + "]");
+        log.info("Running actions of net [{}]", petriNet.getStringId());
 
         actions.forEach(action -> {
             actionsRunner.run(action, null, new HashMap<>(), petriNet.getFunctions());
@@ -579,5 +559,17 @@ public class PetriNetService implements IPetriNetService {
             throw new NullPointerException();
         }
         return obj;
+    }
+
+    protected void fillAndValidateAttributes(ImportPetriNetParams importPetriNetParams) throws IllegalArgumentException {
+        if (importPetriNetParams.getXmlFile() == null) {
+            throw new IllegalArgumentException("No Petriflow source file provided.");
+        }
+        if (importPetriNetParams.getAuthor() == null) {
+            throw new IllegalArgumentException("No author of PetriNet provided.");
+        }
+        if (importPetriNetParams.getReleaseType() == null) {
+            throw new IllegalArgumentException("Version type is null.");
+        }
     }
 }
