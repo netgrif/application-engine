@@ -74,6 +74,12 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
     Optional<ProcessRole> findByIdObjectId(ObjectId objectId);
 
     /**
+     * todo javadoc
+     */
+    @Query("{ '_id.objectId': ?0 }")
+    void deleteByObjectId(ObjectId objectId);
+
+    /**
      * Finds all {@link ProcessRole} entities by their object IDs.
      *
      * @param objectIds a {@link Collection} of object IDs
@@ -133,6 +139,20 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
     }
 
     /**
+     * todo javadoc
+     */
+    default void deleteByCompositeId(String compositeId) {
+        String[] parts = compositeId.split(ProcessResourceId.ID_SEPARATOR);
+        if (parts.length == 2) {
+            String networkId = parts[0];
+            ObjectId objectId = new ObjectId(parts[1]);
+            deleteByNetworkIdAndObjectId(networkId, objectId);
+        } else {
+            deleteByObjectId(new ObjectId(compositeId));
+        }
+    }
+
+    /**
      * Finds a {@link ProcessRole} by a network ID and object ID.
      *
      * @param networkId the short process ID
@@ -141,6 +161,12 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
      */
     @Query("{ '_id.shortProcessId': ?0, '_id.objectId': ?1 }")
     Optional<ProcessRole> findByNetworkIdAndObjectId(String networkId, ObjectId objectId);
+
+    /**
+     * todo javadoc
+     */
+    @Query("{ '_id.shortProcessId': ?0, '_id.objectId': ?1 }")
+    void deleteByNetworkIdAndObjectId(String networkId, ObjectId objectId);
 
     /**
      * Finds all {@link ProcessRole} entities by a collection of composite resource IDs.

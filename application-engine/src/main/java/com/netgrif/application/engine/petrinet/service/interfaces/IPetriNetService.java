@@ -4,7 +4,6 @@ import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.objects.petrinet.domain.Transition;
-import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingIconKeyException;
@@ -23,7 +22,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -315,4 +313,9 @@ public interface IPetriNetService {
      * @return a {@link Page} of {@link PetriNet} objects matching the role ID
      */
     Page<PetriNet> findAllByRoleId(String roleId, Pageable pageable);
+
+    /**
+     * todo javadoc
+     */
+    boolean existsByRoleId(String roleId);
 }
