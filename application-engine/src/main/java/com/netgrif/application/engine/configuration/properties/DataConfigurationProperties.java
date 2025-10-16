@@ -128,6 +128,32 @@ public class DataConfigurationProperties {
     public static class RestProperties extends RepositoryRestProperties {
     }
 
+
+    @Data
+    @NoArgsConstructor
+    public static class Proxy {
+
+        /**
+         * Represents the hostname or IP address for the proxy server.
+         */
+        private String host;
+
+        /**
+         * Represents the port number for the proxy server.
+         */
+        private Integer port;
+
+        /**
+         * Represents the username associated with authentication for the proxy server.
+         */
+        private String username;
+
+        /**
+         * Represents the password associated with authentication for the proxy server.
+         */
+        private String password;
+    }
+
     /**
      * MongoDB-specific configuration properties for the data module.
      */
@@ -242,7 +268,7 @@ public class DataConfigurationProperties {
         private TimeUnit localThresholdUnit = TimeUnit.MILLISECONDS;
 
         /**
-         * The `mode` variable specifies the cluster connection mode for MongoDB.
+         * The mode variable specifies the cluster connection mode for MongoDB.
          * It defines how the application connects to a MongoDB cluster, such as single-node {@code SINGLE}
          * or multi-node {@code MULTIPLE} or {@code LOAD_BALANCED} configurations.
          */
@@ -279,8 +305,16 @@ public class DataConfigurationProperties {
         /**
          * Represents the maximum length of a document log entry in the MongoProperties class.
          * This value specifies the upper limit for the size of individual document log entries.
+         * Value must be greater than zero
          */
         private int maxDocumentLengthLog = 1000;
+
+        /**
+         * Indicates whether a proxy should be used for MongoDB connections.
+         * This flag helps determine if the application will route its database communication
+         * through a proxy server.
+         */
+        private boolean useProxy = false;
 
         /**
          * Represents a proxy configuration for MongoDB connections.
@@ -289,30 +323,10 @@ public class DataConfigurationProperties {
          */
         private Proxy proxy;
 
-        @Data
-        @NoArgsConstructor
-        public static class Proxy {
-
-            /**
-             * Represents the hostname or IP address for the proxy server.
-             */
-            private String host;
-
-            /**
-             * Represents the port number for the proxy server.
-             */
-            private Integer port;
-
-            /**
-             * Represents the username associated with authentication for the proxy server.
-             */
-            private String username;
-
-            /**
-             * Represents the password associated with authentication for the proxy server.
-             */
-            private String password;
-        }
+        /**
+         * Proxy configuration for MongoDB communication. Formatted as String host:port.
+         */
+        private String proxyString;
 
         /**
          * Multi-value map for MongoDB indexes.
@@ -488,15 +502,15 @@ public class DataConfigurationProperties {
         private TimeUnit connectionTtlUnit;
 
         /**
-         * Proxy configuration for Elasticsearch communication. Formatted as String host:port.
-         */
-        private String proxy;
-
-        /**
          * Indicates whether the application should use a proxy for its Elasticsearch connections.
          * If set to {@code true}, the proxy will be enabled.
          */
         private boolean useProxy = false;
+
+        /**
+         * Proxy configuration for Elasticsearch communication. Formatted as String host:port.
+         */
+        private String proxyString;
 
         /**
          * Batch-related configuration properties for Elasticsearch operations.

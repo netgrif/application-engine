@@ -44,23 +44,26 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
         if (mongoProperties.getConnectionTimeoutUnit() != null) {
             builder.maxConnectionIdleTime(mongoProperties.getConnectionTimeout(), mongoProperties.getConnectionTimeoutUnit());
         }
-        if (mongoProperties.getMaxWaitTime() >= 0 && mongoProperties.getMaxWaitTimeUnit() != null) {
+        if (mongoProperties.getMaxWaitTimeUnit() != null) {
             builder.maxWaitTime(mongoProperties.getMaxWaitTime(), mongoProperties.getMaxWaitTimeUnit());
         }
     }
 
     protected void configureSocketSettings(SocketSettings.Builder builder) {
-        if (isInIntegerRange(mongoProperties.getReadTimeout()) && mongoProperties.getReadTimeoutUnit() != null) {
+        if (mongoProperties.getReadTimeoutUnit() != null) {
             builder.readTimeout(mongoProperties.getReadTimeout(), mongoProperties.getReadTimeoutUnit());
         }
-        if (isInIntegerRange(mongoProperties.getSocketTimeout()) && mongoProperties.getSocketTimeoutUnit() != null) {
+        if (mongoProperties.getSocketTimeoutUnit() != null) {
             builder.connectTimeout(mongoProperties.getSocketTimeout(), mongoProperties.getSocketTimeoutUnit());
         }
         builder.applyToProxySettings(this::configureProxySettings);
     }
 
     protected void configureProxySettings(ProxySettings.Builder builder) {
-        DataConfigurationProperties.MongoProperties.Proxy proxy = mongoProperties.getProxy();
+        if (!mongoProperties.isUseProxy()) {
+            return;
+        }
+        DataConfigurationProperties.Proxy proxy = mongoProperties.getProxy();
         if (proxy != null) {
             builder.host(proxy.getHost())
                     .port(proxy.getPort());
@@ -68,6 +71,11 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
                 builder.username(proxy.getUsername())
                         .password(proxy.getPassword());
             }
+        } else if (mongoProperties.getProxyString() != null && !mongoProperties.getProxyString().isBlank()) {
+            String host = parseProxyString(mongoProperties.getProxyString())[0];
+            String port = parseProxyString(mongoProperties.getProxyString())[1];
+            builder.host(host)
+                    .port(Integer.parseInt(port));
         }
     }
 
@@ -76,7 +84,7 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
     }
 
     protected void configureClusterSettings(ClusterSettings.Builder builder) {
-        if (mongoProperties.getLocalThreshold() >= 0 && mongoProperties.getLocalThresholdUnit() != null) {
+        if (mongoProperties.getLocalThresholdUnit() != null) {
             builder.localThreshold(mongoProperties.getLocalThreshold(), mongoProperties.getLocalThresholdUnit());
         }
         if (mongoProperties.getMode() != null) {
@@ -109,7 +117,16 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
         return mongoProperties.getDatabase();
     }
 
-    private static boolean isInIntegerRange(final int value) {
-        return value >= 0 && value < Integer.MAX_VALUE;
+    private static String[] parseProxyString(String proxyString) {
+        String[] proxyInfo = proxyString.split(":");
+        if (proxyInfo.length != 2) {
+            throw new IllegalArgumentException("Invalid proxy string format. Expected format: <host>:<port>");
+        }
+        try {
+            Integer.parseInt(proxyInfo[1]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid proxy string format. Port must be Integer value");
+        }
+        return proxyInfo;
     }
 }

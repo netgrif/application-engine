@@ -16,8 +16,8 @@ import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.nio.conn.NHttpClientConnectionManager;
 import org.apache.http.nio.reactor.IOReactorException;
+import org.elasticsearch.client.RestClientBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.boot.autoconfigure.elasticsearch.RestClientBuilderCustomizer;
 import org.springframework.context.annotation.*;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchClients;
@@ -27,7 +27,6 @@ import org.springframework.data.elasticsearch.support.HttpHeaders;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.function.Function;
 
 import static org.apache.http.impl.nio.reactor.IOReactorConfig.Builder.getDefaultMaxIoThreadCount;
 import static org.elasticsearch.client.RestClientBuilder.*;
@@ -95,20 +94,12 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
             });
         }
 
-        if (elasticsearchProperties.isUseProxy()){
-            clientBuilder.withProxy(elasticsearchProperties.getProxy());
+        if (elasticsearchProperties.isUseProxy()) {
+            clientBuilder.withProxy(elasticsearchProperties.getProxyString());
         }
 
-        try {
-            NHttpClientConnectionManager connectionManager = getConnectionManager();
-            clientBuilder.withClientConfigurer(ElasticsearchClients.ElasticsearchHttpClientConfigurationCallback.from(httpAsyncClientBuilder ->
-                    httpAsyncClientBuilder.setConnectionManager(connectionManager)
-                            // these values are validated in PoolEntry PoolingNHttpClientConnectionManager respectively
-                            .setConnectionTimeToLive(elasticsearchProperties.getConnectionTtl(), elasticsearchProperties.getConnectionTtlUnit())));
-        } catch (IOReactorException e) {
-            log.error("Failed create connection manager", e);
-            log.error("Continuing with default configuration...");
-        }
+        clientBuilder.withClientConfigurer(ElasticsearchClients.ElasticsearchHttpClientConfigurationCallback.from(this::configureHttpAsyncClientBuilder))
+                .withClientConfigurer(ElasticsearchClients.ElasticsearchRestClientConfigurationCallback.from(this::configureRestClientBuilder));
 
         long connectionTimeout = elasticsearchProperties.getConnectionTimeout();
         long socketTimeout = elasticsearchProperties.getSocketTimeout();
@@ -127,7 +118,20 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
                 .build();
     }
 
-    protected NHttpClientConnectionManager getConnectionManager() throws IOReactorException {
+    @NotNull
+    @Override
+    public JsonpMapper jsonpMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeJsonSerializer());
+        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeJsonDeserializer());
+        mapper.registerModule(javaTimeModule);
+        return new JacksonJsonpMapper(mapper);
+    }
+
+    protected NHttpClientConnectionManager configureConnectionManager() throws IOReactorException {
         int threadCount = elasticsearchProperties.getIoThreadCount();
         int totalConnections = elasticsearchProperties.getMaxConnections();
         int defaultMaxConnectionPerRoute = elasticsearchProperties.getDefaultMaxConnectionsPerHost();
@@ -152,17 +156,22 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
         return connectionManager;
     }
 
-    @NotNull
-    @Override
-    public JsonpMapper jsonpMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
+    protected HttpAsyncClientBuilder configureHttpAsyncClientBuilder(HttpAsyncClientBuilder httpAsyncClientBuilder) {
+        NHttpClientConnectionManager connectionManager;
+        try {
+            connectionManager = configureConnectionManager();
+        } catch (IOReactorException e) {
+            throw new IllegalStateException("Could not initialize IO reactor", e);
+        }
 
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeJsonSerializer());
-        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeJsonDeserializer());
-        mapper.registerModule(javaTimeModule);
-        return new JacksonJsonpMapper(mapper);
+        return httpAsyncClientBuilder
+                .setConnectionManager(connectionManager)
+                // these values are validated in PoolEntry PoolingNHttpClientConnectionManager respectively
+                .setConnectionTimeToLive(elasticsearchProperties.getConnectionTtl(), elasticsearchProperties.getConnectionTtlUnit());
+    }
+
+    protected RestClientBuilder configureRestClientBuilder(RestClientBuilder restClientBuilder) {
+        return restClientBuilder;
     }
 
     private boolean hasCredentials() {
