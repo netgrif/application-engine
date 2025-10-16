@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.apache.http.HttpHost;
 import org.springframework.boot.autoconfigure.data.rest.RepositoryRestProperties;
 import org.springframework.boot.autoconfigure.session.RedisSessionProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -24,8 +23,6 @@ import jakarta.validation.Valid;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-
-import static org.apache.http.impl.nio.reactor.IOReactorConfig.Builder.getDefaultMaxIoThreadCount;
 
 /**
  * Configuration properties for the application engine's data functionality.
@@ -146,11 +143,13 @@ public class DataConfigurationProperties {
         /**
          * Represents the username associated with authentication for the proxy server.
          */
+        @ToString.Exclude
         private String username;
 
         /**
          * Represents the password associated with authentication for the proxy server.
          */
+        @ToString.Exclude
         private String password;
     }
 
@@ -186,56 +185,59 @@ public class DataConfigurationProperties {
         private int minConnections = 0;
 
         /**
-         * The default maximum number of connections allowed per host.
-         * This value acts as a limit for the number of concurrent connections that
-         * can be established with a single MongoDB host by the application.
+         * Specifies the maximum number of connections that can be initiated concurrently.
+         * This property is used to throttle the number of simultaneous connection attempts
+         *  to limit resource usage and prevent connection saturation.
          */
-        private int defaultMaxConnectionsPerHost = 2;
+        private int maxConnecting = 2;
 
         /**
-         * Specifies the connection timeout duration for establishing a connection to the MongoDB server.
-         * This value defines the maximum time, in milliseconds, to wait while attempting to connect to a server.
-         * If the connection cannot be established within this time frame, the attempt will fail.
+         * Specifies the maximum amount of time
+         * a connection can remain idle
+         * before being eligible for closure or reallocation by the connection pool.
+         * Use {@code connection-idle-time-unit } to change Time unit
          */
-        private long connectionTimeout;
+        private long connectionIdleTime;
 
         /**
-         * Specifies the unit of time for the connection timeout configuration.
-         * This determines how the value of the connection timeout is interpreted
-         * (e.g., milliseconds, seconds, etc.).
+         * Specifies the unit of time used to define the idle time for a connection.
+         * This variable works in conjunction with {@code connection-idle-time} to configure
+         * how long a connection can remain idle before being closed.
          */
-        private TimeUnit connectionTimeoutUnit = TimeUnit.MILLISECONDS;
+        private TimeUnit connectionIdleTimeUnit = TimeUnit.MILLISECONDS;
 
         /**
-         * Specifies the maximum amount of time, in milliseconds, that the application
+         * Specifies the maximum amount of time that the application
          * will wait for a MongoDB connection acquisition from the connection pool
          * before a timeout is thrown. This is especially useful in scenarios with high
          * demand for connections or constrained resources.
+         * Use {@code max-wait-time-unit} to set Time unit.
          */
         private long maxWaitTime;
 
         /**
          * Specifies the time unit for the maximum waiting time for MongoDB operations.
          * This defines the unit of measurement, such as milliseconds, seconds, or minutes,
-         * used in conjunction with the {@code maxWaitTime} configuration.
+         * used in conjunction with the {@code max-wait-time} configuration.
          */
         private TimeUnit maxWaitTimeUnit = TimeUnit.MILLISECONDS;
 
         /**
-         * Specifies the timeout in milliseconds for socket read and write operations.
+         * Specifies the timeout for socket read and write operations.
          * This value determines the maximum period of inactivity before a socket operation is considered failed.
+         * Use {@code socket-timeout-unit} to set Time unit.
          */
         private int socketTimeout = 10000;
 
         /**
-         * Defines the time unit used for socket timeout configuration.
+         * Defines the time unit {@link TimeUnit} used for socket timeout configuration.
          * This property helps specify the granularity of the socket timeout value,
          * such as milliseconds, seconds, etc.
          */
         private TimeUnit socketTimeoutUnit = TimeUnit.MILLISECONDS;
 
         /**
-         * The read timeout for MongoDB connections, in milliseconds. If a read
+         * The read timeout for MongoDB connections. If a read
          * operation does not complete within this timeframe, it will result in a
          * timeout exception.
          */

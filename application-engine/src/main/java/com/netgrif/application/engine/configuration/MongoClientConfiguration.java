@@ -39,10 +39,10 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
     protected void configureConnectionPoolSetting(ConnectionPoolSettings.Builder builder) {
         builder.maxSize(mongoProperties.getMaxConnections())
                 .minSize(mongoProperties.getMinConnections())
-                .maxConnecting(mongoProperties.getDefaultMaxConnectionsPerHost());
+                .maxConnecting(mongoProperties.getMaxConnecting());
 
-        if (mongoProperties.getConnectionTimeoutUnit() != null) {
-            builder.maxConnectionIdleTime(mongoProperties.getConnectionTimeout(), mongoProperties.getConnectionTimeoutUnit());
+        if (mongoProperties.getConnectionIdleTimeUnit() != null) {
+            builder.maxConnectionIdleTime(mongoProperties.getConnectionIdleTime(), mongoProperties.getConnectionIdleTimeUnit());
         }
         if (mongoProperties.getMaxWaitTimeUnit() != null) {
             builder.maxWaitTime(mongoProperties.getMaxWaitTime(), mongoProperties.getMaxWaitTimeUnit());
