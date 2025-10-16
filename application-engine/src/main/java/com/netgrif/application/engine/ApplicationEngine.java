@@ -34,11 +34,6 @@ import java.util.List;
 @EnableMethodSecurity
 @EnableAspectJAutoProxy
 @ConfigurationPropertiesScan
-@EnableMongoRepositories(basePackages = {"com.netgrif"}, excludeFilters = {
-        @ComponentScan.Filter(
-                type = FilterType.REGEX,
-                pattern = "com\\.netgrif\\.application\\.engine\\.module\\.eventlog\\..*"
-        )})
 @SpringBootApplication(
         exclude = {DataSourceAutoConfiguration.class},
         scanBasePackages = {"com.netgrif"})

@@ -7,16 +7,16 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @Configuration
-@EnableElasticsearchRepositories(excludeFilters = {
+@EnableMongoRepositories(basePackages = {"com.netgrif"}, excludeFilters = {
         @ComponentScan.Filter(
                 type = FilterType.REGEX,
                 pattern = "com\\.netgrif\\.application\\.engine\\.module\\..*"
-        )
-})
+        )})
 public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
 
     private final DataConfigurationProperties.MongoProperties mongoProperties;
