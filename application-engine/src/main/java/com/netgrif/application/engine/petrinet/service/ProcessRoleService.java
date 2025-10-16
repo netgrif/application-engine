@@ -15,8 +15,6 @@ import com.netgrif.application.engine.objects.event.events.user.UserRoleChangeEv
 import com.netgrif.application.engine.objects.importer.model.EventPhaseType;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.objects.workflow.domain.Case;
-import com.netgrif.application.engine.objects.workflow.domain.QCase;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context.RoleContext;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.RoleActionsRunner;
 import com.netgrif.application.engine.objects.petrinet.domain.events.Event;
@@ -102,8 +100,8 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     }
 
     @Override
-    public void delete(String s) {
-        Optional<ProcessRole> processRole = processRoleRepository.findByCompositeId(s);
+    public void delete(String roleId) {
+        Optional<ProcessRole> processRole = processRoleRepository.findByCompositeId(roleId);
         processRole.ifPresent(processRoleRepository::delete);
     }
 

@@ -12,6 +12,7 @@ import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearc
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.dto.AuthPrincipalDto;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
@@ -145,6 +146,21 @@ public class ActionApiImpl implements ActionApi {
         Task task = taskService.findOne(taskId);
         AbstractUser user = resolveAbstractUser(authPrincipalDto);
         return taskService.finishTask(task, user, params);
+    }
+
+    @Override
+    public Case findCase(String caseId) {
+        return workflowService.findOne(caseId);
+    }
+
+    @Override
+    public Task findTask(String taskId) {
+        return taskService.findOne(taskId);
+    }
+
+    @Override
+    public Page<User> searchUsers(Predicate predicate, Pageable pageable, String realmId) {
+        return userService.search(predicate, pageable, realmId);
     }
 
     private AbstractUser resolveAbstractUser(AuthPrincipalDto authPrincipalDto) {

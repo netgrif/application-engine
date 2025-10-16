@@ -6,13 +6,16 @@ public enum ActionApiMethods {
 
     GET_DATA("getData"),
     SET_DATA("setData"),
+    FIND_CASE("findCase"),
     SEARCH_CASES("searchCases"),
     CREATE_CASE_BY_IDENTIFIER("createCaseByIdentifier"),
     DELETE_CASE("deleteCase"),
+    FIND_TASK("findTask"),
     SEARCH_TASKS("searchTasks"),
     ASSIGN_TASK("assignTask"),
     CANCEL_TASK("cancelTask"),
-    FINISH_TASK("finishTask"),;
+    FINISH_TASK("finishTask"),
+    SEARCH_USER("searchUsers");
 
     private String methodName;
 
