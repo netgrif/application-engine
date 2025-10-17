@@ -17,8 +17,9 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -34,7 +35,7 @@ public interface ActionApi {
      * @param params additional parameters for data retrieval
      * @return the outcome of the data retrieval operation
      */
-    GetDataEventOutcome getData(String taskId, HashMap<String, String> params);
+    GetDataEventOutcome getData(String taskId, Map<String, String> params);
 
     /**
      * Sets or updates data for a specific task.
@@ -45,7 +46,7 @@ public interface ActionApi {
      * @return the outcome of the set data operation
      * @throws JsonProcessingException if there is an error processing JSON data
      */
-    SetDataEventOutcome setData(String taskId, HashMap<String, HashMap<String, String>> dataSet, HashMap<String, String> params) throws JsonProcessingException;
+    SetDataEventOutcome setData(String taskId, Map<String, Map<String, String>> dataSet, Map<String, String> params) throws JsonProcessingException;
 
     /**
      * Finds a specific case by its ID.
@@ -86,7 +87,7 @@ public interface ActionApi {
      * @param params           additional parameters for the operation
      * @return the outcome of the case creation operation
      */
-    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, AuthPrincipalDto authPrincipalDto, HashMap<String, String> params);
+    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, AuthPrincipalDto authPrincipalDto, Map<String, String> params);
 
     /**
      * Deletes a specific case by its ID.
@@ -95,7 +96,7 @@ public interface ActionApi {
      * @param params additional parameters for the operation
      * @return the outcome of the delete operation
      */
-    DeleteCaseEventOutcome deleteCase(String caseId, HashMap<String, String> params);
+    DeleteCaseEventOutcome deleteCase(String caseId, Map<String, String> params);
 
     /**
      * Finds a specific task by its ID.
@@ -135,7 +136,7 @@ public interface ActionApi {
      * @return the outcome of the task assignment operation
      * @throws TransitionNotExecutableException if the task's transition cannot be executed
      */
-    AssignTaskEventOutcome assignTask(String taskId, AuthPrincipalDto authPrincipalDto, HashMap<String, String> params) throws TransitionNotExecutableException;
+    AssignTaskEventOutcome assignTask(String taskId, AuthPrincipalDto authPrincipalDto, Map<String, String> params) throws TransitionNotExecutableException;
 
     /**
      * Cancels a specific task.
@@ -145,7 +146,7 @@ public interface ActionApi {
      * @param params           additional parameters for the operation
      * @return the outcome of the task cancellation operation
      */
-    CancelTaskEventOutcome cancelTask(String taskId, AuthPrincipalDto authPrincipalDto, HashMap<String, String> params);
+    CancelTaskEventOutcome cancelTask(String taskId, AuthPrincipalDto authPrincipalDto, Map<String, String> params);
 
     /**
      * Marks a specific task as finished.
@@ -156,7 +157,7 @@ public interface ActionApi {
      * @return the outcome of the task completion operation
      * @throws TransitionNotExecutableException if the task's transition cannot be executed
      */
-    FinishTaskEventOutcome finishTask(String taskId, AuthPrincipalDto authPrincipalDto, HashMap<String, String> params) throws TransitionNotExecutableException;
+    FinishTaskEventOutcome finishTask(String taskId, AuthPrincipalDto authPrincipalDto, Map<String, String> params) throws TransitionNotExecutableException;
 
     /**
      * Searches for users in a specific realm based on a predicate.

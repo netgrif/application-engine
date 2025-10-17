@@ -77,13 +77,13 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
-    public GetDataEventOutcome getData(String taskId, HashMap<String, String> params) {
+    public GetDataEventOutcome getData(String taskId, Map<String, String> params) {
         return dataService.getData(taskId, params);
     }
 
     @Override
-    public SetDataEventOutcome setData(String taskId, HashMap<String, HashMap<String, String>> dataSet, HashMap<String, String> params) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
+    public SetDataEventOutcome setData(String taskId, Map<String, Map<String, String>> dataSet, Map<String, String> params) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper(); 
         String json = mapper.writeValueAsString(dataSet);
         ObjectNode values = (ObjectNode) mapper.readTree(json);
         return dataService.setData(taskId, values, params);
@@ -103,14 +103,14 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, AuthPrincipalDto authPrincipalDto, HashMap<String, String> params) {
+    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, AuthPrincipalDto authPrincipalDto, Map<String, String> params) {
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
         Locale locale = LocaleContextHolder.getLocale();
         return workflowService.createCaseByIdentifier(identifier, title, color, loggedUser, locale, params);
     }
 
     @Override
-    public DeleteCaseEventOutcome deleteCase(String caseId, HashMap<String, String> params) {
+    public DeleteCaseEventOutcome deleteCase(String caseId, Map<String, String> params) {
         return workflowService.deleteCase(caseId, params);
     }
 
@@ -128,21 +128,21 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
-    public AssignTaskEventOutcome assignTask(String taskId, AuthPrincipalDto authPrincipalDto, HashMap<String, String> params) throws TransitionNotExecutableException {
+    public AssignTaskEventOutcome assignTask(String taskId, AuthPrincipalDto authPrincipalDto, Map<String, String> params) throws TransitionNotExecutableException {
         Task task = taskService.findOne(taskId);
         AbstractUser user = resolveAbstractUser(authPrincipalDto);
         return taskService.assignTask(task, user, params);
     }
 
     @Override
-    public CancelTaskEventOutcome cancelTask(String taskId, AuthPrincipalDto authPrincipalDto, HashMap<String, String> params) {
+    public CancelTaskEventOutcome cancelTask(String taskId, AuthPrincipalDto authPrincipalDto, Map<String, String> params) {
         Task task = taskService.findOne(taskId);
         AbstractUser user = resolveAbstractUser(authPrincipalDto);
         return taskService.cancelTask(task, user, params);
     }
 
     @Override
-    public FinishTaskEventOutcome finishTask(String taskId, AuthPrincipalDto authPrincipalDto, HashMap<String, String> params) throws TransitionNotExecutableException {
+    public FinishTaskEventOutcome finishTask(String taskId, AuthPrincipalDto authPrincipalDto, Map<String, String> params) throws TransitionNotExecutableException {
         Task task = taskService.findOne(taskId);
         AbstractUser user = resolveAbstractUser(authPrincipalDto);
         return taskService.finishTask(task, user, params);
