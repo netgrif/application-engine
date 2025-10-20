@@ -58,6 +58,17 @@ public class WorkflowPerformanceTest {
     }
 
     @Test
+    public void testCreate2Performance() throws IOException, MissingPetriNetMetaDataException {
+        PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/test_create_case_performance_with_action.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+        iterateAndShowAvgTime("createCaseWithAction", () -> workflowService.createCase(net.getStringId(), null, null,
+                superCreatorRunner.getLoggedSuper(), Locale.getDefault()), 1000);
+    }
+
+    @Test
     public void testAssignPerformance() {
 
     }
