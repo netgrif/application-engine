@@ -213,7 +213,7 @@ public class DataConfigurationProperties {
          * demand for connections or constrained resources.
          * Use {@code max-wait-time-unit} to set Time unit.
          */
-        private long maxWaitTime;
+        private long maxWaitTime = 120_000;
 
         /**
          * Specifies the time unit for the maximum waiting time for MongoDB operations.
