@@ -51,6 +51,8 @@ public class ActionApiImpl implements ActionApi {
 
     private IElasticTaskService elasticTaskService;
 
+    private ObjectMapper objectMapper;
+
     @Autowired
     public void setDataService(IDataService dataService) {
         this.dataService = dataService;
@@ -76,6 +78,16 @@ public class ActionApiImpl implements ActionApi {
         this.userService = userService;
     }
 
+    @Autowired
+    public void setElasticTaskService(IElasticTaskService elasticTaskService) {
+        this.elasticTaskService = elasticTaskService;
+    }
+
+    @Autowired
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     @Override
     public GetDataEventOutcome getData(String taskId, Map<String, String> params) {
         return dataService.getData(taskId, params);
@@ -96,10 +108,11 @@ public class ActionApiImpl implements ActionApi {
 
     @Override
     public Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection) {
+        boolean intersect = Boolean.TRUE.equals(isIntersection);
         List<CaseSearchRequest> caseSearchRequests = elasticStringQueries.stream().map(query -> CaseSearchRequest.builder().query(query).build()).toList();
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
         Locale locale = LocaleContextHolder.getLocale();
-        return elasticCaseService.search(caseSearchRequests, loggedUser, pageable, locale, isIntersection);
+        return elasticCaseService.search(caseSearchRequests, loggedUser, pageable, locale, intersect);
     }
 
     @Override
@@ -121,10 +134,11 @@ public class ActionApiImpl implements ActionApi {
 
     @Override
     public Page<Task> searchTasks(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection) {
+        boolean intersect = Boolean.TRUE.equals(isIntersection);
         List<ElasticTaskSearchRequest> taskSearchRequests = elasticStringQueries.stream().map(query -> ElasticTaskSearchRequest.builder().query(query).build()).toList();
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
         Locale locale = LocaleContextHolder.getLocale();
-        return elasticTaskService.search(taskSearchRequests, loggedUser, pageable, locale, isIntersection);
+        return elasticTaskService.search(taskSearchRequests, loggedUser, pageable, locale, intersect);
     }
 
     @Override
@@ -164,6 +178,9 @@ public class ActionApiImpl implements ActionApi {
     }
 
     private AbstractUser resolveAbstractUser(AuthPrincipalDto authPrincipalDto) {
+        if (authPrincipalDto == null) {
+            throw new IllegalArgumentException("AuthPrincipalDto cannot be null.");
+        }
         Optional<AbstractUser> userOptional = userService.findUserByUsername(authPrincipalDto.getUsername(), authPrincipalDto.getRealmId());
         return userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] and realm ID [%s] not found".formatted(authPrincipalDto.getUsername(), authPrincipalDto.getRealmId())));
     }
