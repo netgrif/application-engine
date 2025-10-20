@@ -95,7 +95,7 @@ public final class NaeReflectionUtils {
                                                   NoSuchMethodException caughtException)
             throws NoSuchMethodException, AmbiguousMethodCallException {
         Class<?> cls = NaeReflectionUtils.resolveClass(bean);
-        Method[] methods = cls.getMethods();
+        Method[] methods = Arrays.stream(cls.getMethods()).filter(m -> m.isBridge() || m.isSynthetic()).toArray(Method[]::new);
         Method methodToInvoke = null;
         outerLoop:
         for (Method method : methods) {

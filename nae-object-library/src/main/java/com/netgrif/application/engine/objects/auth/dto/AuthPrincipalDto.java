@@ -2,6 +2,7 @@ package com.netgrif.application.engine.objects.auth.dto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import lombok.ToString;
 
 import java.io.Serial;
@@ -13,7 +14,10 @@ public class AuthPrincipalDto implements Serializable {
     @Serial
     private static final long serialVersionUID = 6725518942728316525L;
 
+    @NonNull
     private String username;
+
+    @NonNull
     private String realmId;
 
     @ToString.Exclude
