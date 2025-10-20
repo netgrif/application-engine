@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.objects.auth.dto;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -13,5 +15,8 @@ public class AuthPrincipalDto implements Serializable {
 
     private String username;
     private String realmId;
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private String sessionId;
 }
