@@ -15,7 +15,7 @@ public enum ActionApiMethods {
     ASSIGN_TASK("assignTask"),
     CANCEL_TASK("cancelTask"),
     FINISH_TASK("finishTask"),
-    SEARCH_USER("searchUsers");
+    SEARCH_USERS("searchUsers");
 
     private String methodName;
 
