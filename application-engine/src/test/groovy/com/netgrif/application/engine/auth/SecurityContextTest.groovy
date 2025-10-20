@@ -12,6 +12,7 @@ import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.security.service.ISecurityContextService
@@ -73,7 +74,11 @@ class SecurityContextTest {
         user = userService.saveUser(user, null)
         assert user != null
 
-        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, ActorTransformer.toLoggedUser(userService.getLoggedOrSystem())).getNet()
+        net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/all_data.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+                .build()).getNet()
         assert net != null
     }
 

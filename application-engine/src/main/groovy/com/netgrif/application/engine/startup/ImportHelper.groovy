@@ -6,6 +6,7 @@ import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRol
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
@@ -112,12 +113,16 @@ class ImportHelper {
     }
 
     Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = ActorTransformer.toLoggedUser(userService.getSystem())) {
-        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author, uriNodeId)
+        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author)
     }
 
     Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = ActorTransformer.toLoggedUser(userService.getSystem())) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        def outcome = petriNetService.importPetriNet(netStream, release, author)
+        def outcome = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(netStream)
+                .releaseType(release)
+                .author(author)
+                .build())
         PetriNet petriNet = outcome.getNet()
         if (petriNet == null) {
                 log.warn("Import of [$fileName] produced no PetriNet object")
