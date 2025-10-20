@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class ActionApiConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(ActionApi.class)
     public ActionApi actionApi() {
         return new ActionApiImpl();
     }
