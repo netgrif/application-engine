@@ -27,7 +27,9 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
 
     @Override
     protected void configureClientSettings(MongoClientSettings.Builder builder) {
-        builder.applyToConnectionPoolSettings(this::configureConnectionPoolSetting)
+        builder
+                .applyConnectionString(new ConnectionString(mongoProperties.getUri()))
+                .applyToConnectionPoolSettings(this::configureConnectionPoolSetting)
                 .applyToSocketSettings(this::configureSocketSettings)
                 .applyToSslSettings(this::configureSslSettings)
                 .applyToServerSettings(this::configureServerSettings)
