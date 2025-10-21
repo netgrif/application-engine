@@ -10,6 +10,13 @@ import org.springframework.context.annotation.FilterType;
 
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.util.StringUtils;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Configuration
 @EnableMongoRepositories(basePackages = {"com.netgrif"}, excludeFilters = {
@@ -28,7 +35,7 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
     @Override
     protected void configureClientSettings(MongoClientSettings.Builder builder) {
         builder
-                .applyConnectionString(new ConnectionString(mongoProperties.getUri()))
+                .applyConnectionString(getConnectionString())
                 .applyToConnectionPoolSettings(this::configureConnectionPoolSetting)
                 .applyToSocketSettings(this::configureSocketSettings)
                 .applyToSslSettings(this::configureSslSettings)
@@ -119,6 +126,51 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
         return mongoProperties.getDatabase();
     }
 
+    private ConnectionString getConnectionString() {
+        if (mongoProperties.getUri() != null) {
+            return new ConnectionString(mongoProperties.getUri());
+        } else {
+            StringBuilder builder = new StringBuilder("mongodb://");
+            if (mongoProperties.getUsername() != null && StringUtils.hasText(mongoProperties.getUsername())) {
+                builder.append(encode(mongoProperties.getUsername()));
+                builder.append(":");
+                if (mongoProperties.getPassword() != null && StringUtils.hasText(new String(mongoProperties.getPassword()))) {
+                    builder.append(encode(mongoProperties.getPassword()));
+                }
+
+                builder.append("@");
+            }
+
+            builder.append(mongoProperties.getHost() != null ? mongoProperties.getHost() : "localhost");
+            if (mongoProperties.getPort() != null) {
+                builder.append(":");
+                builder.append(mongoProperties.getPort());
+            }
+
+            if (mongoProperties.getAdditionalHosts() != null && !mongoProperties.getAdditionalHosts().isEmpty()) {
+                builder.append(",");
+                builder.append(String.join(",", mongoProperties.getAdditionalHosts()));
+            }
+            builder.append("/");
+            builder.append(Objects.requireNonNull(mongoProperties.getMongoClientDatabase(), "Database must not be null"));
+            List<String> options = getOptions();
+            if (!options.isEmpty()) {
+                builder.append("?");
+                builder.append(String.join("&", options));
+            }
+
+            return new ConnectionString(builder.toString());
+        }
+    }
+
+    private List<String> getOptions() {
+        List<String> options = new ArrayList<>();
+        if (mongoProperties.getUsername() != null && StringUtils.hasText(mongoProperties.getAuthenticationDatabase())) {
+            options.add("authSource=" + mongoProperties.getAuthenticationDatabase());
+        }
+        return options;
+    }
+
     private static String[] parseProxyString(String proxyString) {
         String[] proxyInfo = proxyString.split(":");
         if (proxyInfo.length != 2) {
@@ -130,5 +182,13 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
             throw new IllegalArgumentException("Invalid proxy string format. Port must be Integer value");
         }
         return proxyInfo;
+    }
+
+    private static String encode(String input) {
+        return URLEncoder.encode(input, StandardCharsets.UTF_8);
+    }
+
+    private static char[] encode(char[] input) {
+        return URLEncoder.encode(new String(input), StandardCharsets.UTF_8).toCharArray();
     }
 }
