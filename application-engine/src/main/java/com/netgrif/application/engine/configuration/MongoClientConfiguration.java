@@ -134,7 +134,7 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
             if (mongoProperties.getUsername() != null && StringUtils.hasText(mongoProperties.getUsername())) {
                 builder.append(encode(mongoProperties.getUsername()));
                 builder.append(":");
-                if (mongoProperties.getPassword() != null && StringUtils.hasText(mongoProperties.getUsername())) {
+                if (mongoProperties.getPassword() != null && StringUtils.hasText(new String(mongoProperties.getPassword()))) {
                     builder.append(encode(mongoProperties.getPassword()));
                 }
 
