@@ -13,6 +13,7 @@ import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -80,7 +81,12 @@ public class ImporterTest {
                 .build());
         assert outcome.getNet() != null;
 
-        CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), outcome.getNet().getTitle().getDefaultValue(), "color", superCreator.getLoggedSuper());
+        CreateCaseEventOutcome caseOutcome = workflowService.createCase(CreateCaseParams.with()
+                .petriNet(outcome.getNet())
+                .title(outcome.getNet().getTitle().getDefaultValue())
+                .color("color")
+                .loggedUser(superCreator.getLoggedSuper())
+                .build());
 
         assert caseOutcome.getCase() != null;
     }

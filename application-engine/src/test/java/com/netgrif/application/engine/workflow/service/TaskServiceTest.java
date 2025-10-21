@@ -28,6 +28,7 @@ import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.bson.types.ObjectId;
@@ -101,7 +102,12 @@ public class TaskServiceTest {
                 .author(superCreator.getLoggedSuper())
                 .build());
         PetriNet net = petriNetRepository.findAll().get(0);
-        workflowService.createCase(net.getStringId(), "Storage Unit", "color", mock.mockLoggedUser());
+        workflowService.createCase(CreateCaseParams.with()
+                .petriNet(net)
+                .title("Storage Unit")
+                .color("color")
+                .loggedUser(mock.mockLoggedUser())
+                .build());
     }
 
     @Test
@@ -112,7 +118,12 @@ public class TaskServiceTest {
                     .author(superCreator.getLoggedSuper())
                 .build()).getNet();
         LoggedUser loggedUser = mock.mockLoggedUser();
-        CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
+        CreateCaseEventOutcome outcome = workflowService.createCase(CreateCaseParams.with()
+                .petriNet(net)
+                .title("Reset test")
+                .color("color")
+                .loggedUser(loggedUser)
+                .build());
         User user = new User();
         user.setFirstName("name");
         user.setPassword("password");

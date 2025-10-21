@@ -938,6 +938,7 @@ class ActionDelegate {
     }
 
     Case createCase(String identifier, String title = null, String color = "", AbstractUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
+        // todo 2235
         return workflowService.createCaseByIdentifier(identifier, title, color, ActorTransformer.toLoggedUser(author), locale, params).getCase()
     }
 

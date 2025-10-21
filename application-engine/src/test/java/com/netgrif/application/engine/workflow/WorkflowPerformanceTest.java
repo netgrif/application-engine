@@ -7,6 +7,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingP
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.WorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,8 +54,11 @@ public class WorkflowPerformanceTest {
                 .releaseType(VersionType.MAJOR)
                 .author(superCreatorRunner.getLoggedSuper())
                 .build()).getNet();
-        iterateAndShowAvgTime("createCase", () -> workflowService.createCase(net.getStringId(), null, null,
-                superCreatorRunner.getLoggedSuper(), Locale.getDefault()), 1000);
+        iterateAndShowAvgTime("createCase", () -> workflowService.createCase(CreateCaseParams.with()
+                .petriNet(net)
+                .loggedUser(superCreatorRunner.getLoggedSuper())
+                .locale(Locale.getDefault())
+                .build()), 1000);
     }
 
     @Test
@@ -64,8 +68,11 @@ public class WorkflowPerformanceTest {
                 .releaseType(VersionType.MAJOR)
                 .author(superCreatorRunner.getLoggedSuper())
                 .build()).getNet();
-        iterateAndShowAvgTime("createCaseWithAction", () -> workflowService.createCase(net.getStringId(), null, null,
-                superCreatorRunner.getLoggedSuper(), Locale.getDefault()), 1000);
+        iterateAndShowAvgTime("createCaseWithAction", () -> workflowService.createCase(CreateCaseParams.with()
+                .petriNet(net)
+                .loggedUser(superCreatorRunner.getLoggedSuper())
+                .locale(Locale.getDefault())
+                .build()), 1000);
     }
 
     @Test

@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Getter
@@ -305,13 +306,19 @@ public abstract class Case implements Serializable {
         });
     }
 
-    public void resolveViewUsers() {
+    /**
+     * todo javadoc
+     * */
+    public boolean resolveViewUsers() {
+        AtomicBoolean isModified = new AtomicBoolean(!this.viewUsers.isEmpty());
         this.viewUsers.clear();
         this.users.forEach((user, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
                 viewUsers.add(user);
+                isModified.set(true);
             }
         });
+        return isModified.get();
     }
 
     private void compareExistingUserPermissions(String userId, Map<String, Boolean> permissions) {

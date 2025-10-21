@@ -19,6 +19,7 @@ import com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.Das
 import com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.DashboardManagementConstants;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ImportHelper;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -64,7 +65,12 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
         }
         addReferencedMenuItems(body);
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
-        managementCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier(DashboardManagementConstants.PROCESS_IDENTIFIER).getStringId(), body.getName().getDefaultValue(), "", loggedUser).getCase();
+        managementCase = workflowService.createCase(CreateCaseParams.with()
+                .petriNetIdentifier(DashboardManagementConstants.PROCESS_IDENTIFIER)
+                .title(body.getName().getDefaultValue())
+                .color("")
+                .loggedUser(loggedUser)
+                .build()).getCase();
         ToDataSetOutcome outcome = body.toDataSet();
         managementCase = setDataWithExecute(managementCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());
         return managementCase;

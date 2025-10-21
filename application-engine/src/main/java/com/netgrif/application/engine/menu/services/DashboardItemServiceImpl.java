@@ -17,6 +17,7 @@ import com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.Das
 import com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.DashboardItemConstants;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ImportHelper;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -62,7 +63,12 @@ public class DashboardItemServiceImpl implements DashboardItemService {
         }
 
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
-        itemCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier(DashboardItemConstants.PROCESS_IDENTIFIER).getStringId(), body.getName().getDefaultValue(), "", loggedUser).getCase();
+        itemCase = workflowService.createCase(CreateCaseParams.with()
+                .petriNetIdentifier(DashboardItemConstants.PROCESS_IDENTIFIER)
+                .title(body.getName().getDefaultValue())
+                .color("")
+                .loggedUser(loggedUser)
+                .build()).getCase();
         ToDataSetOutcome outcome = body.toDataSet();
         itemCase = setDataWithExecute(itemCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());
         return itemCase;

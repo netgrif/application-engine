@@ -14,13 +14,12 @@ import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase;
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Component;
 
@@ -438,7 +437,12 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
         }
 
         try {
-            Case filterCase = this.workflowService.createCase(filterNet.getStringId(), title, null, ActorTransformer.toLoggedUser(loggedUser)).getCase();
+            Case filterCase = this.workflowService.createCase(CreateCaseParams.with()
+                    .petriNet(filterNet)
+                    .title(title)
+                    .color(null)
+                    .loggedUser(ActorTransformer.toLoggedUser(loggedUser))
+                    .build()).getCase();
             filterCase.setIcon(icon);
             filterCase = this.workflowService.save(filterCase);
             Task newFilterTask = this.taskService.searchOne(QTask.task.transitionId.eq(AUTO_CREATE_TRANSITION).and(QTask.task.caseId.eq(filterCase.getStringId())));

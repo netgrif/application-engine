@@ -22,6 +22,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @QueryEntity
 @AllArgsConstructor
@@ -312,14 +313,20 @@ public abstract class Task implements Serializable {
         });
     }
 
-    public void resolveViewUsers() {
+    /**
+     * todo javadoc
+     * */
+    public boolean resolveViewUsers() {
         getViewUsers();
+        AtomicBoolean isModified = new AtomicBoolean(!this.viewUsers.isEmpty());
         this.viewUsers.clear();
         this.users.forEach((role, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
                 viewUsers.add(role);
+                isModified.set(true);
             }
         });
+        return isModified.get();
     }
 
     private void compareExistingUserPermissions(String userId, Map<String, Boolean> permissions) {

@@ -36,7 +36,7 @@ public class EventService implements IEventService {
 
     @Override
     public List<EventOutcome> runActions(List<Action> actions, Case useCase, Task task, Transition transition, Map<String, String> params) {
-        log.info("[" + useCase.getStringId() + "]: Running actions of transition " + transition.getStringId());
+        log.info("[{}]: Running actions of transition {}", useCase.getStringId(), transition.getStringId());
         return runActions(actions, useCase, Optional.of(task), params);
     }
 
@@ -60,7 +60,7 @@ public class EventService implements IEventService {
                     });
             allOutcomes.addAll(outcomes);
         });
-        if (useCase != null) {
+        if (useCase != null && !allOutcomes.isEmpty()) {
             workflowService.save(useCase);
         }
         return allOutcomes;
@@ -114,9 +114,9 @@ public class EventService implements IEventService {
         outcome.getChangedFields().forEach((s, changedField) -> {
             if (changedField.getAttributes().containsKey("value") && trigger == DataEventType.SET) {
                 Field field = outcome.getCase().getField(s);
-                log.info("[" + outcome.getCase().getStringId() + "] " + outcome.getCase().getTitle() + ": Running actions on changed field " + s);
-                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, (Case) outcome.getCase(), (Task) outcome.getTask(), params));
-                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, (Case) outcome.getCase(), (Task) outcome.getTask(), params));
+                log.info("[{}] {}: Running actions on changed field {}", outcome.getCase().getStringId(), outcome.getCase().getTitle(), s);
+                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getCase(), outcome.getTask(), params));
+                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, outcome.getCase(), outcome.getTask(), params));
             }
         });
     }

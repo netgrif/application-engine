@@ -26,6 +26,7 @@ import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.utils.InputStreamToString;
 import com.netgrif.application.engine.objects.workflow.domain.*;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -100,12 +101,22 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Override
     public void createFilterImport(AbstractUser author) {
-        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER, "Import filters " + author.getName(), "", ActorTransformer.toLoggedUser(author));
+        workflowService.createCase(CreateCaseParams.with()
+                .petriNetIdentifier(IMPORT_NET_IDENTIFIER)
+                .title("Import filters %s".formatted(author.getName()))
+                .color("")
+                .loggedUser(ActorTransformer.toLoggedUser(author))
+                .build());
     }
 
     @Override
     public void createFilterExport(AbstractUser author) {
-        workflowService.createCaseByIdentifier(EXPORT_NET_IDENTIFIER, "Export filters " + author.getName(), "", ActorTransformer.toLoggedUser(author));
+        workflowService.createCase(CreateCaseParams.with()
+                .petriNetIdentifier(EXPORT_NET_IDENTIFIER)
+                .title("Export filters %s".formatted(author.getName()))
+                .color("")
+                .loggedUser(ActorTransformer.toLoggedUser(author))
+                .build());
     }
 
     /**

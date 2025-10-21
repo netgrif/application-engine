@@ -25,6 +25,7 @@ import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner;
 import com.netgrif.application.engine.startup.runner.FilterRunner;
 import com.netgrif.application.engine.startup.runner.MenuProcessRunner;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -667,7 +668,12 @@ public class MenuItemService implements IMenuItemService {
     }
 
     protected Case createCase(String identifier, String title, LoggedUser loggedUser) {
-        return workflowService.createCaseByIdentifier(identifier, title, "", loggedUser).getCase();
+        return workflowService.createCase(CreateCaseParams.with()
+                .petriNetIdentifier(identifier)
+                .title(title)
+                .color("")
+                .loggedUser(loggedUser)
+                .build()).getCase();
     }
 
     protected Case setData(Case useCase, String transId, Map<String, Map<String, Object>> dataSet) {

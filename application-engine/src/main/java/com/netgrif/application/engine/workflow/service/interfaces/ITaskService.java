@@ -11,6 +11,7 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.task
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.DelegateTaskEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.ReloadTaskOutcome;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import org.springframework.data.domain.Page;
@@ -20,7 +21,7 @@ import java.util.*;
 
 public interface ITaskService {
 
-    void reloadTasks(Case useCase);
+    ReloadTaskOutcome reloadTasks(Case useCase, boolean lazyCaseSave);
 
     Task findOne(String taskId);
 

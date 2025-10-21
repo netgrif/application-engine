@@ -776,7 +776,7 @@ public class DataService implements IDataService {
     public Case applyFieldConnectedChanges(Case useCase, Field field) {
         switch (field.getType()) {
             case USERLIST:
-                return workflowService.resolveUserRef(useCase);
+                return workflowService.resolveUserRef(useCase, true);
             default:
                 return useCase;
         }
