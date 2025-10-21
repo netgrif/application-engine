@@ -16,6 +16,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Configuration
 @EnableMongoRepositories(basePackages = {"com.netgrif"}, excludeFilters = {
@@ -130,10 +131,10 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
             return new ConnectionString(mongoProperties.getUri());
         } else {
             StringBuilder builder = new StringBuilder("mongodb://");
-            if (mongoProperties.getUsername() != null) {
+            if (mongoProperties.getUsername() != null && StringUtils.hasText(mongoProperties.getUsername())) {
                 builder.append(encode(mongoProperties.getUsername()));
                 builder.append(":");
-                if (mongoProperties.getPassword() != null) {
+                if (mongoProperties.getPassword() != null && StringUtils.hasText(mongoProperties.getUsername())) {
                     builder.append(encode(mongoProperties.getPassword()));
                 }
 
@@ -146,13 +147,12 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
                 builder.append(mongoProperties.getPort());
             }
 
-            if (mongoProperties.getAdditionalHosts() != null) {
+            if (mongoProperties.getAdditionalHosts() != null && !mongoProperties.getAdditionalHosts().isEmpty()) {
                 builder.append(",");
                 builder.append(String.join(",", mongoProperties.getAdditionalHosts()));
             }
-
             builder.append("/");
-            builder.append(mongoProperties.getMongoClientDatabase());
+            builder.append(Objects.requireNonNull(mongoProperties.getMongoClientDatabase(), "Database must not be null"));
             List<String> options = getOptions();
             if (!options.isEmpty()) {
                 builder.append("?");
@@ -165,10 +165,7 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
 
     private List<String> getOptions() {
         List<String> options = new ArrayList<>();
-        if (StringUtils.hasText(mongoProperties.getReplicaSetName())) {
-            options.add("replicaSet=" + mongoProperties.getReplicaSetName());
-        }
-        if (mongoProperties.getUsername() != null && mongoProperties.getAuthenticationDatabase() != null) {
+        if (mongoProperties.getUsername() != null && StringUtils.hasText(mongoProperties.getAuthenticationDatabase())) {
             options.add("authSource=" + mongoProperties.getAuthenticationDatabase());
         }
         return options;
@@ -191,7 +188,7 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
         return URLEncoder.encode(input, StandardCharsets.UTF_8);
     }
 
-    private static  char[] encode(char[] input) {
+    private static char[] encode(char[] input) {
         return URLEncoder.encode(new String(input), StandardCharsets.UTF_8).toCharArray();
     }
 }
