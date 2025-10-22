@@ -1,13 +1,18 @@
 package com.netgrif.application.engine.workflow;
 
 import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.application.engine.objects.workflow.domain.Case;
+import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.service.TaskService;
 import com.netgrif.application.engine.workflow.service.WorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +37,9 @@ public class WorkflowPerformanceTest {
 
     @Autowired
     private WorkflowService workflowService;
+
+    @Autowired
+    private TaskService taskService;
 
     @Autowired
     private IPetriNetService petriNetService;
@@ -62,7 +70,7 @@ public class WorkflowPerformanceTest {
     }
 
     @Test
-    public void testCreate2Performance() throws IOException, MissingPetriNetMetaDataException {
+    public void testCreateWithActionPerformance() throws IOException, MissingPetriNetMetaDataException {
         PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
                 .xmlFile(new FileInputStream("src/test/resources/petriNets/test_create_case_performance_with_action.xml"))
                 .releaseType(VersionType.MAJOR)
@@ -76,18 +84,163 @@ public class WorkflowPerformanceTest {
     }
 
     @Test
-    public void testAssignPerformance() {
+    public void testAssignPerformance() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/test_task_event.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+        long totalElapsedTime = 0;
+        int iterations = 5000;
+        LoggedUser loggedUser = superCreatorRunner.getLoggedSuper();
 
+        for (int i = 0; i < iterations; i++) {
+            Case useCase = workflowService.createCase(CreateCaseParams.with()
+                    .petriNet(net)
+                    .loggedUser(loggedUser)
+                    .locale(Locale.getDefault())
+                    .build()).getCase();
+            String taskId = useCase.getTasks().stream().findFirst().get().getTask();
+            long start = System.currentTimeMillis();
+            taskService.assignTask(taskId);
+            long finish = System.currentTimeMillis();
+            totalElapsedTime += finish - start;
+        }
+        log.info("AVG time for event [assignTask] is [{} ms] for [{}] iterations", totalElapsedTime / iterations, iterations);
     }
 
     @Test
-    public void testCancelPerformance() {
+    public void testAssignWithActionPerformance() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/test_task_event_with_action.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+        long totalElapsedTime = 0;
+        int iterations = 5000;
+        LoggedUser loggedUser = superCreatorRunner.getLoggedSuper();
 
+        for (int i = 0; i < iterations; i++) {
+            Case useCase = workflowService.createCase(CreateCaseParams.with()
+                    .petriNet(net)
+                    .loggedUser(loggedUser)
+                    .locale(Locale.getDefault())
+                    .build()).getCase();
+            String taskId = useCase.getTasks().stream().findFirst().get().getTask();
+            long start = System.currentTimeMillis();
+            taskService.assignTask(taskId);
+            long finish = System.currentTimeMillis();
+            totalElapsedTime += finish - start;
+        }
+        log.info("AVG time for event [assignTaskWithAction] is [{} ms] for [{}] iterations", totalElapsedTime / iterations, iterations);
     }
 
     @Test
-    public void testFinishPerformance() {
+    public void testCancelPerformance() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/test_task_event.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+        long totalElapsedTime = 0;
+        int iterations = 5000;
+        LoggedUser loggedUser = superCreatorRunner.getLoggedSuper();
 
+        for (int i = 0; i < iterations; i++) {
+            Case useCase = workflowService.createCase(CreateCaseParams.with()
+                    .petriNet(net)
+                    .loggedUser(loggedUser)
+                    .locale(Locale.getDefault())
+                    .build()).getCase();
+            String taskId = useCase.getTasks().stream().findFirst().get().getTask();
+            Task task = taskService.assignTask(taskId).getTask();
+            long start = System.currentTimeMillis();
+            taskService.cancelTask(task, loggedUser);
+            long finish = System.currentTimeMillis();
+            totalElapsedTime += finish - start;
+        }
+        log.info("AVG time for event [cancelTask] is [{} ms] for [{}] iterations", totalElapsedTime / iterations, iterations);
+    }
+
+    @Test
+    public void testCancelWithActionPerformance() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/test_task_event_with_action.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+        long totalElapsedTime = 0;
+        int iterations = 5000;
+        LoggedUser loggedUser = superCreatorRunner.getLoggedSuper();
+
+        for (int i = 0; i < iterations; i++) {
+            Case useCase = workflowService.createCase(CreateCaseParams.with()
+                    .petriNet(net)
+                    .loggedUser(loggedUser)
+                    .locale(Locale.getDefault())
+                    .build()).getCase();
+            String taskId = useCase.getTasks().stream().findFirst().get().getTask();
+            Task task = taskService.assignTask(taskId).getTask();
+            long start = System.currentTimeMillis();
+            taskService.cancelTask(task, loggedUser);
+            long finish = System.currentTimeMillis();
+            totalElapsedTime += finish - start;
+        }
+        log.info("AVG time for event [cancelTaskWithAction] is [{} ms] for [{}] iterations", totalElapsedTime / iterations, iterations);
+    }
+
+    @Test
+    public void testFinishPerformance() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/test_task_event.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+        long totalElapsedTime = 0;
+        int iterations = 5000;
+        LoggedUser loggedUser = superCreatorRunner.getLoggedSuper();
+
+        for (int i = 0; i < iterations; i++) {
+            Case useCase = workflowService.createCase(CreateCaseParams.with()
+                    .petriNet(net)
+                    .loggedUser(loggedUser)
+                    .locale(Locale.getDefault())
+                    .build()).getCase();
+            String taskId = useCase.getTasks().stream().findFirst().get().getTask();
+            Task task = taskService.assignTask(taskId).getTask();
+            long start = System.currentTimeMillis();
+            taskService.finishTask(task, loggedUser);
+            long finish = System.currentTimeMillis();
+            totalElapsedTime += finish - start;
+        }
+        log.info("AVG time for event [finishTask] is [{} ms] for [{}] iterations", totalElapsedTime / iterations, iterations);
+    }
+
+    @Test
+    public void testFinishWithActionPerformance() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/test_task_event_with_action.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+        long totalElapsedTime = 0;
+        int iterations = 5000;
+        LoggedUser loggedUser = superCreatorRunner.getLoggedSuper();
+
+        for (int i = 0; i < iterations; i++) {
+            Case useCase = workflowService.createCase(CreateCaseParams.with()
+                    .petriNet(net)
+                    .loggedUser(loggedUser)
+                    .locale(Locale.getDefault())
+                    .build()).getCase();
+            String taskId = useCase.getTasks().stream().findFirst().get().getTask();
+            Task task = taskService.assignTask(taskId).getTask();
+            long start = System.currentTimeMillis();
+            taskService.finishTask(task, loggedUser);
+            long finish = System.currentTimeMillis();
+            totalElapsedTime += finish - start;
+        }
+        log.info("AVG time for event [finishTaskWithAction] is [{} ms] for [{}] iterations", totalElapsedTime / iterations, iterations);
     }
 
     @Test
