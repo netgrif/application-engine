@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
@@ -12,6 +11,7 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.task
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.DelegateTaskEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.ReloadTaskOutcome;
+import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import org.springframework.data.domain.Page;
@@ -53,45 +53,19 @@ public interface ITaskService {
 
     List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, AbstractUser user, Map<String, String> params) throws TransitionNotExecutableException;
 
-    FinishTaskEventOutcome finishTask(Task task, AbstractUser user) throws TransitionNotExecutableException;
-
-    FinishTaskEventOutcome finishTask(Task task, AbstractUser user, Map<String, String> params) throws TransitionNotExecutableException;
-
-    FinishTaskEventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
-
-    FinishTaskEventOutcome finishTask(LoggedUser loggedUser, String taskId, Map<String, String> params) throws IllegalArgumentException, TransitionNotExecutableException;
-
-    FinishTaskEventOutcome finishTask(String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
-
-    FinishTaskEventOutcome finishTask(String taskId, Map<String, String> params) throws IllegalArgumentException, TransitionNotExecutableException;
+    FinishTaskEventOutcome finishTask(TaskParams taskParams) throws TransitionNotExecutableException;
 
     List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, AbstractUser user) throws TransitionNotExecutableException;
 
     List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, AbstractUser user, Map<String, String> params) throws TransitionNotExecutableException;
 
-    AssignTaskEventOutcome assignTask(Task task, AbstractUser user) throws TransitionNotExecutableException;
-
-    AssignTaskEventOutcome assignTask(Task task, AbstractUser user, Map<String, String> params) throws TransitionNotExecutableException;
-
-    AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException, TaskNotFoundException;
-
-    AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId, Map<String, String> params) throws TransitionNotExecutableException, TaskNotFoundException;
-
-    AssignTaskEventOutcome assignTask(String taskId) throws TransitionNotExecutableException;
-
-    AssignTaskEventOutcome assignTask(String taskId, Map<String, String> params) throws TransitionNotExecutableException;
+    AssignTaskEventOutcome assignTask(TaskParams taskParams) throws TransitionNotExecutableException;
 
     List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, AbstractUser user);
 
     List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, AbstractUser user, Map<String, String> params);
 
-    CancelTaskEventOutcome cancelTask(Task task, AbstractUser user);
-
-    CancelTaskEventOutcome cancelTask(Task task, AbstractUser user, Map<String, String> params);
-
-    CancelTaskEventOutcome cancelTask(LoggedUser loggedUser, String taskId);
-
-    CancelTaskEventOutcome cancelTask(LoggedUser loggedUser, String taskId, Map<String, String> params);
+    CancelTaskEventOutcome cancelTask(TaskParams taskParams);
 
     /**
      * cancel task action

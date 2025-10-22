@@ -12,6 +12,7 @@ import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.TaskService;
 import com.netgrif.application.engine.workflow.service.WorkflowService;
 import lombok.extern.slf4j.Slf4j;
@@ -102,7 +103,9 @@ public class WorkflowPerformanceTest {
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
             long start = System.currentTimeMillis();
-            taskService.assignTask(taskId);
+            taskService.assignTask(TaskParams.with()
+                    .taskId(taskId)
+                    .build());
             long finish = System.currentTimeMillis();
             totalElapsedTime += finish - start;
         }
@@ -128,7 +131,9 @@ public class WorkflowPerformanceTest {
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
             long start = System.currentTimeMillis();
-            taskService.assignTask(taskId);
+            taskService.assignTask(TaskParams.with()
+                    .taskId(taskId)
+                    .build());
             long finish = System.currentTimeMillis();
             totalElapsedTime += finish - start;
         }
@@ -153,9 +158,14 @@ public class WorkflowPerformanceTest {
                     .locale(Locale.getDefault())
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
-            Task task = taskService.assignTask(taskId).getTask();
+            Task task = taskService.assignTask(TaskParams.with()
+                    .taskId(taskId)
+                    .build()).getTask();
             long start = System.currentTimeMillis();
-            taskService.cancelTask(task, loggedUser);
+            taskService.cancelTask(TaskParams.with()
+                    .task(task)
+                    .user(loggedUser)
+                    .build());
             long finish = System.currentTimeMillis();
             totalElapsedTime += finish - start;
         }
@@ -180,9 +190,14 @@ public class WorkflowPerformanceTest {
                     .locale(Locale.getDefault())
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
-            Task task = taskService.assignTask(taskId).getTask();
+            Task task = taskService.assignTask(TaskParams.with()
+                    .taskId(taskId)
+                    .build()).getTask();
             long start = System.currentTimeMillis();
-            taskService.cancelTask(task, loggedUser);
+            taskService.cancelTask(TaskParams.with()
+                    .task(task)
+                    .user(loggedUser)
+                    .build());
             long finish = System.currentTimeMillis();
             totalElapsedTime += finish - start;
         }
@@ -207,9 +222,14 @@ public class WorkflowPerformanceTest {
                     .locale(Locale.getDefault())
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
-            Task task = taskService.assignTask(taskId).getTask();
+            Task task = taskService.assignTask(TaskParams.with()
+                    .taskId(taskId)
+                    .build()).getTask();
             long start = System.currentTimeMillis();
-            taskService.finishTask(task, loggedUser);
+            taskService.finishTask(TaskParams.with()
+                    .task(task)
+                    .user(loggedUser)
+                    .build());
             long finish = System.currentTimeMillis();
             totalElapsedTime += finish - start;
         }
@@ -234,9 +254,14 @@ public class WorkflowPerformanceTest {
                     .locale(Locale.getDefault())
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
-            Task task = taskService.assignTask(taskId).getTask();
+            Task task = taskService.assignTask(TaskParams.with()
+                    .taskId(taskId)
+                    .build()).getTask();
             long start = System.currentTimeMillis();
-            taskService.finishTask(task, loggedUser);
+            taskService.finishTask(TaskParams.with()
+                    .task(task)
+                    .user(loggedUser)
+                    .build());
             long finish = System.currentTimeMillis();
             totalElapsedTime += finish - start;
         }

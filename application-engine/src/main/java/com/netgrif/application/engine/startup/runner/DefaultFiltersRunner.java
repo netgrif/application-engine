@@ -15,6 +15,7 @@ import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase;
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -446,7 +447,10 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
             filterCase.setIcon(icon);
             filterCase = this.workflowService.save(filterCase);
             Task newFilterTask = this.taskService.searchOne(QTask.task.transitionId.eq(AUTO_CREATE_TRANSITION).and(QTask.task.caseId.eq(filterCase.getStringId())));
-            this.taskService.assignTask(newFilterTask, this.userService.getLoggedOrSystem());
+            this.taskService.assignTask(TaskParams.with()
+                    .task(newFilterTask)
+                    .user(this.userService.getLoggedOrSystem())
+                    .build());
 
             Map<String, Map<String, Object>> setDataMap = new LinkedHashMap<>();
             setDataMap.put(FILTER_TYPE_FIELD_ID, Map.of(
@@ -488,7 +492,10 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
             filterCase.getDataSet().get(FILTER_I18N_TITLE_FIELD_ID).setValue(translatedTitle);
             workflowService.save(filterCase);
 
-            this.taskService.finishTask(newFilterTask, this.userService.getLoggedOrSystem());
+            this.taskService.finishTask(TaskParams.with()
+                    .task(newFilterTask)
+                    .user(this.userService.getLoggedOrSystem())
+                    .build());
             return Optional.of(this.workflowService.findOne(filterCase.getStringId()));
         } catch (Exception ex) {
             log.error("Failed to create filter case", ex);

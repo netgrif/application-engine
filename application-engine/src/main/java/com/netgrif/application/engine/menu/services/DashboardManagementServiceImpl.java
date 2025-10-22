@@ -20,6 +20,7 @@ import com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.Das
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -114,9 +115,15 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
         AbstractUser loggedUser = userService.getLoggedOrSystem();
         String taskId = MenuItemUtils.findTaskIdInCase(useCase, transId);
         Task task = taskService.findOne(taskId);
-        task = taskService.assignTask(task, loggedUser).getTask();
+        task = taskService.assignTask(TaskParams.with()
+                .task(task)
+                .user(loggedUser)
+                .build()).getTask();
         task = dataService.setData(task, ImportHelper.populateDataset((Map) dataSet)).getTask();
-        return taskService.finishTask(task, loggedUser).getCase();
+        return taskService.finishTask(TaskParams.with()
+                .task(task)
+                .user(loggedUser)
+                .build()).getCase();
     }
 
     protected Case findCase(String processIdentifier, String query) {

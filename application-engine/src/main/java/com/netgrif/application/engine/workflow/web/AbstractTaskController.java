@@ -7,6 +7,7 @@ import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
+import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.IllegalArgumentWithChangedFieldsException;
@@ -103,9 +104,12 @@ public abstract class AbstractTaskController {
     public EntityModel<EventOutcomeWithMessage> assign(LoggedUser loggedUser, String taskId, Locale locale) {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getName(),
-                    LocalisedEventOutcomeFactory.from(taskService.assignTask(loggedUser, taskId), locale));
+                    LocalisedEventOutcomeFactory.from(taskService.assignTask(TaskParams.with()
+                            .taskId(taskId)
+                            .user(loggedUser)
+                            .build()), locale));
         } catch (TransitionNotExecutableException e) {
-            log.error("Assigning task [" + taskId + "] failed: ", e);
+            log.error("Assigning task [{}] failed: ", taskId, e);
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
@@ -115,7 +119,7 @@ public abstract class AbstractTaskController {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]",
                     LocalisedEventOutcomeFactory.from(taskService.delegateTask(loggedUser, delegatedId, taskId), locale));
         } catch (Exception e) {
-            log.error("Delegating task [" + taskId + "] failed: ", e);
+            log.error("Delegating task [{}] failed: ", taskId, e);
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
@@ -124,9 +128,12 @@ public abstract class AbstractTaskController {
 
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " finished",
-                    LocalisedEventOutcomeFactory.from(taskService.finishTask(loggedUser, taskId), locale));
+                    LocalisedEventOutcomeFactory.from(taskService.finishTask(TaskParams.with()
+                            .taskId(taskId)
+                            .user(loggedUser)
+                            .build()), locale));
         } catch (Exception e) {
-            log.error("Finishing task [" + taskId + "] failed: ", e);
+            log.error("Finishing task [{}] failed: ", taskId, e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
                 return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), LocalisedEventOutcomeFactory.from(((IllegalArgumentWithChangedFieldsException) e).getOutcome(), locale));
             } else {
@@ -138,9 +145,12 @@ public abstract class AbstractTaskController {
     public EntityModel<EventOutcomeWithMessage> cancel(LoggedUser loggedUser, String taskId, Locale locale) {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " canceled",
-                    LocalisedEventOutcomeFactory.from(taskService.cancelTask(loggedUser, taskId), locale));
+                    LocalisedEventOutcomeFactory.from(taskService.cancelTask(TaskParams.with()
+                            .taskId(taskId)
+                            .user(loggedUser)
+                            .build()), locale));
         } catch (Exception e) {
-            log.error("Canceling task [" + taskId + "] failed: ", e);
+            log.error("Canceling task [{}] failed: ", taskId, e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
                 return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), LocalisedEventOutcomeFactory.from(((IllegalArgumentWithChangedFieldsException) e).getOutcome(), locale));
             } else {
