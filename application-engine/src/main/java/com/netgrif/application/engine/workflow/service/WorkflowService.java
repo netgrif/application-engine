@@ -33,6 +33,7 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.case
 import com.netgrif.application.engine.workflow.domain.outcomes.ReloadTaskOutcome;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.params.DeleteCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.objects.workflow.service.InitValueExpressionEvaluator;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -373,26 +374,15 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public DeleteCaseEventOutcome deleteCase(String caseId, Map<String, String> params) {
-        Case useCase = findOne(caseId);
-        return deleteCase(useCase, params);
-    }
+    public DeleteCaseEventOutcome deleteCase(DeleteCaseParams deleteCaseParams) {
+        fillMissingAttributes(deleteCaseParams);
 
-    @Override
-    public DeleteCaseEventOutcome deleteCase(String caseId) {
-        return deleteCase(caseId, new HashMap<>());
-    }
-
-    @Override
-    public DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params) {
-        return deleteCase(useCase, params, false);
-    }
-
-    @Override
-    public DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params, boolean force) {
         DeleteCaseEventOutcome outcome = null;
-        if (!force) {
-            outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty(), params));
+        Case useCase = deleteCaseParams.getUseCase();
+
+        if (!deleteCaseParams.isForce()) {
+            outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(),
+                    useCase, Optional.empty(), deleteCaseParams.getParams()));
             publisher.publishEvent(new DeleteCaseEvent(outcome, EventPhase.PRE));
             useCase = ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("default")).apply(new DeleteCaseEvent(outcome, EventPhase.PRE));
         }
@@ -401,23 +391,26 @@ public class WorkflowService implements IWorkflowService {
 
         taskService.deleteTasksByCase(useCase.getStringId());
         repository.delete(useCase);
-        if (!force) {
-            outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty(), params));
+
+        if (!deleteCaseParams.isForce()) {
+            outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null,
+                    Optional.empty(), deleteCaseParams.getParams()));
             addMessageToOutcome(useCase.getPetriNet(), CaseEventType.DELETE, outcome);
             ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("noContext")).apply(new DeleteCaseEvent(outcome, EventPhase.POST));
             publisher.publishEvent(new DeleteCaseEvent(outcome, EventPhase.POST));
         }
+
         return outcome;
     }
 
-    @Override
-    public DeleteCaseEventOutcome deleteCase(Case useCase) {
-        return deleteCase(useCase, false);
-    }
-
-    @Override
-    public DeleteCaseEventOutcome deleteCase(Case useCase, boolean force) {
-        return deleteCase(useCase, new HashMap<>(), force);
+    protected void fillMissingAttributes(DeleteCaseParams deleteCaseParams) throws IllegalArgumentException {
+        if (deleteCaseParams.getUseCase() == null) {
+            if (deleteCaseParams.getUseCaseId() != null) {
+                deleteCaseParams.setUseCase(findOne(deleteCaseParams.getUseCaseId()));
+            } else {
+                throw new IllegalArgumentException("At least case id must be provided on case removal.");
+            }
+        }
     }
 
     @Override
@@ -431,7 +424,10 @@ public class WorkflowService implements IWorkflowService {
                 userService.getLoggedOrSystem().getStringId(), net.getIdentifier(), net.getVersion().toString());
         List<Case> cases = this.searchAll(QCase.case$.petriNetObjectId.eq(net.getObjectId())).getContent();
         if (!cases.isEmpty()) {
-            cases.forEach(aCase -> deleteCase(aCase, new HashMap<>(), force));
+            cases.forEach(aCase -> deleteCase(DeleteCaseParams.with()
+                    .useCase(aCase)
+                    .force(force)
+                    .build()));
         }
     }
 
@@ -441,7 +437,9 @@ public class WorkflowService implements IWorkflowService {
         if (subtreeRoot.getImmediateDataFields().contains("treeChildCases")) {
             ((List<String>) subtreeRoot.getDataSet().get("treeChildCases").getValue()).forEach(this::deleteSubtreeRootedAt);
         }
-        return deleteCase(subtreeRootCaseId);
+        return deleteCase(DeleteCaseParams.with()
+                .useCase(subtreeRoot)
+                .build());
     }
 
     @Override

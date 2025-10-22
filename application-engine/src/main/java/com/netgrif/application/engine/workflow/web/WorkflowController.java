@@ -12,6 +12,7 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.params.DeleteCaseParams;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -222,12 +223,14 @@ public class WorkflowController {
             if (deleteSubtree) {
                 outcome = workflowService.deleteSubtreeRootedAt(caseId);
             } else {
-                outcome = workflowService.deleteCase(caseId);
+                outcome = workflowService.deleteCase(DeleteCaseParams.with()
+                        .useCaseId(caseId)
+                        .build());
             }
             return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted",
                     LocalisedEventOutcomeFactory.from(outcome, LocaleContextHolder.getLocale()));
         } catch (UnsupportedEncodingException e) {
-            log.error("Deleting case [" + caseId + "] failed:", e);
+            log.error("Deleting case [{}] failed:", caseId, e);
             return EventOutcomeWithMessageResource.errorMessage("Deleting case " + caseId + " has failed!");
         }
     }

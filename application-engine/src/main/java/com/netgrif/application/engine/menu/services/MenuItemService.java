@@ -26,6 +26,7 @@ import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner;
 import com.netgrif.application.engine.startup.runner.FilterRunner;
 import com.netgrif.application.engine.startup.runner.MenuProcessRunner;
 import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.params.DeleteCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -505,7 +506,9 @@ public class MenuItemService implements IMenuItemService {
     }
 
     protected void removeView(Case viewCase) {
-        workflowService.deleteCase(viewCase);
+        workflowService.deleteCase(DeleteCaseParams.with()
+                .useCase(viewCase)
+                .build());
         log.trace("Removed configuration view case [{}].", viewCase.getStringId());
     }
 
