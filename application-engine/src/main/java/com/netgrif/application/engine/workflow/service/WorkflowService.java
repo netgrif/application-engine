@@ -295,7 +295,6 @@ public class WorkflowService implements IWorkflowService {
             save(useCase);
         }
 
-
         outcome.addOutcomes(eventService.runActions(petriNet.getPostCreateActions(), useCase, Optional.empty(),
                 createCaseParams.getParams()));
 
