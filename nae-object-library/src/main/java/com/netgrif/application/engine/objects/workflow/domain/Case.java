@@ -190,32 +190,30 @@ public abstract class Case implements Serializable {
         List<MapOptionsField<I18nString, ?>> dynamicOptionsFields = new LinkedList<>();
         List<ChoiceField<?>> dynamicChoicesFields = new LinkedList<>();
         petriNet.getDataSet().forEach((key, field) -> {
+            DataField dataField;
             if (field.isDynamicDefaultValue()) {
                 dynamicInitFields.add(field);
-                this.dataSet.put(key, new DataField());
+                dataField = new DataField();
+                this.dataSet.put(key, dataField);
             } else {
-                this.dataSet.put(key, new DataField(field.getDefaultValue()));
+                dataField = new DataField(field.getDefaultValue());
+                this.dataSet.put(key, dataField);
             }
             if (field.getComponent() != null) {
-                this.dataSet.get(key).setComponent(field.getComponent());
+                dataField.setComponent(field.getComponent());
             }
-            if (field instanceof UserField) {
-                this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
-            }
-            if (field instanceof UserListField) {
-                this.dataSet.get(key).setChoices(((UserListField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
-            }
-            if (field instanceof FieldWithAllowedNets) {
-                this.dataSet.get(key).setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());
-            }
-            if (field instanceof FilterField) {
-                this.dataSet.get(key).setFilterMetadata(((FilterField) field).getFilterMetadata());
-            }
-            if (field instanceof MapOptionsField && ((MapOptionsField) field).isDynamic()) {
-                dynamicOptionsFields.add((MapOptionsField<I18nString, ?>) field);
-            }
-            if (field instanceof ChoiceField && ((ChoiceField) field).isDynamic()) {
-                dynamicChoicesFields.add((ChoiceField<?>) field);
+            switch (field) {
+                case UserField userField ->
+                        dataField.setChoices(userField.getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
+                case UserListField userListField ->
+                        dataField.setChoices(userListField.getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
+                case FilterField filterField -> dataField.setFilterMetadata(filterField.getFilterMetadata());
+                case FieldWithAllowedNets fieldWithAllowedNets ->
+                        dataField.setAllowedNets(fieldWithAllowedNets.getAllowedNets());
+                case MapOptionsField mapOptionsField when mapOptionsField.isDynamic() ->
+                        dynamicOptionsFields.add((MapOptionsField<I18nString, ?>) field);
+                case ChoiceField choiceField when choiceField.isDynamic() -> dynamicChoicesFields.add(choiceField);
+                default -> {}
             }
         });
         dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field, params)));

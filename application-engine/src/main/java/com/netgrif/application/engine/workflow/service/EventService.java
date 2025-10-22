@@ -60,7 +60,7 @@ public class EventService implements IEventService {
                     });
             allOutcomes.addAll(outcomes);
         });
-        if (useCase != null && !allOutcomes.isEmpty()) {
+        if (useCase != null) {
             workflowService.save(useCase);
         }
         return allOutcomes;

@@ -496,6 +496,7 @@ public class TaskService implements ITaskService {
         ReloadTaskOutcome outcome = new ReloadTaskOutcome();
 
         List<Task> newTasks = new ArrayList<>();
+        List<Task> tasksToBeExecuted = new ArrayList<>();
         List<Task> disabledTasks = new ArrayList<>();
         Map<String, String> tasks = useCase.getTasks().stream().collect(Collectors.toMap(TaskPair::getTransition, TaskPair::getTask));
         for (Transition transition : net.getTransitions().values()) {
@@ -504,8 +505,12 @@ public class TaskService implements ITaskService {
                 if (taskId != null) {
                     // task exists - do nothing
                 } else {
-                    // task does not exist - create a new task
-                    newTasks.add(createFromTransition(transition, useCase));
+                    // task does not exist - create a new task and check a trigger
+                    Task newTask = createFromTransition(transition, useCase);
+                    newTasks.add(newTask);
+                    if (transition.hasAutoTrigger()) {
+                        tasksToBeExecuted.add(newTask);
+                    }
                 }
             } else {
                 if (taskId != null) {
@@ -535,21 +540,15 @@ public class TaskService implements ITaskService {
             outcome.setUseCaseSaved(true);
         }
 
-        for (Task task : newTasks) {
-            if (shouldExecuteTask(net, task)) {
-                if (!outcome.isUseCaseSaved()) {
-                    useCase = workflowService.save(useCase);
-                }
-                executeTransition(task, useCase);
-                outcome.setAnyTaskExecuted(true);
+        for (Task task : tasksToBeExecuted) {
+            if (!outcome.isUseCaseSaved()) {
+                useCase = workflowService.save(useCase);
+                outcome.setUseCaseSaved(true);
             }
+            executeTransition(task, useCase);
+            outcome.setAnyTaskExecuted(true);
         }
         return outcome;
-    }
-
-    protected boolean shouldExecuteTask(PetriNet net, Task task) {
-        Transition transition = net.getTransition(task.getTransitionId());
-        return transition.hasAutoTrigger();
     }
 
     protected boolean isExecutable(Transition transition, PetriNet net) {
