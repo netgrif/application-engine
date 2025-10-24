@@ -83,7 +83,7 @@ netgrif:
       jwt:
         expiration: 900000
         algorithm: RSA
-        private-key: file:src/main/resources/certificates/private.der
+        private-key: classpath:certificates/private.der
       server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/api/public/**,/v3/api-docs/public,/manage/**
       anonymous-exceptions: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/manage/**
       providers: NetgrifBasicAuthenticationProvider

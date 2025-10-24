@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.configuration.security;
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl;
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.UserService;
@@ -11,7 +12,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
@@ -39,10 +39,12 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private final IJwtService jwtService;
     private final UserService userService;
     private final AuthorityService authorityService;
+    private final SecurityConfigurationProperties securityConfigurationProperties;
 
     public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider,
                                       String[] urls, String[] exceptions, IJwtService jwtService,
-                                      UserService userService, AuthorityService authorityService) {
+                                      UserService userService, AuthorityService authorityService,
+                                      SecurityConfigurationProperties securityConfigurationProperties) {
         this.authenticationManager = authenticationManager;
         this.authenticationManager.getProviders().add(provider);
         this.anonymousAccessUrls = urls;
@@ -50,6 +52,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
         this.jwtService = jwtService;
         this.userService = userService;
         this.authorityService = authorityService;
+        this.securityConfigurationProperties = securityConfigurationProperties;
     }
 
     @Override
@@ -65,7 +68,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
     private void authenticate(HttpServletRequest request, String jwtToken) {
         AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(
-                "anonymous-user",
+                securityConfigurationProperties.getAnonymousAuthenticationKey(),
                 jwtService.getLoggedUser(jwtToken, Authority.anonymous),
                 Collections.singleton((AuthorityImpl) authorityService.getOrCreate(Authority.anonymous))
         );
@@ -106,6 +109,9 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
     private LoggedUser createAnonymousUser() {
         User anonymousUser = new User();
+        anonymousUser.setUsername("anonymous_" + anonymousUser.getStringId());
+        anonymousUser.setFirstName("Anonymous");
+        anonymousUser.setLastName("User");
         anonymousUser.setState(UserState.ACTIVE);
         anonymousUser = (User) userService.saveUser(anonymousUser, null);
         return ActorTransformer.toLoggedUser(anonymousUser);

@@ -14,13 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -70,13 +69,9 @@ public class PublicPetriNetController {
 
     @Operation(summary = "Search processes")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<PetriNetReferenceResource> searchPetriNets(@RequestBody PetriNetSearch criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
+    public ResponseEntity<Page<PetriNetReferenceResource>> searchPetriNets(@RequestBody PetriNetSearch criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
         Page<PetriNetReference> nets = petriNetService.search(criteria, ActorTransformer.toLoggedUser(userService.getLoggedUser()), pageable, locale);
-//        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicPetriNetController.class)
-//                .searchPetriNets(criteria, pageable, assembler, locale)).withRel("search");
-//        PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);
-//        PetriNetReferenceResourceAssembler.buildLinks(resources);
-        return PagedModel.of(nets.stream().map(PetriNetReferenceResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), nets.getTotalElements()));
+        return ResponseEntity.ok(new PageImpl<>(nets.stream().map(PetriNetReferenceResource::new).toList(), pageable, nets.getTotalElements()));
     }
 
     @Operation(summary = "Get roles of process")

@@ -468,8 +468,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public AbstractUser getLoggedUser() {
         LoggedUser loggedUser = getLoggedUserFromContext();
-        Optional<AbstractUser> userOptional = findUserByUsername(loggedUser.getUsername(), loggedUser.getRealmId());
-        AbstractUser user = userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] in realm [%s] is not present in the system.".formatted(loggedUser.getUsername(), loggedUser.getRealmId())));
+        AbstractUser user;
+        if (loggedUser.isAnonymous()) {
+            user = ActorTransformer.toUser(loggedUser);
+        } else {
+            Optional<AbstractUser> userOptional = findUserByUsername(loggedUser.getUsername(), loggedUser.getRealmId());
+            user = userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] in realm [%s] is not present in the system.".formatted(loggedUser.getUsername(), loggedUser.getRealmId())));
+        }
         // TODO: impersonation
 //        if (loggedUser.isImpersonating()) {
 //            IUser impersonated = transformToUser((LoggedUserImpl) loggedUser.getImpersonated());

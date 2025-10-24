@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.auth.web;
+ package com.netgrif.application.engine.auth.web;
 
 import com.netgrif.application.engine.adapter.spring.common.web.responsebodies.ResponseMessage;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;

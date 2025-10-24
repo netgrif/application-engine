@@ -1,8 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
-import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.petrinet.domain.throwable.IllegalTaskStateException;
@@ -21,12 +20,9 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     @Autowired
     ITaskService taskService;
 
-    @Autowired
-    UserService userService;
-
     @Override
     public Boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions) {
-        return userHasAtLeastOneRolePermission(userService.transformToUser((LoggedUserImpl) loggedUser), taskService.findById(taskId), permissions);
+        return userHasAtLeastOneRolePermission(ActorTransformer.toUser(loggedUser), taskService.findById(taskId), permissions);
     }
 
     @Override
@@ -47,7 +43,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     @Override
     public Boolean userHasUserListPermission(LoggedUser loggedUser, String taskId, RolePermission... permissions) {
-        return userHasUserListPermission(userService.transformToUser((LoggedUserImpl) loggedUser), taskService.findById(taskId), permissions);
+        return userHasUserListPermission(ActorTransformer.toUser(loggedUser), taskService.findById(taskId), permissions);
     }
 
     @Override
@@ -76,7 +72,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     @Override
     public boolean isAssignee(LoggedUser loggedUser, String taskId) {
-        return isAssignee(userService.transformToUser((LoggedUserImpl) loggedUser), taskService.findById(taskId));
+        return isAssignee(ActorTransformer.toUser(loggedUser), taskService.findById(taskId));
     }
 
     @Override
@@ -151,7 +147,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
         Boolean userPerm = userHasUserListPermission(loggedUser, taskId, RolePermission.CANCEL);
         // TODO: impersonation
 //        return loggedUser.getSelfOrImpersonated().isAdmin() || ((userPerm == null ? (rolePerm != null && rolePerm) : userPerm) && isAssignee(loggedUser, taskId)) && canAssignedCancel(userService.transformToUser((LoggedUserImpl) loggedUser), taskId);
-        return loggedUser.isAdmin() || ((userPerm == null ? (rolePerm != null && rolePerm) : userPerm) && isAssignee(loggedUser, taskId)) && canAssignedCancel(userService.transformToUser((LoggedUserImpl) loggedUser), taskId);
+        return loggedUser.isAdmin() || ((userPerm == null ? (rolePerm != null && rolePerm) : userPerm) && isAssignee(loggedUser, taskId)) && canAssignedCancel(ActorTransformer.toUser(loggedUser), taskId);
     }
 
     @Override

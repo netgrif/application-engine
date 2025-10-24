@@ -1,12 +1,14 @@
 package com.netgrif.application.engine.auth.web;
 
 import com.netgrif.application.engine.auth.service.PreferencesService;
+import com.netgrif.application.engine.auth.service.UserFactory;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.requestbodies.PreferencesRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.application.engine.auth.web.responsebodies.PreferencesResource;
 import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.preferences.Preferences;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
@@ -24,10 +26,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Locale;
 
 @Slf4j
 @RestController
@@ -37,7 +40,7 @@ import java.util.List;
         matchIfMissing = true
 )
 @Tag(name = "Public User Controller")
-@RequestMapping("/api/public/user")
+@RequestMapping("/api/public/users")
 public class PublicUserController {
 
     @Autowired
@@ -46,6 +49,9 @@ public class PublicUserController {
     @Autowired
     private PreferencesService preferencesService;
 
+    @Autowired
+    private UserFactory userFactory;
+
     @Operation(summary = "Get logged user", description = "Retrieves information of currently logged user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User retrieved successfully"),
@@ -53,11 +59,11 @@ public class PublicUserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> getLoggedUser(Authentication auth) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+    public ResponseEntity<User> getLoggedUser(Locale locale) {
+        LoggedUser loggedUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         AbstractUser user;
         try {
-            user = userService.findById(loggedUser.getStringId(), loggedUser.getRealmId());
+            user = ActorTransformer.toUser(loggedUser);
             if (user == null) {
                 return ResponseEntity
                         .status(HttpStatus.UNAUTHORIZED).build();
@@ -67,7 +73,7 @@ public class PublicUserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        return ResponseEntity.ok(User.createUser(user));
+        return ResponseEntity.ok(userFactory.getUser(user, locale));
     }
 
     @ApiResponses(value = {
@@ -77,13 +83,13 @@ public class PublicUserController {
     })
     @Operation(summary = "Generic user search", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<User>> search(@RequestBody UserSearchRequestBody query, Pageable pageable, Authentication auth) {
+    public ResponseEntity<Page<User>> search(@RequestBody UserSearchRequestBody query, Pageable pageable) {
         List<ProcessResourceId> roles = query.getRoles() == null ? null : query.getRoles().stream().map(ProcessResourceId::new).toList();
         List<ProcessResourceId> negativeRoles = query.getNegativeRoles() == null ? null : query.getNegativeRoles().stream().map(ProcessResourceId::new).toList();
         Page<AbstractUser> users = userService.searchAllCoMembers(query.getFulltext(),
                 roles,
                 negativeRoles,
-                (LoggedUser) auth.getPrincipal(), pageable);
+                (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal(), pageable);
         return ResponseEntity.ok(changeToResponse(users, pageable));
     }
 
@@ -94,8 +100,8 @@ public class PublicUserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping(value = "/preferences", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PreferencesResource> preferences(Authentication auth) {
-        String userId = ((LoggedUser) auth.getPrincipal()).getStringId();
+    public ResponseEntity<PreferencesResource> preferences() {
+        String userId = ((LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getStringId();
         Preferences preferences = preferencesService.get(userId);
 
         if (preferences == null) {
@@ -115,9 +121,9 @@ public class PublicUserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> savePreferences(@RequestBody PreferencesRequest preferences, Authentication auth) {
+    public ResponseEntity<String> savePreferences(@RequestBody PreferencesRequest preferences) {
         try {
-            String userId = ((LoggedUser) auth.getPrincipal()).getStringId();
+            String userId = ((LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getStringId();
             preferences.setUserId(userId);
             preferencesService.save(preferences.toPreferences());
             return ResponseEntity.ok("User preferences saved");

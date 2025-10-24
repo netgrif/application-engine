@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import java.util.Locale;
 
 @Slf4j
@@ -43,7 +44,7 @@ public class PublicWorkflowController {
         this.workflowService = workflowService;
     }
 
-    @PreAuthorize("@workflowAuthorizationService.canCallCreate(@userService.getAnonymousLogged(), #body.netId)")
+    @PreAuthorize("@workflowAuthorizationService.canCallCreate(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #body.netId)")
     @PostMapping(value = "/case", consumes = "application/json;charset=UTF-8", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Create new case")
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Locale locale) {

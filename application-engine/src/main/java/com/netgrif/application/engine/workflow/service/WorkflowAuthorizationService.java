@@ -1,8 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
-import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRolePermission;
@@ -25,9 +24,6 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
     @Autowired
     private IPetriNetService petriNetService;
 
-    @Autowired
-    private UserService userService;
-
     @Override
     public boolean canCallDelete(LoggedUser user, String caseId) {
         Case requestedCase = workflowService.findOne(caseId);
@@ -35,8 +31,8 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
 //        Boolean rolePerm = userHasAtLeastOneRolePermission(userService.transformToUser((LoggedUserImpl) user.getSelfOrImpersonated()), requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
 //        Boolean userPerm = userHasUserListPermission(userService.transformToUser((LoggedUserImpl) user.getSelfOrImpersonated()), requestedCase, ProcessRolePermission.DELETE);
 //        return user.getSelfOrImpersonated().isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
-        Boolean rolePerm = userHasAtLeastOneRolePermission(userService.transformToUser(user), requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
-        Boolean userPerm = userHasUserListPermission(userService.transformToUser(user), requestedCase, ProcessRolePermission.DELETE);
+        Boolean rolePerm = userHasAtLeastOneRolePermission(ActorTransformer.toUser(user), requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
+        Boolean userPerm = userHasUserListPermission(ActorTransformer.toUser(user), requestedCase, ProcessRolePermission.DELETE);
         return user.isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
     }
 
@@ -44,7 +40,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
     public boolean canCallCreate(LoggedUser user, String netId) {
         PetriNet net = petriNetService.getPetriNet(netId);
         // TODO: impersonation
-        return user.isAdmin() || userHasAtLeastOneRolePermission(userService.transformToUser(user), net, ProcessRolePermission.CREATE);
+        return user.isAdmin() || userHasAtLeastOneRolePermission(ActorTransformer.toUser(user), net, ProcessRolePermission.CREATE);
     }
 
     @Override

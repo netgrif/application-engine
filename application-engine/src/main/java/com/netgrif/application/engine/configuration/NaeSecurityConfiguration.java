@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
-import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.security.ImpersonationRequestFilter;
@@ -37,7 +36,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 
-import java.util.HashSet;
 import java.util.List;
 
 import static org.springframework.http.HttpMethod.OPTIONS;
@@ -69,9 +67,6 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     private SecurityConfigurationProperties securityConfigurationProperties;
 
     @Autowired
-    private SecurityConfigurationProperties properties;
-
-    @Autowired
     private ISecurityContextService securityContextService;
 
     @Autowired
@@ -83,11 +78,11 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     @Autowired
     private AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    private static final String ANONYMOUS_USER = "anonymousUser";
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        List<String> allowedOrigins = properties.getAllowedOrigins();
+        List<String> allowedOrigins = securityConfigurationProperties.getAllowedOrigins();
 
         CorsConfiguration config = new CorsConfiguration().applyPermitDefaultValues();
         config.addAllowedMethod("*");
@@ -145,12 +140,12 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Override
     protected boolean isCsrfEnabled() {
-        return properties.isCsrf();
+        return securityConfigurationProperties.isCsrf();
     }
 
     @Override
     protected boolean isCorsEnabled() {
-        return properties.isCors();
+        return securityConfigurationProperties.isCors();
     }
 
     @Override
@@ -170,19 +165,19 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Override
     protected SecurityConfigurationProperties getSecurityConfigProperties() {
-        return properties;
+        return securityConfigurationProperties;
     }
 
     protected PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
-        Authority authority = authorityService.getOrCreate(Authority.anonymous);
         return new PublicAuthenticationFilter(
                 (ProviderManager) authenticationManager(authenticationManagerBuilder),
-                new AnonymousAuthenticationProvider(ANONYMOUS_USER),
+                new AnonymousAuthenticationProvider(securityConfigurationProperties.getAnonymousAuthenticationKey()),
                 securityConfigurationProperties.getServerPatterns(),
                 securityConfigurationProperties.getAnonymousExceptions(),
                 jwtService,
                 userService,
-                authorityService
+                authorityService,
+                securityConfigurationProperties
         );
     }
 
@@ -191,7 +186,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     }
 
     private HostValidationRequestFilter hostValidationRequestFilter() {
-        return new HostValidationRequestFilter(properties);
+        return new HostValidationRequestFilter(securityConfigurationProperties);
     }
 
     private ImpersonationRequestFilter impersonationRequestFilter() {
