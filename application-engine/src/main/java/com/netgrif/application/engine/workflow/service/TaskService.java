@@ -173,8 +173,10 @@ public class TaskService implements ITaskService {
 
         useCase = workflowService.save(useCase);
         save(task);
-        reloadTasks(useCase, false);
-        useCase = workflowService.findOne(useCase.getStringId());
+        ReloadTaskOutcome reloadTaskOutcome = reloadTasks(useCase, false);
+        if (reloadTaskOutcome.isAnyTaskExecuted()) {
+            useCase = workflowService.findOne(useCase.getStringId());
+        }
         return useCase;
     }
 
