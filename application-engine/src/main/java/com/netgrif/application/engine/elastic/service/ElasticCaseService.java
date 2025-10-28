@@ -7,6 +7,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticQueryFactory;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
@@ -39,6 +40,8 @@ import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.Order;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
@@ -85,6 +88,9 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     public void setElasticProperties(DataConfigurationProperties.ElasticsearchProperties elasticProperties) {
         this.elasticProperties = elasticProperties;
     }
+
+    @Autowired
+    protected IElasticQueryFactory queryFactory;
 
     @Override
     public void remove(String caseId) {
@@ -430,7 +436,17 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             return;
         }
 
-        String populatedQuery = request.query.replaceAll(ElasticQueryConstants.USER_ID_TEMPLATE, user.getId().toString());
+        String populatedQuery;
+        if (request.dynamicQuery) {
+            populatedQuery = queryFactory.populateQuery(request.query, new HashMap<>(Map.of(
+                    ElasticQueryConstants.DYNAMIC_USER_ID_TEMPLATE, user.getId().toString(),
+                    ElasticQueryConstants.LOCAL_DATE_NOW_TEMPLATE, LocalDateTime.now(),
+                    ElasticQueryConstants.LOCAL_DATE_TODAY_TEMPLATE, LocalDate.now(),
+                    ElasticQueryConstants.LOGGED_USER_TEMPLATE, user
+            )));
+        } else {
+            populatedQuery = request.query.replaceAll(ElasticQueryConstants.USER_ID_TEMPLATE, user.getId().toString());
+        }
 
         query.must(QueryStringQuery.of(builder -> builder.query(populatedQuery).allowLeadingWildcard(true).analyzeWildcard(true))._toQuery());
     }
