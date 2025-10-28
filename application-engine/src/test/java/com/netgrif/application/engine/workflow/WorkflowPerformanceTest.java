@@ -8,6 +8,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingP
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome;
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
@@ -105,6 +106,7 @@ public class WorkflowPerformanceTest {
             long start = System.currentTimeMillis();
             taskService.assignTask(TaskParams.with()
                     .taskId(taskId)
+                    .useCase(useCase)
                     .build());
             long finish = System.currentTimeMillis();
             totalElapsedTime += finish - start;
@@ -133,6 +135,7 @@ public class WorkflowPerformanceTest {
             long start = System.currentTimeMillis();
             taskService.assignTask(TaskParams.with()
                     .taskId(taskId)
+                    .useCase(useCase)
                     .build());
             long finish = System.currentTimeMillis();
             totalElapsedTime += finish - start;
@@ -158,12 +161,13 @@ public class WorkflowPerformanceTest {
                     .locale(Locale.getDefault())
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
-            Task task = taskService.assignTask(TaskParams.with()
+            AssignTaskEventOutcome assignOutcome = taskService.assignTask(TaskParams.with()
                     .taskId(taskId)
-                    .build()).getTask();
+                    .build());
             long start = System.currentTimeMillis();
             taskService.cancelTask(TaskParams.with()
-                    .task(task)
+                    .task(assignOutcome.getTask())
+                    .useCase(assignOutcome.getCase())
                     .user(loggedUser)
                     .build());
             long finish = System.currentTimeMillis();

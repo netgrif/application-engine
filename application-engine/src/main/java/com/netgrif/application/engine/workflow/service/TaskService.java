@@ -269,6 +269,8 @@ public class TaskService implements ITaskService {
 
     @Override
     public CancelTaskEventOutcome cancelTask(TaskParams taskParams) {
+        fillMissingAttributes(taskParams);
+
         Task task = taskParams.getTask();
         Case useCase = taskParams.getUseCase();
         AbstractUser user = taskParams.getUser();
@@ -279,16 +281,21 @@ public class TaskService implements ITaskService {
 
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreCancelActions(), useCase,
                 task, transition, taskParams.getParams()));
-        task = findOne(task.getStringId());
+        if (!outcomes.isEmpty()) {
+            useCase = workflowService.findOne(useCase.getStringId());
+        }
         CancelTaskEventOutcome outcome = new CancelTaskEventOutcome(useCase, task, outcomes);
         useCase = evaluateRules(new CancelTaskEvent(outcome, EventPhase.PRE));
-        task = returnTokens(task, useCase.getStringId());
-        useCase = workflowService.findOne(useCase.getStringId());
-        reloadTasks(useCase, false);
-        useCase = workflowService.findOne(useCase.getStringId());
+
+        useCase = returnTokens(task, useCase);
+        ReloadTaskOutcome reloadTaskOutcome = reloadTasks(useCase, false);
+        if (reloadTaskOutcome.isAnyTaskExecuted()) {
+            useCase = workflowService.findOne(useCase.getStringId());
+        }
+
         publisher.publishEvent(new CancelTaskEvent(outcome, EventPhase.POST, user));
         outcomes.addAll(eventService.runActions(transition.getPostCancelActions(), useCase, task, transition, taskParams.getParams()));
-        useCase = evaluateRules(new CancelTaskEvent(new CancelTaskEventOutcome(useCase, task, outcomes), EventPhase.POST));
+        useCase = evaluateRules(new CancelTaskEvent(outcome, EventPhase.POST));
 
         outcome = new CancelTaskEventOutcome(useCase, task);
         outcome.setOutcomes(outcomes);
@@ -317,14 +324,21 @@ public class TaskService implements ITaskService {
         List<Task> tasks = taskRepository.findAllByTransitionIdInAndCaseId(transitions, caseId);
         Case useCase = null;
         for (Task task : tasks) {
-            if (task.getUserId() != null) {
-                if (useCase == null)
-                    useCase = workflowService.findOne(task.getCaseId());
-                Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
-                eventService.runActions(transition.getPreCancelActions(), useCase, task, transition, params);
-                returnTokens(task, useCase.getStringId());
-                eventService.runActions(transition.getPostCancelActions(), useCase, task, transition, params);
+            if (task.getUserId() == null) {
+                continue;
             }
+            if (useCase == null) {
+                useCase = workflowService.findOne(task.getCaseId());
+            }
+
+            Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+            boolean anyActionExecuted = eventService.runActions(transition.getPreCancelActions(), useCase, task,
+                    transition, params).isEmpty();
+            if (anyActionExecuted) {
+                useCase = workflowService.findOne(useCase.getStringId());
+            }
+            returnTokens(task, useCase);
+            eventService.runActions(transition.getPostCancelActions(), useCase, task, transition, params);
         }
     }
 
@@ -343,24 +357,25 @@ public class TaskService implements ITaskService {
         }
     }
 
-    private Task returnTokens(Task task, String useCaseId) {
-        Case useCase = workflowService.findOne(useCaseId);
+    private Case returnTokens(Task task, Case useCase) {
         PetriNet net = useCase.getPetriNet();
+        Case finalUseCase = useCase;
         net.getArcsOfTransition(task.getTransitionId()).stream()
                 .filter(arc -> arc.getSource() instanceof Place)
                 .forEach(arc -> {
-                    arc.rollbackExecution(useCase.getConsumedTokens().get(arc.getStringId()));
-                    useCase.getConsumedTokens().remove(arc.getStringId());
+                    arc.rollbackExecution(finalUseCase.getConsumedTokens().get(arc.getStringId()));
+                    finalUseCase.getConsumedTokens().remove(arc.getStringId());
                 });
         workflowService.updateMarking(useCase);
 
         task.setUserId(null);
         task.setUserRealmId(null);
         task.setStartDate(null);
-        task = save(task);
-        workflowService.save(useCase);
 
-        return task;
+        useCase = workflowService.save(useCase);
+        save(task);
+
+        return useCase;
     }
 
     @Override
