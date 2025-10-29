@@ -92,8 +92,9 @@ public class EventService implements IEventService {
         }
         if (task != null) {
             Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
-            if (transition.getDataSet().containsKey(field.getStringId()) && !transition.getDataSet().get(field.getStringId()).getEvents().isEmpty()) {
-                fieldActions.addAll(DataFieldLogic.getEventAction(transition.getDataSet().get(field.getStringId()).getEvents().get(actionTrigger), phase));
+            DataFieldLogic dataRef = transition.getDataSet().get(field.getStringId());
+            if (dataRef != null && !dataRef.getEvents().isEmpty()) {
+                fieldActions.addAll(DataFieldLogic.getEventAction(dataRef.getEvents().get(actionTrigger), phase));
             }
         }
 
@@ -113,7 +114,7 @@ public class EventService implements IEventService {
     public void runEventActionsOnChanged(Task task, SetDataEventOutcome outcome, DataEventType trigger, Map<String, String> params) {
         outcome.getChangedFields().forEach((s, changedField) -> {
             if (changedField.getAttributes().containsKey("value") && trigger == DataEventType.SET) {
-                Field field = outcome.getCase().getField(s);
+                Field<?> field = outcome.getCase().getField(s);
                 log.info("[{}] {}: Running actions on changed field {}", outcome.getCase().getStringId(), outcome.getCase().getTitle(), s);
                 outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getCase(), outcome.getTask(), params));
                 outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, outcome.getCase(), outcome.getTask(), params));

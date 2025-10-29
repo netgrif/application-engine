@@ -230,70 +230,74 @@ public class DataService implements IDataService {
         values.fields().forEachRemaining(entry -> {
             String fieldId = entry.getKey();
             DataField dataField = useCase.getDataSet().get(fieldId);
-            if (dataField != null) {
-                Field field = useCase.getPetriNet().getField(fieldId).get();
-                outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task, params));
-                if (outcome.getMessage() == null) {
+            if (dataField == null) {
+                return;
+            }
+
+            Field<?> field = useCase.getPetriNet().getField(fieldId).get();
+            outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task, params));
+            if (outcome.getMessage() == null) {
+                if (field.getEvents().containsKey(DataEventType.SET) &&
+                        field.getEvents().get(DataEventType.SET).getMessage() != null) {
+                    outcome.setMessage(field.getEvents().get(DataEventType.SET).getMessage());
+                } else {
                     Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
-                    if (field.getEvents().containsKey(DataEventType.SET) &&
-                            ((DataEvent) field.getEvents().get(DataEventType.SET)).getMessage() != null) {
-                        outcome.setMessage(((DataEvent) field.getEvents().get(DataEventType.SET)).getMessage());
-                    } else if (dataSet.containsKey(fieldId)
-                            && dataSet.get(fieldId).getEvents().containsKey(DataEventType.SET)
-                            && dataSet.get(fieldId).getEvents().get(DataEventType.SET).getMessage() != null) {
-                        outcome.setMessage(dataSet.get(fieldId).getEvents().get(DataEventType.SET).getMessage());
+                    DataFieldLogic dataRef = dataSet.get(fieldId);
+                    if (dataRef != null && dataRef.getEvents().containsKey(DataEventType.SET)
+                            && dataRef.getEvents().get(DataEventType.SET).getMessage() != null) {
+                        outcome.setMessage(dataRef.getEvents().get(DataEventType.SET).getMessage());
                     }
                 }
-                boolean modified = false;
-                ChangedField changedField = new ChangedField();
-                changedField.setId(fieldId);
-                Object newValue = parseFieldsValues(entry.getValue(), dataField, task.getStringId());
-                if (entry.getValue().has("value") || getFieldTypeFromNode((ObjectNode) entry.getValue()).equals("button")) {
-                    dataField.setValue(newValue);
-                    changedField.addAttribute("value", newValue);
-                    modified = true;
-                }
-                List<String> allowedNets = parseAllowedNetsValue(entry.getValue());
-                if (allowedNets != null) {
-                    dataField.setAllowedNets(allowedNets);
-                    changedField.addAttribute("allowedNets", allowedNets);
-                    modified = true;
-                }
-                String fieldType = getFieldTypeFromNode((ObjectNode) entry.getValue());
-                Map<String, Object> filterMetadata = parseFilterMetadataValue((ObjectNode) entry.getValue(), fieldType);
-                if (filterMetadata != null) {
-                    dataField.setFilterMetadata(filterMetadata);
-                    changedField.addAttribute("filterMetadata", filterMetadata);
-                    modified = true;
-                }
-                Map<String, I18nString> options = parseOptionsNode(entry.getValue(), fieldType);
-                if (options != null) {
-                    setDataFieldOptions(options, dataField, changedField, fieldType);
-                    modified = true;
-                }
-                Set<I18nString> choices = parseChoicesNode((ObjectNode) entry.getValue(), fieldType);
-                if (choices != null) {
-                    dataField.setChoices(choices);
-                    changedField.addAttribute("choices", choices.stream().map(i18nString -> i18nString.getTranslation(LocaleContextHolder.getLocale())).collect(Collectors.toSet()));
-                    modified = true;
-                }
-                Map<String, String> properties = parseProperties(entry.getValue());
-                if (properties != null) {
-                    outcome.addOutcome(this.changeComponentProperties(useCase, task, field.getStringId(), properties));
-                    modified = true;
-                }
-                if (modified) {
-                    dataField.setLastModified(LocalDateTime.now());
-                }
-                if (dataConfigurationProperties.getValidation().isSetDataEnabled()) {
-                    validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), dataField);
-                }
-                outcome.addChangedField(fieldId, changedField);
-                workflowService.save(useCase);
-                publisher.publishEvent(new SetDataEvent(outcome, EventPhase.PRE, user));
-                outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, params));
-                applyFieldConnectedChanges(useCase, field);
             }
+            boolean modified = false;
+            ChangedField changedField = new ChangedField();
+            changedField.setId(fieldId);
+            Object newValue = parseFieldsValues(entry.getValue(), dataField, task.getStringId());
+            if (entry.getValue().has("value") || getFieldTypeFromNode((ObjectNode) entry.getValue()).equals("button")) {
+                dataField.setValue(newValue);
+                changedField.addAttribute("value", newValue);
+                modified = true;
+            }
+            List<String> allowedNets = parseAllowedNetsValue(entry.getValue());
+            if (allowedNets != null) {
+                dataField.setAllowedNets(allowedNets);
+                changedField.addAttribute("allowedNets", allowedNets);
+                modified = true;
+            }
+            String fieldType = getFieldTypeFromNode((ObjectNode) entry.getValue());
+            Map<String, Object> filterMetadata = parseFilterMetadataValue((ObjectNode) entry.getValue(), fieldType);
+            if (filterMetadata != null) {
+                dataField.setFilterMetadata(filterMetadata);
+                changedField.addAttribute("filterMetadata", filterMetadata);
+                modified = true;
+            }
+            Map<String, I18nString> options = parseOptionsNode(entry.getValue(), fieldType);
+            if (options != null) {
+                setDataFieldOptions(options, dataField, changedField, fieldType);
+                modified = true;
+            }
+            Set<I18nString> choices = parseChoicesNode((ObjectNode) entry.getValue(), fieldType);
+            if (choices != null) {
+                dataField.setChoices(choices);
+                changedField.addAttribute("choices", choices.stream().map(i18nString -> i18nString.getTranslation(LocaleContextHolder.getLocale())).collect(Collectors.toSet()));
+                modified = true;
+            }
+            Map<String, String> properties = parseProperties(entry.getValue());
+            if (properties != null) {
+                outcome.addOutcome(this.changeComponentProperties(useCase, task, field.getStringId(), properties));
+                modified = true;
+            }
+            if (modified) {
+                dataField.setLastModified(LocalDateTime.now());
+            }
+            if (dataConfigurationProperties.getValidation().isSetDataEnabled()) {
+                validation.valid(field, dataField);
+            }
+            outcome.addChangedField(fieldId, changedField);
+            workflowService.save(useCase);
+            publisher.publishEvent(new SetDataEvent(outcome, EventPhase.PRE, user));
+            outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, params));
+            applyFieldConnectedChanges(useCase, field);
         });
         updateDataset(useCase);
         outcome.setCase(workflowService.save(useCase));
@@ -831,7 +835,8 @@ public class DataService implements IDataService {
         return outcome;
     }
 
-    private List<EventOutcome> resolveDataEvents(Field field, DataEventType trigger, EventPhase phase, Case useCase, Task task, Map<String, String> params) {
+    private List<EventOutcome> resolveDataEvents(Field<?> field, DataEventType trigger, EventPhase phase, Case useCase,
+                                                 Task task, Map<String, String> params) {
         return eventService.processDataEvents(field, trigger, phase, useCase, task, params);
     }
 
@@ -1025,7 +1030,7 @@ public class DataService implements IDataService {
                 return null;
             }
             ObjectMapper mapper = new ObjectMapper();
-            return mapper.convertValue(filterMetadata, new TypeReference<Map<String, Object>>() {
+            return mapper.convertValue(filterMetadata, new TypeReference<>() {
             });
         }
         return null;
@@ -1059,7 +1064,7 @@ public class DataService implements IDataService {
         SimpleModule module = new SimpleModule();
         module.addDeserializer(I18nString.class, new com.netgrif.application.engine.objects.petrinet.domain.I18nStringDeserializer());
         mapper.registerModule(module);
-        Map<String, I18nString> optionsMapped = mapper.convertValue(optionsNode, new TypeReference<Map<String, I18nString>>() {
+        Map<String, I18nString> optionsMapped = mapper.convertValue(optionsNode, new TypeReference<>() {
         });
         if (optionsMapped.isEmpty()) {
             return null;
@@ -1101,7 +1106,7 @@ public class DataService implements IDataService {
             return null;
         }
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, String> propertiesMapped = mapper.convertValue(propertiesNode, new TypeReference<Map<String, String>>() {
+        Map<String, String> propertiesMapped = mapper.convertValue(propertiesNode, new TypeReference<>() {
         });
         if (propertiesMapped.isEmpty()) {
             return null;
