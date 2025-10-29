@@ -36,6 +36,14 @@
 				</action>
 			</actions>
 		</event>
+		<event type="delegate">
+			<id>1_delegate</id>
+			<actions phase="post">
+				<action>
+					print("testing delegate")
+				</action>
+			</actions>
+		</event>
 	</transition>
 	<place>
 		<id>p1</id>

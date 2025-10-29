@@ -7,12 +7,13 @@ import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
-import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome;
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
+import com.netgrif.application.engine.startup.runner.SystemUserRunner;
 import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.params.DelegateTaskParams;
 import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.TaskService;
 import com.netgrif.application.engine.workflow.service.WorkflowService;
@@ -50,6 +51,9 @@ public class WorkflowPerformanceTest {
     private SuperCreatorRunner superCreatorRunner;
 
     @Autowired
+    private SystemUserRunner systemUserRunner;
+
+    @Autowired
     private TestHelper testHelper;
 
     @BeforeEach
@@ -82,7 +86,7 @@ public class WorkflowPerformanceTest {
                 .petriNet(net)
                 .loggedUser(superCreatorRunner.getLoggedSuper())
                 .locale(Locale.getDefault())
-                .build()), 1000);
+                .build()), 5000);
     }
 
     @Test
@@ -275,6 +279,76 @@ public class WorkflowPerformanceTest {
             totalElapsedTime += finish - start;
         }
         log.info("AVG time for event [finishTaskWithAction] is [{} ms] for [{}] iterations", totalElapsedTime / iterations, iterations);
+    }
+
+    @Test
+    public void testDelegatePerformance() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/test_task_event.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+        long totalElapsedTime = 0;
+        int iterations = 5000;
+        LoggedUser loggedUser = superCreatorRunner.getLoggedSuper();
+
+        for (int i = 0; i < iterations; i++) {
+            Case useCase = workflowService.createCase(CreateCaseParams.with()
+                    .petriNet(net)
+                    .loggedUser(loggedUser)
+                    .locale(Locale.getDefault())
+                    .build()).getCase();
+            String taskId = useCase.getTasks().stream().findFirst().get().getTask();
+            AssignTaskEventOutcome assignOutcome = taskService.assignTask(TaskParams.with()
+                    .taskId(taskId)
+                    .user(loggedUser)
+                    .build());
+            long start = System.currentTimeMillis();
+            taskService.delegateTask(DelegateTaskParams.with()
+                    .task(assignOutcome.getTask())
+                    .useCase(assignOutcome.getCase())
+                    .newAssignee(systemUserRunner.getLoggedSystem())
+                    .delegator(loggedUser)
+                    .build());
+            long finish = System.currentTimeMillis();
+            totalElapsedTime += finish - start;
+        }
+        log.info("AVG time for event [delegateTask] is [{} ms] for [{}] iterations", totalElapsedTime / iterations, iterations);
+    }
+
+    @Test
+    public void testDelegateWithActionPerformance() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/test_task_event_with_action.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+        long totalElapsedTime = 0;
+        int iterations = 5000;
+        LoggedUser loggedUser = superCreatorRunner.getLoggedSuper();
+
+        for (int i = 0; i < iterations; i++) {
+            Case useCase = workflowService.createCase(CreateCaseParams.with()
+                    .petriNet(net)
+                    .loggedUser(loggedUser)
+                    .locale(Locale.getDefault())
+                    .build()).getCase();
+            String taskId = useCase.getTasks().stream().findFirst().get().getTask();
+            AssignTaskEventOutcome assignOutcome = taskService.assignTask(TaskParams.with()
+                    .taskId(taskId)
+                    .user(loggedUser)
+                    .build());
+            long start = System.currentTimeMillis();
+            taskService.delegateTask(DelegateTaskParams.with()
+                    .task(assignOutcome.getTask())
+                    .useCase(assignOutcome.getCase())
+                    .newAssignee(systemUserRunner.getLoggedSystem())
+                    .delegator(loggedUser)
+                    .build());
+            long finish = System.currentTimeMillis();
+            totalElapsedTime += finish - start;
+        }
+        log.info("AVG time for event [delegateTaskWithAction] is [{} ms] for [{}] iterations", totalElapsedTime / iterations, iterations);
     }
 
     @Test

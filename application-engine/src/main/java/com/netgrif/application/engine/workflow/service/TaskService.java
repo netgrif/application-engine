@@ -366,12 +366,12 @@ public class TaskService implements ITaskService {
             taskParams.setUseCase(useCase);
         }
         if (taskParams.getDelegator() == null) {
-            if (taskParams.getDelegatorId() == null) {
-                throw new IllegalArgumentException("Delegate user is not specified.");
+            AbstractUser delegator = null;
+            if (taskParams.getDelegatorId() != null) {
+                delegator = userService.findById(taskParams.getDelegatorId(), null);
             }
-            AbstractUser delegator = userService.findById(taskParams.getDelegatorId(), null);
             if (delegator == null) {
-                throw new IllegalArgumentException("Such user [%s] does not exist.".formatted(taskParams.getDelegatorId()));
+                delegator = userService.getLoggedOrSystem();
             }
             taskParams.setDelegator(delegator);
         }
