@@ -11,6 +11,7 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.task
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.DelegateTaskEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.ReloadTaskOutcome;
+import com.netgrif.application.engine.workflow.params.DelegateTaskParams;
 import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
@@ -67,17 +68,12 @@ public interface ITaskService {
 
     CancelTaskEventOutcome cancelTask(TaskParams taskParams);
 
-    /**
-     * cancel task action
-     */
     @SuppressWarnings("unused")
     void cancelTasksWithoutReload(Set<String> transitions, String caseId);
 
     void cancelTasksWithoutReload(Set<String> transitions, String caseId, Map<String, String> params);
 
-    DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException;
-
-    DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId, Map<String, String> params) throws TransitionNotExecutableException;
+    DelegateTaskEventOutcome delegateTask(DelegateTaskParams delegateTaskParams) throws TransitionNotExecutableException;
 
     void resolveUserRef(Case useCase);
 

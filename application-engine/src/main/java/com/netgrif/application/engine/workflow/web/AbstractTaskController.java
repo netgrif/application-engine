@@ -7,6 +7,7 @@ import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
+import com.netgrif.application.engine.workflow.params.DelegateTaskParams;
 import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -117,7 +118,11 @@ public abstract class AbstractTaskController {
     public EntityModel<EventOutcomeWithMessage> delegate(LoggedUser loggedUser, String taskId, String delegatedId, Locale locale) {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]",
-                    LocalisedEventOutcomeFactory.from(taskService.delegateTask(loggedUser, delegatedId, taskId), locale));
+                    LocalisedEventOutcomeFactory.from(taskService.delegateTask(DelegateTaskParams.with()
+                            .delegator(loggedUser)
+                            .newAssigneeId(delegatedId)
+                            .taskId(taskId)
+                            .build()), locale));
         } catch (Exception e) {
             log.error("Delegating task [{}] failed: ", taskId, e);
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");

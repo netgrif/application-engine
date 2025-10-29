@@ -30,6 +30,7 @@ import com.netgrif.application.engine.workflow.domain.outcomes.ReloadTaskOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.objects.workflow.domain.triggers.TimeTrigger;
 import com.netgrif.application.engine.objects.workflow.domain.triggers.Trigger;
+import com.netgrif.application.engine.workflow.params.DelegateTaskParams;
 import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
@@ -355,6 +356,37 @@ public class TaskService implements ITaskService {
         }
     }
 
+    protected void fillMissingAttributes(DelegateTaskParams taskParams) {
+        if (taskParams.getTask() == null) {
+            Task task = findOne(taskParams.getTaskId());
+            taskParams.setTask(task);
+        }
+        if (taskParams.getUseCase() == null) {
+            Case useCase = workflowService.findOne(taskParams.getTask().getCaseId());
+            taskParams.setUseCase(useCase);
+        }
+        if (taskParams.getDelegator() == null) {
+            if (taskParams.getDelegatorId() == null) {
+                throw new IllegalArgumentException("Delegate user is not specified.");
+            }
+            AbstractUser delegator = userService.findById(taskParams.getDelegatorId(), null);
+            if (delegator == null) {
+                throw new IllegalArgumentException("Such user [%s] does not exist.".formatted(taskParams.getDelegatorId()));
+            }
+            taskParams.setDelegator(delegator);
+        }
+        if (taskParams.getNewAssignee() == null) {
+            if (taskParams.getNewAssigneeId() == null) {
+                throw new IllegalArgumentException("New assignee is not specified.");
+            }
+            AbstractUser newAssignee = userService.findById(taskParams.getNewAssigneeId(), null);
+            if (newAssignee == null) {
+                throw new IllegalArgumentException("Such user [%s] does not exist.".formatted(taskParams.getNewAssigneeId()));
+            }
+            taskParams.setNewAssignee(newAssignee);
+        }
+    }
+
     private Case returnTokens(Task task, Case useCase) {
         PetriNet net = useCase.getPetriNet();
         Case finalUseCase = useCase;
@@ -377,56 +409,56 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException {
-        return delegateTask(loggedUser, delegatedId, taskId, new HashMap<>());
-    }
+    public DelegateTaskEventOutcome delegateTask(DelegateTaskParams delegateTaskParams) throws TransitionNotExecutableException {
+        fillMissingAttributes(delegateTaskParams);
 
-    @Override
-    public DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId, Map<String, String> params) throws TransitionNotExecutableException {
-        AbstractUser delegatedUser = userService.findById(delegatedId, null);
-        AbstractUser delegateUser = getUserFromLoggedUser(loggedUser);
-
-        Optional<Task> taskOptional = findOptionalById(taskId);
-        if (taskOptional.isEmpty()) {
-            throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
-        }
-        Task task = taskOptional.get();
-
-        Case useCase = workflowService.findOne(task.getCaseId());
+        AbstractUser newAssignee = delegateTaskParams.getNewAssignee();
+        AbstractUser delegator = delegateTaskParams.getDelegator();
+        Task task = delegateTaskParams.getTask();
+        Case useCase = delegateTaskParams.getUseCase();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
-        log.info("[{}]: Delegating task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), delegatedUser.getEmail());
+        log.info("[{}]: Delegating task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), newAssignee.getEmail());
 
-        List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreDelegateActions(), useCase, task, transition, params));
-        task = findOne(task.getStringId());
+        List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreDelegateActions(), useCase,
+                task, transition, delegateTaskParams.getParams()));
+        if (!outcomes.isEmpty()) {
+            useCase = workflowService.findOne(useCase.getStringId());
+        }
+
         DelegateTaskEventOutcome outcome = new DelegateTaskEventOutcome(useCase, task, outcomes);
         useCase = evaluateRules(new DelegateTaskEvent(outcome, EventPhase.PRE));
-        delegate(delegatedUser, task, useCase, transition);
-        publisher.publishEvent(new DelegateTaskEvent(outcome, EventPhase.PRE, delegateUser, delegatedUser.getStringId()));
-        outcomes.addAll(eventService.runActions(transition.getPostDelegateActions(), useCase, task, transition, params));
+        publisher.publishEvent(new DelegateTaskEvent(outcome, EventPhase.PRE, delegator, newAssignee.getStringId()));
+
+        useCase = delegate(newAssignee, task, useCase, transition);
+
+        outcomes.addAll(eventService.runActions(transition.getPostDelegateActions(), useCase, task, transition,
+                delegateTaskParams.getParams()));
         useCase = evaluateRules(new DelegateTaskEvent(new DelegateTaskEventOutcome(useCase, task, outcomes), EventPhase.POST));
 
-        useCase = workflowService.findOne(useCase.getStringId());
-        reloadTasks(useCase, false);
+        ReloadTaskOutcome reloadTaskOutcome = reloadTasks(useCase, false);
+        if (reloadTaskOutcome.isAnyTaskExecuted()) {
+            useCase = workflowService.findOne(useCase.getStringId());
+        }
 
-        outcome = new DelegateTaskEventOutcome(useCase, task, outcomes);
         addMessageToOutcome(transition, EventType.DELEGATE, outcome);
-        publisher.publishEvent(new DelegateTaskEvent(outcome, EventPhase.POST, delegateUser, delegatedUser.getStringId()));
+        publisher.publishEvent(new DelegateTaskEvent(outcome, EventPhase.POST, delegator, newAssignee.getStringId()));
         // TODO: impersonation
         log.info("Task [{}] in case [{}] assigned to [{}] was delegated to [{}]", task.getTitle(), useCase.getTitle(),
-                delegatedUser.getEmail(), delegatedUser.getEmail());
+                newAssignee.getEmail(), newAssignee.getEmail());
 
         return outcome;
     }
 
-    protected void delegate(AbstractUser delegated, Task task, Case useCase, Transition transition) throws TransitionNotExecutableException {
+    protected Case delegate(AbstractUser delegated, Task task, Case useCase, Transition transition) throws TransitionNotExecutableException {
         if (task.getUserId() != null) {
             task.setUserId(delegated.getStringId());
             task.setUserRealmId(delegated.getRealmId());
             task.setUser(delegated);
             save(task);
+            return useCase;
         } else {
-            assignTaskToUser(delegated, task, useCase, transition);
+            return assignTaskToUser(delegated, task, useCase, transition);
         }
     }
 
