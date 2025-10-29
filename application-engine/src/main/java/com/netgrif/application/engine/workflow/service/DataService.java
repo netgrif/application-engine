@@ -133,36 +133,41 @@ public class DataService implements IDataService {
         fieldsIds.forEach(fieldId -> {
             if (isForbidden(fieldId, transition, useCase.getDataField(fieldId)))
                 return;
-            Field field = useCase.getPetriNet().getField(fieldId).get();
+            Field<?> field = useCase.getPetriNet().getField(fieldId).get();
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, params));
             publisher.publishEvent(new GetDataEvent(outcome, EventPhase.PRE, user));
 
             if (outcome.getMessage() == null) {
-                Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
                 if (field.getEvents().containsKey(DataEventType.GET)
-                        && ((DataEvent) field.getEvents().get(DataEventType.GET)).getMessage() != null) {
-                    outcome.setMessage(((DataEvent) field.getEvents().get(DataEventType.GET)).getMessage());
-                } else if (dataSet.containsKey(fieldId)
-                        && dataSet.get(fieldId).getEvents().containsKey(DataEventType.GET)
-                        && dataSet.get(fieldId).getEvents().get(DataEventType.GET).getMessage() != null) {
-                    outcome.setMessage(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getEvents().get(DataEventType.GET).getMessage());
+                        && field.getEvents().get(DataEventType.GET).getMessage() != null) {
+                    outcome.setMessage(field.getEvents().get(DataEventType.GET).getMessage());
+                } else {
+                    Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
+                    DataFieldLogic dataRef = dataSet.get(fieldId);
+                    if (dataRef != null && dataRef.getEvents().containsKey(DataEventType.GET)
+                            && dataRef.getEvents().get(DataEventType.GET).getMessage() != null) {
+                        outcome.setMessage(dataRef.getEvents().get(DataEventType.GET).getMessage());
+                    }
                 }
             }
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
-                if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
+                DataField dataField = useCase.getDataSet().get(fieldId);
+                if (dataField.isDisplayable(transition.getStringId())) {
                     Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
-                    validationField.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
-                    if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
-                        validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
+                    validationField.setBehavior(dataField.applyBehavior(transition.getStringId()));
+                    DataFieldLogic dataRef = transition.getDataSet().get(fieldId);
+                    if (dataRef.layoutExist() && dataRef.getLayout().layoutFilled()) {
+                        validationField.setLayout(dataRef.getLayout().clone());
                     }
                     dataSetFields.add(validationField);
                 }
             } else {
-                if (transition.getDataSet().get(fieldId).isDisplayable()) {
+                DataFieldLogic dataRef = transition.getDataSet().get(fieldId);
+                if (dataRef.isDisplayable()) {
                     Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
-                    validationField.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
-                    if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
-                        validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
+                    validationField.setBehavior(dataRef.applyBehavior());
+                    if (dataRef.layoutExist() && dataRef.getLayout().layoutFilled()) {
+                        validationField.setLayout(dataRef.getLayout().clone());
                     }
                     dataSetFields.add(validationField);
                 }
