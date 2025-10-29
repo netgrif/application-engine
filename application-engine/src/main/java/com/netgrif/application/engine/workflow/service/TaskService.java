@@ -726,7 +726,7 @@ public class TaskService implements ITaskService {
     public Task findById(String id) {
         Optional<Task> taskOptional = findOptionalById(id);
         if (taskOptional.isEmpty()) {
-            throw new IllegalArgumentException("Could not find task with id [" + id + "]");
+            throw new IllegalArgumentException("Could not find task with id [%s]".formatted(id));
         }
         Task task = taskOptional.get();
         this.setUser(task);
@@ -737,7 +737,7 @@ public class TaskService implements ITaskService {
     public Optional<Task> findOptionalById(String id) {
         String[] parts = id.split(ProcessResourceId.ID_SEPARATOR);
         if (parts.length < 2) {
-            throw new IllegalArgumentException("Invalid NetgrifId format: " + id);
+            throw new IllegalArgumentException("Invalid NetgrifId format: %s".formatted(id));
         }
         String objectIdPart = parts[1];
         ObjectId objectId = new ObjectId(objectIdPart);
@@ -781,7 +781,7 @@ public class TaskService implements ITaskService {
     public Task searchOne(com.querydsl.core.types.Predicate predicate) {
         Page<Task> tasks = taskRepository.findAll(predicate, PageRequest.of(0, 1));
         if (tasks.getTotalElements() > 0)
-            return tasks.getContent().get(0);
+            return tasks.getContent().getFirst();
         return null;
     }
 
@@ -1006,13 +1006,5 @@ public class TaskService implements ITaskService {
         mainOutcome = outcomes.remove(key);
         mainOutcome.addOutcomes(new ArrayList<>(outcomes.values()));
         return mainOutcome;
-    }
-
-    protected AbstractUser getUserFromLoggedUser(LoggedUser loggedUser) {
-        AbstractUser user = userService.findById(loggedUser.getStringId(), loggedUser.getRealmId());
-        // TODO: impersonation
-//        AbstractUser fromLogged = userService.transformToUser((LoggedUserImpl) loggedUser);
-//        user.setImpersonated(fromLogged.getImpersonated());
-        return user;
     }
 }

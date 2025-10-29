@@ -17,7 +17,6 @@ import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.application.engine.objects.event.events.data.GetDataEvent;
 import com.netgrif.application.engine.objects.event.events.data.SetDataEvent;
-import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.Component;
 import com.netgrif.application.engine.objects.petrinet.domain.*;
@@ -48,7 +47,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -68,8 +66,6 @@ import java.util.stream.LongStream;
 @Slf4j
 @Service
 public class DataService implements IDataService {
-
-    public static final int MONGO_ID_LENGTH = 24;
 
     @Autowired
     protected ApplicationEventPublisher publisher;
@@ -91,9 +87,6 @@ public class DataService implements IDataService {
 
     @Autowired
     protected IEventService eventService;
-
-    @Autowired
-    protected IHistoryService historyService;
 
     @Autowired
     protected IPetriNetService petriNetService;
@@ -127,7 +120,7 @@ public class DataService implements IDataService {
 
     @Override
     public GetDataEventOutcome getData(Task task, Case useCase, Map<String, String> params) {
-        log.info("[" + useCase.getStringId() + "]: Getting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
+        log.info("[{}]: Getting data of task {} [{}]", useCase.getStringId(), task.getTransitionId(), task.getStringId());
         AbstractUser user = userService.getLoggedOrSystem();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
@@ -223,7 +216,7 @@ public class DataService implements IDataService {
         Case useCase = workflowService.findOne(task.getCaseId());
         AbstractUser user = userService.getLoggedOrSystem();
 
-        log.info("[" + useCase.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
+        log.info("[{}]: Setting data of task {} [{}]", useCase.getStringId(), task.getTransitionId(), task.getStringId());
 
         if (task.getUserId() != null) {
             task.setUser(userService.findById(task.getUserId(), task.getUserRealmId()));
@@ -315,7 +308,7 @@ public class DataService implements IDataService {
         PetriNet net = useCase.getPetriNet();
         Transition transition = net.getTransition(task.getTransitionId());
         GetDataGroupsEventOutcome outcome = new GetDataGroupsEventOutcome(useCase, task);
-        log.info("Getting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level);
+        log.info("Getting groups of task {} in case {} level: {}", taskId, useCase.getTitle(), level);
         List<DataGroup> resultDataGroups = new ArrayList<>();
 
         List<Field<?>> data = getData(task, useCase).getData();
@@ -324,7 +317,7 @@ public class DataService implements IDataService {
         for (DataGroup dataGroup : dataGroups) {
             resolveTaskRefOrderOnGrid(dataGroup, dataFieldMap);
             resultDataGroups.add(dataGroup);
-            log.debug("Setting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level + " " + dataGroup.getImportId());
+            log.debug("Setting groups of task {} in case {} level: {} {}", taskId, useCase.getTitle(), level, dataGroup.getImportId());
 
             List<Field<?>> resources = new LinkedList<>();
             for (String dataFieldId : dataGroup.getData()) {
@@ -373,7 +366,7 @@ public class DataService implements IDataService {
         List<DataGroup> groups = new ArrayList<>();
 
         if (taskIds != null) {
-            taskIds = taskIds.stream().filter(id -> !collectedTaskIds.contains(id)).collect(Collectors.toList());
+            taskIds = taskIds.stream().filter(id -> !collectedTaskIds.contains(id)).toList();
             taskIds.forEach(id -> {
                 collectedTaskIds.add(id);
                 List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1, taskRefField.getStringId()).getData();
@@ -432,7 +425,7 @@ public class DataService implements IDataService {
         FileFieldInputStream fileFieldInputStream = getFileByCase(task.getCaseId(), task, fieldId, forPreview);
 
         if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null)
-            throw new FileNotFoundException("File in field " + fieldId + " within task " + taskId + " was not found!");
+            throw new FileNotFoundException("File in field %s within task %s was not found!".formatted(fieldId, taskId));
 
         return fileFieldInputStream;
     }
@@ -483,8 +476,8 @@ public class DataService implements IDataService {
 
         Optional<FileFieldValue> fileFieldValue = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
         if (fileFieldValue.isEmpty() || fileFieldValue.get().getPath() == null) {
-            log.error("File " + name + " not found!");
-            throw new FileNotFoundException("File " + name + " not found!");
+            log.error("File {} not found!", name);
+            throw new FileNotFoundException("File %s not found!".formatted(name));
         }
         return new FileFieldInputStream(storageResolverService.resolve(field.getStorageType()).get(field, fileFieldValue.get().getPath()), name);
     }
@@ -498,7 +491,7 @@ public class DataService implements IDataService {
     public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview, Map<String, String> params) throws FileNotFoundException {
         runGetActionsFromFileField(field.getEvents(), useCase, params);
         if (useCase.getFieldValue(field.getStringId()) == null) {
-            throw new FileNotFoundException("Field " + field.getStringId() + " not found on case " + useCase.getStringId());
+            throw new FileNotFoundException("Field %s not found on case %s".formatted(field.getStringId(), useCase.getStringId()));
         }
 
         workflowService.save(useCase);
@@ -611,8 +604,10 @@ public class DataService implements IDataService {
             field.getValue().setPath(path);
             storageService.save(field, path, multipartFile);
         } catch (StorageException e) {
-            log.error("File " + multipartFile.getOriginalFilename() + " in case " + useCase.getStringId() + " could not be saved to file field " + field.getStringId(), e);
-            throw new EventNotExecutableException("File " + multipartFile.getOriginalFilename() + " in case " + useCase.getStringId() + " could not be saved to file field " + field.getStringId(), e);
+            String msg = "File %s in case %s could not be saved to file field %s".formatted(multipartFile.getOriginalFilename(),
+                    useCase.getStringId(), field.getStringId());
+            log.error(msg, e);
+            throw new EventNotExecutableException(msg, e);
         }
 
         useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
@@ -644,8 +639,9 @@ public class DataService implements IDataService {
                 field.addValue(multipartFile.getOriginalFilename(), path);
                 storageService.save(field, path, multipartFile);
             } catch (StorageException e) {
-                log.error(e.getMessage());
-                throw new EventNotExecutableException("File " + multipartFile.getOriginalFilename() + " in case " + useCase.getStringId() + " could not be saved to file list field " + field.getStringId(), e);
+                log.error(e.getMessage(), e);
+                throw new EventNotExecutableException("File %s in case %s could not be saved to file list field %s".formatted(
+                        multipartFile.getOriginalFilename(), useCase.getStringId(), field.getStringId()), e);
             }
 
         }
@@ -682,7 +678,7 @@ public class DataService implements IDataService {
                     storageService.delete(field, field.getValue().getPreviewPath());
                 }
             } catch (StorageException e) {
-                log.error(e.getMessage());
+                log.error(e.getMessage(), e);
                 throw new EventNotExecutableException("File " + field.getValue().getName() + " in case " + useCase.getStringId() + " and field " + fieldId + "  could not be deleted.", e);
             }
             useCase.getDataSet().get(field.getStringId()).setValue(null);
@@ -719,7 +715,8 @@ public class DataService implements IDataService {
                 useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
             } catch (StorageException e) {
                 log.error(e.getMessage());
-                throw new EventNotExecutableException("File " + name + " in case " + useCase.getStringId() + " and field " + fieldId + "  could not be deleted.", e);
+                throw new EventNotExecutableException("File %s in case %s and field %s  could not be deleted.".formatted(
+                        name, useCase.getStringId(), fieldId), e);
             }
         }
         return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase, params));
@@ -767,7 +764,8 @@ public class DataService implements IDataService {
         PetriNet petriNet = petriNetService.getPetriNet(useCase.getPetriNetId());
         Optional<Field> field = petriNet.getField(fieldId);
         if (field.isEmpty()) {
-            throw new IllegalArgumentException("Field with given id [" + fieldId + "] does not exists on Petri net [" + petriNet.getStringId() + " " + petriNet.getIdentifier() + "]");
+            throw new IllegalArgumentException("Field with given id [%s] does not exists on Petri net [%s %s]".formatted(
+                    fieldId, petriNet.getStringId(), petriNet.getIdentifier()));
         }
         return applyFieldConnectedChanges(useCase, field.get());
     }
@@ -815,13 +813,14 @@ public class DataService implements IDataService {
                 useCase.getDataField(fieldId).addDataRefComponent(task.getTransitionId(), comp);
             }
         } else if (task == null) {
-            log.debug("Setting component on field " + fieldId + " in case [" + useCase.getTitle() + "] as default");
+            log.debug("Setting component on field {} in case [{}] as default", fieldId, useCase.getTitle());
             Component newComp = new Component("default", properties);
             useCase.getDataField(fieldId).setComponent(newComp);
             changedField.addAttribute("component", newComp);
             outcome.addChangedField(fieldId, changedField);
         } else {
-            log.warn("Setting properties on field " + fieldId + " on task [" + task.getStringId() + "] in case [" + useCase.getTitle() + "] failed, field dont have component!");
+            log.warn("Setting properties on field {} on task [{}] in case [{}] failed, field dont have component!",
+                    fieldId, task.getStringId(), useCase.getTitle());
         }
         outcome.setCase(workflowService.save(useCase));
         return outcome;
@@ -1110,7 +1109,8 @@ public class DataService implements IDataService {
         Set<String> nets = new HashSet<>(allowedNets);
         cases.forEach(_case -> {
             if (!nets.contains(_case.getProcessIdentifier())) {
-                throw new IllegalArgumentException(String.format("Case '%s' with id '%s' cannot be added to case ref, since it is an instance of process with identifier '%s', which is not one of the allowed nets", _case.getTitle(), _case.getStringId(), _case.getProcessIdentifier()));
+                throw new IllegalArgumentException("Case '%s' with id '%s' cannot be added to case ref, since it is an instance of process with identifier '%s', which is not one of the allowed nets".formatted(
+                        _case.getTitle(), _case.getStringId(), _case.getProcessIdentifier()));
             }
         });
     }
