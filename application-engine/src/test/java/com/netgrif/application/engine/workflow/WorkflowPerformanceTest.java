@@ -194,12 +194,13 @@ public class WorkflowPerformanceTest {
                     .locale(Locale.getDefault())
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
-            Task task = taskService.assignTask(TaskParams.with()
+            AssignTaskEventOutcome assignOutcome = taskService.assignTask(TaskParams.with()
                     .taskId(taskId)
-                    .build()).getTask();
+                    .build());
             long start = System.currentTimeMillis();
             taskService.cancelTask(TaskParams.with()
-                    .task(task)
+                    .task(assignOutcome.getTask())
+                    .useCase(assignOutcome.getCase())
                     .user(loggedUser)
                     .build());
             long finish = System.currentTimeMillis();
@@ -226,12 +227,14 @@ public class WorkflowPerformanceTest {
                     .locale(Locale.getDefault())
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
-            Task task = taskService.assignTask(TaskParams.with()
+            AssignTaskEventOutcome assignOutcome = taskService.assignTask(TaskParams.with()
                     .taskId(taskId)
-                    .build()).getTask();
+                    .user(loggedUser)
+                    .build());
             long start = System.currentTimeMillis();
             taskService.finishTask(TaskParams.with()
-                    .task(task)
+                    .task(assignOutcome.getTask())
+                    .useCase(assignOutcome.getCase())
                     .user(loggedUser)
                     .build());
             long finish = System.currentTimeMillis();
@@ -258,12 +261,14 @@ public class WorkflowPerformanceTest {
                     .locale(Locale.getDefault())
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
-            Task task = taskService.assignTask(TaskParams.with()
+            AssignTaskEventOutcome assignOutcome = taskService.assignTask(TaskParams.with()
                     .taskId(taskId)
-                    .build()).getTask();
+                    .user(loggedUser)
+                    .build());
             long start = System.currentTimeMillis();
             taskService.finishTask(TaskParams.with()
-                    .task(task)
+                    .task(assignOutcome.getTask())
+                    .useCase(assignOutcome.getCase())
                     .user(loggedUser)
                     .build());
             long finish = System.currentTimeMillis();

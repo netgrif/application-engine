@@ -101,7 +101,7 @@ public class TaskService implements ITaskService {
     protected IElasticTaskService elasticTaskService;
 
     @Autowired
-    protected IValidationService validation;
+    protected IValidationService validationService;
 
     @Lazy
     @Autowired
@@ -221,23 +221,21 @@ public class TaskService implements ITaskService {
         validateData(transition, useCase);
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreFinishActions(), useCase,
                 task, transition, taskParams.getParams()));
-        task = findOne(task.getStringId());
+        if (!outcomes.isEmpty()) {
+            useCase = workflowService.findOne(useCase.getStringId());
+        }
         FinishTaskEventOutcome outcome = new FinishTaskEventOutcome(useCase, task, outcomes);
         useCase = evaluateRules(new FinishTaskEvent(outcome, EventPhase.PRE));
 
-        finishExecution(transition, useCase.getStringId());
-        task.setFinishDate(LocalDateTime.now());
-        task.setFinishedBy(task.getUserId());
-        task.setUserId(null);
-        task.setUserRealmId(null);
+        useCase = finishExecution(transition, task, useCase);
+        ReloadTaskOutcome reloadTaskOutcome = reloadTasks(useCase, false);
+        if (reloadTaskOutcome.isAnyTaskExecuted()) {
+            useCase = workflowService.findOne(useCase.getStringId());
+        }
 
-        useCase = workflowService.findOne(useCase.getStringId());
-        save(task);
-        reloadTasks(useCase, false);
-        useCase = workflowService.findOne(useCase.getStringId());
         publisher.publishEvent(new FinishTaskEvent(outcome, EventPhase.PRE, user));
         outcomes.addAll(eventService.runActions(transition.getPostFinishActions(), useCase, task, transition, taskParams.getParams()));
-        useCase = evaluateRules(new FinishTaskEvent(new FinishTaskEventOutcome(useCase, task, outcomes), EventPhase.POST));
+        useCase = evaluateRules(new FinishTaskEvent(outcome, EventPhase.POST));
 
         outcome = new FinishTaskEventOutcome(useCase, task, outcomes);
         addMessageToOutcome(transition, EventType.FINISH, outcome);
@@ -527,13 +525,21 @@ public class TaskService implements ITaskService {
                 .allMatch(Arc::isExecutable);
     }
 
-    protected void finishExecution(Transition transition, String useCaseId) throws TransitionNotExecutableException {
-        Case useCase = workflowService.findOne(useCaseId);
-        log.info("[{}]: Finish execution of task [{}] in case [{}]", useCaseId, transition.getTitle(), useCase.getTitle());
+    protected Case finishExecution(Transition transition, Task task, Case useCase) throws TransitionNotExecutableException {
+        log.info("[{}]: Finish execution of task [{}] in case [{}]", useCase.getStringId(), transition.getTitle(), useCase.getTitle());
+
         execute(transition, useCase, arc -> arc.getSource().equals(transition));
-        Supplier<Stream<Arc>> arcStreamSupplier = () -> useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream();
-        arcStreamSupplier.get().filter(arc -> useCase.getConsumedTokens().containsKey(arc.getStringId())).forEach(arc -> useCase.getConsumedTokens().remove(arc.getStringId()));
-        workflowService.save(useCase);
+        useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream()
+                .filter(arc -> useCase.getConsumedTokens().containsKey(arc.getStringId()))
+                .forEach(arc -> useCase.getConsumedTokens().remove(arc.getStringId()));
+
+        task.setFinishDate(LocalDateTime.now());
+        task.setFinishedBy(task.getUserId());
+        task.setUserId(null);
+        task.setUserRealmId(null);
+
+        save(task);
+        return workflowService.save(useCase);
     }
 
     public void startExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {
@@ -583,23 +589,30 @@ public class TaskService implements ITaskService {
 
     void validateData(Transition transition, Case useCase) {
         for (Map.Entry<String, DataFieldLogic> entry : transition.getDataSet().entrySet()) {
-            if (useCase.getPetriNet().getDataSet().get(entry.getKey()) != null
-                    && useCase.getPetriNet().getDataSet().get(entry.getKey()).getValidations() != null) {
-                validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), useCase.getDataField(entry.getKey()));
+            Field<?> field = useCase.getField(entry.getKey());
+            DataField dataField = useCase.getDataField(entry.getKey());
+            if (field != null && field.getValidations() != null) {
+                validationService.valid(field, dataField);
             }
-            if (!useCase.getDataField(entry.getKey()).isRequired(transition.getImportId()))
+            if (!dataField.isRequired(transition.getImportId())
+                    || dataField.isUndefined(transition.getImportId()) && !entry.getValue().isRequired()) {
                 continue;
-            if (useCase.getDataField(entry.getKey()).isUndefined(transition.getImportId()) && !entry.getValue().isRequired())
-                continue;
+            }
 
-            Object value = useCase.getDataSet().get(entry.getKey()).getValue();
+            Object value = dataField.getValue();
             if (value == null) {
-                Field field = useCase.getField(entry.getKey());
-                throw new IllegalArgumentException("Field \"" + field.getName() + "\" has null value");
+                if (field == null) {
+                    throw new IllegalArgumentException("Some field has null value");
+                } else {
+                    throw new IllegalArgumentException("Field \"%s\" has null value".formatted(field.getName()));
+                }
             }
             if (value instanceof String && ((String) value).isEmpty()) {
-                Field field = useCase.getField(entry.getKey());
-                throw new IllegalArgumentException("Field \"" + field.getName() + "\" has empty value");
+                if (field == null) {
+                    throw new IllegalArgumentException("Some field has empty value");
+                } else {
+                    throw new IllegalArgumentException("Field \"%s\" has empty value".formatted(field.getName()));
+                }
             }
         }
     }
