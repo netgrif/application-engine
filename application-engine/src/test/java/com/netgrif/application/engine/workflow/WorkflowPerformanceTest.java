@@ -351,11 +351,6 @@ public class WorkflowPerformanceTest {
         log.info("AVG time for event [delegateTaskWithAction] is [{} ms] for [{}] iterations", totalElapsedTime / iterations, iterations);
     }
 
-    @Test
-    public void testSetDataPerformance() {
-
-    }
-
     private void iterateAndShowAvgTime(String event, Runnable callback, int iterations) {
         long totalElapsedTime = 0;
         for (int i = 0; i < iterations; i++) {

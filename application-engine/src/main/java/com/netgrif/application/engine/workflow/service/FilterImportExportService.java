@@ -218,12 +218,12 @@ public class FilterImportExportService implements IFilterImportExportService {
             String parentId = null;
             boolean viewOrigin = false;
 
-            if (filter.getParentCaseId() != null && !filter.getParentCaseId().equals("")) {
+            if (filter.getParentCaseId() != null && !filter.getParentCaseId().isEmpty()) {
                 parentId = oldToNewFilterId.get(filter.getParentCaseId());
                 if (parentId == null) {
-                    log.error("Imported filter with ID '" + filter.getCaseId() + "' could not find an imported mapping of its parent case with original ID '" + filter.getParentCaseId() + "'");
+                    log.error("Imported filter with ID '{}' could not find an imported mapping of its parent case with original ID '{}'", filter.getCaseId(), filter.getParentCaseId());
                 }
-            } else if (filter.getParentViewId() != null && !filter.getParentViewId().equals("")) {
+            } else if (filter.getParentViewId() != null && !filter.getParentViewId().isEmpty()) {
                 parentId = filter.getParentViewId();
                 viewOrigin = true;
             }

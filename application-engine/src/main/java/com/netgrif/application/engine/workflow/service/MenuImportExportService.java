@@ -23,7 +23,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.Multichoic
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.utils.InputStreamToString;
 import com.netgrif.application.engine.objects.workflow.domain.*;
@@ -70,9 +69,6 @@ public class MenuImportExportService implements IMenuImportExportService {
 
     @Autowired
     IPetriNetService petriNetService;
-
-    @Autowired
-    DefaultFiltersRunner defaultFiltersRunner;
 
     @Autowired
     private ITaskService taskService;

@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
-import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
@@ -25,26 +23,37 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
     @Autowired
     private IPetriNetService petriNetService;
 
-    @Autowired
-    private UserService userService;
-
     @Override
     public boolean canCallDelete(LoggedUser user, String caseId) {
+        // TODO: impersonation user.getSelfOrImpersonated().isAdmin()
+        if (user.isAdmin()) {
+            return true;
+        }
+
         Case requestedCase = workflowService.findOne(caseId);
-        // TODO: impersonation
-//        Boolean rolePerm = userHasAtLeastOneRolePermission(userService.transformToUser((LoggedUserImpl) user.getSelfOrImpersonated()), requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
-//        Boolean userPerm = userHasUserListPermission(userService.transformToUser((LoggedUserImpl) user.getSelfOrImpersonated()), requestedCase, ProcessRolePermission.DELETE);
-//        return user.getSelfOrImpersonated().isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
-        Boolean rolePerm = userHasAtLeastOneRolePermission(userService.transformToUser(user), requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
-        Boolean userPerm = userHasUserListPermission(userService.transformToUser(user), requestedCase, ProcessRolePermission.DELETE);
-        return user.isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
+        // todo 2235 test if user has roles
+        // TODO: impersonation user.getSelfOrImpersonated()
+        Boolean userPerm = userHasUserListPermission(user, requestedCase, ProcessRolePermission.DELETE);
+        if (userPerm != null) {
+            return userPerm;
+        }
+
+        // TODO: impersonation user.getSelfOrImpersonated()
+        Boolean rolePerm = userHasAtLeastOneRolePermission(user, requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
+        return rolePerm != null && rolePerm;
     }
 
     @Override
     public boolean canCallCreate(LoggedUser user, String netId) {
+        // TODO: impersonation
+        if (user.isAdmin()) {
+            return true;
+        }
+
         PetriNet net = petriNetService.getPetriNet(netId);
         // TODO: impersonation
-        return user.isAdmin() || userHasAtLeastOneRolePermission(userService.transformToUser(user), net, ProcessRolePermission.CREATE);
+        // todo 2235 test if user has roles
+        return userHasAtLeastOneRolePermission(user, net, ProcessRolePermission.CREATE);
     }
 
     @Override
@@ -57,7 +66,8 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
             }
         }
 
-        return Arrays.stream(permissions).anyMatch(permission -> hasPermission(aggregatePermissions.get(permission.toString())));
+        return Arrays.stream(permissions)
+                .anyMatch(permission -> hasPermission(aggregatePermissions.get(permission.toString())));
     }
 
     @Override
@@ -65,8 +75,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
         if (useCase.getUserRefs() == null || useCase.getUserRefs().isEmpty())
             return null;
 
-        // TODO: impersonation
-//        if (!useCase.getUsers().containsKey(user.getSelfOrImpersonated().getStringId())) {
+        // TODO: impersonation user.getSelfOrImpersonated().getStringId()
         if (!useCase.getUsers().containsKey(user.getStringId())) {
             return null;
         }
@@ -80,6 +89,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
                 return false;
             }
         }
-        return Arrays.stream(permissions).anyMatch(permission -> hasPermission(userPermissions.get(permission.toString())));
+        return Arrays.stream(permissions)
+                .anyMatch(permission -> hasPermission(userPermissions.get(permission.toString())));
     }
 }

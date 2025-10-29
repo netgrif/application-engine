@@ -208,7 +208,7 @@ public class MongoSearchService<T> {
 
     protected Page<T> executeQuery(String queryString, Pageable pageable) {
         Query query = new BasicQuery(queryString).with(pageable);
-        log.info("Executing search query: " + queryString);
+        log.info("Executing search query: {}", queryString);
         return new PageImpl<>(mongoTemplate.find(query, tClass),
                 pageable,
                 mongoTemplate.count(new BasicQuery(queryString, "{_id:1}"), tClass));
