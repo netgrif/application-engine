@@ -101,4 +101,10 @@ public class AnonymousUserRef {
         this.realmId = realmId;
         this.createdAt = LocalDateTime.now();
     }
+
+    public AnonymousUserRef(String realmId, Set<Authority> authorities, Set<ProcessRole> processRoles) {
+        this(realmId);
+        this.authorities = authorities;
+        this.processRoles = processRoles;
+    }
 }

@@ -1,14 +1,12 @@
 package com.netgrif.application.engine.configuration;
 
+import com.netgrif.application.engine.adapter.spring.configuration.filters.NetgrifHttpRequestTransformFilter;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
-import com.netgrif.application.engine.auth.service.AuthorityService;
-import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.security.ImpersonationRequestFilter;
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.application.engine.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.application.engine.configuration.security.SecurityContextFilter;
 import com.netgrif.application.engine.configuration.security.filter.HostValidationRequestFilter;
-import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +17,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -55,15 +50,6 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     private RestAuthenticationEntryPoint authenticationEntryPoint;
 
     @Autowired
-    private AuthorityService authorityService;
-
-    @Autowired
-    private IJwtService jwtService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
     private SecurityConfigurationProperties securityConfigurationProperties;
 
     @Autowired
@@ -76,9 +62,10 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     private List<AuthenticationProvider> authenticationProviders;
 
     @Autowired
-    private AuthenticationManagerBuilder authenticationManagerBuilder;
+    private PublicAuthenticationFilter publicAuthenticationFilter;
 
-
+    @Autowired
+    private NetgrifHttpRequestTransformFilter netgrifHttpRequestTransformFilter;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -88,7 +75,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
         config.addExposedHeader("X-Auth-Token");
-        config.addExposedHeader("X-Jwt-Token");
+        config.addExposedHeader("X-Anonymous-Token");
         config.setAllowCredentials(true);
         if (allowedOrigins == null || allowedOrigins.isEmpty()) {
             config.addAllowedOriginPattern("*");
@@ -109,10 +96,11 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .httpBasic(httpSecurityHttpBasicConfigurer ->
                         httpSecurityHttpBasicConfigurer.authenticationEntryPoint(authenticationEntryPoint))
                 .addFilterBefore(new ForwardedHeaderFilter(), WebAsyncManagerIntegrationFilter.class)
-                .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(impersonationRequestFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(hostValidationRequestFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(publicAuthenticationFilter, SecurityContextFilter.class)
+                .addFilterBefore(netgrifHttpRequestTransformFilter, BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(requestMatcherRegistry ->
                         requestMatcherRegistry
                                 .requestMatchers(getPatterns()).permitAll()
@@ -168,18 +156,6 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
         return securityConfigurationProperties;
     }
 
-    protected PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
-        return new PublicAuthenticationFilter(
-                (ProviderManager) authenticationManager(authenticationManagerBuilder),
-                new AnonymousAuthenticationProvider(securityConfigurationProperties.getAnonymousAuthenticationKey()),
-                securityConfigurationProperties.getServerPatterns(),
-                securityConfigurationProperties.getAnonymousExceptions(),
-                jwtService,
-                userService,
-                authorityService,
-                securityConfigurationProperties
-        );
-    }
 
     private SecurityContextFilter createSecurityContextFilter() {
         return new SecurityContextFilter(securityContextService);

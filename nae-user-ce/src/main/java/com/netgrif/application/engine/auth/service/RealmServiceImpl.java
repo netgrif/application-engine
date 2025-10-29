@@ -67,6 +67,7 @@ public class RealmServiceImpl implements RealmService {
         com.netgrif.application.engine.adapter.spring.auth.domain.Realm realm = new com.netgrif.application.engine.adapter.spring.auth.domain.Realm(createRequest.getName());
         realm.setDescription(createRequest.getDescription());
         realm.setAdminRealm(createRequest.isAdminRealm());
+        realm.setPublicAccess(createRequest.isPublicAccess());
 
         if (createRequest.isDefaultRealm() && getDefaultRealm().isEmpty()) {
             realm.setDefaultRealm(true);

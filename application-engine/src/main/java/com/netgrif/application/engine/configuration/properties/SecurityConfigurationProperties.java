@@ -421,6 +421,8 @@ public class SecurityConfigurationProperties {
         @Data
         public static class PublicProperties {
 
+            private boolean enabled = true;
+
             /**
              * Public URL for web functionalities.
              */
