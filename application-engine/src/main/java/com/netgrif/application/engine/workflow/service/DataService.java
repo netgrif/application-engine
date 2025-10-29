@@ -317,39 +317,44 @@ public class DataService implements IDataService {
         PetriNet net = useCase.getPetriNet();
         Transition transition = net.getTransition(task.getTransitionId());
         GetDataGroupsEventOutcome outcome = new GetDataGroupsEventOutcome(useCase, task);
+
         log.info("Getting groups of task {} in case {} level: {}", taskId, useCase.getTitle(), level);
         List<DataGroup> resultDataGroups = new ArrayList<>();
 
         List<Field<?>> data = getData(task, useCase).getData();
         Map<String, Field<?>> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
-        List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map((dg) -> (DataGroup) new com.netgrif.application.engine.adapter.spring.workflow.domain.DataGroup((com.netgrif.application.engine.adapter.spring.workflow.domain.DataGroup) dg)).toList();
-        for (DataGroup dataGroup : dataGroups) {
-            resolveTaskRefOrderOnGrid(dataGroup, dataFieldMap);
-            resultDataGroups.add(dataGroup);
-            log.debug("Setting groups of task {} in case {} level: {} {}", taskId, useCase.getTitle(), level, dataGroup.getImportId());
+        transition.getDataGroups().values().stream()
+                .map((dg) -> (DataGroup) new com.netgrif.application.engine.adapter.spring.workflow.domain.DataGroup((com.netgrif.application.engine.adapter.spring.workflow.domain.DataGroup) dg))
+                .forEach((dataGroup -> {
+                    resolveTaskRefOrderOnGrid(dataGroup, dataFieldMap);
+                    resultDataGroups.add(dataGroup);
+                    log.debug("Setting groups of task {} in case {} level: {} {}", taskId, useCase.getTitle(), level,
+                            dataGroup.getImportId());
 
-            List<Field<?>> resources = new LinkedList<>();
-            for (String dataFieldId : dataGroup.getData()) {
-                Field<?> field = net.getDataSet().get(dataFieldId);
-                if (dataFieldMap.containsKey(dataFieldId)) {
-                    Field<?> resource = dataFieldMap.get(dataFieldId);
-                    if (level != 0) {
-                        dataGroup.setParentCaseId(useCase.getStringId());
-                        resource.setParentCaseId(useCase.getStringId());
-                        dataGroup.setParentTaskId(taskId);
-                        dataGroup.setParentTransitionId(task.getTransitionId());
-                        dataGroup.setParentTaskRefId(parentTaskRefId);
-                        dataGroup.setNestingLevel(level);
-                        resource.setParentTaskId(taskId);
+                    List<Field<?>> resources = new LinkedList<>();
+                    for (String dataFieldId : dataGroup.getData()) {
+                        Field<?> resource = dataFieldMap.get(dataFieldId);
+                        if (resource != null) {
+                            if (level != 0) {
+                                dataGroup.setParentCaseId(useCase.getStringId());
+                                resource.setParentCaseId(useCase.getStringId());
+                                dataGroup.setParentTaskId(taskId);
+                                dataGroup.setParentTransitionId(task.getTransitionId());
+                                dataGroup.setParentTaskRefId(parentTaskRefId);
+                                dataGroup.setNestingLevel(level);
+                                resource.setParentTaskId(taskId);
+                            }
+                            resources.add(resource);
+                            Field<?> field = net.getDataSet().get(dataFieldId);
+                            if (field.getType() == FieldType.TASK_REF
+                                    && shouldResolveTaskRefData(field, transition.getDataSet().get(field.getStringId()))) {
+                                resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) resource, locale, collectedTaskIds, level));
+                            }
+                        }
                     }
-                    resources.add(resource);
-                    if (field.getType() == FieldType.TASK_REF && shouldResolveTaskRefData(field, transition.getDataSet().get(field.getStringId()))) {
-                        resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), locale, collectedTaskIds, level));
-                    }
-                }
-            }
-            dataGroup.setFields(new DataFieldsResource(resources, locale));
-        }
+                    dataGroup.setFields(new DataFieldsResource(resources, locale));
+                }));
+
         outcome.setData(resultDataGroups);
         return outcome;
     }
@@ -372,17 +377,20 @@ public class DataService implements IDataService {
 
     private List<DataGroup> collectTaskRefDataGroups(TaskField taskRefField, Locale locale, Set<String> collectedTaskIds, int level) {
         List<String> taskIds = taskRefField.getValue();
-        List<DataGroup> groups = new ArrayList<>();
-
-        if (taskIds != null) {
-            taskIds = taskIds.stream().filter(id -> !collectedTaskIds.contains(id)).toList();
-            taskIds.forEach(id -> {
-                collectedTaskIds.add(id);
-                List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1, taskRefField.getStringId()).getData();
-                resolveTaskRefBehavior(taskRefField, taskRefDataGroups);
-                groups.addAll(taskRefDataGroups);
-            });
+        if (taskIds == null) {
+            return new ArrayList<>();
         }
+
+        List<DataGroup> groups = new ArrayList<>();
+        taskIds.stream()
+                .filter(id -> !collectedTaskIds.contains(id))
+                .forEach(id -> {
+                    collectedTaskIds.add(id);
+                    List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1,
+                            taskRefField.getStringId()).getData();
+                    resolveTaskRefBehavior(taskRefField, taskRefDataGroups);
+                    groups.addAll(taskRefDataGroups);
+                });
 
         return groups;
     }
@@ -391,8 +399,8 @@ public class DataService implements IDataService {
         if (dataGroup.getLayout() != null && Objects.equals(dataGroup.getLayout().getType(), "grid")) {
             dataGroup.setData(
                     dataGroup.getData().stream()
-                            .filter(dataFieldMap::containsKey)
                             .map(dataFieldMap::get)
+                            .filter(Objects::nonNull)
                             .sorted(Comparator.comparingInt(a -> a.getLayout().getY()))
                             .map(Field::getStringId)
                             .collect(Collectors.toCollection(LinkedHashSet::new))
@@ -659,10 +667,10 @@ public class DataService implements IDataService {
     }
 
     private List<EventOutcome> getChangedFieldByFileFieldContainer(String fieldId, Task referencingTask, Case useCase, Map<String, String> params) {
-        List<EventOutcome> outcomes = new ArrayList<>(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
-                EventPhase.PRE, useCase, referencingTask, params));
-        outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
-                EventPhase.POST, useCase, referencingTask, params));
+        Field<?> field = useCase.getPetriNet().getField(fieldId).get();
+        List<EventOutcome> outcomes = new ArrayList<>(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE,
+                useCase, referencingTask, params));
+        outcomes.addAll(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, referencingTask, params));
         updateDataset(useCase);
         workflowService.save(useCase);
         return outcomes;
@@ -688,7 +696,8 @@ public class DataService implements IDataService {
                 }
             } catch (StorageException e) {
                 log.error(e.getMessage(), e);
-                throw new EventNotExecutableException("File " + field.getValue().getName() + " in case " + useCase.getStringId() + " and field " + fieldId + "  could not be deleted.", e);
+                throw new EventNotExecutableException("File %s in case %s and field %s  could not be deleted.".formatted(
+                        field.getValue().getName(), useCase.getStringId(), fieldId), e);
             }
             useCase.getDataSet().get(field.getStringId()).setValue(null);
         }
@@ -1119,8 +1128,8 @@ public class DataService implements IDataService {
         Set<String> nets = new HashSet<>(allowedNets);
         cases.forEach(_case -> {
             if (!nets.contains(_case.getProcessIdentifier())) {
-                throw new IllegalArgumentException("Case '%s' with id '%s' cannot be added to case ref, since it is an instance of process with identifier '%s', which is not one of the allowed nets".formatted(
-                        _case.getTitle(), _case.getStringId(), _case.getProcessIdentifier()));
+                throw new IllegalArgumentException("Case '%s' with id '%s' cannot be added to case ref, since it is an instance of process with identifier '%s', which is not one of the allowed nets"
+                        .formatted(_case.getTitle(), _case.getStringId(), _case.getProcessIdentifier()));
             }
         });
     }
