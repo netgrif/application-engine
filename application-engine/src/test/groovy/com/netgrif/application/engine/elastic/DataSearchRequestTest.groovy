@@ -13,6 +13,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldV
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileListFieldValue
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -96,7 +97,11 @@ class DataSearchRequestTest {
     void before() {
         testHelper.truncateDbs()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/all_data.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert net.getNet() != null
 
         def users = userService.findAllUsers(null, Pageable.ofSize(100))
