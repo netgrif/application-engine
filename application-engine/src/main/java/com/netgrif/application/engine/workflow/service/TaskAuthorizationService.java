@@ -88,7 +88,8 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
             return false;
         else
             // TODO: impersonation user.getSelfOrImpersonated().getStringId()
-            return task.getUserId().equals(user.getStringId()) || (Boolean) user.getAttributeValue("anonymous");
+            return task.getUserId().equals(user.getStringId())
+                    || (user.getAttributeValue("anonymous") != null && (Boolean) user.getAttributeValue("anonymous"));
     }
 
     private boolean isAssigned(String taskId) {
@@ -133,7 +134,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
         }
 
         // TODO: impersonation
-        Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.DELEGATE);
+        Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, task, RolePermission.DELEGATE);
         return rolePerm != null && rolePerm;
     }
 
@@ -188,13 +189,13 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
         }
 
         // TODO: impersonation
-        Boolean userPerm = userHasUserListPermission(loggedUser, taskId, RolePermission.CANCEL);
+        Boolean userPerm = userHasUserListPermission(loggedUser, task, RolePermission.CANCEL);
         if (userPerm != null) {
             return userPerm;
         }
 
         // TODO: impersonation
-        Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.CANCEL);
+        Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, task, RolePermission.CANCEL);
         return rolePerm != null && rolePerm;
     }
 

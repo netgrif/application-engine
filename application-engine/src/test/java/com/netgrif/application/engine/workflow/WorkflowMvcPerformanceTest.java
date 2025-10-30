@@ -2,10 +2,7 @@ package com.netgrif.application.engine.workflow;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.objects.auth.domain.PasswordCredential;
-import com.netgrif.application.engine.objects.auth.domain.User;
+import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
@@ -15,6 +12,8 @@ import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.params.TaskParams;
+import com.netgrif.application.engine.workflow.service.TaskService;
 import com.netgrif.application.engine.workflow.service.WorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,6 +68,9 @@ public class WorkflowMvcPerformanceTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private TaskService taskService;
 
     @BeforeEach
     public void beforeEach() throws IOException, MissingPetriNetMetaDataException {
@@ -136,6 +138,110 @@ public class WorkflowMvcPerformanceTest {
             totalElapsedTime += finish - start;
         }
         log.info("AVG time for event [assignTask] is [{} ms] for [{}] iterations", totalElapsedTime / iterations, iterations);
+    }
+
+    @Test
+    public void testCancelAdminPerformance() throws Exception {
+        long totalElapsedTime = 0;
+        int iterations = 1000;
+        LoggedUser loggedUser = superCreatorRunner.getLoggedSuper();
+
+        for (int i = 0; i < iterations; i++) {
+            Case useCase = workflowService.createCase(CreateCaseParams.with()
+                    .petriNet(net)
+                    .loggedUser(loggedUser)
+                    .locale(Locale.getDefault())
+                    .build()).getCase();
+            String taskId = useCase.getTasks().stream().findFirst().get().getTask();
+            taskService.assignTask(TaskParams.with()
+                    .taskId(taskId)
+                    .user(loggedUser)
+                    .build());
+            long start = System.currentTimeMillis();
+            mvc.perform(get(CANCEL_TASK_URL + taskId)
+                    .with(httpBasic("super@netgrif.com", "password")));
+            long finish = System.currentTimeMillis();
+            totalElapsedTime += finish - start;
+        }
+        log.info("AVG time for event [cancelTask by admin] is [{} ms] for [{}] iterations", totalElapsedTime / iterations, iterations);
+    }
+
+    @Test
+    public void testCancelPerformance() throws Exception {
+        long totalElapsedTime = 0;
+        int iterations = 1000;
+        LoggedUser loggedUser = superCreatorRunner.getLoggedSuper();
+
+        for (int i = 0; i < iterations; i++) {
+            Case useCase = workflowService.createCase(CreateCaseParams.with()
+                    .petriNet(net)
+                    .loggedUser(loggedUser)
+                    .locale(Locale.getDefault())
+                    .build()).getCase();
+            String taskId = useCase.getTasks().stream().findFirst().get().getTask();
+            taskService.assignTask(TaskParams.with()
+                    .taskId(taskId)
+                    .user(this.user1)
+                    .build());
+            long start = System.currentTimeMillis();
+            mvc.perform(get(CANCEL_TASK_URL + taskId)
+                    .with(httpBasic("user1@netgrif.com", "password")));
+            long finish = System.currentTimeMillis();
+            totalElapsedTime += finish - start;
+        }
+        log.info("AVG time for event [cancelTask] is [{} ms] for [{}] iterations", totalElapsedTime / iterations, iterations);
+    }
+
+    @Test
+    public void testFinishAdminPerformance() throws Exception {
+        long totalElapsedTime = 0;
+        int iterations = 1000;
+        LoggedUser loggedUser = superCreatorRunner.getLoggedSuper();
+
+        for (int i = 0; i < iterations; i++) {
+            Case useCase = workflowService.createCase(CreateCaseParams.with()
+                    .petriNet(net)
+                    .loggedUser(loggedUser)
+                    .locale(Locale.getDefault())
+                    .build()).getCase();
+            String taskId = useCase.getTasks().stream().findFirst().get().getTask();
+            taskService.assignTask(TaskParams.with()
+                    .taskId(taskId)
+                    .user(loggedUser)
+                    .build());
+            long start = System.currentTimeMillis();
+            mvc.perform(get(FINISH_TASK_URL + taskId)
+                    .with(httpBasic("super@netgrif.com", "password")));
+            long finish = System.currentTimeMillis();
+            totalElapsedTime += finish - start;
+        }
+        log.info("AVG time for event [finishTask by admin] is [{} ms] for [{}] iterations", totalElapsedTime / iterations, iterations);
+    }
+
+    @Test
+    public void testFinishPerformance() throws Exception {
+        long totalElapsedTime = 0;
+        int iterations = 1000;
+        LoggedUser loggedUser = superCreatorRunner.getLoggedSuper();
+
+        for (int i = 0; i < iterations; i++) {
+            Case useCase = workflowService.createCase(CreateCaseParams.with()
+                    .petriNet(net)
+                    .loggedUser(loggedUser)
+                    .locale(Locale.getDefault())
+                    .build()).getCase();
+            String taskId = useCase.getTasks().stream().findFirst().get().getTask();
+            taskService.assignTask(TaskParams.with()
+                    .taskId(taskId)
+                    .user(this.user1)
+                    .build());
+            long start = System.currentTimeMillis();
+            mvc.perform(get(FINISH_TASK_URL + taskId)
+                    .with(httpBasic("user1@netgrif.com", "password")));
+            long finish = System.currentTimeMillis();
+            totalElapsedTime += finish - start;
+        }
+        log.info("AVG time for event [finishTask] is [{} ms] for [{}] iterations", totalElapsedTime / iterations, iterations);
     }
 
 
