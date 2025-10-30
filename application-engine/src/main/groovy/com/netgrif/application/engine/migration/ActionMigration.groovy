@@ -56,7 +56,7 @@ class ActionMigration {
         }
     }
 
-    private void migrateDataSetActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
+    private static void migrateDataSetActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
         newPetriNet.dataSet.each { key, data ->
             if (data.events != null && data.events.size() > 0) {
                 oldPetriNet.dataSet[key].events = data.events
@@ -64,7 +64,7 @@ class ActionMigration {
         }
     }
 
-    private void migrateDataRefActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
+    private static void migrateDataRefActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
         newPetriNet.transitions.each { transKey, trans ->
             trans.dataSet.each { dataKey, data ->
                 if (data.events != null && data.events.size() > 0) {

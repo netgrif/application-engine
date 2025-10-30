@@ -122,7 +122,7 @@
 				"referenced_filters": ["type": "caseRef", "value": previousCaseRefValue],
 			])
 			async.run {
-				workflowService.deleteCase(useCase.stringId)
+				deleteCase(useCase.stringId)
 			}
 		</action>
 	</data>

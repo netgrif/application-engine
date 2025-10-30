@@ -22,7 +22,7 @@
             importedFilters: f.imported_filters;
 
             taskService.findAllById(importedFilters.value).forEach({filterTask ->
-                workflowService.deleteCase(filterTask.caseId)
+                deleteCase(filterTask.caseId)
             })
             change importedFilters value { return [] }
         </action>
@@ -148,7 +148,7 @@
                     importedFilters: f.imported_filters;
 
                     taskService.findAllById(importedFilters.value).forEach({filterTask ->
-                        workflowService.deleteCase(filterTask.caseId)
+                        deleteCase(filterTask.caseId)
                     })
                     change importedFilters value { [] }
                 </action>
