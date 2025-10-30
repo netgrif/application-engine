@@ -2,8 +2,6 @@ package com.netgrif.application.engine.startup.runner;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
-import com.netgrif.application.engine.objects.petrinet.domain.events.Event;
-import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
@@ -37,7 +35,7 @@ public class AnonymousRoleRunner implements ApplicationEngineStartupRunner {
         anonymousRole.setImportId(ProcessRole.ANONYMOUS_ROLE);
         anonymousRole.setName(new I18nString(ProcessRole.ANONYMOUS_ROLE));
         anonymousRole.setDescription("Anonymous system process role");
-        anonymousRole.setEvents(new LinkedHashMap<EventType, Event>());
+        anonymousRole.setEvents(new LinkedHashMap<>());
         processRoleService.save(anonymousRole);
     }
 

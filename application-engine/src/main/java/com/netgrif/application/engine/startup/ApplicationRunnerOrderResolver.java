@@ -40,7 +40,7 @@ public class ApplicationRunnerOrderResolver {
         runners.forEach(runner -> {
             Class<?> runnerClass = resolveClass(runner);
             RunnerOrder[] runnerOrders = runnerClass.getAnnotationsByType(RunnerOrder.class);
-            if (runnerOrders == null || runnerOrders.length == 0) {
+            if (runnerOrders.length == 0) {
                 unresolved.add(runner);
                 return;
             }
@@ -102,8 +102,7 @@ public class ApplicationRunnerOrderResolver {
         }
 
         protected boolean sortUnresolvedRunners() {
-            boolean changed = false;
-            changed = changed || resolveSortingAnnotation(BeforeRunner.class, this::insertBeforeRunner);
+            boolean changed = resolveSortingAnnotation(BeforeRunner.class, this::insertBeforeRunner);
             changed = changed || resolveSortingAnnotation(AfterRunner.class, this::insertAfterRunner);
             changed = changed || resolveSortingAnnotation(ReplaceRunner.class, this::replaceRunner);
             if (unresolved.isEmpty()) return true;

@@ -2,8 +2,6 @@ package com.netgrif.application.engine.startup.runner;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
-import com.netgrif.application.engine.objects.petrinet.domain.events.Event;
-import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
@@ -39,7 +37,7 @@ public class DefaultRoleRunner implements ApplicationEngineStartupRunner {
         defaultRole.setImportId(ProcessRole.DEFAULT_ROLE);
         defaultRole.setName(new I18nString(ProcessRole.DEFAULT_ROLE));
         defaultRole.setDescription("Default system process role");
-        defaultRole.setEvents(new LinkedHashMap<EventType, Event>());
+        defaultRole.setEvents(new LinkedHashMap<>());
         defaultRole = processRoleService.save(defaultRole);
 
         if (defaultRole == null) {
