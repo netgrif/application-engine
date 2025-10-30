@@ -16,7 +16,7 @@ public class UserControllerAdvice {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public @ResponseBody
     MessageResource handleException(NumberFormatException e) {
-        log.error("Long could not be parsed from request. " + e.getMessage(), e);
+        log.error("Long could not be parsed from request. {}", e.getMessage(), e);
         return MessageResource.errorMessage(e.getMessage());
     }
 }

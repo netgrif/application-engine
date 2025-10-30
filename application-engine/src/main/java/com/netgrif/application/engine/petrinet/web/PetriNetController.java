@@ -190,7 +190,7 @@ public class PetriNetController {
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileResource.getFilename() + Importer.FILE_EXTENSION + "\"");
         response.setHeader("Content-Length", String.valueOf(fileResource.getFile().length()));
-        log.info("Downloading Petri net file: " + fileResource.getFilename() + " [" + netId + "]");
+        log.info("Downloading Petri net file: {} [{}]", fileResource.getFilename(), netId);
         return fileResource;
     }
 
@@ -232,7 +232,7 @@ public class PetriNetController {
     public MessageResource deletePetriNet(@PathVariable("id") String processId, @RequestParam(required = false) boolean force, Authentication auth) {
         String decodedProcessId = decodeUrl(processId);
         if (Objects.equals(decodedProcessId, "")) {
-            log.error("Deleting Petri net [" + processId + "] failed: could not decode process ID from URL");
+            log.error("Deleting Petri net [{}] failed: could not decode process ID from URL", processId);
             return MessageResource.errorMessage("Deleting Petri net " + processId + " failed!");
         }
         LoggedUser user = (LoggedUser) auth.getPrincipal();
