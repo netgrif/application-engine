@@ -9,6 +9,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.arcs.InhibitorArc
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.ReadArc
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.ResetArc
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -67,7 +68,11 @@ class PetriNetTest {
     void testClone() {
         int beforeImportNet = processRoleRepository.count()
 
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(netResource.inputStream)
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
 
         assert netOptional.getNet() != null
 
