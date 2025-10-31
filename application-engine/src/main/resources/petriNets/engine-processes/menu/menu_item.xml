@@ -813,6 +813,20 @@
 				</layout>
 			</dataRef>
 			<dataRef>
+				<id>hasChildren</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
 				<id>is_auto_select</id>
 				<logic>
 					<behavior>editable</behavior>

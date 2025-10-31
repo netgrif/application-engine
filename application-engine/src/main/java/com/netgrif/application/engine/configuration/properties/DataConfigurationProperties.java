@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.configuration.properties;
 
+import com.mongodb.connection.ClusterConnectionMode;
+import com.mongodb.connection.ClusterType;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
@@ -17,8 +19,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import jakarta.validation.Valid;
+
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Configuration properties for the application engine's data functionality.
@@ -35,37 +39,37 @@ public class DataConfigurationProperties {
      * REST API configuration properties specific to the application engine.
      */
     private RestProperties rest = new RestProperties();
-    
+
     /**
      * MongoDB configuration properties related to database connection and behavior.
      */
     private MongoProperties mongodb = new MongoProperties();
-    
+
     /**
      * Elasticsearch properties for configuring search-related functionality.
      */
     private ElasticsearchProperties elasticsearch = new ElasticsearchProperties();
-    
+
     /**
      * Redis configuration properties for caching and session management.
      */
     private RedisProperties redis = new RedisProperties();
-    
+
     /**
      * Flag indicating whether to drop collections or indexes during application initialization.
      */
     private boolean drop = false;
-    
+
     /**
      * Name of the primary database used by the application engine.
      */
     private String databaseName = "nae";
-    
+
     /**
      * Size in pixels for scaling the image preview.
      */
     private int imagePreviewScalingPx = 400;
-    
+
     /**
      * Validation-specific configuration properties.
      */
@@ -121,6 +125,34 @@ public class DataConfigurationProperties {
     public static class RestProperties extends RepositoryRestProperties {
     }
 
+
+    @Data
+    @NoArgsConstructor
+    public static class Proxy {
+
+        /**
+         * Represents the hostname or IP address for the proxy server.
+         */
+        private String host;
+
+        /**
+         * Represents the port number for the proxy server.
+         */
+        private Integer port;
+
+        /**
+         * Represents the username associated with authentication for the proxy server.
+         */
+        @ToString.Exclude
+        private String username;
+
+        /**
+         * Represents the password associated with authentication for the proxy server.
+         */
+        @ToString.Exclude
+        private String password;
+    }
+
     /**
      * MongoDB-specific configuration properties for the data module.
      */
@@ -128,7 +160,6 @@ public class DataConfigurationProperties {
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class MongoProperties extends org.springframework.boot.autoconfigure.mongo.MongoProperties {
-        
         /**
          * Flag indicating whether the database should drop collections during initialization.
          */
@@ -138,6 +169,166 @@ public class DataConfigurationProperties {
          * Ensures indexes are applied during initialization, if true.
          */
         private Boolean runnerEnsureIndex = true;
+
+        /**
+         * The maximum number of connections allowed. This value determines
+         * the upper limit of concurrent connections that can be established
+         * with the MongoDB server.
+         */
+        private int maxConnections = 100;
+
+        /**
+         * The minimum number of connections that should be maintained in the connection pool.
+         * This value represents the baseline of connections that are kept ready for use,
+         * even when demand for connections is low or idle.
+         */
+        private int minConnections = 0;
+
+        /**
+         * Specifies the maximum number of connections that can be initiated concurrently.
+         * This property is used to throttle the number of simultaneous connection attempts
+         *  to limit resource usage and prevent connection saturation.
+         */
+        private int maxConnecting = 2;
+
+        /**
+         * Specifies the maximum amount of time
+         * a connection can remain idle
+         * before being eligible for closure or reallocation by the connection pool.
+         * Use {@code connection-idle-time-unit } to change Time unit
+         */
+        private long connectionIdleTime;
+
+        /**
+         * Specifies the unit of time used to define the idle time for a connection.
+         * This variable works in conjunction with {@code connection-idle-time} to configure
+         * how long a connection can remain idle before being closed.
+         */
+        private TimeUnit connectionIdleTimeUnit = TimeUnit.MILLISECONDS;
+
+        /**
+         * Specifies the maximum amount of time that the application
+         * will wait for a MongoDB connection acquisition from the connection pool
+         * before a timeout is thrown. This is especially useful in scenarios with high
+         * demand for connections or constrained resources.
+         * Use {@code max-wait-time-unit} to set Time unit.
+         */
+        private long maxWaitTime = 120_000;
+
+        /**
+         * Specifies the time unit for the maximum waiting time for MongoDB operations.
+         * This defines the unit of measurement, such as milliseconds, seconds, or minutes,
+         * used in conjunction with the {@code max-wait-time} configuration.
+         */
+        private TimeUnit maxWaitTimeUnit = TimeUnit.MILLISECONDS;
+
+        /**
+         * Specifies the timeout for socket read and write operations.
+         * This value determines the maximum period of inactivity before a socket operation is considered failed.
+         * Use {@code socket-timeout-unit} to set Time unit.
+         */
+        private int socketTimeout = 10000;
+
+        /**
+         * Defines the time unit {@link TimeUnit} used for socket timeout configuration.
+         * This property helps specify the granularity of the socket timeout value,
+         * such as milliseconds, seconds, etc.
+         */
+        private TimeUnit socketTimeoutUnit = TimeUnit.MILLISECONDS;
+
+        /**
+         * The read timeout for MongoDB connections. If a read
+         * operation does not complete within this timeframe, it will result in a
+         * timeout exception.
+         */
+        private int readTimeout;
+
+        /**
+         * Specifies the unit of time for the read timeout.
+         * The read timeout defines the maximum amount of time a read operation
+         * can block before timing out. This variable uses {@link TimeUnit} to
+         * represent the time unit (e.g., milliseconds, seconds).
+         */
+        private TimeUnit readTimeoutUnit = TimeUnit.MILLISECONDS;
+
+        /**
+         * Indicates whether SSL is enabled for the MongoDB connection.
+         */
+        private boolean ssl = false;
+
+        /**
+         * Defines the local threshold in milliseconds for MongoDB operations.
+         * This value represents the acceptable latency difference between the primary
+         * and a secondary server for read operations.
+         */
+        private long localThreshold = 15;
+
+        /**
+         * Specifies the time unit for the local threshold, which determines the acceptable
+         * delay between the fastest and a candidate server in the database cluster.
+         */
+        private TimeUnit localThresholdUnit = TimeUnit.MILLISECONDS;
+
+        /**
+         * The mode variable specifies the cluster connection mode for MongoDB.
+         * It defines how the application connects to a MongoDB cluster, such as single-node {@code SINGLE}
+         * or multi-node {@code MULTIPLE} or {@code LOAD_BALANCED} configurations.
+         */
+        private ClusterConnectionMode mode = ClusterConnectionMode.SINGLE;
+
+        /**
+         * The name of the MongoDB replica set to which the application should connect.
+         * This property is used to specify the replica set name when working with
+         * MongoDB clusters configured for high availability using replica sets.
+         */
+        private String replicaSetName;
+
+        /**
+         * Represents the type of the cluster used for MongoDB configuration.
+         * Used to define the MongoDB cluster topology, such as whether
+         * it is a replica set, sharded, or a standalone deployment.
+         * Initialized to {@code ClusterType.UNKNOWN} by default.
+         */
+        private ClusterType clusterType = ClusterType.UNKNOWN;
+
+        /**
+         * Specifies the maximum amount of time, in milliseconds, that the client will wait
+         * to select a server for an operation.
+         */
+        private long serverSelectionTimeout = 30000;
+
+        /**
+         * The {@code serverSelectionTimeoutUnit} variable represents the time unit for the server selection timeout.
+         * This defines the time granularity (e.g., milliseconds, seconds) used when specifying the duration
+         * of the server selection timeout for connections related to MongoDB properties.
+         */
+        private TimeUnit serverSelectionTimeoutUnit = TimeUnit.MILLISECONDS;
+
+        /**
+         * Represents the maximum length of a document log entry in the MongoProperties class.
+         * This value specifies the upper limit for the size of individual document log entries.
+         * Value must be greater than zero
+         */
+        private int maxDocumentLengthLog = 1000;
+
+        /**
+         * Indicates whether a proxy should be used for MongoDB connections.
+         * This flag helps determine if the application will route its database communication
+         * through a proxy server.
+         */
+        private boolean useProxy = false;
+
+        /**
+         * Represents a proxy configuration for MongoDB connections.
+         * This variable allows specifying details such as host, port, username, and
+         * password to connect to a MongoDB server through a proxy.
+         */
+        private Proxy proxy;
+
+        /**
+         * Proxy configuration for MongoDB communication. Formatted as String host:port.
+         */
+        private String proxyString;
 
         /**
          * Multi-value map for MongoDB indexes.
@@ -268,6 +459,60 @@ public class DataConfigurationProperties {
          */
         private PriorityProperties priority = new PriorityProperties();
 
+        /**
+         * Specifies the timeout duration, in milliseconds, for establishing a connection.
+         * This configuration determines how long the system will wait before considering
+         * the connection attempt as failed if no response is received within this time frame.
+         */
+        private long connectionTimeout = 1000;
+
+        /**
+         * Specifies the timeout value in milliseconds for socket connections.
+         * This value determines how long the system waits for a response from
+         * a socket connection before throwing a timeout exception.
+         */
+        private long socketTimeout = 30000;
+
+        /**
+         * Specifies the maximum number of total connections that can be established.
+         */
+        private int maxConnections = 30;
+
+        /**
+         * The maximum number of connections allowed per host by default.
+         * This setting defines how many connections can be maintained simultaneously
+         * to a single target endpoint or route, for example, a single server or service.
+         */
+        private int defaultMaxConnectionsPerHost = 10;
+
+        /**
+         * Represents the number of I/O threads to be used for handling input/output operations.
+         * This configuration determines the level of concurrency for I/O tasks in the application.
+         */
+        private int ioThreadCount;
+
+        /**
+         * The time-to-live value for connections. Use {@code  connection-ttl-unit} to change unit of time.
+         */
+        private long connectionTtl;
+
+        /**
+         * Specifies the time unit for connection TTL (Time-To-Live) in the application.
+         * This determines the granularity of the connection TTL setting, such as
+         * seconds, milliseconds, or another valid {@link TimeUnit}.
+         */
+        private TimeUnit connectionTtlUnit;
+
+        /**
+         * Indicates whether the application should use a proxy for its Elasticsearch connections.
+         * If set to {@code true}, the proxy will be enabled.
+         */
+        private boolean useProxy = false;
+
+        /**
+         * Proxy configuration for Elasticsearch communication. Formatted as String host:port.
+         */
+        private String proxyString;
 
         /**
          * Batch-related configuration properties for Elasticsearch operations.
@@ -305,7 +550,7 @@ public class DataConfigurationProperties {
 
         @Data
         public static class ExecutorProperties {
-            
+
             /**
              * Number of threads for executor service.
              */
@@ -344,7 +589,7 @@ public class DataConfigurationProperties {
 
         @Data
         public static class ServiceProperties {
-            
+
             /**
              * Enables Elasticsearch service configurations, if true.
              */
@@ -358,7 +603,7 @@ public class DataConfigurationProperties {
 
         @Data
         public static class PriorityProperties {
-            
+
             /**
              * List of fields with boosted priorities in full-text search operations.
              */
@@ -394,7 +639,7 @@ public class DataConfigurationProperties {
             private int taskBatchSize = 20000;
         }
     }
-    
+
     /**
      * Configuration properties for Redis session management in the application.
      * <p>
