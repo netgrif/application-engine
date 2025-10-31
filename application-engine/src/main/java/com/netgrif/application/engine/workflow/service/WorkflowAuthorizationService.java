@@ -31,7 +31,6 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
         }
 
         Case requestedCase = workflowService.findOne(caseId);
-        // todo 2235 test if user has roles
         // TODO: impersonation user.getSelfOrImpersonated()
         Boolean userPerm = userHasUserListPermission(user, requestedCase, ProcessRolePermission.DELETE);
         if (userPerm != null) {
@@ -52,7 +51,6 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
 
         PetriNet net = petriNetService.getPetriNet(netId);
         // TODO: impersonation
-        // todo 2235 test if user has roles
         return userHasAtLeastOneRolePermission(user, net, ProcessRolePermission.CREATE);
     }
 

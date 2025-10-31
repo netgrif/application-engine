@@ -21,7 +21,6 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     @Override
     public Boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions) {
-        // todo 2235 test
         return userHasAtLeastOneRolePermission(loggedUser, taskService.findById(taskId), permissions);
     }
 
@@ -44,7 +43,6 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     @Override
     public Boolean userHasUserListPermission(LoggedUser loggedUser, String taskId, RolePermission... permissions) {
-        // todo 2235 test
         return userHasUserListPermission(loggedUser, taskService.findById(taskId), permissions);
     }
 
@@ -73,7 +71,6 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     @Override
     public boolean isAssignee(LoggedUser loggedUser, String taskId) {
-        // todo 2235 test
         return isAssignee(loggedUser, taskService.findById(taskId));
     }
 
