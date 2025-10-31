@@ -139,7 +139,7 @@ public class TaskService implements ITaskService {
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreAssignActions(), useCase,
                 task, transition, taskParams.getParams()));
         if (!outcomes.isEmpty()) {
-            useCase = workflowService.findOne(useCase.getStringId());
+            task = findOne(task.getStringId());
         }
         AssignTaskEventOutcome outcome = new AssignTaskEventOutcome(useCase, task, outcomes);
         useCase = evaluateRules(new AssignTaskEvent(outcome, EventPhase.PRE));
@@ -223,7 +223,7 @@ public class TaskService implements ITaskService {
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreFinishActions(), useCase,
                 task, transition, taskParams.getParams()));
         if (!outcomes.isEmpty()) {
-            useCase = workflowService.findOne(useCase.getStringId());
+            task = findOne(task.getStringId());
         }
         FinishTaskEventOutcome outcome = new FinishTaskEventOutcome(useCase, task, outcomes);
         useCase = evaluateRules(new FinishTaskEvent(outcome, EventPhase.PRE));
@@ -281,7 +281,7 @@ public class TaskService implements ITaskService {
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreCancelActions(), useCase,
                 task, transition, taskParams.getParams()));
         if (!outcomes.isEmpty()) {
-            useCase = workflowService.findOne(useCase.getStringId());
+            task = findOne(task.getStringId());
         }
         CancelTaskEventOutcome outcome = new CancelTaskEventOutcome(useCase, task, outcomes);
         useCase = evaluateRules(new CancelTaskEvent(outcome, EventPhase.PRE));
@@ -423,7 +423,7 @@ public class TaskService implements ITaskService {
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreDelegateActions(), useCase,
                 task, transition, delegateTaskParams.getParams()));
         if (!outcomes.isEmpty()) {
-            useCase = workflowService.findOne(useCase.getStringId());
+            task = findOne(task.getStringId());
         }
 
         DelegateTaskEventOutcome outcome = new DelegateTaskEventOutcome(useCase, task, outcomes);

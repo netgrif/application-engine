@@ -166,7 +166,7 @@ class FilterImportExportTest {
                         "value": importedTasksIds
                 ]
         ]))
-        this.taskService.finishTask(new TaskParams(importTask, dummyUser))
+        this.taskService.finishTask(new TaskParams(importTask.getStringId(), dummyUser))
         Thread.sleep(1000)
         filterCases = this.userFilterSearchService.autocompleteFindFilters("")
         List<String> filterCasesNames = filterCases.stream().map({ filterCase -> filterCase.title }).collect(Collectors.toList())

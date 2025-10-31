@@ -80,8 +80,8 @@ class ChangeFieldValueInitTest {
 
     Case execute(String trans, Case useCase) {
         Task task = taskService.searchOne(QTask.task.caseId.eq(useCase.getStringId()) & QTask.task.transitionId.eq(trans))
-        taskService.assignTask(new TaskParams(task))
-        taskService.finishTask(new TaskParams(task))
+        taskService.assignTask(new TaskParams(task.getStringId()))
+        taskService.finishTask(new TaskParams(task.getStringId()))
         return reload(useCase)
     }
 

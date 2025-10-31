@@ -49,6 +49,7 @@ import com.netgrif.application.engine.objects.utils.MenuItemUtils
 import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.ChangeCasePropertyOutcome
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
@@ -877,6 +878,8 @@ class ActionDelegate {
                 }
                 taskService.save(tasks)
             }
+
+            outcomes.add(new ChangeCasePropertyOutcome(useCase))
         }]
     }
 

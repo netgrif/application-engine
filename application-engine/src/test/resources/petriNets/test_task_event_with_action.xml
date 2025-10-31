@@ -7,6 +7,10 @@
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
 	<transitionRole>false</transitionRole>
+	<data type="text">
+		<id>data1</id>
+		<title/>
+	</data>
 	<transition>
 		<id>t1</id>
 		<x>368</x>
@@ -16,7 +20,8 @@
 			<id>1_assign</id>
 			<actions phase="post">
 				<action>
-					print("testing assign")
+					data1:f.data1;
+					change data1 value { "test" }
 				</action>
 			</actions>
 		</event>
@@ -24,7 +29,8 @@
 			<id>1_cancel</id>
 			<actions phase="post">
 				<action>
-					print("testing cancel")
+					data1:f.data1;
+					change data1 value { "test" }
 				</action>
 			</actions>
 		</event>
@@ -32,7 +38,8 @@
 			<id>1_finish</id>
 			<actions phase="post">
 				<action>
-					print("testing finish")
+					data1:f.data1;
+					change data1 value { "test" }
 				</action>
 			</actions>
 		</event>
@@ -40,7 +47,8 @@
 			<id>1_delegate</id>
 			<actions phase="post">
 				<action>
-					print("testing delegate")
+					data1:f.data1;
+					change data1 value { "test" }
 				</action>
 			</actions>
 		</event>

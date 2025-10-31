@@ -89,8 +89,8 @@ class SetDataOnButtonTest {
         Task parentTask = taskService.searchOne(QTask.task.caseTitle.eq(PARENT_CASE) & QTask.task.transitionId.eq(TEST_TRANSITION))
         assert parentTask != null
 
-        taskService.assignTask(new TaskParams(parentTask))
-        taskService.finishTask(new TaskParams(parentTask))
+        taskService.assignTask(new TaskParams(parentTask.getStringId()))
+        taskService.finishTask(new TaskParams(parentTask.getStringId()))
 
         childCase = workflowService.findOne(childCase.getStringId())
 

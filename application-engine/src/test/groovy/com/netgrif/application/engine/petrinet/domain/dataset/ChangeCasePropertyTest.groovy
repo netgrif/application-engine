@@ -76,8 +76,8 @@ class ChangeCasePropertyTest {
         Task testCaseTask = taskService.searchOne(QTask.task.caseTitle.eq(TEST_CASE_TITLE) & QTask.task.transitionId.eq(TEST_TRANSITION))
         assert testCaseTask
 
-        taskService.assignTask(new TaskParams(testCaseTask))
-        taskService.finishTask(new TaskParams(testCaseTask))
+        taskService.assignTask(new TaskParams(testCaseTask.getStringId()))
+        taskService.finishTask(new TaskParams(testCaseTask.getStringId()))
 
         testCase = workflowService.findOne(testCase.getStringId())
         testCaseTask = taskService.findOne(testCaseTask.getStringId())
@@ -95,14 +95,14 @@ class ChangeCasePropertyTest {
         Task testCaseTask = taskService.searchOne(QTask.task.caseTitle.eq(TEST_CASE_TITLE) & QTask.task.transitionId.eq(TEST_TRANSITION))
         assert testCaseTask
 
-        taskService.assignTask(new TaskParams(testCaseTask))
+        taskService.assignTask(new TaskParams(testCaseTask.getStringId()))
         dataService.setData(testCaseTask.stringId, ImportHelper.populateDataset([
                 "bln": [
                         "value": "true",
                         "type" : "boolean"
                 ]
         ]))
-        taskService.finishTask(new TaskParams(testCaseTask))
+        taskService.finishTask(new TaskParams(testCaseTask.getStringId()))
 
         testCase = workflowService.findOne(testCase.getStringId())
         testCaseTask = taskService.findOne(testCaseTask.getStringId())
