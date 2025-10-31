@@ -52,7 +52,7 @@ class TaskRefInitTest {
                 .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
                 .build()).getNet()
         autoTrigger = petriNetService.importPetriNet(ImportPetriNetParams.with()
-                .xmlFile(new FileInputStream("src/test/resources/taskref_init.xml"))
+                .xmlFile(new FileInputStream("src/test/resources/autotrigger_taskref.xml"))
                 .releaseType(VersionType.MAJOR)
                 .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
                 .build()).getNet()

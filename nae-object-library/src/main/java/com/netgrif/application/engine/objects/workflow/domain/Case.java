@@ -202,18 +202,23 @@ public abstract class Case implements Serializable {
             if (field.getComponent() != null) {
                 dataField.setComponent(field.getComponent());
             }
-            switch (field) {
-                case UserField userField ->
-                        dataField.setChoices(userField.getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
-                case UserListField userListField ->
-                        dataField.setChoices(userListField.getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
-                case FilterField filterField -> dataField.setFilterMetadata(filterField.getFilterMetadata());
-                case FieldWithAllowedNets fieldWithAllowedNets ->
-                        dataField.setAllowedNets(fieldWithAllowedNets.getAllowedNets());
-                case MapOptionsField mapOptionsField when mapOptionsField.isDynamic() ->
-                        dynamicOptionsFields.add((MapOptionsField<I18nString, ?>) field);
-                case ChoiceField choiceField when choiceField.isDynamic() -> dynamicChoicesFields.add(choiceField);
-                default -> {}
+            if (field instanceof UserField) {
+                dataField.setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
+            }
+            if (field instanceof UserListField) {
+                dataField.setChoices(((UserListField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
+            }
+            if (field instanceof FieldWithAllowedNets) {
+                dataField.setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());
+            }
+            if (field instanceof FilterField) {
+                dataField.setFilterMetadata(((FilterField) field).getFilterMetadata());
+            }
+            if (field instanceof MapOptionsField && ((MapOptionsField) field).isDynamic()) {
+                dynamicOptionsFields.add((MapOptionsField<I18nString, ?>) field);
+            }
+            if (field instanceof ChoiceField && ((ChoiceField) field).isDynamic()) {
+                dynamicChoicesFields.add((ChoiceField<?>) field);
             }
         });
         dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field, params)));

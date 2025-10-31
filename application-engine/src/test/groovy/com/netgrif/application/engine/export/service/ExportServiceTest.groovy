@@ -87,7 +87,7 @@ class ExportServiceTest {
         assert (headerSplit.contains("immediate_multichoice")
                 && headerSplit.contains("immediate_number")
                 && !headerSplit.contains("text"))
-        taskService.cancelTask(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()), exportTask)
+        taskService.cancelTask(new TaskParams(exportTask, ActorTransformer.toLoggedUser(userService.getLoggedOrSystem())))
         taskService.cancelTask(new TaskParams(exportTask, ActorTransformer.toLoggedUser(userService.getLoggedOrSystem())))
     }
 

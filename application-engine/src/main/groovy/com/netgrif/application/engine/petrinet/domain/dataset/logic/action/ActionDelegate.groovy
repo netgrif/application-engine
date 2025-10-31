@@ -971,6 +971,14 @@ class ActionDelegate {
         return outcome.getCase()
     }
 
+    Case deleteCase(Case useCase) {
+        return workflowService.deleteCase(new DeleteCaseParams(useCase)).case
+    }
+
+    Case deleteCase(String caseId) {
+        return workflowService.deleteCase(new DeleteCaseParams(caseId)).case
+    }
+
     Task assignTask(String transitionId, Case aCase = useCase, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
         AssignTaskEventOutcome outcome = taskService.assignTask(TaskParams.with()
