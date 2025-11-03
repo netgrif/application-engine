@@ -524,6 +524,8 @@ public class PetriNetService implements IPetriNetService {
     @Override
     @Transactional
     public void deletePetriNet(DeletePetriNetParams deletePetriNetParams) {
+        fillAndValidateAttributes(deletePetriNetParams);
+
         Optional<PetriNet> petriNetOptional = repository.findById(deletePetriNetParams.getPetriNetId());
         if (petriNetOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find process with id [" + deletePetriNetParams.getPetriNetId() + "]");
@@ -579,6 +581,15 @@ public class PetriNetService implements IPetriNetService {
         }
         if (importPetriNetParams.getReleaseType() == null) {
             throw new IllegalArgumentException("Version type is null.");
+        }
+    }
+
+    protected void fillAndValidateAttributes(DeletePetriNetParams deletePetriNetParams) throws IllegalArgumentException {
+        if (deletePetriNetParams.getPetriNetId() == null) {
+            throw new IllegalArgumentException("No petriNet identifier was provided.");
+        }
+        if (deletePetriNetParams.getLoggedUser() == null) {
+            deletePetriNetParams.setLoggedUser(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()));
         }
     }
 }

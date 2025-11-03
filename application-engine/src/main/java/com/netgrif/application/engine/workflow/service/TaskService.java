@@ -130,7 +130,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public AssignTaskEventOutcome assignTask(TaskParams taskParams) throws TransitionNotExecutableException {
-        fillMissingAttributes(taskParams);
+        fillAndValidateAttributes(taskParams);
 
         Case useCase = taskParams.getUseCase();
         Task task = taskParams.getTask();
@@ -201,7 +201,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public FinishTaskEventOutcome finishTask(TaskParams taskParams) throws TransitionNotExecutableException {
-        fillMissingAttributes(taskParams);
+        fillAndValidateAttributes(taskParams);
 
         Task task = taskParams.getTask();
         Case useCase = taskParams.getUseCase();
@@ -268,7 +268,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public CancelTaskEventOutcome cancelTask(TaskParams taskParams) {
-        fillMissingAttributes(taskParams);
+        fillAndValidateAttributes(taskParams);
 
         Task task = taskParams.getTask();
         Case useCase = taskParams.getUseCase();
@@ -341,7 +341,7 @@ public class TaskService implements ITaskService {
         }
     }
 
-    protected void fillMissingAttributes(TaskParams taskParams) {
+    protected void fillAndValidateAttributes(TaskParams taskParams) {
         if (taskParams.getTask() == null) {
             Task task = findOne(taskParams.getTaskId());
             taskParams.setTask(task);
@@ -356,7 +356,7 @@ public class TaskService implements ITaskService {
         }
     }
 
-    protected void fillMissingAttributes(DelegateTaskParams taskParams) {
+    protected void fillAndValidateAttributes(DelegateTaskParams taskParams) {
         if (taskParams.getTask() == null) {
             Task task = findOne(taskParams.getTaskId());
             taskParams.setTask(task);
@@ -410,7 +410,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public DelegateTaskEventOutcome delegateTask(DelegateTaskParams delegateTaskParams) throws TransitionNotExecutableException {
-        fillMissingAttributes(delegateTaskParams);
+        fillAndValidateAttributes(delegateTaskParams);
 
         AbstractUser newAssignee = delegateTaskParams.getNewAssignee();
         AbstractUser delegator = delegateTaskParams.getDelegator();

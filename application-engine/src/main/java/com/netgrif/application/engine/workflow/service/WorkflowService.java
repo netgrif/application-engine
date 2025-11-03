@@ -274,7 +274,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     public CreateCaseEventOutcome createCase(CreateCaseParams createCaseParams) {
-        fillMissingAttributes(createCaseParams);
+        fillAndValidateAttributes(createCaseParams);
         PetriNet petriNet = createCaseParams.getPetriNet();
 
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
@@ -328,7 +328,7 @@ public class WorkflowService implements IWorkflowService {
         return useCase;
     }
 
-    private void fillMissingAttributes(CreateCaseParams createCaseParams) throws IllegalArgumentException {
+    private void fillAndValidateAttributes(CreateCaseParams createCaseParams) throws IllegalArgumentException {
         if (createCaseParams.getLoggedUser() == null) {
             throw new IllegalArgumentException("Logged user cannot be null on Case creation.");
         }
@@ -374,7 +374,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public DeleteCaseEventOutcome deleteCase(DeleteCaseParams deleteCaseParams) {
-        fillMissingAttributes(deleteCaseParams);
+        fillAndValidateAttributes(deleteCaseParams);
 
         DeleteCaseEventOutcome outcome = null;
         Case useCase = deleteCaseParams.getUseCase();
@@ -402,7 +402,7 @@ public class WorkflowService implements IWorkflowService {
         return outcome;
     }
 
-    protected void fillMissingAttributes(DeleteCaseParams deleteCaseParams) throws IllegalArgumentException {
+    protected void fillAndValidateAttributes(DeleteCaseParams deleteCaseParams) throws IllegalArgumentException {
         if (deleteCaseParams.getUseCase() == null) {
             if (deleteCaseParams.getUseCaseId() != null) {
                 deleteCaseParams.setUseCase(findOne(deleteCaseParams.getUseCaseId()));
