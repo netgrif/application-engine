@@ -2126,6 +2126,7 @@ class ActionDelegate {
         caseViewBody.setAllowHeaderTableMode(true)
         caseViewBody.setShowCreateCaseButton(false)
         caseViewBody.setShowMoreMenu(true)
+        resolveDefaultHeaders(caseViewBody, defaultHeaders)
 
         TabbedSingleTaskViewBody taskViewBody = new TabbedSingleTaskViewBody()
         taskViewBody.setTransitionId(transitionId)
@@ -2169,15 +2170,18 @@ class ActionDelegate {
         caseViewBody.setAllowHeaderTableMode(true)
         caseViewBody.setShowCreateCaseButton(false)
         caseViewBody.setShowMoreMenu(true)
-
-        if (defaultHeaders == null) {
-            caseViewBody.setUseDefaultHeaders(false)
-        } else {
-            caseViewBody.setUseDefaultHeaders(true)
-            caseViewBody.setDefaultHeaders(defaultHeaders)
-        }
+        resolveDefaultHeaders(caseViewBody, defaultHeaders)
 
         return caseViewBody
+    }
+
+    protected static void resolveDefaultHeaders(TabbedCaseViewBody viewBody, List<String> defaultHeaders) {
+        if (defaultHeaders == null) {
+            viewBody.setUseDefaultHeaders(false)
+        } else {
+            viewBody.setUseDefaultHeaders(true)
+            viewBody.setDefaultHeaders(defaultHeaders)
+        }
     }
 
     protected ViewBody createLegacyMenuItemViews(Case filterCase, List<String> caseDefaultHeaders = null,
@@ -2192,7 +2196,7 @@ class ActionDelegate {
         if (filterBody.getType() == "Case") {
             ViewBody caseView = new TabbedCaseViewBody()
             caseView.setFilterBody(filterBody)
-            caseView.setDefaultHeaders(caseDefaultHeaders)
+            resolveDefaultHeaders(caseView, caseDefaultHeaders)
             caseView.setRequireTitleInCreation(true)
 
             ViewBody taskView = new TabbedTaskViewBody()
@@ -2427,14 +2431,11 @@ class ActionDelegate {
         Map<String, PetriNet> temp = [:]
         return roles.collectEntries { entry ->
             if (entry.value == GLOBAL_ROLE) {
-                Set<ProcessRole> findGlobalRole = processRoleService.findAllByImportId(ProcessRole.GLOBAL + entry.key)
-                if (findGlobalRole == null || findGlobalRole.isEmpty()) {
+                List<ProcessRole> roleList = processRoleService.findAllByImportId(ProcessRole.GLOBAL + entry.key, Pageable.ofSize(1)).getContent()
+                if (roleList.isEmpty()) {
                     return
                 }
-                ProcessRole role = findGlobalRole.find { it.isGlobal() }
-                if (role == null) {
-                    return
-                }
+                ProcessRole role = roleList.getFirst()
                 return [(role.importId + ":" + GLOBAL_ROLE), ("$role.name (🌍 Global role)" as String)]
             } else {
                 if (!temp.containsKey(entry.value)) {
