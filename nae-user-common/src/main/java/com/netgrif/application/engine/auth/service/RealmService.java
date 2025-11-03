@@ -1,21 +1,20 @@
 package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.auth.provider.AbstractAuthConfig;
-import com.netgrif.application.engine.auth.realm.request.RealmSearch;
+import com.netgrif.application.engine.objects.dto.request.realm.RealmSearchDto;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
 import com.netgrif.application.engine.objects.auth.provider.AuthMethodConfig;
 import com.netgrif.application.engine.objects.auth.provider.RealmUpdate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Map;
 import java.util.Optional;
 
 public interface RealmService {
 
     Realm createRealm(Realm realm);
 
-    Page<Realm> search(RealmSearch nodeProbe, Pageable pageable);
+    Page<Realm> search(RealmSearchDto nodeProbe, Pageable pageable);
 
     void enableAnonymUser(Realm realm);
 

@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
+import com.netgrif.application.engine.objects.dto.response.petrinet.PetriNetReferenceDto
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.Arc
@@ -10,7 +11,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.arcs.ReadArc
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.ResetArc
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -97,7 +97,7 @@ class PetriNetTest {
         def netOptional3 = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
         assert netOptional3.getNet() != null
 
-        Page<PetriNetReference> nets = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK, Pageable.unpaged())
+        Page<PetriNetReferenceDto> nets = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK, Pageable.unpaged())
         assert nets.findAll { it.identifier in [netOptional.getNet().identifier, netOptional3.getNet().identifier] }.size() == 2
         assert nets.find { it.identifier == "new_model" }.version == "1.0.0"
         assert nets.find { it.identifier == "test" }.version == "2.0.0"
@@ -122,7 +122,7 @@ class PetriNetTest {
         def lastImport = petriNetService.importPetriNet(netResource4.inputStream, VersionType.PATCH, superCreator.loggedSuper)
         assert lastImport.getNet().version.toString() == "3.1.1"
 
-        Page<PetriNetReference> nets = petriNetService.getByIdentifier(zeroImport.getNet().identifier, Pageable.unpaged())
+        Page<PetriNet> nets = petriNetService.getByIdentifier(zeroImport.getNet().identifier, Pageable.unpaged())
         assert nets.getSize() == 5
     }
 

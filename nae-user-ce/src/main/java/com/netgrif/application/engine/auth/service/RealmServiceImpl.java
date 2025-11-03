@@ -7,7 +7,7 @@ import com.netgrif.application.engine.auth.provider.AbstractAuthConfig;
 import com.netgrif.application.engine.auth.provider.AuthMethodProvider;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
 import com.netgrif.application.engine.auth.provider.ProviderRegistry;
-import com.netgrif.application.engine.auth.realm.request.RealmSearch;
+import com.netgrif.application.engine.objects.dto.request.realm.RealmSearchDto;
 import com.netgrif.application.engine.auth.repository.RealmRepository;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
 import com.netgrif.application.engine.objects.auth.domain.User;
@@ -90,7 +90,7 @@ public class RealmServiceImpl implements RealmService {
     }
 
     @Override
-    public Page<Realm> search(RealmSearch nodeProbe, Pageable pageable) {
+    public Page<Realm> search(RealmSearchDto nodeProbe, Pageable pageable) {
         return realmRepository.searchRealms(nodeProbe, pageable, mongoTemplate).map(Realm.class::cast);
     }
 

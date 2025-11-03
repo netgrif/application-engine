@@ -1,9 +1,8 @@
 package com.netgrif.application.engine.workflow.domain.repositories;
 
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.dto.response.petrinet.PetriNetReferenceDto;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
-import com.netgrif.application.engine.petrinet.web.responsebodies.Reference;
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase;
 import com.netgrif.application.engine.objects.workflow.domain.QDataField;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -32,9 +31,9 @@ public abstract class CaseRepositoryImpl implements CaseRepository {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         // TODO: impersonation
 //        List<PetriNetReference> nets = petriNetService.getReferencesByUsersProcessRoles(((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated(), null);
-        List<PetriNetReference> nets = petriNetService.getReferencesByUsersProcessRoles(((LoggedUser) auth.getPrincipal()), null);
-        Set<String> netIds = nets.stream().map(Reference::getStringId).collect(Collectors.toSet());
-        Set<String> netIdentifiers = nets.stream().map(PetriNetReference::getIdentifier).collect(Collectors.toSet());
+        List<PetriNetReferenceDto> nets = petriNetService.getReferencesByUsersProcessRoles(((LoggedUser) auth.getPrincipal()), null);
+        Set<String> netIds = nets.stream().map(PetriNetReferenceDto::stringId).collect(Collectors.toSet());
+        Set<String> netIdentifiers = nets.stream().map(PetriNetReferenceDto::identifier).collect(Collectors.toSet());
 
         bindings.bind(qCase.petriNetId).first((stringPath, s) -> {
             if (!netIds.contains(s))

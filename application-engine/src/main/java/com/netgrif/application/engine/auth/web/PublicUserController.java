@@ -2,12 +2,12 @@ package com.netgrif.application.engine.auth.web;
 
 import com.netgrif.application.engine.auth.service.PreferencesService;
 import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.auth.web.requestbodies.PreferencesRequest;
-import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.application.engine.auth.web.responsebodies.PreferencesResource;
-import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.dto.PreferencesDto;
+import com.netgrif.application.engine.objects.dto.request.user.UserSearchRequestBody;
+import com.netgrif.application.engine.objects.dto.response.user.UserDto;
 import com.netgrif.application.engine.objects.preferences.Preferences;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +28,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Locale;
 
 @Slf4j
 @RestController
@@ -53,7 +54,7 @@ public class PublicUserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> getLoggedUser(Authentication auth) {
+    public ResponseEntity<UserDto> getLoggedUser(Authentication auth) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         AbstractUser user;
         try {
@@ -67,7 +68,7 @@ public class PublicUserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        return ResponseEntity.ok(User.createUser(user));
+        return ResponseEntity.ok(UserDto.fromAbstractUser(user));
     }
 
     @ApiResponses(value = {
@@ -77,12 +78,10 @@ public class PublicUserController {
     })
     @Operation(summary = "Generic user search", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<User>> search(@RequestBody UserSearchRequestBody query, Pageable pageable, Authentication auth) {
-        List<ProcessResourceId> roles = query.getRoles() == null ? null : query.getRoles().stream().map(ProcessResourceId::new).toList();
-        List<ProcessResourceId> negativeRoles = query.getNegativeRoles() == null ? null : query.getNegativeRoles().stream().map(ProcessResourceId::new).toList();
-        Page<AbstractUser> users = userService.searchAllCoMembers(query.getFulltext(),
+    public ResponseEntity<Page<UserDto>> search(@RequestBody UserSearchRequestBody query, Pageable pageable, Authentication auth, Locale locale) {
+        List<ProcessResourceId> roles = query.roles() == null ? null : query.roles().stream().map(ProcessResourceId::new).toList();
+        Page<AbstractUser> users = userService.searchAllCoMembers(query.fulltext(),
                 roles,
-                negativeRoles,
                 (LoggedUser) auth.getPrincipal(), pageable);
         return ResponseEntity.ok(changeToResponse(users, pageable));
     }
@@ -101,7 +100,7 @@ public class PublicUserController {
         if (preferences == null) {
             preferences = new com.netgrif.application.engine.adapter.spring.preferences.Preferences(userId);
         }
-        PreferencesResource preferencesResource = PreferencesResource.withPreferences(preferences);
+        PreferencesResource preferencesResource = PreferencesResource.withPreferences(PreferencesDto.fromPreferences(preferences));
 
         return ResponseEntity.ok(preferencesResource);
     }
@@ -115,11 +114,11 @@ public class PublicUserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> savePreferences(@RequestBody PreferencesRequest preferences, Authentication auth) {
+    public ResponseEntity<String> savePreferences(@RequestBody PreferencesDto preferences, Authentication auth) {
         try {
             String userId = ((LoggedUser) auth.getPrincipal()).getStringId();
-            preferences.setUserId(userId);
-            preferencesService.save(preferences.toPreferences());
+            Preferences domainPreferences = com.netgrif.application.engine.adapter.spring.preferences.Preferences.fromDto(preferences, userId);
+            preferencesService.save(domainPreferences);
             return ResponseEntity.ok("User preferences saved");
         } catch (Exception e) {
             log.error("Saving user preferences failed", e);
@@ -127,12 +126,12 @@ public class PublicUserController {
         }
     }
 
-    private Page<User> changeToResponse(Page<AbstractUser> users, Pageable pageable) {
+    private Page<UserDto> changeToResponse(Page<AbstractUser> users, Pageable pageable) {
         return new PageImpl<>(changeType(users.getContent()), pageable, users.getTotalElements());
     }
 
-    public List<User> changeType(List<AbstractUser> users) {
-        return users.stream().map(User::createUser).toList();
+    public List<UserDto> changeType(List<AbstractUser> users) {
+        return users.stream().map(UserDto::fromAbstractUser).toList();
     }
 
 }

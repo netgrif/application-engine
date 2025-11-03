@@ -55,7 +55,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     @Override
     public Page<AbstractUser> getConfiguredImpersonationUsers(String query, LoggedUser impersonator, Pageable pageable) {
         if (impersonator.isAdmin()) {
-            return userService.searchAllCoMembers(query, null, null, impersonator, pageable);
+            return userService.searchAllCoMembers(query, null, impersonator, pageable);
 
         } else {
             Page<Case> cases = searchConfigs(impersonator.getStringId(), pageable);

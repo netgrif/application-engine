@@ -7,11 +7,11 @@ import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.dto.response.petrinet.PetriNetReferenceDto;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticPetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +107,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
      * @return Page<PetriNetReference> - page of PetriNetReferences
      */
     @Override
-    public Page<PetriNetReference> search(PetriNetSearch requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+    public Page<PetriNetReferenceDto> search(PetriNetSearch requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
         if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
@@ -129,7 +129,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
             total = 0;
         }
 
-        return new PageImpl<>(netPage.stream().map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()), pageable, total);
+        return new PageImpl<>(netPage.stream().map(net -> PetriNetReferenceDto.fromPetriNet(net, locale)).collect(Collectors.toList()), pageable, total);
     }
 
     protected NativeQuery buildQuery(PetriNetSearch request, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
@@ -191,12 +191,12 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
 
         PetriNetSearch processQuery = new PetriNetSearch();
         processQuery.setGroup(request.getGroup());
-        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
+        List<PetriNetReferenceDto> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
         if (groupProcesses.isEmpty())
             return true;
 
         BoolQuery.Builder groupQuery = new BoolQuery.Builder();
-        groupProcesses.stream().map(PetriNetReference::getIdentifier)
+        groupProcesses.stream().map(PetriNetReferenceDto::identifier)
                 .map(netIdentifier -> termQuery("identifier", netIdentifier))
                 .forEach(termQuery -> groupQuery.should(termQuery._toQuery()));
         query.filter(groupQuery.build()._toQuery());

@@ -19,12 +19,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Configuration
-@EnableElasticsearchRepositories(excludeFilters = {
-        @ComponentScan.Filter(
-                type = FilterType.REGEX,
-                pattern = "com\\.netgrif\\.application\\.engine\\.module\\..*"
-        )
-})
+@EnableElasticsearchRepositories(
+        basePackages = "com.netgrif.application.engine.elastic.domain",
+        excludeFilters = {
+                @ComponentScan.Filter(
+                        type = FilterType.REGEX,
+                        pattern = "com\\.netgrif\\.application\\.engine\\.module\\..*"
+                )
+        })
 public class ElasticsearchConfiguration extends org.springframework.data.elasticsearch.client.elc.ElasticsearchConfiguration {
 
     private final DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;

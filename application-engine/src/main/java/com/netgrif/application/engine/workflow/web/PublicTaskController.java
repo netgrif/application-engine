@@ -50,14 +50,12 @@ public class PublicTaskController extends AbstractTaskController {
 
     final UserService userService;
     private final ITaskService taskService;
-    private final IDataService dataService;
 
     public PublicTaskController(ITaskService taskService,
                                 IDataService dataService,
                                 UserService userService) {
         super(taskService, dataService, null, userService);
         this.taskService = taskService;
-        this.dataService = dataService;
         this.userService = userService;
     }
 

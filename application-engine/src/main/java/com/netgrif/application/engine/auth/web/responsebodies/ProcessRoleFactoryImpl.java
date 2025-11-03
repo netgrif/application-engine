@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.auth.web.responsebodies;
 
-import com.netgrif.application.engine.adapter.spring.petrinet.web.responsebodies.ProcessRole;
 import com.netgrif.application.engine.auth.service.ProcessRoleFactory;
+import com.netgrif.application.engine.objects.dto.response.petrinet.ProcessRoleDto;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import org.bson.types.ObjectId;
@@ -17,19 +17,15 @@ public class ProcessRoleFactoryImpl implements ProcessRoleFactory {
     private IPetriNetService petriNetService;
 
     @Override
-    public ProcessRole getProcessRole(com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole role, Locale locale) {
+    public ProcessRoleDto getProcessRole(com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole role, Locale locale) {
         /*if (!role.getStringId().equals(userProcessRole.getRoleId())) {
             throw new IllegalArgumentException(String.format("ProcessRole StringId (%s) and UserProcessRole roleId (%s) must match!", role.getStringId(), userProcessRole.getRoleId()));
         }*/
         if (!role.isGlobal()) {
-            ProcessRole result = new ProcessRole(role, locale);
             PetriNet net = petriNetService.get(new ObjectId(role.getProcessId()));
-            result.setNetStringId(net.getStringId());
-            result.setNetImportId(net.getImportId());
-            result.setNetVersion(net.getVersion().toString());
-            return result;
+            return new ProcessRoleDto(role, locale, net.getImportId(), net.getVersion().toString(), net.getStringId());
         }
-        return new ProcessRole(role, locale);
+        return new ProcessRoleDto(role, locale);
     }
 
 }

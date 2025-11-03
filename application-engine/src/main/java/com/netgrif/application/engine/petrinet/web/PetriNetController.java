@@ -6,6 +6,9 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNe
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.dto.response.petrinet.PetriNetImportReferenceDto;
+import com.netgrif.application.engine.objects.dto.response.petrinet.PetriNetReferenceDto;
+import com.netgrif.application.engine.objects.dto.response.petrinet.TransitionReferenceDto;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
@@ -122,15 +125,15 @@ public class PetriNetController {
 
     @Operation(summary = "Get all processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
-    public ResponseEntity<Page<PetriNetReference>> getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Pageable pageable, Authentication auth, Locale locale) {
+    public ResponseEntity<Page<PetriNetReferenceDto>> getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Pageable pageable, Authentication auth, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         if (identifier != null && version == null) {
             return ResponseEntity.ok(service.getReferencesByIdentifier(identifier, user, locale, pageable));
         } else if (identifier == null && version != null) {
             return ResponseEntity.ok(service.getReferencesByVersion(converter.convert(version), user, locale, pageable));
         } else if (identifier != null) {
-            PetriNetReference reference = service.getReference(identifier, converter.convert(version), user, locale);
-            return ResponseEntity.ok(new PageImpl<>(Collections.singletonList(reference), pageable, reference.getIdentifier().isEmpty() ? 0 : 1));
+            PetriNetReferenceDto reference = service.getReference(identifier, converter.convert(version), user, locale);
+            return ResponseEntity.ok(new PageImpl<>(Collections.singletonList(reference), pageable, reference == null ? 0 : 1));
         } else {
             return ResponseEntity.ok(service.getReferences(user, locale, pageable));
         }
@@ -158,7 +161,7 @@ public class PetriNetController {
 
     @Operation(summary = "Get data fields of transitions", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/data", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public DataFieldReferencesResource getDataFieldReferences(@RequestBody List<TransitionReference> referenceBody, Locale locale) {
+    public DataFieldReferencesResource getDataFieldReferences(@RequestBody List<TransitionReferenceDto> referenceBody, Locale locale) {
         return new DataFieldReferencesResource(service.getDataFieldReferences(referenceBody, locale));
     }
 
@@ -191,20 +194,20 @@ public class PetriNetController {
     @Operation(summary = "Search processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search", produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
-    ResponseEntity<Page<PetriNetReferenceResource>> searchPetriNets(@RequestBody PetriNetSearch criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
+    ResponseEntity<Page<PetriNetReferenceResource>> searchPetriNets(@RequestBody PetriNetSearch criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReferenceDto> assembler, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
-        Page<PetriNetReference> nets = service.search(criteria, user, pageable, locale);
+        Page<PetriNetReferenceDto> nets = service.search(criteria, user, pageable, locale);
         return ResponseEntity.ok(new PageImpl<>(nets.stream().map(PetriNetReferenceResource::new).toList(), pageable, nets.getTotalElements()));
     }
 
     @Operation(summary = "Search elastic processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search_elastic", produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
-    PagedModel<PetriNetReferenceResource> searchElasticPetriNets(@RequestBody PetriNetSearch criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
+    PagedModel<PetriNetReferenceResource> searchElasticPetriNets(@RequestBody PetriNetSearch criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReferenceDto> assembler, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         // TODO: add Merge Filters and its operations
 
-        Page<PetriNetReference> nets = elasticService.search(criteria, user, pageable, locale, false);
+        Page<PetriNetReferenceDto> nets = elasticService.search(criteria, user, pageable, locale, false);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
                 .searchElasticPetriNets(criteria, auth, pageable, assembler, locale)).withRel("search_elastic");
 
@@ -236,7 +239,7 @@ public class PetriNetController {
 
     @Operation(summary = "Get net by case id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public PetriNetImportReference getOne(@PathVariable("id") String caseId) {
+    public PetriNetImportReferenceDto getOne(@PathVariable("id") String caseId) {
         return service.getNetFromCase(decodeUrl(caseId));
     }
 }

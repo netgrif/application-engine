@@ -2,8 +2,8 @@ package com.netgrif.application.engine.workflow.web.responsebodies;
 
 
 import com.netgrif.application.engine.objects.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
+import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.web.TaskController;
 import com.netgrif.application.engine.workflow.web.WorkflowController;
 import org.springframework.hateoas.PagedModel;
@@ -45,7 +45,7 @@ public class ResourceLinkAssembler {
     private static void addCasesLinks(PagedModel pagedResources, String selfRel) {
         if (!selfRel.equalsIgnoreCase("all"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
-                    .getAll(null, null)).withRel("all"));
+                    .getAll(null, null, null)).withRel("all"));
         if (!selfRel.equalsIgnoreCase("search"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                     .search(null, MergeFilterOperation.OR, null, null, null, null)).withRel("search"));
@@ -54,7 +54,7 @@ public class ResourceLinkAssembler {
                     .count(null, MergeFilterOperation.OR, null, null)).withRel("count"));
         if (!selfRel.equalsIgnoreCase("author"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
-                    .findAllByAuthor(null, "", null, null)).withRel("author"));
+                    .findAllByAuthor(null, "", null, null, null)).withRel("author"));
     }
 
 

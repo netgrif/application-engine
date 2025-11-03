@@ -5,9 +5,8 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
+import com.netgrif.application.engine.objects.dto.response.petrinet.*;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.ArcImportReference;
-import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
@@ -29,7 +28,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingI
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.objects.petrinet.domain.version.Version;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
@@ -318,15 +316,13 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public PetriNetImportReference getNetFromCase(String caseId) {
+    public PetriNetImportReferenceDto getNetFromCase(String caseId) {
         Case useCase = workflowService.findOne(caseId);
-        PetriNetImportReference pn = new PetriNetImportReference();
-        useCase.getPetriNet().getTransitions().forEach((key, value) -> pn.getTransitions().add(new TransitionImportReference(value)));
-        useCase.getPetriNet().getPlaces().forEach((key, value) -> pn.getPlaces().add(new PlaceImportReference(value)));
-        useCase.getPetriNet().getArcs().forEach((key, arcs) -> {
-            arcs.forEach(arc -> pn.getArcs().add(new ArcImportReference(arc)));
-        });
-        return pn;
+        PetriNet net = useCase.getPetriNet();
+        List<TransitionImportReferenceDto> transitions = net.getTransitions().values().stream().map(TransitionImportReferenceDto::fromTransition).toList();
+        List<PlaceImportReferenceDto> places = net.getPlaces().values().stream().map(PlaceImportReferenceDto::fromPlace).toList();
+        List<ArcImportReferenceDto> arcs = net.getArcs().values().stream().map(value -> value.stream().map(ArcImportReferenceDto::fromArc).collect(Collectors.toList())).flatMap(Collection::stream).toList();
+        return new PetriNetImportReferenceDto(transitions, places, arcs, null, null);
     }
 
     @Override
@@ -357,18 +353,18 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public Page<PetriNetReference> getReferences(LoggedUser user, Locale locale, Pageable pageable) {
+    public Page<PetriNetReferenceDto> getReferences(LoggedUser user, Locale locale, Pageable pageable) {
         return getAll(pageable).map(net -> transformToReference(net, locale));
     }
 
     @Override
-    public Page<PetriNetReference> getReferencesByIdentifier(String identifier, LoggedUser user, Locale locale, Pageable pageable) {
+    public Page<PetriNetReferenceDto> getReferencesByIdentifier(String identifier, LoggedUser user, Locale locale, Pageable pageable) {
         return getByIdentifier(identifier, pageable).map(net -> transformToReference(net, locale));
     }
 
     @Override
-    public Page<PetriNetReference> getReferencesByVersion(Version version, LoggedUser user, Locale locale, Pageable pageable) {
-        Page<PetriNetReference> references;
+    public Page<PetriNetReferenceDto> getReferencesByVersion(Version version, LoggedUser user, Locale locale, Pageable pageable) {
+        Page<PetriNetReferenceDto> references;
         if (version == null) {
             GroupOperation groupByIdentifier = Aggregation.group("identifier").max("version").as("version");
             Aggregation aggregation;
@@ -385,7 +381,7 @@ public class PetriNetService implements IPetriNetService {
                 );
             }
             List<Document> results = mongoTemplate.aggregate(aggregation, "petriNet", Document.class).getMappedResults();
-            List<PetriNetReference> referenceList = results.stream()
+            List<PetriNetReferenceDto> referenceList = results.stream()
                     .map(doc -> {
                         Document versionDoc = doc.get("version", Document.class);
                         Version refVersion = new Version(versionDoc.getLong("major"), versionDoc.getLong("minor"), versionDoc.getLong("patch"));
@@ -415,21 +411,21 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNetReference> getReferencesByUsersProcessRoles(LoggedUser user, Locale locale) {
+    public List<PetriNetReferenceDto> getReferencesByUsersProcessRoles(LoggedUser user, Locale locale) {
         Query query = Query.query(getProcessRolesCriteria(user));
         return mongoTemplate.find(query, com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class).stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
     }
 
     @Override
-    public PetriNetReference getReference(String identifier, Version version, LoggedUser user, Locale locale) {
+    public PetriNetReferenceDto getReference(String identifier, Version version, LoggedUser user, Locale locale) {
         PetriNet net = version == null ? getNewestVersionByIdentifier(identifier) : getPetriNet(identifier, version);
-        return net != null ? transformToReference(net, locale) : new PetriNetReference();
+        return net != null ? transformToReference(net, locale) : null;
     }
 
     @Override
-    public List<TransitionReference> getTransitionReferences(List<String> netIds, LoggedUser user, Locale locale) {
+    public List<TransitionReferenceDto> getTransitionReferences(List<String> netIds, LoggedUser user, Locale locale) {
         Iterable<PetriNet> nets = get(netIds);
-        List<TransitionReference> references = new ArrayList<>();
+        List<TransitionReferenceDto> references = new ArrayList<>();
 
         nets.forEach(net -> references.addAll(net.getTransitions().entrySet().stream()
                 .map(entry -> transformToReference(net, entry.getValue(), locale)).collect(Collectors.toList())));
@@ -438,16 +434,16 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<DataFieldReference> getDataFieldReferences(List<TransitionReference> transitions, Locale locale) {
-        Iterable<PetriNet> nets = repository.findAllById(transitions.stream().map(TransitionReference::getPetriNetId).collect(Collectors.toList()));
-        List<DataFieldReference> dataRefs = new ArrayList<>();
-        Map<String, List<TransitionReference>> transitionReferenceMap = transitions.stream()
-                .collect(Collectors.groupingBy(TransitionReference::getPetriNetId));
+    public List<DataFieldReferenceDto> getDataFieldReferences(List<TransitionReferenceDto> transitions, Locale locale) {
+        Iterable<PetriNet> nets = repository.findAllById(transitions.stream().map(TransitionReferenceDto::petriNetId).collect(Collectors.toList()));
+        List<DataFieldReferenceDto> dataRefs = new ArrayList<>();
+        Map<String, List<TransitionReferenceDto>> transitionReferenceMap = transitions.stream()
+                .collect(Collectors.groupingBy(TransitionReferenceDto::petriNetId));
 
         nets.forEach(net -> transitionReferenceMap.get(net.getStringId())
                 .forEach(transition -> {
                     Transition trans;
-                    if ((trans = net.getTransition(transition.getStringId())) != null) {
+                    if ((trans = net.getTransition(transition.stringId())) != null) {
                         dataRefs.addAll(trans.getDataSet().entrySet().stream()
                                 .map(entry -> transformToReference(net, trans, net.getDataSet().get(entry.getKey()), locale))
                                 .collect(Collectors.toList()));
@@ -463,7 +459,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public Page<PetriNetReference> search(PetriNetSearch criteriaClass, LoggedUser user, Pageable pageable, Locale locale) {
+    public Page<PetriNetReferenceDto> search(PetriNetSearch criteriaClass, LoggedUser user, Pageable pageable, Locale locale) {
         Query query = new Query();
         Query queryTotal = new Query();
 
@@ -520,7 +516,7 @@ public class PetriNetService implements IPetriNetService {
 
         query.with(pageable);
         List<com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet> nets = mongoTemplate.find(query, com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class);
-        return new PageImpl<>(nets.stream().map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()), pageable, mongoTemplate.count(queryTotal, com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class));
+        return new PageImpl<>(nets.stream().map(net -> PetriNetReferenceDto.fromPetriNet(net, locale)).collect(Collectors.toList()), pageable, mongoTemplate.count(queryTotal, com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class));
     }
 
     private void addValueCriteria(Query query, Query queryTotal, Criteria criteria) {

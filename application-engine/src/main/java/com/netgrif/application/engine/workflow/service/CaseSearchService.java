@@ -2,13 +2,13 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.FieldFactory;
+import com.netgrif.application.engine.objects.dto.response.petrinet.PetriNetReferenceDto;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
@@ -140,7 +140,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     public Predicate petriNet(Object query, LoggedUser user, Locale locale) {
-        List<PetriNetReference> allowedNets = petriNetService.getReferencesByUsersProcessRoles(user, locale);
+        List<PetriNetReferenceDto> allowedNets = petriNetService.getReferencesByUsersProcessRoles(user, locale);
         if (query instanceof ArrayList) {
             List<Predicate> expressions = (List<Predicate>) ((ArrayList) query).stream().filter(q -> q instanceof HashMap).map(q -> petriNetObject((HashMap<String, String>) q, allowedNets)).collect(Collectors.toList());
             return constructPredicateTree(expressions, BooleanBuilder::or);
@@ -150,8 +150,8 @@ public class CaseSearchService extends MongoSearchService<Case> {
         return null;
     }
 
-    private static BooleanExpression petriNetObject(HashMap<String, String> query, List<PetriNetReference> allowedNets) {
-        if (query.containsKey(PETRINET_IDENTIFIER) && allowedNets.stream().anyMatch(net -> net.getIdentifier().equalsIgnoreCase(query.get(PETRINET_IDENTIFIER))))
+    private static BooleanExpression petriNetObject(HashMap<String, String> query, List<PetriNetReferenceDto> allowedNets) {
+        if (query.containsKey(PETRINET_IDENTIFIER) && allowedNets.stream().anyMatch(net -> net.identifier().equalsIgnoreCase(query.get(PETRINET_IDENTIFIER))))
             return QCase.case$.processIdentifier.equalsIgnoreCase(query.get(PETRINET_IDENTIFIER));
         return null;
     }
@@ -363,11 +363,11 @@ public class CaseSearchService extends MongoSearchService<Case> {
         } else if (query instanceof String) {
             processQuery.setGroup(new ArrayList<>(Arrays.asList((String) query)));
         }
-        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
-        if (groupProcesses.size() == 0)
+        List<PetriNetReferenceDto> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
+        if (groupProcesses.isEmpty())
             return null;
 
-        List<Predicate> processQueries = groupProcesses.stream().map(PetriNetReference::getIdentifier).map(QCase.case$.processIdentifier::eq).collect(Collectors.toList());
+        List<Predicate> processQueries = groupProcesses.stream().map(PetriNetReferenceDto::identifier).map(QCase.case$.processIdentifier::eq).collect(Collectors.toList());
         return constructPredicateTree(processQueries, BooleanBuilder::or);
     }
 }

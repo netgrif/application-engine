@@ -3,15 +3,15 @@ package com.netgrif.application.engine.auth.web;
 import com.netgrif.application.engine.adapter.spring.common.web.responsebodies.ResponseMessage;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.auth.service.*;
-import com.netgrif.application.engine.auth.web.requestbodies.PreferencesRequest;
-import com.netgrif.application.engine.auth.web.requestbodies.UserCreateRequest;
-import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.application.engine.auth.web.responsebodies.PreferencesResource;
-import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
+import com.netgrif.application.engine.objects.dto.PreferencesDto;
+import com.netgrif.application.engine.objects.dto.request.user.UserCreateRequest;
+import com.netgrif.application.engine.objects.dto.request.user.UserSearchRequestBody;
+import com.netgrif.application.engine.objects.dto.response.authority.AuthorityDto;
+import com.netgrif.application.engine.objects.dto.response.user.UserDto;
 import com.netgrif.application.engine.objects.preferences.Preferences;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import io.swagger.v3.oas.annotations.Operation;
@@ -62,25 +62,25 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/{realmId}")
-    public ResponseEntity<User> createUser(@PathVariable String realmId, @RequestBody UserCreateRequest request, Locale locale) {
+    public ResponseEntity<UserDto> createUser(@PathVariable String realmId, @RequestBody UserCreateRequest request, Locale locale) {
         try {
             if (!realmExists(realmId)) {
                 log.error("Realm with id [{}] not found", realmId);
                 return ResponseEntity.badRequest().build();
             }
-            if (userService.findUserByUsername(request.getUsername(), realmId).isPresent()) {
-                log.error("User with username [{}] already exists in realm [{}]", request.getUsername(), realmId);
+            if (userService.findUserByUsername(request.username(), realmId).isPresent()) {
+                log.error("User with username [{}] already exists in realm [{}]", request.username(), realmId);
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
             AbstractUser user = userService.createUser(
-                    request.getUsername(),
-                    request.getEmail(),
-                    request.getFirstName(),
-                    request.getLastName(),
-                    request.getPassword(),
+                    request.username(),
+                    request.email(),
+                    request.firstName(),
+                    request.lastName(),
+                    request.password(),
                     realmId
             );
-            log.info("New user with username [{}] has been created in realm [{}]", request.getUsername(), realmId);
+            log.info("New user with username [{}] has been created in realm [{}]", request.username(), realmId);
             return ResponseEntity.status(HttpStatus.CREATED).body(userFactory.getUser(user, locale));
         } catch (Exception e) {
             log.error("Failed to create user", e);
@@ -95,7 +95,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{realmId}/all")
-    public ResponseEntity<Page<User>> getAllUsers(@PathVariable String realmId, Pageable pageable, Locale locale) {
+    public ResponseEntity<Page<UserDto>> getAllUsers(@PathVariable String realmId, Pageable pageable, Locale locale) {
         if (!realmExists(realmId)) {
             log.error("Realm with id [{}] not found", realmId);
             return ResponseEntity.badRequest().build();
@@ -111,7 +111,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> getLoggedUser(Authentication auth, Locale locale) {
+    public ResponseEntity<UserDto> getLoggedUser(Authentication auth, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         AbstractUser user;
         try {
@@ -135,12 +135,10 @@ public class UserController {
     })
     @Operation(summary = "Generic user search", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<User>> search(@RequestBody UserSearchRequestBody query, Pageable pageable, Authentication auth, Locale locale) {
-        List<ProcessResourceId> roles = query.getRoles() == null ? null : query.getRoles().stream().map(ProcessResourceId::new).toList();
-        List<ProcessResourceId> negativeRoles = query.getNegativeRoles() == null ? null : query.getNegativeRoles().stream().map(ProcessResourceId::new).toList();
-        Page<AbstractUser> users = userService.searchAllCoMembers(query.getFulltext(),
+    public ResponseEntity<Page<UserDto>> search(@RequestBody UserSearchRequestBody query, Pageable pageable, Authentication auth, Locale locale) {
+        List<ProcessResourceId> roles = query.roles() == null ? null : query.roles().stream().map(ProcessResourceId::new).toList();
+        Page<AbstractUser> users = userService.searchAllCoMembers(query.fulltext(),
                 roles,
-                negativeRoles,
                 (LoggedUser) auth.getPrincipal(), pageable);
         return ResponseEntity.ok(changeToResponse(users, pageable, locale));
     }
@@ -153,7 +151,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping(value = "/{realmId}/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> getUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, Locale locale) {
+    public ResponseEntity<UserDto> getUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, Locale locale) {
         LoggedUser actualUser = userService.getLoggedUserFromContext();
         // TODO: impersonation
 //        LoggedUser loggedUser = actualUser.getSelfOrImpersonated();
@@ -261,8 +259,8 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<List<Authority>> getAllAuthorities() {
-        return ResponseEntity.ok(authorityService.findAll(Pageable.unpaged()).stream().toList());
+    public ResponseEntity<List<AuthorityDto>> getAllAuthorities() {
+        return ResponseEntity.ok(authorityService.findAll(Pageable.unpaged()).stream().map(AuthorityDto::fromAuthority).toList());
     }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
@@ -300,7 +298,7 @@ public class UserController {
         if (preferences == null) {
             preferences = new com.netgrif.application.engine.adapter.spring.preferences.Preferences(userId);
         }
-        PreferencesResource preferencesResource = PreferencesResource.withPreferences(preferences);
+        PreferencesResource preferencesResource = PreferencesResource.withPreferences(PreferencesDto.fromPreferences(preferences));
 
         return ResponseEntity.ok(preferencesResource);
     }
@@ -313,11 +311,11 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseMessage> savePreferences(@RequestBody PreferencesRequest preferences, Authentication auth) {
+    public ResponseEntity<ResponseMessage> savePreferences(@RequestBody PreferencesDto preferences, Authentication auth) {
         try {
             String userId = ((LoggedUser) auth.getPrincipal()).getStringId();
-            preferences.setUserId(userId);
-            preferencesService.save(preferences.toPreferences());
+            Preferences domainPreferences = com.netgrif.application.engine.adapter.spring.preferences.Preferences.fromDto(preferences, userId);
+            preferencesService.save(domainPreferences);
             return ResponseEntity.ok(ResponseMessage.createSuccessMessage("User preferences saved"));
         } catch (Exception e) {
             log.error("Saving user preferences failed", e);
@@ -325,11 +323,11 @@ public class UserController {
         }
     }
 
-    private Page<User> changeToResponse(Page<AbstractUser> users, Pageable pageable, Locale locale) {
+    private Page<UserDto> changeToResponse(Page<AbstractUser> users, Pageable pageable, Locale locale) {
         return new PageImpl<>(changeType(users.getContent(), locale), pageable, users.getTotalElements());
     }
 
-    public List<User> changeType(List<AbstractUser> users, Locale locale) {
+    public List<UserDto> changeType(List<AbstractUser> users, Locale locale) {
         return users.stream().map(u -> userFactory.getUser(u, locale)).toList();
     }
 
