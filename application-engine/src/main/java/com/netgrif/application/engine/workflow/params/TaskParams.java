@@ -30,6 +30,9 @@ public class TaskParams {
 
     public TaskParams(Task task, AbstractUser user) {
         this.task = task;
+        if (task != null) {
+            this.taskId = task.getStringId();
+        }
         this.user = user;
     }
 
@@ -40,5 +43,18 @@ public class TaskParams {
     public TaskParams(String taskId, AbstractUser user) {
         this.taskId = taskId;
         this.user = user;
+    }
+
+    public static class TaskParamsBuilder {
+        /**
+         * Sets the {@link #task} and {@link #taskId}
+         * */
+        public TaskParams.TaskParamsBuilder task(Task task) {
+            this.task = task;
+            if (task != null) {
+                this.taskId = task.getStringId();
+            }
+            return this;
+        }
     }
 }
