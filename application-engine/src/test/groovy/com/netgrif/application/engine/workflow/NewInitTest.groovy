@@ -52,10 +52,10 @@ class NewInitTest {
                 .author(superCreator.getLoggedSuper())
                 .build())
         Case initTestCase = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(petriNetService.getNewestVersionByIdentifier("new_init_test"))
+                .process(petriNetService.getNewestVersionByIdentifier("new_init_test"))
                 .title("New init test")
                 .color("")
-                .loggedUser(superCreator.loggedSuper)
+                .author(superCreator.loggedSuper)
                 .build()).getCase()
         assert (initTestCase.dataSet["new_init_multichoice"].value as List<I18nString>).stream().any { it.defaultValue == "Bob" }
         assert (initTestCase.dataSet["new_init_multichoice"].value as List<I18nString>).stream().any { it.defaultValue == "Alice" }

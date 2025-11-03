@@ -3,7 +3,6 @@ package com.netgrif.application.engine.petrinet.domain
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
-import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.FieldBehavior
@@ -108,10 +107,10 @@ class FunctionsTest {
         assert functionTestNet
 
         Case aCase = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(functionTestNet)
+                .process(functionTestNet)
                 .title("Test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+                .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
                 .build()).getCase()
         dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["createUser": ["value": "true", "type": "boolean"]]))
 
@@ -139,10 +138,10 @@ class FunctionsTest {
         assert functionTestNet
 
         Case aCase = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(functionTestNet)
+                .process(functionTestNet)
                 .title("Test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+                .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
                 .build()).getCase()
         dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["enum": ["value": "ano", "type": "enumeration"]]))
         aCase = workflowService.findOne(aCase.getStringId())
@@ -178,10 +177,10 @@ class FunctionsTest {
             assert functionTestNet
 
             Case aCase = workflowService.createCase(CreateCaseParams.with()
-                    .petriNet(functionTestNet)
+                    .process(functionTestNet)
                     .title("Test")
                     .color("")
-                    .loggedUser(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+                    .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
                     .build()).getCase()
             dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
         })
@@ -208,10 +207,10 @@ class FunctionsTest {
             assert functionTestNet
 
             Case aCase = workflowService.createCase(CreateCaseParams.with()
-                    .petriNet(functionTestNet)
+                    .process(functionTestNet)
                     .title("Test")
                     .color("")
-                    .loggedUser(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+                    .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
                     .build()).getCase()
             dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["text": ["value": "20", "type": "text"]]))
 
@@ -237,10 +236,10 @@ class FunctionsTest {
             assert functionTestNet
 
             Case aCase = workflowService.createCase(CreateCaseParams.with()
-                    .petriNet(functionTestNet)
+                    .process(functionTestNet)
                     .title("Test")
                     .color("")
-                    .loggedUser(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+                    .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
                     .build()).getCase()
             dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number3": ["value": "20", "type": "number"]]))
         })
@@ -263,10 +262,10 @@ class FunctionsTest {
         assert functionTestNet
 
         Case aCase = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(functionTestNet)
+                .process(functionTestNet)
                 .title("Test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+                .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
                 .build()).getCase()
         dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
         aCase = workflowService.findOne(aCase.getStringId())
@@ -311,10 +310,10 @@ class FunctionsTest {
                 .build()).getNet()
 
         Case aCase = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(functionTestV2Net)
+                .process(functionTestV2Net)
                 .title("Test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+                .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
                 .build()).getCase()
         dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["updateOtherField": ["value": "true", "type": "boolean"]]))
 
@@ -354,10 +353,10 @@ class FunctionsTest {
         assert petriNet
 
         Case aCase = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(petriNet)
+                .process(petriNet)
                 .title("Test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+                .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
                 .build()).getCase()
         dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
         aCase = workflowService.findOne(aCase.getStringId())

@@ -65,10 +65,10 @@ public class DashboardItemServiceImpl implements DashboardItemService {
 
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
         itemCase = workflowService.createCase(CreateCaseParams.with()
-                .petriNetIdentifier(DashboardItemConstants.PROCESS_IDENTIFIER)
+                .processIdentifier(DashboardItemConstants.PROCESS_IDENTIFIER)
                 .title(body.getName().getDefaultValue())
                 .color("")
-                .loggedUser(loggedUser)
+                .author(loggedUser)
                 .build()).getCase();
         ToDataSetOutcome outcome = body.toDataSet();
         itemCase = setDataWithExecute(itemCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());

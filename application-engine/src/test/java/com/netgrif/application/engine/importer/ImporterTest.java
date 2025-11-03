@@ -82,10 +82,10 @@ public class ImporterTest {
         assert outcome.getNet() != null;
 
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(outcome.getNet())
+                .process(outcome.getNet())
                 .title(outcome.getNet().getTitle().getDefaultValue())
                 .color("color")
-                .loggedUser(superCreator.getLoggedSuper())
+                .author(superCreator.getLoggedSuper())
                 .build());
 
         assert caseOutcome.getCase() != null;

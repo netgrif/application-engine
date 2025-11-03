@@ -458,10 +458,10 @@ class PredefinedRolesPermissionsTest {
         PetriNet net = importOutcome.getNet()
 
         CreateCaseEventOutcome createCaseOutcome = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(net)
+                .process(net)
                 .title('')
                 .color('')
-                .loggedUser(superCreator.loggedSuper)
+                .author(superCreator.loggedSuper)
                 .build())
         assert createCaseOutcome.getCase() != null
         Case aCase = createCaseOutcome.getCase()

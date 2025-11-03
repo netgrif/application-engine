@@ -52,7 +52,6 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
 
@@ -88,10 +87,10 @@ public class WorkflowController {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             CreateCaseEventOutcome outcome = workflowService.createCase(CreateCaseParams.with()
-                    .petriNetId(body.netId)
+                    .processId(body.netId)
                     .title(body.title)
                     .color(body.color)
-                    .loggedUser(loggedUser)
+                    .author(loggedUser)
                     .locale(locale)
                     .build());
             return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getCase().getStringId() + " was created succesfully",

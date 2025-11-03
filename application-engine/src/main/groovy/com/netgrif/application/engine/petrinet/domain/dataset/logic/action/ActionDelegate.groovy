@@ -951,10 +951,10 @@ class ActionDelegate {
     Case createCase(String identifier, String title = null, String color = "", AbstractUser author = userService.loggedOrSystem,
                     Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
         return workflowService.createCase(CreateCaseParams.with()
-                .petriNetIdentifier(identifier)
+                .processIdentifier(identifier)
                 .title(title)
                 .color(color)
-                .loggedUser(ActorTransformer.toLoggedUser(author))
+                .author(ActorTransformer.toLoggedUser(author))
                 .locale(locale)
                 .params(params)
                 .build()).getCase()
@@ -963,10 +963,10 @@ class ActionDelegate {
     Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "",
                     AbstractUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
         CreateCaseEventOutcome outcome = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(net)
+                .process(net)
                 .title(title)
                 .color(color)
-                .loggedUser(ActorTransformer.toLoggedUser(author))
+                .author(ActorTransformer.toLoggedUser(author))
                 .locale(locale)
                 .params(params)
                 .build())

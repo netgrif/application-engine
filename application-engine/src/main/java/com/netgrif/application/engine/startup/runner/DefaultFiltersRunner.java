@@ -439,10 +439,10 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
 
         try {
             Case filterCase = this.workflowService.createCase(CreateCaseParams.with()
-                    .petriNet(filterNet)
+                    .process(filterNet)
                     .title(title)
                     .color(null)
-                    .loggedUser(ActorTransformer.toLoggedUser(loggedUser))
+                    .author(ActorTransformer.toLoggedUser(loggedUser))
                     .build()).getCase();
             filterCase.setIcon(icon);
             filterCase = this.workflowService.save(filterCase);

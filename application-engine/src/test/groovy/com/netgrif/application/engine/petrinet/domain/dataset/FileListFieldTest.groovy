@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
 import com.netgrif.application.engine.auth.service.UserService
@@ -229,10 +228,10 @@ class FileListFieldTest {
         AbstractUser user = userService.findUserByUsername(UserConstants.ADMIN_USER_USERNAME, null).get()
         assert user != null
         Case useCase = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(net)
+                .process(net)
                 .title("Test file from file list download")
                 .color("black")
-                .loggedUser(ActorTransformer.toLoggedUser(user))
+                .author(ActorTransformer.toLoggedUser(user))
                 .build()).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), ActorTransformer.toLoggedUser(user))
 

@@ -275,7 +275,7 @@ public class WorkflowService implements IWorkflowService {
 
     public CreateCaseEventOutcome createCase(CreateCaseParams createCaseParams) {
         fillAndValidateAttributes(createCaseParams);
-        PetriNet petriNet = createCaseParams.getPetriNet();
+        PetriNet petriNet = createCaseParams.getProcess();
 
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
         outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty(),
@@ -315,11 +315,11 @@ public class WorkflowService implements IWorkflowService {
      * @return created {@link Case} object
      * */
     private Case createCaseObject(CreateCaseParams createCaseParams) {
-        PetriNet petriNet = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet((com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet) createCaseParams.getPetriNet());
+        PetriNet petriNet = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet((com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet) createCaseParams.getProcess());
         Case useCase = new com.netgrif.application.engine.adapter.spring.workflow.domain.Case(petriNet);
         useCase.populateDataSet(initValueExpressionEvaluator, createCaseParams.getParams());
         useCase.setColor(createCaseParams.getColor());
-        useCase.setAuthor(ActorTransformer.toActorRef(createCaseParams.getLoggedUser())); // TODO: impersonation
+        useCase.setAuthor(ActorTransformer.toActorRef(createCaseParams.getAuthor())); // TODO: impersonation
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(createCaseParams.getMakeTitle().apply(useCase));
 
@@ -329,28 +329,28 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private void fillAndValidateAttributes(CreateCaseParams createCaseParams) throws IllegalArgumentException {
-        if (createCaseParams.getLoggedUser() == null) {
-            throw new IllegalArgumentException("Logged user cannot be null on Case creation.");
+        if (createCaseParams.getAuthor() == null) {
+            throw new IllegalArgumentException("Author cannot be null on Case creation.");
         }
-        if (createCaseParams.getPetriNet() == null) {
+        if (createCaseParams.getProcess() == null) {
             PetriNet petriNet;
-            if (createCaseParams.getPetriNetId() != null) {
-                petriNet = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet((com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet) petriNetService.get(new ObjectId(createCaseParams.getPetriNetId())));
-            } else if (createCaseParams.getPetriNetIdentifier() != null) {
-                petriNet = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet((com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet) petriNetService.getNewestVersionByIdentifier(createCaseParams.getPetriNetIdentifier()));
+            if (createCaseParams.getProcessId() != null) {
+                petriNet = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet((com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet) petriNetService.get(new ObjectId(createCaseParams.getProcessId())));
+            } else if (createCaseParams.getProcessIdentifier() != null) {
+                petriNet = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet((com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet) petriNetService.getNewestVersionByIdentifier(createCaseParams.getProcessIdentifier()));
             } else {
-                throw new IllegalArgumentException("Could not find the PetriNet for the Case from provided inputs on case creation.");
+                throw new IllegalArgumentException("Could not find the process for the Case from provided inputs on case creation.");
             }
-            createCaseParams.setPetriNet(petriNet);
+            createCaseParams.setProcess(petriNet);
         }
-        if (createCaseParams.getMakeTitle() == null && createCaseParams.getPetriNet() != null) {
+        if (createCaseParams.getMakeTitle() == null && createCaseParams.getProcess() != null) {
             createCaseParams.setMakeTitle(resolveDefaultCaseTitle(createCaseParams));
         }
     }
 
     private Function<Case, String> resolveDefaultCaseTitle(CreateCaseParams createCaseParams) {
         Locale locale = createCaseParams.getLocale();
-        PetriNet petriNet = createCaseParams.getPetriNet();
+        PetriNet petriNet = createCaseParams.getProcess();
         Function<Case, String> makeTitle;
         if (petriNet.hasDynamicCaseName()) {
             makeTitle = (u) -> initValueExpressionEvaluator.evaluateCaseName(u, petriNet.getDefaultCaseNameExpression(),

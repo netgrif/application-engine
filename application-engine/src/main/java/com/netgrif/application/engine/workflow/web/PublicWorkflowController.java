@@ -51,10 +51,10 @@ public class PublicWorkflowController {
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
         try {
             CreateCaseEventOutcome outcome = this.workflowService.createCase(CreateCaseParams.with()
-                    .petriNetId(body.netId)
+                    .processId(body.netId)
                     .title(body.title)
                     .color(body.color)
-                    .loggedUser(loggedUser)
+                    .author(loggedUser)
                     .locale(locale)
                     .build());
             return EventOutcomeWithMessageResource.successMessage("Case created successfully",

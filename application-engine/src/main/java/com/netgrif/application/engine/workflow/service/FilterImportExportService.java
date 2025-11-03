@@ -102,20 +102,20 @@ public class FilterImportExportService implements IFilterImportExportService {
     @Override
     public void createFilterImport(AbstractUser author) {
         workflowService.createCase(CreateCaseParams.with()
-                .petriNetIdentifier(IMPORT_NET_IDENTIFIER)
+                .processIdentifier(IMPORT_NET_IDENTIFIER)
                 .title("Import filters %s".formatted(author.getName()))
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(author))
+                .author(ActorTransformer.toLoggedUser(author))
                 .build());
     }
 
     @Override
     public void createFilterExport(AbstractUser author) {
         workflowService.createCase(CreateCaseParams.with()
-                .petriNetIdentifier(EXPORT_NET_IDENTIFIER)
+                .processIdentifier(EXPORT_NET_IDENTIFIER)
                 .title("Export filters %s".formatted(author.getName()))
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(author))
+                .author(ActorTransformer.toLoggedUser(author))
                 .build());
     }
 

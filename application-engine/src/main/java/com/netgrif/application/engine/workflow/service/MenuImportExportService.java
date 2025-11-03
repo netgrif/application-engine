@@ -263,10 +263,10 @@ public class MenuImportExportService implements IMenuImportExportService {
         }
         //Creating new Case of preference_filter_item net and setting its data...
         Case menuItemCase = workflowService.createCase(CreateCaseParams.with()
-                .petriNetIdentifier("preference_filter_item")
+                .processIdentifier("preference_filter_item")
                 .title("%s_%s".formatted(item.getEntryName(), menuIdentifier))
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(userService.getSystem()))
+                .author(ActorTransformer.toLoggedUser(userService.getSystem()))
                 .build()).getCase();
 
         QTask qTask = new QTask("task");

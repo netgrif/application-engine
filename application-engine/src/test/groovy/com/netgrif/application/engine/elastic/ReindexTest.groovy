@@ -4,7 +4,6 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.elastic.service.ReindexingTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -65,10 +64,10 @@ class ReindexTest {
         for (int i in 1..2000) {
             threads << Thread.start {
                 def useCase = workflowService.createCase(CreateCaseParams.with()
-                        .petriNet(net.getNet())
+                        .process(net.getNet())
                         .title("Test")
                         .color("color")
-                        .loggedUser(superCreator.getLoggedSuper())
+                        .author(superCreator.getLoggedSuper())
                         .build()).getCase()
                 savedCase.add(useCase)
             }
@@ -82,10 +81,10 @@ class ReindexTest {
         for (int i in 1..4000) {
             threads << Thread.start {
                 def useCase = workflowService.createCase(CreateCaseParams.with()
-                        .petriNet(net.getNet())
+                        .process(net.getNet())
                         .title("Test")
                         .color("color")
-                        .loggedUser(superCreator.getLoggedSuper())
+                        .author(superCreator.getLoggedSuper())
                         .build()).getCase()
                 savedCase.add(useCase)
             }

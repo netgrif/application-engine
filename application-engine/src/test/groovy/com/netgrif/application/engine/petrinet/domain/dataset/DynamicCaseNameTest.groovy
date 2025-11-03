@@ -47,17 +47,17 @@ class DynamicCaseNameTest {
                 .author(superCreator.getLoggedSuper())
                 .build())
         Case useCase = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(optNet.getNet())
+                .process(optNet.getNet())
                 .color("")
-                .loggedUser(superCreator.loggedSuper)
+                .author(superCreator.loggedSuper)
                 .locale(Locale.forLanguageTag("sk-SK"))
                 .build()).getCase()
         assert useCase.title == "SK text value 6"
 
         Case useCase2 = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(optNet.getNet())
+                .process(optNet.getNet())
                 .color("")
-                .loggedUser(superCreator.loggedSuper)
+                .author(superCreator.loggedSuper)
                 .locale(Locale.ENGLISH)
                 .build()).getCase()
         assert useCase2.title == "EN text value 6"

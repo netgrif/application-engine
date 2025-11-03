@@ -88,10 +88,10 @@ class EncryptionTest {
                 .build())
         assert net.getNet() != null
         def useCase = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(net.getNet())
+                .process(net.getNet())
                 .title("Encryption test")
                 .color("color")
-                .loggedUser(mockLoggedUser())
+                .author(mockLoggedUser())
                 .build()).getCase()
         def nameField = useCase.petriNet.dataSet.values().find { v -> v.name.defaultValue == FIELD_NAME }
         useCase.dataSet.put(nameField.stringId, new DataField(FIELD_VALUE))

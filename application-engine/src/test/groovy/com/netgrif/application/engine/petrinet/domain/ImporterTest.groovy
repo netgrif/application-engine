@@ -2,7 +2,6 @@ package com.netgrif.application.engine.petrinet.domain
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.ChoiceField
@@ -296,10 +295,10 @@ class ImporterTest {
 
         assert net != null
         Case testCase = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(net)
+                .process(net)
                 .title("Test case")
                 .color("")
-                .loggedUser(superCreator.loggedSuper)
+                .author(superCreator.loggedSuper)
                 .build()).getCase()
         taskService.assignTask(new TaskParams(testCase.getTasks().toList().get(0).getTask()))
         testCase = workflowService.findOne(testCase.getStringId())
@@ -316,10 +315,10 @@ class ImporterTest {
 
         assert net
         Case testCase = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(net)
+                .process(net)
                 .title("Test case")
                 .color("")
-                .loggedUser(superCreator.loggedSuper)
+                .author(superCreator.loggedSuper)
                 .build()).getCase()
 
         assert testCase.dataSet.get(NUMBER_FIELD).behavior.get("1") == [FieldBehavior.FORBIDDEN] as Set<FieldBehavior>

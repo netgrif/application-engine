@@ -144,10 +144,10 @@ public class VariableArcsTest {
         List<Arc> arcs = this.loaded.getArcs().values().stream().flatMap(List::stream).collect(Collectors.toList());
         assert arcs.size() > 0;
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(this.loaded)
+                .process(this.loaded)
                 .title("VARTEST")
                 .color("red")
-                .loggedUser(mock.mockLoggedUser())
+                .author(mock.mockLoggedUser())
                 .build());
 
         assert caseOutcome.getCase().getPetriNet().getArcs()

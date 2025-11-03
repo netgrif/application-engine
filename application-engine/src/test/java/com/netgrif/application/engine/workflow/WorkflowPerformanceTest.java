@@ -69,8 +69,8 @@ public class WorkflowPerformanceTest {
                 .author(superCreatorRunner.getLoggedSuper())
                 .build()).getNet();
         iterateAndShowAvgTime("createCase", () -> workflowService.createCase(CreateCaseParams.with()
-                .petriNet(net)
-                .loggedUser(superCreatorRunner.getLoggedSuper())
+                .process(net)
+                .author(superCreatorRunner.getLoggedSuper())
                 .locale(Locale.getDefault())
                 .build()), 1000);
     }
@@ -83,8 +83,8 @@ public class WorkflowPerformanceTest {
                 .author(superCreatorRunner.getLoggedSuper())
                 .build()).getNet();
         iterateAndShowAvgTime("createCaseWithAction", () -> workflowService.createCase(CreateCaseParams.with()
-                .petriNet(net)
-                .loggedUser(superCreatorRunner.getLoggedSuper())
+                .process(net)
+                .author(superCreatorRunner.getLoggedSuper())
                 .locale(Locale.getDefault())
                 .build()), 5000);
     }
@@ -102,8 +102,8 @@ public class WorkflowPerformanceTest {
 
         for (int i = 0; i < iterations; i++) {
             Case useCase = workflowService.createCase(CreateCaseParams.with()
-                    .petriNet(net)
-                    .loggedUser(loggedUser)
+                    .process(net)
+                    .author(loggedUser)
                     .locale(Locale.getDefault())
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
@@ -131,8 +131,8 @@ public class WorkflowPerformanceTest {
 
         for (int i = 0; i < iterations; i++) {
             Case useCase = workflowService.createCase(CreateCaseParams.with()
-                    .petriNet(net)
-                    .loggedUser(loggedUser)
+                    .process(net)
+                    .author(loggedUser)
                     .locale(Locale.getDefault())
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
@@ -160,8 +160,8 @@ public class WorkflowPerformanceTest {
 
         for (int i = 0; i < iterations; i++) {
             Case useCase = workflowService.createCase(CreateCaseParams.with()
-                    .petriNet(net)
-                    .loggedUser(loggedUser)
+                    .process(net)
+                    .author(loggedUser)
                     .locale(Locale.getDefault())
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
@@ -193,8 +193,8 @@ public class WorkflowPerformanceTest {
 
         for (int i = 0; i < iterations; i++) {
             Case useCase = workflowService.createCase(CreateCaseParams.with()
-                    .petriNet(net)
-                    .loggedUser(loggedUser)
+                    .process(net)
+                    .author(loggedUser)
                     .locale(Locale.getDefault())
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
@@ -226,8 +226,8 @@ public class WorkflowPerformanceTest {
 
         for (int i = 0; i < iterations; i++) {
             Case useCase = workflowService.createCase(CreateCaseParams.with()
-                    .petriNet(net)
-                    .loggedUser(loggedUser)
+                    .process(net)
+                    .author(loggedUser)
                     .locale(Locale.getDefault())
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
@@ -260,8 +260,8 @@ public class WorkflowPerformanceTest {
 
         for (int i = 0; i < iterations; i++) {
             Case useCase = workflowService.createCase(CreateCaseParams.with()
-                    .petriNet(net)
-                    .loggedUser(loggedUser)
+                    .process(net)
+                    .author(loggedUser)
                     .locale(Locale.getDefault())
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
@@ -294,8 +294,8 @@ public class WorkflowPerformanceTest {
 
         for (int i = 0; i < iterations; i++) {
             Case useCase = workflowService.createCase(CreateCaseParams.with()
-                    .petriNet(net)
-                    .loggedUser(loggedUser)
+                    .process(net)
+                    .author(loggedUser)
                     .locale(Locale.getDefault())
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
@@ -329,8 +329,8 @@ public class WorkflowPerformanceTest {
 
         for (int i = 0; i < iterations; i++) {
             Case useCase = workflowService.createCase(CreateCaseParams.with()
-                    .petriNet(net)
-                    .loggedUser(loggedUser)
+                    .process(net)
+                    .author(loggedUser)
                     .locale(Locale.getDefault())
                     .build()).getCase();
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();

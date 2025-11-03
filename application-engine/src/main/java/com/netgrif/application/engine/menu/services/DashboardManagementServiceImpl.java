@@ -67,10 +67,10 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
         addReferencedMenuItems(body);
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
         managementCase = workflowService.createCase(CreateCaseParams.with()
-                .petriNetIdentifier(DashboardManagementConstants.PROCESS_IDENTIFIER)
+                .processIdentifier(DashboardManagementConstants.PROCESS_IDENTIFIER)
                 .title(body.getName().getDefaultValue())
                 .color("")
-                .loggedUser(loggedUser)
+                .author(loggedUser)
                 .build()).getCase();
         ToDataSetOutcome outcome = body.toDataSet();
         managementCase = setDataWithExecute(managementCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());

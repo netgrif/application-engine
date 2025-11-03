@@ -673,10 +673,10 @@ public class MenuItemService implements IMenuItemService {
 
     protected Case createCase(String identifier, String title, LoggedUser loggedUser) {
         return workflowService.createCase(CreateCaseParams.with()
-                .petriNetIdentifier(identifier)
+                .processIdentifier(identifier)
                 .title(title)
                 .color("")
-                .loggedUser(loggedUser)
+                .author(loggedUser)
                 .build()).getCase();
     }
 

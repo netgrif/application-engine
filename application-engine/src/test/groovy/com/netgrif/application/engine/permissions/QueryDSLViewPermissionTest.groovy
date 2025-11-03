@@ -102,10 +102,10 @@ class QueryDSLViewPermissionTest {
     @Test
     void testSearchQueryDSLViewWithoutRole() {
         Case case_ = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(net)
+                .process(net)
                 .title("Permission test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(testUser))
+                .author(ActorTransformer.toLoggedUser(testUser))
                 .build()).getCase()
         Page<Case> casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
                 PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale())
@@ -117,10 +117,10 @@ class QueryDSLViewPermissionTest {
     @Test
     void testSearchQueryDSLViewWithUserWithPosRole() {
         Case case_ = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(net)
+                .process(net)
                 .title("Permission test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(testUser))
+                .author(ActorTransformer.toLoggedUser(testUser))
                 .build()).getCase()
         ProcessRole posViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_pos_role")
         userService.addRole(testUser, posViewRole.getStringId())
@@ -136,10 +136,10 @@ class QueryDSLViewPermissionTest {
     @Test
     void testSearchQueryDSLViewWithUserWithNegRole() {
         Case case_ = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(net)
+                .process(net)
                 .title("Permission test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(testUser))
+                .author(ActorTransformer.toLoggedUser(testUser))
                 .build()).getCase()
         ProcessRole negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
         userService.addRole(testUser, negViewRole.getStringId())
@@ -155,10 +155,10 @@ class QueryDSLViewPermissionTest {
     @Test
     void testSearchQueryDSLViewWithoutUserRef() {
         Case case_ = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(netWithUserRefs)
+                .process(netWithUserRefs)
                 .title("Permission test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(testUser))
+                .author(ActorTransformer.toLoggedUser(testUser))
                 .build()).getCase()
         Page<Case> casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
                 PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale())
@@ -170,10 +170,10 @@ class QueryDSLViewPermissionTest {
     @Test
     void testSearchQueryDSLViewWithPosUserRef() {
         Case case_ = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(netWithUserRefs)
+                .process(netWithUserRefs)
                 .title("Permission test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(testUser))
+                .author(ActorTransformer.toLoggedUser(testUser))
                 .build()).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
@@ -195,10 +195,10 @@ class QueryDSLViewPermissionTest {
     @Test
     void testSearchTaskQueryDSLViewWithPosUserRef() {
         Case case_ = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(netWithUserRefs)
+                .process(netWithUserRefs)
                 .title("Permission test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(testUser))
+                .author(ActorTransformer.toLoggedUser(testUser))
                 .build()).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
@@ -222,10 +222,10 @@ class QueryDSLViewPermissionTest {
     @Test
     void testSearchTaskQueryDSLViewWithUserWithPosRole() {
         Case case_ = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(netWithUserRefs)
+                .process(netWithUserRefs)
                 .title("Permission test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(testUser))
+                .author(ActorTransformer.toLoggedUser(testUser))
                 .build()).getCase()
         ProcessRole posViewRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "view_pos_role")
         userService.addRole(testUser, posViewRole.getStringId())
@@ -243,10 +243,10 @@ class QueryDSLViewPermissionTest {
     @Test
     void testSearchQueryDSLViewWithNegUserRef() {
         Case case_ = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(netWithUserRefs)
+                .process(netWithUserRefs)
                 .title("Permission test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(testUser))
+                .author(ActorTransformer.toLoggedUser(testUser))
                 .build()).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
@@ -268,10 +268,10 @@ class QueryDSLViewPermissionTest {
     @Test
     void testSearchQueryDSLViewWithNegRoleAndPosUserRef() {
         Case case_ = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(netWithUserRefs)
+                .process(netWithUserRefs)
                 .title("Permission test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(testUser))
+                .author(ActorTransformer.toLoggedUser(testUser))
                 .build()).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([

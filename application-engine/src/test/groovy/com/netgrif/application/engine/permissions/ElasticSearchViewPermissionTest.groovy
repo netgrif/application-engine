@@ -109,10 +109,10 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithoutRole() {
         Case case_ = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(net)
+                .process(net)
                 .title("Permission test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(testUser))
+                .author(ActorTransformer.toLoggedUser(testUser))
                 .build()).getCase()
 
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest()
@@ -126,10 +126,10 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithPosRole() {
         Case case_ = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(net)
+                .process(net)
                 .title("Permission test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(testUser))
+                .author(ActorTransformer.toLoggedUser(testUser))
                 .build()).getCase()
         ProcessRole posViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_pos_role")
         userService.addRole(testUser, posViewRole.getStringId())
@@ -149,10 +149,10 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithNegRole() {
         Case case_ = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(net)
+                .process(net)
                 .title("Permission test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(testUser))
+                .author(ActorTransformer.toLoggedUser(testUser))
                 .build()).getCase()
         ProcessRole negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
         userService.addRole(testUser, negViewRole.getStringId())
@@ -169,10 +169,10 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithoutUserRef() {
         Case case_ = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(netWithUserRefs)
+                .process(netWithUserRefs)
                 .title("Permission test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(testUser))
+                .author(ActorTransformer.toLoggedUser(testUser))
                 .build()).getCase()
 
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest()
@@ -186,10 +186,10 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithPosUserRef() {
         Case case_ = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(netWithUserRefs)
+                .process(netWithUserRefs)
                 .title("Permission test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(testUser))
+                .author(ActorTransformer.toLoggedUser(testUser))
                 .build()).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
@@ -212,10 +212,10 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithNegUserRef() {
         Case case_ = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(netWithUserRefs)
+                .process(netWithUserRefs)
                 .title("Permission test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(testUser))
+                .author(ActorTransformer.toLoggedUser(testUser))
                 .build()).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
@@ -238,10 +238,10 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithNegativeRoleAndPosUserRef() {
         Case case_ = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(netWithUserRefs)
+                .process(netWithUserRefs)
                 .title("Permission test")
                 .color("")
-                .loggedUser(ActorTransformer.toLoggedUser(testUser))
+                .author(ActorTransformer.toLoggedUser(testUser))
                 .build()).getCase()
         ProcessRole negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
         userService.addRole(testUser, negViewRole.getStringId())

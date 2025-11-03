@@ -1,12 +1,9 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.MockService;
-import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
-import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
@@ -23,16 +20,12 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.runner.DefaultRealmRunner;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.startup.runner.SystemUserRunner;
-import com.netgrif.application.engine.objects.workflow.domain.Case;
-import com.netgrif.application.engine.objects.workflow.domain.Task;
-import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +37,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Set;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -104,10 +96,10 @@ public class TaskServiceTest {
                 .build());
         PetriNet net = petriNetRepository.findAll().get(0);
         workflowService.createCase(CreateCaseParams.with()
-                .petriNet(net)
+                .process(net)
                 .title("Storage Unit")
                 .color("color")
-                .loggedUser(mock.mockLoggedUser())
+                .author(mock.mockLoggedUser())
                 .build());
     }
 
@@ -120,10 +112,10 @@ public class TaskServiceTest {
                 .build()).getNet();
         LoggedUser loggedUser = mock.mockLoggedUser();
         CreateCaseEventOutcome outcome = workflowService.createCase(CreateCaseParams.with()
-                .petriNet(net)
+                .process(net)
                 .title("Reset test")
                 .color("color")
-                .loggedUser(loggedUser)
+                .author(loggedUser)
                 .build());
         User user = new User();
         user.setFirstName("name");

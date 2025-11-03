@@ -193,10 +193,10 @@ class ImportHelper {
 
     Case createCase(String title, PetriNet net, LoggedUser user) {
         return workflowService.createCase(CreateCaseParams.with()
-                .petriNet(net)
+                .process(net)
                 .title(title)
                 .color("")
-                .loggedUser(user)
+                .author(user)
                 .build()).getCase()
     }
 

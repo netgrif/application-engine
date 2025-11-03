@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.params;
 
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import lombok.Builder;
@@ -17,13 +17,13 @@ import java.util.function.Function;
 public class CreateCaseParams {
     // todo javadoc
 
-    private String petriNetId;
-    private String petriNetIdentifier;
-    private PetriNet petriNet;
+    private String processId;
+    private String processIdentifier;
+    private PetriNet process;
     private String title;
     private Function<Case, String> makeTitle;
     private String color;
-    private LoggedUser loggedUser;
+    private AbstractUser author;
     @Builder.Default
     private Locale locale = LocaleContextHolder.getLocale();
     @Builder.Default
@@ -44,12 +44,12 @@ public class CreateCaseParams {
         }
 
         /**
-         * Sets the {@link #petriNet} as clone, {@link #petriNetIdentifier} and {@link #petriNetId}
+         * Sets the {@link #process} as clone, {@link #processIdentifier} and {@link #processId}
          * */
-        public CreateCaseParams.CreateCaseParamsBuilder petriNet(PetriNet petriNet) {
-            this.petriNet = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet((com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet) petriNet);
-            this.petriNetIdentifier = petriNet.getIdentifier();
-            this.petriNetId = petriNet.getStringId();
+        public CreateCaseParams.CreateCaseParamsBuilder process(PetriNet petriNet) {
+            this.process = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet((com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet) petriNet);
+            this.processIdentifier = petriNet.getIdentifier();
+            this.processId = petriNet.getStringId();
             return this;
         }
     }
