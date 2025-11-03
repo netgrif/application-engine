@@ -48,7 +48,7 @@ public class SessionConfiguration {
             redisStandaloneConfiguration.setPassword(redisProperties.getPassword());
         }
         JedisClientConfiguration clientConfiguration = jedisClientConfiguration();
-        return new JedisConnectionFactory(redisStandaloneConfiguration);
+        return new JedisConnectionFactory(redisStandaloneConfiguration, clientConfiguration);
     }
 
     protected JedisConnectionFactory redisSentinelConfiguration() {
@@ -74,7 +74,8 @@ public class SessionConfiguration {
             sentinelConfiguration.setSentinelPassword(redisProperties.getSentinel().getPassword());
         }
 
-        return new JedisConnectionFactory(sentinelConfiguration);
+        JedisClientConfiguration clientConfiguration = jedisClientConfiguration();
+        return new JedisConnectionFactory(sentinelConfiguration, clientConfiguration);
     }
 
     protected JedisClientConfiguration jedisClientConfiguration() {
