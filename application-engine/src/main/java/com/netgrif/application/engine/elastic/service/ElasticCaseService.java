@@ -84,34 +84,27 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     @Override
     public void remove(String caseId) {
         caseElasticDeleteQueueManager.push(DeleteQuery.builder(CriteriaQuery.builder(Criteria.where("id").is(caseId)).build()).build());
-        log.info("[{}]: Case \"{}\" deleted", caseId, caseId);
+        log.info("[{}]: Case \"{}\" queued for deletion", caseId, caseId);
     }
 
     @Override
     public void removeByPetriNetId(String processId) {
         caseElasticDeleteQueueManager.push(DeleteQuery.builder(CriteriaQuery.builder(Criteria.where("processId").is(processId)).build()).build());
-        log.info("[{}]: All cases of Petri Net with id \"{}\" deleted", processId, processId);
+        log.info("[{}]: All cases of Petri Net with id \"{}\" are queued for deletion", processId, processId);
     }
 
     @Override
     public void index(ElasticCase useCase) {
-        try {
-            Optional<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> elasticCaseOptional = repository.findById(useCase.getId());
-            if (elasticCaseOptional.isEmpty()) {
-                caseElasticIndexQueueManager.push(new IndexQueryBuilder().withObject(useCase).build());
-            } else {
-                com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase elasticCase = elasticCaseOptional.get();
-                elasticCase.update(useCase);
-                caseElasticIndexQueueManager.push(new IndexQueryBuilder().withObject(elasticCase).build());
-            }
-            log.debug("[" + useCase.getId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
-            publisher.publishEvent(new IndexCaseEvent(useCase));
-        } catch (InvalidDataAccessApiUsageException ignored) {
-            log.debug("[" + useCase.getId() + "]: Case \"" + useCase.getTitle() + "\" has duplicates, will be reindexed");
-            repository.deleteAllById(useCase.getId());
-            repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase) useCase);
-            log.debug("[" + useCase.getId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
+        Optional<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> elasticCaseOptional = repository.findById(useCase.getId());
+        if (elasticCaseOptional.isEmpty()) {
+            caseElasticIndexQueueManager.push(new IndexQueryBuilder().withObject(useCase).build());
+        } else {
+            com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase elasticCase = elasticCaseOptional.get();
+            elasticCase.update(useCase);
+            caseElasticIndexQueueManager.push(new IndexQueryBuilder().withObject(elasticCase).build());
         }
+        log.debug("[{}]: Case \"{}\" indexed", useCase.getId(), useCase.getTitle());
+        publisher.publishEvent(new IndexCaseEvent(useCase));
     }
 
     @Override
