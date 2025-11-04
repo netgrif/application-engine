@@ -274,7 +274,7 @@ public class DataConfigurationProperties {
          * It defines how the application connects to a MongoDB cluster, such as single-node {@code SINGLE}
          * or multi-node {@code MULTIPLE} or {@code LOAD_BALANCED} configurations.
          */
-        private ClusterConnectionMode mode = ClusterConnectionMode.SINGLE;
+        private ClusterConnectionMode mode;
 
         /**
          * The name of the MongoDB replica set to which the application should connect.
