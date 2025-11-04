@@ -64,18 +64,8 @@ public final class ElasticQueueManager<E> {
      */
     @PreDestroy
     public void shutdown() {
-        ScheduledFuture<?> delayer = atomicDelayer.getAndSet(null);
-        if (delayer != null) {
-            delayer.cancel(false);
-        }
         flush();
-        try {
-            if (!scheduler.awaitTermination(30, TimeUnit.SECONDS)) {
-                scheduler.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            scheduler.shutdownNow();
-        }
+        scheduler.shutdown();
     }
 
 
