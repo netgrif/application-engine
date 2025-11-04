@@ -20,7 +20,7 @@ import java.util.List;
 
 @Slf4j
 @Configuration
-@EnableRedisIndexedHttpSession(redisNamespace = "spring:session:${netgrif.engine.data.redis.namespace}")
+@EnableRedisIndexedHttpSession(redisNamespace = "spring:session:${netgrif.engine.data.redis.session.namespace}")
 @ConditionalOnProperty(
         value = "netgrif.engine.security.static.enabled",
         havingValue = "false",
