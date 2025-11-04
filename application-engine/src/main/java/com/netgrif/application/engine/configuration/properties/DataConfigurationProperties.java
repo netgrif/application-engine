@@ -706,6 +706,9 @@ public class DataConfigurationProperties {
          */
         @Data
         public static class RedisSentinelProperties {
+
+            public static final String DEFAULT_SENTINEL_NODE = "localhost:" + RedisNode.DEFAULT_SENTINEL_PORT;
+
             /**
              * The name of the Redis master node to which Redis Sentinel clients should connect.
              * Specifies the master node in a Redis Sentinel deployment that is responsible for
@@ -721,7 +724,7 @@ public class DataConfigurationProperties {
              * By default, this list contains a single node pointing to "localhost:26379".
              * In a Redis Sentinel setup, multiple nodes can be specified to ensure high availability and fault tolerance.
              */
-            private List<String> nodes = List.of("localhost:"+RedisNode.DEFAULT_SENTINEL_PORT);
+            private List<String> nodes = List.of(DEFAULT_SENTINEL_NODE);
 
             /**
              * The username used for authentications or configurations related to Redis Sentinel properties.

@@ -2,6 +2,7 @@ package com.netgrif.application.engine.configuration;
 
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,7 @@ import org.springframework.session.web.http.HttpSessionIdResolver;
 
 import java.util.List;
 
+@Slf4j
 @Configuration
 @EnableRedisIndexedHttpSession(redisNamespace = "spring:session:${netgrif.engine.data.redis.namespace}")
 @ConditionalOnProperty(
@@ -43,7 +45,7 @@ public class SessionConfiguration {
         String hostName = redisProperties.getHost() == null ? "localhost" : redisProperties.getHost();
         int port = redisProperties.getPort() == 0 ? RedisNode.DEFAULT_PORT : redisProperties.getPort();
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(hostName, port);
-        if (redisProperties.getUsername() != null && redisProperties.getPassword() != null && !redisProperties.getUsername().isEmpty() && !redisProperties.getPassword().isEmpty()) {
+        if (hasCredentials(redisProperties.getUsername(), redisProperties.getPassword())) {
             redisStandaloneConfiguration.setUsername(redisProperties.getUsername());
             redisStandaloneConfiguration.setPassword(redisProperties.getPassword());
         }
@@ -55,21 +57,20 @@ public class SessionConfiguration {
         RedisSentinelConfiguration sentinelConfiguration = new RedisSentinelConfiguration();
         sentinelConfiguration.setMaster(redisProperties.getSentinel().getMaster());
         List<RedisNode> nodes = redisProperties.getSentinel().getNodes().stream().map(node -> {
-            String nodeAddress = node;
-            if (!nodeAddress.contains(":")) {
-                nodeAddress += ":" + RedisNode.DEFAULT_SENTINEL_PORT;
+            try {
+                return RedisNode.fromString(node);
+            } catch (Exception e) {
+                log.warn("Parsing redis sentinel node {} has failed. Trying to use the value as an address without port and adding default sentinel port {}", node, RedisNode.DEFAULT_SENTINEL_PORT, e);
+                return new RedisNode(node, RedisNode.DEFAULT_SENTINEL_PORT);
             }
-            return RedisNode.fromString(nodeAddress);
         }).toList();
         sentinelConfiguration.setSentinels(nodes);
 
-        if (redisProperties.getUsername() != null && redisProperties.getPassword() != null &&
-                !redisProperties.getUsername().isEmpty() && !redisProperties.getPassword().isEmpty()) {
+        if (hasCredentials(redisProperties.getUsername(), redisProperties.getPassword())) {
             sentinelConfiguration.setUsername(redisProperties.getUsername());
             sentinelConfiguration.setPassword(redisProperties.getPassword());
         }
-        if (redisProperties.getSentinel().getUsername() != null && redisProperties.getSentinel().getPassword() != null &&
-                !redisProperties.getSentinel().getUsername().isEmpty() && !redisProperties.getSentinel().getPassword().isEmpty()) {
+        if (hasCredentials(redisProperties.getSentinel().getUsername(), redisProperties.getSentinel().getPassword())) {
             sentinelConfiguration.setSentinelUsername(redisProperties.getSentinel().getUsername());
             sentinelConfiguration.setSentinelPassword(redisProperties.getSentinel().getPassword());
         }
@@ -83,6 +84,11 @@ public class SessionConfiguration {
             return JedisClientConfiguration.builder().useSsl().build();
         }
         return JedisClientConfiguration.defaultConfiguration();
+    }
+
+    private boolean hasCredentials(String username, String password) {
+        return username != null && !username.isBlank() &&
+                password != null && !password.isBlank();
     }
 
     @Bean
