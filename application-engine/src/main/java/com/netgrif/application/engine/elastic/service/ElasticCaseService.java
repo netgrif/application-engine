@@ -103,7 +103,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             elasticCase.update(useCase);
             caseElasticIndexQueueManager.push(new IndexQueryBuilder().withObject(elasticCase).build());
         }
-        log.debug("[{}]: Case \"{}\" indexed", useCase.getId(), useCase.getTitle());
+        log.debug("[{}]: Case \"{}\" queued for indexing", useCase.getId(), useCase.getTitle());
         publisher.publishEvent(new IndexCaseEvent(useCase));
     }
 
