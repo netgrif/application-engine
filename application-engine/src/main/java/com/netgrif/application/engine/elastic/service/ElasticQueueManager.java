@@ -92,7 +92,10 @@ public final class ElasticQueueManager<E> {
         }
 
         String uuid = UUID.randomUUID().toString();
-        if (!batch.isEmpty()) {
+        if (batch.isEmpty()) {
+            return;
+        }
+        try {
             log.debug("Index started with batch size: {} and id: {}", batch.size(), uuid);
             BulkOptions bulkOptions = BulkOptions.builder()
                     .withRefreshPolicy(RefreshPolicy.WAIT_UNTIL)
@@ -100,6 +103,9 @@ public final class ElasticQueueManager<E> {
             elasticsearchTemplate.bulkOperation(batch, bulkOptions, IndexCoordinates.of(indexName));
             log.debug("Index finished with batch size: {} and id: {}", batch.size(), uuid);
             resetTimer();
+        } catch (Exception e) {
+            queue.addAll(batch);
+            log.error("Index failed with batch size: {} and id: {}", batch.size(), uuid, e);
         }
     }
 
@@ -112,6 +118,9 @@ public final class ElasticQueueManager<E> {
         ScheduledFuture<?> delayer = atomicDelayer.getAndSet(null);
         if (delayer != null) {
             delayer.cancel(false);
+        }
+        if (scheduler.isShutdown()) {
+            return;
         }
         ScheduledFuture<?> newTask = scheduler.schedule(this::flush, queueProperties.getDelay(), queueProperties.getDelayUnit());
         atomicDelayer.set(newTask);
