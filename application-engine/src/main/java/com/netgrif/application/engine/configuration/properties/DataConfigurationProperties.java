@@ -661,9 +661,9 @@ public class DataConfigurationProperties {
             /**
              * The size of the thread pool for the scheduled executor service.
              * This determines the number of threads available to schedule and execute tasks.
-             * Default value: 50.
+             * Default value: 10.
              */
-            private int scheduledExecutorPoolSize = 50;
+            private int scheduledExecutorPoolSize = 10;
 
             /**
              * Delay time between flush operations in the queue.
