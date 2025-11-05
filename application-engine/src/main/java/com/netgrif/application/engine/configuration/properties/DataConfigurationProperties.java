@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
+import org.springframework.data.elasticsearch.core.RefreshPolicy;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -529,6 +530,7 @@ public class DataConfigurationProperties {
          * including the maximum queue size, delay between flush operations,
          * and the thread pool size for scheduled executor service tasks.
          */
+        @Valid
         private QueueProperties queue = new QueueProperties();
 
         public static final String PETRI_NET_INDEX = "petriNet";
@@ -663,6 +665,7 @@ public class DataConfigurationProperties {
              * This determines the number of threads available to schedule and execute tasks.
              * Default value: 10.
              */
+            @Min(1)
             private int scheduledExecutorPoolSize = 10;
 
             /**
@@ -670,6 +673,7 @@ public class DataConfigurationProperties {
              * This value represents the amount of time the scheduler waits before initiating the next flush.
              * Default value: 150.
              */
+            @Min(1)
             private int delay = 150;
 
             /**
@@ -683,7 +687,10 @@ public class DataConfigurationProperties {
              * When the queue size reaches this limit, it triggers a flush operation.
              * Default value: 400.
              */
+            @Min(1)
             private int maxQueueSize = 400;
+
+            private RefreshPolicy refreshPolicy = RefreshPolicy.NONE;
         }
     }
 
