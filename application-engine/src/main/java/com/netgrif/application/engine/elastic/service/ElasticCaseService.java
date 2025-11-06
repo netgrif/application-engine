@@ -99,14 +99,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     @Override
-    public void removeByPetriNetId(String processId) {
-        CriteriaQuery query = CriteriaQuery.builder(Criteria.where("processId").is(processId)).build();
-        SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, IndexCoordinates.of(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX)));
-        hits.stream().forEach(hit -> remove(hit.getId()));
-        log.info("[{}]: All cases of Petri Net with id \"{}\" are queued for deletion", processId, processId);
-    }
-
-    @Override
     public void index(ElasticCase useCase) {
         Optional<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> elasticCaseOptional = repository.findById(useCase.getId());
         if (elasticCaseOptional.isEmpty()) {
