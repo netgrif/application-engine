@@ -24,6 +24,7 @@ import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetRefere
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -34,6 +35,7 @@ import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.SearchHitSupport;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.*;
 import org.springframework.stereotype.Service;
@@ -81,6 +83,14 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         this.publisher = publisher;
         this.caseElasticIndexQueueManager = new ElasticQueueManager<>(elasticProperties, elasticsearchClient);
         this.caseElasticDeleteQueueManager = new ElasticQueueManager<>(elasticProperties, elasticsearchClient);
+
+    }
+
+    @PreDestroy
+    private void stopQueues() {
+        caseElasticIndexQueueManager.shutdown();
+        caseElasticDeleteQueueManager.shutdown();
+        log.info("Queues for cases have been stopped");
     }
 
     @Override
@@ -104,7 +114,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             caseElasticIndexQueueManager.push(BulkOperation.of(op -> op.index(i -> i
                     .index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX))
                     .id(useCase.getId())
-                    .document(useCase))
+                    .document(template.getElasticsearchConverter().mapObject(useCase)))
             ));
         } else {
             com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase elasticCase = elasticCaseOptional.get();
@@ -112,7 +122,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             caseElasticIndexQueueManager.push(BulkOperation.of(op -> op.index(i -> i
                     .index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX))
                     .id(elasticCase.getId())
-                    .document(elasticCase))
+                    .document(template.getElasticsearchConverter().mapObject(elasticCase)))
             ));
         }
         log.debug("[{}]: Case \"{}\" queued for indexing", useCase.getId(), useCase.getTitle());

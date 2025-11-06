@@ -8,6 +8,7 @@ import com.netgrif.application.engine.configuration.properties.DataConfiguration
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,6 @@ public final class ElasticQueueManager<E> {
     private final AtomicReference<ScheduledFuture<?>> atomicDelayer;
 
     private final DataConfigurationProperties.ElasticsearchProperties.QueueProperties queueProperties;
-
 
     private final ElasticsearchClient elasticsearchClient;
 
@@ -84,7 +84,7 @@ public final class ElasticQueueManager<E> {
      */
     public void push(BulkOperation elasticQuery) {
         queue.add(elasticQuery);
-        if (queue.size() <= queueProperties.getMaxQueueSize()) {
+        if (queue.size() < queueProperties.getMaxQueueSize()) {
             resetTimer();
         }
     }

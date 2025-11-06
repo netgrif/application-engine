@@ -23,8 +23,6 @@ public abstract class ElasticCase implements Serializable {
     @Serial
     private static final long serialVersionUID = 7536959921044863265L;
 
-    private String _class;
-
     private String id;
 
     private Long version;
