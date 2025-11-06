@@ -155,4 +155,10 @@ public class ElasticTask extends com.netgrif.application.engine.objects.elastic.
     public String getFinishPolicy() {
         return super.getFinishPolicy();
     }
+
+    @Field(type = Keyword)
+    @Override
+    public String get_class() {
+        return this.getClass().getName();
+    }
 }
