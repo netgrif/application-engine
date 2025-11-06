@@ -3,17 +3,14 @@ package com.netgrif.application.engine.elastic.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
-import co.elastic.clients.elasticsearch.core.BulkResponse;
-import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
+import com.netgrif.application.engine.elastic.domain.BulkOperationWrapper;
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -27,7 +24,7 @@ public final class ElasticQueueManager {
 
     private final Logger log = LoggerFactory.getLogger(ElasticQueueManager.class);
 
-    private final Queue<BulkOperation> queue;
+    private final Queue<BulkOperationWrapper> queue;
 
     private final ScheduledExecutorService scheduler;
 
@@ -37,18 +34,22 @@ public final class ElasticQueueManager {
 
     private final ElasticsearchClient elasticsearchClient;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     /**
      * Constructs an ElasticQueueManager instance.
      *
      * @param elasticsearchProperties the configuration properties for Elasticsearch, including queue parameters
      */
     public ElasticQueueManager(DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties,
-                               ElasticsearchClient elasticsearchClient) {
+                               ElasticsearchClient elasticsearchClient,
+                               ApplicationEventPublisher eventPublisher) {
         queue = new ConcurrentLinkedDeque<>();
         atomicDelayer = new AtomicReference<>();
         queueProperties = elasticsearchProperties.getQueue();
         scheduler = Executors.newScheduledThreadPool(queueProperties.getScheduledExecutorPoolSize());
         this.elasticsearchClient = elasticsearchClient;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -75,13 +76,8 @@ public final class ElasticQueueManager {
     }
 
 
-    /**
-     * Adds an elastic query to the queue and resets the timer for the scheduled flush.
-     *
-     * @param elasticQuery the elastic query to be added to the queue
-     */
-    public void push(BulkOperation elasticQuery) {
-        queue.add(elasticQuery);
+    public void push(BulkOperationWrapper operation) {
+        queue.add(operation);
         if (queue.size() < queueProperties.getMaxQueueSize()) {
             resetTimer();
         }
@@ -97,7 +93,7 @@ public final class ElasticQueueManager {
             return;
         }
 
-        List<BulkOperation> batch = new ArrayList<>();
+        List<BulkOperationWrapper> batch = new ArrayList<>();
         while (!queue.isEmpty() && batch.size() < queueProperties.getMaxQueueSize()) {
             batch.add(queue.poll());
         }
@@ -105,13 +101,10 @@ public final class ElasticQueueManager {
         String uuid = UUID.randomUUID().toString();
         try {
             log.debug("Index started with batch size: {} and id: {}", batch.size(), uuid);
-            elasticsearchClient.bulk(new BulkRequest.Builder().operations(batch).refresh(Refresh.False).build());
+            elasticsearchClient.bulk(new BulkRequest.Builder().operations(batch.stream().map(BulkOperationWrapper::getOperation).toList()).refresh(Refresh.False).build());
+            publishEventsOfBatch(batch);
             log.debug("Index finished with batch size: {} and id: {}", batch.size(), uuid);
-            if (queue.size() >= queueProperties.getMaxQueueSize()) {
-                flush();
-            } else {
-                resetTimer();
-            }
+            checkQueue();
         } catch (Exception e) {
             queue.addAll(batch);
             resetTimer();
@@ -136,4 +129,16 @@ public final class ElasticQueueManager {
         atomicDelayer.set(newTask);
     }
 
+    private void checkQueue() {
+        if (queue.size() >= queueProperties.getMaxQueueSize()) {
+            flush();
+        } else {
+            resetTimer();
+        }
+    }
+
+    private void publishEventsOfBatch(List<BulkOperationWrapper> batch) {
+        batch.stream().filter(operationWrapper -> operationWrapper.getPublishableEvent() != null)
+                .forEach(operationWrapper -> eventPublisher.publishEvent(operationWrapper.getPublishableEvent()));
+    }
 }

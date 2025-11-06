@@ -9,6 +9,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
+import com.netgrif.application.engine.elastic.domain.BulkOperationWrapper;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
@@ -80,8 +81,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         this.workflowService = workflowService;
         this.iElasticCasePrioritySearch = iElasticCasePrioritySearch;
         this.publisher = publisher;
-        this.caseElasticIndexQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient);
-        this.caseElasticDeleteQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient);
+        this.caseElasticIndexQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient, publisher);
+        this.caseElasticDeleteQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient, publisher);
 
     }
 
@@ -94,7 +95,10 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     @Override
     public void remove(String caseId) {
-        caseElasticDeleteQueueManager.push(BulkOperation.of(op -> op.delete(d -> d.index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX)).id(caseId))));
+        caseElasticDeleteQueueManager.push(new BulkOperationWrapper(
+                BulkOperation.of(op -> op.delete(d -> d.index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX)).id(caseId))),
+                null
+        ));
         log.info("[{}]: Case \"{}\" queued for deletion", caseId, caseId);
     }
 
@@ -102,22 +106,19 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     public void index(ElasticCase useCase) {
         Optional<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> elasticCaseOptional = repository.findById(useCase.getId());
         if (elasticCaseOptional.isEmpty()) {
-            caseElasticIndexQueueManager.push(BulkOperation.of(op -> op.index(i -> i
-                    .index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX))
-                    .id(useCase.getId())
-                    .document(template.getElasticsearchConverter().mapObject(useCase)))
-            ));
+            caseElasticIndexQueueManager.push(BulkOperationWrapper.builder()
+                    .operation(createIndexOperation(useCase))
+                    .publishableEvent(new IndexCaseEvent(useCase))
+                    .build());
         } else {
             com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase elasticCase = elasticCaseOptional.get();
             elasticCase.update(useCase);
-            caseElasticIndexQueueManager.push(BulkOperation.of(op -> op.index(i -> i
-                    .index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX))
-                    .id(elasticCase.getId())
-                    .document(template.getElasticsearchConverter().mapObject(elasticCase)))
-            ));
+            caseElasticIndexQueueManager.push(BulkOperationWrapper.builder()
+                    .operation(createIndexOperation(elasticCase))
+                    .publishableEvent(new IndexCaseEvent(elasticCase))
+                    .build());
         }
         log.debug("[{}]: Case \"{}\" queued for indexing", useCase.getId(), useCase.getTitle());
-        publisher.publishEvent(new IndexCaseEvent(useCase));
     }
 
     @Override
@@ -516,5 +517,12 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         List<Sort.Order> modifiedOrders = new ArrayList<>();
         pageable.getSort().iterator().forEachRemaining(order -> modifiedOrders.add(new Order(order.getDirection(), order.getProperty()).withUnmappedType("keyword")));
         return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()).withSort(Sort.by(modifiedOrders));
+    }
+
+    private BulkOperation createIndexOperation(ElasticCase useCase) {
+        return BulkOperation.of(op -> op.index(i -> i
+                .index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX))
+                .id(useCase.getId())
+                .document(template.getElasticsearchConverter().mapObject(useCase))));
     }
 }
