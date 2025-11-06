@@ -61,8 +61,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     protected IWorkflowService workflowService;
     protected IElasticCasePrioritySearch iElasticCasePrioritySearch;
     protected ApplicationEventPublisher publisher;
-    protected ElasticQueueManager<IndexQuery> caseElasticIndexQueueManager;
-    protected ElasticQueueManager<DeleteQuery> caseElasticDeleteQueueManager;
+    protected ElasticQueueManager caseElasticIndexQueueManager;
+    protected ElasticQueueManager caseElasticDeleteQueueManager;
 
     public ElasticCaseService(ElasticCaseRepository repository,
                               ElasticsearchTemplate template,
@@ -81,8 +81,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         this.workflowService = workflowService;
         this.iElasticCasePrioritySearch = iElasticCasePrioritySearch;
         this.publisher = publisher;
-        this.caseElasticIndexQueueManager = new ElasticQueueManager<>(elasticProperties, elasticsearchClient);
-        this.caseElasticDeleteQueueManager = new ElasticQueueManager<>(elasticProperties, elasticsearchClient);
+        this.caseElasticIndexQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient);
+        this.caseElasticDeleteQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient);
 
     }
 

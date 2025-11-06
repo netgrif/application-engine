@@ -8,7 +8,6 @@ import com.netgrif.application.engine.configuration.properties.DataConfiguration
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +21,8 @@ import java.util.concurrent.atomic.AtomicReference;
  * Manages a queue of elastic queries and handles their periodic bulk processing in Elasticsearch.
  * This class efficiently buffers and schedules elastic queries in batches, ensuring timely
  * indexing into the Elasticsearch index with controlled execution and concurrency.
- *
- * @param <E> the type of elements to be managed in the queue and indexed by Elasticsearch
- */
-public final class ElasticQueueManager<E> {
+ **/
+public final class ElasticQueueManager {
 
     private final Logger log = LoggerFactory.getLogger(ElasticQueueManager.class);
 
