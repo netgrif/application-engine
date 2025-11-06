@@ -114,6 +114,7 @@ public final class ElasticQueueManager {
             }
         } catch (Exception e) {
             queue.addAll(batch);
+            resetTimer();
             log.error("Index failed with batch size: {} and id: {}", batch.size(), uuid, e);
         }
     }
