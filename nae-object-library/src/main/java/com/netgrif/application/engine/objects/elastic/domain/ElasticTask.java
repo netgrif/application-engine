@@ -24,7 +24,6 @@ public abstract class ElasticTask implements Serializable {
     @Serial
     private static final long serialVersionUID = 8399390623172906801L;
 
-//    private String _class;
 
     private String id;
 

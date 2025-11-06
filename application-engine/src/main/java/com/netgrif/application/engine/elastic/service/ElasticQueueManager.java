@@ -3,6 +3,7 @@ package com.netgrif.application.engine.elastic.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
+import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import jakarta.annotation.PreDestroy;
@@ -104,7 +105,7 @@ public final class ElasticQueueManager {
         String uuid = UUID.randomUUID().toString();
         try {
             log.debug("Index started with batch size: {} and id: {}", batch.size(), uuid);
-            elasticsearchClient.bulk(new BulkRequest.Builder().operations(batch).refresh(Refresh.False).build());
+            BulkResponse bulkResponse = elasticsearchClient.bulk(new BulkRequest.Builder().operations(batch).refresh(Refresh.False).build());
             log.debug("Index finished with batch size: {} and id: {}", batch.size(), uuid);
             if (queue.size() >= queueProperties.getMaxQueueSize()) {
                 flush();
