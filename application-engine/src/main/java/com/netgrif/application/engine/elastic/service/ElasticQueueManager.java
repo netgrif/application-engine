@@ -105,7 +105,7 @@ public final class ElasticQueueManager {
         String uuid = UUID.randomUUID().toString();
         try {
             log.debug("Index started with batch size: {} and id: {}", batch.size(), uuid);
-            BulkResponse bulkResponse = elasticsearchClient.bulk(new BulkRequest.Builder().operations(batch).refresh(Refresh.False).build());
+            elasticsearchClient.bulk(new BulkRequest.Builder().operations(batch).refresh(Refresh.False).build());
             log.debug("Index finished with batch size: {} and id: {}", batch.size(), uuid);
             if (queue.size() >= queueProperties.getMaxQueueSize()) {
                 flush();
