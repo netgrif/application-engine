@@ -109,7 +109,11 @@ public final class ElasticQueueManager<E> {
             log.debug("Index started with batch size: {} and id: {}", batch.size(), uuid);
             elasticsearchClient.bulk(new BulkRequest.Builder().operations(batch).refresh(Refresh.False).build());
             log.debug("Index finished with batch size: {} and id: {}", batch.size(), uuid);
-            resetTimer();
+            if (queue.size() >= queueProperties.getMaxQueueSize()) {
+                flush();
+            } else {
+                resetTimer();
+            }
         } catch (Exception e) {
             queue.addAll(batch);
             log.error("Index failed with batch size: {} and id: {}", batch.size(), uuid, e);
