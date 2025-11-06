@@ -8,9 +8,6 @@ import com.netgrif.application.engine.configuration.properties.DataConfiguration
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.core.query.BulkOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,12 +43,8 @@ public final class ElasticQueueManager<E> {
      * Constructs an ElasticQueueManager instance.
      *
      * @param elasticsearchProperties the configuration properties for Elasticsearch, including queue parameters
-     * @param elasticsearchTemplate   the template for interacting with Elasticsearch
-     * @param indexName               the name of the Elasticsearch index
      */
     public ElasticQueueManager(DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties,
-                               ElasticsearchTemplate elasticsearchTemplate,
-                               String indexName,
                                ElasticsearchClient elasticsearchClient) {
         queue = new ConcurrentLinkedDeque<>();
         atomicDelayer = new AtomicReference<>();
@@ -70,6 +63,7 @@ public final class ElasticQueueManager<E> {
         if (delayer != null) {
             delayer.cancel(false);
         }
+        scheduler.shutdown();
         while (!queue.isEmpty()) {
             flush();
         }
@@ -90,7 +84,9 @@ public final class ElasticQueueManager<E> {
      */
     public void push(BulkOperation elasticQuery) {
         queue.add(elasticQuery);
-        resetTimer();
+        if (queue.size() <= queueProperties.getMaxQueueSize()) {
+            resetTimer();
+        }
     }
 
     /**
@@ -129,12 +125,12 @@ public final class ElasticQueueManager<E> {
         if (scheduler.isShutdown()) {
             return;
         }
-        atomicDelayer.updateAndGet(existing -> {
-            if (existing != null && !existing.isDone() && !existing.isCancelled()) {
-                return existing;
-            }
-            return scheduler.schedule(this::flush, queueProperties.getDelay(), queueProperties.getDelayUnit());
-        });
+        ScheduledFuture<?> delayer = atomicDelayer.getAndSet(null);
+        if (delayer != null) {
+            delayer.cancel(false);
+        }
+        ScheduledFuture<?> newTask = scheduler.schedule(this::flush, queueProperties.getDelay(), queueProperties.getDelayUnit());
+        atomicDelayer.set(newTask);
     }
 
 }

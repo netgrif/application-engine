@@ -79,8 +79,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         this.workflowService = workflowService;
         this.iElasticCasePrioritySearch = iElasticCasePrioritySearch;
         this.publisher = publisher;
-        this.caseElasticIndexQueueManager = new ElasticQueueManager<>(elasticProperties, template, elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX), elasticsearchClient);
-        this.caseElasticDeleteQueueManager = new ElasticQueueManager<>(elasticProperties, template, elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX), elasticsearchClient);
+        this.caseElasticIndexQueueManager = new ElasticQueueManager<>(elasticProperties, elasticsearchClient);
+        this.caseElasticDeleteQueueManager = new ElasticQueueManager<>(elasticProperties, elasticsearchClient);
     }
 
     @Override
