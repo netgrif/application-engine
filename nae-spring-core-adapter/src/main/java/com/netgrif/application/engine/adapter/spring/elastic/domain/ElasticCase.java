@@ -142,4 +142,9 @@ public class ElasticCase extends com.netgrif.application.engine.objects.elastic.
     public Set<String> getNegativeViewUsers() {
         return super.getNegativeViewUsers();
     }
+
+    @Field(type = Keyword)
+    public String get_class() {
+        return this.getClass().getName();
+    }
 }

@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository;
@@ -37,6 +38,7 @@ public class ElasticServiceConfiguration {
     private final IWorkflowService workflowService;
     private final IElasticCasePrioritySearch elasticCasePrioritySearch;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final ElasticsearchClient elasticsearchClient;
 
     @Bean
     @Primary
@@ -65,7 +67,8 @@ public class ElasticServiceConfiguration {
                 petriNetService,
                 workflowService,
                 elasticCasePrioritySearch,
-                applicationEventPublisher
+                applicationEventPublisher,
+                elasticsearchClient
         );
     }
 
@@ -85,7 +88,8 @@ public class ElasticServiceConfiguration {
                 petriNetService,
                 workflowService,
                 elasticCasePrioritySearch,
-                applicationEventPublisher
+                applicationEventPublisher,
+                elasticsearchClient
         );
     }
 

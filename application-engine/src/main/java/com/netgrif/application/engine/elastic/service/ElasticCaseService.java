@@ -1,11 +1,13 @@
 package com.netgrif.application.engine.elastic.service;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.mapping.FieldType;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
@@ -26,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.*;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -68,7 +69,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                               @Lazy IPetriNetService petriNetService,
                               @Lazy IWorkflowService workflowService,
                               IElasticCasePrioritySearch iElasticCasePrioritySearch,
-                              ApplicationEventPublisher publisher) {
+                              ApplicationEventPublisher publisher,
+                              ElasticsearchClient elasticsearchClient) {
         this.repository = repository;
         this.template = template;
         this.executors = executors;
@@ -77,19 +79,21 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         this.workflowService = workflowService;
         this.iElasticCasePrioritySearch = iElasticCasePrioritySearch;
         this.publisher = publisher;
-        this.caseElasticIndexQueueManager = new ElasticQueueManager<>(elasticProperties, template, elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX));
-        this.caseElasticDeleteQueueManager = new ElasticQueueManager<>(elasticProperties, template, elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX));
+        this.caseElasticIndexQueueManager = new ElasticQueueManager<>(elasticProperties, template, elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX), elasticsearchClient);
+        this.caseElasticDeleteQueueManager = new ElasticQueueManager<>(elasticProperties, template, elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX), elasticsearchClient);
     }
 
     @Override
     public void remove(String caseId) {
-        caseElasticDeleteQueueManager.push(DeleteQuery.builder(CriteriaQuery.builder(Criteria.where("id").is(caseId)).build()).build());
+        caseElasticDeleteQueueManager.push(BulkOperation.of(op -> op.delete(d -> d.index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX)).id(caseId))));
         log.info("[{}]: Case \"{}\" queued for deletion", caseId, caseId);
     }
 
     @Override
     public void removeByPetriNetId(String processId) {
-        caseElasticDeleteQueueManager.push(DeleteQuery.builder(CriteriaQuery.builder(Criteria.where("processId").is(processId)).build()).build());
+        CriteriaQuery query = CriteriaQuery.builder(Criteria.where("processId").is(processId)).build();
+        SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, IndexCoordinates.of(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX)));
+        hits.stream().forEach(hit -> remove(hit.getId()));
         log.info("[{}]: All cases of Petri Net with id \"{}\" are queued for deletion", processId, processId);
     }
 
@@ -97,11 +101,19 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     public void index(ElasticCase useCase) {
         Optional<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> elasticCaseOptional = repository.findById(useCase.getId());
         if (elasticCaseOptional.isEmpty()) {
-            caseElasticIndexQueueManager.push(new IndexQueryBuilder().withObject(useCase).build());
+            caseElasticIndexQueueManager.push(BulkOperation.of(op -> op.index(i -> i
+                    .index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX))
+                    .id(useCase.getId())
+                    .document(useCase))
+            ));
         } else {
             com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase elasticCase = elasticCaseOptional.get();
             elasticCase.update(useCase);
-            caseElasticIndexQueueManager.push(new IndexQueryBuilder().withObject(elasticCase).build());
+            caseElasticIndexQueueManager.push(BulkOperation.of(op -> op.index(i -> i
+                    .index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX))
+                    .id(elasticCase.getId())
+                    .document(elasticCase))
+            ));
         }
         log.debug("[{}]: Case \"{}\" queued for indexing", useCase.getId(), useCase.getTitle());
         publisher.publishEvent(new IndexCaseEvent(useCase));

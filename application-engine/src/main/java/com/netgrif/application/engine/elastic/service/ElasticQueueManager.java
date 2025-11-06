@@ -1,11 +1,14 @@
 package com.netgrif.application.engine.elastic.service;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.Refresh;
+import co.elastic.clients.elasticsearch.core.BulkRequest;
+import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.core.RefreshPolicy;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.BulkOptions;
 
@@ -28,9 +31,7 @@ public final class ElasticQueueManager<E> {
 
     private final Logger log = LoggerFactory.getLogger(ElasticQueueManager.class);
 
-    private final String indexName;
-
-    private final Queue<E> queue;
+    private final Queue<BulkOperation> queue;
 
     private final ScheduledExecutorService scheduler;
 
@@ -38,7 +39,8 @@ public final class ElasticQueueManager<E> {
 
     private final DataConfigurationProperties.ElasticsearchProperties.QueueProperties queueProperties;
 
-    private final ElasticsearchTemplate elasticsearchTemplate;
+
+    private final ElasticsearchClient elasticsearchClient;
 
     /**
      * Constructs an ElasticQueueManager instance.
@@ -49,13 +51,13 @@ public final class ElasticQueueManager<E> {
      */
     public ElasticQueueManager(DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties,
                                ElasticsearchTemplate elasticsearchTemplate,
-                               String indexName) {
+                               String indexName,
+                               ElasticsearchClient elasticsearchClient) {
         queue = new ConcurrentLinkedDeque<>();
         atomicDelayer = new AtomicReference<>();
         queueProperties = elasticsearchProperties.getQueue();
         scheduler = Executors.newScheduledThreadPool(queueProperties.getScheduledExecutorPoolSize());
-        this.elasticsearchTemplate = elasticsearchTemplate;
-        this.indexName = indexName;
+        this.elasticsearchClient = elasticsearchClient;
     }
 
     /**
@@ -86,7 +88,7 @@ public final class ElasticQueueManager<E> {
      *
      * @param elasticQuery the elastic query to be added to the queue
      */
-    public void push(E elasticQuery) {
+    public void push(BulkOperation elasticQuery) {
         queue.add(elasticQuery);
         resetTimer();
     }
@@ -97,22 +99,19 @@ public final class ElasticQueueManager<E> {
      * processed at a time.
      */
     private synchronized void flush() {
-        List<E> batch = new ArrayList<>();
+        if (queue.isEmpty()) {
+            return;
+        }
 
+        List<BulkOperation> batch = new ArrayList<>();
         while (!queue.isEmpty() && batch.size() < queueProperties.getMaxQueueSize()) {
             batch.add(queue.poll());
         }
 
         String uuid = UUID.randomUUID().toString();
-        if (batch.isEmpty()) {
-            return;
-        }
         try {
             log.debug("Index started with batch size: {} and id: {}", batch.size(), uuid);
-            BulkOptions bulkOptions = BulkOptions.builder()
-                    .withRefreshPolicy(RefreshPolicy.WAIT_UNTIL)
-                    .build();
-            elasticsearchTemplate.bulkOperation(batch, bulkOptions, IndexCoordinates.of(indexName));
+            elasticsearchClient.bulk(new BulkRequest.Builder().operations(batch).refresh(Refresh.False).build());
             log.debug("Index finished with batch size: {} and id: {}", batch.size(), uuid);
             resetTimer();
         } catch (Exception e) {
@@ -127,15 +126,15 @@ public final class ElasticQueueManager<E> {
      * has elapsed from the last push to the queue.
      */
     private void resetTimer() {
-        ScheduledFuture<?> delayer = atomicDelayer.getAndSet(null);
-        if (delayer != null) {
-            delayer.cancel(false);
-        }
         if (scheduler.isShutdown()) {
             return;
         }
-        ScheduledFuture<?> newTask = scheduler.schedule(this::flush, queueProperties.getDelay(), queueProperties.getDelayUnit());
-        atomicDelayer.set(newTask);
+        atomicDelayer.updateAndGet(existing -> {
+            if (existing != null && !existing.isDone() && !existing.isCancelled()) {
+                return existing;
+            }
+            return scheduler.schedule(this::flush, queueProperties.getDelay(), queueProperties.getDelayUnit());
+        });
     }
 
 }
