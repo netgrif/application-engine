@@ -146,9 +146,9 @@ public final class ElasticQueueManager {
             queue.addAll(batch);
             resetTimer();
             log.error("Index failed with batch size: {} and id: {}", batch.size(), uuid, e);
-        } finally {
-            publishEventsOfBatch(batch);
+            return;
         }
+        publishEventsOfBatch(batch);
     }
 
     /**
