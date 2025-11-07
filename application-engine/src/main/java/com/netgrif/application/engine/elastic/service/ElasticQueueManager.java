@@ -117,11 +117,14 @@ public final class ElasticQueueManager {
     /**
      * Processes and synchronously flushes a batch of elements from the queue to Elasticsearch.
      * <p>
-     * The method retrieves up to the configured maximum batch size of operations from the queue
-     * and sends them to Elasticsearch for indexing. On errors, the batch is re-added to the queue
-     * for a retry at a later time. Additionally, event publishing is triggered for successfully
-     * processed operations.
-     **/
+     * Retrieves a batch of operations up to the configured maximum size from the queue
+     * and sends them to Elasticsearch using the bulk API. If a failure occurs during the
+     * bulk operation, the failed batch remains unprocessed and will be retried later via
+     * scheduled execution or manual flush invocation. All successfully processed operations
+     * trigger their respective publishable events.
+     * <p>
+     * This method is thread-safe and ensures that only one flush operation executes at any time.
+     */
     private synchronized void flush() {
         if (queue.isEmpty()) {
             return;
