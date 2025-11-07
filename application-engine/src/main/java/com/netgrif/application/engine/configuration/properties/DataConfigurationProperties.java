@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.configuration.properties;
 
+import co.elastic.clients.elasticsearch._types.Refresh;
 import com.mongodb.connection.ClusterConnectionMode;
 import com.mongodb.connection.ClusterType;
 import jakarta.annotation.PostConstruct;
@@ -704,7 +705,7 @@ public class DataConfigurationProperties {
              * Determines when changes made by bulk operations will be visible for search.
              * Default value is {@link RefreshPolicy#NONE}, meaning no immediate refresh.
              */
-            private RefreshPolicy refreshPolicy = RefreshPolicy.NONE;
+            private Refresh refreshPolicy = Refresh.False;
         }
     }
 
