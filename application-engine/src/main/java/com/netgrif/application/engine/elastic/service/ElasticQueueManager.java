@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.elastic.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.domain.BulkOperationWrapper;
