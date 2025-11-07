@@ -108,7 +108,7 @@ public final class ElasticQueueManager {
     public void push(BulkOperationWrapper operation) {
         try {
             queue.put(operation);
-            if (queue.size() < queueProperties.getMaxQueueSize()) {
+            if (queue.size() < queueProperties.getMaxBatchSize()) {
                 resetTimer();
             }
         } catch (InterruptedException e) {
@@ -143,9 +143,9 @@ public final class ElasticQueueManager {
             log.debug("Index finished with batch size: {} and id: {}", batch.size(), uuid);
             checkQueue();
         } catch (Exception e) {
-            queue.addAll(batch);
-            resetTimer();
-            log.error("Index failed with batch size: {} and id: {}", batch.size(), uuid, e);
+            log.error("Bulk operation failed for batch id: {} with {} operations. " +
+                            "Operations will be retried via scheduled indexing or manual reindex.",
+                    uuid, batch.size(), e);
             return;
         }
         publishEventsOfBatch(batch);
