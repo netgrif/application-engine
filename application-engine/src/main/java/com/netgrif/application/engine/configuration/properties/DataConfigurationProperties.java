@@ -683,13 +683,27 @@ public class DataConfigurationProperties {
             private TimeUnit delayUnit = TimeUnit.MILLISECONDS;
 
             /**
-             * Maximum number of elements allowed in the queue.
-             * When the queue size reaches this limit, it triggers a flush operation.
+             * Maximum number of elements allowed in batch to flush.
+             * When the batch size reaches this limit, it triggers a flush operation.
              * Default value: 400.
              */
             @Min(1)
-            private int maxQueueSize = 400;
+            private int maxBatchSize = 400;
 
+
+            /**
+             * Specifies the maximum size of the queue. When the queue reaches this size,
+             * a flush operation is triggered to process the elements in the queue.
+             * Default value is 3000, and the minimum allowable value is 400.
+             */
+            @Min(400)
+            private int maxQueueSize = 3000;
+
+            /**
+             * Defines the refresh policy for Elasticsearch operations.
+             * Determines when changes made by bulk operations will be visible for search.
+             * Default value is {@link RefreshPolicy#NONE}, meaning no immediate refresh.
+             */
             private RefreshPolicy refreshPolicy = RefreshPolicy.NONE;
         }
     }
