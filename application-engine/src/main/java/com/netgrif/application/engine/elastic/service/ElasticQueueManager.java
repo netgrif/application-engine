@@ -103,7 +103,6 @@ public final class ElasticQueueManager {
      * is rescheduled to execute after the appropriate delay interval.
      *
      * @param operation the bulk operation to be added to the queue.
-     * @throws IllegalStateException if the queue is full and cannot accept new operations.
      */
     public void push(BulkOperationWrapper operation) {
         try {
