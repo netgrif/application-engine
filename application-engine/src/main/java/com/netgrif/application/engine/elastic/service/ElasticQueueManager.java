@@ -72,9 +72,7 @@ public final class ElasticQueueManager {
      * This method cancels any pending scheduled tasks, flushes all remaining elements in the queue
      * to Elasticsearch, and shuts down the executor service. It ensures that no queued operations
      * are lost during the application shutdown process.
-     *
-     * @throws InterruptedException if the shutdown is interrupted during termination waiting period.
-     */
+     **/
     @PreDestroy
     public void shutdown() {
         ScheduledFuture<?> delayer = atomicDelayer.getAndSet(null);
