@@ -121,9 +121,7 @@ public final class ElasticQueueManager {
      * and sends them to Elasticsearch for indexing. On errors, the batch is re-added to the queue
      * for a retry at a later time. Additionally, event publishing is triggered for successfully
      * processed operations.
-     *
-     * @throws IllegalStateException if triggered in a shutdown state.
-     */
+     **/
     private synchronized void flush() {
         if (queue.isEmpty()) {
             return;
