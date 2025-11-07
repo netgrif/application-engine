@@ -117,7 +117,7 @@ public final class ElasticQueueManager {
      * that the flush operation is delayed until the configured time interval
      * has elapsed from the last push to the queue.
      */
-    private void resetTimer() {
+    private synchronized void resetTimer() {
         if (scheduler.isShutdown()) {
             return;
         }
