@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * - Enqueuing bulk operations and managing a bounded queue to ensure memory efficiency.
  * - Automatically flushing queued operations into Elasticsearch in configurable batches.
  * - Controlling execution with a scheduled timer to avoid overloading Elasticsearch.
- * - Handling exceptions during the bulk operation, retrying in case of failures.
+ * - Handling exceptions during bulk operations; failed operations are retried via scheduled reindexing or manual endpoints.
  * <p>
  * Key components of this class:
  * - {@code queue}: A thread-safe queue to hold bulk operations before processing.
@@ -145,7 +145,11 @@ public final class ElasticQueueManager {
                     uuid, batch.size(), e);
             return;
         }
-        publishEventsOfBatch(batch);
+        try {
+            publishEventsOfBatch(batch);
+        } catch (Exception e) {
+            log.error("Event publishing failed for batch id: {}", uuid, e);
+        }
     }
 
     /**
