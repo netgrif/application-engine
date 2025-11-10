@@ -106,8 +106,9 @@ public class DataConfigurationProperties {
     @Bean
     @Primary
     public RedisProperties redisProperties() {
-        if (redis.getSession().getNamespace() == null) {
-            redis.getSession().setNamespace(databaseName);
+        String namespace = redis.getSession().getNamespace();
+        if (namespace == null || namespace.isBlank() || "spring:session".equals(namespace)) {
+            redis.getSession().setNamespace("spring:session:" + databaseName);
         }
         return redis;
     }
