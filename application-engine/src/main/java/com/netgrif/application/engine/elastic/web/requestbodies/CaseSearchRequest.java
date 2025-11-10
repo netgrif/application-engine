@@ -44,6 +44,8 @@ public class CaseSearchRequest implements Serializable {
 
     public String query;
 
+    public boolean dynamicQuery;
+
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> id;
 
