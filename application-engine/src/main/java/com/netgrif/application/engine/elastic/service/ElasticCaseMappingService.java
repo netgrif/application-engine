@@ -1,13 +1,5 @@
 package com.netgrif.application.engine.elastic.service;
 
-
-import com.netgrif.application.engine.objects.elastic.domain.BooleanField;
-import com.netgrif.application.engine.objects.elastic.domain.ButtonField;
-import com.netgrif.application.engine.objects.elastic.domain.DateField;
-import com.netgrif.application.engine.objects.elastic.domain.FileField;
-import com.netgrif.application.engine.objects.elastic.domain.I18nField;
-import com.netgrif.application.engine.objects.elastic.domain.NumberField;
-import com.netgrif.application.engine.objects.elastic.domain.TextField;
 import com.netgrif.application.engine.objects.elastic.domain.UserField;
 import com.netgrif.application.engine.objects.elastic.domain.UserListField;
 import com.netgrif.application.engine.objects.elastic.domain.*;
@@ -163,7 +155,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         List<String> translations = new ArrayList<>();
         values.forEach(value -> {
             if (value instanceof I18nString) {
-                translations.addAll(this.collectTranslations((I18nString) value));
+                translations.addAll(I18nStringUtils.collectTranslations((I18nString) value));
             } else if (value instanceof String) {
                 translations.add((String) value);
             } else {
@@ -194,7 +186,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             (com.netgrif.application.engine.objects.workflow.domain.DataField enumField) {
         Object value = enumField.getValue();
         if (value instanceof I18nString) {
-            return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.TextField(this.collectTranslations((I18nString) value).toArray(new String[0])));
+            return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.TextField(I18nStringUtils.collectTranslations((I18nString) value).toArray(new String[0])));
         } else if (value instanceof String) {
             return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.TextField((String) value));
         } else {
@@ -202,16 +194,6 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             log.error("Enumeration field has value of illegal type! Expected: I18nString, Found: " + value.getClass().getCanonicalName());
             return Optional.empty();
         }
-    }
-
-    protected List<String> collectTranslations(I18nString i18nString) {
-        List<String> translations = new ArrayList<>();
-        if (i18nString == null) {
-            return translations;
-        }
-        translations.add(i18nString.getDefaultValue());
-        translations.addAll(i18nString.getTranslations().values());
-        return translations;
     }
 
     protected Optional<DataField> transformNumberField

@@ -6,8 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
 
 @Data
 @NoArgsConstructor
@@ -19,7 +17,7 @@ public abstract class MapField extends TextField {
 
     public MapField(Map.Entry<String, I18nString> valueTranslationPair) {
         super(new String[0]);
-        List<String> values = this.collectTranslations(valueTranslationPair.getValue());
+        List<String> values = I18nStringUtils.collectTranslations(valueTranslationPair.getValue());
         this.keyValue = new String[1];
         this.keyValue[0] = valueTranslationPair.getKey();
         this.textValue = values.toArray(new String[0]);
@@ -35,7 +33,7 @@ public abstract class MapField extends TextField {
         this.keyValueTranslations = new HashMap<>();
         for (int i = 0; i < valueTranslationPairs.size(); i++) {
             this.keyValue[i] = valueTranslationPairs.get(i).getKey();
-            values.addAll(this.collectTranslations(valueTranslationPairs.get(i).getValue()));
+            values.addAll(I18nStringUtils.collectTranslations(valueTranslationPairs.get(i).getValue()));
             this.keyValueTranslations.put(valueTranslationPairs.get(i).getKey(), valueTranslationPairs.get(i).getValue());
         }
         this.textValue = values.toArray(new String[0]);
@@ -49,15 +47,5 @@ public abstract class MapField extends TextField {
             return new LinkedHashSet<>(Arrays.asList(keyValue));
         }
         return null;
-    }
-
-    protected List<String> collectTranslations(I18nString i18nString) {
-        List<String> translations = new ArrayList<>();
-        if (i18nString == null) {
-            return translations;
-        }
-        translations.add(i18nString.getDefaultValue());
-        translations.addAll(i18nString.getTranslations().values());
-        return translations;
     }
 }
