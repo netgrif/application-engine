@@ -95,7 +95,8 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         Map<String, I18nString> options = this.getFieldOptions(multichoiceMap, netField);
         List<Map.Entry<String, I18nString>> values = new ArrayList<>();
         for (String key : (Set<String>) mapValues) {
-            values.add(new AbstractMap.SimpleEntry<>(key, options.get(key)));
+            I18nString selectedValue = options.get(key);
+            values.add(new AbstractMap.SimpleEntry<>(key, selectedValue != null ? selectedValue : new I18nString("")));
         }
         return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.MapField(values));
     }
@@ -133,7 +134,8 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             (com.netgrif.application.engine.objects.workflow.domain.DataField enumMap, EnumerationMapField netField) {
         Map<String, I18nString> options = this.getFieldOptions(enumMap, netField);
         String selectedKey = (String) enumMap.getValue();
-        return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.MapField(new AbstractMap.SimpleEntry<>(selectedKey, options.get(selectedKey))));
+        I18nString selectedValue = options.get(selectedKey);
+        return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.MapField(new AbstractMap.SimpleEntry<>(selectedKey, selectedValue != null ? selectedValue : new I18nString(""))));
     }
 
     private Map<String, I18nString> getFieldOptions
