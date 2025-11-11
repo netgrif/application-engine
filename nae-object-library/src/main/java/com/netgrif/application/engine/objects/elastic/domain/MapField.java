@@ -16,14 +16,7 @@ public abstract class MapField extends TextField {
     public Map<String, I18nString> keyValueTranslations;
 
     public MapField(Map.Entry<String, I18nString> valueTranslationPair) {
-        super(new String[0]);
-        List<String> values = I18nStringUtils.collectTranslations(valueTranslationPair.getValue());
-        this.keyValue = new String[1];
-        this.keyValue[0] = valueTranslationPair.getKey();
-        this.textValue = values.toArray(new String[0]);
-        this.fulltextValue = values.toArray(new String[0]);
-        this.keyValueTranslations = new HashMap<>();
-        this.keyValueTranslations.put(valueTranslationPair.getKey(), valueTranslationPair.getValue());
+        this(List.of(valueTranslationPair));
     }
 
     public MapField(List<Map.Entry<String, I18nString>> valueTranslationPairs) {
