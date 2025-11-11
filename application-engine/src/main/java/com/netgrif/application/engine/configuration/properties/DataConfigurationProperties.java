@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
+import org.springframework.data.redis.connection.RedisNode;
 import org.springframework.data.elasticsearch.core.RefreshPolicy;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -107,8 +108,9 @@ public class DataConfigurationProperties {
     @Bean
     @Primary
     public RedisProperties redisProperties() {
-        if (redis.getNamespace() == null) {
-            redis.setNamespace(databaseName);
+        String namespace = redis.getSession().getNamespace();
+        if (namespace == null || namespace.isBlank() || "spring:session".equals(namespace)) {
+            redis.getSession().setNamespace("spring:session:" + databaseName);
         }
         return redis;
     }
@@ -189,7 +191,7 @@ public class DataConfigurationProperties {
         /**
          * Specifies the maximum number of connections that can be initiated concurrently.
          * This property is used to throttle the number of simultaneous connection attempts
-         *  to limit resource usage and prevent connection saturation.
+         * to limit resource usage and prevent connection saturation.
          */
         private int maxConnecting = 2;
 
@@ -523,7 +525,7 @@ public class DataConfigurationProperties {
          */
         @Valid
         private BatchProperties batch = new BatchProperties();
-        
+
 
         /**
          * Configuration properties for handling queues in Elasticsearch operations.
@@ -709,17 +711,15 @@ public class DataConfigurationProperties {
         }
     }
 
+
     /**
-     * Configuration properties for Redis session management in the application.
-     * <p>
-     * This class extends {@link RedisSessionProperties}, providing additional
-     * configurations specific to Redis-based session handling in the application.
-     * It allows customization of connection details, session limiting, and other Redis-specific settings.
+     * Represents configuration properties for Redis used within the application.
+     * This class contains configurations related to the Redis server, including its
+     * connection details, sentinel and cluster settings, and session management properties.
      */
     @Data
-    @EqualsAndHashCode(callSuper = true)
-    @ConfigurationProperties(prefix = "netgrif.engine.session")
-    public static class RedisProperties extends RedisSessionProperties {
+    @ConfigurationProperties(prefix = "netgrif.engine.data.redis")
+    public static class RedisProperties {
 
         /**
          * Hostname or IP address of the Redis server.
@@ -731,7 +731,7 @@ public class DataConfigurationProperties {
          * Port number for connecting to the Redis server.
          * Default value is {@code 6379}.
          */
-        private int port = 6379;
+        private int port = RedisNode.DEFAULT_PORT;
 
         /**
          * Username for authenticating with the Redis server.
@@ -746,22 +746,101 @@ public class DataConfigurationProperties {
         private String password;
 
         /**
-         * Flag indicating whether to enable session limit functionality.
-         * If {@code true}, sessions will be limited based on the configured {@link #maxSession} value.
+         * Indicates whether SSL (Secure Sockets Layer) is enabled for connections.
+         * Set to {@code true} to enable SSL or {@code false} to disable it.
+         * This property is primarily used for configuring secure communication
+         * with a Redis server.
          */
-        private boolean enabledLimitSession = false;
+        private boolean ssl = false;
 
         /**
-         * Maximum number of sessions allowed per user when session limiting is enabled.
-         * Default value is {@code 1}.
+         * Configuration properties for Redis Sentinel.
+         * <p>
+         * This property defines the settings required for connecting to a Redis Sentinel
+         * setup. It includes information about the master node, a list of sentinel nodes,
+         * and optional authentication credentials such as username and password.
          */
-        private int maxSession = 1;
+        private RedisSentinelProperties sentinel = new RedisSentinelProperties();
 
         /**
-         * Flag indicating whether Redis filtering is enabled.
-         * Default value is {@code false}.
+         * Configuration property for managing Redis-based session settings for this application.
+         * Uses the {@link EngineRedisSessionProperties} class to define specific session handling configurations.
+         * Allows customization of session behavior such as session limiting and filtering.
          */
-        private boolean enabledFilter = false;
+        private EngineRedisSessionProperties session = new EngineRedisSessionProperties();
+
+        /**
+         * Represents configuration properties for Redis Sentinel.
+         * This class is typically used to configure and connect to a Redis Sentinel setup
+         * by specifying the master node and the sentinel nodes involved.
+         */
+        @Data
+        public static class RedisSentinelProperties {
+
+            public static final String DEFAULT_SENTINEL_NODE = "localhost:" + RedisNode.DEFAULT_SENTINEL_PORT;
+
+            /**
+             * The name of the Redis master node to which Redis Sentinel clients should connect.
+             * Specifies the master node in a Redis Sentinel deployment that is responsible for
+             * managing the data and serving read/write queries.
+             * This variable is essential for identifying the Redis master node among the available
+             * nodes in the Sentinel setup.
+             */
+            private String master;
+
+            /**
+             * A list of Redis Sentinel nodes used for connection.
+             * Each node in the list should be in the format of "host:port".
+             * By default, this list contains a single node pointing to "localhost:26379".
+             * In a Redis Sentinel setup, multiple nodes can be specified to ensure high availability and fault tolerance.
+             */
+            private List<String> nodes = List.of(DEFAULT_SENTINEL_NODE);
+
+            /**
+             * The username used for authentications or configurations related to Redis Sentinel properties.
+             * This variable can be used to specify an optional username for connecting to a Redis database
+             * when authentication is configured to require one.
+             */
+            private String username;
+
+            /**
+             * The password used for authentication with the Redis Sentinel setup.
+             * This variable specifies the password needed to connect to the Redis database
+             * when the configuration requires authentication for access.
+             * It ensures secure communication and prevents unauthorized access to the database.
+             */
+            private String password;
+        }
+
+        /**
+         * Configuration properties for Redis session management in the application.
+         * <p>
+         * This class extends {@link RedisSessionProperties}, providing additional
+         * configurations specific to Redis-based session handling in the application.
+         * It allows session limiting and other Redis-specific session settings.
+         */
+        @Data
+        @EqualsAndHashCode(callSuper = true)
+        public static class EngineRedisSessionProperties extends RedisSessionProperties {
+
+            /**
+             * Flag indicating whether to enable session limit functionality.
+             * If {@code true}, sessions will be limited based on the configured {@link #maxSession} value.
+             */
+            private boolean enabledLimitSession = false;
+
+            /**
+             * Maximum number of sessions allowed per user when session limiting is enabled.
+             * Default value is {@code 1}.
+             */
+            private int maxSession = 1;
+
+            /**
+             * Flag indicating whether Redis filtering is enabled.
+             * Default value is {@code false}.
+             */
+            private boolean enabledFilter = false;
+        }
     }
 
     /**
