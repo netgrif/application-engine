@@ -8,7 +8,7 @@ import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
 import com.netgrif.application.engine.objects.dto.PreferencesDto;
-import com.netgrif.application.engine.objects.dto.request.user.UserCreateRequest;
+import com.netgrif.application.engine.objects.dto.request.user.UserCreateRequestDto;
 import com.netgrif.application.engine.objects.dto.request.user.UserSearchRequestBody;
 import com.netgrif.application.engine.objects.dto.response.authority.AuthorityDto;
 import com.netgrif.application.engine.objects.dto.response.user.UserDto;
@@ -62,7 +62,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/{realmId}")
-    public ResponseEntity<UserDto> createUser(@PathVariable String realmId, @RequestBody UserCreateRequest request, Locale locale) {
+    public ResponseEntity<UserDto> createUser(@PathVariable String realmId, @RequestBody UserCreateRequestDto request, Locale locale) {
         try {
             if (!realmExists(realmId)) {
                 log.error("Realm with id [{}] not found", realmId);

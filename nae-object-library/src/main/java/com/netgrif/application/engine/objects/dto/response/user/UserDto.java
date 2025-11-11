@@ -56,7 +56,7 @@ public record UserDto(String id, String username, String realmId, String email, 
                 attributes.put(ATTR_ENABLED_CREDENTIALS, enabledCredentialsAttribute);
             }
         }
-//        todo negative roles were not set before now, is it ok?
+
         return new UserDto(
                 user.getStringId(), user.getUsername(), user.getRealmId(), user.getEmail(), user.getAvatar(),
                 user.getFirstName(), user.getLastName(), user.getFullName(),

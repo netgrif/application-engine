@@ -97,41 +97,41 @@ public class WorkflowController {
 
     @Operation(summary = "Get all cases of the system, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/all", produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<CaseResource> getAll(Pageable pageable, PagedResourcesAssembler<CaseDto> assembler, Locale locale) {
-        Page<CaseDto> cases = workflowService.getAll(pageable).map(domainCase -> CaseDto.fromCase(domainCase, locale));
+    public PagedModel<CaseResource> getAll(Pageable pageable, PagedResourcesAssembler<Case> assembler, Locale locale) {
+        Page<Case> cases = workflowService.getAll(pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                 .getAll(pageable, assembler, locale)).withRel("all");
-        return buildResponse(assembler, cases, selfLink);
+        return buildResponse(assembler, cases, selfLink, locale);
     }
 
     @Operation(summary = "Generic case search with QueryDSL predicate, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/search2", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> search2(@QuerydslPredicate(root = Case.class) Predicate predicate, Pageable pageable,
-                                            PagedResourcesAssembler<CaseDto> assembler, Locale locale) {
-        Page<CaseDto> cases = workflowService.search(predicate, pageable).map(domainCase -> CaseDto.fromCase(domainCase, locale));
+                                            PagedResourcesAssembler<Case> assembler, Locale locale) {
+        Page<Case> cases = workflowService.search(predicate, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                 .search2(predicate, pageable, assembler, locale)).withRel("search2");
-        return buildResponse(assembler, cases, selfLink);
+        return buildResponse(assembler, cases, selfLink, locale);
     }
 
     @Operation(summary = "Generic case search on Elasticsearch database, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<CaseResource> search(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<CaseDto> assembler, Authentication auth, Locale locale) {
+    public PagedModel<CaseResource> search(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
 
-        Page<CaseDto> cases = elasticCaseService.search(searchBody.getList(), user, pageable, locale, operation == MergeFilterOperation.AND).map(domainCase -> CaseDto.fromCase(domainCase, locale));
+        Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, locale, operation == MergeFilterOperation.AND);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                 .search(searchBody, operation, pageable, assembler, auth, locale)).withRel("search");
-        return buildResponse(assembler, cases, selfLink);
+        return buildResponse(assembler, cases, selfLink, locale);
     }
 
     @Operation(summary = "Generic case search on Mongo database, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/search_mongo", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<CaseResource> searchMongo(@RequestBody Map<String, Object> searchBody, Pageable pageable, Authentication auth, PagedResourcesAssembler<CaseDto> assembler, Locale locale) {
-        Page<CaseDto> cases = workflowService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal(), locale).map(domainCase -> CaseDto.fromCase(domainCase, locale));
+    public PagedModel<CaseResource> searchMongo(@RequestBody Map<String, Object> searchBody, Pageable pageable, Authentication auth, PagedResourcesAssembler<Case> assembler, Locale locale) {
+        Page<Case> cases = workflowService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal(), locale);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                 .searchMongo(searchBody, pageable, auth, assembler, locale)).withRel("search");
-        return buildResponse(assembler, cases, selfLink);
+        return buildResponse(assembler, cases, selfLink, locale);
     }
 
 
@@ -153,11 +153,11 @@ public class WorkflowController {
 
     @Operation(summary = "Get all cases by user that created them, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
     @RequestMapping(value = "/case/author/{id}", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<CaseResource> findAllByAuthor(@PathVariable("id") String authorId, @RequestBody String petriNet, PagedResourcesAssembler<CaseDto> assembler, Pageable pageable, Locale locale) {
-        Page<CaseDto> cases = workflowService.findAllByAuthor(authorId, petriNet, pageable).map(domainCase -> CaseDto.fromCase(domainCase, locale));
+    public PagedModel<CaseResource> findAllByAuthor(@PathVariable("id") String authorId, @RequestBody String petriNet, PagedResourcesAssembler<Case> assembler, Pageable pageable, Locale locale) {
+        Page<Case> cases = workflowService.findAllByAuthor(authorId, petriNet, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                 .findAllByAuthor(authorId, petriNet, assembler, pageable, locale)).withRel("author");
-        return buildResponse(assembler, cases, selfLink);
+        return buildResponse(assembler, cases, selfLink, locale);
     }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
@@ -248,8 +248,8 @@ public class WorkflowController {
     }
 
     @NotNull
-    private PagedModel<CaseResource> buildResponse(PagedResourcesAssembler<CaseDto> assembler, Page<CaseDto> cases, Link selfLink) {
-        PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
+    private PagedModel<CaseResource> buildResponse(PagedResourcesAssembler<Case> assembler, Page<Case> cases, Link selfLink, Locale locale) {
+        PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(locale), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
         return resources;
     }

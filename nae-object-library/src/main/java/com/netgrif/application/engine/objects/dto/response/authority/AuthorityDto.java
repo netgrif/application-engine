@@ -8,10 +8,10 @@ import java.io.Serializable;
 /**
  * DTO for {@link Authority}
  */
-public record AuthorityDto(ObjectId id, String name) implements Serializable {
+public record AuthorityDto(ObjectId id, String authority, String stringId) implements Serializable {
 
     public static AuthorityDto fromAuthority(Authority authority) {
-        return new AuthorityDto(authority.get_id(), authority.getName());
+        return new AuthorityDto(authority.get_id(), authority.getName(), authority.getStringId());
     }
 
 }

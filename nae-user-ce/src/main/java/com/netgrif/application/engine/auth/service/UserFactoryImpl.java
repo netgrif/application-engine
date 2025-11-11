@@ -27,7 +27,6 @@ public class UserFactoryImpl implements UserFactory {
     public UserDto getUserWithImpersonation(AbstractUser user, AbstractUser impersonated, Locale locale) {
         String defaultRoleId = processRoleService.getDefaultRole().getStringId();
         String anonymousRoleId = processRoleService.getAnonymousRole().getStringId();
-//        todo negative processRoles?
         Set<ProcessRoleDto> roles = user.getProcessRoles().stream().map(processRole -> {
             if (processRole.getStringId().equals(defaultRoleId)) {
                 return new ProcessRoleDto(processRole, locale);
