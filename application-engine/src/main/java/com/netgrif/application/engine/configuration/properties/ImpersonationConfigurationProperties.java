@@ -19,7 +19,7 @@ public class ImpersonationConfigurationProperties {
      * The Redis namespace used for storing impersonation configurations.
      * This value is resolved from the "redisProperties.namespace" SpEL expression.
      */
-    @Value("#{redisProperties.namespace}")
+    @Value("#{redisProperties.session.namespace}")
     private String redisNamespace;
 
     /**
