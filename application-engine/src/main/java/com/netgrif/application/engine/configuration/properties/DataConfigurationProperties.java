@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.configuration.properties;
 
+import co.elastic.clients.elasticsearch._types.Refresh;
 import com.mongodb.connection.ClusterConnectionMode;
 import com.mongodb.connection.ClusterType;
 import jakarta.annotation.PostConstruct;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
+import org.springframework.data.elasticsearch.core.RefreshPolicy;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -521,6 +523,16 @@ public class DataConfigurationProperties {
          */
         @Valid
         private BatchProperties batch = new BatchProperties();
+        
+
+        /**
+         * Configuration properties for handling queues in Elasticsearch operations.
+         * These properties specify the behavior of the ElasticQueueManager,
+         * including the maximum queue size, delay between flush operations,
+         * and the thread pool size for scheduled executor service tasks.
+         */
+        @Valid
+        private QueueProperties queue = new QueueProperties();
 
         public static final String PETRI_NET_INDEX = "petriNet";
 
@@ -637,6 +649,63 @@ public class DataConfigurationProperties {
              */
             @Min(1)
             private int taskBatchSize = 20000;
+        }
+
+
+        /**
+         * Configuration properties for handling queues in Elasticsearch operations.
+         * These properties specify the behavior of the ElasticQueueManager,
+         * including the maximum queue size, delay between flush operations,
+         * and the thread pool size for scheduled executor service tasks.
+         */
+        @Data
+        public static class QueueProperties {
+
+            /**
+             * The size of the thread pool for the scheduled executor service.
+             * This determines the number of threads available to schedule and execute tasks.
+             * Default value: 10.
+             */
+            @Min(1)
+            private int scheduledExecutorPoolSize = 10;
+
+            /**
+             * Delay time between flush operations in the queue.
+             * This value represents the amount of time the scheduler waits before initiating the next flush.
+             * Default value: 150.
+             */
+            @Min(1)
+            private int delay = 150;
+
+            /**
+             * The time unit of the delay for flush operations.
+             * Default value: {@link TimeUnit#MILLISECONDS}.
+             */
+            private TimeUnit delayUnit = TimeUnit.MILLISECONDS;
+
+            /**
+             * Maximum number of elements allowed in batch to flush.
+             * When the batch size reaches this limit, it triggers a flush operation.
+             * Default value: 400.
+             */
+            @Min(1)
+            private int maxBatchSize = 400;
+
+
+            /**
+             * Specifies the maximum size of the queue. When the queue reaches this size,
+             * a flush operation is triggered to process the elements in the queue.
+             * Default value is 3000, and the minimum allowable value is 400.
+             */
+            @Min(400)
+            private int maxQueueSize = 3000;
+
+            /**
+             * Defines the refresh policy for Elasticsearch operations.
+             * Determines when changes made by bulk operations will be visible for search.
+             * Default value is {@link RefreshPolicy#NONE}, meaning no immediate refresh.
+             */
+            private Refresh refreshPolicy = Refresh.False;
         }
     }
 
