@@ -100,11 +100,11 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     @Override
     public void delete(String compositeId) {
-        // todo test
         if (compositeId == null) {
             return;
         }
-        processRoleRepository.deleteByCompositeId(compositeId);
+        Optional<ProcessRole> processRole = processRoleRepository.findByCompositeId(compositeId);
+        processRole.ifPresent(processRoleRepository::delete);
     }
 
     @Override
