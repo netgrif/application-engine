@@ -310,8 +310,11 @@ public abstract class Case implements Serializable {
     }
 
     /**
-     * todo javadoc
-     * */
+     * Initializes {@link #viewUsers} collection. Any user defined in {@link #users} with permission {@link RolePermission#VIEW}
+     * of true value is added to the {@link #viewUsers} collection.
+     *
+     * @return true if the {@link #viewUsers} was modified, false otherwise
+     */
     public boolean resolveViewUsers() {
         AtomicBoolean isModified = new AtomicBoolean(!this.viewUsers.isEmpty());
         this.viewUsers.clear();

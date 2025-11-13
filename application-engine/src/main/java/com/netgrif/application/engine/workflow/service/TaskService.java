@@ -480,7 +480,12 @@ public class TaskService implements ITaskService {
      * <td>Transition not executable</td><td>destroy task</td><td>no action</td>
      * </tr>
      * </table>
-     * todo javadoc
+     *
+     * @param useCase useCase for which to reload tasks
+     * @param lazyCaseSave if set to true, the useCase is saved only if any task is about to be executed. If set to false
+     *                     the useCase is saved every time this method is called.
+     *
+     * @return {@link ReloadTaskOutcome}, which holds the information if any task was executed and if the useCase was saved
      */
     @SuppressWarnings("StatementWithEmptyBody")
     @Override

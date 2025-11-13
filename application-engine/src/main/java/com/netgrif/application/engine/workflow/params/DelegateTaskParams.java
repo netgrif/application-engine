@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow.params;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.service.TaskService;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,20 +11,35 @@ import lombok.Data;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A parameter class for the {@link TaskService#delegateTask(DelegateTaskParams)} method.
+ */
 @Data
 @AllArgsConstructor
 @Builder(builderMethodName = "with")
 public class DelegateTaskParams {
 
-    // todo javadoc
-
+    /// String id of the task to be delegated
     private String taskId;
+
+    /// Task object to be delegated. The state of task must be up to date.
     private Task task;
+
+    /// Case of the subject task. The state of useCase must be up to date.
     private Case useCase;
+
+    /// The user, who is going to be a new assignee.
     private AbstractUser newAssignee;
+
+    /// The user's string id, who is going to be a new assignee.
     private String newAssigneeId;
+
+    /// The user, who is performing the delegation
     private AbstractUser delegator;
+
+    /// The user's string id, who is performing the delegation
     private String delegatorId;
+
     @Builder.Default
     private Map<String, String> params = new HashMap<>();
 }

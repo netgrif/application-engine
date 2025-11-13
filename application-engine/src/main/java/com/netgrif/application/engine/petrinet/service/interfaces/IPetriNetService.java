@@ -69,13 +69,15 @@ public interface IPetriNetService {
 
     /**
      * Imports a PetriNet from XML input.
-     * todo javadoc
      *
-     * @param importPetriNetParams additional parameters
+     * @param importPetriNetParams parameters for PetriNet import
+     * <br>
+     * <b>Required parameters: xmlFile, releaseType, author</b>
+     *
      * @return an {@link ImportPetriNetEventOutcome} representing the result
-     * @throws IOException if an I/O error occurs
-     * @throws MissingPetriNetMetaDataException if metadata is incomplete
-     * @throws MissingIconKeyException if an icon key is missing
+     * @throws IOException                      if an error occurs while processing the XML file
+     * @throws MissingPetriNetMetaDataException if metadata is missing from the PetriNet
+     * @throws MissingIconKeyException          if an icon key is missing
      */
     ImportPetriNetEventOutcome importPetriNet(ImportPetriNetParams importPetriNetParams) throws IOException,
             MissingPetriNetMetaDataException, MissingIconKeyException;
@@ -274,8 +276,13 @@ public interface IPetriNetService {
     List<PetriNet> get(List<String> petriNetIds);
 
     /**
-     * Deletes a PetriNet by its ID.
-     * todo javadoc
+     * Deletes a PetriNet instance by its process ID.
+     *
+     * @param deletePetriNetParams parameters for petriNet removal
+     * <br>
+     * <b>Required parameters: petriNetId</b>
+     *
+     * @throws IllegalArgumentException if the PetriNet doesn't exist
      */
     void deletePetriNet(DeletePetriNetParams deletePetriNetParams);
 

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.params;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,17 +11,29 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A parameter class for the {@link PetriNetService#importPetriNet(ImportPetriNetParams)} method.
+ */
 @Data
 @AllArgsConstructor
 @Builder(builderMethodName = "with")
 public class ImportPetriNetParams {
 
-    // todo javadoc
-
+    /// Input stream of the process XML file.
     private InputStream xmlFile;
+
+    /// uri node id for the process
     private String uriNodeId;
+
+    /**
+     * Release type of the process
+     * @see VersionType
+     */
     private VersionType releaseType;
+
+    /// Author of the process
     private AbstractUser author;
+
     @Builder.Default
     private Map<String, String> params = new HashMap<>();
 
@@ -30,6 +42,7 @@ public class ImportPetriNetParams {
         this.releaseType = releaseType;
         this.author = author;
         this.uriNodeId = uriNodeId;
+        this.params = new HashMap<>();
     }
 
     public ImportPetriNetParams(InputStream xmlFile, VersionType releaseType, AbstractUser author) {

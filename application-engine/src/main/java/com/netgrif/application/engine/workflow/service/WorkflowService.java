@@ -250,8 +250,14 @@ public class WorkflowService implements IWorkflowService {
     }
 
     /**
-     * todo javadoc
-     * */
+     * Resolves user permissions for the useCase based on the user list data field.
+     *
+     * @param useCase useCase where to resolve user permissions
+     * @param userListId field id of the user list
+     * @param permission permission associated with the useCase and user list
+     *
+     * @return true if the useCase was modified, false otherwise
+     */
     private boolean resolveUserRefPermissions(Case useCase, String userListId, Map<String, Boolean> permission) {
         List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(userListId).getValue());
         if (userIds != null && !userIds.isEmpty()) {
@@ -501,8 +507,12 @@ public class WorkflowService implements IWorkflowService {
     }
 
     /**
-     * todo javadoc
-     * */
+     * Initializes task ref data fields with the task ids based on field definition in petriNet
+     *
+     * @param useCase useCase where to initialize task ref data fields
+     *
+     * @return true if useCase was modified, false otherwise
+     */
     protected boolean resolveTaskRefs(Case useCase) {
         AtomicBoolean anyDataFieldChanged = new AtomicBoolean(false);
         useCase.getPetriNet().getDataSet().values().stream()
