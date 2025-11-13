@@ -34,6 +34,7 @@ public class TaskParams {
             this.taskId = task.getStringId();
         }
         this.user = user;
+        this.params = new HashMap<>();
     }
 
     public TaskParams(String taskId) {
@@ -43,6 +44,7 @@ public class TaskParams {
     public TaskParams(String taskId, AbstractUser user) {
         this.taskId = taskId;
         this.user = user;
+        this.params = new HashMap<>();
     }
 
     public static class TaskParamsBuilder {

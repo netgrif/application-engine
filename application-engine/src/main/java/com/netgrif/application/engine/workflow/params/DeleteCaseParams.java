@@ -26,10 +26,12 @@ public class DeleteCaseParams {
         if (useCase != null) {
             this.useCaseId = useCase.getStringId();
         }
+        this.params = new HashMap<>();
     }
 
     public DeleteCaseParams(String useCaseId) {
         this.useCaseId = useCaseId;
+        this.params = new HashMap<>();
     }
 
     public static class DeleteCaseParamsBuilder {
