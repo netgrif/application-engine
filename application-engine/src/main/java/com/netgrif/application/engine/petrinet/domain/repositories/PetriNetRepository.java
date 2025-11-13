@@ -69,6 +69,4 @@ public interface PetriNetRepository extends MongoRepository<PetriNet, String>, Q
     @Query("{ 'roles.?0' : { $exists: true } }")
     Page<PetriNet> findAllByRoleId(String roleId, Pageable pageable);
 
-    @Query("{ 'roles.?0' : { $exists: true } }")
-    boolean existsByRoleId(String roleId);
 }

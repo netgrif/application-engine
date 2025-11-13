@@ -314,8 +314,4 @@ public interface IPetriNetService {
      */
     Page<PetriNet> findAllByRoleId(String roleId, Pageable pageable);
 
-    /**
-     * todo javadoc
-     */
-    boolean existsByRoleId(String roleId);
 }

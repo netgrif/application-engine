@@ -503,7 +503,9 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     }
 
     protected boolean isRoleReferenced(ProcessRole processRole) {
-        return petriNetService.existsByRoleId(processRole.getStringId());
+        Pageable pageable = PageRequest.of(0, 1);
+        Page<PetriNet> petriNetPage = petriNetService.findAllByRoleId(processRole.getStringId(), pageable);
+        return petriNetPage.getTotalElements() > 0;
     }
 
     private void removeRoleFromUser(AbstractUser user, ProcessRole processRole, LoggedUser loggedUser) {

@@ -317,15 +317,6 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public boolean existsByRoleId(String roleId) {
-        // todo test
-        if (roleId == null) {
-            return false;
-        }
-        return repository.existsByRoleId(roleId);
-    }
-
-    @Override
     public Page<PetriNet> getAll(Pageable pageable) {
         Page<PetriNet> nets = repository.findAll(pageable);
         nets.forEach(PetriNet::initializeArcs);
