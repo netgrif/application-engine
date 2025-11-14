@@ -98,7 +98,7 @@ public class RegistrationService implements IRegistrationService {
     @Override
     public boolean verifyToken(String token) {
         try {
-            log.info("Verifying token: {}", token);
+            log.debug("Verifying token: {}", token);
             String[] tokenParts = decodeToken(token);
             User user = (User) userService.findByEmail(tokenParts[0], null);
             return user != null && Objects.equals(user.getToken(), tokenParts[1]) && user.getExpirationDate().isAfter(LocalDateTime.now());
