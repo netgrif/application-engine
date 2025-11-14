@@ -66,6 +66,7 @@ public class RegistrationService implements IRegistrationService {
 
         Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
         Page<User> users;
+        int totalReset = 0;
         do {
             users = userService.findAllByStateAndExpirationDateBefore(UserState.BLOCKED, LocalDateTime.now(), null, pageable);
             if (users == null || users.isEmpty()) {
@@ -78,11 +79,12 @@ public class RegistrationService implements IRegistrationService {
                 user.setExpirationDate(null);
             });
             userService.saveUsers(users.getContent().stream().map(AbstractUser.class::cast).toList());
+            totalReset += users.getContent().size();
 
             pageable = pageable.next();
         } while (users.hasNext());
 
-        log.info("Reset {} expired user tokens", users.getContent().size());
+        log.info("Reset {} expired user tokens", totalReset);
     }
 
     @Override
