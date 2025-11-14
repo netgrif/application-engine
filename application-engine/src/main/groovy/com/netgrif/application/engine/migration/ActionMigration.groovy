@@ -33,7 +33,7 @@ class ActionMigration {
                     .build())
             List<PetriNet> oldPetriNets
 
-            if (newPetriNet.getNet() != null) {
+            if (newPetriNet.getNet() == null) {
                 String message = "Petri net from file [" + petriNetPath + "] was not imported"
                 log.error(message)
                 throw new IllegalArgumentException(message)
