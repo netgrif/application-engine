@@ -217,7 +217,7 @@ public class WorkflowController {
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
         try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8);
             DeleteCaseEventOutcome outcome;
             if (deleteSubtree) {
                 outcome = workflowService.deleteSubtreeRootedAt(caseId);
@@ -228,7 +228,7 @@ public class WorkflowController {
             }
             return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted",
                     LocalisedEventOutcomeFactory.from(outcome, LocaleContextHolder.getLocale()));
-        } catch (UnsupportedEncodingException e) {
+        } catch (Exception e) {
             log.error("Deleting case [{}] failed:", caseId, e);
             return EventOutcomeWithMessageResource.errorMessage("Deleting case " + caseId + " has failed!");
         }
