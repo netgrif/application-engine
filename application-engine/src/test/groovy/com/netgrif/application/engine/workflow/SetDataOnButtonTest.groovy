@@ -69,11 +69,13 @@ class SetDataOnButtonTest {
     @BeforeEach
     void initNet() {
         testHelper.truncateDbs()
-        net = petriNetService.importPetriNet(ImportPetriNetParams.with()
-                .xmlFile(new FileInputStream(RESOURCE_PATH))
-                .releaseType(VersionType.MAJOR)
-                .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
-                .build()).getNet()
+        new FileInputStream(RESOURCE_PATH).withCloseable { inputStream ->
+            net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                    .xmlFile(inputStream)
+                    .releaseType(VersionType.MAJOR)
+                    .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+                    .build()).getNet()
+        }
         assert net != null
     }
 

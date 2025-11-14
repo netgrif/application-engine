@@ -51,13 +51,16 @@ class DynamicChoicesTest {
 
     @Test
     void testDynamicEnum() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(ImportPetriNetParams.with()
-                .xmlFile(new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml"))
-                .releaseType(VersionType.MAJOR)
-                .author(superCreator.getLoggedSuper())
-                .build());
+        ImportPetriNetEventOutcome optNet = null
+        new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml").withCloseable { inputStream ->
+            optNet = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                    .xmlFile(inputStream)
+                    .releaseType(VersionType.MAJOR)
+                    .author(superCreator.getLoggedSuper())
+                    .build())
+        }
 
-        assert optNet.getNet() != null;
+        assert optNet.getNet() != null
         def net = optNet.getNet()
 
         def aCase = importHelper.createCase("Case", net)
