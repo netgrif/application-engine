@@ -42,4 +42,33 @@ public class DelegateTaskParams {
 
     @Builder.Default
     private Map<String, String> params = new HashMap<>();
+
+    public static class DelegateTaskParamsBuilder {
+        /// Sets the {@link #task} and {@link #taskId}
+        public DelegateTaskParamsBuilder task(Task task) {
+            this.task = task;
+            if (task != null) {
+                this.taskId = task.getStringId();
+            }
+            return this;
+        }
+
+        /// Sets the {@link #newAssignee} and {@link #newAssigneeId}
+        public DelegateTaskParamsBuilder newAssignee(AbstractUser newAssignee) {
+            this.newAssignee = newAssignee;
+            if (newAssignee != null) {
+                this.newAssigneeId = newAssignee.getStringId();
+            }
+            return this;
+        }
+
+        /// Sets the {@link #delegator} and {@link #delegatorId}
+        public DelegateTaskParamsBuilder delegator(AbstractUser delegator) {
+            this.delegator = delegator;
+            if (delegator != null) {
+                this.delegatorId = delegator.getStringId();
+            }
+            return this;
+        }
+    }
 }
