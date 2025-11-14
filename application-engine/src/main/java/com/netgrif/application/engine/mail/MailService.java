@@ -74,7 +74,7 @@ public class MailService implements IMailService {
         MimeMessage email = buildEmail(mailDraft);
         mailSender.send(email);
 
-        log.info("Registration email sent to [{}] with token [{}], expiring on [{}]", user.getEmail(), model.get(TOKEN), model.get(EXPIRATION));
+        log.info("Registration email sent to [{}] with a token expiring on [{}]", user.getEmail(), model.get(EXPIRATION));
     }
 
     @Override
@@ -94,7 +94,7 @@ public class MailService implements IMailService {
         MimeMessage email = buildEmail(mailDraft);
         mailSender.send(email);
 
-        log.info("Reset email sent to [{}] with token [{}], expiring on [{}]", user.getEmail(), model.get(TOKEN), model.get(EXPIRATION));
+        log.info("Reset email sent to [{}] with a token expiring on [{}]", user.getEmail(), model.get(EXPIRATION));
     }
 
     @Override
