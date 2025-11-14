@@ -331,7 +331,7 @@ public class TaskService implements ITaskService {
             }
 
             Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
-            boolean anyActionExecuted = eventService.runActions(transition.getPreCancelActions(), useCase, task,
+            boolean anyActionExecuted = !eventService.runActions(transition.getPreCancelActions(), useCase, task,
                     transition, params).isEmpty();
             if (anyActionExecuted) {
                 useCase = workflowService.findOne(useCase.getStringId());
