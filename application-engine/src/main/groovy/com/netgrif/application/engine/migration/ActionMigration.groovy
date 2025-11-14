@@ -25,33 +25,34 @@ class ActionMigration {
     private UserService userService;
 
     void migrateActions(String petriNetPath) {
-        InputStream netStream = new ClassPathResource(petriNetPath).inputStream
-        ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(ImportPetriNetParams.with()
-                .xmlFile(netStream)
-                .releaseType(VersionType.MAJOR)
-                .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
-                .build())
-        List<PetriNet> oldPetriNets
+        try (InputStream netStream = new ClassPathResource(petriNetPath).inputStream) {
+            ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                    .xmlFile(netStream)
+                    .releaseType(VersionType.MAJOR)
+                    .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+                    .build())
+            List<PetriNet> oldPetriNets
 
-        if(newPetriNet.getNet() != null) {
-            String message = "Petri net from file [" + petriNetPath + "] was not imported"
-            log.error(message)
-            throw new IllegalArgumentException(message)
-        } else {
-            oldPetriNets = petriNetService.getByIdentifier(newPetriNet.getNet().importId)
-                    .stream().filter({ net -> (net.version != newPetriNet.getNet().version)})
-                    .collect(Collectors.toList())
-        }
+            if (newPetriNet.getNet() != null) {
+                String message = "Petri net from file [" + petriNetPath + "] was not imported"
+                log.error(message)
+                throw new IllegalArgumentException(message)
+            } else {
+                oldPetriNets = petriNetService.getByIdentifier(newPetriNet.getNet().importId)
+                        .stream().filter({ net -> (net.version != newPetriNet.getNet().version)})
+                        .collect(Collectors.toList())
+            }
 
-        if(oldPetriNets.size() == 0){
-            String message = "Older version of Petri net with ID [" + newPetriNet.getNet().importId + "] is not present in MongoDB."
-            log.error(message)
-            throw new IllegalArgumentException(message)
-        } else {
-            oldPetriNets.each {net ->
-                migrateDataSetActions(newPetriNet.getNet(), net)
-                migrateDataRefActions(newPetriNet.getNet(), net)
-                petriNetService.save(net)
+            if (oldPetriNets.size() == 0){
+                String message = "Older version of Petri net with ID [" + newPetriNet.getNet().importId + "] is not present in MongoDB."
+                log.error(message)
+                throw new IllegalArgumentException(message)
+            } else {
+                oldPetriNets.each {net ->
+                    migrateDataSetActions(newPetriNet.getNet(), net)
+                    migrateDataRefActions(newPetriNet.getNet(), net)
+                    petriNetService.save(net)
+                }
             }
         }
     }
