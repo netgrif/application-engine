@@ -16,7 +16,7 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Flatt
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 
 @NoArgsConstructor
-@Document(indexName = "#{@elasticTaskIndex}")
+@Document(indexName = "#{@elasticTaskIndex}", createIndex = false)
 public class ElasticTask extends com.netgrif.application.engine.objects.elastic.domain.ElasticTask {
 
     public ElasticTask(Task task) {

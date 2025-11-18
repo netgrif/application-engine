@@ -9,7 +9,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisIndexedHttpSession;
 
 @Configuration
-@EnableRedisIndexedHttpSession(redisNamespace = "spring:session:${spring.session.redis.namespace}")
+@EnableRedisIndexedHttpSession(redisNamespace = "spring:session:${netgrif.engine.data.redis.session.namespace}")
 @ConditionalOnProperty(
         value = "netgrif.engine.security.static.enabled",
         havingValue = "true"
