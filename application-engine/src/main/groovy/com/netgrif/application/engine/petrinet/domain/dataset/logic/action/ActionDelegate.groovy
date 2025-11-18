@@ -1024,8 +1024,8 @@ class ActionDelegate {
         return actualUser
     }
 
-    AbstractUser assignRole(String roleId, String netId, AbstractUser user = userService.loggedUser) {
-        List<PetriNet> nets = petriNetService.getByIdentifier(netId)
+    AbstractUser assignRole(String roleId, String netId, AbstractUser user = userService.loggedUser, Pageable pageable = Pageable.unpaged()) {
+        List<PetriNet> nets = petriNetService.getByIdentifier(netId, pageable).content
         nets.forEach({ net -> user = assignRole(roleId, net, user) })
         return user
     }
@@ -1045,8 +1045,8 @@ class ActionDelegate {
         return actualUser
     }
 
-    AbstractUser removeRole(String roleId, String netId, AbstractUser user = userService.loggedUser) {
-        List<PetriNet> nets = petriNetService.getByIdentifier(netId)
+    AbstractUser removeRole(String roleId, String netId, AbstractUser user = userService.loggedUser, Pageable pageable = Pageable.unpaged()) {
+        List<PetriNet> nets = petriNetService.getByIdentifier(netId, pageable).content
         nets.forEach({ net -> user = removeRole(roleId, net, user) })
         return user
     }
@@ -1321,7 +1321,7 @@ class ActionDelegate {
     }
 
     def changeUserByEmail(String email, String attribute, def cl) {
-        AbstractUser user = userService.findUserByUsername(email, null)
+        AbstractUser user = userService.findUserByUsername(email, null).get()
         changeUser(user, attribute, cl)
     }
 
