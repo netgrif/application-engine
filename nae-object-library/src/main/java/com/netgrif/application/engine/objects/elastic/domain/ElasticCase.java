@@ -49,8 +49,6 @@ public abstract class ElasticCase implements Serializable {
 
     private String authorUsername;
 
-    private List<ImmediateField> immediateData;
-
     private Map<String, DataField> dataSet;
 
     private Set<String> taskIds;
@@ -79,6 +77,8 @@ public abstract class ElasticCase implements Serializable {
 
     private Map<String, String> tags;
 
+    private NodeInfo nodeInfo;
+
     public ElasticCase(Case useCase) {
         id = useCase.getStringId();
         lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
@@ -104,7 +104,6 @@ public abstract class ElasticCase implements Serializable {
         tags = new HashMap<>(useCase.getTags());
 
         dataSet = new HashMap<>();
-        immediateData = useCase.getImmediateData().stream().map(ImmediateField::new).collect(Collectors.toList());
     }
 
     public void update(ElasticCase useCase) {
@@ -123,6 +122,5 @@ public abstract class ElasticCase implements Serializable {
         tags = useCase.getTags();
 
         dataSet = useCase.getDataSet();
-        immediateData = useCase.getImmediateData();
     }
 }

@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public abstract class MapField extends TextField {
+public abstract class MapField extends DataField {
 
     public String[] keyValue;
 
@@ -29,7 +29,6 @@ public abstract class MapField extends TextField {
             keyValue[i] = valuePairs.get(i).getKey();
             values.addAll(valuePairs.get(i).getValue());
         }
-        this.textValue = values.toArray(new String[0]);
         this.fulltextValue = values.toArray(new String[0]);
     }
 
