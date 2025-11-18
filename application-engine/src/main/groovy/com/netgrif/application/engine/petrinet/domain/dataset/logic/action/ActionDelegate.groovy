@@ -1321,7 +1321,12 @@ class ActionDelegate {
     }
 
     def changeUserByEmail(String email, String attribute, def cl) {
-        AbstractUser user = userService.findUserByUsername(email, null).get()
+        Optional<AbstractUser> userOptional = userService.findUserByUsername(email, null)
+        if (!userOptional.isPresent()) {
+            log.error("Cannot find user with email [" + email + "]")
+            return
+        }
+        AbstractUser user = userOptional.get()
         changeUser(user, attribute, cl)
     }
 
