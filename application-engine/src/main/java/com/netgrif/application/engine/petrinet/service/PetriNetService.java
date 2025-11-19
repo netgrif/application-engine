@@ -200,7 +200,7 @@ public class PetriNetService implements IPetriNetService {
         PetriNet newProcess = importedProcess.get();
         PetriNet inactivatedProcess = null;
 
-        if (self.getPetriNet(newProcess.getIdentifier(), newProcess.getVersion()) != null) {
+        if (newProcess.getVersion() != null && self.getPetriNet(newProcess.getIdentifier(), newProcess.getVersion()) != null) {
             throw new IllegalArgumentException("A process [%s] with such version [%s] already exists"
                     .formatted(newProcess.getIdentifier(), newProcess.getVersion()));
         }
@@ -209,7 +209,7 @@ public class PetriNetService implements IPetriNetService {
             newProcess.setVersion(new Version());
         } else {
             if (newProcess.getVersion() == null) {
-                newProcess.setVersion(existingLatestProcess.getVersion());
+                newProcess.setVersion(existingLatestProcess.getVersion().clone());
                 newProcess.incrementVersion(releaseType);
             } else if (newProcess.getVersion().isLowerThan(existingLatestProcess.getVersion())) {
                 throw new IllegalArgumentException("Only higher versions of process [%s] are allowed to import. The requested version [%s] cannot be imported because the higher version [%s] already exists."
@@ -322,7 +322,7 @@ public class PetriNetService implements IPetriNetService {
         if (identifier == null) {
             return null;
         }
-        return repository.findByIdentifierAndVersionActive(identifier, true);
+        return repository.findByIdentifierAndIsVersionActive(identifier, true);
     }
 
     @Override
