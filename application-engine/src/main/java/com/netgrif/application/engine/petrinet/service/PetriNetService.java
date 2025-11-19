@@ -7,7 +7,6 @@ import com.netgrif.application.engine.configuration.properties.CacheConfiguratio
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.ArcImportReference;
-import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
@@ -141,15 +140,16 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public void evictAllCaches() {
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetById()), cacheProperties.getPetriNetById()).clear();
-        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetNewest()), cacheProperties.getPetriNetNewest()).clear();
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetActive()), cacheProperties.getPetriNetActive()).clear();
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetLatest()), cacheProperties.getPetriNetLatest()).clear();
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetCache()), cacheProperties.getPetriNetCache()).clear();
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetByIdentifier()), cacheProperties.getPetriNetByIdentifier()).clear();
-
     }
 
     public void evictCache(PetriNet net) {
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetById()), cacheProperties.getPetriNetById()).evict(net.getStringId());
-        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetNewest()), cacheProperties.getPetriNetNewest()).evict(net.getIdentifier());
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetActive()), cacheProperties.getPetriNetActive()).evict(net.getIdentifier());
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetLatest()), cacheProperties.getPetriNetLatest()).evict(net.getIdentifier());
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetCache()), cacheProperties.getPetriNetCache()).evict(net.getObjectId());
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetByIdentifier()), cacheProperties.getPetriNetByIdentifier()).evict(net.getIdentifier() + net.getVersion().toString());
     }
@@ -193,38 +193,67 @@ public class PetriNetService implements IPetriNetService {
         ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
         ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
         IOUtils.copy(xmlFile, xmlCopy);
-        Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(xmlCopy.toByteArray()));
-        if (imported.isEmpty()) {
+        Optional<PetriNet> importedProcess = getImporter().importPetriNet(new ByteArrayInputStream(xmlCopy.toByteArray()));
+        if (importedProcess.isEmpty()) {
             return outcome;
         }
-        PetriNet net = imported.get();
+        PetriNet newProcess = importedProcess.get();
+        PetriNet inactivatedProcess = null;
 
-        PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
-
-        if (existingNet != null) {
-            if (existingNet.getVersion().equals(net.getVersion())) {
-                throw new IllegalArgumentException("Provided Petri net version is already present in the system");
-            }
-            if (net.getVersion() == null) {
-                net.setVersion(existingNet.getVersion());
-                net.incrementVersion(releaseType);
-            }
-        } else if (net.getVersion() == null) {
-            net.setVersion(new Version());
+        if (self.getPetriNet(newProcess.getIdentifier(), newProcess.getVersion()) != null) {
+            throw new IllegalArgumentException("A process [%s] with such version [%s] already exists"
+                    .formatted(newProcess.getIdentifier(), newProcess.getVersion()));
         }
+        PetriNet existingLatestProcess = self.getLatestVersionByIdentifier(newProcess.getIdentifier());
+        if (existingLatestProcess == null) {
+            newProcess.setVersion(new Version());
+        } else {
+            if (newProcess.getVersion() == null) {
+                newProcess.setVersion(existingLatestProcess.getVersion());
+                newProcess.incrementVersion(releaseType);
+            } else if (newProcess.getVersion().isLowerThan(existingLatestProcess.getVersion())) {
+                throw new IllegalArgumentException("Only higher versions of process [%s] are allowed to import. The requested version [%s] cannot be imported because the higher version [%s] already exists."
+                        .formatted(newProcess.getIdentifier(), newProcess.getVersion(), existingLatestProcess.getVersion()));
+            }
+            if (existingLatestProcess.isVersionActive()) {
+                existingLatestProcess.makeInactive();
+                inactivatedProcess = existingLatestProcess;
+            } else {
+                PetriNet existingActiveProcess = self.getActiveVersionByIdentifier(newProcess.getIdentifier());
+                if (existingActiveProcess != null) {
+                    existingActiveProcess.makeInactive();
+                    inactivatedProcess = existingActiveProcess;
+                }
+            }
+        }
+        newProcess.makeActive();
 
-        processRoleService.saveAll(net.getRoles().values());
-        net.setAuthor(ActorTransformer.toActorRef(author));
-        functionCacheService.cachePetriNetFunctions(net);
-        Path savedPath = getImporter().saveNetFile(net, new ByteArrayInputStream(xmlCopy.toByteArray()));
+        processRoleService.saveAll(newProcess.getRoles().values());
+        newProcess.setAuthor(ActorTransformer.toActorRef(author));
+        functionCacheService.cachePetriNetFunctions(newProcess);
+        Path savedPath = getImporter().saveNetFile(newProcess, new ByteArrayInputStream(xmlCopy.toByteArray()));
         xmlCopy.close();
-        log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully and saved in a folder: " + savedPath.toString());
+        log.info("Petri newProcess " + newProcess.getTitle() + " (" + newProcess.getInitials() + " v" + newProcess.getVersion() + ") importedProcess successfully and saved in a folder: " + savedPath.toString());
 
-        outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
+        outcome.setOutcomes(eventService.runActions(newProcess.getPreUploadActions(), null, Optional.empty(), params));
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.PRE));
-        save(net);
-        outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params));
-        outcome.setNet(imported.get());
+        if (inactivatedProcess != null) {
+            save(inactivatedProcess);
+        }
+        try {
+            save(newProcess);
+        } catch (Exception rethrow) {
+            if (inactivatedProcess != null) {
+                // make sure there is always an active version
+                log.warn("Something unexpected happened while saving new version of process [{}]. Rolling back status of a version, that have been inactivated...",
+                        newProcess.getIdentifier());
+                inactivatedProcess.makeActive();
+                save(inactivatedProcess);
+            }
+            throw rethrow;
+        }
+        outcome.setOutcomes(eventService.runActions(newProcess.getPostUploadActions(), null, Optional.empty(), params));
+        outcome.setNet(importedProcess.get());
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
         return outcome;
     }
@@ -263,6 +292,9 @@ public class PetriNetService implements IPetriNetService {
     @Override
     @Cacheable(value = "petriNetByIdentifier", key = "#identifier+#version.toString()", unless = "#result == null")
     public PetriNet getPetriNet(String identifier, Version version) {
+        if (identifier == null || version == null) {
+            return null;
+        }
         PetriNet net = repository.findByIdentifierAndVersion(identifier, version);
         if (net == null) {
             return null;
@@ -284,13 +316,28 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Cacheable(value = "petriNetNewest", unless = "#result == null")
-    public PetriNet getNewestVersionByIdentifier(String identifier) {
-        List<PetriNet> nets = repository.findByIdentifier(identifier, PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
-        if (nets.isEmpty()) {
+    @Cacheable(value = "petriNetActive", unless = "#result == null")
+    public PetriNet getActiveVersionByIdentifier(String identifier) {
+        // todo 2266 test
+        if (identifier == null) {
             return null;
         }
-        return nets.getFirst();
+        return repository.findByIdentifierAndVersionActive(identifier, true);
+    }
+
+    @Override
+    @Cacheable(value = "petriNetLatest", unless = "#result == null")
+    public PetriNet getLatestVersionByIdentifier(String identifier) {
+        // todo 2266 test
+        if (identifier == null) {
+            return null;
+        }
+        List<PetriNet> processes = repository.findByIdentifier(identifier, PageRequest.of(0, 1,
+                Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
+        if (processes.isEmpty()) {
+            return null;
+        }
+        return processes.getFirst();
     }
 
     /**
@@ -422,7 +469,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public PetriNetReference getReference(String identifier, Version version, LoggedUser user, Locale locale) {
-        PetriNet net = version == null ? getNewestVersionByIdentifier(identifier) : getPetriNet(identifier, version);
+        PetriNet net = version == null ? getActiveVersionByIdentifier(identifier) : getPetriNet(identifier, version);
         return net != null ? transformToReference(net, locale) : new PetriNetReference();
     }
 

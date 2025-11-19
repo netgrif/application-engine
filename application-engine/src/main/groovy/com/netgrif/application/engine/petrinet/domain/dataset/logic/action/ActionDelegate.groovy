@@ -2439,7 +2439,7 @@ class ActionDelegate {
                 return [(role.importId + ":" + GLOBAL_ROLE), ("$role.name (🌍 Global role)" as String)]
             } else {
                 if (!temp.containsKey(entry.value)) {
-                    temp.put(entry.value, petriNetService.getNewestVersionByIdentifier(entry.value))
+                    temp.put(entry.value, petriNetService.getActiveVersionByIdentifier(entry.value))
                 }
                 PetriNet net = temp[entry.value]
                 ProcessRole role = net.roles.find { it.value.importId == entry.key }.value

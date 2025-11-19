@@ -52,6 +52,12 @@ public class Version implements Serializable, Comparable<Version> {
         }
     }
 
+    /**
+     * todo javadoc
+     * 0 equals
+     * <0 this < other
+     * >0 this > other
+     */
     public int compareTo(Version other) {
         if (this.major != other.major) {
             return Long.compare(this.major, other.major);
@@ -60,6 +66,20 @@ public class Version implements Serializable, Comparable<Version> {
             return Long.compare(this.minor, other.minor);
         }
         return Long.compare(this.patch, other.patch);
+    }
+
+    /**
+     * todo javadoc
+     */
+    public boolean isHigherThan(Version other) {
+        return compareTo(other) > 0;
+    }
+
+    /**
+     * todo javadoc
+     */
+    public boolean isLowerThan(Version other) {
+        return compareTo(other) < 0;
     }
 
 

@@ -153,12 +153,21 @@ public interface IPetriNetService {
     List<PetriNet> findAllById(List<String> ids);
 
     /**
-     * Retrieves the newest version of a {@link PetriNet} by its identifier.
+     * Retrieves the active version of a {@link PetriNet} by its identifier.
+     * todo javadoc isversionactive logic
      *
      * @param identifier the unique identifier of the PetriNet
-     * @return the newest version of the {@link PetriNet} matching the provided identifier
+     * @return the active version of the {@link PetriNet} matching the provided identifier
      */
-    PetriNet getNewestVersionByIdentifier(String identifier);
+    PetriNet getActiveVersionByIdentifier(String identifier);
+
+    /**
+     * Retrieves the latest version of a {@link PetriNet} by its identifier.
+     *
+     * @param identifier the unique identifier of the PetriNet
+     * @return the latest version of the {@link PetriNet} matching the provided identifier
+     */
+    PetriNet getLatestVersionByIdentifier(String identifier);
 
     /**
      * Retrieves a paginated list of all {@link PetriNet} objects.

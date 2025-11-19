@@ -51,7 +51,7 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
     }
 
     AbstractUser assignRole(String roleImportId, String petriNetIdentifier, AbstractUser user = affectedUser) {
-        PetriNet petriNet = petriNetService.getNewestVersionByIdentifier(petriNetIdentifier)
+        PetriNet petriNet = petriNetService.getActiveVersionByIdentifier(petriNetIdentifier)
         assignRole(roleImportId, user, petriNet)
     }
 
@@ -75,7 +75,7 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
     }
 
     AbstractUser removeRole(String roleImportId, String petriNetIdentifier, AbstractUser user = affectedUser) {
-        PetriNet petriNet = petriNetService.getNewestVersionByIdentifier(petriNetIdentifier)
+        PetriNet petriNet = petriNetService.getActiveVersionByIdentifier(petriNetIdentifier)
         removeRole(roleImportId, user, petriNet)
     }
 
