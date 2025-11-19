@@ -205,17 +205,17 @@ public class PetriNetService implements IPetriNetService {
                     .formatted(newProcess.getIdentifier(), newProcess.getVersion()));
         }
         PetriNet existingLatestProcess = self.getLatestVersionByIdentifier(newProcess.getIdentifier());
-        if (existingLatestProcess == null) {
+        if (existingLatestProcess == null && newProcess.getVersion() == null) {
             newProcess.setVersion(new Version());
         } else {
             if (newProcess.getVersion() == null) {
                 newProcess.setVersion(existingLatestProcess.getVersion().clone());
                 newProcess.incrementVersion(releaseType);
-            } else if (newProcess.getVersion().isLowerThan(existingLatestProcess.getVersion())) {
+            } else if (existingLatestProcess != null && newProcess.getVersion().isLowerThan(existingLatestProcess.getVersion())) {
                 throw new IllegalArgumentException("Only higher versions of process [%s] are allowed to import. The requested version [%s] cannot be imported because the higher version [%s] already exists."
                         .formatted(newProcess.getIdentifier(), newProcess.getVersion(), existingLatestProcess.getVersion()));
             }
-            if (existingLatestProcess.isVersionActive()) {
+            if (existingLatestProcess != null && existingLatestProcess.isVersionActive()) {
                 existingLatestProcess.makeInactive();
                 inactivatedProcess = existingLatestProcess;
             } else {
