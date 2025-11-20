@@ -271,8 +271,8 @@ public class PetriNetService implements IPetriNetService {
         }
 
         if (processToInactivate != null) {
-            log.debug("Inactivating current active version of process identifier and ID [{}][{}]",
-                    processToInactivate.getIdentifier(), processToInactivate.getStringId());
+            log.debug("Inactivating current active version of process with ID [{}] of identifier [{}]",
+                    processToInactivate.getStringId(), processToInactivate.getIdentifier());
             processToInactivate.makeInactive();
             save(processToInactivate);
         }
@@ -291,8 +291,8 @@ public class PetriNetService implements IPetriNetService {
             throw rethrow;
         }
 
-        log.debug("Successfully activated process with ID [{}] of identifier [{}]", processToActivate.getIdentifier(),
-                processToActivate.getStringId());
+        log.debug("Successfully activated process with ID [{}] of identifier [{}]", processToActivate.getStringId(),
+                processToActivate.getIdentifier());
         return new MakeVersionActiveDTO(processToActivate.getStringId(), processToInactivate == null ? null
                 : processToInactivate.getStringId());
     }
