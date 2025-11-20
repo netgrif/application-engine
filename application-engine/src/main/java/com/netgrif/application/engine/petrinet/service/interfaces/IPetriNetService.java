@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.service.interfaces;
 
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.dto.response.petrinet.MakeVersionActiveDTO;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.objects.petrinet.domain.Transition;
@@ -111,6 +112,11 @@ public interface IPetriNetService {
     ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
     /**
+     * todo javadoc
+     */
+    MakeVersionActiveDTO makeVersionActive(String processId);
+
+    /**
      * Saves a PetriNet object.
      *
      * @param petriNet the PetriNet to save
@@ -157,7 +163,7 @@ public interface IPetriNetService {
      * todo javadoc isversionactive logic
      *
      * @param identifier the unique identifier of the PetriNet
-     * @return the active version of the {@link PetriNet} matching the provided identifier
+     * @return the active version of the {@link PetriNet} matching the provided identifier or null if not found
      */
     PetriNet getActiveVersionByIdentifier(String identifier);
 

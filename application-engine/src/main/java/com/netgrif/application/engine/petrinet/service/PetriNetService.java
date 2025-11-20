@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
+import com.netgrif.application.engine.objects.dto.response.petrinet.MakeVersionActiveDTO;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.ArcImportReference;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
@@ -245,7 +246,7 @@ public class PetriNetService implements IPetriNetService {
         } catch (Exception rethrow) {
             if (inactivatedProcess != null) {
                 // make sure there is always an active version
-                log.warn("Something unexpected happened while saving new version of process [{}]. Rolling back status of a version, that have been inactivated...",
+                log.warn("Something unexpected happened while saving new version of process [{}]. Rolling back process version, that have been inactivated...",
                         newProcess.getIdentifier());
                 inactivatedProcess.makeActive();
                 save(inactivatedProcess);
@@ -256,6 +257,44 @@ public class PetriNetService implements IPetriNetService {
         outcome.setNet(importedProcess.get());
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
         return outcome;
+    }
+
+    @Override
+    public MakeVersionActiveDTO makeVersionActive(String processId) {
+        log.info("Activating the process with id [{}]...", processId);
+        PetriNet processToActivate = self.getPetriNet(processId);
+        PetriNet processToInactivate = self.getActiveVersionByIdentifier(processToActivate.getIdentifier());
+
+        if (processToInactivate != null && processToInactivate.getStringId().equals(processToActivate.getStringId())) {
+            log.debug("The process to activate is already active. Nothing to do");
+            return new MakeVersionActiveDTO();
+        }
+
+        if (processToInactivate != null) {
+            log.debug("Inactivating current active version of process identifier and ID [{}][{}]",
+                    processToInactivate.getIdentifier(), processToInactivate.getStringId());
+            processToInactivate.makeInactive();
+            save(processToInactivate);
+        }
+
+        try {
+            processToActivate.makeActive();
+            save(processToActivate);
+        } catch (Exception rethrow) {
+            if (processToInactivate != null) {
+                // make sure there is always an active version
+                log.warn("Something unexpected happened while activating process [{}]. Rolling back status of a version, that have been inactivated...",
+                        processId);
+                processToInactivate.makeActive();
+                save(processToInactivate);
+            }
+            throw rethrow;
+        }
+
+        log.debug("Successfully activated process with ID [{}] of identifier [{}]", processToActivate.getIdentifier(),
+                processToActivate.getStringId());
+        return new MakeVersionActiveDTO(processToActivate.getStringId(), processToInactivate == null ? null
+                : processToInactivate.getStringId());
     }
 
     protected void evaluateRules(Event event) {

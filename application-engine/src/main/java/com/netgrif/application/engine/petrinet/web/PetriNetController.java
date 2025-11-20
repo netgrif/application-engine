@@ -6,6 +6,7 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNe
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.dto.response.petrinet.MakeVersionActiveDTO;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
@@ -39,6 +40,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -117,6 +119,29 @@ public class PetriNetController {
             return EventOutcomeWithMessageResource.errorMessage("IO error while importing Petri net");
         } catch (MissingPetriNetMetaDataException e) {
             return EventOutcomeWithMessageResource.errorMessage("Missing metadata error while importing Petri net");
+        }
+    }
+
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Operation(summary = "Make the process active",
+            description = "Caller must have the ADMIN role. Makes the provided process active. The previous active version is inactivated.",
+            security = {@SecurityRequirement(name = "BasicAuth")})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK. The response contains the IDs of process models, that have been activated and inactivated"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "404", description = "Process model is not found")
+    })
+    @PostMapping(value = "/activate/{id}", produces = MediaTypes.HAL_JSON_VALUE)
+    public ResponseEntity<MakeVersionActiveDTO> makeVersionActive(@PathVariable("id") String processId) {
+        try {
+            MakeVersionActiveDTO response = service.makeVersionActive(processId);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            log.error("The process with id [{}] was not found.", processId, e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            log.error("Making process [{}] active failed: ", processId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
