@@ -239,9 +239,9 @@ public class PetriNetService implements IPetriNetService {
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.PRE));
 
         if (inactivatedProcess != null) {
-            save(inactivatedProcess);
+            doSaveInternal(inactivatedProcess);
         }
-        save(newProcess);
+        doSaveInternal(newProcess);
 
         outcome.setOutcomes(eventService.runActions(newProcess.getPostUploadActions(), null, Optional.empty(), params));
         outcome.setNet(importedProcess.get());
@@ -264,10 +264,10 @@ public class PetriNetService implements IPetriNetService {
             log.debug("Inactivating current active version of process with ID [{}] of identifier [{}]",
                     processToInactivate.getStringId(), processToInactivate.getIdentifier());
             processToInactivate.makeInactive();
-            save(processToInactivate);
+            doSaveInternal(processToInactivate);
         }
         processToActivate.makeActive();
-        save(processToActivate);
+        doSaveInternal(processToActivate);
 
         log.debug("Successfully activated process with ID [{}] of identifier [{}]", processToActivate.getStringId(),
                 processToActivate.getIdentifier());
@@ -277,6 +277,10 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public Optional<PetriNet> save(PetriNet petriNet) {
+        return doSaveInternal(petriNet);
+    }
+
+    protected final Optional<PetriNet> doSaveInternal(PetriNet petriNet) {
         petriNet.initializeArcs();
         this.evictCache(petriNet);
         petriNet = repository.save(petriNet);
@@ -284,7 +288,7 @@ public class PetriNetService implements IPetriNetService {
         try {
             elasticPetriNetService.indexNow(this.petriNetMappingService.transform(petriNet));
         } catch (Exception e) {
-            log.error("Indexing failed [" + petriNet.getStringId() + "]", e);
+            log.error("Indexing failed [{}]", petriNet.getStringId(), e);
         }
 
         return Optional.of(petriNet);
