@@ -234,7 +234,7 @@ public class PetriNetService implements IPetriNetService {
         functionCacheService.cachePetriNetFunctions(newProcess);
         Path savedPath = getImporter().saveNetFile(newProcess, new ByteArrayInputStream(xmlCopy.toByteArray()));
         xmlCopy.close();
-        log.info("Petri newProcess " + newProcess.getTitle() + " (" + newProcess.getInitials() + " v" + newProcess.getVersion() + ") importedProcess successfully and saved in a folder: " + savedPath.toString());
+        log.info("Petri net " + newProcess.getTitle() + " (" + newProcess.getInitials() + " v" + newProcess.getVersion() + ") imported successfully and saved in a folder: " + savedPath.toString());
 
         outcome.setOutcomes(eventService.runActions(newProcess.getPreUploadActions(), null, Optional.empty(), params));
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.PRE));
