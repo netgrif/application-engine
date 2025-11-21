@@ -251,7 +251,6 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public MakeVersionActiveDTO makeVersionActive(String processId) {
-        // todo 2266 test
         log.info("Activating the process with id [{}]...", processId);
         PetriNet processToActivate = self.getPetriNet(processId);
         PetriNet processToInactivate = self.getActiveVersionByIdentifier(processToActivate.getIdentifier());
@@ -331,7 +330,6 @@ public class PetriNetService implements IPetriNetService {
     @Override
     @Cacheable(value = "petriNetActive", unless = "#result == null")
     public PetriNet getActiveVersionByIdentifier(String identifier) {
-        // todo 2266 test
         if (identifier == null) {
             return null;
         }
@@ -341,7 +339,6 @@ public class PetriNetService implements IPetriNetService {
     @Override
     @Cacheable(value = "petriNetLatest", unless = "#result == null")
     public PetriNet getLatestVersionByIdentifier(String identifier) {
-        // todo 2266 test
         if (identifier == null) {
             return null;
         }

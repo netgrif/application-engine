@@ -7,6 +7,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.objects.auth.domain.*
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
+import com.netgrif.application.engine.objects.dto.response.petrinet.MakeVersionActiveDTO
 import com.netgrif.application.engine.objects.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch
@@ -212,9 +213,38 @@ class PetriNetServiceTest {
     }
 
     @Test
+    void testMakeVersionActive() {
+        PetriNet petriNetV1 = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("1"), superCreator.loggedSuper).getNet()
+        PetriNet petriNetV2 = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("2"), superCreator.loggedSuper).getNet()
+        PetriNet petriNetV3 = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("3"), superCreator.loggedSuper).getNet()
+        assert !petriNetService.get(petriNetV1.getObjectId()).isVersionActive()
+        assert !petriNetService.get(petriNetV2.getObjectId()).isVersionActive()
+        assert petriNetService.get(petriNetV3.getObjectId()).isVersionActive()
+
+        MakeVersionActiveDTO response = petriNetService.makeVersionActive(petriNetV2.getStringId())
+        assert response != null
+        assert response.activatedProcessId() == petriNetV2.getStringId()
+        assert response.inactivatedProcessId() == petriNetV3.getStringId()
+        petriNetV2 = petriNetService.get(petriNetV2.getObjectId())
+        assert !petriNetService.get(petriNetV1.getObjectId()).isVersionActive()
+        assert petriNetService.get(petriNetV2.getObjectId()).isVersionActive()
+        assert !petriNetService.get(petriNetV3.getObjectId()).isVersionActive()
+
+        petriNetV2.makeInactive()
+        petriNetService.save(petriNetV2)
+
+        response = petriNetService.makeVersionActive(petriNetV3.getStringId())
+        assert response != null
+        assert response.activatedProcessId() == petriNetV3.getStringId()
+        assert response.inactivatedProcessId() == null
+        assert !petriNetService.get(petriNetV1.getObjectId()).isVersionActive()
+        assert !petriNetService.get(petriNetV2.getObjectId()).isVersionActive()
+        assert petriNetService.get(petriNetV3.getObjectId()).isVersionActive()
+    }
+
+    @Test
     void processSearch() {
         long processCount = petriNetRepository.count()
-
 
         def user = userService.findUserByUsername(CUSTOMER_USER_MAIL, null)
         assert user != null && user.isPresent()
