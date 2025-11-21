@@ -12,7 +12,6 @@ import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
-import com.netgrif.application.engine.objects.event.events.Event;
 import com.netgrif.application.engine.objects.event.events.petrinet.ProcessDeleteEvent;
 import com.netgrif.application.engine.objects.event.events.petrinet.ProcessDeployEvent;
 import com.netgrif.application.engine.importer.service.Importer;
@@ -238,21 +237,12 @@ public class PetriNetService implements IPetriNetService {
 
         outcome.setOutcomes(eventService.runActions(newProcess.getPreUploadActions(), null, Optional.empty(), params));
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.PRE));
+
         if (inactivatedProcess != null) {
             save(inactivatedProcess);
         }
-        try {
-            save(newProcess);
-        } catch (Exception rethrow) {
-            if (inactivatedProcess != null) {
-                // make sure there is always an active version
-                log.warn("Something unexpected happened while saving new version of process [{}]. Rolling back process version, that have been inactivated...",
-                        newProcess.getIdentifier());
-                inactivatedProcess.makeActive();
-                save(inactivatedProcess);
-            }
-            throw rethrow;
-        }
+        save(newProcess);
+
         outcome.setOutcomes(eventService.runActions(newProcess.getPostUploadActions(), null, Optional.empty(), params));
         outcome.setNet(importedProcess.get());
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
@@ -261,6 +251,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public MakeVersionActiveDTO makeVersionActive(String processId) {
+        // todo 2266 test
         log.info("Activating the process with id [{}]...", processId);
         PetriNet processToActivate = self.getPetriNet(processId);
         PetriNet processToInactivate = self.getActiveVersionByIdentifier(processToActivate.getIdentifier());
@@ -276,30 +267,13 @@ public class PetriNetService implements IPetriNetService {
             processToInactivate.makeInactive();
             save(processToInactivate);
         }
-
-        try {
-            processToActivate.makeActive();
-            save(processToActivate);
-        } catch (Exception rethrow) {
-            if (processToInactivate != null) {
-                // make sure there is always an active version
-                log.warn("Something unexpected happened while activating process [{}]. Rolling back status of a version, that have been inactivated...",
-                        processId);
-                processToInactivate.makeActive();
-                save(processToInactivate);
-            }
-            throw rethrow;
-        }
+        processToActivate.makeActive();
+        save(processToActivate);
 
         log.debug("Successfully activated process with ID [{}] of identifier [{}]", processToActivate.getStringId(),
                 processToActivate.getIdentifier());
         return new MakeVersionActiveDTO(processToActivate.getStringId(), processToInactivate == null ? null
                 : processToInactivate.getStringId());
-    }
-
-    protected void evaluateRules(Event event) {
-        publisher.publishEvent(event);
-
     }
 
     @Override
