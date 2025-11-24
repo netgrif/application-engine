@@ -337,7 +337,7 @@ public class PetriNetService implements IPetriNetService {
         if (identifier == null) {
             return null;
         }
-        return repository.findByIdentifierAndIsVersionActive(identifier, true);
+        return repository.findByIdentifierAndVersionActive(identifier, true);
     }
 
     @Override

@@ -24,7 +24,7 @@ public abstract class ElasticPetriNet {
 
     private Version version;
 
-    private boolean isVersionActive;
+    private boolean versionActive;
 
     private String uriNodeId;
 
@@ -40,7 +40,7 @@ public abstract class ElasticPetriNet {
         this.id = net.getStringId();
         this.identifier = net.getIdentifier();
         this.version = net.getVersion();
-        this.isVersionActive = net.isVersionActive();
+        this.versionActive = net.isVersionActive();
         this.uriNodeId = net.getUriNodeId();
         this.title = this.transformToField(net.getTitle());
         this.initials = net.getInitials();
@@ -49,7 +49,7 @@ public abstract class ElasticPetriNet {
 
     public void update(ElasticPetriNet net) {
         this.version = net.getVersion();
-        this.isVersionActive = net.isVersionActive();
+        this.versionActive = net.isVersionActive();
         if (net.getUriNodeId() != null) {
             this.uriNodeId = net.getUriNodeId();
         }

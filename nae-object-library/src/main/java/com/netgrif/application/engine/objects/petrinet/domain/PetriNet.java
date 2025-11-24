@@ -76,7 +76,7 @@ public abstract class PetriNet extends PetriNetObject {
     @Getter
     @Setter
     @Indexed
-    private boolean isVersionActive;
+    private boolean versionActive;
 
     @Getter
     @Setter
@@ -174,7 +174,7 @@ public abstract class PetriNet extends PetriNetObject {
         this.title = petriNet.getTitle();
         this.importId = petriNet.getImportId();
         this.version = petriNet.getVersion();
-        this.isVersionActive = petriNet.isVersionActive();
+        this.versionActive = petriNet.isVersionActive();
         this.defaultCaseName = petriNet.getDefaultCaseName();
         this.defaultCaseNameExpression = petriNet.getDefaultCaseNameExpression();
         this.initials = petriNet.getInitials();

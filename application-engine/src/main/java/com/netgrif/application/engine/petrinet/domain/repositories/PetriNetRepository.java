@@ -36,7 +36,7 @@ public interface PetriNetRepository extends MongoRepository<PetriNet, String>, Q
     /**
      * todo javadoc
      */
-    PetriNet findByIdentifierAndIsVersionActive(String identifier, boolean isVersionActive);
+    PetriNet findByIdentifierAndVersionActive(String identifier, boolean versionActive);
 
     /**
      * Finds a paginated list of {@link PetriNet} entities by their identifier.
