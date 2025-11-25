@@ -588,6 +588,15 @@ public class PetriNetService implements IPetriNetService {
         repository.deleteBy_id(petriNet.getObjectId());
         evictCache(petriNet);
         functionCacheService.reloadCachedFunctions(petriNet);
+        if (petriNet.isVersionActive()) {
+            PetriNet toBeActivated = self.getLatestVersionByIdentifier(petriNet.getIdentifier());
+            if (toBeActivated != null) {
+                log.debug("The active version was removed. Activating the latest version of the process [{}] with id [{}]...",
+                        toBeActivated.getIdentifier(), toBeActivated.getStringId());
+                toBeActivated.makeActive();
+                save(toBeActivated);
+            }
+        }
         publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.POST));
     }
 

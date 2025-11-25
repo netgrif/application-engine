@@ -7,7 +7,6 @@ import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.objects.auth.domain.*
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
-import com.netgrif.application.engine.objects.dto.response.petrinet.MakeVersionActiveDTO
 import com.netgrif.application.engine.objects.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch
@@ -153,7 +152,7 @@ class PetriNetServiceTest {
         ImportPetriNetEventOutcome outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("2"), superCreator.loggedSuper)
         PetriNet petriNetV2 = outcome.getNet()
         assert petriNetV2 != null
-        assert petriNetV2.versionActive()
+        assert petriNetV2.versionActive
         Version version = new Version()
         version.setMajor(2)
         assert petriNetV2.getVersion() == version
@@ -188,58 +187,57 @@ class PetriNetServiceTest {
 
         petriNetV2.makeActive()
         petriNetV2 = petriNetService.save(petriNetV2).get()
-        assert petriNetV2.versionActive()
+        assert petriNetV2.versionActive
         petriNetV4.makeInactive()
         petriNetV4 = petriNetService.save(petriNetV4).get()
-        assert !petriNetV4.versionActive()
+        assert !petriNetV4.versionActive
 
         outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("5"), superCreator.loggedSuper)
         PetriNet petriNetV5 = outcome.getNet()
         assert petriNetV5 != null
-        assert !petriNetService.get(petriNetV2.getObjectId()).versionActive()
-        assert !petriNetService.get(petriNetV4.getObjectId()).versionActive()
-        assert petriNetV5.versionActive()
+        assert !petriNetService.get(petriNetV2.getObjectId()).versionActive
+        assert !petriNetService.get(petriNetV4.getObjectId()).versionActive
+        assert petriNetV5.versionActive
         version = new Version()
         version.setMajor(5)
         assert petriNetV5.getVersion() == version
         Thread.sleep(5000)
         elasticPetriNetV2Optional = elasticPetriNetRepository.findById(petriNetV2.stringId)
-        assert !elasticPetriNetV2Optional.get().versionActive()
+        assert !elasticPetriNetV2Optional.get().versionActive
         elasticPetriNetV4Optional = elasticPetriNetRepository.findById(petriNetV4.stringId)
-        assert !elasticPetriNetV4Optional.get().versionActive()
+        assert !elasticPetriNetV4Optional.get().versionActive
         Optional<ElasticPetriNet> elasticPetriNetV5Optional = elasticPetriNetRepository.findById(petriNetV5.stringId)
         assert elasticPetriNetV5Optional.isPresent()
-        assert elasticPetriNetV5Optional.get().versionActive()
+        assert elasticPetriNetV5Optional.get().versionActive
     }
 
     @Test
-    void testMakeVersionActive() {
-        PetriNet petriNetV1 = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("1"), superCreator.loggedSuper).getNet()
-        PetriNet petriNetV2 = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("2"), superCreator.loggedSuper).getNet()
-        PetriNet petriNetV3 = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("3"), superCreator.loggedSuper).getNet()
-        assert !petriNetService.get(petriNetV1.getObjectId()).versionActive()
-        assert !petriNetService.get(petriNetV2.getObjectId()).versionActive()
-        assert petriNetService.get(petriNetV3.getObjectId()).versionActive()
+    void testVersionActiveOnDelete() {
+        ImportPetriNetEventOutcome outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("1"), superCreator.loggedSuper)
+        PetriNet processV1 = outcome.getNet()
+        outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("2"), superCreator.loggedSuper)
+        PetriNet processV2 = outcome.getNet()
+        outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("3"), superCreator.loggedSuper)
+        PetriNet processV3 = outcome.getNet()
 
-        MakeVersionActiveDTO response = petriNetService.makeVersionActive(petriNetV2.getStringId())
-        assert response != null
-        assert response.activatedProcessId() == petriNetV2.getStringId()
-        assert response.inactivatedProcessId() == petriNetV3.getStringId()
-        petriNetV2 = petriNetService.get(petriNetV2.getObjectId())
-        assert !petriNetService.get(petriNetV1.getObjectId()).versionActive()
-        assert petriNetService.get(petriNetV2.getObjectId()).versionActive()
-        assert !petriNetService.get(petriNetV3.getObjectId()).versionActive()
+        assert !petriNetService.get(processV1.getObjectId()).versionActive
+        assert !petriNetService.get(processV2.getObjectId()).versionActive
+        assert petriNetService.get(processV3.getObjectId()).versionActive
 
-        petriNetV2.makeInactive()
-        petriNetService.save(petriNetV2)
+        petriNetService.deletePetriNet(processV2.getStringId(), superCreator.loggedSuper)
 
-        response = petriNetService.makeVersionActive(petriNetV3.getStringId())
-        assert response != null
-        assert response.activatedProcessId() == petriNetV3.getStringId()
-        assert response.inactivatedProcessId() == null
-        assert !petriNetService.get(petriNetV1.getObjectId()).versionActive()
-        assert !petriNetService.get(petriNetV2.getObjectId()).versionActive()
-        assert petriNetService.get(petriNetV3.getObjectId()).versionActive()
+        assert petriNetRepository.findById(processV2.getStringId()).isEmpty()
+        assert !petriNetService.get(processV1.getObjectId()).versionActive
+        assert petriNetService.get(processV3.getObjectId()).versionActive
+
+        petriNetService.deletePetriNet(processV3.getStringId(), superCreator.loggedSuper)
+
+        assert petriNetRepository.findById(processV3.getStringId()).isEmpty()
+        assert petriNetService.get(processV1.getObjectId()).versionActive
+
+        petriNetService.deletePetriNet(processV1.getStringId(), superCreator.loggedSuper)
+
+        assert petriNetRepository.findById(processV1.getStringId()).isEmpty()
     }
 
     @Test
