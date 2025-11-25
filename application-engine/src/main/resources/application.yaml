@@ -131,7 +131,6 @@ netgrif:
         env:
           enabled: 'true'
     logging:
-      config: classpath:logback.xml
       file:
         path: log
       endpoints: 'true'
