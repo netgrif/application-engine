@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.petrinet.service.interfaces;
 
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.objects.dto.response.petrinet.MakeVersionActiveDTO;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.objects.petrinet.domain.Transition;
@@ -110,11 +109,6 @@ public interface IPetriNetService {
      * @throws MissingIconKeyException if an icon key is missing
      */
     ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
-
-    /**
-     * todo javadoc
-     */
-    MakeVersionActiveDTO makeVersionActive(String processId);
 
     /**
      * Saves a PetriNet object.

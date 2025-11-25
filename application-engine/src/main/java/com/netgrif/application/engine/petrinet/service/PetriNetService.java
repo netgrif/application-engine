@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
-import com.netgrif.application.engine.objects.dto.response.petrinet.MakeVersionActiveDTO;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.ArcImportReference;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
@@ -247,32 +246,6 @@ public class PetriNetService implements IPetriNetService {
         outcome.setNet(importedProcess.get());
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
         return outcome;
-    }
-
-    @Override
-    public MakeVersionActiveDTO makeVersionActive(String processId) {
-        log.info("Activating the process with id [{}]...", processId);
-        PetriNet processToActivate = self.getPetriNet(processId);
-        PetriNet processToInactivate = self.getActiveVersionByIdentifier(processToActivate.getIdentifier());
-
-        if (processToInactivate != null && processToInactivate.getStringId().equals(processToActivate.getStringId())) {
-            log.debug("The process to activate is already active. Nothing to do");
-            return new MakeVersionActiveDTO();
-        }
-
-        if (processToInactivate != null) {
-            log.debug("Inactivating current active version of process with ID [{}] of identifier [{}]",
-                    processToInactivate.getStringId(), processToInactivate.getIdentifier());
-            processToInactivate.makeInactive();
-            doSaveInternal(processToInactivate);
-        }
-        processToActivate.makeActive();
-        doSaveInternal(processToActivate);
-
-        log.debug("Successfully activated process with ID [{}] of identifier [{}]", processToActivate.getStringId(),
-                processToActivate.getIdentifier());
-        return new MakeVersionActiveDTO(processToActivate.getStringId(), processToInactivate == null ? null
-                : processToInactivate.getStringId());
     }
 
     @Override
