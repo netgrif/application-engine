@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <conversionRule conversionWord="clr" class="org.springframework.boot.logging.logback.ColorConverter"/>
+    <conversionRule conversionWord="clr"
+                    class="org.springframework.boot.logging.logback.ColorConverter"/>
     <conversionRule conversionWord="wex"
                     class="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
     <conversionRule conversionWord="wEx"
@@ -44,10 +45,12 @@
             <fileNamePattern>log/old.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
             <maxHistory>30</maxHistory>
             <maxFileSize>10MB</maxFileSize>
+            <totalSizeCap>5GB</totalSizeCap>
         </rollingPolicy>
 
         <encoder>
             <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
         </encoder>
 
     </appender>
