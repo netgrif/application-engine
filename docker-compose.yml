@@ -39,7 +39,7 @@ services:
     ports:
       - "6379:6379"
   minio:
-    image: docker.io/bitnami/minio:2022
+    image: bawix/minio:2022
     ports:
       - '9000:9000'
       - '9001:9001'
