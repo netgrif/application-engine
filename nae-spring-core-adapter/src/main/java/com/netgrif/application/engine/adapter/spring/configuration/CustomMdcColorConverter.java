@@ -9,7 +9,7 @@ import org.springframework.boot.ansi.AnsiOutput;
 import java.util.List;
 import java.util.Map;
 
-@NoArgsConstructor
+
 public class CustomMdcColorConverter extends ClassicConverter {
     private static final List<String> KEYS = List.of("spanId", "traceId", "realmId", "userId", "username");
     private static final Map<String, AnsiColor> KEY_COLORS = Map.of(
