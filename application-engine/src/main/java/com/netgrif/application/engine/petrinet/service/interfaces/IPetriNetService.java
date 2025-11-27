@@ -154,7 +154,6 @@ public interface IPetriNetService {
 
     /**
      * Retrieves the active version of a {@link PetriNet} by its identifier.
-     * todo javadoc isversionactive logic
      *
      * @param identifier the unique identifier of the PetriNet
      * @return the active version of the {@link PetriNet} matching the provided identifier or null if not found

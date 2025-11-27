@@ -53,10 +53,10 @@ public class Version implements Serializable, Comparable<Version> {
     }
 
     /**
-     * todo javadoc
-     * 0 equals
-     * <0 this < other
-     * >0 this > other
+     * Compares this version to the other version
+     *
+     * @param other other version to be compared with
+     * @return 0 if the versions equal, <0 if this is lower than other, >0 if this is higher than other</0>
      */
     public int compareTo(Version other) {
         if (this.major != other.major) {
@@ -69,14 +69,18 @@ public class Version implements Serializable, Comparable<Version> {
     }
 
     /**
-     * todo javadoc
+     * Checks if this version is higher than the other
+     * @param other other version to be compared with
+     * @return true if this version is higher than the other
      */
     public boolean isHigherThan(Version other) {
         return compareTo(other) > 0;
     }
 
     /**
-     * todo javadoc
+     * Checks if this version is lower than the other
+     * @param other other version to be compared with
+     * @return true if this version is lower than the other
      */
     public boolean isLowerThan(Version other) {
         return compareTo(other) < 0;
