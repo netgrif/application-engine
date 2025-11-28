@@ -8,13 +8,13 @@
     <conversionRule conversionWord="wEx"
                     converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
     <conversionRule conversionWord="logLevel" converterClass="com.netgrif.application.engine.adapter.spring.configuration.CustomLevelColorConverter"/>
-    <conversionRule conversionWord="mdcColor" converterClass="com.netgrif.application.engine.adapter.spring.configuration.CustomMdcColorConverter" />
+    <conversionRule conversionWord="mdc" converterClass="com.netgrif.application.engine.adapter.spring.configuration.CustomMdcConverter" />
 
     <property name="CONSOLE_LOG_PATTERN"
-              value="%clr(time=){faint}%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){cyan}  %clr(level=){faint}%logLevel  %clr(pid=){faint}%clr(${PID:- }){magenta}  %clr(thread=){faint}%clr(%-15.15t){yellow}  %mdcColor  %clr(logger=){faint}%clr(%-40.40logger{39}){blue}  %clr(msg=){faint}%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+              value="%clr(time=){faint}%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){cyan}  %clr(level=){faint}%logLevel  %clr(pid=){faint}%clr(${PID:- }){magenta}  %clr(thread=){faint}%clr(%-15.15t){yellow} %clr(logger=){faint}%clr(%-40.40logger{39}){blue} %mdc %clr(msg=){faint}%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
 
     <property name="FILE_LOG_PATTERN"
-              value="${FILE_LOG_PATTERN:-time=%d{yyyy-MM-dd HH:mm:ss.SSS} level=${LOG_LEVEL_PATTERN:-%5p} pid=${PID:- } thread=%t logger=%-40.40logger{39} spanId=%X{spanId:-} traceId=%X{traceId:-} msg=%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+              value="${FILE_LOG_PATTERN:-time=%d{yyyy-MM-dd HH:mm:ss.SSS} level=${LOG_LEVEL_PATTERN:-%5p} pid=${PID:- } thread=%t logger=%-40.40logger{39} traceId=%X{traceId:-} userId=%X{userId:-} msg=%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
 
     <logger name="org.apache.catalina.startup.DigesterFactory" level="ERROR"/>
     <logger name="org.apache.catalina.util.LifecycleBase" level="ERROR"/>
