@@ -2,7 +2,6 @@ package com.netgrif.application.engine.adapter.spring.configuration;
 
 import ch.qos.logback.classic.pattern.ClassicConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.boot.ansi.AnsiColor;
 import org.springframework.boot.ansi.AnsiOutput;
 
@@ -55,7 +54,7 @@ public class CustomMdcConverter extends ClassicConverter {
     }
 
     private String fillEmptySpaces(int length) {
-        return Strings.repeat(" ", length);
+        return " ".repeat(length);
     }
 
 }
