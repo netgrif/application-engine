@@ -52,6 +52,9 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
 
     AbstractUser assignRole(String roleImportId, String petriNetIdentifier, AbstractUser user = affectedUser) {
         PetriNet petriNet = petriNetService.getActiveVersionByIdentifier(petriNetIdentifier)
+        if (petriNet == null) {
+            throw new IllegalArgumentException("The process with identifier [%s] could not be found".formatted(petriNetIdentifier))
+        }
         assignRole(roleImportId, user, petriNet)
     }
 
@@ -76,6 +79,9 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
 
     AbstractUser removeRole(String roleImportId, String petriNetIdentifier, AbstractUser user = affectedUser) {
         PetriNet petriNet = petriNetService.getActiveVersionByIdentifier(petriNetIdentifier)
+        if (petriNet == null) {
+            throw new IllegalArgumentException("The process with identifier [%s] could not be found".formatted(petriNetIdentifier))
+        }
         removeRole(roleImportId, user, petriNet)
     }
 

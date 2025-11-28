@@ -8,6 +8,7 @@ import com.netgrif.application.engine.menu.services.interfaces.DashboardItemServ
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.objects.utils.MenuItemUtils;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
@@ -62,7 +63,11 @@ public class DashboardItemServiceImpl implements DashboardItemService {
         }
 
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
-        itemCase = workflowService.createCase(petriNetService.getActiveVersionByIdentifier(DashboardItemConstants.PROCESS_IDENTIFIER).getStringId(), body.getName().getDefaultValue(), "", loggedUser).getCase();
+        PetriNet petriNet = petriNetService.getActiveVersionByIdentifier(DashboardItemConstants.PROCESS_IDENTIFIER);
+        if (petriNet == null) {
+            throw new IllegalStateException("Dashboard item process not found or not active");
+        }
+        itemCase = workflowService.createCase(petriNet.getStringId(), body.getName().getDefaultValue(), "", loggedUser).getCase();
         ToDataSetOutcome outcome = body.toDataSet();
         itemCase = setDataWithExecute(itemCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());
         return itemCase;

@@ -2442,6 +2442,10 @@ class ActionDelegate {
                     temp.put(entry.value, petriNetService.getActiveVersionByIdentifier(entry.value))
                 }
                 PetriNet net = temp[entry.value]
+                if (net == null) {
+                    throw new IllegalArgumentException("The process with identifier [%s] could not be found when collecting roles."
+                            .formatted(entry.value))
+                }
                 ProcessRole role = net.roles.find { it.value.importId == entry.key }.value
                 return [(role.importId + ":" + net.identifier), ("$role.name ($net.title)" as String)]
             }
