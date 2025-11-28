@@ -164,7 +164,7 @@ public interface IPetriNetService {
      * Retrieves the latest version of a {@link PetriNet} by its identifier.
      *
      * @param identifier the unique identifier of the PetriNet
-     * @return the latest version of the {@link PetriNet} matching the provided identifier
+     * @return the latest version of the {@link PetriNet} matching the provided identifier or null if not found
      */
     PetriNet getLatestVersionByIdentifier(String identifier);
 
