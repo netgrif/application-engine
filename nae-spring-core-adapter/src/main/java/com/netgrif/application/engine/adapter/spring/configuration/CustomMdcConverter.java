@@ -22,8 +22,8 @@ public class CustomMdcConverter extends ClassicConverter {
             new KeyLength(USER_ID, 31));
 
     private static final Map<String, AnsiColor> KEY_COLORS = Map.of(
-            "traceId", AnsiColor.MAGENTA,
-            "userId", AnsiColor.BLUE
+            TRACE_ID, AnsiColor.MAGENTA,
+            USER_ID, AnsiColor.BLUE
     );
 
     @Override
