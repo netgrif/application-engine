@@ -9,6 +9,10 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.4.2](h
 
 ## [6.4.2](https://github.com/netgrif/application-engine/releases/tag/v6.4.2) (2025-05-16)
 
+### Fixed
+- [NAE-2225] Not possible to set empty options using setData
+- [NAE-2231] Unable to change behavior of taskRef on finish event without error message
+
 ### Added
 - [NAE-2100] Case view export button as NAE feature
 
