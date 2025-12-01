@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
 	<id>preference_filter_item</id>
 	<initials>PFI</initials>
 	<title>Preference filter item</title>
@@ -313,7 +313,7 @@
 		<id>default_headers</id>
 		<title name="default_headers">Set default headers</title>
 	</data>
-  
+
 <data type="multichoice_map">
 		<id>allowed_nets</id>
 		<title name="allowed_nets">Allowed nets</title>

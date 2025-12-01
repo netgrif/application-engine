@@ -40,7 +40,7 @@ services:
       - "6379:6379"
 
   minio:
-    image: docker.io/bitnami/minio:2022
+    image: docker.io/bitnamilegacy/minio:2025.7.23
     ports:
       - '9000:9000'
       - '9001:9001'
