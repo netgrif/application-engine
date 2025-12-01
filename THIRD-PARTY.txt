@@ -40,7 +40,6 @@ Lists of 378 third-party dependencies.
      (The Apache Software License, Version 2.0) project ':json-path' (com.jayway.jsonpath:json-path:2.6.0 - https://github.com/jayway/JsonPath)
      (Eclipse Public License, Version 1.0) (GNU Lesser General Public License, Version 2.1) mchange-commons-java (com.mchange:mchange-commons-java:0.2.15 - https://github.com/swaldman/mchange-commons-java)
      (The Apache Software License, Version 2.0) lang (com.mysema.commons:mysema-commons-lang:0.2.4 - http://www.github.com/mysema/mysema-commons-lang)
-     (Unknown license) quartz-mongodb (com.novemberain:quartz-mongodb:2.2.0-rc2 - no url defined)
      (Apache License, Version 2.0) Querydsl - Codegen utils (com.querydsl:codegen-utils:5.0.0 - https://querydsl.github.io/codegen-utils/)
      (Apache License, Version 2.0) Querydsl - APT support (com.querydsl:querydsl-apt:5.0.0 - http://www.querydsl.com)
      (Apache License, Version 2.0) Querydsl - Codegen module (com.querydsl:querydsl-codegen:5.0.0 - http://www.querydsl.com)
