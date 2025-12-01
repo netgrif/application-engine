@@ -184,19 +184,23 @@ jobs:
         id: getVersion
 
       - name: Push Version ${{ steps.getVersion.outputs.version }}
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
+          context: .
+          file: ./Dockerfile
           push: true
           platforms: linux/amd64,linux/arm64
           tags: netgrif/application-engine:${{ steps.getVersion.outputs.version }}
 
-      - name: Push Latest
-        if:  ${{ !contains(steps.getVersion.outputs.version, '-SNAPSHOT') }}
-        uses: docker/build-push-action@v3
-        with:
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: netgrif/application-engine:latest
+#      - name: Push Latest
+#        if: ${{ !contains(steps.getVersion.outputs.version, '-SNAPSHOT') }}
+#        uses: docker/build-push-action@v6
+#        with:
+#          context: .
+#          file: ./Dockerfile
+#          push: true
+#          platforms: linux/amd64,linux/arm64
+#          tags: netgrif/application-engine:latest
 
   publish-artifact:
     name: GitHub Artifacts
