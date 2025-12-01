@@ -544,7 +544,7 @@ public class UserServiceImpl implements UserService {
     public void removeRoleOfDeletedPetriNet(Set<ProcessRole> petriNetRoles) {
         String defaultRealmCollection = collectionNameProvider.getDefaultRealmCollection();
         Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-        Collection<ProcessResourceId> roleIds = petriNetRoles.stream().map(ProcessRole::get_id).collect(Collectors.toSet());
+        Collection<ProcessResourceId> roleIds = petriNetRoles.stream().filter(r -> !r.isGlobal()).map(ProcessRole::get_id).collect(Collectors.toSet());
         Page<AbstractUser> users;
         do {
             users = searchUsersByRoleIds(roleIds, defaultRealmCollection, pageable);
