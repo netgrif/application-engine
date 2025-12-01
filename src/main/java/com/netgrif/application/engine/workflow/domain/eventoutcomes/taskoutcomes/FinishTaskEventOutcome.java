@@ -6,6 +6,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import lombok.Data;
 
 import java.util.List;
+import java.util.Objects;
 
 @Data
 public class FinishTaskEventOutcome extends TaskEventOutcome {
@@ -31,6 +32,6 @@ public class FinishTaskEventOutcome extends TaskEventOutcome {
 
     protected boolean isTaskStillExecutable(Case useCase, Task task) {
         return useCase.getTasks().stream()
-                .anyMatch(taskPair -> taskPair.getTask().equals(task.getStringId()));
+                .anyMatch(taskPair -> task != null && Objects.equals(taskPair.getTask(), task.getStringId()));
     }
 }

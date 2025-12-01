@@ -14,7 +14,7 @@ public class LocalisedFinishTaskEventOutcome extends LocalisedTaskEventOutcome {
     public LocalisedFinishTaskEventOutcome(FinishTaskEventOutcome outcome, Locale locale) {
         super(outcome, locale);
         if (outcome != null) {
-            this.isTaskStillExecutable = outcome.isTaskStillExecutable() ;
+            this.isTaskStillExecutable = outcome.isTaskStillExecutable();
         }
     }
 }
