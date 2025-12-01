@@ -135,7 +135,7 @@ jobs:
         with:
           java-version: 11
           distribution: 'adopt'
-          server-id: ossrh
+          server-id: central
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
 
@@ -187,6 +187,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: netgrif/application-engine:${{ steps.getVersion.outputs.version }}
 
       - name: Push Latest
@@ -194,6 +195,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: netgrif/application-engine:latest
 
   publish-artifact:
