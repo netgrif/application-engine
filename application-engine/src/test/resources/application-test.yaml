@@ -7,11 +7,13 @@ netgrif:
       mongodb:
         drop: true
       elasticsearch:
+        queue:
+          delay: 10
         drop: true
         index:
           petriNet: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_test_petrinet
           case: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_test_case
-          task: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_test_taks
+          task: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_test_task
         reindex: 0 0 0 * * *
     postal-code:
       enable-import: true

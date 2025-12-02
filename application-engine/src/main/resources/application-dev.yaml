@@ -11,7 +11,7 @@ netgrif:
         index:
           petriNet: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_dev_petrinet
           case: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_dev_case
-          task: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_dev_taks
+          task: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_dev_task
         reindex: 0 */10 * * * *
     postal-code:
       enable-import: true

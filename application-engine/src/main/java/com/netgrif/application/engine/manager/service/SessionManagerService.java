@@ -28,7 +28,7 @@ public class SessionManagerService implements ISessionManagerService {
     public SessionManagerService(RedisIndexedSessionRepository repository, SessionRegistry sessionRegistry, DataConfigurationProperties.RedisProperties redisProperties) {
         this.repository = repository;
         this.sessionRegistry = sessionRegistry;
-        this.redisUsernameKey = RedisIndexedSessionRepository.DEFAULT_NAMESPACE + ":" + redisProperties.getNamespace() + ":index:org.springframework.session.FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME:";
+        this.redisUsernameKey = RedisIndexedSessionRepository.DEFAULT_NAMESPACE + ":" + redisProperties.getSession().getNamespace() + ":index:org.springframework.session.FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME:";
     }
 
     @Override
