@@ -51,7 +51,7 @@ public interface ActionApi {
      * Finds a specific case by its ID.
      *
      * @param caseId the ID of the case to find
-     * @return the found case
+     * @return the found case, otherwise returns null
      */
     Case findCase(String caseId);
 

@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.adapter.spring.actions;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public enum ActionApiMethods {
 
@@ -19,6 +21,8 @@ public enum ActionApiMethods {
 
     private String methodName;
 
+    private static final Map<String, ActionApiMethods> METHODS_BY_NAME_MAP = Arrays.stream(values()).collect(Collectors.toUnmodifiableMap(ActionApiMethods::getMethodName, e -> e));
+
     ActionApiMethods(String methodName) {
         this.methodName = methodName;
     }
@@ -27,10 +31,8 @@ public enum ActionApiMethods {
         return methodName;
     }
 
+
     public static ActionApiMethods fromMethodName(String methodName) {
-        return Arrays.stream(ActionApiMethods.values())
-                .filter(type -> type.methodName.equals(methodName))
-                .findFirst()
-                .orElse(null);
+        return METHODS_BY_NAME_MAP.get(methodName);
     }
 }

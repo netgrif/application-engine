@@ -71,8 +71,11 @@ public final class NaeReflectionUtils {
      */
     public static Method findMethod(Object bean, String methodToExecute, Class<?>[] requestParamTypes)
             throws NoSuchMethodException, AmbiguousMethodCallException {
+        Objects.requireNonNull(bean, "bean must not be null");
+        Objects.requireNonNull(methodToExecute, "methodToExecute must not be null");
+        final Class<?>[] paramTypes = (requestParamTypes == null) ? new Class<?>[0] : requestParamTypes;
         try {
-            return NaeReflectionUtils.resolveClass(bean).getMethod(methodToExecute, requestParamTypes);
+            return NaeReflectionUtils.resolveClass(bean).getMethod(methodToExecute, paramTypes);
         } catch (NoSuchMethodException e) {
             return findMethodWithSuperClassParams(bean, methodToExecute, requestParamTypes, e);
         }
@@ -95,7 +98,9 @@ public final class NaeReflectionUtils {
                                                   NoSuchMethodException caughtException)
             throws NoSuchMethodException, AmbiguousMethodCallException {
         Class<?> cls = NaeReflectionUtils.resolveClass(bean);
-        Method[] methods = Arrays.stream(cls.getMethods()).filter(m -> m.isBridge() || m.isSynthetic()).toArray(Method[]::new);
+        Method[] methods = Arrays.stream(cls.getMethods())
+                .filter(m -> !m.isBridge() && !m.isSynthetic())
+                .toArray(Method[]::new);
         Method methodToInvoke = null;
         outerLoop:
         for (Method method : methods) {
