@@ -230,7 +230,13 @@ public class PetriNetController {
             return MessageResource.errorMessage("Deleting Petri net " + processId + " failed!");
         }
         LoggedUser user = (LoggedUser) auth.getPrincipal();
-        asyncRunner.execute(() -> this.service.deletePetriNet(decodedProcessId, user, force));
+        asyncRunner.execute(() -> {
+            if (force) {
+                service.deletePetriNet(decodedProcessId, user, true);
+            } else {
+                service.deletePetriNet(decodedProcessId, user);
+            }
+        });
         return MessageResource.successMessage("Petri net " + decodedProcessId + " is being deleted");
     }
 

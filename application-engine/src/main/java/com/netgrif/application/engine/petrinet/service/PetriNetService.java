@@ -535,7 +535,6 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Transactional
     public void deletePetriNet(String processId, LoggedUser loggedUser, boolean force) {
         Optional<PetriNet> petriNetOptional = repository.findById(processId);
         if (petriNetOptional.isEmpty()) {
