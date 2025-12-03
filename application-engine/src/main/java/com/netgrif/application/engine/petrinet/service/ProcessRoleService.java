@@ -147,10 +147,6 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         Set<ProcessRole> rolesNewToUser = getRolesNewToActor(userOldRoles, requestedRoles);
         Set<ProcessRole> rolesRemovedFromUser = getRolesRemovedFromActor(userOldRoles, requestedRoles);
 
-//        String idOfPetriNetContainingRole = getProcessIdRoleBelongsTo(rolesNewToUser, rolesRemovedFromUser);
-//        if (!isGlobalFromFirstRole(rolesNewToUser) && !isGlobalFromFirstRole(rolesRemovedFromUser) && idOfPetriNetContainingRole == null) {
-//            return;
-//        }
 
         oldActorRoles.clear();
         oldActorRoles.addAll(updateRequestedRoles(userOldRoles, rolesNewToUser, rolesRemovedFromUser));
