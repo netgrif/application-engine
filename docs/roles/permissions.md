@@ -1,5 +1,7 @@
 # Process permissions
 
+[//]: # (todo 2285 user refs)
+
 In NAE, permissions represent a layer in security of processes modeled and implemented in Petriflow. Using permissions
 the developer can define, who can see and edit the processes, cases and tasks, who can execute events and actions.
 
@@ -94,24 +96,24 @@ For these examples only the `default` role is used to demonstrate the principles
 
 ```xml
 <document>
-    <userRef>
+    <actorRef>
         <id>other</id>
         <caseLogic>
             <view>false</view>
         </caseLogic>
-    </userRef>
+    </actorRef>
 </document>
 ```
 
 ```xml
 <document>
     <transition>
-        <userRef>
+        <actorRef>
             <id>other</id>
             <logic>
                 <view>false</view>
             </logic>
-        </userRef>
+        </actorRef>
     </transition>
 </document>
 ```
@@ -192,24 +194,24 @@ For these examples only the `default` role is used to demonstrate the principles
 
 ```xml
 <document>
-    <userRef>
+    <actorRef>
         <id>other</id>
         <caseLogic>
             <view>true</view>
         </caseLogic>
-    </userRef>
+    </actorRef>
 </document>
 ```
 
 ```xml
 <document>
     <transition>
-        <userRef>
+        <actorRef>
             <id>other</id>
             <logic>
                 <view>true</view>
             </logic>
-        </userRef>
+        </actorRef>
     </transition>
 </document>
 ```
@@ -318,13 +320,13 @@ Permission documentation can be found [here](#Permissions). User list can be ref
 ```
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	...
-	<userRef>
+	<actorRef>
 		<id>user_list_1</id>
 		<caseLogic>
 			<create>false</view>
 			<view>true</view>
 		</caseLogic>
-	</userRef>
+	</actorRef>
 	...
 </document>
 ```
@@ -336,13 +338,13 @@ Permission documentation can be found [here](#Permissions). User list can be ref
 	...
 	<transition>
 		...
-		<userRef>
+		<actorRef>
 		<id>user_list_1</id>
 			<logic>
 				<finish>false</view>
 				<view>true</view>
 			</logic>
-		</userRef>
+		</actorRef>
 		...
 	</transition>
 	...
@@ -392,14 +394,14 @@ permissions for case created from process as follows:
 		</caseLogic>
 	</roleRef>
 	...
-	<userRef>
+	<actorRef>
 		<id>user_list_1</id>
 		<caseLogic>
 			<create>true</view>
 			<delete>true</delete>
 			<view>true</view>
 		</caseLogic>
-	</userRef>
+	</actorRef>
 	...
 </document>
 ```
@@ -442,13 +444,13 @@ permissions for task created from transition as follows:
 			</logic>
 		</roleRef>
 		...
-		<userRef>
+		<actorRef>
 			<id>user_list_1</id>
 			<logic>
 				<finish>false</view>
 				<view>true</view>
 			</logic>
-		</userRef>
+		</actorRef>
 		...
 	</transition>
 	...

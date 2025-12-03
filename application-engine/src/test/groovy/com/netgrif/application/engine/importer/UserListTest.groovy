@@ -71,7 +71,7 @@ class UserListTest {
                 ]
         ]))
 
-        assert taskService.findById(task.stringId).users.get(superCreator.getSuperUser().getStringId())
-        assert caseRepository.findById(caseOpt.get().stringId).get().users.get(superCreator.getSuperUser().getStringId())
+        assert taskService.findById(task.stringId).actors.get(superCreator.getSuperUser().getStringId())
+        assert caseRepository.findById(caseOpt.get().stringId).get().actors.get(superCreator.getSuperUser().getStringId())
     }
 }

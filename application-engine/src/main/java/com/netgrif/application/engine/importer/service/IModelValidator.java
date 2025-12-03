@@ -11,11 +11,11 @@ public interface IModelValidator {
         Logger log = LoggerFactory.getLogger(IModelValidator.class);
 
         if (attr instanceof Collection && !((Collection<?>) attr).isEmpty()) {
-            log.warn("Data attribute [" + attrName + "] is deprecated.");
+            log.warn("Data attribute [{}] is deprecated.", attrName);
         }
 
         if (!(attr instanceof Collection) && attr != null) {
-            log.warn("Data attribute [" + attrName + "] is deprecated.");
+            log.warn("Data attribute [{}] is deprecated.", attrName);
         }
     }
 }

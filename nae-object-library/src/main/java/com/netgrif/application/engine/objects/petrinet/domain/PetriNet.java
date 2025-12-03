@@ -118,7 +118,7 @@ public abstract class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
-    private Map<String, Map<String, Boolean>> userRefs;
+    private Map<String, Map<String, Boolean>> actorRefs;
 
     @Getter
     @Setter
@@ -154,7 +154,7 @@ public abstract class PetriNet extends PetriNetObject {
         processEvents = new LinkedHashMap<>();
         caseEvents = new LinkedHashMap<>();
         permissions = new HashMap<>();
-        userRefs = new HashMap<>();
+        actorRefs = new HashMap<>();
         functions = new LinkedList<>();
         tags = new HashMap<>();
     }
@@ -184,7 +184,7 @@ public abstract class PetriNet extends PetriNetObject {
         this.processEvents = petriNet.getProcessEvents();
         this.caseEvents = petriNet.getCaseEvents();
         this.permissions = petriNet.getPermissions();
-        this.userRefs = petriNet.getUserRefs();
+        this.actorRefs = petriNet.getActorRefs();
         this.functions.addAll(petriNet.getFunctions());
         this.tags = petriNet.getTags();
         this.initialized = true;
@@ -223,11 +223,11 @@ public abstract class PetriNet extends PetriNetObject {
         functions.add(function);
     }
 
-    public void addUserPermission(String usersRefId, Map<String, Boolean> permissions) {
-        if (this.userRefs.containsKey(usersRefId) && this.userRefs.get(usersRefId) != null) {
-            this.userRefs.get(usersRefId).putAll(permissions);
+    public void addActorPermission(String actorFieldId, Map<String, Boolean> permissions) {
+        if (this.actorRefs.containsKey(actorFieldId) && this.actorRefs.get(actorFieldId) != null) {
+            this.actorRefs.get(actorFieldId).putAll(permissions);
         } else {
-            this.userRefs.put(usersRefId, permissions);
+            this.actorRefs.put(actorFieldId, permissions);
         }
     }
 

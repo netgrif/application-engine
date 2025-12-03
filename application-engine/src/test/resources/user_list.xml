@@ -7,13 +7,13 @@
     <data type="userList">
         <id>users_1</id>
     </data>
-    <usersRef>
+    <actorRef>
         <id>users_1</id>
         <caseLogic>
             <create>false</create>
             <delete>true</delete>
         </caseLogic>
-    </usersRef>
+    </actorRef>
     <processEvents>
         <event type="upload">
             <id>upload</id>
@@ -53,12 +53,12 @@
     <transition>
         <id>1</id>
         <label>Title</label>
-        <usersRef>
+        <actorRef>
             <id>users_1</id>
             <logic>
                 <perform>true</perform>
             </logic>
-        </usersRef>
+        </actorRef>
     </transition>
 
 </document>

@@ -11,6 +11,7 @@ public class DocumentValidator implements IDocumentValidator {
     @Override
     public void checkDeprecatedAttributes(Document document) {
         validateAttribute(document.getUsersRef(), "usersRef");
+        validateAttribute(document.getUsersRef(), "userRef");
     }
 
     @Override

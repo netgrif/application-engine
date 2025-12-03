@@ -34,6 +34,8 @@ import java.util.stream.Collectors;
 @Service
 public class CaseSearchService extends MongoSearchService<Case> {
 
+    // todo 2285 this class
+
     private static final Logger log = LoggerFactory.getLogger(CaseSearchService.class.getName());
 
     public static final String ROLE = "role";
@@ -109,16 +111,17 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     public Predicate viewRoleQuery(String role) {
-        return QCase.case$.viewUserRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewRoles.contains(role));
+        return QCase.case$.viewActorRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewRoles.contains(role));
     }
 
     protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
-        Predicate roleConstraints = viewUserQuery(user.getStringId());
+        // todo 2285
+        Predicate roleConstraints = viewActorQuery(user.getStringId());
         return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
     }
 
-    public Predicate viewUserQuery(String userId) {
-        return QCase.case$.viewUserRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewUsers.contains(userId));
+    public Predicate viewActorQuery(String actorId) {
+        return QCase.case$.viewActorRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewActors.contains(actorId));
     }
 
     protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {
@@ -131,12 +134,14 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     protected Predicate buildNegativeViewUsersQueryConstraint(LoggedUser user) {
+        // todo 2285
         Predicate roleConstraints = negativeViewUserQuery(user.getStringId());
         return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
     }
 
-    public Predicate negativeViewUserQuery(String userId) {
-        return QCase.case$.negativeViewUsers.contains(userId);
+    public Predicate negativeViewUserQuery(String actorId) {
+        // todo 2285
+        return QCase.case$.negativeViewActors.contains(actorId);
     }
 
     public Predicate petriNet(Object query, LoggedUser user, Locale locale) {

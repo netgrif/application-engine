@@ -63,22 +63,22 @@ content of the userList can be changed at runtime.
     <title/>
   </data>
   ...
-  <userRef>
+  <actorRef>
     <id>userList1</id>
     <caseLogic>
       <view>true</view>
       <delete>true</delete>
     </caseLogic>
-  </userRef>
+  </actorRef>
   ...
   <transition>
     <id>1</id>
-    <usersRef>
+    <actorRef>
       <id>userList1</id>
       <logic>
         <perform>true</perform>
       </logic>
-    </usersRef>
+    </actorRef>
   </transition>
 </document>
 ```

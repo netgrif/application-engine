@@ -88,7 +88,7 @@ public class Task {
         this.userId = task.getUser() != null ? task.getUser().getStringId() : null;
         this.userRealmId = task.getUser() != null ? task.getUser().getRealmId() : null;
         this.roles = task.getRoles();
-        this.users = task.getUsers();
+        this.users = task.getActors();
         this.startDate = task.getStartDate();
         this.finishDate = task.getFinishDate();
         this.finishedBy = task.getFinishedBy();

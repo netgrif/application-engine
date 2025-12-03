@@ -152,7 +152,7 @@ class QueryDSLViewPermissionTest {
         Page<Case> casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
                 PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale())
 
-        assert casePage.getContent().size() == 1 && casePage.getContent()[0].stringId == case_.stringId && case_.viewUsers.contains(testUser.getStringId())
+        assert casePage.getContent().size() == 1 && casePage.getContent()[0].stringId == case_.stringId && case_.viewActors.contains(testUser.getStringId())
         workflowService.deleteCase(case_.getStringId())
     }
 
@@ -174,7 +174,7 @@ class QueryDSLViewPermissionTest {
         Page<Task> taskPage = taskService.search([request],
                 PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale(), false)
 
-        assert taskPage.getContent().size() == 1 && taskPage.content[0].caseId == case_.stringId && taskPage.content[0].viewUsers.contains(testUser.getStringId())
+        assert taskPage.getContent().size() == 1 && taskPage.content[0].caseId == case_.stringId && taskPage.content[0].viewActors.contains(testUser.getStringId())
         workflowService.deleteCase(case_.getStringId())
     }
 
@@ -210,7 +210,7 @@ class QueryDSLViewPermissionTest {
         Page<Case> casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
                 PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale())
 
-        assert casePage.getContent().size() == 0 && case_.negativeViewUsers.contains(testUser.getStringId())
+        assert casePage.getContent().size() == 0 && case_.negativeViewActors.contains(testUser.getStringId())
         workflowService.deleteCase(case_.getStringId())
     }
 
@@ -233,7 +233,7 @@ class QueryDSLViewPermissionTest {
         Page<Case> casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
                 PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale())
 
-        assert casePage.getContent().size() == 1 && case_.viewUsers.contains(testUser.stringId)
+        assert casePage.getContent().size() == 1 && case_.viewActors.contains(testUser.stringId)
         userService.removeRole(testUser, negViewRole.getStringId())
         workflowService.deleteCase(case_.getStringId())
     }

@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
+import com.netgrif.application.engine.auth.service.GroupService;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
@@ -92,6 +94,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     protected UserService userService;
+
+    @Autowired
+    protected GroupService groupService;
 
     @Autowired
     protected InitValueExpressionEvaluator initValueExpressionEvaluator;
@@ -224,35 +229,46 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public Case resolveUserRef(Case useCase) {
-        useCase.getUsers().clear();
-        useCase.getNegativeViewUsers().clear();
-        useCase.getUserRefs().forEach((id, permission) -> {
-            resolveUserRefPermissions(useCase, id, permission);
+    public Case resolveActorRef(Case useCase) {
+        useCase.getActors().clear();
+        useCase.getNegativeViewActors().clear();
+        useCase.getActorRefs().forEach((actorFieldId, permission) -> {
+            resolveActorRefPermissions(useCase, actorFieldId, permission);
         });
-        useCase.resolveViewUsers();
-        taskService.resolveUserRef(useCase);
+        useCase.resolveViewActors();
+        taskService.resolveActorRef(useCase);
         return save(useCase);
     }
 
-    private void resolveUserRefPermissions(Case useCase, String userListId, Map<String, Boolean> permission) {
-        // todo 2285
-        List<String> userIds = getExistingUsers((ActorListFieldValue) useCase.getDataSet().get(userListId).getValue());
-        if (userIds != null && userIds.size() != 0) {
+    private void resolveActorRefPermissions(Case useCase, String actorFieldId, Map<String, Boolean> permission) {
+        List<String> actorIds = getExistingActors((ActorListFieldValue) useCase.getDataSet().get(actorFieldId).getValue());
+        if (actorIds != null && !actorIds.isEmpty()) {
             if (permission.containsKey("view") && !permission.get("view")) {
-                useCase.getNegativeViewUsers().addAll(userIds);
+                useCase.getNegativeViewActors().addAll(actorIds);
             } else {
-                useCase.addUsers(new HashSet<>(userIds), permission);
+                useCase.addActors(new HashSet<>(actorIds), permission);
             }
         }
     }
 
-    private List<String> getExistingUsers(ActorListFieldValue userListValue) {
-        // todo 2285
-        if (userListValue == null)
+    private List<String> getExistingActors(ActorListFieldValue actorListFieldValue) {
+        if (actorListFieldValue == null) {
             return null;
-        return userListValue.getActorValues().stream().map(ActorFieldValue::getId)
-                .filter(id -> userService.findById(id, null) != null)
+        }
+        return actorListFieldValue.getActorValues().stream()
+                .map(ActorFieldValue::getId)
+                .filter(actorId -> {
+                    AbstractUser user = userService.findById(actorId, null);
+                    if (user != null) {
+                        return true;
+                    }
+                    try {
+                        groupService.findById(actorId);
+                        return true;
+                    } catch (IllegalArgumentException ignored) {
+                        return false;
+                    }
+                })
                 .collect(Collectors.toList());
     }
 

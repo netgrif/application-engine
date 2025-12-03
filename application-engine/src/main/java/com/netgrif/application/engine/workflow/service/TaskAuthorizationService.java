@@ -52,18 +52,18 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     @Override
     public Boolean userHasUserListPermission(AbstractUser user, Task task, RolePermission... permissions) {
-        if (task.getUserRefs() == null || task.getUserRefs().isEmpty())
+        if (task.getActorRefs() == null || task.getActorRefs().isEmpty())
             return null;
 
         // TODO: impersonation
 //        if (!task.getUsers().containsKey(user.getSelfOrImpersonated().getStringId())) {
-        if (!task.getUsers().containsKey(user.getStringId())) {
+        if (!task.getActors().containsKey(user.getStringId())) {
             return null;
         }
 
         // TODO: impersonation
 //        Map<String, Boolean> userPermissions = task.getUsers().get(user.getSelfOrImpersonated().getStringId());
-        Map<String, Boolean> userPermissions = task.getUsers().get(user.getStringId());
+        Map<String, Boolean> userPermissions = task.getActors().get(user.getStringId());
 
         for (RolePermission permission : permissions) {
             Boolean perm = userPermissions.get(permission.toString());

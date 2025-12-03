@@ -12,7 +12,6 @@ import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchReque
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +20,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class TaskSearchService extends MongoSearchService<Task> {
+
+    // todo 2285 this class
 
     @Autowired
     private IPetriNetService petriNetService;
@@ -62,7 +63,8 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     protected Predicate buildUserRefQueryConstraint(LoggedUser user) {
-        Predicate userRefConstraints = userRefQuery(user.getStringId());
+        // todo 2285
+        Predicate userRefConstraints = actorRefQuery(user.getStringId());
         return constructPredicateTree(Collections.singletonList(userRefConstraints), BooleanBuilder::or);
     }
 
@@ -72,16 +74,18 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     public Predicate viewRoleQuery(String role) {
-        return QTask.task.viewUserRefs.isEmpty().and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewRoles.contains(role));
+        return QTask.task.viewActorRefs.isEmpty().and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewRoles.contains(role));
     }
 
     protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
+        // todo 2285
         Predicate userConstraints = viewUsersQuery(user.getStringId());
         return constructPredicateTree(Collections.singletonList(userConstraints), BooleanBuilder::or);
     }
 
-    public Predicate viewUsersQuery(String userId) {
-        return QTask.task.negativeViewRoles.isEmpty().and(QTask.task.viewUserRefs.isEmpty()).and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewUsers.contains(userId));
+    public Predicate viewUsersQuery(String actorId) {
+        // todo 2285
+        return QTask.task.negativeViewRoles.isEmpty().and(QTask.task.viewActorRefs.isEmpty()).and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewActors.contains(actorId));
     }
 
     protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {
@@ -94,12 +98,14 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     protected Predicate buildNegativeViewUsersQueryConstraint(LoggedUser user) {
+        // todo 2285
         Predicate userConstraints = negativeViewUsersQuery(user.getStringId());
         return constructPredicateTree(Collections.singletonList(userConstraints), BooleanBuilder::or);
     }
 
-    public Predicate negativeViewUsersQuery(String userId) {
-        return QTask.task.negativeViewUsers.contains(userId);
+    public Predicate negativeViewUsersQuery(String actorId) {
+        // todo 2285
+        return QTask.task.negativeViewActors.contains(actorId);
     }
 
 
@@ -155,8 +161,8 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return QTask.task._id.eq(new ProcessResourceId(id));
     }
 
-    public Predicate userRefQuery(String userId) {
-        return QTask.task.users.containsKey(userId);
+    public Predicate actorRefQuery(String actorId) {
+        return QTask.task.actors.containsKey(actorId);
     }
 
     private void buildCaseQuery(TaskSearchRequest request, BooleanBuilder query) {
@@ -278,7 +284,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
         PetriNetSearch processQuery = new PetriNetSearch();
         processQuery.setGroup(request.group);
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
-        if (groupProcesses.size() == 0)
+        if (groupProcesses.isEmpty())
             return true;
 
         query.and(

@@ -69,7 +69,7 @@ public abstract class ElasticCase implements Serializable {
 
     private Set<String> viewRoles;
 
-    private Set<String> viewUserRefs;
+    private Set<String> viewUserRefs; // todo 2285
 
     private Set<String> negativeViewRoles;
 
@@ -97,10 +97,10 @@ public abstract class ElasticCase implements Serializable {
         tasks = useCase.getTasks() == null ? Collections.emptySet() : useCase.getTasks().stream().map(tp -> new ElasticTaskPair(tp.getTask(), tp.getTransition())).collect(Collectors.toSet());
         enabledRoles = new HashSet<>(useCase.getEnabledRoles());
         viewRoles = new HashSet<>(useCase.getViewRoles());
-        viewUserRefs = new HashSet<>(useCase.getViewUserRefs());
+        viewUserRefs = new HashSet<>(useCase.getViewActorRefs());
         negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
-        viewUsers = new HashSet<>(useCase.getViewUsers());
-        negativeViewUsers = new HashSet<>(useCase.getNegativeViewUsers());
+        viewUsers = new HashSet<>(useCase.getViewActors());
+        negativeViewUsers = new HashSet<>(useCase.getNegativeViewActors());
         tags = new HashMap<>(useCase.getTags());
 
         dataSet = new HashMap<>();

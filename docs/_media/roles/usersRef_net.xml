@@ -31,12 +31,12 @@
             <view>true</view>
         </caseLogic>
     </roleRef>
-    <usersRef>
+    <actorRef>
         <id>user_list_1</id>
         <caseLogic>
             <view>true</view>
         </caseLogic>
-    </usersRef>
+    </actorRef>
 
     <!-- PROCESS USER REFS -->
     <!-- DATA -->
@@ -84,12 +84,12 @@
                 <view>true</view>
             </logic>
         </roleRef>
-        <usersRef>
+        <actorRef>
             <id>user_list_1</id>
             <logic>
                 <view>false</view>
             </logic>
-        </usersRef>
+        </actorRef>
         <dataRef>
             <id>assign</id>
             <logic>

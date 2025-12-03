@@ -169,7 +169,7 @@ class ElasticSearchViewPermissionTest {
         caseSearchRequest.process = [new CaseSearchRequest.PetriNet(netWithUserRefs.getIdentifier())] as List
         Page<Case> casePage = elasticCaseService.search([caseSearchRequest] as List, ActorTransformer.toLoggedUser(testUser), PageRequest.of(0, 20), LocaleContextHolder.getLocale(), false)
 
-        assert casePage.getContent().size() == 1 && casePage.getContent()[0].stringId == case_.stringId && case_.viewUsers.contains(testUser.getStringId())
+        assert casePage.getContent().size() == 1 && casePage.getContent()[0].stringId == case_.stringId && case_.viewActors.contains(testUser.getStringId())
         workflowService.deleteCase(case_.getStringId())
     }
 
@@ -190,7 +190,7 @@ class ElasticSearchViewPermissionTest {
         caseSearchRequest.process = [new CaseSearchRequest.PetriNet(netWithUserRefs.getIdentifier())] as List
         Page<Case> casePage = elasticCaseService.search([caseSearchRequest] as List, ActorTransformer.toLoggedUser(testUser), PageRequest.of(0, 20), LocaleContextHolder.getLocale(), false)
 
-        assert casePage.getContent().size() == 0 && case_.negativeViewUsers.contains(testUser.getStringId())
+        assert casePage.getContent().size() == 0 && case_.negativeViewActors.contains(testUser.getStringId())
         workflowService.deleteCase(case_.getStringId())
     }
 
@@ -213,7 +213,7 @@ class ElasticSearchViewPermissionTest {
         caseSearchRequest.process = [new CaseSearchRequest.PetriNet(netWithUserRefs.getIdentifier())] as List
         Page<Case> casePage = elasticCaseService.search([caseSearchRequest] as List, ActorTransformer.toLoggedUser(testUser), PageRequest.of(0, 20), LocaleContextHolder.getLocale(), false)
 
-        assert casePage.getContent().size() == 1 && case_.viewUsers.contains(testUser.stringId)
+        assert casePage.getContent().size() == 1 && case_.viewActors.contains(testUser.stringId)
         userService.removeRole(testUser, negViewRole.getStringId())
         workflowService.deleteCase(case_.getStringId())
     }

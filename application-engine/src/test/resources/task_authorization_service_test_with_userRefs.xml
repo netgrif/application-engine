@@ -90,54 +90,54 @@
                 <finish>false</finish>
             </logic>
         </roleRef>
-        <userRef>
+        <actorRef>
             <id>assign_pos_ul</id>
             <logic>
                 <assign>true</assign>
             </logic>
-        </userRef>
-        <userRef>
+        </actorRef>
+        <actorRef>
             <id>assign_neg_ul</id>
             <logic>
                 <assign>false</assign>
             </logic>
-        </userRef>
-        <userRef>
+        </actorRef>
+        <actorRef>
             <id>delegate_pos_ul</id>
             <logic>
                 <delegate>true</delegate>
             </logic>
-        </userRef>
-        <userRef>
+        </actorRef>
+        <actorRef>
             <id>delegate_neg_ul</id>
             <logic>
                 <delegate>false</delegate>
             </logic>
-        </userRef>
-        <userRef>
+        </actorRef>
+        <actorRef>
             <id>cancel_pos_ul</id>
             <logic>
                 <cancel>true</cancel>
             </logic>
-        </userRef>
-        <userRef>
+        </actorRef>
+        <actorRef>
             <id>cancel_neg_ul</id>
             <logic>
                 <cancel>false</cancel>
             </logic>
-        </userRef>
-        <userRef>
+        </actorRef>
+        <actorRef>
             <id>finish_pos_ul</id>
             <logic>
                 <finish>true</finish>
             </logic>
-        </userRef>
-        <userRef>
+        </actorRef>
+        <actorRef>
             <id>finish_neg_ul</id>
             <logic>
                 <finish>false</finish>
             </logic>
-        </userRef>
+        </actorRef>
         <dataRef>
             <id>text</id>
             <logic>

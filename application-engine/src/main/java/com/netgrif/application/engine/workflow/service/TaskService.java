@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
+import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorFieldValue;
@@ -71,6 +72,9 @@ public class TaskService implements ITaskService {
 
     @Autowired
     protected UserService userService;
+
+    @Autowired
+    protected GroupService groupService;
 
     @Autowired
     protected MongoTemplate mongoTemplate;
@@ -524,7 +528,7 @@ public class TaskService implements ITaskService {
         }
         save(newTasks);
         delete(disabledTasks, useCase);
-        useCase = workflowService.resolveUserRef(useCase);
+        useCase = workflowService.resolveActorRef(useCase);
 
         for (Task task : newTasks) {
             executeIfAutoTrigger(useCase, net, task);
@@ -798,37 +802,48 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void resolveUserRef(Case useCase) {
+    public void resolveActorRef(Case useCase) {
         useCase.getTasks().forEach(taskPair -> {
             Optional<Task> taskOptional = findOptionalById(taskPair.getTask());
-            taskOptional.ifPresent(task -> resolveUserRef(task, useCase));
+            taskOptional.ifPresent(task -> resolveActorRef(task, useCase));
         });
 
     }
 
     @Override
-    public Task resolveUserRef(Task task, Case useCase) {
-        // todo 2285
-        task.getUsers().clear();
-        task.getNegativeViewUsers().clear();
-        task.getUserRefs().forEach((id, permission) -> {
-            List<String> userIds = getExistingUsers((ActorListFieldValue) useCase.getDataSet().get(id).getValue());
-            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
-                task.getNegativeViewUsers().addAll(userIds);
-            } else if (userIds != null && userIds.size() != 0) {
-                task.addUsers(new HashSet<>(userIds), permission);
+    public Task resolveActorRef(Task task, Case useCase) {
+        task.getActors().clear();
+        task.getNegativeViewActors().clear();
+        task.getActorRefs().forEach((actorFieldId, permission) -> {
+            List<String> actorIds = getExistingActors((ActorListFieldValue) useCase.getDataSet().get(actorFieldId).getValue());
+            if (actorIds != null && !actorIds.isEmpty() && permission.containsKey("view") && !permission.get("view")) {
+                task.getNegativeViewActors().addAll(actorIds);
+            } else if (actorIds != null && !actorIds.isEmpty()) {
+                task.addActors(new HashSet<>(actorIds), permission);
             }
         });
-        task.resolveViewUsers();
+        task.resolveViewActors();
         return taskRepository.save(task);
     }
 
-    private List<String> getExistingUsers(ActorListFieldValue userListValue) {
-        // todo 2285
-        if (userListValue == null)
+    private List<String> getExistingActors(ActorListFieldValue actorListFieldValue) {
+        if (actorListFieldValue == null) {
             return null;
-        return userListValue.getActorValues().stream().map(ActorFieldValue::getId)
-                .filter(id -> userService.findById(id, null) != null)
+        }
+        return actorListFieldValue.getActorValues().stream()
+                .map(ActorFieldValue::getId)
+                .filter(actorId -> {
+                    AbstractUser user = userService.findById(actorId, null);
+                    if (user != null) {
+                        return true;
+                    }
+                    try {
+                        groupService.findById(actorId);
+                        return true;
+                    } catch (IllegalArgumentException ignored) {
+                        return false;
+                    }
+                })
                 .collect(Collectors.toList());
     }
 
@@ -850,13 +865,13 @@ public class TaskService implements ITaskService {
                 .finishPolicy(transition.getFinishPolicy())
                 .assignedUserPolicy(new HashMap<>(transition.getAssignedUserPolicy()))
                 .roles(new HashMap<>())
-                .userRefs(new HashMap<>())
-                .users(new HashMap<>())
+                .actorRefs(new HashMap<>())
+                .actors(new HashMap<>())
                 .viewRoles(new LinkedList<>())
-                .viewUserRefs(new LinkedList<>())
-                .viewUsers(new LinkedList<>())
+                .viewActorRefs(new LinkedList<>())
+                .viewActors(new LinkedList<>())
                 .negativeViewRoles(new LinkedList<>())
-                .negativeViewUsers(new LinkedList<>())
+                .negativeViewActors(new LinkedList<>())
                 .triggers(new LinkedList<>())
                 .eventTitles(new HashMap<>())
                 .build();
@@ -880,11 +895,11 @@ public class TaskService implements ITaskService {
         }
         transition.getNegativeViewRoles().forEach(task::addNegativeViewRole);
 
-        for (Map.Entry<String, Map<String, Boolean>> entry : transition.getUserRefs().entrySet()) {
-            task.addUserRef(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, Map<String, Boolean>> entry : transition.getActorRefs().entrySet()) {
+            task.addActorRef(entry.getKey(), entry.getValue());
         }
         task.resolveViewRoles();
-        task.resolveViewUserRefs();
+        task.resolveViewActorRefs();
 
         Transaction transaction = useCase.getPetriNet().getTransactionByTransition(transition);
         if (transaction != null) {

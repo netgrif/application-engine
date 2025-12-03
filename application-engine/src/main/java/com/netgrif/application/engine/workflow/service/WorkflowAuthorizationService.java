@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
@@ -62,17 +61,18 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
 
     @Override
     public Boolean userHasUserListPermission(AbstractUser user, Case useCase, ProcessRolePermission... permissions) {
-        if (useCase.getUserRefs() == null || useCase.getUserRefs().isEmpty())
+        if (useCase.getActorRefs() == null || useCase.getActorRefs().isEmpty())
             return null;
 
         // TODO: impersonation
 //        if (!useCase.getUsers().containsKey(user.getSelfOrImpersonated().getStringId())) {
-        if (!useCase.getUsers().containsKey(user.getStringId())) {
+        // todo 2285 user.groupIds intersection with useCase.actors
+        if (!useCase.getActors().containsKey(user.getStringId())) {
             return null;
         }
 
         // TODO: impersonation
-        Map<String, Boolean> userPermissions = useCase.getUsers().get(user.getStringId());
+        Map<String, Boolean> userPermissions = useCase.getActors().get(user.getStringId());
 
         for (ProcessRolePermission permission : permissions) {
             Boolean perm = userPermissions.get(permission.toString());

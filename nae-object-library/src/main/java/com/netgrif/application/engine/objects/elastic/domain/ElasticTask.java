@@ -1,9 +1,5 @@
 package com.netgrif.application.engine.objects.elastic.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import lombok.*;
@@ -57,7 +53,7 @@ public abstract class ElasticTask implements Serializable {
 
     private Map<String, Map<String, Boolean>> roles;
 
-    private Map<String, Map<String, Boolean>> userRefs;
+    private Map<String, Map<String, Boolean>> userRefs; // todo 2285
 
     private Map<String, Map<String, Boolean>> users;
 
@@ -97,13 +93,13 @@ public abstract class ElasticTask implements Serializable {
         this.userRealmId = task.getUserRealmId();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles();
-        this.userRefs = task.getUserRefs();
-        this.users = task.getUsers();
+        this.userRefs = task.getActorRefs();
+        this.users = task.getActors();
         this.viewRoles = new HashSet<>(task.getViewRoles());
-        this.viewUserRefs = new HashSet<>(task.getViewUserRefs());
+        this.viewUserRefs = new HashSet<>(task.getViewActorRefs());
         this.negativeViewRoles = new HashSet<>(task.getNegativeViewRoles());
-        this.viewUsers = new HashSet<>(task.getViewUsers());
-        this.negativeViewUsers = new HashSet<>(task.getNegativeViewUsers());
+        this.viewUsers = new HashSet<>(task.getViewActors());
+        this.negativeViewUsers = new HashSet<>(task.getNegativeViewActors());
         this.assignPolicy = task.getAssignPolicy().toString();
         this.dataFocusPolicy = task.getDataFocusPolicy().toString();
         this.finishPolicy = task.getFinishPolicy().toString();
