@@ -97,7 +97,6 @@
 				change impersonated value { new com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue(user.stringId, user.firstName, user.lastName, user.username) }
 				change impersonated_email value { user.username }
 
-				// todo 2285
 				change config_owner value { new com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorListFieldValue([impersonated.value]) }
 				</action>
 

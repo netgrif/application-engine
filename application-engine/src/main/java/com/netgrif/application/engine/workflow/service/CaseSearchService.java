@@ -5,8 +5,8 @@ import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorFieldValue;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldType;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
@@ -227,8 +227,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
                     switch (type) {
                         case ACTOR:
-                            // todo 2285
-                            Path valuePath = Expressions.simplePath(UserFieldValue.class, QCase.case$.dataSet.get((String) k), "value");
+                            Path valuePath = Expressions.simplePath(ActorFieldValue.class, QCase.case$.dataSet.get((String) k), "value");
                             Path idPath = Expressions.stringPath(valuePath, "id");
                             Expression<Long> constant = Expressions.constant(Long.valueOf("" + fieldValue));
                             predicates.add(Expressions.predicate(Ops.EQ, idPath, constant));

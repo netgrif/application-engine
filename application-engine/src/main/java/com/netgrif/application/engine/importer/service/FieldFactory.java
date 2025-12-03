@@ -712,31 +712,29 @@ public final class FieldFactory {
                 parseFileListValue((FileListField) field, useCase, fieldId);
                 break;
             case ACTOR:
-                parseUserValues((ActorField) field, useCase, fieldId);
+                parseActorValues((ActorField) field, useCase, fieldId);
                 break;
             case ACTORLIST:
-                parseUserListValues((ActorListField) field, useCase, fieldId);
+                parseActorListValues((ActorListField) field, useCase, fieldId);
                 break;
             default:
                 field.setValue(useCase.getFieldValue(fieldId));
         }
     }
 
-    private void parseUserValues(ActorField field, Case useCase, String fieldId) {
-        // todo 2285
-        DataField userField = useCase.getDataField(fieldId);
-        if (userField.getChoices() != null) {
-            Set<String> roles = userField.getChoices().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
+    private void parseActorValues(ActorField field, Case useCase, String fieldId) {
+        DataField actorField = useCase.getDataField(fieldId);
+        if (actorField.getChoices() != null) {
+            Set<String> roles = actorField.getChoices().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
             field.setRoles(roles);
         }
-        field.setValue((UserFieldValue) useCase.getFieldValue(fieldId));
+        field.setValue((ActorFieldValue) useCase.getFieldValue(fieldId));
     }
 
-    private void parseUserListValues(ActorListField field, Case useCase, String fieldId) {
-        // todo 2285
-        DataField userListField = useCase.getDataField(fieldId);
-        if (userListField.getChoices() != null) {
-            Set<String> roles = userListField.getChoices().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
+    private void parseActorListValues(ActorListField field, Case useCase, String fieldId) {
+        DataField actorListField = useCase.getDataField(fieldId);
+        if (actorListField.getChoices() != null) {
+            Set<String> roles = actorListField.getChoices().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
             field.setRoles(roles);
         }
         field.setValue((ActorListFieldValue) useCase.getFieldValue(fieldId));

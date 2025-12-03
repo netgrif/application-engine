@@ -60,7 +60,6 @@ public class TextFieldBuilder extends FieldBuilder {
                 value = field.getValue() != null ? ((UserFieldValue) field.getValue()).getFullName() : "";
                 break;
             case ACTORLIST:
-                // todo 2285
                 value = field.getValue() != null ? ((ActorListFieldValue) field.getValue()).getActorValues().stream()
                         .map(ActorFieldValue::getFullName)
                         .collect(Collectors.joining(", ")) : "";
