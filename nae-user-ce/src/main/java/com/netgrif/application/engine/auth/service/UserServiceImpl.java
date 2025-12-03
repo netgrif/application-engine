@@ -550,7 +550,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void removeRoleOfDeletedPetriNet(Set<ProcessRole> petriNetRoles) {
         Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-        Collection<ProcessResourceId> roleIds = petriNetRoles.stream().filter(r -> !r.isGlobal()).map(ProcessRole::get_id).collect(Collectors.toSet());
+        Set<ProcessRole> nonGlobalPetriNetRoles = petriNetRoles.stream().filter(r -> !r.isGlobal()).collect(Collectors.toSet());
+        Collection<ProcessResourceId> roleIds = nonGlobalPetriNetRoles.stream().map(ProcessRole::get_id).collect(Collectors.toSet());
         Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
         Page<Realm> realms;
         do {
@@ -559,7 +560,7 @@ public class UserServiceImpl implements UserService {
             for (Realm realm : realms.getContent()) {
                 do {
                     users = searchUsersByRoleIds(roleIds, collectionNameProvider.getCollectionNameForRealm(realm.getName()), pageable);
-                    users.getContent().forEach(u -> removeRoles(u, petriNetRoles));
+                    users.getContent().forEach(u -> removeRoles(u, nonGlobalPetriNetRoles));
                     pageable = pageable.next();
                 } while (users.hasNext());
             }
