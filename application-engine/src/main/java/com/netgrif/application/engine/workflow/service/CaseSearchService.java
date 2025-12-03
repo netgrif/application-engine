@@ -226,7 +226,8 @@ public class CaseSearchService extends MongoSearchService<Case> {
                     FieldType type = FieldType.fromString(entry.getKey());
 
                     switch (type) {
-                        case USER:
+                        case ACTOR:
+                            // todo 2285
                             Path valuePath = Expressions.simplePath(UserFieldValue.class, QCase.case$.dataSet.get((String) k), "value");
                             Path idPath = Expressions.stringPath(valuePath, "id");
                             Expression<Long> constant = Expressions.constant(Long.valueOf("" + fieldValue));

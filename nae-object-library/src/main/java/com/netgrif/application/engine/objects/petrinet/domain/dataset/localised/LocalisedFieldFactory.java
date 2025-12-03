@@ -23,10 +23,10 @@ public class LocalisedFieldFactory {
             return fromDateTime((DateTimeField) field, locale);
         } else if (field instanceof BooleanField) {
             return fromBoolean((BooleanField) field, locale);
-        } else if (field instanceof UserField) {
-            return fromUser((UserField) field, locale);
-        } else if (field instanceof UserListField) {
-            return fromUserList((UserListField) field, locale);
+        } else if (field instanceof ActorField) {
+            return fromUser((ActorField) field, locale);
+        } else if (field instanceof ActorListField) {
+            return fromUserList((ActorListField) field, locale);
         } else if (field instanceof EnumerationMapField) {
             return fromEnumerationMap((EnumerationMapField) field, locale);
         } else if (field instanceof MultichoiceMapField) {
@@ -68,11 +68,11 @@ public class LocalisedFieldFactory {
         return new LocalisedBooleanField(field, locale);
     }
 
-    private static LocalisedField fromUser(UserField field, Locale locale) {
+    private static LocalisedField fromUser(ActorField field, Locale locale) {
         return new LocalisedUserField(field, locale);
     }
 
-    private static LocalisedField fromUserList(UserListField field, Locale locale) {
+    private static LocalisedField fromUserList(ActorListField field, Locale locale) {
         return new LocalisedUserListField(field, locale);
     }
 

@@ -13,15 +13,15 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public abstract class CaseField extends FieldWithAllowedNetsField {
 
-    private List<String> caseValue;
+    protected List<String> caseValue;
 
-    public CaseField(String[] fullTextValue, String[] allowedNets) {
-        super(fullTextValue, allowedNets);
-        this.caseValue = Arrays.asList(fullTextValue);
+    public CaseField(List<String> caseValue, List<String> allowedNets) {
+        super(caseValue, allowedNets);
+        this.caseValue = caseValue;
     }
 
     @Override
     public Object getValue() {
-        return new ArrayList<>(List.of(fulltextValue));
+        return this.caseValue;
     }
 }

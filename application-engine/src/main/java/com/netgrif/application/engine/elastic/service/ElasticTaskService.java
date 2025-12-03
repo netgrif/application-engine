@@ -325,6 +325,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
      * Tasks assigned to user with id 1 OR 2
      */
     protected void buildUserQuery(ElasticTaskSearchRequest request, BoolQuery.Builder query) {
+        // todo 2285
         if (request.user == null || request.user.isEmpty()) {
             return;
         }

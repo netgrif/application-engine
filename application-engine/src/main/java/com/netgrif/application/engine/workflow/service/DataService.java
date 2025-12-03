@@ -7,8 +7,10 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
@@ -48,7 +50,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -82,6 +83,9 @@ public class DataService implements IDataService {
 
     @Autowired
     protected UserService userService;
+
+    @Autowired
+    protected GroupService groupService;
 
     @Autowired
     protected FieldFactory fieldFactory;
@@ -748,9 +752,14 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public UserFieldValue makeUserFieldValue(String id) {
+    public ActorFieldValue makeActorFieldValue(String id) {
         AbstractUser user = userService.findById(id, null);
-        return new UserFieldValue(user);
+        if (user != null) {
+            return new UserFieldValue(user);
+        } else {
+            Group group = groupService.findById(id);
+            return new GroupFieldValue(group);
+        }
     }
 
     private void updateDataset(Case useCase) {
@@ -775,7 +784,7 @@ public class DataService implements IDataService {
     @Override
     public Case applyFieldConnectedChanges(Case useCase, Field field) {
         switch (field.getType()) {
-            case USERLIST:
+            case ACTORLIST:
                 return workflowService.resolveUserRef(useCase);
             default:
                 return useCase;
@@ -866,16 +875,12 @@ public class DataService implements IDataService {
                 value = parseI18nString(node.get("value"));
                 break;
             case "user":
+            case "actor":
                 if (node.get("value") == null || node.get("value").isNull()) {
                     value = null;
                     break;
                 }
-//                User user = new User(userService.findById(node.get("value").asLong(), true));
-//                user.setPassword(null);
-//                user.setGroups(null);
-//                user.setAuthorities(null);
-//                user.setUserProcessRoles(null);
-                value = makeUserFieldValue(node.get("value").asText());
+                value = makeActorFieldValue(node.get("value").asText());
                 break;
             case "number":
                 if (node.get("value") == null || node.get("value").isNull()) {
@@ -909,11 +914,12 @@ public class DataService implements IDataService {
                 value = parseListStringValues(node);
                 break;
             case "userList":
+            case "actorList":
                 if (node.get("value") == null) {
                     value = null;
                     break;
                 }
-                value = makeUserListFieldValue(node);
+                value = makeActorListFieldValue(node);
                 break;
             case "button":
                 if (node.get("value") == null) {
@@ -952,9 +958,9 @@ public class DataService implements IDataService {
         return set;
     }
 
-    private UserListFieldValue makeUserListFieldValue(ObjectNode nodes) {
-        Set<String> userIds = new LinkedHashSet<>(parseListStringValues(nodes));
-        return new UserListFieldValue(userIds.stream().map(this::makeUserFieldValue).collect(Collectors.toSet()));
+    private ActorListFieldValue makeActorListFieldValue(ObjectNode nodes) {
+        Set<String> actorIds = new LinkedHashSet<>(parseListStringValues(nodes));
+        return new ActorListFieldValue(actorIds.stream().map(this::makeActorFieldValue).collect(Collectors.toSet()));
     }
 
     private List<String> parseListStringValues(ObjectNode node) {

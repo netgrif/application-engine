@@ -93,11 +93,12 @@
                     impersonated: f.impersonated,
                     config_owner: f.config_owner;
 
-					def user = userService.loggedOrSystem
-					change impersonated value { new com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue(user.stringId, user.firstName, user.lastName, user.username) }
-					change impersonated_email value { user.username }
+				def user = userService.loggedOrSystem
+				change impersonated value { new com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue(user.stringId, user.firstName, user.lastName, user.username) }
+				change impersonated_email value { user.username }
 
-					change config_owner value { new com.netgrif.application.engine.objects.petrinet.domain.dataset.UserListFieldValue([impersonated.value]) }
+				// todo 2285
+				change config_owner value { new com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorListFieldValue([impersonated.value]) }
 				</action>
 
 				<action>
@@ -147,7 +148,7 @@
 			</actions>
 		</event>
 	</data>
-	<data type="userList">
+	<data type="actorList">
 		<id>config_owner</id>
 		<title/>
 	</data>
@@ -193,7 +194,7 @@
 			</actions>
 		</event>
 	</data>
-	<data type="user" immediate="true">
+	<data type="actor" immediate="true">
 		<id>impersonated</id>
 		<title name="impersonated">User to impersonate</title>
 		<event type="set">

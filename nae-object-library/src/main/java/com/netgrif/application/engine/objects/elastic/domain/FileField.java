@@ -6,50 +6,46 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public abstract class FileField extends DataField {
 
-    public String[] filePath;
+    protected List<String> filePath;
+    protected List<String> fileNameValue;
+    protected List<String> fileExtensionValue;
 
-    public String[] fileNameValue;
-
-    public String[] fileExtensionValue;
-
-    public FileField(FileFieldValue value) {
-        super(value.getName());
-        this.filePath = new String[1];
-        this.fileNameValue = new String[1];
-        this.fileExtensionValue = new String[1];
-        FileNameAndExtension extracted = this.extractFileExtensionFromName(value.getName());
-        this.filePath[0] = value.getPath();
-        this.fileNameValue[0] = extracted.name;
-        this.fileExtensionValue[0] = extracted.extension;
+    public FileField(FileFieldValue fileFieldValue) {
+        this(List.of(fileFieldValue));
     }
 
-    public FileField(FileFieldValue[] values) {
-        super(new String[values.length]);
-        this.fileNameValue = new String[values.length];
-        this.fileExtensionValue = new String[values.length];
-        for (int i = 0; i < values.length; i++) {
-            FileNameAndExtension extracted = this.extractFileExtensionFromName(values[i].getName());
-            this.fileNameValue[i] = extracted.name;
-            this.fileExtensionValue[i] = extracted.extension;
-            super.fulltextValue[i] = values[i].getName();
+    public FileField(List<FileFieldValue> fileFieldValues) {
+        if (fileFieldValues == null || fileFieldValues.isEmpty()) {
+            return;
+        }
+        this.fileNameValue = new ArrayList<>();
+        this.fileExtensionValue = new ArrayList<>();
+        for (FileFieldValue fileFieldValue : fileFieldValues) {
+            FileNameAndExtension extracted = this.extractFileExtensionFromName(fileFieldValue.getName());
+            this.fileNameValue.add(extracted.name);
+            this.fileExtensionValue.add(extracted.extension);
+            this.fulltextValue.add(fileFieldValue.getName());
         }
     }
 
     @Override
     public Object getValue() {
-        if (fileNameValue != null && fileNameValue.length == 1) {
-            return new FileFieldValue(fileNameValue[0] + "." + fileExtensionValue[0], filePath[0]);
-        } else if (fileNameValue != null && fileNameValue.length > 1) {
-            return IntStream.range(0, fileNameValue.length).mapToObj(i -> new FileFieldValue(fileNameValue[i] + "." + fileExtensionValue[i], filePath[i])).toList();
+        if (this.fileNameValue != null && this.fileNameValue.size() == 1) {
+            return new FileFieldValue(nameWithExtension(this.fileNameValue.getFirst(), this.fileExtensionValue.getFirst()),
+                    this.filePath.getFirst());
+        } else if (this.fileNameValue != null && this.fileNameValue.size() > 1) {
+            return IntStream.range(0, this.fileNameValue.size())
+                    .mapToObj(i -> new FileFieldValue(nameWithExtension(this.fileNameValue.get(i), this.fileExtensionValue.get(i)),
+                            this.filePath.get(i))).toList();
         }
         return null;
     }
@@ -60,6 +56,10 @@ public abstract class FileField extends DataField {
             return new FileNameAndExtension(filename.substring(0, index), filename.substring(index + 1));
         }
         return new FileNameAndExtension(filename, null);
+    }
+
+    private static String nameWithExtension(String fileName, String extension) {
+        return fileName + "." + extension;
     }
 
     @AllArgsConstructor

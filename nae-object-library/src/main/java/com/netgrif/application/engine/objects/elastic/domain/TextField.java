@@ -4,20 +4,20 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public abstract class TextField extends DataField {
 
-    public String[] textValue;
+    protected List<String> textValue;
 
     public TextField(String value) {
-        super(value);
-        this.textValue = new String[1];
-        this.textValue[0] = value;
+        this(List.of(value));
     }
 
-    public TextField(String[] values) {
+    public TextField(List<String> values) {
         super(values);
         this.textValue = values;
     }

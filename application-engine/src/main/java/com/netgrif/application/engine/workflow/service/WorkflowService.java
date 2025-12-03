@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
@@ -15,10 +16,6 @@ import com.netgrif.application.engine.event.services.EvaluationService;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.TaskField;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.objects.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
@@ -239,7 +236,8 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private void resolveUserRefPermissions(Case useCase, String userListId, Map<String, Boolean> permission) {
-        List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(userListId).getValue());
+        // todo 2285
+        List<String> userIds = getExistingUsers((ActorListFieldValue) useCase.getDataSet().get(userListId).getValue());
         if (userIds != null && userIds.size() != 0) {
             if (permission.containsKey("view") && !permission.get("view")) {
                 useCase.getNegativeViewUsers().addAll(userIds);
@@ -249,10 +247,11 @@ public class WorkflowService implements IWorkflowService {
         }
     }
 
-    private List<String> getExistingUsers(UserListFieldValue userListValue) {
+    private List<String> getExistingUsers(ActorListFieldValue userListValue) {
+        // todo 2285
         if (userListValue == null)
             return null;
-        return userListValue.getUserValues().stream().map(UserFieldValue::getId)
+        return userListValue.getActorValues().stream().map(ActorFieldValue::getId)
                 .filter(id -> userService.findById(id, null) != null)
                 .collect(Collectors.toList());
     }

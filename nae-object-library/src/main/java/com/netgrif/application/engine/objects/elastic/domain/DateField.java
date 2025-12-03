@@ -14,9 +14,8 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 public abstract class DateField extends DataField {
 
-    public LocalDateTime dateValue;
-
-    public Long timestampValue;
+    protected LocalDateTime dateValue;
+    protected Long timestampValue;
 
     public DateField(String value, LocalDateTime dateTime) {
         super(value);
@@ -26,6 +25,6 @@ public abstract class DateField extends DataField {
 
     @Override
     public Object getValue() {
-        return dateValue;
+        return this.dateValue;
     }
 }

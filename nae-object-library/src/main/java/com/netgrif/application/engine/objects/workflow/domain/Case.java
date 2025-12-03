@@ -198,11 +198,11 @@ public abstract class Case implements Serializable {
             if (field.getComponent() != null) {
                 this.dataSet.get(key).setComponent(field.getComponent());
             }
-            if (field instanceof UserField) {
-                this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
+            if (field instanceof ActorField) {
+                this.dataSet.get(key).setChoices(((ActorField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
             }
-            if (field instanceof UserListField) {
-                this.dataSet.get(key).setChoices(((UserListField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
+            if (field instanceof ActorListField) {
+                this.dataSet.get(key).setChoices(((ActorListField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
             }
             if (field instanceof FieldWithAllowedNets) {
                 this.dataSet.get(key).setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());

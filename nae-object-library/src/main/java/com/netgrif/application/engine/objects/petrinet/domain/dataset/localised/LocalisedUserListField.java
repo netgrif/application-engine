@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.objects.petrinet.domain.dataset.localised;
 
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserListField;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorListField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,7 +13,7 @@ public class LocalisedUserListField extends LocalisedField {
 
     private Set<String> roles;
 
-    public LocalisedUserListField(UserListField field, Locale locale) {
+    public LocalisedUserListField(ActorListField field, Locale locale) {
         super(field, locale);
         this.roles = field.getRoles();
     }

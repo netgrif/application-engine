@@ -223,11 +223,13 @@ public final class FieldFactory {
             case NUMBER:
                 field = buildNumberField(data);
                 break;
+            case ACTOR:
             case USER:
-                field = buildUserField(data, importer);
+                field = buildActorField(data, importer);
                 break;
+            case ACTOR_LIST:
             case USER_LIST:
-                field = buildUserListField(data, importer);
+                field = buildActorListField(data, importer);
                 break;
             case CASE_REF:
                 field = buildCaseField(data);
@@ -505,22 +507,22 @@ public final class FieldFactory {
         return field;
     }
 
-    private UserField buildUserField(Data data, Importer importer) {
+    private ActorField buildActorField(Data data, Importer importer) {
         String[] roles = data.getValues().stream()
                 .map(value -> importer.getRoles().get(value.getValue()).getStringId())
                 .toArray(String[]::new);
-        UserField field = new UserField(roles);
+        ActorField field = new ActorField(roles);
         setDefaultValues(field, data, inits -> {
             field.setDefaultValue(null);
         });
         return field;
     }
 
-    private UserListField buildUserListField(Data data, Importer importer) {
+    private ActorListField buildActorListField(Data data, Importer importer) {
         String[] roles = data.getValues().stream()
                 .map(value -> importer.getRoles().get(value.getValue()).getStringId())
                 .toArray(String[]::new);
-        UserListField field = new UserListField(roles);
+        ActorListField field = new ActorListField(roles);
         setDefaultValues(field, data, inits -> {
         });
         return field;
@@ -709,18 +711,19 @@ public final class FieldFactory {
             case FILELIST:
                 parseFileListValue((FileListField) field, useCase, fieldId);
                 break;
-            case USER:
-                parseUserValues((UserField) field, useCase, fieldId);
+            case ACTOR:
+                parseUserValues((ActorField) field, useCase, fieldId);
                 break;
-            case USERLIST:
-                parseUserListValues((UserListField) field, useCase, fieldId);
+            case ACTORLIST:
+                parseUserListValues((ActorListField) field, useCase, fieldId);
                 break;
             default:
                 field.setValue(useCase.getFieldValue(fieldId));
         }
     }
 
-    private void parseUserValues(UserField field, Case useCase, String fieldId) {
+    private void parseUserValues(ActorField field, Case useCase, String fieldId) {
+        // todo 2285
         DataField userField = useCase.getDataField(fieldId);
         if (userField.getChoices() != null) {
             Set<String> roles = userField.getChoices().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
@@ -729,13 +732,14 @@ public final class FieldFactory {
         field.setValue((UserFieldValue) useCase.getFieldValue(fieldId));
     }
 
-    private void parseUserListValues(UserListField field, Case useCase, String fieldId) {
+    private void parseUserListValues(ActorListField field, Case useCase, String fieldId) {
+        // todo 2285
         DataField userListField = useCase.getDataField(fieldId);
         if (userListField.getChoices() != null) {
             Set<String> roles = userListField.getChoices().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
             field.setRoles(roles);
         }
-        field.setValue((UserListFieldValue) useCase.getFieldValue(fieldId));
+        field.setValue((ActorListFieldValue) useCase.getFieldValue(fieldId));
     }
 
     private Double parseNumberValue(Case useCase, String fieldId) {

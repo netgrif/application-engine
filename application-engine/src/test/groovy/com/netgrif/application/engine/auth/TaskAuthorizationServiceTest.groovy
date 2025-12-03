@@ -125,7 +125,7 @@ class TaskAuthorizationServiceTest {
 //                [auths.get("user")] as Authority[],
 //                [processRoles.find({ it.name.equals("role") })] as ProcessRole[])
 //
-//        userId = user.getStringId()
+//        actorId = user.getStringId()
 //        this.userWithRoleAuth = new UsernamePasswordAuthenticationToken(USER_WITH_ROLE_EMAIL, "password")
 //
 //        importHelper.createUser(new User(firstName: "NoRole", lastName: "User", email: USER_WITHOUT_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),

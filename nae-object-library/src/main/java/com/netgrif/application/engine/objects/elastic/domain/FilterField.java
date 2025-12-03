@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -12,9 +13,9 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 public abstract class FilterField extends FieldWithAllowedNetsField {
 
-    public Map<String, Object> filterMetadata;
+    protected Map<String, Object> filterMetadata;
 
-    public FilterField(String fullTextValue, String[] allowedNets, Map<String, Object> filterMetadata) {
+    public FilterField(String fullTextValue, List<String> allowedNets, Map<String, Object> filterMetadata) {
         super(fullTextValue, allowedNets);
         this.filterMetadata = filterMetadata != null ? filterMetadata : new HashMap<>();
     }

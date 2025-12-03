@@ -75,7 +75,7 @@ public class Importer {
     protected ProcessRole anonymousRole;
     @Getter
     protected Map<String, ProcessRole> roles;
-    protected Map<String, Field> fields;
+    protected Map<String, Field<?>> fields;
     protected Map<String, Transition> transitions;
     protected Map<String, Place> places;
     protected Map<String, Transaction> transactions;
@@ -489,7 +489,7 @@ public class Importer {
 
     @Transactional
     protected void createDataSet(Data importData) throws MissingIconKeyException {
-        Field field = fieldFactory.getField(importData, this);
+        Field<?> field = fieldFactory.getField(importData, this);
 
         net.addDataSetField(field);
         fields.put(importData.getId(), field);

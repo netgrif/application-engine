@@ -87,7 +87,7 @@ public interface IDataService {
 
     List<Field<?>> getImmediateFields(Task task);
 
-    UserFieldValue makeUserFieldValue(String id);
+    ActorFieldValue makeActorFieldValue(String id);
 
     Case applyFieldConnectedChanges(Case useCase, String fieldId);
 

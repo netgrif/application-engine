@@ -12,14 +12,14 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public abstract class FieldWithAllowedNetsField extends DataField {
 
-    public String[] allowedNets;
+    protected List<String> allowedNets;
 
-    public FieldWithAllowedNetsField(String fullTextValue, String[] allowedNets) {
+    public FieldWithAllowedNetsField(String fullTextValue, List<String> allowedNets) {
         super(fullTextValue);
         this.allowedNets = allowedNets;
     }
 
-    public FieldWithAllowedNetsField(String[] fullTextValue, String[] allowedNets) {
+    public FieldWithAllowedNetsField(List<String> fullTextValue, List<String> allowedNets) {
         super(fullTextValue);
         this.allowedNets = allowedNets;
     }

@@ -3,6 +3,8 @@ package com.netgrif.application.engine.workflow.service;
 import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorFieldValue;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorListFieldValue;
 import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
@@ -14,8 +16,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.ArcOrderComparator;
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.ResetArc;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
@@ -808,10 +808,11 @@ public class TaskService implements ITaskService {
 
     @Override
     public Task resolveUserRef(Task task, Case useCase) {
+        // todo 2285
         task.getUsers().clear();
         task.getNegativeViewUsers().clear();
         task.getUserRefs().forEach((id, permission) -> {
-            List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(id).getValue());
+            List<String> userIds = getExistingUsers((ActorListFieldValue) useCase.getDataSet().get(id).getValue());
             if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
                 task.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {
@@ -822,10 +823,11 @@ public class TaskService implements ITaskService {
         return taskRepository.save(task);
     }
 
-    private List<String> getExistingUsers(UserListFieldValue userListValue) {
+    private List<String> getExistingUsers(ActorListFieldValue userListValue) {
+        // todo 2285
         if (userListValue == null)
             return null;
-        return userListValue.getUserValues().stream().map(UserFieldValue::getId)
+        return userListValue.getActorValues().stream().map(ActorFieldValue::getId)
                 .filter(id -> userService.findById(id, null) != null)
                 .collect(Collectors.toList());
     }

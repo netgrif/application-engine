@@ -9,30 +9,31 @@ import java.util.Set;
 
 @Setter
 @Getter
-public class UserListField extends Field<UserListFieldValue> {
+public class ActorListField extends Field<ActorListFieldValue> {
 
     private Set<String> roles;
 
-    public UserListField() {
-        super();
-        this.roles = new HashSet<>();
+    public ActorListField() {
+        this(new HashSet<>());
     }
 
-    public UserListField(String[] values) {
-        this();
-        if (values != null) {
-            this.roles.addAll(Arrays.asList(values));
-        }
+    public ActorListField(String[] roles) {
+        this(new HashSet<>(Arrays.asList(roles)));
+    }
+
+    public ActorListField(Set<String> roles) {
+        super();
+        this.roles = roles == null ? new HashSet<>() : roles;
     }
 
     @Override
     public FieldType getType() {
-        return FieldType.USERLIST;
+        return FieldType.ACTORLIST;
     }
 
     @Override
     public Field<?> clone() {
-        UserListField clone = new UserListField();
+        ActorListField clone = new ActorListField();
         super.clone(clone);
         clone.setRoles(this.roles);
         return clone;
