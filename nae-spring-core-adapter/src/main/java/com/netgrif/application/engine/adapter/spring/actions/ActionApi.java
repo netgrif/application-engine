@@ -51,7 +51,8 @@ public interface ActionApi {
      * Finds a specific case by its ID.
      *
      * @param caseId the ID of the case to find
-     * @return the found case, otherwise returns null
+     * @return the found case
+     * @throws IllegalArgumentException if not found
      */
     Case findCase(String caseId);
 
@@ -105,6 +106,7 @@ public interface ActionApi {
      *
      * @param taskId the ID of the task to find
      * @return the found task
+     * @throws IllegalArgumentException if not found
      */
     Task findTask(String taskId);
 
