@@ -116,6 +116,15 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
+    public Long countCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Boolean isIntersection) {
+        boolean intersect = Boolean.TRUE.equals(isIntersection);
+        List<CaseSearchRequest> caseSearchRequests = elasticStringQueries.stream().map(query -> CaseSearchRequest.builder().query(query).build()).toList();
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
+        Locale locale = LocaleContextHolder.getLocale();
+        return elasticCaseService.count(caseSearchRequests, loggedUser, locale, intersect);
+    }
+
+    @Override
     public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, AuthPrincipalDto authPrincipalDto, Map<String, String> params) {
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
         Locale locale = LocaleContextHolder.getLocale();
@@ -175,6 +184,11 @@ public class ActionApiImpl implements ActionApi {
     @Override
     public Page<User> searchUsers(Predicate predicate, Pageable pageable, String realmId) {
         return userService.search(predicate, pageable, realmId);
+    }
+
+    @Override
+    public AbstractUser getSystemUser() {
+        return userService.getSystem();
     }
 
     private AbstractUser resolveAbstractUser(AuthPrincipalDto authPrincipalDto) {

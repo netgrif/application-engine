@@ -9,6 +9,7 @@ public enum ActionApiMethods {
     GET_DATA("getData"),
     SET_DATA("setData"),
     FIND_CASE("findCase"),
+    COUNT_CASES("countCases"),
     SEARCH_CASES("searchCases"),
     CREATE_CASE_BY_IDENTIFIER("createCaseByIdentifier"),
     DELETE_CASE("deleteCase"),
@@ -17,7 +18,8 @@ public enum ActionApiMethods {
     ASSIGN_TASK("assignTask"),
     CANCEL_TASK("cancelTask"),
     FINISH_TASK("finishTask"),
-    SEARCH_USERS("searchUsers");
+    SEARCH_USERS("searchUsers"),
+    GET_SYSTEM_USER("getSystemUser");
 
     private String methodName;
 

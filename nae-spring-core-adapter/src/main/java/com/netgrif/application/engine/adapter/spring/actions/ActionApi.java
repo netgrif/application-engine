@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.adapter.spring.actions;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.dto.AuthPrincipalDto;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -79,6 +80,17 @@ public interface ActionApi {
      * @return a page of cases matching the criteria
      */
     Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection);
+
+
+    /**
+     * Counts the number of cases that match the provided elastic search queries.
+     *
+     * @param elasticStringQueries a list of elastic search queries used for filtering cases
+     * @param authPrincipalDto     the authorization principal for the operation
+     * @param isIntersection       true to intersect the results of all queries; false for union
+     * @return the total number of cases matching the criteria
+     */
+    Long countCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Boolean isIntersection);
 
     /**
      * Creates a new case identified by the given process identifier.
@@ -175,4 +187,12 @@ public interface ActionApi {
      * @return a page of users matching the criteria
      */
     Page<User> searchUsers(Predicate predicate, Pageable pageable, String realmId);
+
+
+    /**
+     * Retrieves the system user of the application.
+     *
+     * @return the system user
+     */
+    AbstractUser getSystemUser();
 }
