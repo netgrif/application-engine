@@ -25,7 +25,7 @@ public class MultichoiceMapFieldTransformer extends ElasticDataFieldTransformer<
             I18nString selectedValue = options.get(value) != null ? options.get(value) : new I18nString();
             fieldValues.put(value, selectedValue.collectTranslations());
         }
-        return new MapField(fieldValues);
+        return new MapField(fieldValues, options);
     }
 
     @Override

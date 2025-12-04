@@ -18,7 +18,7 @@ public class EnumerationMapFieldTransformer extends ElasticDataFieldTransformer<
         DataFieldValue<String> selectedKey = caseField.getValue();
         String value = selectedKey != null ? selectedKey.getValue() : null;
         I18nString selectedValue = options.get(value) != null ? options.get(value) : new I18nString();
-        return new MapField(value, selectedValue.collectTranslations());
+        return new MapField(value, selectedValue.collectTranslations(), caseField.getOptions());
     }
 
     @Override

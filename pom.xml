@@ -64,6 +64,7 @@
         <drools.version>7.70.0.Final</drools.version>
         <sonar.organization>netgrif-oss</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <antlr4.version>4.13.1</antlr4.version>
     </properties>
 
     <repositories>
@@ -505,6 +506,14 @@
             <artifactId>jackson-module-jsonSchema</artifactId>
             <version>2.13.2</version>
         </dependency>
+
+        <!--    ANTLR (query language)    -->
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>${antlr4.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -778,6 +787,22 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <version>2.0.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>${antlr4.version}</version>
+                <configuration>
+                    <sourceDirectory>src/main/java</sourceDirectory>
+                    <outputDirectory>${project.build.directory}/generated-sources/java/</outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

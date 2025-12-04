@@ -77,11 +77,9 @@ public class ElasticCase {
 
     private Map<String, DataField> dataSet;
 
-    @Field(type = Keyword)
-    private Set<String> taskIds;
+    private Map<String, Task> tasks;
 
-    @Field(type = Keyword)
-    private Set<String> taskMongoIds;
+    private Map<String, Place> places;
 
     @Field(type = Keyword)
     private Set<String> enabledRoles;
@@ -126,8 +124,6 @@ public class ElasticCase {
         author = useCase.getAuthor().getId();
         authorName = useCase.getAuthor().getFullName();
         authorEmail = useCase.getAuthor().getEmail();
-        taskIds = useCase.getTasks().keySet();
-        taskMongoIds = useCase.getTasks().values().stream().map(TaskPair::getTaskStringId).collect(Collectors.toSet());
         enabledRoles = new HashSet<>(useCase.getEnabledRoles());
         viewRoles = new HashSet<>(useCase.getViewRoles());
         viewUserRefs = new HashSet<>(useCase.getViewUserRefs());
@@ -137,6 +133,17 @@ public class ElasticCase {
         tags = new HashMap<>(useCase.getTags());
 
         dataSet = new HashMap<>();
+
+        tasks = useCase.getTasks().entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> new Task(entry.getValue().getTaskStringId(), entry.getValue().getState(), entry.getValue().getUserId())
+                ));
+        places = useCase.getActivePlaces().entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> new Place(entry.getValue())
+                ));
     }
 
     public void update(ElasticCase useCase) {
@@ -146,8 +153,6 @@ public class ElasticCase {
             uriNodeId = useCase.getUriNodeId();
         }
         title = useCase.getTitle();
-        taskIds = useCase.getTaskIds();
-        taskMongoIds = useCase.getTaskMongoIds();
         enabledRoles = useCase.getEnabledRoles();
         viewRoles = useCase.getViewRoles();
         viewUserRefs = useCase.getViewUserRefs();
@@ -157,5 +162,7 @@ public class ElasticCase {
         tags = useCase.getTags();
 
         dataSet = useCase.getDataSet();
+        tasks = useCase.getTasks();
+        places = useCase.getPlaces();
     }
 }
