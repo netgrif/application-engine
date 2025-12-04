@@ -1,11 +1,14 @@
 package com.netgrif.application.engine.search;
 
+import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.domain.QUser;
 import com.netgrif.application.engine.auth.domain.User;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.QPetriNet;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
+import com.netgrif.application.engine.search.interfaces.ISearchService;
 import com.netgrif.application.engine.search.utils.MongoDbUtils;
+import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.domain.*;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
@@ -27,7 +30,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.netgrif.application.engine.search.utils.SearchUtils.evaluateQuery;
 
@@ -40,6 +46,50 @@ public class QueryLangTest {
 
     @Autowired
     MongoOperations mongoOperations;
+    @Autowired
+    ISearchService searchService;
+    @Autowired
+    ImportHelper helper;
+    @Autowired
+    TestHelper testHelper;
+
+    @Test
+    public void testSearchService() {
+        testHelper.truncateDbs();
+
+        Optional<PetriNet> optionalPetriNet = helper.createNet("../query_test.xml");
+        if (optionalPetriNet.isEmpty()) {
+            throw new RuntimeException("query_test.xml net not created");
+        }
+
+        Object process = searchService.search("process: identifier == 'query_test'");
+        if (!(process instanceof PetriNet)) {
+            throw new RuntimeException("Process not found");
+        }
+        PetriNet net = (PetriNet) process;
+        for (int i = 0; i < 10; i++) {
+            Map<String, String> params = new HashMap<>();
+            params.put("id", ""+i);
+            helper.createCase(String.format("Test %02d", i), net, params);
+        }
+
+        Object cases = searchService.search("cases: processIdentifier eq 'query_test' page 1 size 5 sort by title desc");
+        log.info("Cases: {}", cases);
+
+        Object case_3 = searchService.search("case: processIdentifier eq 'query_test' and data.number_0.value == 3");
+        log.info("Case with number_0 == 3: {}", ((Case)case_3).getTitle());
+        Object case_4 = searchService.search("case: processIdentifier eq 'query_test' and data.text_0.value == '4'");
+        log.info("Case with text_0 == '4': {}", ((Case)case_4).getTitle());
+        Object case_5 = searchService.search("case: processIdentifier eq 'query_test' and data.boolean_0.value == true");
+        log.info("Case with boolean_0 == true: {}", ((Case)case_5).getTitle());
+
+        cases = searchService.search("cases: processIdentifier eq 'query_test' and data.boolean_0.value == true");
+        assert ((List<Case>)cases).size() == 5;
+
+        // TODO: release/8.0.0 add 'neq'/'!=', simplify 'not' requires ()
+        cases = searchService.search("cases: processIdentifier eq 'query_test'    and data.boolean_0.value == true and not (data.text_0.value == '4')");
+        assert ((List<Case>)cases).size() == 4;
+    }
 
     @Test
     public void testSimpleMongodbProcessQuery() {
@@ -277,31 +327,31 @@ public class QueryLangTest {
 
         actual = evaluateQuery("case: data.field1.value eq 1").getFullMongoQuery();
         assert actual == null;
-        
+
         actual = evaluateQuery("case: data.field1.value lt 1").getFullMongoQuery();
         assert actual == null;
-        
+
         actual = evaluateQuery("case: data.field1.value lte 1").getFullMongoQuery();
         assert actual == null;
-        
+
         actual = evaluateQuery("case: data.field1.value gt 1").getFullMongoQuery();
         assert actual == null;
-        
+
         actual = evaluateQuery("case: data.field1.value gte 1").getFullMongoQuery();
         assert actual == null;
 
         actual = evaluateQuery("case: data.field1.value eq 2011-12-03T10:15:30").getFullMongoQuery();
         assert actual == null;
-        
+
         actual = evaluateQuery("case: data.field1.value lt 2011-12-03T10:15:30").getFullMongoQuery();
         assert actual == null;
-        
+
         actual = evaluateQuery("case: data.field1.value lte 2011-12-03T10:15:30").getFullMongoQuery();
         assert actual == null;
-        
+
         actual = evaluateQuery("case: data.field1.value gt 2011-12-03T10:15:30").getFullMongoQuery();
         assert actual == null;
-        
+
         actual = evaluateQuery("case: data.field1.value gte 2011-12-03T10:15:30").getFullMongoQuery();
         assert actual == null;
 
