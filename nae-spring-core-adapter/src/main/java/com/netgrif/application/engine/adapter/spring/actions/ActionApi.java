@@ -111,9 +111,12 @@ public interface ActionApi {
     Task findTask(String taskId);
 
     /**
-     * Searches for tasks matching the given process identifier and predicate.
+     * Searches for tasks matching the given predicate.
      *
-     * @param processIdentifier the identifier of the process
+     * @param processIdentifier reserved for interface compatibility; this implementation
+     *                          does not filter by process identifier and returns tasks
+     *                          from all processes. Use the predicate parameter to filter
+     *                          by specific process(es) if needed.
      * @param predicate         the criteria for filtering tasks
      * @param pageable          the pagination information
      * @return a page of tasks matching the criteria
