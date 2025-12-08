@@ -98,6 +98,7 @@ public class WorkflowService implements IWorkflowService {
     @Autowired
     protected IInitValueExpressionEvaluator initValueExpressionEvaluator;
 
+    @Lazy
     @Autowired
     protected IElasticCaseMappingService caseMappingService;
 
@@ -110,6 +111,7 @@ public class WorkflowService implements IWorkflowService {
 
     protected IElasticCaseService elasticCaseService;
 
+    @Lazy
     @Autowired
     public void setElasticCaseService(IElasticCaseService elasticCaseService) {
         this.elasticCaseService = elasticCaseService;
