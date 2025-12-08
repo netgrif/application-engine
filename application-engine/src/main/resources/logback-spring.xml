@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration scan="true">
+<configuration>
 
-    <!-- DEFAULT CONFIG -->
-    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+    <conversionRule conversionWord="clr"
+                    class="org.springframework.boot.logging.logback.ColorConverter"/>
     <conversionRule conversionWord="wex"
-                    converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
+                    class="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
     <conversionRule conversionWord="wEx"
-                    converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
-    <conversionRule conversionWord="logLevel" converterClass="com.netgrif.application.engine.adapter.spring.configuration.CustomLevelColorConverter"/>
+                    class="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
+    <conversionRule conversionWord="logLevel"
+                    class="com.netgrif.application.engine.adapter.spring.configuration.CustomLevelColorConverter"/>
+    <conversionRule conversionWord="mdc"
+                    class="com.netgrif.application.engine.adapter.spring.configuration.CustomMdcConverter" />
 
     <property name="CONSOLE_LOG_PATTERN"
-              value="%clr(time=){faint}%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){cyan}  %clr(level=){faint}%logLevel  %clr(pid=){faint}%clr(${PID:- }){magenta}  %clr(thread=){faint}%clr(%-15.15t){yellow}  %clr(logger=){faint}%clr(%-40.40logger{39}){blue}  %clr(msg=){faint}%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+              value="%clr(time=){faint}%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){cyan}  %clr(level=){faint}%logLevel  %clr(pid=){faint}%clr(${PID:- }){magenta}  %clr(thread=){faint}%clr(%-15.15t){yellow} %clr(logger=){faint}%clr(%-40.40logger{39}){blue} %mdc %clr(msg=){faint}%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
 
     <property name="FILE_LOG_PATTERN"
-              value="${FILE_LOG_PATTERN:-time=%d{yyyy-MM-dd HH:mm:ss.SSS} level=${LOG_LEVEL_PATTERN:-%5p} pid=${PID:- } thread=%t logger=%-40.40logger{39} msg=%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+              value="${FILE_LOG_PATTERN:-time=%d{yyyy-MM-dd HH:mm:ss.SSS} level=${LOG_LEVEL_PATTERN:-%5p} pid=${PID:- } thread=%t logger=%-40.40logger{39} traceId=%X{traceId:-} userId=%X{userId:-} msg=%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
 
     <logger name="org.apache.catalina.startup.DigesterFactory" level="ERROR"/>
     <logger name="org.apache.catalina.util.LifecycleBase" level="ERROR"/>
@@ -25,15 +28,7 @@
     <logger name="org.eclipse.jetty.util.component.AbstractLifeCycle" level="ERROR"/>
     <logger name="org.hibernate.validator.internal.util.Version" level="WARN"/>
     <logger name="org.springframework.boot.actuate.autoconfigure.CrshAutoConfiguration" level="WARN"/>
-
-    <!-- CUSTOM CONFIG -->
     <logger name="org.apache.pdfbox.pdmodel" level="ERROR"/>
-    <logger name="com.netgrif.application.engine.configuration.logging.ControllerRequestLoggingFilter">
-        <level value="DEBUG"/>
-    </logger>
-    <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter">
-        <level value="DEBUG"/>
-    </logger>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -46,17 +41,16 @@
 
         <file>log/nae.log</file>
 
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>log/old.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
-
             <maxHistory>30</maxHistory>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFileNamingAndTriggeringPolicy">
-                <maxFileSize>10MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxFileSize>10MB</maxFileSize>
+            <totalSizeCap>5GB</totalSizeCap>
         </rollingPolicy>
 
         <encoder>
             <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
         </encoder>
 
     </appender>
@@ -65,4 +59,5 @@
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
     </root>
+
 </configuration>
