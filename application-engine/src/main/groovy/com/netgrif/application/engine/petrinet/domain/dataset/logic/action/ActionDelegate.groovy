@@ -950,14 +950,16 @@ class ActionDelegate {
 
     Case createCase(String identifier, String title = null, String color = "", AbstractUser author = userService.loggedOrSystem,
                     Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
-        return workflowService.createCase(CreateCaseParams.with()
+        CreateCaseEventOutcome outcome = workflowService.createCase(CreateCaseParams.with()
                 .processIdentifier(identifier)
                 .title(title)
                 .color(color)
                 .author(ActorTransformer.toLoggedUser(author))
                 .locale(locale)
                 .params(params)
-                .build()).getCase()
+                .build())
+        this.outcomes.add(outcome)
+        return outcome.getCase()
     }
 
     Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "",
