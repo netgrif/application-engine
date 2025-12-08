@@ -1,21 +1,27 @@
 package com.netgrif.application.engine.configuration;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository;
 import com.netgrif.application.engine.elastic.service.ElasticCaseService;
 import com.netgrif.application.engine.elastic.service.ElasticTaskService;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 
 @Configuration
+@RequiredArgsConstructor
 @ConditionalOnProperty(
         value = "netgrif.engine.data.elasticsearch.service.configuration-enabled",
         matchIfMissing = true,
@@ -23,17 +29,14 @@ import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 )
 public class ElasticServiceConfiguration {
 
-    @Autowired
-    private ElasticCaseRepository caseRepository;
-
-    @Autowired
-    private ElasticTaskRepository taskRepository;
-
-    @Autowired
-    private ElasticsearchTemplate elasticsearchTemplate;
-
-    @Autowired
-    private DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
+    private final ElasticCaseRepository caseRepository;
+    private final ElasticsearchTemplate elasticsearchTemplate;
+    private final DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
+    private final IPetriNetService petriNetService;
+    private final IWorkflowService workflowService;
+    private final IElasticCasePrioritySearch elasticCasePrioritySearch;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final ElasticsearchClient elasticsearchClient;
 
     @Bean
     @Primary
@@ -54,7 +57,17 @@ public class ElasticServiceConfiguration {
     @Bean
     @Primary
     public IElasticCaseService elasticCaseService() {
-        return new ElasticCaseService(caseRepository, elasticsearchTemplate, executor());
+        return new ElasticCaseService(
+                caseRepository,
+                elasticsearchTemplate,
+                executor(),
+                elasticsearchProperties,
+                petriNetService,
+                workflowService,
+                elasticCasePrioritySearch,
+                applicationEventPublisher,
+                elasticsearchClient
+        );
     }
 
     @Bean
@@ -65,7 +78,17 @@ public class ElasticServiceConfiguration {
 
     @Bean
     public IElasticCaseService reindexingTaskElasticCaseService() {
-        return new ElasticCaseService(caseRepository, elasticsearchTemplate, reindexingTaskCaseExecutor());
+        return new ElasticCaseService(
+                caseRepository,
+                elasticsearchTemplate,
+                reindexingTaskCaseExecutor(),
+                elasticsearchProperties,
+                petriNetService,
+                workflowService,
+                elasticCasePrioritySearch,
+                applicationEventPublisher,
+                elasticsearchClient
+        );
     }
 
 

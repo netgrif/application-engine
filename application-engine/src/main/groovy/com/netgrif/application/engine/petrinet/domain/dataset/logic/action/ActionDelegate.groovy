@@ -2485,7 +2485,7 @@ class ActionDelegate {
             if (role.isGlobal()) {
                 return [(role.importId + ":" + GLOBAL_ROLE), ("$role.name (🌍 Global role)" as String)]
             } else {
-                PetriNet net = petriNetService.get(new ObjectId(role.netId))
+                PetriNet net = petriNetService.get(new ObjectId(role.processId))
                 return [(role.importId + ":" + net.identifier), ("$role.name ($net.title)" as String)]
             }
         } as Map<String, I18nString>

@@ -452,7 +452,7 @@ public class ElasticIndexService implements IElasticIndexService {
                             .index(elasticsearchProperties.getIndex().get("case"))
                             .id(doc.getId())
                             .action(a -> a
-                                    .doc(doc)
+                                    .doc(elasticsearchTemplate.getElasticsearchConverter().mapObject(doc))
                                     .docAsUpsert(true)
                             )
                     )));
@@ -474,7 +474,7 @@ public class ElasticIndexService implements IElasticIndexService {
                             .index(elasticsearchProperties.getIndex().get("task"))
                             .id(doc.getId())
                             .action(a -> a
-                                    .doc(doc)
+                                    .doc(elasticsearchTemplate.getElasticsearchConverter().mapObject(doc))
                                     .docAsUpsert(true)
                             )
                     ))

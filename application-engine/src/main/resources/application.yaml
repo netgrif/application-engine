@@ -23,7 +23,8 @@ netgrif:
           case: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_case
           task: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_task
       redis:
-        namespace: nae
+        session:
+          namespace: ${NETGRIF_ENGINE_DATA_REDIS_SESSION_NAMESPACE:netgrif}
         host: ${NETGRIF_ENGINE_DATA_REDIS_HOST:localhost}
         port: ${NETGRIF_ENGINE_DATA_REDIS_PORT:6379}
     jackson:
@@ -130,7 +131,6 @@ netgrif:
         env:
           enabled: 'true'
     logging:
-      config: classpath:logback.xml
       file:
         path: log
       endpoints: 'true'
