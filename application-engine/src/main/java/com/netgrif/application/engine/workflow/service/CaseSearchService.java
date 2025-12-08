@@ -34,8 +34,6 @@ import java.util.stream.Collectors;
 @Service
 public class CaseSearchService extends MongoSearchService<Case> {
 
-    // todo 2285 this class
-
     private static final Logger log = LoggerFactory.getLogger(CaseSearchService.class.getName());
 
     public static final String ROLE = "role";
@@ -99,8 +97,8 @@ public class CaseSearchService extends MongoSearchService<Case> {
         }
         BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(user));
         permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(user));
-        permissionConstraints.or(buildViewUserQueryConstraint(user));
-        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(user));
+        permissionConstraints.or(buildViewActorQueryConstraint(user));
+        permissionConstraints.andNot(buildNegativeViewActorsQueryConstraint(user));
         builder.and(permissionConstraints);
         return builder;
     }
@@ -114,13 +112,13 @@ public class CaseSearchService extends MongoSearchService<Case> {
         return QCase.case$.viewActorRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewRoles.contains(role));
     }
 
-    protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
-        // todo 2285
+    protected Predicate buildViewActorQueryConstraint(LoggedUser user) {
         Predicate roleConstraints = viewActorQuery(user.getStringId());
         return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
     }
 
     public Predicate viewActorQuery(String actorId) {
+        // todo 2285 user's group ids
         return QCase.case$.viewActorRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewActors.contains(actorId));
     }
 
@@ -133,14 +131,13 @@ public class CaseSearchService extends MongoSearchService<Case> {
         return QCase.case$.negativeViewRoles.contains(role);
     }
 
-    protected Predicate buildNegativeViewUsersQueryConstraint(LoggedUser user) {
-        // todo 2285
-        Predicate roleConstraints = negativeViewUserQuery(user.getStringId());
+    protected Predicate buildNegativeViewActorsQueryConstraint(LoggedUser user) {
+        Predicate roleConstraints = negativeViewActorQuery(user.getStringId());
         return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
     }
 
-    public Predicate negativeViewUserQuery(String actorId) {
-        // todo 2285
+    public Predicate negativeViewActorQuery(String actorId) {
+        // todo 2285 user's group ids
         return QCase.case$.negativeViewActors.contains(actorId);
     }
 

@@ -9,16 +9,16 @@ import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.springframework.data.elasticsearch.client.elc.Queries.termQuery;
 
 public abstract class ElasticViewPermissionService {
 
     protected void buildViewPermissionQuery(BoolQuery.Builder query, LoggedUser user) {
+        // todo 2285
         BoolQuery.Builder viewPermsExists = new BoolQuery.Builder()
                 .should(should -> should.exists(ExistsQuery.of(builder -> builder.field("viewRoles"))))
-                .should(should -> should.exists(ExistsQuery.of(builder -> builder.field("viewUserRefs"))));
+                .should(should -> should.exists(ExistsQuery.of(builder -> builder.field("viewActorRefs"))));
         BoolQuery.Builder viewPermNotExistsBuilder = new BoolQuery.Builder()
                 .mustNot(mustNot -> mustNot.bool(viewPermsExists.build()));
 
@@ -79,13 +79,13 @@ public abstract class ElasticViewPermissionService {
     private BoolQuery buildPositiveViewUser(BoolQuery viewPermNotExists, LoggedUser user) {
         return new BoolQuery.Builder()
                 .should(viewPermNotExists._toQuery())
-                .filter(termQuery("viewUsers", user.getStringId())._toQuery())
+                .filter(termQuery("viewActors", user.getStringId())._toQuery())
                 .build();
     }
 
     private BoolQuery buildNegativeViewUser(LoggedUser user) {
         return new BoolQuery.Builder()
-                .mustNot(termQuery("negativeViewUsers", user.getStringId())._toQuery())
+                .mustNot(termQuery("negativeViewActors", user.getStringId())._toQuery())
                 .build();
     }
 

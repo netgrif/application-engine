@@ -21,8 +21,6 @@ import java.util.stream.Collectors;
 @Service
 public class TaskSearchService extends MongoSearchService<Task> {
 
-    // todo 2285 this class
-
     @Autowired
     private IPetriNetService petriNetService;
 
@@ -46,13 +44,13 @@ public class TaskSearchService extends MongoSearchService<Task> {
         BooleanBuilder builder = constructPredicateTree(singleQueries, isIntersection ? BooleanBuilder::and : BooleanBuilder::or);
 
         BooleanBuilder constraints = new BooleanBuilder(buildRolesQueryConstraint(loggedOrImpersonated));
-        constraints.or(buildUserRefQueryConstraint(loggedOrImpersonated));
+        constraints.or(buildActorRefQueryConstraint(loggedOrImpersonated));
         builder.and(constraints);
 
         BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated));
         permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
+        permissionConstraints.or(buildViewActorQueryConstraint(loggedOrImpersonated));
+        permissionConstraints.andNot(buildNegativeViewActorsQueryConstraint(loggedOrImpersonated));
         builder.and(permissionConstraints);
         return builder;
     }
@@ -62,8 +60,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return constructPredicateTree(roleConstraints, BooleanBuilder::or);
     }
 
-    protected Predicate buildUserRefQueryConstraint(LoggedUser user) {
-        // todo 2285
+    protected Predicate buildActorRefQueryConstraint(LoggedUser user) {
         Predicate userRefConstraints = actorRefQuery(user.getStringId());
         return constructPredicateTree(Collections.singletonList(userRefConstraints), BooleanBuilder::or);
     }
@@ -77,14 +74,13 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return QTask.task.viewActorRefs.isEmpty().and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewRoles.contains(role));
     }
 
-    protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
-        // todo 2285
-        Predicate userConstraints = viewUsersQuery(user.getStringId());
-        return constructPredicateTree(Collections.singletonList(userConstraints), BooleanBuilder::or);
+    protected Predicate buildViewActorQueryConstraint(LoggedUser user) {
+        Predicate actorConstraints = viewActorsQuery(user.getStringId());
+        return constructPredicateTree(Collections.singletonList(actorConstraints), BooleanBuilder::or);
     }
 
-    public Predicate viewUsersQuery(String actorId) {
-        // todo 2285
+    public Predicate viewActorsQuery(String actorId) {
+        // todo 2285 user's group ids
         return QTask.task.negativeViewRoles.isEmpty().and(QTask.task.viewActorRefs.isEmpty()).and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewActors.contains(actorId));
     }
 
@@ -97,14 +93,13 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return QTask.task.negativeViewRoles.contains(role);
     }
 
-    protected Predicate buildNegativeViewUsersQueryConstraint(LoggedUser user) {
-        // todo 2285
-        Predicate userConstraints = negativeViewUsersQuery(user.getStringId());
-        return constructPredicateTree(Collections.singletonList(userConstraints), BooleanBuilder::or);
+    protected Predicate buildNegativeViewActorsQueryConstraint(LoggedUser user) {
+        Predicate actorConstraints = negativeViewActorsQuery(user.getStringId());
+        return constructPredicateTree(Collections.singletonList(actorConstraints), BooleanBuilder::or);
     }
 
-    public Predicate negativeViewUsersQuery(String actorId) {
-        // todo 2285
+    public Predicate negativeViewActorsQuery(String actorId) {
+        // todo 2285 user's group ids
         return QTask.task.negativeViewActors.contains(actorId);
     }
 
@@ -162,6 +157,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     public Predicate actorRefQuery(String actorId) {
+        // todo 2285 user's group ids
         return QTask.task.actors.containsKey(actorId);
     }
 
