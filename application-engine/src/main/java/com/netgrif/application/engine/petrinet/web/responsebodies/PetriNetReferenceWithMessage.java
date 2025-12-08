@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
+import com.netgrif.application.engine.objects.dto.response.petrinet.PetriNetReferenceDto;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.adapter.spring.common.web.responsebodies.ResponseMessage;
 import lombok.Data;
@@ -9,7 +10,7 @@ import java.util.Locale;
 @Data
 public class PetriNetReferenceWithMessage extends ResponseMessage {
 
-    private PetriNetReference net;
+    private PetriNetReferenceDto net;
 
     public PetriNetReferenceWithMessage(String msg) {
         super();
@@ -19,14 +20,14 @@ public class PetriNetReferenceWithMessage extends ResponseMessage {
     public PetriNetReferenceWithMessage(String msg, PetriNet net, Locale locale) {
         super();
         setSuccess(msg);
-        setNet(new PetriNetReference(net, locale));
+        setNet(PetriNetReferenceDto.fromPetriNet(net, locale));
     }
 
-    public PetriNetReference getNet() {
+    public PetriNetReferenceDto getNet() {
         return net;
     }
 
-    public void setNet(PetriNetReference net) {
+    public void setNet(PetriNetReferenceDto net) {
         this.net = net;
     }
 }

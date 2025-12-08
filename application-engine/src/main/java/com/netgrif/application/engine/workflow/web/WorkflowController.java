@@ -1,14 +1,14 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
-import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.dto.response.workflow.CaseDto;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
@@ -23,9 +23,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.InputStreamResource;
@@ -47,10 +47,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
 
@@ -66,17 +64,20 @@ public class WorkflowController {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowController.class.getName());
 
-    @Autowired
-    private IWorkflowService workflowService;
+    private final IWorkflowService workflowService;
 
-    @Autowired
-    private ITaskService taskService;
+    private final ITaskService taskService;
 
-    @Autowired
-    private IElasticCaseService elasticCaseService;
+    private final IElasticCaseService elasticCaseService;
 
-    @Autowired
-    private IDataService dataService;
+    private final IDataService dataService;
+
+    public WorkflowController(IWorkflowService workflowService, ITaskService taskService, IElasticCaseService elasticCaseService, IDataService dataService) {
+        this.workflowService = workflowService;
+        this.taskService = taskService;
+        this.elasticCaseService = elasticCaseService;
+        this.dataService = dataService;
+    }
 
 
     @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
@@ -86,7 +87,7 @@ public class WorkflowController {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             CreateCaseEventOutcome outcome = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
-            return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getCase().getStringId() + " was created succesfully",
+            return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getCase().getStringId() + " was created successfully",
                     LocalisedEventOutcomeFactory.from(outcome, locale));
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
             log.error("Creating case failed:", e);
@@ -96,24 +97,21 @@ public class WorkflowController {
 
     @Operation(summary = "Get all cases of the system, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/all", produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<CaseResource> getAll(Pageable pageable, PagedResourcesAssembler<Case> assembler) {
+    public PagedModel<CaseResource> getAll(Pageable pageable, PagedResourcesAssembler<Case> assembler, Locale locale) {
         Page<Case> cases = workflowService.getAll(pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
-                .getAll(pageable, assembler)).withRel("all");
-        PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
+                .getAll(pageable, assembler, locale)).withRel("all");
+        return buildResponse(assembler, cases, selfLink, locale);
     }
 
     @Operation(summary = "Generic case search with QueryDSL predicate, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/search2", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<CaseResource> search2(@QuerydslPredicate(root = Case.class) Predicate predicate, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
+    public PagedModel<CaseResource> search2(@QuerydslPredicate(root = Case.class) Predicate predicate, Pageable pageable,
+                                            PagedResourcesAssembler<Case> assembler, Locale locale) {
         Page<Case> cases = workflowService.search(predicate, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
-                .search2(predicate, pageable, assembler)).withRel("search2");
-        PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
+                .search2(predicate, pageable, assembler, locale)).withRel("search2");
+        return buildResponse(assembler, cases, selfLink, locale);
     }
 
     @Operation(summary = "Generic case search on Elasticsearch database, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -124,10 +122,7 @@ public class WorkflowController {
         Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, locale, operation == MergeFilterOperation.AND);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                 .search(searchBody, operation, pageable, assembler, auth, locale)).withRel("search");
-
-        PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources, ElasticCase.class, selfLink.getRel().toString());
-        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
+        return buildResponse(assembler, cases, selfLink, locale);
     }
 
     @Operation(summary = "Generic case search on Mongo database, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -136,9 +131,7 @@ public class WorkflowController {
         Page<Case> cases = workflowService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal(), locale);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                 .searchMongo(searchBody, pageable, auth, assembler, locale)).withRel("search");
-        PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
+        return buildResponse(assembler, cases, selfLink, locale);
     }
 
 
@@ -151,22 +144,20 @@ public class WorkflowController {
 
     @Operation(summary = "Get case by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public CaseResource getOne(@PathVariable("id") String caseId) {
+    public CaseResource getOne(@PathVariable("id") String caseId, Locale locale) {
         Case aCase = workflowService.findOne(caseId);
         if (aCase == null)
             return null;
-        return new CaseResource(aCase);
+        return new CaseResource(CaseDto.fromCase(aCase, locale));
     }
 
     @Operation(summary = "Get all cases by user that created them, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
     @RequestMapping(value = "/case/author/{id}", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<CaseResource> findAllByAuthor(@PathVariable("id") String authorId, @RequestBody String petriNet, PagedResourcesAssembler<Case> assembler, Pageable pageable) {
+    public PagedModel<CaseResource> findAllByAuthor(@PathVariable("id") String authorId, @RequestBody String petriNet, PagedResourcesAssembler<Case> assembler, Pageable pageable, Locale locale) {
         Page<Case> cases = workflowService.findAllByAuthor(authorId, petriNet, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
-                .findAllByAuthor(authorId, petriNet, assembler, pageable)).withRel("author");
-        PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
+                .findAllByAuthor(authorId, petriNet, assembler, pageable, locale)).withRel("author");
+        return buildResponse(assembler, cases, selfLink, locale);
     }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
@@ -180,13 +171,13 @@ public class WorkflowController {
     })
     public MessageResource reloadTasks(@PathVariable("id") String caseId) {
         try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8);
             Case aCase = workflowService.findOne(caseId);
             taskService.reloadTasks(aCase);
 
             return MessageResource.successMessage("Task reloaded in case [" + caseId + "]");
         } catch (Exception e) {
-            log.error("Reloading tasks of case [" + caseId + "] failed:", e);
+            log.error("Reloading tasks of case [{}] failed:", caseId, e);
             return MessageResource.errorMessage("Reloading tasks in case " + caseId + " has failed!");
         }
     }
@@ -209,20 +200,15 @@ public class WorkflowController {
     @Operation(summary = "Delete case", security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
-        try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            DeleteCaseEventOutcome outcome;
-            if (deleteSubtree) {
-                outcome = workflowService.deleteSubtreeRootedAt(caseId);
-            } else {
-                outcome = workflowService.deleteCase(caseId);
-            }
-            return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted",
-                    LocalisedEventOutcomeFactory.from(outcome, LocaleContextHolder.getLocale()));
-        } catch (UnsupportedEncodingException e) {
-            log.error("Deleting case [" + caseId + "] failed:", e);
-            return EventOutcomeWithMessageResource.errorMessage("Deleting case " + caseId + " has failed!");
+        caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8);
+        DeleteCaseEventOutcome outcome;
+        if (deleteSubtree) {
+            outcome = workflowService.deleteSubtreeRootedAt(caseId);
+        } else {
+            outcome = workflowService.deleteCase(caseId);
         }
+        return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted",
+                LocalisedEventOutcomeFactory.from(outcome, LocaleContextHolder.getLocale()));
     }
 
     @Operation(summary = "Download case file field value", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -259,5 +245,12 @@ public class WorkflowController {
                 .ok()
                 .headers(headers)
                 .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
+    }
+
+    @NotNull
+    private PagedModel<CaseResource> buildResponse(PagedResourcesAssembler<Case> assembler, Page<Case> cases, Link selfLink, Locale locale) {
+        PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(locale), selfLink);
+        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
+        return resources;
     }
 }

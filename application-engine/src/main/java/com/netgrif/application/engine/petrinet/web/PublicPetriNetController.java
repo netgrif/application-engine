@@ -2,6 +2,8 @@ package com.netgrif.application.engine.petrinet.web;
 
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
+import com.netgrif.application.engine.objects.dto.response.petrinet.PetriNetReferenceDto;
+import com.netgrif.application.engine.objects.dto.response.petrinet.TransitionReferenceDto;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
@@ -70,8 +72,8 @@ public class PublicPetriNetController {
 
     @Operation(summary = "Search processes")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<PetriNetReferenceResource> searchPetriNets(@RequestBody PetriNetSearch criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
-        Page<PetriNetReference> nets = petriNetService.search(criteria, ActorTransformer.toLoggedUser(userService.getLoggedUser()), pageable, locale);
+    public PagedModel<PetriNetReferenceResource> searchPetriNets(@RequestBody PetriNetSearch criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReferenceDto> assembler, Locale locale) {
+        Page<PetriNetReferenceDto> nets = petriNetService.search(criteria, ActorTransformer.toLoggedUser(userService.getLoggedUser()), pageable, locale);
 //        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicPetriNetController.class)
 //                .searchPetriNets(criteria, pageable, assembler, locale)).withRel("search");
 //        PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);
@@ -95,7 +97,7 @@ public class PublicPetriNetController {
 
     @Operation(summary = "Get data fields of transitions")
     @PostMapping(value = "/data", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public DataFieldReferencesResource getDataFieldReferences(@RequestBody List<TransitionReference> referenceBody, Locale locale) {
+    public DataFieldReferencesResource getDataFieldReferences(@RequestBody List<TransitionReferenceDto> referenceBody, Locale locale) {
         return new DataFieldReferencesResource(petriNetService.getDataFieldReferences(referenceBody, locale));
     }
 

@@ -1,9 +1,10 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
+import com.netgrif.application.engine.objects.dto.response.petrinet.PetriNetReferenceDto;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 
-public class PetriNetReferenceResourceAssembler implements RepresentationModelAssembler<PetriNetReference, PetriNetReferenceResource> {
+public class PetriNetReferenceResourceAssembler implements RepresentationModelAssembler<PetriNetReferenceDto, PetriNetReferenceResource> {
     public static void buildLinks(CollectionModel resources) {
 //        resources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
 //                        .methodOn(PetriNetController.class).getAll(null, null, null, null))
@@ -23,7 +24,7 @@ public class PetriNetReferenceResourceAssembler implements RepresentationModelAs
     }
 
     @Override
-    public PetriNetReferenceResource toModel(PetriNetReference petriNetReference) {
+    public PetriNetReferenceResource toModel(PetriNetReferenceDto petriNetReference) {
         return new PetriNetReferenceResource(petriNetReference);
     }
 }

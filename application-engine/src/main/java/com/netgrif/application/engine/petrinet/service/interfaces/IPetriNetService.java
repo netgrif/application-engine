@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.service.interfaces;
 
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.dto.response.petrinet.*;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.objects.petrinet.domain.Transition;
@@ -10,10 +11,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.acti
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.objects.petrinet.domain.version.Version;
-import com.netgrif.application.engine.petrinet.web.responsebodies.DataFieldReference;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetImportReference;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
-import com.netgrif.application.engine.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import org.bson.types.ObjectId;
 import org.springframework.core.io.FileSystemResource;
@@ -30,41 +27,41 @@ import java.util.*;
 public interface IPetriNetService {
 
     /** 
-     * Transforms a {@link PetriNet} into a {@link PetriNetReference}.
+     * Transforms a {@link PetriNet} into a {@link PetriNetReferenceDto}.
      * 
      * @param net the PetriNet to transform
      * @param locale the locale to use for translations
-     * @return a {@link PetriNetReference} representing the given PetriNet
+     * @return a {@link PetriNetReferenceDto} representing the given PetriNet
      */
-    static PetriNetReference transformToReference(PetriNet net, Locale locale) {
-        return new PetriNetReference(net, locale);
+    static PetriNetReferenceDto transformToReference(PetriNet net, Locale locale) {
+        return PetriNetReferenceDto.fromPetriNet(net, locale);
     }
 
     /** 
-     * Transforms a {@link Transition} into a {@link TransitionReference}.
+     * Transforms a {@link Transition} into a {@link TransitionReferenceDto}.
      * 
      * @param net the {@link PetriNet} containing the transition
      * @param transition the transition to transform
      * @param locale the locale to use for translations
-     * @return a {@link TransitionReference} for the given transition
+     * @return a {@link TransitionReferenceDto} for the given transition
      */
-    static TransitionReference transformToReference(PetriNet net, Transition transition, Locale locale) {
-        List<com.netgrif.application.engine.workflow.web.responsebodies.DataFieldReference> list = new ArrayList<>();
-        transition.getImmediateData().forEach(fieldId -> list.add(new com.netgrif.application.engine.workflow.web.responsebodies.DataFieldReference(net.getDataSet().get(fieldId), locale)));
-        return new TransitionReference(transition.getStringId(), transition.getTitle().getTranslation(locale), net.getStringId(), list);
+    static TransitionReferenceDto transformToReference(PetriNet net, Transition transition, Locale locale) {
+        List<DataFieldReferenceDto> list = new ArrayList<>();
+        transition.getImmediateData().forEach(fieldId -> list.add(DataFieldReferenceDto.fromField(net.getDataSet().get(fieldId), locale)));
+        return new TransitionReferenceDto(transition.getStringId(), transition.getTitle().getTranslation(locale), net.getStringId(), list);
     }
 
     /** 
-     * Transforms a {@link Field} into a {@link DataFieldReference}.
+     * Transforms a {@link Field} into a {@link DataFieldReferenceDto}.
      * 
      * @param net the {@link PetriNet} containing the field
      * @param transition the {@link Transition} containing the field
      * @param field the field to transform
      * @param locale the locale to use for translations
-     * @return a {@link DataFieldReference} for the given field
+     * @return a {@link DataFieldReferenceDto} for the given field
      */
-    static DataFieldReference transformToReference(PetriNet net, Transition transition, Field field, Locale locale) {
-        return new DataFieldReference(field.getStringId(), field.getName().getTranslation(locale), net.getStringId(), transition.getStringId());
+    static DataFieldReferenceDto transformToReference(PetriNet net, Transition transition, Field field, Locale locale) {
+        return new DataFieldReferenceDto(field.getStringId(), field.getName().getTranslation(locale), net.getStringId(), transition.getStringId(), field.getType().getName());
     }
 
     /**
@@ -183,81 +180,81 @@ public interface IPetriNetService {
      * @param user the logged-in user
      * @param locale the locale for translations
      * @param pageable the pagination information
-     * @return a {@link Page} of {@link PetriNetReference} objects
+     * @return a {@link Page} of {@link PetriNetReferenceDto} objects
      */ 
-    Page<PetriNetReference> getReferences(LoggedUser user, Locale locale, Pageable pageable);
+    Page<PetriNetReferenceDto> getReferences(LoggedUser user, Locale locale, Pageable pageable);
 
     /**
-     * Retrieves a paginated list of {@link PetriNetReference} objects by their identifier.
+     * Retrieves a paginated list of {@link PetriNetReferenceDto} objects by their identifier.
      *
      * @param identifier the unique identifier of the PetriNet
      * @param user the logged-in user making the request
      * @param locale the locale for translations
      * @param pageable the pagination information
-     * @return a paginated list of {@link PetriNetReference} objects
+     * @return a paginated list of {@link PetriNetReferenceDto} objects
      */
-    Page<PetriNetReference> getReferencesByIdentifier(String identifier, LoggedUser user, Locale locale, Pageable pageable);
+    Page<PetriNetReferenceDto> getReferencesByIdentifier(String identifier, LoggedUser user, Locale locale, Pageable pageable);
 
     /**
-     * Retrieves a paginated list of {@link PetriNetReference} objects by version.
+     * Retrieves a paginated list of {@link PetriNetReferenceDto} objects by version.
      *
      * @param version the {@link Version} of the PetriNet
      * @param user the logged-in user making the request
      * @param locale the locale for translations
      * @param pageable the pagination information
-     * @return a paginated list of {@link PetriNetReference} objects
+     * @return a paginated list of {@link PetriNetReferenceDto} objects
      */
-    Page<PetriNetReference> getReferencesByVersion(Version version, LoggedUser user, Locale locale, Pageable pageable);
+    Page<PetriNetReferenceDto> getReferencesByVersion(Version version, LoggedUser user, Locale locale, Pageable pageable);
 
     /**
-     * Retrieves a list of {@link PetriNetReference} objects accessible by the user's process roles.
+     * Retrieves a list of {@link PetriNetReferenceDto} objects accessible by the user's process roles.
      *
      * @param user the logged-in user making the request
      * @param locale the locale for translations
-     * @return a list of {@link PetriNetReference} objects accessible by the user
+     * @return a list of {@link PetriNetReferenceDto} objects accessible by the user
      */
-    List<PetriNetReference> getReferencesByUsersProcessRoles(LoggedUser user, Locale locale);
+    List<PetriNetReferenceDto> getReferencesByUsersProcessRoles(LoggedUser user, Locale locale);
 
     /**
-     * Retrieves a single {@link PetriNetReference} by identifier and version.
+     * Retrieves a single {@link PetriNetReferenceDto} by identifier and version.
      *
      * @param identifier the unique identifier of the PetriNet
      * @param version the {@link Version} of the PetriNet
      * @param user the logged-in user making the request
      * @param locale the locale for translations
-     * @return the {@link PetriNetReference} object corresponding to the given identifier and version
+     * @return the {@link PetriNetReferenceDto} object corresponding to the given identifier and version
      */
-    PetriNetReference getReference(String identifier, Version version, LoggedUser user, Locale locale);
+    PetriNetReferenceDto getReference(String identifier, Version version, LoggedUser user, Locale locale);
 
     /**
-     * Retrieves a list of {@link TransitionReference} objects for the given PetriNet IDs.
+     * Retrieves a list of {@link TransitionReferenceDto} objects for the given PetriNet IDs.
      *
      * @param netsIds the list of PetriNet IDs for which to retrieve transitions
      * @param user the logged-in user making the request
      * @param locale the locale for translations
-     * @return a list of {@link TransitionReference} objects for the given PetriNet IDs
+     * @return a list of {@link TransitionReferenceDto} objects for the given PetriNet IDs
      */
-    List<TransitionReference> getTransitionReferences(List<String> netsIds, LoggedUser user, Locale locale);
+    List<TransitionReferenceDto> getTransitionReferences(List<String> netsIds, LoggedUser user, Locale locale);
 
     /**
-     * Retrieves a list of {@link DataFieldReference} objects for the given transition references.
+     * Retrieves a list of {@link DataFieldReferenceDto} objects for the given transition references.
      *
-     * @param transitions the list of {@link TransitionReference} objects
+     * @param transitions the list of {@link TransitionReferenceDto} objects
      * @param locale the locale for translations
-     * @return a list of {@link DataFieldReference} objects
+     * @return a list of {@link DataFieldReferenceDto} objects
      */
-    List<DataFieldReference> getDataFieldReferences(List<TransitionReference> transitions, Locale locale);
+    List<DataFieldReferenceDto> getDataFieldReferences(List<TransitionReferenceDto> transitions, Locale locale);
 
     /**
-     * Performs a search for {@link PetriNetReference} objects based on the provided criteria.
+     * Performs a search for {@link PetriNetReferenceDto} objects based on the provided criteria.
      *
      * @param criteria the {@link PetriNetSearch} criteria to filter results
      * @param user the logged-in user making the request
      * @param pageable the pagination information
      * @param locale the locale for translations
-     * @return a paginated list of {@link PetriNetReference} objects matching the criteria
+     * @return a paginated list of {@link PetriNetReferenceDto} objects matching the criteria
      */
-    Page<PetriNetReference> search(PetriNetSearch criteria, LoggedUser user, Pageable pageable, Locale locale);
+    Page<PetriNetReferenceDto> search(PetriNetSearch criteria, LoggedUser user, Pageable pageable, Locale locale);
 
     /**
      * Finds a {@link PetriNet} by its import ID.
@@ -341,9 +338,9 @@ public interface IPetriNetService {
      * Retrieves the reference of a {@link PetriNet} associated with a case ID.
      *
      * @param caseId the ID of the workflow case
-     * @return a {@link PetriNetImportReference} linking the PetriNet
+     * @return a {@link PetriNetImportReferenceDto} linking the PetriNet
      */
-    PetriNetImportReference getNetFromCase(String caseId);
+    PetriNetImportReferenceDto getNetFromCase(String caseId);
 
 
     /**

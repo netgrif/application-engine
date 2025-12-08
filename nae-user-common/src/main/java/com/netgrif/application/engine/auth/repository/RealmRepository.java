@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.auth.repository;
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.Realm;
-import com.netgrif.application.engine.auth.realm.request.RealmSearch;
+import com.netgrif.application.engine.objects.dto.request.realm.RealmSearchDto;
 import org.bson.Document;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -32,7 +32,7 @@ public interface RealmRepository extends MongoRepository<Realm, String> {
     @Query("{ 'adminRealm': true }")
     Optional<Realm> findAdminRealm();
 
-    default Page<Realm> searchRealms(RealmSearch realmSerach, Pageable pageable, MongoTemplate mongoTemplate) {
+    default Page<Realm> searchRealms(RealmSearchDto realmSerach, Pageable pageable, MongoTemplate mongoTemplate) {
         Criteria searchCriteria = new Criteria();
 
         List<Criteria> criteriaList = new ArrayList<>();

@@ -1,19 +1,28 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
 
-import com.netgrif.application.engine.objects.workflow.domain.Case;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.netgrif.application.engine.objects.dto.response.workflow.CaseDto;
 import com.netgrif.application.engine.workflow.web.WorkflowController;
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateCaseBody;
+import lombok.Getter;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 import java.util.ArrayList;
 
-public class CaseResource extends EntityModel<Case> {
+@Getter
+@Relation(collectionRelation = "cases", itemRelation = "case")
+public class CaseResource extends RepresentationModel<CaseResource> {
 
-    public CaseResource(Case content) {
-        super(content, new ArrayList<>());
+    @JsonUnwrapped
+    private final CaseDto content;
+
+    public CaseResource(CaseDto content) {
+        this.content = content;
         buildLinks();
     }
 

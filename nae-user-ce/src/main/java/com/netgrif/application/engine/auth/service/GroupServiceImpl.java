@@ -6,7 +6,7 @@ import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
 import com.netgrif.application.engine.auth.repository.GroupRepository;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Group;
-import com.netgrif.application.engine.objects.auth.dto.GroupSearchDto;
+import com.netgrif.application.engine.objects.dto.request.group.GroupSearchRequestDto;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundException;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundExceptionCode;
 import org.springframework.data.domain.PageImpl;
@@ -372,18 +372,18 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Page<Group> search(GroupSearchDto searchDto, Pageable pageable) {
+    public Page<Group> search(GroupSearchRequestDto searchDto, Pageable pageable) {
         List<Criteria> filters = new ArrayList<>();
-        if (searchDto.getFullText() != null && !searchDto.getFullText().isBlank()) {
+        if (searchDto.fullText() != null && !searchDto.fullText().isBlank()) {
             Criteria criteria = new Criteria().orOperator(
-                    Criteria.where("identifier").regex(searchDto.getFullText(), "i"),
-                    Criteria.where("displayName").regex(searchDto.getFullText(), "i"),
-                    Criteria.where("ownerUsername").regex(searchDto.getFullText(), "i")
+                    Criteria.where("identifier").regex(searchDto.fullText(), "i"),
+                    Criteria.where("displayName").regex(searchDto.fullText(), "i"),
+                    Criteria.where("ownerUsername").regex(searchDto.fullText(), "i")
             );
             filters.add(criteria);
         }
-        if (searchDto.getRealmId() != null && !searchDto.getRealmId().isBlank())  {
-            filters.add(Criteria.where("realmId").regex(searchDto.getRealmId(), "i"));
+        if (searchDto.realmId() != null && !searchDto.realmId().isBlank())  {
+            filters.add(Criteria.where("realmId").regex(searchDto.realmId(), "i"));
         }
         Query query = Query.query(filters.isEmpty() ? new Criteria() : new Criteria().andOperator(filters.toArray(new Criteria[0])));
         long count = mongoTemplate.count(query, Group.class);

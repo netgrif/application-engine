@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
 
+import com.netgrif.application.engine.objects.dto.response.petrinet.ProcessRoleDto;
 import com.netgrif.application.engine.petrinet.web.PetriNetController;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -19,8 +20,8 @@ public class ProcessRolesResource extends EntityModel<ProcessRolesAndPermissions
     }
 
     public ProcessRolesResource(Collection<com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole> content, Map<String, Map<String, Boolean>> permissions, String netId, Locale locale) {
-        this(new ProcessRolesAndPermissions(content.stream().map(role -> new ProcessRole(
-                role.getStringId(), role.getName().getTranslation(locale), role.getDescription()
+        this(new ProcessRolesAndPermissions(content.stream().map(role -> new ProcessRoleDto(
+                role, locale
         )).collect(Collectors.toList()), permissions), netId);
     }
 

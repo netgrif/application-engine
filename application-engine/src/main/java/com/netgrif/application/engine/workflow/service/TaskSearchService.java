@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.dto.response.petrinet.PetriNetReferenceDto;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask;
@@ -277,13 +277,13 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
         PetriNetSearch processQuery = new PetriNetSearch();
         processQuery.setGroup(request.group);
-        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
-        if (groupProcesses.size() == 0)
+        List<PetriNetReferenceDto> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
+        if (groupProcesses.isEmpty())
             return true;
 
         query.and(
                 constructPredicateTree(
-                        groupProcesses.stream().map(PetriNetReference::getStringId).map(QTask.task.processId::eq).collect(Collectors.toList()),
+                        groupProcesses.stream().map(PetriNetReferenceDto::stringId).map(QTask.task.processId::eq).collect(Collectors.toList()),
                         BooleanBuilder::or
                 )
         );

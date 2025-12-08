@@ -11,6 +11,7 @@ import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.domain.BulkOperationWrapper;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.dto.response.petrinet.PetriNetReferenceDto;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
@@ -21,7 +22,6 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import com.netgrif.application.engine.objects.event.events.workflow.IndexCaseEvent;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -500,13 +500,13 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
         PetriNetSearch processQuery = new PetriNetSearch();
         processQuery.setGroup(request.group);
-        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
+        List<PetriNetReferenceDto> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
         if (groupProcesses.isEmpty()) {
             return true;
         }
 
         TermsQueryField stringIds = new TermsQueryField.Builder()
-                .value(groupProcesses.stream().map(PetriNetReference::getIdentifier).map(FieldValue::of).collect(Collectors.toList()))
+                .value(groupProcesses.stream().map(PetriNetReferenceDto::identifier).map(FieldValue::of).collect(Collectors.toList()))
                 .build();
 
         query.filter(QueryBuilders.terms(term -> term.field("processIdentifier").terms(stringIds)));

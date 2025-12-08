@@ -398,8 +398,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<AbstractUser> searchAllCoMembers(String query, Collection<ProcessResourceId> roleIds, Collection<ProcessResourceId> negateRoleIds, LoggedUser loggedUser, Pageable pageable) {
-        if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty())) {
+    public Page<AbstractUser> searchAllCoMembers(String query, Collection<ProcessResourceId> roleIds, LoggedUser loggedUser, Pageable pageable) {
+        if (roleIds == null || roleIds.isEmpty()) {
             return searchAllCoMembers(query, loggedUser, pageable);
         }
 
@@ -409,9 +409,6 @@ public class UserServiceImpl implements UserService {
         BooleanExpression predicate = buildPredicate(user, query);
         if (roleIds != null && !roleIds.isEmpty()) {
             predicate = predicate.and(QUser.user.processRoles.any()._id.in(roleIds));
-        }
-        if (negateRoleIds != null && !negateRoleIds.isEmpty()) {
-            predicate = predicate.and(QUser.user.processRoles.any()._id.in(negateRoleIds).not());
         }
 
         String collectionName = collectionNameProvider.getCollectionNameForRealm(loggedUser.getRealmId());

@@ -3,7 +3,7 @@ package com.netgrif.application.engine.auth.service;
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl;
 import com.netgrif.application.engine.auth.repository.AuthorityRepository;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
-import com.netgrif.application.engine.objects.auth.dto.AuthoritySearchDto;
+import com.netgrif.application.engine.objects.dto.request.authority.AuthoritySearchRequestDto;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,12 +59,12 @@ public class AuthorityServiceImpl implements AuthorityService {
     }
 
     @Override
-    public Page<Authority> search(AuthoritySearchDto searchDto, Pageable pageable) {
+    public Page<Authority> search(AuthoritySearchRequestDto searchDto, Pageable pageable) {
         Query query;
 
-        if (searchDto.getFullText() != null && !searchDto.getFullText().isBlank()) {
+        if (searchDto.fullText() != null && !searchDto.fullText().isBlank()) {
             Criteria criteria = new Criteria().orOperator(
-                    Criteria.where("name").regex(searchDto.getFullText(), "i")
+                    Criteria.where("name").regex(searchDto.fullText(), "i")
             );
             query = Query.query(criteria);
         } else {

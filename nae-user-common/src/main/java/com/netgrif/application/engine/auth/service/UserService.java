@@ -301,7 +301,7 @@ public interface UserService {
      * @return page of matching co-members
      */
     Page<AbstractUser> searchAllCoMembers(String query, Collection<ProcessResourceId> roleIds,
-            Collection<ProcessResourceId> negateRoleIds, LoggedUser loggedUser, Pageable pageable);
+            LoggedUser loggedUser, Pageable pageable);
 
     /**
      * Removes specified process roles from a user.

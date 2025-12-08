@@ -4,6 +4,7 @@ import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.dto.response.petrinet.PetriNetReferenceDto;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
@@ -13,7 +14,6 @@ import com.netgrif.application.engine.petrinet.domain.version.StringToVersionCon
 import com.netgrif.application.engine.objects.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.service.interfaces.IConfigurableMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,15 +59,15 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
         LoggedUser loggedAuthor = ActorTransformer.toLoggedUser(author);
         PetriNetSearch requestQuery = new PetriNetSearch();
         requestQuery.setAuthor(ActorTransformer.toActorRef(author));
-        List<PetriNetReference> nets = this.petriNetService.search(requestQuery, loggedAuthor, new FullPageRequest(), locale).getContent();
+        List<PetriNetReferenceDto> nets = this.petriNetService.search(requestQuery, loggedAuthor, new FullPageRequest(), locale).getContent();
 
         Map<String, I18nString> options = new LinkedHashMap<>();
         options.put("GLOBAL_ROLE", new I18nString("🌍 Global role"));
 
-        for (PetriNetReference net : nets) {
-            String[] versionSplit = net.getVersion().split("\\.");
-            I18nString titleAndVersion = new I18nString(net.getTitle() + " :" + net.getVersion());
-            options.put(net.getIdentifier() + ":" + versionSplit[0] + "-" + versionSplit[1] + "-" + versionSplit[2], titleAndVersion);
+        for (PetriNetReferenceDto net : nets) {
+            String[] versionSplit = net.version().split("\\.");
+            I18nString titleAndVersion = new I18nString(net.title() + " :" + net.version());
+            options.put(net.identifier() + ":" + versionSplit[0] + "-" + versionSplit[1] + "-" + versionSplit[2], titleAndVersion);
         }
 
         return options;

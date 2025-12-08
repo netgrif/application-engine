@@ -5,6 +5,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import com.google.common.collect.ImmutableList;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.dto.response.petrinet.PetriNetReferenceDto;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticJob;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticTask;
@@ -14,12 +15,10 @@ import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearc
 import com.netgrif.application.engine.objects.event.events.task.IndexTaskEvent;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
-import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import org.slf4j.Logger;
@@ -451,12 +450,12 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
 
         PetriNetSearch processQuery = new PetriNetSearch();
         processQuery.setGroup(request.group);
-        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
+        List<PetriNetReferenceDto> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
         if (groupProcesses.isEmpty()) {
             return true;
         }
         TermsQueryField stringIds = new TermsQueryField.Builder()
-                .value(groupProcesses.stream().map(PetriNetReference::getStringId).map(FieldValue::of).collect(Collectors.toList()))
+                .value(groupProcesses.stream().map(PetriNetReferenceDto::stringId).map(FieldValue::of).collect(Collectors.toList()))
                 .build();
 
         query.filter(QueryBuilders.terms(term -> term.field("processId").terms(stringIds)));
