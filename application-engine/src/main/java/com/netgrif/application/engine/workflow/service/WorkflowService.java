@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*;
+import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
@@ -243,10 +244,9 @@ public class WorkflowService implements IWorkflowService {
     private void resolveActorRefPermissions(Case useCase, String actorFieldId, Map<String, Boolean> permission) {
         List<String> actorIds = getExistingActors((ActorListFieldValue) useCase.getDataSet().get(actorFieldId).getValue());
         if (actorIds != null && !actorIds.isEmpty()) {
-            if (permission.containsKey("view") && !permission.get("view")) {
+            useCase.addActors(new HashSet<>(actorIds), permission);
+            if (permission.containsKey(ProcessRolePermission.VIEW.getValue()) && !permission.get(ProcessRolePermission.VIEW.getValue())) {
                 useCase.getNegativeViewActors().addAll(actorIds);
-            } else {
-                useCase.addActors(new HashSet<>(actorIds), permission);
             }
         }
     }

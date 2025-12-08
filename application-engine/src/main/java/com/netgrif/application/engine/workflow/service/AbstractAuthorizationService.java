@@ -3,6 +3,7 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,6 +41,49 @@ public abstract class AbstractAuthorizationService {
                     aggregatePermissions.put(permission.getKey(), permission.getValue());
                 }
             }
+        }
+    }
+
+    protected Map<String, Boolean> findUserPermissions(Map<String, Map<String, Boolean>> docPermissions, AbstractUser user) {
+        // TODO: impersonation
+        if (docPermissions == null) {
+            return null;
+        }
+        Map<String, Boolean> permissions = docPermissions.get(user.getStringId());
+        if (user.getGroupIds().isEmpty()) {
+            return permissions;
+        } else {
+            Set<String> intersectionOfActorIds = new HashSet<>(docPermissions.keySet());
+            intersectionOfActorIds.retainAll(user.getGroupIds());
+
+            if (intersectionOfActorIds.isEmpty()) {
+                return permissions;
+            }
+
+            if (permissions == null) {
+                permissions = new HashMap<>();
+            }
+
+            for (Map.Entry<String, Map<String, Boolean>> entry : docPermissions.entrySet()) {
+                if (intersectionOfActorIds.contains(entry.getKey())) {
+                    putPermissionIfNotAlreadyNegative(permissions, entry.getValue());
+                }
+            }
+
+            return permissions;
+        }
+    }
+
+    protected static void putPermissionIfNotAlreadyNegative(Map<String, Boolean> permissions, Map<String, Boolean> newPermissions) {
+        for (Map.Entry<String, Boolean> entry : newPermissions.entrySet()) {
+            putPermissionIfNotAlreadyNegative(permissions, entry.getKey(), entry.getValue());
+        }
+    }
+
+    protected static void putPermissionIfNotAlreadyNegative(Map<String, Boolean> permissions, String permType, Boolean permValue) {
+        Boolean existingPermValue = permissions.get(permType);
+        if (existingPermValue == null || existingPermValue) {
+            permissions.put(permType, permValue);
         }
     }
 }

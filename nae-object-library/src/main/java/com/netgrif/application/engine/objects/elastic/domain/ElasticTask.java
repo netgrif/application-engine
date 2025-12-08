@@ -53,19 +53,19 @@ public abstract class ElasticTask implements Serializable {
 
     private Map<String, Map<String, Boolean>> roles;
 
-    private Map<String, Map<String, Boolean>> userRefs; // todo 2285
+    private Map<String, Map<String, Boolean>> actorRefs;
 
-    private Map<String, Map<String, Boolean>> users;
+    private Map<String, Map<String, Boolean>> actors;
 
-    private Set<String> viewUserRefs;
+    private Set<String> viewActorRefs;
 
     private Set<String> viewRoles;
 
     private Set<String> negativeViewRoles;
 
-    private Set<String> viewUsers;
+    private Set<String> viewActors;
 
-    private Set<String> negativeViewUsers;
+    private Set<String> negativeViewActors;
 
     private String icon;
 
@@ -93,13 +93,13 @@ public abstract class ElasticTask implements Serializable {
         this.userRealmId = task.getUserRealmId();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles();
-        this.userRefs = task.getActorRefs();
-        this.users = task.getActors();
+        this.actorRefs = task.getActorRefs();
+        this.actors = task.getActors();
         this.viewRoles = new HashSet<>(task.getViewRoles());
-        this.viewUserRefs = new HashSet<>(task.getViewActorRefs());
+        this.viewActorRefs = new HashSet<>(task.getViewActorRefs());
         this.negativeViewRoles = new HashSet<>(task.getNegativeViewRoles());
-        this.viewUsers = new HashSet<>(task.getViewActors());
-        this.negativeViewUsers = new HashSet<>(task.getNegativeViewActors());
+        this.viewActors = new HashSet<>(task.getViewActors());
+        this.negativeViewActors = new HashSet<>(task.getNegativeViewActors());
         this.assignPolicy = task.getAssignPolicy().toString();
         this.dataFocusPolicy = task.getDataFocusPolicy().toString();
         this.finishPolicy = task.getFinishPolicy().toString();
@@ -117,10 +117,10 @@ public abstract class ElasticTask implements Serializable {
         this.startDate = task.getStartDate();
         this.roles = task.getRoles();
         this.viewRoles = task.getViewRoles();
-        this.viewUserRefs = task.getViewUserRefs();
+        this.viewActorRefs = task.getViewActorRefs();
         this.negativeViewRoles = task.getNegativeViewRoles();
-        this.viewUsers = task.getViewUsers();
-        this.negativeViewUsers = task.getNegativeViewUsers();
+        this.viewActors = task.getViewActors();
+        this.negativeViewActors = task.getNegativeViewActors();
         this.tags = task.getTags();
     }
 }

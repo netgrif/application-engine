@@ -6,6 +6,7 @@ import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorFieldValue;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorListFieldValue;
+import com.netgrif.application.engine.objects.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
@@ -816,10 +817,11 @@ public class TaskService implements ITaskService {
         task.getNegativeViewActors().clear();
         task.getActorRefs().forEach((actorFieldId, permission) -> {
             List<String> actorIds = getExistingActors((ActorListFieldValue) useCase.getDataSet().get(actorFieldId).getValue());
-            if (actorIds != null && !actorIds.isEmpty() && permission.containsKey("view") && !permission.get("view")) {
-                task.getNegativeViewActors().addAll(actorIds);
-            } else if (actorIds != null && !actorIds.isEmpty()) {
+            if (actorIds != null && !actorIds.isEmpty()) {
                 task.addActors(new HashSet<>(actorIds), permission);
+                if (permission.containsKey(RolePermission.VIEW.getValue()) && !permission.get(RolePermission.VIEW.getValue())) {
+                    task.getNegativeViewActors().addAll(actorIds);
+                }
             }
         });
         task.resolveViewActors();

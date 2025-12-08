@@ -61,21 +61,21 @@ public abstract class ElasticCase implements Serializable {
 
     private Map<String, Map<String, Boolean>> permissions;
 
-    private Map<String, Map<String, Boolean>> userRefs;
+    private Map<String, Map<String, Boolean>> actorRefs;
 
-    private Map<String, Map<String, Boolean>> users;
+    private Map<String, Map<String, Boolean>> actors;
 
     private Set<String> enabledRoles;
 
     private Set<String> viewRoles;
 
-    private Set<String> viewUserRefs; // todo 2285
+    private Set<String> viewActorRefs;
 
     private Set<String> negativeViewRoles;
 
-    private Set<String> viewUsers;
+    private Set<String> viewActors;
 
-    private Set<String> negativeViewUsers;
+    private Set<String> negativeViewActors;
 
     private Map<String, String> tags;
 
@@ -97,10 +97,10 @@ public abstract class ElasticCase implements Serializable {
         tasks = useCase.getTasks() == null ? Collections.emptySet() : useCase.getTasks().stream().map(tp -> new ElasticTaskPair(tp.getTask(), tp.getTransition())).collect(Collectors.toSet());
         enabledRoles = new HashSet<>(useCase.getEnabledRoles());
         viewRoles = new HashSet<>(useCase.getViewRoles());
-        viewUserRefs = new HashSet<>(useCase.getViewActorRefs());
+        viewActorRefs = new HashSet<>(useCase.getViewActorRefs());
         negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
-        viewUsers = new HashSet<>(useCase.getViewActors());
-        negativeViewUsers = new HashSet<>(useCase.getNegativeViewActors());
+        viewActors = new HashSet<>(useCase.getViewActors());
+        negativeViewActors = new HashSet<>(useCase.getNegativeViewActors());
         tags = new HashMap<>(useCase.getTags());
 
         dataSet = new HashMap<>();
@@ -116,10 +116,10 @@ public abstract class ElasticCase implements Serializable {
         tasks = useCase.getTasks();
         enabledRoles = useCase.getEnabledRoles();
         viewRoles = useCase.getViewRoles();
-        viewUserRefs = useCase.getViewUserRefs();
+        viewActorRefs = useCase.getViewActorRefs();
         negativeViewRoles = useCase.getNegativeViewRoles();
-        viewUsers = useCase.getViewUsers();
-        negativeViewUsers = useCase.getNegativeViewUsers();
+        viewActors = useCase.getViewActors();
+        negativeViewActors = useCase.getNegativeViewActors();
         tags = useCase.getTags();
 
         dataSet = useCase.getDataSet();
