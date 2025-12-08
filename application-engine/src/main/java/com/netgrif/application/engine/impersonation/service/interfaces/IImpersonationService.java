@@ -4,6 +4,7 @@ import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
 import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserHasSessionException;
+import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public interface IImpersonationService {
 
     void onSessionDestroy(LoggedUser impersonator);
 
-    AbstractUser reloadImpersonatedUserRoles(AbstractUser impersonated, String impersonatorId);
+    User reloadImpersonatedUserRoles(User impersonated, String impersonatorId);
 
-    AbstractUser applyRolesAndAuthorities(AbstractUser impersonated, String impersonatorId, List<Case> configs);
+    User applyRolesAndAuthorities(User impersonated, String impersonatorId, List<Case> configs);
 }

@@ -3,6 +3,7 @@ package com.netgrif.application.engine.adapter.spring.auth.domain;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Attribute;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
+import com.netgrif.application.engine.objects.auth.domain.enums.UserType;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
@@ -41,6 +42,7 @@ public class AnonymousUser extends AbstractUser {
         this.username = "anonymous@" + this.realmId;
         this.firstName = ref.getDisplayName();
         this.lastName = "";
+        this.type = UserType.ANONYMOUS;
 
         this.authoritySet = new HashSet<>();
         if (ref.getAuthorities() != null && !ref.getAuthorities().isEmpty()) {

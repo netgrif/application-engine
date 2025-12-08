@@ -6,6 +6,7 @@ import com.netgrif.application.engine.objects.auth.domain.Attribute;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.Credential;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
+import com.netgrif.application.engine.objects.auth.domain.enums.UserType;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -35,6 +36,7 @@ public class User {
     private boolean enabled;
     private boolean emailVerified;
     protected UserState state;
+    private UserType type;
 
     public User(AbstractUser user) {
         Attribute<Set<String>> enabledCredentialsAttribute = new Attribute<>();
@@ -62,6 +64,7 @@ public class User {
         attributes = user.getAttributes() != null
                 ? new java.util.HashMap<>(user.getAttributes())
                 : new java.util.HashMap<>();
+        type = user.getType();
         if (enabledCredentialsAttribute.getValue() != null && !enabledCredentialsAttribute.getValue().isEmpty()) {
             attributes.put(ATTR_ENABLED_CREDENTIALS, enabledCredentialsAttribute);
         }

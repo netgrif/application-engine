@@ -71,6 +71,7 @@ public class RealmServiceImpl implements RealmService {
         if (createRequest.isDefaultRealm() && getDefaultRealm().isEmpty()) {
             realm.setDefaultRealm(true);
         }
+        realm.setDomains(createRequest.getDomains());
 
         realm = realmRepository.save(realm);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realm.getName());
@@ -179,6 +180,7 @@ public class RealmServiceImpl implements RealmService {
         realm.setPublicSessionTimeout(update.getPublicSessionTimeout());
         realm.setEnableLimitSessions(update.isEnableLimitSessions());
         realm.setMaxSessionsAllowed(update.getMaxSessionsAllowed());
+        realm.setDomains(update.getDomains());
 
         if (update.isDefaultRealm()) {
             if (!realm.isDefaultRealm() && getDefaultRealm().isEmpty()) {

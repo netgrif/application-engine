@@ -38,7 +38,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     private final ProcessRoleService processRoleService;
 
     @Getter
-    private AbstractUser superUser;
+    private User superUser;
 
     @Override
     public void run(ApplicationArguments strings) {
@@ -46,14 +46,14 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
         createSuperUser();
     }
 
-    private AbstractUser createSuperUser() {
+    private User createSuperUser() {
         Authority adminAuthority = authorityService.getOrCreate(Authority.admin);
         Authority systemAuthority = authorityService.getOrCreate(Authority.systemAdmin);
         Set<Authority> authorities = new HashSet<>();
         authorities.add(adminAuthority);
         authorities.add(systemAuthority);
 
-        Optional<AbstractUser> superUser = userService.findUserByUsername(UserConstants.ADMIN_USER_USERNAME, null);
+        Optional<User> superUser = userService.findUserByUsername(UserConstants.ADMIN_USER_USERNAME, null);
         if (superUser.isEmpty()) {
             User user = new User();
             user.setFirstName(UserConstants.ADMIN_USER_FIRST_NAME);

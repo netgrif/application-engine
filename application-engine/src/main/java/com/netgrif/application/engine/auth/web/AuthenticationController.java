@@ -2,6 +2,7 @@ package com.netgrif.application.engine.auth.web;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
+import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.InvalidUserTokenException;
@@ -192,7 +193,7 @@ public class AuthenticationController {
     @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource changePassword(Authentication auth, @RequestBody ChangePasswordRequest request) {
         try {
-            Optional<AbstractUser> user = userService.findUserByUsername(request.login, null);
+            Optional<User> user = userService.findUserByUsername(request.login, null);
             if (user.isEmpty() || request.password == null || request.newPassword == null) {
                 return MessageResource.errorMessage("Incorrect login!");
             }

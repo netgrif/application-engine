@@ -1,16 +1,13 @@
 package com.netgrif.application.engine.impersonation.service;
 
 import com.netgrif.application.engine.configuration.properties.ImpersonationConfigurationProperties;
-import com.netgrif.application.engine.objects.auth.domain.Authority;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
@@ -53,13 +50,13 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     protected ProcessRoleService processRoleService;
 
     @Override
-    public Page<AbstractUser> getConfiguredImpersonationUsers(String query, LoggedUser impersonator, Pageable pageable) {
+    public Page<User> getConfiguredImpersonationUsers(String query, LoggedUser impersonator, Pageable pageable) {
         if (impersonator.isAdmin()) {
             return userService.searchAllCoMembers(query, null, null, impersonator, pageable);
 
         } else {
             Page<Case> cases = searchConfigs(impersonator.getStringId(), pageable);
-            List<AbstractUser> users = cases.getContent().stream()
+            List<User> users = cases.getContent().stream()
                     .map(c -> ((UserFieldValue) c.getDataSet().get("impersonated").getValue()).getId())
                     .distinct()
                     .map(id -> userService.findById(id, null))
@@ -76,7 +73,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
 
     @Override
     public boolean canImpersonateUser(LoggedUser impersonator, String userId) {
-        AbstractUser impersonated = userService.findById(userId, null);
+        User impersonated = userService.findById(userId, null);
         return impersonator.isAdmin() || !searchConfigs(impersonator.getStringId(), impersonated.getStringId()).isEmpty();
     }
 
@@ -92,7 +89,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     }
 
     @Override
-    public List<Authority> getAuthorities(Collection<Case> configs, AbstractUser impersonated) {
+    public List<Authority> getAuthorities(Collection<Case> configs, User impersonated) {
         if (configs.isEmpty()) {
             return new ArrayList<>();
         }
@@ -103,7 +100,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     }
 
     @Override
-    public List<ProcessRole> getRoles(Collection<Case> configs, AbstractUser impersonated) {
+    public List<ProcessRole> getRoles(Collection<Case> configs, User impersonated) {
         List<ProcessRole> impersonatedRoles = new ArrayList<>();
         impersonatedRoles.add(processRoleService.getDefaultRole());
         if (configs.isEmpty()) {

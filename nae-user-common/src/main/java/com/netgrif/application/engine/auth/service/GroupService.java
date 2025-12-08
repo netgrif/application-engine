@@ -1,17 +1,17 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Group;
+import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.dto.GroupSearchDto;
-import org.springframework.data.mongodb.core.query.Query;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.util.Pair;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service interface for managing user groups in the application.
@@ -34,7 +34,7 @@ public interface GroupService {
      * @param groupOwner the user for whom to create the group
      * @return the newly created {@link Group}
      */
-    Group create(AbstractUser groupOwner);
+    Group create(User groupOwner);
 
     /**
      * Creates a new group with specified parameters.
@@ -44,7 +44,7 @@ public interface GroupService {
      * @param groupOwner the user associated with the group creation
      * @return the newly created {@link Group}
      */
-    Group create(String identifier, String title, AbstractUser groupOwner);
+    Group create(String identifier, String title, User groupOwner);
 
     /**
      * Retrieves the default user group for a given user.
@@ -52,14 +52,14 @@ public interface GroupService {
      * @param user the user whose default group is to be retrieved
      * @return the default {@link Group} for the user
      */
-    Group getDefaultUserGroup(AbstractUser user);
+    Group getDefaultUserGroup(User user);
 
     /**
      * Adds a user to the default system group.
      *
      * @param user the user to be added to the default system group
      */
-    void addUserToDefaultSystemGroup(AbstractUser user);
+    void addUserToDefaultSystemGroup(User user);
 
     /**
      * Persists a group to the database.
@@ -165,7 +165,7 @@ public interface GroupService {
      * @param groupIdentifier identifier of the target group
      * @return the updated {@link Group}
      */
-    Group addUser(AbstractUser user, String groupIdentifier);
+    Group addUser(User user, String groupIdentifier);
 
     /**
      * Adds a user to a specific group.
@@ -174,7 +174,7 @@ public interface GroupService {
      * @param group the group to add the user to
      * @return the updated {@link Group}
      */
-    Group addUser(AbstractUser user, Group group);
+    Group addUser(User user, Group group);
 
     /**
      * Removes a user from a group specified by identifier.
@@ -183,7 +183,7 @@ public interface GroupService {
      * @param groupIdentifier identifier of the target group
      * @return the updated {@link Group}
      */
-    Group removeUser(AbstractUser user, String groupIdentifier);
+    Group removeUser(User user, String groupIdentifier);
 
     /**
      * Removes a user from a specific group.
@@ -192,7 +192,7 @@ public interface GroupService {
      * @param group the group to remove the user from
      * @return the updated {@link Group}
      */
-    Group removeUser(AbstractUser user, Group group);
+    Group removeUser(User user, Group group);
 
     /**
      * Finds groups matching a given predicate with pagination.

@@ -43,12 +43,12 @@ public abstract class AbstractActor implements Serializable {
     /** Set of group identifiers this actor belongs to */
     protected Set<String> groupIds = new HashSet<>();
 
-    public AbstractActor(ObjectId id, String realmId) {
+    protected AbstractActor(ObjectId id, String realmId) {
         this.id = id;
         this.realmId = realmId;
     }
 
-    public AbstractActor(String stringId, String realmId) {
+    protected AbstractActor(String stringId, String realmId) {
         this.id = new ObjectId(stringId);
         this.realmId = realmId;
     }

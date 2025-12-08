@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.User;
 import com.querydsl.core.BooleanBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -244,8 +245,8 @@ public class MongoSearchService<T> {
     }
 
     protected String resolveAuthorByEmail(String email) {
-        Optional<AbstractUser> user = userService.findUserByUsername(email, null);
-        return user.map(AbstractUser::getStringId).orElse(null);
+        Optional<User> user = userService.findUserByUsername(email, null);
+        return user.map(User::getStringId).orElse(null);
     }
 
     protected BooleanBuilder constructPredicateTree(List<com.querydsl.core.types.Predicate> elementaryPredicates, BiFunction<BooleanBuilder, com.querydsl.core.types.Predicate, BooleanBuilder> nodeOperation) {
