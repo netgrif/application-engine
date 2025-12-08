@@ -30,8 +30,8 @@ public class SessionConfiguration {
     @Value("${spring.session.redis.host}")
     private String hostName;
 
-    @Value("${spring.session.redis.port}")
-    private Integer port;
+    @Value("${spring.session.redis.port:6379}")
+    private Integer port = 6379;
 
     @Value("${spring.session.redis.username:#{null}}")
     private String username;
@@ -39,7 +39,7 @@ public class SessionConfiguration {
     @Value("${spring.session.redis.password:#{null}}")
     private String password;
 
-    @Value("${spring.session.redis.ssl:#{null}}")
+    @Value("${spring.session.redis.ssl:false}")
     private Boolean ssl;
 
     @Value("${spring.redis.sentinel.master:#{null}}")
@@ -48,7 +48,7 @@ public class SessionConfiguration {
     @Value("${spring.redis.sentinel.nodes:#{null}}")
     private List<String> sentinelNodes;
 
-    @Value("${spring.redis.sentinel.port:#{null}}")
+    @Value("${spring.redis.sentinel.port:26379}")
     private Integer sentinelPort = 26379;
 
     @Value("${spring.redis.sentinel.username:#{null}}")
