@@ -2,6 +2,7 @@ package com.netgrif.application.engine.elastic
 
 import com.netgrif.application.engine.MockService
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
@@ -88,6 +89,9 @@ class DataSearchRequestTest {
     private IDataService dataService
 
     @Autowired
+    private GroupService groupService
+
+    @Autowired
     private TestHelper testHelper
 
     private ArrayList<Map.Entry<String, String>> testCases
@@ -123,8 +127,9 @@ class DataSearchRequestTest {
         _case.dataSet["multichoice_map"].value = ["alice", "bob"].toSet()
         _case.dataSet["file"].value = FileFieldValue.fromString("singlefile.txt")
         _case.dataSet["fileList"].value = FileListFieldValue.fromString("multifile1.txt,multifile2.pdf")
-        // todo 2285 add group id and assert it
-        _case.dataSet["userList"].value = new ActorListFieldValue([dataService.makeActorFieldValue(testUser1.stringId), dataService.makeActorFieldValue(testUser2.stringId)])
+        _case.dataSet["userList"].value = new ActorListFieldValue([dataService.makeActorFieldValue(testUser1.stringId),
+                                                                   dataService.makeActorFieldValue(testUser2.stringId),
+                                                                   dataService.makeActorFieldValue(groupService.getDefaultSystemGroup().stringId)])
         _case.dataSet["i18n_text"].value.defaultValue = "Modified i18n text value"
         _case.dataSet["i18n_divider"].value.defaultValue = "Modified i18n divider value"
         workflowService.save(_case)
@@ -195,6 +200,7 @@ class DataSearchRequestTest {
                 new AbstractMap.SimpleEntry<String, String>("userList.fullNameValue.keyword" as String, "${testUser2.name}" as String),
                 new AbstractMap.SimpleEntry<String, String>("userList.actorIdValue" as String, "${testUser1.getStringId()}" as String),
                 new AbstractMap.SimpleEntry<String, String>("userList.actorIdValue" as String, "${testUser2.getStringId()}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.actorIdValue" as String, "${groupService.getDefaultSystemGroup().stringId}" as String),
                 new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed" as String, "Eve" as String),
                 new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed" as String, "Eva" as String),
                 new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed.textValue.keyword" as String, "Eve" as String),
