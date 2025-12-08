@@ -34,13 +34,13 @@ public abstract class ElasticViewPermissionService {
         BoolQuery positiveRoleSetMinusNegativeRole = setMinus(positiveViewRole, negativeViewRole);
 
         /* Build positive view userList query */
-        BoolQuery positiveViewUser = buildPositiveViewUser(viewPermNotExists, user);
+        BoolQuery positiveViewUser = buildPositiveViewActor(viewPermNotExists, user);
 
         /* Role query union positive view userList */
         BoolQuery roleSetMinusPositiveUserList = union(positiveRoleSetMinusNegativeRole, positiveViewUser);
 
         /* Build negative view userList query */
-        BoolQuery negativeViewUser = buildNegativeViewUser(user);
+        BoolQuery negativeViewUser = buildNegativeViewActor(user);
 
         /* Role-UserListPositive set-minus negative view userList */
         BoolQuery permissionQuery = setMinus(roleSetMinusPositiveUserList, negativeViewUser);
@@ -76,16 +76,16 @@ public abstract class ElasticViewPermissionService {
         return negativeViewRole.build();
     }
 
-    private BoolQuery buildPositiveViewUser(BoolQuery viewPermNotExists, LoggedUser user) {
+    private BoolQuery buildPositiveViewActor(BoolQuery viewPermNotExists, LoggedUser user) {
         return new BoolQuery.Builder()
                 .should(viewPermNotExists._toQuery())
-                .filter(termQuery("viewActors", user.getStringId())._toQuery())
+                .filter(termQuery("viewActors", user.getStringId())._toQuery()) // todo 2285 also group ids
                 .build();
     }
 
-    private BoolQuery buildNegativeViewUser(LoggedUser user) {
+    private BoolQuery buildNegativeViewActor(LoggedUser user) {
         return new BoolQuery.Builder()
-                .mustNot(termQuery("negativeViewActors", user.getStringId())._toQuery())
+                .mustNot(termQuery("negativeViewActors", user.getStringId())._toQuery()) // todo 2285 also group ids
                 .build();
     }
 

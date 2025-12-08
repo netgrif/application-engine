@@ -315,7 +315,7 @@ class ImpersonationServiceTest {
         def owner = new UserFieldValue(user)
         caze.dataSet["impersonated"].value = owner
         caze.dataSet["impersonated_email"].value = owner.username
-        caze.dataSet["config_owner"].value = new ActorListFieldValue([owner]) // todo 2285
+        caze.dataSet["config_owner"].value = new ActorListFieldValue([owner])
         caze.dataSet["impersonators"].value = [impersonator]
         caze.dataSet["impersonated_roles"].value = roles ?: user.processRoles.stringId as List
         caze.dataSet["impersonated_authorities"].value = auths ?: user.authoritySet.stringId as List
