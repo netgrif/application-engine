@@ -232,7 +232,7 @@ public class PetriNetController {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         asyncRunner.execute(() -> {
             if (force) {
-                service.forceDelete(decodedProcessId, user);
+                service.forceDeletePetriNet(decodedProcessId, user);
             } else {
                 service.deletePetriNet(decodedProcessId, user);
             }

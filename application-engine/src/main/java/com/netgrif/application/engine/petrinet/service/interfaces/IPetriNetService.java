@@ -318,7 +318,7 @@ public interface IPetriNetService {
      * @param processId  the ID of the process to delete
      * @param loggedUser the user requesting the deletion
      */
-    void forceDelete(String processId, LoggedUser loggedUser);
+    void forceDeletePetriNet(String processId, LoggedUser loggedUser);
 
     /**
      * Runs the specified set of actions on a PetriNet.

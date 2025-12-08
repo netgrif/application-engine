@@ -534,7 +534,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public void forceDelete(String processId, LoggedUser loggedUser) {
+    public void forceDeletePetriNet(String processId, LoggedUser loggedUser) {
         deletePetriNet(processId, loggedUser, true);
     }
 
