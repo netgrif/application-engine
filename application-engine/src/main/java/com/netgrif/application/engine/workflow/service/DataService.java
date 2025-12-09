@@ -965,7 +965,11 @@ public class DataService implements IDataService {
     }
 
     private FileListFieldValue parseFileListFieldValue(ObjectNode node) {
-        ArrayNode arrayNode = (ArrayNode) node.get("value");
+        JsonNode valueNode = node.get("value");
+        if (valueNode == null || !valueNode.isArray()) {
+            return new FileListFieldValue();
+        }
+        ArrayNode arrayNode = (ArrayNode) valueNode;
         List<String> fileListValueList = new ArrayList<>();
         arrayNode.forEach(item -> fileListValueList.add(item.asText()));
         return FileListFieldValue.fromList(fileListValueList);
