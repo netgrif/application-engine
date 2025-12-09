@@ -552,12 +552,12 @@ public class UserServiceImpl implements UserService {
         Set<ProcessRole> nonGlobalPetriNetRoles = petriNetRoles.stream().filter(r -> !r.isGlobal()).collect(Collectors.toSet());
         Collection<ProcessResourceId> roleIds = nonGlobalPetriNetRoles.stream().map(ProcessRole::get_id).collect(Collectors.toSet());
         Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
         Page<Realm> realms;
         do {
             realms = realmService.getSmallRealm(realmPageable);
             for (Realm realm : realms.getContent()) {
-                Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-                Page<AbstractUser> users = searchUsersByRoleIds(roleIds, collectionNameProvider.getCollectionNameForRealm(realm.getName()), pageable);;
+                Page<AbstractUser> users = searchUsersByRoleIds(roleIds, collectionNameProvider.getCollectionNameForRealm(realm.getName()), pageable);
                 while (users.hasContent()) {
                     users.getContent().forEach(u -> removeRoles(u, nonGlobalPetriNetRoles));
                     users = searchUsersByRoleIds(roleIds, collectionNameProvider.getCollectionNameForRealm(realm.getName()), pageable);
