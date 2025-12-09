@@ -22,7 +22,7 @@ public abstract class TaskField extends DataField {
     @Override
     public Object getValue() {
         if (taskRefValue == null) {
-            return new ArrayList<String>();
+            return new ArrayList<>();
         }
         return new ArrayList<>(Arrays.asList(taskRefValue));
     }
