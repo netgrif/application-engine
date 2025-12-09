@@ -555,9 +555,14 @@ public class UserServiceImpl implements UserService {
         Page<Realm> realms;
         do {
             realms = realmService.getSmallRealm(realmPageable);
-            Page<AbstractUser> users;
             for (Realm realm : realms.getContent()) {
                 Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+                Page<AbstractUser> users = searchUsersByRoleIds(roleIds, collectionNameProvider.getCollectionNameForRealm(realm.getName()), pageable);;
+                while (users.hasContent()) {
+                    users.getContent().forEach(u -> removeRoles(u, nonGlobalPetriNetRoles));
+                    users = searchUsersByRoleIds(roleIds, collectionNameProvider.getCollectionNameForRealm(realm.getName()), pageable);
+                }
+
                 do {
                     users = searchUsersByRoleIds(roleIds, collectionNameProvider.getCollectionNameForRealm(realm.getName()), pageable);
                     users.getContent().forEach(u -> removeRoles(u, nonGlobalPetriNetRoles));
