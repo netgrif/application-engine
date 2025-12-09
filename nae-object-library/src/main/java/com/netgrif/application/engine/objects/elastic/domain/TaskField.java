@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 @Data
 @NoArgsConstructor
@@ -21,6 +21,9 @@ public abstract class TaskField extends DataField {
 
     @Override
     public Object getValue() {
-        return new ArrayList<>(List.of(taskRefValue));
+        if (taskRefValue == null) {
+            return new ArrayList<String>();
+        }
+        return new ArrayList<>(Arrays.asList(taskRefValue));
     }
 }
