@@ -56,6 +56,8 @@ public class UserServiceImpl implements UserService {
 
     private AbstractUser systemUser;
 
+    private RealmService realmService;
+
     @Getter
     private PaginationProperties paginationProperties;
 
@@ -110,6 +112,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public void setPaginationProperties(PaginationProperties paginationProperties) {
         this.paginationProperties = paginationProperties;
+    }
+
+    @Autowired
+    public void setRealmService(RealmService realmService) {
+        this.realmService = realmService;
     }
 
     @Override
@@ -542,15 +549,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void removeRoleOfDeletedPetriNet(Set<ProcessRole> petriNetRoles) {
-        String defaultRealmCollection = collectionNameProvider.getDefaultRealmCollection();
+        Set<ProcessRole> nonGlobalPetriNetRoles = petriNetRoles.stream().filter(r -> !r.isGlobal()).collect(Collectors.toSet());
+        Collection<ProcessResourceId> roleIds = nonGlobalPetriNetRoles.stream().map(ProcessRole::get_id).collect(Collectors.toSet());
+        Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
         Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-        Collection<ProcessResourceId> roleIds = petriNetRoles.stream().map(ProcessRole::get_id).collect(Collectors.toSet());
-        Page<AbstractUser> users;
+        Page<Realm> realms;
         do {
-            users = searchUsersByRoleIds(roleIds, defaultRealmCollection, pageable);
-            users.getContent().forEach(u -> removeRoles(u, petriNetRoles));
-            pageable = pageable.next();
-        } while (users.hasNext());
+            realms = realmService.getSmallRealm(realmPageable);
+            for (Realm realm : realms.getContent()) {
+                Page<AbstractUser> users = searchUsersByRoleIds(roleIds, collectionNameProvider.getCollectionNameForRealm(realm.getName()), pageable);
+                while (users.hasContent()) {
+                    users.getContent().forEach(u -> removeRoles(u, nonGlobalPetriNetRoles));
+                    users = searchUsersByRoleIds(roleIds, collectionNameProvider.getCollectionNameForRealm(realm.getName()), pageable);
+                }
+            }
+            realmPageable = realmPageable.next();
+        } while (realms.hasNext());
     }
 
     @Override

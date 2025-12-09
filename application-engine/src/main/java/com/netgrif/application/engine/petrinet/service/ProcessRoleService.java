@@ -147,10 +147,6 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         Set<ProcessRole> rolesNewToUser = getRolesNewToActor(userOldRoles, requestedRoles);
         Set<ProcessRole> rolesRemovedFromUser = getRolesRemovedFromActor(userOldRoles, requestedRoles);
 
-        String idOfPetriNetContainingRole = getProcessIdRoleBelongsTo(rolesNewToUser, rolesRemovedFromUser);
-        if (!isGlobalFromFirstRole(rolesNewToUser) && !isGlobalFromFirstRole(rolesRemovedFromUser) && idOfPetriNetContainingRole == null) {
-            return;
-        }
 
         oldActorRoles.clear();
         oldActorRoles.addAll(updateRequestedRoles(userOldRoles, rolesNewToUser, rolesRemovedFromUser));
@@ -416,7 +412,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     @Override
     public void deleteRolesOfNet(PetriNet net, LoggedUser loggedUser) {
         log.info("[" + net.getStringId() + "]: Initiating deletion of all roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
-        List<ProcessResourceId> deletedRoleIds = this.findAllByNetStringId(net.getStringId()).stream().filter(processRole -> processRole.getProcessId() != null).map(ProcessRole::get_id).collect(Collectors.toList());
+        List<ProcessResourceId> deletedRoleIds = this.findAllByNetStringId(net.getStringId()).stream().filter(processRole -> !processRole.isGlobal()).map(ProcessRole::get_id).collect(Collectors.toList());
         Set<String> deletedRoleStringIds = deletedRoleIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet());
 
         Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
@@ -478,19 +474,16 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         }
         log.info("Initiating deletion of global role with import ID [{}] and object ID [{}]", processRole.getImportId(), processRole.getStringId());
         Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Pageable usersPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
         Page<Realm> realms;
         do {
             realms = realmService.getSmallRealm(realmPageable);
             realms.forEach(realm -> {
-                Pageable usersPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-                Page<AbstractUser> users;
-                do {
-                    users = this.userService.findAllByProcessRoles(Set.of(processRole.get_id()), realm.getName(), usersPageable);
-                    for (AbstractUser user : users) {
-                        removeRoleFromUser(user, processRole, loggedUser);
-                    }
-                    usersPageable = usersPageable.next();
-                } while (users.hasNext());
+                Page<AbstractUser> users = userService.findAllByProcessRoles(Set.of(processRole.get_id()), realm.getName(), usersPageable);
+                while (users.hasContent()) {
+                    users.getContent().forEach(u -> removeRoleFromUser(u, processRole, loggedUser));
+                    users = userService.findAllByProcessRoles(Set.of(processRole.get_id()), realm.getName(), usersPageable);
+                }
             });
             realmPageable = realmPageable.next();
         } while (realms.hasNext());
