@@ -51,8 +51,6 @@ public class ActionApiImpl implements ActionApi {
 
     private IElasticTaskService elasticTaskService;
 
-    private ObjectMapper objectMapper;
-
     @Autowired
     public void setDataService(IDataService dataService) {
         this.dataService = dataService;
@@ -81,11 +79,6 @@ public class ActionApiImpl implements ActionApi {
     @Autowired
     public void setElasticTaskService(IElasticTaskService elasticTaskService) {
         this.elasticTaskService = elasticTaskService;
-    }
-
-    @Autowired
-    public void setObjectMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
     }
 
     @Override
