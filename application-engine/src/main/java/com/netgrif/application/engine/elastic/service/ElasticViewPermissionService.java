@@ -8,14 +8,13 @@ import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
-
-import static org.springframework.data.elasticsearch.client.elc.Queries.termQuery;
 
 public abstract class ElasticViewPermissionService {
 
     protected void buildViewPermissionQuery(BoolQuery.Builder query, LoggedUser user) {
-        // todo 2285
         BoolQuery.Builder viewPermsExists = new BoolQuery.Builder()
                 .should(should -> should.exists(ExistsQuery.of(builder -> builder.field("viewRoles"))))
                 .should(should -> should.exists(ExistsQuery.of(builder -> builder.field("viewActorRefs"))));
@@ -77,15 +76,28 @@ public abstract class ElasticViewPermissionService {
     }
 
     private BoolQuery buildPositiveViewActor(BoolQuery viewPermNotExists, LoggedUser user) {
+        TermsQueryField actorIdsQueryField = buildTermsQueryFieldOfUser(user);
         return new BoolQuery.Builder()
                 .should(viewPermNotExists._toQuery())
-                .filter(termQuery("viewActors", user.getStringId())._toQuery()) // todo 2285 also group ids
+                .filter(QueryBuilders.terms(term -> term.field("viewActors").terms(actorIdsQueryField)))
                 .build();
     }
 
     private BoolQuery buildNegativeViewActor(LoggedUser user) {
+        TermsQueryField actorIdsQueryField = buildTermsQueryFieldOfUser(user);
         return new BoolQuery.Builder()
-                .mustNot(termQuery("negativeViewActors", user.getStringId())._toQuery()) // todo 2285 also group ids
+                .mustNot(QueryBuilders.terms(term -> term.field("negativeViewActors").terms(actorIdsQueryField)))
+                .build();
+    }
+
+    private TermsQueryField buildTermsQueryFieldOfUser(LoggedUser loggedUser) {
+        Set<String> actorIds = loggedUser.getGroupIds();
+        if (actorIds == null) {
+            actorIds = new HashSet<>();
+        }
+        actorIds.add(loggedUser.getStringId());
+        return new TermsQueryField.Builder()
+                .value(actorIds.stream().map(FieldValue::of).toList())
                 .build();
     }
 
