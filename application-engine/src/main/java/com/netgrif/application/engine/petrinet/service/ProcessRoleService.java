@@ -479,14 +479,11 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
             realms = realmService.getSmallRealm(realmPageable);
             realms.forEach(realm -> {
                 Pageable usersPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-                Page<AbstractUser> users;
-                do {
-                    users = this.userService.findAllByProcessRoles(Set.of(processRole.get_id()), realm.getName(), usersPageable);
-                    for (AbstractUser user : users) {
-                        removeRoleFromUser(user, processRole, loggedUser);
-                    }
-                    usersPageable = usersPageable.next();
-                } while (users.hasNext());
+                Page<AbstractUser> users = userService.findAllByProcessRoles(Set.of(processRole.get_id()), realm.getName(), usersPageable);
+                while (users.hasContent()) {
+                    users.getContent().forEach(u -> removeRoleFromUser(u, processRole, loggedUser));
+                    users = userService.findAllByProcessRoles(Set.of(processRole.get_id()), realm.getName(), usersPageable);
+                }
             });
             realmPageable = realmPageable.next();
         } while (realms.hasNext());

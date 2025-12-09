@@ -562,12 +562,6 @@ public class UserServiceImpl implements UserService {
                     users.getContent().forEach(u -> removeRoles(u, nonGlobalPetriNetRoles));
                     users = searchUsersByRoleIds(roleIds, collectionNameProvider.getCollectionNameForRealm(realm.getName()), pageable);
                 }
-
-                do {
-                    users = searchUsersByRoleIds(roleIds, collectionNameProvider.getCollectionNameForRealm(realm.getName()), pageable);
-                    users.getContent().forEach(u -> removeRoles(u, nonGlobalPetriNetRoles));
-                    pageable = pageable.next();
-                } while (users.hasNext());
             }
             realmPageable = realmPageable.next();
         } while (realms.hasNext());
