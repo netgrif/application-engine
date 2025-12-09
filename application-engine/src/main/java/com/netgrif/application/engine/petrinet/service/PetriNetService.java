@@ -7,7 +7,6 @@ import com.netgrif.application.engine.configuration.properties.CacheConfiguratio
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.ArcImportReference;
-import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
@@ -535,8 +534,11 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Transactional
-    public void deletePetriNet(String processId, LoggedUser loggedUser, boolean force) {
+    public void forceDeletePetriNet(String processId, LoggedUser loggedUser) {
+        deletePetriNet(processId, loggedUser, true);
+    }
+
+    protected void deletePetriNet(String processId, LoggedUser loggedUser, boolean force) {
         Optional<PetriNet> petriNetOptional = repository.findById(processId);
         if (petriNetOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find process with id [" + processId + "]");
