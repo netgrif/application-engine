@@ -5,6 +5,7 @@ import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
+import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Query;
@@ -424,4 +425,14 @@ public interface UserService {
      * @return the updated user
      */
     AbstractUser changePassword(AbstractUser user, String newPassword, String oldPassword);
+
+    /**
+     * Searches for users in the specified realm based on the provided predicate and pagination parameters.
+     *
+     * @param predicate the query conditions to filter users
+     * @param pageable  the pagination parameters for the search results
+     * @param realmId   the name of the realm, used to determine which collection to query
+     * @return a paginated list of users matching the predicate within the specified realm
+     */
+    Page<User> search(Predicate predicate, Pageable pageable, String realmId);
 }
