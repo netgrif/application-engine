@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.permissions
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
@@ -67,6 +68,9 @@ class ElasticSearchViewPermissionTest {
 
     @Autowired
     private IDataService dataService
+
+    @Autowired
+    private GroupService groupService
 
     @Autowired
     private TestHelper testHelper
@@ -141,7 +145,7 @@ class ElasticSearchViewPermissionTest {
     }
 
     @Test
-    void testSearchElasticViewWithUserWithoutUserRef() {
+    void testSearchElasticViewWithUserWithoutActorRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", ActorTransformer.toLoggedUser(testUser)).getCase()
 
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest()
@@ -153,13 +157,13 @@ class ElasticSearchViewPermissionTest {
     }
 
     @Test
-    void testSearchElasticViewWithUserWithPosUserRef() {
+    void testSearchElasticViewWithUserWithPosActorRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", ActorTransformer.toLoggedUser(testUser)).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "view_ul_pos": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
         case_ = workflowService.save(case_)
@@ -174,13 +178,37 @@ class ElasticSearchViewPermissionTest {
     }
 
     @Test
-    void testSearchElasticViewWithUserWithNegUserRef() {
+    void testSearchElasticViewWithGroupWithPosActorRef() {
+        String defaultGroupId = groupService.getDefaultSystemGroup().stringId
+        assert testUser.getGroupIds().contains(defaultGroupId)
+
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", ActorTransformer.toLoggedUser(testUser)).getCase()
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_pos": [
+                        "value": [defaultGroupId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        case_ = workflowService.save(case_)
+        sleep(4000)
+
+        CaseSearchRequest caseSearchRequest = new CaseSearchRequest()
+        caseSearchRequest.process = [new CaseSearchRequest.PetriNet(netWithUserRefs.getIdentifier())] as List
+        Page<Case> casePage = elasticCaseService.search([caseSearchRequest] as List, ActorTransformer.toLoggedUser(testUser), PageRequest.of(0, 20), LocaleContextHolder.getLocale(), false)
+
+        assert casePage.getContent().size() == 1 && casePage.getContent()[0].stringId == case_.stringId && case_.viewActors.contains(defaultGroupId)
+        workflowService.deleteCase(case_.getStringId())
+    }
+
+    @Test
+    void testSearchElasticViewWithUserWithNegActorRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", ActorTransformer.toLoggedUser(testUser)).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "view_ul_neg": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
         case_ = workflowService.save(case_)
@@ -195,7 +223,31 @@ class ElasticSearchViewPermissionTest {
     }
 
     @Test
-    void testSearchElasticViewWithUserWithNegativeRoleAndPosUserRef() {
+    void testSearchElasticViewWithGroupWithNegActorRef() {
+        String defaultGroupId = groupService.getDefaultSystemGroup().stringId
+        assert testUser.getGroupIds().contains(defaultGroupId)
+
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", ActorTransformer.toLoggedUser(testUser)).getCase()
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_neg": [
+                        "value": [defaultGroupId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        case_ = workflowService.save(case_)
+        sleep(4000)
+
+        CaseSearchRequest caseSearchRequest = new CaseSearchRequest()
+        caseSearchRequest.process = [new CaseSearchRequest.PetriNet(netWithUserRefs.getIdentifier())] as List
+        Page<Case> casePage = elasticCaseService.search([caseSearchRequest] as List, ActorTransformer.toLoggedUser(testUser), PageRequest.of(0, 20), LocaleContextHolder.getLocale(), false)
+
+        assert casePage.getContent().size() == 0 && case_.negativeViewActors.contains(defaultGroupId)
+        workflowService.deleteCase(case_.getStringId())
+    }
+
+    @Test
+    void testSearchElasticViewWithUserWithNegativeRoleAndPosActorRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", ActorTransformer.toLoggedUser(testUser)).getCase()
         ProcessRole negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
         userService.addRole(testUser, negViewRole.getStringId())
@@ -203,7 +255,7 @@ class ElasticSearchViewPermissionTest {
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "view_ul_pos": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
         case_ = workflowService.save(case_)
