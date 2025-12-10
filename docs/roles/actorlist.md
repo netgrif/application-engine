@@ -1,6 +1,6 @@
-# UserList and UsersRef
+# ActorList and ActorRef
 
-## UserList
+## ActorList
 
 ActorList is a type of data field. Values of this field represent actors (users, groups, ...) in system. Some basic information about
 this field:
