@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-    <id>user_list</id>
-    <title>User list</title>
+    <id>actor_list</id>
+    <title>Actor list</title>
     <initials>ULT</initials>
     <data type="actorList">
         <id>users_1</id>
@@ -19,7 +19,7 @@
             <id>upload</id>
             <actions phase="post">
                 <action>
-                    createCase("user_list", "User List")
+                    createCase("actor_list", "Actor List")
                 </action>
             </actions>
         </event>
@@ -39,7 +39,7 @@
             <id>pdf</id>
             <actions phase="post">
                 <action>
-                    createCase("user_list", "Destruct")
+                    createCase("actor_list", "Destruct")
                 </action>
             </actions>
         </event>
