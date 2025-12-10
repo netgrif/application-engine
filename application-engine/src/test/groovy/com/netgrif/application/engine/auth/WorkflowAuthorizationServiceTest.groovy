@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.auth
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
@@ -72,6 +73,9 @@ class WorkflowAuthorizationServiceTest {
 
     @Autowired
     private IDataService dataService
+
+    @Autowired
+    private GroupService groupService
 
     @Autowired
     TestHelper testHelper
@@ -219,7 +223,7 @@ class WorkflowAuthorizationServiceTest {
 
 
     @Test
-    void testCanCallDeleteRoleFalseUserRefTrue() {
+    void testCanCallDeleteRoleFalseActorRefTrue() {
         ProcessRole posDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
         ProcessRole negDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_neg_role")
 
@@ -234,7 +238,15 @@ class WorkflowAuthorizationServiceTest {
                         "type": "actorList"
                 ]
         ] as Map)).getCase()
-        workflowService.save(case_)
+
+        assert workflowAuthorizationService.canCallDelete(ActorTransformer.toLoggedUser(testUser), case_.getStringId())
+
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "pos_user_list": [
+                        "value": [groupService.getDefaultSystemGroup().stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
 
         assert workflowAuthorizationService.canCallDelete(ActorTransformer.toLoggedUser(testUser), case_.getStringId())
 
@@ -243,7 +255,7 @@ class WorkflowAuthorizationServiceTest {
     }
 
     @Test
-    void testCanCallDeleteRoleFalseUserRefTrueUserRefFalse() {
+    void testCanCallDeleteRoleFalseActorRefTrueActorRefFalse() {
         ProcessRole posDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
         ProcessRole negDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_neg_role")
 
@@ -258,11 +270,10 @@ class WorkflowAuthorizationServiceTest {
                         "type": "actorList"
                 ],
                 "neg_user_list": [
-                        "value": [testUser.stringId],
+                        "value": [groupService.getDefaultSystemGroup().stringId],
                         "type": "actorList"
                 ]
         ] as Map)).getCase()
-        workflowService.save(case_)
 
         assert !workflowAuthorizationService.canCallDelete(ActorTransformer.toLoggedUser(testUser), case_.getStringId())
 

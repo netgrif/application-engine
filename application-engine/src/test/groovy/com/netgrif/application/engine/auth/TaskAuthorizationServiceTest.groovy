@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.auth
 
+import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
@@ -90,6 +91,9 @@ class TaskAuthorizationServiceTest {
 
     @Autowired
     private IWorkflowService workflowService
+
+    @Autowired
+    private GroupService groupService
 
     @Autowired
     TestHelper testHelper
@@ -352,10 +356,18 @@ class TaskAuthorizationServiceTest {
                         "type": "actorList"
                 ]
         ] as Map)).getCase()
-        workflowService.save(case_)
-        sleep(4000)
 
         assert taskAuthorizationService.canCallAssign(ActorTransformer.toLoggedUser(testUser), taskId)
+
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "assign_pos_ul": [
+                        "value": [groupService.getDefaultSystemGroup().stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+
+        assert taskAuthorizationService.canCallAssign(ActorTransformer.toLoggedUser(testUser), taskId)
+
         workflowService.deleteCase(case_.stringId)
     }
 
@@ -369,10 +381,18 @@ class TaskAuthorizationServiceTest {
                         "type": "actorList"
                 ]
         ] as Map)).getCase()
-        workflowService.save(case_)
-        sleep(4000)
 
         assert !taskAuthorizationService.canCallAssign(ActorTransformer.toLoggedUser(testUser), taskId)
+
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "assign_neg_ul": [
+                        "value": [groupService.getDefaultSystemGroup().stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+
+        assert !taskAuthorizationService.canCallAssign(ActorTransformer.toLoggedUser(testUser), taskId)
+
         workflowService.deleteCase(case_.stringId)
     }
 
@@ -388,10 +408,18 @@ class TaskAuthorizationServiceTest {
                         "type": "actorList"
                 ]
         ] as Map)).getCase()
-        workflowService.save(case_)
-        sleep(4000)
 
         assert taskAuthorizationService.canCallAssign(ActorTransformer.toLoggedUser(testUser), taskId)
+
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "assign_pos_ul": [
+                        "value": [groupService.getDefaultSystemGroup().stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+
+        assert taskAuthorizationService.canCallAssign(ActorTransformer.toLoggedUser(testUser), taskId)
+
         userService.removeRole(testUser, positiveRole.get_id())
         workflowService.deleteCase(case_.stringId)
     }
@@ -432,11 +460,18 @@ class TaskAuthorizationServiceTest {
                         "type": "actorList"
                 ]
         ] as Map)).getCase()
-        workflowService.save(case_)
-        sleep(4000)
 
         taskService.assignTask(ActorTransformer.toLoggedUser(testUser), taskId)
         assert taskAuthorizationService.canCallFinish(ActorTransformer.toLoggedUser(testUser), taskId)
+
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "finish_pos_ul": [
+                        "value": [groupService.getDefaultSystemGroup().stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        assert taskAuthorizationService.canCallFinish(ActorTransformer.toLoggedUser(testUser), taskId)
+
         workflowService.deleteCase(case_.stringId)
     }
 
@@ -450,11 +485,18 @@ class TaskAuthorizationServiceTest {
                         "type": "actorList"
                 ]
         ] as Map)).getCase()
-        workflowService.save(case_)
-        sleep(4000)
 
         taskService.assignTask(ActorTransformer.toLoggedUser(testUser), taskId)
         assert !taskAuthorizationService.canCallFinish(ActorTransformer.toLoggedUser(testUser), taskId)
+
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "finish_neg_ul": [
+                        "value": [groupService.getDefaultSystemGroup().stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        assert !taskAuthorizationService.canCallFinish(ActorTransformer.toLoggedUser(testUser), taskId)
+
         workflowService.deleteCase(case_.stringId)
     }
 
@@ -470,11 +512,18 @@ class TaskAuthorizationServiceTest {
                         "type": "actorList"
                 ]
         ] as Map)).getCase()
-        workflowService.save(case_)
-        sleep(4000)
 
         taskService.assignTask(ActorTransformer.toLoggedUser(testUser), taskId)
         assert taskAuthorizationService.canCallFinish(ActorTransformer.toLoggedUser(testUser), taskId)
+
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "finish_pos_ul": [
+                        "value": [groupService.getDefaultSystemGroup().stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        assert taskAuthorizationService.canCallFinish(ActorTransformer.toLoggedUser(testUser), taskId)
+
         userService.removeRole(testUser, positiveRole.get_id())
         workflowService.deleteCase(case_.stringId)
     }
