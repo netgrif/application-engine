@@ -1,7 +1,5 @@
 # Process permissions
 
-[//]: # (todo 2285 user refs)
-
 In NAE, permissions represent a layer in security of processes modeled and implemented in Petriflow. Using permissions
 the developer can define, who can see and edit the processes, cases and tasks, who can execute events and actions.
 
@@ -310,18 +308,18 @@ defined, as child element of the root **document** element:
 
 The value of this data field can be modified and managed using Actions API, as in case other types of data field.
 
-### User reference
+### Actor reference
 
-Defined user lists can be referenced with **userRef** element, this element will contain the definition of permissions.
-Permission documentation can be found [here](#Permissions). User list can be referenced as follows:
+Defined actor lists can be referenced with **actorRef** element, this element will contain the definition of permissions.
+Permission documentation can be found [here](#Permissions). Actor list can be referenced as follows:
 
-- as a child element of the `document` tag for referencing user list on cases:
+- as a child element of the `document` tag for referencing actor list on cases:
 
 ```
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	...
 	<actorRef>
-		<id>user_list_1</id>
+		<id>actor_list_1</id>
 		<caseLogic>
 			<create>false</view>
 			<view>true</view>
@@ -331,7 +329,7 @@ Permission documentation can be found [here](#Permissions). User list can be ref
 </document>
 ```
 
-- as a child element of the `transition` tag for referencing user list on tasks:
+- as a child element of the `transition` tag for referencing actor list on tasks:
 
 ```
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
@@ -339,7 +337,7 @@ Permission documentation can be found [here](#Permissions). User list can be ref
 	<transition>
 		...
 		<actorRef>
-		<id>user_list_1</id>
+		<id>actor_list_1</id>
 			<logic>
 				<finish>false</view>
 				<view>true</view>
@@ -354,23 +352,23 @@ Permission documentation can be found [here](#Permissions). User list can be ref
 ## Permissions
 
 Permissions can manage access and execution rights to Case and Task objects. These permissions are assigned to user
-through **roleRef** and **userRef**. There may be the case, when a user can have multiple role assigned and be present
-in multiple user list, and the references of the roles and user lists define the same permission but with other flags (
-e.g. one role reference grants the permission, the other forbids it, one user list reference grants the permission, the other
+through **roleRef** and **actorRef**. There may be the case, when a user can have multiple role assigned and be present
+in multiple actor lists, and the references of the roles and user lists define the same permission but with other flags (
+e.g. one role reference grants the permission, the other forbids it, one actor list reference grants the permission, the other
 forbids it). These complex situations are always resolved according to the following rule:
 
-$$((R_{p} \setminus R_{n}) \cup U_{p}) \setminus U_{n}$$
+$$((R_{p} \setminus R_{n}) \cup A_{p}) \setminus A_{n}$$
 
 - $\setminus$ - seminus, e.g. $A \setminus B$ = every element from A that is not in B
 - $\cup$ - union of sets
 - $R_{p}$ - set of roles that are assigned to user and define given permission with `true` (grant the permission)
 - $R_{n}$ - set of roles that are assigned to user and define given permission with `false` (forbid the permission)
-- $U_{p}$ - set of user lists that user is part of and define given permission with `true` (grant the permission)
-- $U_{n}$ - set of user lists that user is part of and define given permission with `false` (forbid the permission)
+- $A_{p}$ - set of actor lists that user is part of and define given permission with `true` (grant the permission)
+- $A_{n}$ - set of actor lists that user is part of and define given permission with `false` (forbid the permission)
 
 Explained in words:
-A user list is stronger than a role and a forbidding/revoking (negative - `false`) association is stronger than a granting (positive - `true`) association. 
-A user must be granted a permission from at least one source in order to be allowed to perform an operation.
+An actor list is stronger than a role and a forbidding/revoking (negative - `false`) association is stronger than a granting (positive - `true`) association. 
+An actor must be granted a permission from at least one source in order to be allowed to perform an operation.
 A granting (positive) user list association overrides a forbidding (negative) role association.
 A forbidding (negative) user list association overrides any granting (positive) association.
 
@@ -378,7 +376,7 @@ There are two types of permissions - case permissions and task permissions.
 
 ### Case permissions
 
-In the XML model of process, you can define permissions for Case using **roleRef** and **userRef** inside the root **document** element.
+In the XML model of process, you can define permissions for Case using **roleRef** and **actorRef** inside the root **document** element.
 Each reference element has a child element called **caseLogic**, which can be used to define the
 permissions for case created from process as follows:
 
@@ -395,7 +393,7 @@ permissions for case created from process as follows:
 	</roleRef>
 	...
 	<actorRef>
-		<id>user_list_1</id>
+		<id>actor_list_1</id>
 		<caseLogic>
 			<create>true</view>
 			<delete>true</delete>
@@ -410,23 +408,23 @@ permissions for case created from process as follows:
 
 If this permission is set to **true** in **roleRef**, user with this permission is allowed to create cases from the
 process. If it is **false**, user with this permission cannot create cases from the given process. This permission **cannot
-be defined** in a **userRef**.
+be defined** in an **actorRef**.
 
 #### Delete
 
 If this permission is set to **true**, user with this permission is allowed to delete cases created from the process. If
 it is **false**, user with this permission cannot delete cases created from given process. This permission can be
-defined in both **roleRef** and **userRef**.
+defined in both **roleRef** and **actorRef**.
 
 #### View
 
 If this permission is set to **true**, user with this permission can see cases created from the process. If it is
 **false**, user with this permission cannot see cases created from given process. This permission can be defined in
-both **roleRef** and **userRef**.
+both **roleRef** and **actorRef**.
 
 ### Task permissions
 
-In the XML model of process, you can define permissions for Task using **roleRef** and **userRef** inside the **
+In the XML model of process, you can define permissions for Task using **roleRef** and **actorRef** inside the **
 transition** element. Each reference element has a child element called **logic**, which can be used to define the
 permissions for task created from transition as follows:
 
@@ -445,7 +443,7 @@ permissions for task created from transition as follows:
 		</roleRef>
 		...
 		<actorRef>
-			<id>user_list_1</id>
+			<id>actor_list_1</id>
 			<logic>
 				<finish>false</view>
 				<view>true</view>
@@ -461,40 +459,40 @@ permissions for task created from transition as follows:
 
 If this permission is set to **true**, user with this permission can assign task to themselves created from the
 transition. If it is **false**, user with this permission cannot assign task to themselves created from the
-transition. This permission can be defined in both **roleRef** and **userRef**.
+transition. This permission can be defined in both **roleRef** and **actorRef**.
 
 #### Cancel
 
 If this permission is set to **true**, user with this permission can cancel task created from the transition. If it
 is **false**, user with this permission cannot cancel task created from the transition. This permission can be defined
-in both **roleRef** and **userRef**.
+in both **roleRef** and **actorRef**.
 
 #### Delegate
 
 If this permission is set to **true**, user with this permission can assign task to others created from the
 transition. If it is **false**, user with this permission cannot assign task to others created from the transition. This
-permission can be defined in both **roleRef** and **userRef**.
+permission can be defined in both **roleRef** and **actorRef**.
 
 #### Finish
 
 If this permission is set to **true**, user with this permission can finish task created from the transition. If it
 is **false**, user with this permission cannot finish task created from the transition. This permission can be defined
-in both **roleRef** and **userRef**.
+in both **roleRef** and **actorRef**.
 
 #### View
 
 If this permission is set to **true**, user with this permission can see task created from the transition. If it
 is **false**, user with this permission cannot see task created from the transition. This permission can be defined in
-both **roleRef** and **userRef**.
+both **roleRef** and **actorRef**.
 
 #### Set
 
 If this permission is set to **true**, user with this permission can set data on task created from the transition. If
 it is **false**, user with this permission cannot set data on task created from the transition. This permission can be
-defined in both **roleRef** and **userRef**.
+defined in both **roleRef** and **actorRef**.
 
 #### Perform
 
 It is a shortcut to define **assign, cancel, finish, view** and **set** permissions with single line of code. This
-shortcut can be defined in both **roleRef** and **userRef**. A perform permission does not exist by itself, instead it is
+shortcut can be defined in both **roleRef** and **actorRef**. A perform permission does not exist by itself, instead it is
 translated into its components when the process is imported.
