@@ -68,7 +68,7 @@ class UserRefsTest {
             _case = dataService.setData(taskId, ImportHelper.populateDataset([
                     "user_list_1": [
                             "value": [id],
-                            "type": "userList"
+                            "type": "actorList"
                     ]
             ] as Map)).getCase()
             newCases.add(workflowService.save(_case))

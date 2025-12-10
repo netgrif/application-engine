@@ -20,35 +20,35 @@
         <id>finish_neg_role</id>
         <name>finish neg role</name>
     </role>
-    <data type="userList">
+    <data type="actorList">
         <id>assign_pos_ul</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>assign_neg_ul</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>delegate_pos_ul</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>delegate_neg_ul</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>cancel_pos_ul</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>cancel_neg_ul</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>finish_pos_ul</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>finish_neg_ul</id>
         <title/>
     </data>

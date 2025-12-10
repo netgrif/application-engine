@@ -16,7 +16,7 @@
         <id>3</id>
         <title>Dátum odovzdania</title>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>4</id>
         <title>Vedúci práce</title>
         <values>1</values>
@@ -40,12 +40,12 @@
         <id>8</id>
         <title>Posudok vedúceho práce</title>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>9</id>
         <title>Oponent práce</title>
         <values>3</values>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>10</id>
         <title>Autor</title>
         <values>5</values>

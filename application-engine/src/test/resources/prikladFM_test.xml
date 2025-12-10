@@ -40,7 +40,7 @@
         <id>8</id>
         <title>Miestnosť</title>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>9</id>
         <title>Odovzdávajúci</title>
         <values>1</values>

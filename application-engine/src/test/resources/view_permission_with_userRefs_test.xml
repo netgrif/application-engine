@@ -37,11 +37,11 @@
         <id>view_neg_role</id>
         <name>view role</name>
     </role>
-    <data type="userList">
+    <data type="actorList">
         <id>view_ul_pos</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>view_ul_neg</id>
         <title/>
     </data>

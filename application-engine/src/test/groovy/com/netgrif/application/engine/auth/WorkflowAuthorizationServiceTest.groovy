@@ -231,7 +231,7 @@ class WorkflowAuthorizationServiceTest {
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "pos_user_list": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
         workflowService.save(case_)
@@ -255,11 +255,11 @@ class WorkflowAuthorizationServiceTest {
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "pos_user_list": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ],
                 "neg_user_list": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
         workflowService.save(case_)

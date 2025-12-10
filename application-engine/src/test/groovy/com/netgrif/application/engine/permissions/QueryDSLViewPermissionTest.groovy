@@ -143,7 +143,7 @@ class QueryDSLViewPermissionTest {
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "view_ul_pos": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
         case_ = workflowService.save(case_)
@@ -163,7 +163,7 @@ class QueryDSLViewPermissionTest {
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "view_ul_pos": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
         case_ = workflowService.save(case_)
@@ -201,7 +201,7 @@ class QueryDSLViewPermissionTest {
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "view_ul_neg": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
         case_ = workflowService.save(case_)
@@ -221,7 +221,7 @@ class QueryDSLViewPermissionTest {
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "view_ul_pos": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
 

@@ -343,13 +343,13 @@ class TaskAuthorizationServiceTest {
     }
 
     @Test
-    void testCanAssignWithUsersRef() {
+    void testCanAssignWithActorsRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", ActorTransformer.toLoggedUser(testUser)).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "assign_pos_ul": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
         workflowService.save(case_)
@@ -360,13 +360,13 @@ class TaskAuthorizationServiceTest {
     }
 
     @Test
-    void testCannotAssignWithUsersRef() {
+    void testCannotAssignWithActorsRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", ActorTransformer.toLoggedUser(testUser)).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "assign_neg_ul": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
         workflowService.save(case_)
@@ -377,7 +377,7 @@ class TaskAuthorizationServiceTest {
     }
 
     @Test
-    void testCanAssignWithNegRoleAndPosUsersRef() {
+    void testCanAssignWithNegRoleAndPosActorsRef() {
         ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "assign_pos_role")
         userService.addRole(testUser, positiveRole.get_id())
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", ActorTransformer.toLoggedUser(testUser)).getCase()
@@ -385,7 +385,7 @@ class TaskAuthorizationServiceTest {
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "assign_pos_ul": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
         workflowService.save(case_)
@@ -423,13 +423,13 @@ class TaskAuthorizationServiceTest {
     }
 
     @Test
-    void testCanFinishWithUsersRef() {
+    void testCanFinishWithActorsRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", ActorTransformer.toLoggedUser(testUser)).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "finish_pos_ul": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
         workflowService.save(case_)
@@ -441,13 +441,13 @@ class TaskAuthorizationServiceTest {
     }
 
     @Test
-    void testCannotFinishWithUsersRef() {
+    void testCannotFinishWithActorsRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", ActorTransformer.toLoggedUser(testUser)).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "finish_neg_ul": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
         workflowService.save(case_)
@@ -459,7 +459,7 @@ class TaskAuthorizationServiceTest {
     }
 
     @Test
-    void testCanFinishWithNegRoleAndPosUsersRef() {
+    void testCanFinishWithNegRoleAndPosActorsRef() {
         ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "finish_pos_role")
         userService.addRole(testUser, positiveRole.get_id())
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", ActorTransformer.toLoggedUser(testUser)).getCase()
@@ -467,7 +467,7 @@ class TaskAuthorizationServiceTest {
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "finish_pos_ul": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
         workflowService.save(case_)

@@ -112,7 +112,7 @@
         <init>pom.xml</init>
     </data>
 
-    <data type="user" immediate="true">
+    <data type="actor" immediate="true">
         <id>user</id>
         <title>User</title>
     </data>
@@ -151,7 +151,7 @@
         <init></init>
     </data>
 
-    <data type="userList" immediate="true">
+    <data type="actorList" immediate="true">
         <id>userList</id>
         <title>User list</title>
         <init></init>

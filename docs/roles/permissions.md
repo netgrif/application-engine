@@ -289,18 +289,18 @@ Permission documentation can be found [here](#Permissions). Roles can be referen
 </document>
 ```
 
-## User list
+## Actor list
 
-In NAE, user list is a type of data field, that is used for managing access of a set of users (who's ID is in the
-given user list) to Petriflow objects and their actions. User list can be defined where other data fields used to be
+In NAE, actor list is a type of data field, that is used for managing access of a set of actors (who's ID is in the
+given actor list) to Petriflow objects and their actions. Actor list can be defined where other data fields used to be
 defined, as child element of the root **document** element:
 
 ```
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	...
-	<data type="userList">
-		<id>user_list_1</id>
-		<title>User list 1</title>
+	<data type="actorList">
+		<id>actor_list_1</id>
+		<title>Actor list 1</title>
 	</data>
 	...
 </document>

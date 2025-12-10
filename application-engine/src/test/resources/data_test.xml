@@ -102,7 +102,7 @@
         <desc>File field description</desc>
     </data>
     <!-- USER -->
-    <data type="user">
+    <data type="actor">
         <id>user</id>
         <title>User</title>
         <placeholder>User field placeholder</placeholder>
@@ -135,8 +135,8 @@
             <allowedNet>processId2</allowedNet>
         </allowedNets>
     </data>
-    <!--  USER LIST  -->
-    <data type="userList">
+    <!--  ACTOR LIST  -->
+    <data type="actorList">
         <id>emptyUserList</id>
         <title>Empty user list</title>
         <desc>User list description</desc>

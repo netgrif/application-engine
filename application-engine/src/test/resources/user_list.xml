@@ -4,7 +4,7 @@
     <id>user_list</id>
     <title>User list</title>
     <initials>ULT</initials>
-    <data type="userList">
+    <data type="actorList">
         <id>users_1</id>
     </data>
     <actorRef>

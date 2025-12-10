@@ -33,7 +33,7 @@
 		<placeholder>Enter group ID</placeholder>
 		<desc>ID of organization group</desc>
 	</data>
-	<data type="user">
+	<data type="actor">
 		<id>author</id>
 		<title>Group Author</title>
 	</data>
@@ -54,7 +54,7 @@
 			workflowService.save(useCase)
 		</action>
 	</data>
-	<data type="user">
+	<data type="actor">
 		<id>user_selection</id>
 		<title>Select user</title>
 		<placeholder>No user selected</placeholder>

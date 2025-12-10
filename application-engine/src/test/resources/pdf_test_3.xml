@@ -154,7 +154,7 @@
         <id>boolean_1</id>
         <title>set label?</title>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>[object Object]_0</id>
         <title>set label</title>
         <placeholder>placeholder</placeholder>

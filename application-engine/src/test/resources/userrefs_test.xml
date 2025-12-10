@@ -37,11 +37,11 @@
         <id>remove</id>
         <title>Remove from user ref</title>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>user_list_1</id>
         <title>User list 1</title>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>user_list_2</id>
         <title>User list 2</title>
     </data>

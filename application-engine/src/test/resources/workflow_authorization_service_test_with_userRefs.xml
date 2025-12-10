@@ -56,11 +56,11 @@
         <id>create_neg_role</id>
         <name>create role</name>
     </role>
-    <data type="userList">
+    <data type="actorList">
         <id>pos_user_list</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>neg_user_list</id>
         <title/>
     </data>

@@ -32,16 +32,16 @@ public abstract class ElasticViewPermissionService {
         /* Positive view role set-minus negative view role */
         BoolQuery positiveRoleSetMinusNegativeRole = setMinus(positiveViewRole, negativeViewRole);
 
-        /* Build positive view userList query */
+        /* Build positive view actorList query */
         BoolQuery positiveViewUser = buildPositiveViewActor(viewPermNotExists, user);
 
-        /* Role query union positive view userList */
+        /* Role query union positive view actorList */
         BoolQuery roleSetMinusPositiveUserList = union(positiveRoleSetMinusNegativeRole, positiveViewUser);
 
-        /* Build negative view userList query */
+        /* Build negative view actorList query */
         BoolQuery negativeViewUser = buildNegativeViewActor(user);
 
-        /* Role-UserListPositive set-minus negative view userList */
+        /* Role-UserListPositive set-minus negative view actorList */
         BoolQuery permissionQuery = setMinus(roleSetMinusPositiveUserList, negativeViewUser);
 
         query.filter(permissionQuery._toQuery());

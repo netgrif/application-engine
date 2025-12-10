@@ -75,7 +75,7 @@
         <id>25</id>
         <title name="alarm">Is a burglar alarm fitted and used?</title>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>27</id>
         <title name="property_owner">Property owner</title>
         <values>1</values>

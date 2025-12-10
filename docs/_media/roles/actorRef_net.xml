@@ -32,13 +32,13 @@
         </caseLogic>
     </roleRef>
     <actorRef>
-        <id>user_list_1</id>
+        <id>actor_list_1</id>
         <caseLogic>
             <view>true</view>
         </caseLogic>
     </actorRef>
 
-    <!-- PROCESS USER REFS -->
+    <!-- PROCESS ACTOR REFS -->
     <!-- DATA -->
     <data type="button">
         <id>assign</id>
@@ -49,11 +49,11 @@
         <title>Remove from user ref</title>
     </data>
     <data type="actorList">
-        <id>user_list_1</id>
+        <id>actor_list_1</id>
         <title>User list 1</title>
     </data>
     <data type="actorList">
-        <id>user_list_2</id>
+        <id>actor_list_2</id>
         <title>User list 2</title>
     </data>
     <!-- I18NS -->
@@ -63,8 +63,8 @@
             <id>userAddition</id>
             <actions phase="post">
                 <action>
-                    userList: f.user_list_1;
-                    change userList value { [getDummyUser()] }
+                    actorList: f.actor_list_1;
+                    change actorList value { [getDummyUser()] }
                 </action>
             </actions>
         </event>
@@ -85,7 +85,7 @@
             </logic>
         </roleRef>
         <actorRef>
-            <id>user_list_1</id>
+            <id>actor_list_1</id>
             <logic>
                 <view>false</view>
             </logic>
@@ -99,8 +99,8 @@
                 <id>assign</id>
                 <actions phase="pre">
                     <action>
-                        userList: f.user_list_1;
-                        change userList value { [getDummyUser()] }
+                        actorList: f.actor_list_1;
+                        change actorList value { [getDummyUser()] }
                     </action>
                 </actions>
             </event>
@@ -114,8 +114,8 @@
                 <id>remove</id>
                 <actions phase="pre">
                     <action>
-                        userList: f.user_list_1;
-                        change userList value { [] }
+                        actorList: f.actor_list_1;
+                        change actorList value { [] }
                     </action>
                 </actions>
             </event>

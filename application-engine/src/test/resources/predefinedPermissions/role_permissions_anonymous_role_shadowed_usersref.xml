@@ -16,7 +16,7 @@
 		</caseLogic>
 	</actorRef>
 	<!-- DATA -->
-	<data type="userList">
+	<data type="actorList">
 		<id>userList</id>
 		<title></title>
 	</data>

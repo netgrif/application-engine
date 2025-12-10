@@ -67,7 +67,7 @@ class UserListTest {
         dataService.setData(task.stringId, ImportHelper.populateDataset([
                 "users_1": [
                         "value": [superCreator.getSuperUser().getStringId()],
-                        "type" : "userList"
+                        "type" : "actorList"
                 ]
         ]))
 

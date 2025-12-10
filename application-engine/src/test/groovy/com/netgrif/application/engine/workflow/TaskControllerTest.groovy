@@ -197,7 +197,7 @@ class TaskControllerTest {
         dataService.setData(task.stringId, ImportHelper.populateDataset([
                 "performable_users": [
                         "value": userIds,
-                        "type" : "userList"
+                        "type" : "actorList"
                 ]
         ]))
     }
