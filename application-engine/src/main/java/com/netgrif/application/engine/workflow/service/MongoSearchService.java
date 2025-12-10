@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.querydsl.core.BooleanBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -249,7 +250,7 @@ public class MongoSearchService<T> {
     }
 
     protected BooleanBuilder constructPredicateTree(List<com.querydsl.core.types.Predicate> elementaryPredicates, BiFunction<BooleanBuilder, com.querydsl.core.types.Predicate, BooleanBuilder> nodeOperation) {
-        if (elementaryPredicates.size() == 0)
+        if (elementaryPredicates.isEmpty())
             return new BooleanBuilder();
 
         ArrayDeque<BooleanBuilder> subtrees = new ArrayDeque<>(elementaryPredicates.size() / 2 + elementaryPredicates.size() % 2);
@@ -265,5 +266,14 @@ public class MongoSearchService<T> {
             subtrees.addLast(nodeOperation.apply(subtrees.pollFirst(), subtrees.pollFirst()));
 
         return subtrees.peekFirst();
+    }
+
+    protected Set<String> getActorIdsOfUser(LoggedUser loggedUser) {
+        Set<String> actorIds = loggedUser.getGroupIds();
+        if (actorIds == null) {
+            actorIds = new HashSet<>();
+        }
+        actorIds.add(loggedUser.getStringId());
+        return actorIds;
     }
 }

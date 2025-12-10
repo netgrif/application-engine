@@ -35,7 +35,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
             return null;
         } else if (!isIntersection) {
             singleQueries = singleQueries.stream().filter(Objects::nonNull).collect(Collectors.toList());
-            if (singleQueries.size() == 0) {
+            if (singleQueries.isEmpty()) {
                 // all queries result in an empty set => the entire result is an empty set
                 return null;
             }
@@ -61,8 +61,8 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     protected Predicate buildActorRefQueryConstraint(LoggedUser user) {
-        Predicate userRefConstraints = actorRefQuery(user.getStringId());
-        return constructPredicateTree(Collections.singletonList(userRefConstraints), BooleanBuilder::or);
+        List<Predicate> userConstraints = getActorIdsOfUser(user).stream().map(this::actorRefQuery).toList();
+        return constructPredicateTree(userConstraints, BooleanBuilder::or);
     }
 
     protected Predicate buildViewRoleQueryConstraint(LoggedUser user) {
@@ -75,12 +75,11 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     protected Predicate buildViewActorQueryConstraint(LoggedUser user) {
-        Predicate actorConstraints = viewActorsQuery(user.getStringId());
-        return constructPredicateTree(Collections.singletonList(actorConstraints), BooleanBuilder::or);
+        List<Predicate> userConstraints = getActorIdsOfUser(user).stream().map(this::viewActorsQuery).toList();
+        return constructPredicateTree(userConstraints, BooleanBuilder::or);
     }
 
     public Predicate viewActorsQuery(String actorId) {
-        // todo 2285 user's group ids
         return QTask.task.negativeViewRoles.isEmpty().and(QTask.task.viewActorRefs.isEmpty()).and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewActors.contains(actorId));
     }
 
@@ -94,12 +93,11 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     protected Predicate buildNegativeViewActorsQueryConstraint(LoggedUser user) {
-        Predicate actorConstraints = negativeViewActorsQuery(user.getStringId());
-        return constructPredicateTree(Collections.singletonList(actorConstraints), BooleanBuilder::or);
+        List<Predicate> userConstraints = getActorIdsOfUser(user).stream().map(this::negativeViewActorsQuery).toList();
+        return constructPredicateTree(userConstraints, BooleanBuilder::or);
     }
 
     public Predicate negativeViewActorsQuery(String actorId) {
-        // todo 2285 user's group ids
         return QTask.task.negativeViewActors.contains(actorId);
     }
 
@@ -157,7 +155,6 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     public Predicate actorRefQuery(String actorId) {
-        // todo 2285 user's group ids
         return QTask.task.actors.containsKey(actorId);
     }
 

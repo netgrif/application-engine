@@ -113,12 +113,11 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     protected Predicate buildViewActorQueryConstraint(LoggedUser user) {
-        Predicate roleConstraints = viewActorQuery(user.getStringId());
-        return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
+        List<Predicate> userConstraints = getActorIdsOfUser(user).stream().map(this::viewActorQuery).toList();
+        return constructPredicateTree(userConstraints, BooleanBuilder::or);
     }
 
     public Predicate viewActorQuery(String actorId) {
-        // todo 2285 user's group ids
         return QCase.case$.viewActorRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewActors.contains(actorId));
     }
 
@@ -132,12 +131,11 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     protected Predicate buildNegativeViewActorsQueryConstraint(LoggedUser user) {
-        Predicate roleConstraints = negativeViewActorQuery(user.getStringId());
-        return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
+        List<Predicate> userConstraints = getActorIdsOfUser(user).stream().map(this::negativeViewActorQuery).toList();
+        return constructPredicateTree(userConstraints, BooleanBuilder::or);
     }
 
     public Predicate negativeViewActorQuery(String actorId) {
-        // todo 2285 user's group ids
         return QCase.case$.negativeViewActors.contains(actorId);
     }
 
