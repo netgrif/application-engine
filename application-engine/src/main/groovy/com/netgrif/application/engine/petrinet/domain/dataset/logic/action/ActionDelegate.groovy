@@ -1042,8 +1042,8 @@ class ActionDelegate {
         return actualUser
     }
 
-    AbstractUser assignRole(String roleId, String netId, AbstractUser user = userService.loggedUser) {
-        List<PetriNet> nets = petriNetService.getByIdentifier(netId)
+    AbstractUser assignRole(String roleId, String netId, AbstractUser user = userService.loggedUser, Pageable pageable = Pageable.unpaged()) {
+        List<PetriNet> nets = petriNetService.getByIdentifier(netId, pageable).content
         nets.forEach({ net -> user = assignRole(roleId, net, user) })
         return user
     }
@@ -1063,8 +1063,8 @@ class ActionDelegate {
         return actualUser
     }
 
-    AbstractUser removeRole(String roleId, String netId, AbstractUser user = userService.loggedUser) {
-        List<PetriNet> nets = petriNetService.getByIdentifier(netId)
+    AbstractUser removeRole(String roleId, String netId, AbstractUser user = userService.loggedUser, Pageable pageable = Pageable.unpaged()) {
+        List<PetriNet> nets = petriNetService.getByIdentifier(netId, pageable).content
         nets.forEach({ net -> user = removeRole(roleId, net, user) })
         return user
     }
@@ -1339,7 +1339,12 @@ class ActionDelegate {
     }
 
     def changeUserByEmail(String email, String attribute, def cl) {
-        AbstractUser user = userService.findUserByUsername(email, null)
+        Optional<AbstractUser> userOptional = userService.findUserByUsername(email, null)
+        if (!userOptional.isPresent()) {
+            log.error("Cannot find user with email [" + email + "]")
+            return
+        }
+        AbstractUser user = userOptional.get()
         changeUser(user, attribute, cl)
     }
 
