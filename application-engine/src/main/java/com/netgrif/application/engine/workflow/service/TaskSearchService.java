@@ -152,7 +152,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     public Predicate stringIdQuery(String id) {
-        return QTask.task._id.eq(new ProcessResourceId(id));
+        return QTask.task._id.eq((id == null || id.isEmpty()) ? new ProcessResourceId() : new ProcessResourceId(id));
     }
 
     public Predicate userRefQuery(String userId) {
