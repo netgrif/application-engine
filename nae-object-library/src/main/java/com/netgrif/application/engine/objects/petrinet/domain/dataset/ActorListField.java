@@ -35,7 +35,7 @@ public class ActorListField extends Field<ActorListFieldValue> {
     public Field<?> clone() {
         ActorListField clone = new ActorListField();
         super.clone(clone);
-        clone.setRoles(this.roles);
+        clone.setRoles(this.roles == null ? null : new HashSet<>(this.roles));
         return clone;
     }
 }
