@@ -18,7 +18,7 @@ public class ActorListField extends Field<ActorListFieldValue> {
     }
 
     public ActorListField(String[] roles) {
-        this(new HashSet<>(Arrays.asList(roles)));
+        this(roles == null ? new HashSet<>() : new HashSet<>(Arrays.asList(roles)));
     }
 
     public ActorListField(Set<String> roles) {
