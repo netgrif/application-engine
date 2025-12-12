@@ -224,6 +224,9 @@ public abstract class PetriNet extends PetriNetObject {
     }
 
     public void addActorPermission(String actorFieldId, Map<String, Boolean> permissions) {
+        if (permissions == null || permissions.isEmpty()) {
+            return;
+        }
         if (this.actorRefs.containsKey(actorFieldId) && this.actorRefs.get(actorFieldId) != null) {
             this.actorRefs.get(actorFieldId).putAll(permissions);
         } else {
