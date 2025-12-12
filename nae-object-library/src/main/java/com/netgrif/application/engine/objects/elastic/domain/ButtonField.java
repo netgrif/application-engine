@@ -17,6 +17,11 @@ public abstract class ButtonField extends DataField {
         this.buttonValue = value;
     }
 
+    public void setButtonValue(Integer value) {
+        this.fulltextValue.add(value.toString());
+        this.buttonValue = value;
+    }
+
     @Override
     public Object getValue() {
         return this.buttonValue;
