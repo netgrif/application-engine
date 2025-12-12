@@ -261,7 +261,7 @@ Permission documentation can be found [here](#Permissions). Roles can be referen
 	<roleRef>
 		<id>process_role</id>
 		<caseLogic>
-			<create>false</view>
+			<create>false</create>
 			<view>true</view>
 		</caseLogic>
 	</roleRef>
@@ -279,7 +279,7 @@ Permission documentation can be found [here](#Permissions). Roles can be referen
 		<roleRef>
 		<id>process_role</id>
 			<logic>
-				<finish>false</view>
+				<finish>false</finish>
 				<view>true</view>
 			</logic>
 		</roleRef>
@@ -321,7 +321,7 @@ Permission documentation can be found [here](#Permissions). Actor list can be re
 	<actorRef>
 		<id>actor_list_1</id>
 		<caseLogic>
-			<create>false</view>
+			<create>false</create>
 			<view>true</view>
 		</caseLogic>
 	</actorRef>
@@ -339,7 +339,7 @@ Permission documentation can be found [here](#Permissions). Actor list can be re
 		<actorRef>
 		<id>actor_list_1</id>
 			<logic>
-				<finish>false</view>
+				<finish>false</finish>
 				<view>true</view>
 			</logic>
 		</actorRef>
@@ -386,7 +386,7 @@ permissions for case created from process as follows:
 	<roleRef>
 		<id>process_role</id>
 		<caseLogic>
-			<create>false</view>
+			<create>false</create>
 			<delete>false</delete>
 			<view>false</view>
 		</caseLogic>
@@ -395,7 +395,7 @@ permissions for case created from process as follows:
 	<actorRef>
 		<id>actor_list_1</id>
 		<caseLogic>
-			<create>true</view>
+			<create>true</create>
 			<delete>true</delete>
 			<view>true</view>
 		</caseLogic>
@@ -437,7 +437,7 @@ permissions for task created from transition as follows:
 			<id>process_role</id>
 			<logic>
 				<perform>true</perform>
-				<finish>false</view>
+				<finish>false</finish>
 				<view>true</view>
 			</logic>
 		</roleRef>
@@ -445,7 +445,7 @@ permissions for task created from transition as follows:
 		<actorRef>
 			<id>actor_list_1</id>
 			<logic>
-				<finish>false</view>
+				<finish>false</finish>
 				<view>true</view>
 			</logic>
 		</actorRef>
