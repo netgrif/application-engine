@@ -82,6 +82,8 @@ public abstract class AbstractAuthorizationService {
 
     protected static void putPermissionIfNotAlreadyNegative(Map<String, Boolean> permissions, String permType, Boolean permValue) {
         Boolean existingPermValue = permissions.get(permType);
+        // Overwrite if no existing value OR existing is positive (true).
+        // Existing negative (false) permissions are never overwritten to preserve explicit denials.
         if (existingPermValue == null || existingPermValue) {
             permissions.put(permType, permValue);
         }
