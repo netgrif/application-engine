@@ -15,8 +15,8 @@ public class DataValidator implements IDataValidator {
         validateAttribute(data.getValid() != null && !data.getValid().isEmpty() ? data.getValid() : null, "valid", data.getId());
         validateAttribute(data.getFormat(), "format", data.getId());
         validateAttribute(data.getValues() != null && !data.getValues().isEmpty() ? data.getValues() : null, "values", data.getId());
-        validateAttribute(data.getType() != null && data.getType().equals(DataType.USER) ? data.getType() : null, "type: " + DataType.USER.name(), data.getId());
-        validateAttribute(data.getType() != null && data.getType().equals(DataType.USER_LIST) ? data.getType() : null, "type: " + DataType.USER_LIST.name(), data.getId());
+        validateAttribute(data.getType() == DataType.USER ? Boolean.TRUE : null, "type: " + DataType.USER.name(), data.getId());
+        validateAttribute(data.getType() == DataType.USER_LIST ? Boolean.TRUE : null, "type: " + DataType.USER_LIST.name(), data.getId());
     }
 
     protected void validateAttribute(Object attr, String attrName, String fieldName) {
