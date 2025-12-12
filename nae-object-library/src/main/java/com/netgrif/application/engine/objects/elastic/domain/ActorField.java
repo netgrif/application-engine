@@ -40,9 +40,7 @@ public abstract class ActorField extends DataField {
         for (ActorMappingData mappingData : mappingDataList) {
             this.fullNameValue.add(mappingData.fullName());
             this.actorIdValue.add(mappingData.actorId());
-            if (mappingData.actorRealmId() != null) {
-                this.actorRealmIdValue.add(mappingData.actorRealmId());
-            }
+            this.actorRealmIdValue.add(mappingData.actorRealmId());
             if (mappingData.username() == null) {
                 this.fulltextValue.add(mappingData.fullName());
             } else {
