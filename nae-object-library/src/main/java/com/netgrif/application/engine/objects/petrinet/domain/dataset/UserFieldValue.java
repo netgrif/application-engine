@@ -5,14 +5,9 @@ import com.netgrif.application.engine.objects.elastic.domain.ActorMappingData;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.io.Serial;
-
 @Getter
 @NoArgsConstructor
 public class UserFieldValue extends ActorFieldValue {
-
-    @Serial
-    private static final long serialVersionUID = 5228212326436828485L;
 
     protected String firstName;
     protected String lastName;

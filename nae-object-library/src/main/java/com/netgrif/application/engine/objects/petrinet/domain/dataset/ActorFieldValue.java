@@ -5,12 +5,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class ActorFieldValue implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -6421919316454802530L;
 
     protected String id;
     protected String realmId;
@@ -21,6 +26,6 @@ public abstract class ActorFieldValue implements Serializable {
     public abstract ActorMappingData buildMappingData();
 
     public int hashCode() {
-        return this.id.hashCode();
+        return Objects.hashCode(this.id);
     }
 }
