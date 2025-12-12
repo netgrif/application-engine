@@ -369,8 +369,8 @@ $$((R_{p} \setminus R_{n}) \cup A_{p}) \setminus A_{n}$$
 Explained in words:
 An actor list is stronger than a role and a forbidding/revoking (negative - `false`) association is stronger than a granting (positive - `true`) association. 
 An actor must be granted a permission from at least one source in order to be allowed to perform an operation.
-A granting (positive) user list association overrides a forbidding (negative) role association.
-A forbidding (negative) user list association overrides any granting (positive) association.
+A granting (positive) actor list association overrides a forbidding (negative) role association.
+A forbidding (negative) actor list association overrides any granting (positive) association.
 
 There are two types of permissions - case permissions and task permissions.
 
