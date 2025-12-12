@@ -269,10 +269,7 @@ public class MongoSearchService<T> {
     }
 
     protected Set<String> getActorIdsOfUser(LoggedUser loggedUser) {
-        Set<String> actorIds = loggedUser.getGroupIds();
-        if (actorIds == null) {
-            actorIds = new HashSet<>();
-        }
+        Set<String> actorIds = loggedUser.getGroupIds() == null ? new HashSet<>() : new HashSet<>(loggedUser.getGroupIds());
         actorIds.add(loggedUser.getStringId());
         return actorIds;
     }

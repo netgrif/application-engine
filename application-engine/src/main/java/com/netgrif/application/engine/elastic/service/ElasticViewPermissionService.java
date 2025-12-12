@@ -91,10 +91,7 @@ public abstract class ElasticViewPermissionService {
     }
 
     private TermsQueryField buildTermsQueryFieldOfUser(LoggedUser loggedUser) {
-        Set<String> actorIds = loggedUser.getGroupIds();
-        if (actorIds == null) {
-            actorIds = new HashSet<>();
-        }
+        Set<String> actorIds = loggedUser.getGroupIds() == null ? new HashSet<>() : new HashSet<>(loggedUser.getGroupIds());
         actorIds.add(loggedUser.getStringId());
         return new TermsQueryField.Builder()
                 .value(actorIds.stream().map(FieldValue::of).toList())
