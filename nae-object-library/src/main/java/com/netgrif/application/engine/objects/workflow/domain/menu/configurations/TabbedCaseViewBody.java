@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.objects.workflow.domain.menu.configurations;
 
+import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemView;
 import com.netgrif.application.engine.objects.workflow.domain.menu.ToDataSetOutcome;
@@ -15,7 +16,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class TabbedCaseViewBody extends ViewBody {
     private String viewSearchType = "fulltext_advanced";
-    private String createCaseButtonTitle;
+    private I18nString createCaseButtonTitle = new I18nString("");
     private String createCaseButtonIcon = "add";
     private boolean requireTitleInCreation = true;
     private boolean showCreateCaseButton = true;
@@ -45,7 +46,7 @@ public class TabbedCaseViewBody extends ViewBody {
 
         outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_VIEW_SEARCH_TYPE, FieldType.ENUMERATION_MAP,
                 this.viewSearchType);
-        outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_CREATE_CASE_BUTTON_TITLE, FieldType.TEXT,
+        outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_CREATE_CASE_BUTTON_TITLE, FieldType.I18N,
                 this.createCaseButtonTitle);
         outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_CREATE_CASE_BUTTON_ICON, FieldType.TEXT,
                 this.createCaseButtonIcon);

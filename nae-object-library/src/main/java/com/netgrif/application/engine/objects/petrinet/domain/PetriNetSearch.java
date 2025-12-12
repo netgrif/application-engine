@@ -28,6 +28,8 @@ public class PetriNetSearch {
 
     private ActorRef author;
 
+    private List<String> roles;
+
     private List<String> negativeViewRoles;
 
     private Map<String, String> tags;
