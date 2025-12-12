@@ -66,7 +66,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         } else if (netField instanceof FileListField) {
             return this.transformFileListField(caseField);
         } else if (netField instanceof com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorListField) {
-            return this.transformUserListField(caseField);
+            return this.transformActorListField(caseField);
         } else if (netField instanceof com.netgrif.application.engine.objects.petrinet.domain.dataset.I18nField) {
             return this.transformI18nField(caseField, (com.netgrif.application.engine.objects.petrinet.domain.dataset.I18nField) netField);
         } else if (netField instanceof com.netgrif.application.engine.objects.petrinet.domain.dataset.CaseField) {
@@ -218,7 +218,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.ActorField(actorFieldValue.buildMappingData()));
     }
 
-    protected Optional<DataField> transformUserListField
+    protected Optional<DataField> transformActorListField
             (com.netgrif.application.engine.objects.workflow.domain.DataField actorListField) {
         ActorListFieldValue actorListFieldValue = (ActorListFieldValue) actorListField.getValue();
         List<ActorMappingData> actorMappingDataList = actorListFieldValue.getActorValues().stream()
