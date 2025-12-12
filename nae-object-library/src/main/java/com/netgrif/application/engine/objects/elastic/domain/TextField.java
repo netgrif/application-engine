@@ -14,7 +14,7 @@ public abstract class TextField extends DataField {
     protected List<String> textValue;
 
     public TextField(String value) {
-        this(List.of(value));
+        this(value != null ? List.of(value) : List.of());
     }
 
     public TextField(List<String> values) {
