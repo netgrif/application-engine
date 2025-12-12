@@ -103,7 +103,7 @@ actorList-actorRef combo is the best way to do so. You have to follow these step
         4. *cancel* - enable or disable canceling of tasks
         5. *finish* - enable or disable finish of tasks
 
-[Permission resolution](roles/permissions.md?id=permissions)
+[Permission resolution](permissions.md?id=permissions)
 
 [ActorRef Petri Net](../_media/roles/actorRef_functions.groovy)
 
