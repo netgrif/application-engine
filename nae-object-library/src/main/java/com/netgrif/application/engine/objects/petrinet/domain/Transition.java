@@ -135,6 +135,9 @@ public class Transition extends Node {
     }
 
     public void addActorRef(String actorFieldId, Map<String, Boolean> permissions) {
+        if (actorFieldId == null) {
+            throw new IllegalArgumentException("actorFieldId must not be null");
+        }
         if (actorRefs.containsKey(actorFieldId) && actorRefs.get(actorFieldId) != null) {
             actorRefs.get(actorFieldId).putAll(permissions);
         } else {
