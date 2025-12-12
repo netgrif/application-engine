@@ -274,7 +274,13 @@ public class ExportService implements IExportService {
                 fieldValue = String.join(";", ((TaskField) fieldData).getValue());
                 break;
             case ACTOR:
-                fieldValue = ((UserFieldValue) fieldData).getUsername();
+                if (fieldData instanceof UserFieldValue) {
+                    fieldValue = ((UserFieldValue) fieldData).getUsername();
+                } else if (fieldData instanceof GroupFieldValue) {
+                    fieldValue = ((GroupFieldValue) fieldData).getName();
+                } else {
+                    fieldValue = "";
+                }
                 break;
             case DATE:
                 fieldValue = ((LocalDate) fieldData).toString();
