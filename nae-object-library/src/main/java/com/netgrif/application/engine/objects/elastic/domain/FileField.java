@@ -61,6 +61,9 @@ public abstract class FileField extends DataField {
     }
 
     private static String nameWithExtension(String fileName, String extension) {
+        if (extension == null || extension.isEmpty()) {
+            return fileName;
+        }
         return fileName + "." + extension;
     }
 
