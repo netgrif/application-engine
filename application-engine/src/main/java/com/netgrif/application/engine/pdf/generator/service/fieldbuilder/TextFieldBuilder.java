@@ -57,7 +57,7 @@ public class TextFieldBuilder extends FieldBuilder {
                 value = field.getValue() != null ? resolveFileListNames((FileListFieldValue) field.getValue()) : "";
                 break;
             case ACTOR:
-                value = field.getValue() != null ? ((UserFieldValue) field.getValue()).getFullName() : "";
+                value = field.getValue() != null ? ((ActorFieldValue) field.getValue()).getFullName() : "";
                 break;
             case ACTORLIST:
                 value = field.getValue() != null ? ((ActorListFieldValue) field.getValue()).getActorValues().stream()
