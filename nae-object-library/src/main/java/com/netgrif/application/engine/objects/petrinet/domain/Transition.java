@@ -138,10 +138,11 @@ public class Transition extends Node {
         if (actorFieldId == null) {
             throw new IllegalArgumentException("actorFieldId must not be null");
         }
+        Map<String, Boolean> safePermissions = (permissions == null) ? new HashMap<>() : permissions;
         if (actorRefs.containsKey(actorFieldId) && actorRefs.get(actorFieldId) != null) {
-            actorRefs.get(actorFieldId).putAll(permissions);
+            actorRefs.get(actorFieldId).putAll(safePermissions);
         } else {
-            actorRefs.put(actorFieldId, permissions);
+            actorRefs.put(actorFieldId, safePermissions);
         }
     }
 
