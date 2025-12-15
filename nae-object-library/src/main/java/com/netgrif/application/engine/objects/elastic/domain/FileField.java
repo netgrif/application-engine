@@ -31,6 +31,9 @@ public abstract class FileField extends DataField {
         this.fileExtensionValue = new ArrayList<>();
         this.filePath = new ArrayList<>();
         for (FileFieldValue fileFieldValue : fileFieldValues) {
+            if (fileFieldValue == null) {
+                continue;
+            }
             FileNameAndExtension extracted = this.extractFileExtensionFromName(fileFieldValue.getName());
             this.fileNameValue.add(extracted.name);
             this.fileExtensionValue.add(extracted.extension);
