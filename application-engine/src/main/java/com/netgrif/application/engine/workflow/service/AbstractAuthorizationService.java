@@ -53,6 +53,8 @@ public abstract class AbstractAuthorizationService {
         if (user.getGroupIds().isEmpty()) {
             return permissions;
         } else {
+            // Defensive copy: do not mutate docPermissions' backing maps
+            permissions = (permissions == null) ? null : new HashMap<>(permissions);
             Set<String> intersectionOfActorIds = new HashSet<>(docPermissions.keySet());
             intersectionOfActorIds.retainAll(user.getGroupIds());
 
