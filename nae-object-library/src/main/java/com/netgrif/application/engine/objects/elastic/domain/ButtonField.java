@@ -13,7 +13,7 @@ public abstract class ButtonField extends DataField {
     protected Integer buttonValue;
 
     public ButtonField(Integer value) {
-        super(value.toString());
+        super(value == null ? null : value.toString());
         this.buttonValue = value;
     }
 
