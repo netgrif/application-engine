@@ -66,10 +66,8 @@ public abstract class AbstractAuthorizationService {
                 permissions = new HashMap<>();
             }
 
-            for (Map.Entry<String, Map<String, Boolean>> entry : docPermissions.entrySet()) {
-                if (intersectionOfActorIds.contains(entry.getKey())) {
-                    putPermissionIfNotAlreadyNegative(permissions, entry.getValue());
-                }
+            for (String actorId : intersectionOfActorIds) {
+                putPermissionIfNotAlreadyNegative(permissions, docPermissions.get(actorId));
             }
 
             return permissions;
