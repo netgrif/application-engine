@@ -122,8 +122,9 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
     protected Optional<DataField> transformStringCollectionField(com.netgrif.application.engine.objects.workflow.domain.DataField dataField,
                                                                  com.netgrif.application.engine.objects.petrinet.domain.dataset.StringCollectionField netField) {
-        if (dataField.getValue() != null && dataField.getValue() instanceof Collection && !((Collection<?>) dataField.getValue()).isEmpty()) {
-            return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.StringCollectionField((List<String>) dataField.getValue()));
+        if (dataField.getValue() != null && dataField.getValue() instanceof Collection<?> dataFieldValue && !dataFieldValue.isEmpty()) {
+            List<String> dataFieldValueAsList = dataFieldValue.stream().map(String::valueOf).toList();
+            return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.StringCollectionField(dataFieldValueAsList));
         }
         return Optional.empty();
     }
