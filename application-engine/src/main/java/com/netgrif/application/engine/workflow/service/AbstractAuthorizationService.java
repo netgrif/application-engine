@@ -77,6 +77,9 @@ public abstract class AbstractAuthorizationService {
     }
 
     protected static void putPermissionIfNotAlreadyNegative(Map<String, Boolean> permissions, Map<String, Boolean> newPermissions) {
+        if (newPermissions == null) {
+            return;
+        }
         for (Map.Entry<String, Boolean> entry : newPermissions.entrySet()) {
             putPermissionIfNotAlreadyNegative(permissions, entry.getKey(), entry.getValue());
         }
