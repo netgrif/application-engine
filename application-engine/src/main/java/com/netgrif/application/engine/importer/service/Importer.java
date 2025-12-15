@@ -49,8 +49,6 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import java.io.*;
 import java.nio.file.Path;
