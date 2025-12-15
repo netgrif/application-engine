@@ -134,6 +134,10 @@ public abstract class PetriNet extends PetriNetObject {
     @Setter
     private Map<String, String> tags;
 
+    @Getter
+    @Setter
+    private Set<String> pluginDependencies;
+
     public PetriNet() {
         this._id = new ObjectId();
         this.identifier = "Default";
@@ -157,6 +161,7 @@ public abstract class PetriNet extends PetriNetObject {
         userRefs = new HashMap<>();
         functions = new LinkedList<>();
         tags = new HashMap<>();
+        pluginDependencies = new HashSet<>();
     }
 
     public PetriNet(PetriNet petriNet) {
@@ -192,6 +197,7 @@ public abstract class PetriNet extends PetriNetObject {
         this.defaultRoleEnabled = petriNet.isDefaultRoleEnabled();
         this.anonymousRoleEnabled = petriNet.isAnonymousRoleEnabled();
         this.author = petriNet.getAuthor();
+        this.pluginDependencies = petriNet.getPluginDependencies();
         initializeArcs();
     }
 

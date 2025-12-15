@@ -49,11 +49,15 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -67,6 +71,8 @@ public class Importer {
     public static final String DEFAULT_FIELD_TEMPLATE = "material";
     public static final String DEFAULT_FIELD_APPEARANCE = "outline";
     public static final String DEFAULT_FIELD_ALIGNMENT = null;
+    public static final String PLUGIN_STRING_REGEX = "(?<=\\bPlugin\\.)[^.]+";
+    public static final Pattern PLUGIN_STRING_PATTERN =  Pattern.compile(PLUGIN_STRING_REGEX);
 
     @Getter
     protected Document document;
@@ -222,6 +228,7 @@ public class Importer {
         resolveCaseEvents(document.getCaseEvents());
         evaluateFunctions();
         actions.forEach(this::evaluateActions);
+        net.setPluginDependencies(extractPluginDependencies());
 
         if (document.getCaseName() != null && document.getCaseName().isDynamic()) {
             net.setDefaultCaseNameExpression(new Expression(document.getCaseName().getValue()));
@@ -1342,5 +1349,17 @@ public class Importer {
             });
         }
         return tags;
+    }
+
+    @Transactional
+    protected Set<String> extractPluginDependencies() {
+        HashSet<String> plugins = new HashSet<>();
+        for (Action action: this.actions.values()) {
+            Matcher matcher = PLUGIN_STRING_PATTERN.matcher(action.getDefinition());
+            while (matcher.find()) {
+                plugins.add(matcher.group(0));
+            }
+        }
+        return plugins;
     }
 }
