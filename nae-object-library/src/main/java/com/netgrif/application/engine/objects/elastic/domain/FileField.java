@@ -20,7 +20,7 @@ public abstract class FileField extends DataField {
     protected List<String> fileExtensionValue;
 
     public FileField(FileFieldValue fileFieldValue) {
-        this(List.of(fileFieldValue));
+        this(fileFieldValue == null ? null : List.of(fileFieldValue));
     }
 
     public FileField(List<FileFieldValue> fileFieldValues) {
