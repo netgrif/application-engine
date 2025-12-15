@@ -18,7 +18,8 @@ public abstract class ButtonField extends DataField {
     }
 
     public void setButtonValue(Integer value) {
-        this.fulltextValue.add(value.toString());
+        this.fulltextValue.clear();
+        this.fulltextValue.add(value == null ? null : value.toString());
         this.buttonValue = value;
     }
 
