@@ -233,6 +233,9 @@ public class DataService implements IDataService {
             String fieldId = entry.getKey();
             DataField dataField = useCase.getDataSet().get(fieldId);
             if (dataField != null) {
+                if (!isDataFieldEditable(dataField, task.getTransitionId())) {
+                    throw new IllegalArgumentException("Cannot edit data field [" + fieldId + "], which is not editable on transition [" + task.getTransitionId() + "].");
+                }
                 Field field = useCase.getPetriNet().getField(fieldId).get();
                 outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task, params));
                 if (outcome.getMessage() == null) {
@@ -301,6 +304,15 @@ public class DataService implements IDataService {
         outcome.setCase(workflowService.save(useCase));
         publisher.publishEvent(new SetDataEvent(outcome));
         return outcome;
+    }
+
+    private boolean isDataFieldEditable(DataField dataField, String transId) {
+        Map<String, Set<FieldBehavior>> behaviorMap = dataField.getBehavior();
+        if (behaviorMap == null) {
+            return false;
+        }
+        Set<FieldBehavior> behaviorSet = behaviorMap.get(transId);
+        return behaviorSet != null && behaviorSet.contains(FieldBehavior.EDITABLE);
     }
 
     @Override
