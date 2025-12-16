@@ -1,16 +1,14 @@
 package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.configuration.cache.WorkerConcurrentCacheManager;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.cache.interceptor.CacheResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-
-import java.util.Set;
 
 
 @Configuration
@@ -27,7 +25,7 @@ public class CacheConfiguration extends CachingConfigurerSupport {
     @Primary
     @Override
     public CacheManager cacheManager() {
-        return new WorkerConcurrentCacheManager(Set.of(properties.getNamespaceFunctions()), properties.getAllCaches().toArray(String[]::new));
+        return new ConcurrentMapCacheManager(properties.getAllCaches().toArray(String[]::new));
     }
 
     @Bean

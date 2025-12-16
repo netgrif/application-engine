@@ -34,7 +34,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     private IPetriNetService petriNetService;
     private Map<String, Closure> actionsCache;
-    private Map<String, List<CachedFunction>> namespaceFunctionsCache;
+    private Map<String, List<CachedFunction>> globalFunctionsCache;
     private Map<String, CachedFunction> functionsCache;
     private final GroovyShell shell;
 
@@ -42,7 +42,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
         this.properties = properties;
         this.actionsCache = new MaxSizeHashMap<>(properties.getActionCacheSize());
         this.functionsCache = new MaxSizeHashMap<>(properties.getFunctionsCacheSize());
-        this.namespaceFunctionsCache = new MaxSizeHashMap<>(properties.getNamespaceCacheSize());
+        this.globalFunctionsCache = new MaxSizeHashMap<>(properties.getGlobalFunctionsCacheSize());
         this.shell = shellFactory.getGroovyShell();
     }
 
@@ -58,21 +58,21 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
             return;
         }
 
-        List<CachedFunction> functions = petriNet.getFunctions(FunctionScope.NAMESPACE).stream()
+        List<CachedFunction> functions = petriNet.getFunctions(FunctionScope.GLOBAL).stream()
                 .map(function -> CachedFunction.build(shell, function))
                 .collect(Collectors.toList());
 
         if (!functions.isEmpty()) {
             evaluateCachedFunctions(functions);
-            namespaceFunctionsCache.put(petriNet.getIdentifier(), functions);
+            globalFunctionsCache.put(petriNet.getIdentifier(), functions);
         } else {
-            namespaceFunctionsCache.remove(petriNet.getIdentifier());
+            globalFunctionsCache.remove(petriNet.getIdentifier());
         }
     }
 
     @Override
     public void reloadCachedFunctions(PetriNet petriNet) {
-        namespaceFunctionsCache.remove(petriNet.getIdentifier());
+        globalFunctionsCache.remove(petriNet.getIdentifier());
         cachePetriNetFunctions(petriNetService.getNewestVersionByIdentifier(petriNet.getIdentifier()));
     }
 
@@ -159,7 +159,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public Map<String, List<CachedFunction>> getNamespaceFunctionCache() {
-        return new HashMap<>(namespaceFunctionsCache);
+        return new HashMap<>(globalFunctionsCache);
     }
 
     @Override
@@ -168,8 +168,8 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     }
 
     @Override
-    public void clearNamespaceFunctionCache() {
-        this.namespaceFunctionsCache = new MaxSizeHashMap<>(properties.getNamespaceCacheSize());
+    public void clearGlobalFunctionCache() {
+        this.globalFunctionsCache = new MaxSizeHashMap<>(properties.getGlobalFunctionsCacheSize());
     }
 
     @Override
