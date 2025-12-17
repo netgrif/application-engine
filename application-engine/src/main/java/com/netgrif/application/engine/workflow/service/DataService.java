@@ -71,6 +71,8 @@ public class DataService implements IDataService {
 
     public static final int MONGO_ID_LENGTH = 24;
 
+    private static final Set<FieldType> setDataForbiddenFieldTypes = Set.of(FieldType.TASK_REF, FieldType.CASE_REF);
+
     @Autowired
     protected ApplicationEventPublisher publisher;
 
@@ -220,6 +222,11 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params) {
+        return setData(task, values, params, false);
+    }
+
+    @Override
+    public SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params, boolean applyForbiddenTypes) {
         Case useCase = workflowService.findOne(task.getCaseId());
         AbstractUser user = userService.getLoggedOrSystem();
 
@@ -231,6 +238,12 @@ public class DataService implements IDataService {
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
         values.fields().forEachRemaining(entry -> {
             String fieldId = entry.getKey();
+            if (applyForbiddenTypes) {
+                FieldType fieldType =  useCase.getField(fieldId).getType();
+                if (setDataForbiddenFieldTypes.contains(fieldType)) {
+                    return;
+                }
+            }
             DataField dataField = useCase.getDataSet().get(fieldId);
             if (dataField != null) {
                 if (!isDataFieldEditable(dataField, task.getTransitionId())) {
