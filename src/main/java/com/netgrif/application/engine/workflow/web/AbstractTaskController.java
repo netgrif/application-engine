@@ -211,7 +211,12 @@ public abstract class AbstractTaskController {
     public EntityModel<EventOutcomeWithMessage> setData(String taskId, ObjectNode dataBody, Locale locale) {
         try {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
-            dataBody.fields().forEachRemaining(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue().deepCopy())));
+            dataBody.fields().forEachRemaining(fieldChangesEntry -> {
+                String taskIdToChangeWith = fieldChangesEntry.getKey();
+                Task taskToChangeWith = taskService.findOne(taskIdToChangeWith);
+                outcomes.put(taskIdToChangeWith, dataService.setData(taskToChangeWith,
+                        fieldChangesEntry.getValue().deepCopy(), new HashMap<>(), true));
+            });
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set",
                     LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
