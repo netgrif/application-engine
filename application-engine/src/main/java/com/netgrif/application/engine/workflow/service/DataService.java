@@ -225,8 +225,11 @@ public class DataService implements IDataService {
         return setData(task, values, params, false);
     }
 
+    /**
+     * todo javadoc
+     * */
     @Override
-    public SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params, boolean applyForbiddenTypes) {
+    public SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params, boolean runSafe) {
         Case useCase = workflowService.findOne(task.getCaseId());
         AbstractUser user = userService.getLoggedOrSystem();
 
@@ -238,7 +241,7 @@ public class DataService implements IDataService {
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
         values.fields().forEachRemaining(entry -> {
             String fieldId = entry.getKey();
-            if (applyForbiddenTypes) {
+            if (runSafe) {
                 FieldType fieldType =  useCase.getField(fieldId).getType();
                 if (setDataForbiddenFieldTypes.contains(fieldType)) {
                     return;
@@ -246,7 +249,7 @@ public class DataService implements IDataService {
             }
             DataField dataField = useCase.getDataSet().get(fieldId);
             if (dataField != null) {
-                if (!isDataFieldEditable(dataField, task.getTransitionId())) {
+                if (runSafe && !isDataFieldEditable(dataField, task.getTransitionId())) {
                     throw new IllegalArgumentException("Cannot edit data field [" + fieldId + "], which is not editable on transition [" + task.getTransitionId() + "].");
                 }
                 Field field = useCase.getPetriNet().getField(fieldId).get();
