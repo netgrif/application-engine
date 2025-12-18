@@ -187,7 +187,7 @@ public class ElasticsearchQuerySanitizerTest {
     }
 
     @Test
-    void shouldNotModifyQueryWithoutReservedCharactersExcludeingSpace() {
+    void shouldNotModifyQueryWithoutReservedCharactersExcludingSpace() {
         String query = "simple search query";
         String[] exclude = {" "};
         String sanitized = ElasticsearchQuerySanitizer.sanitize(query, exclude);
