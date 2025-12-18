@@ -24,7 +24,7 @@ public final class FunctionFactory {
     }
 
     private void checkDeprecatedAttributes(com.netgrif.application.engine.objects.importer.model.Function function) {
-        if (function.getScope() != null && function.getScope().name().equals(NAMESPACE)) {
+        if (function.getScope() != null && function.getScope().value().equals(NAMESPACE)) {
             log.warn("Function scope [NAMESPACE] is deprecated. Replacing with [GLOBAL].]");
             function.setScope(Scope.GLOBAL);
         }
