@@ -3,7 +3,6 @@ package com.netgrif.application.engine.workflow.utils;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.netgrif.application.engine.elastic.service.ElasticsearchQuerySanitizer;
 import com.netgrif.application.engine.utils.SingleItemAsList;
@@ -12,14 +11,12 @@ import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchReque
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 
 import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.List;
 
 /**
  * Custom deserializer for handling cases where single `TaskSearchRequest` items
  * are sent as lists or standalone entities during JSON deserialization.
- *
+ * <p>
  * This class extends the `SingleItemAsListDeserializer`, enabling support for
  * deserialization scenarios where JSON may represent either a single item or a list of items.
  * It ensures compatibility with `SingleTaskSearchRequestAsList` by sanitizing the `fullText` field
@@ -37,13 +34,7 @@ public class TaskSearchRequestSingleItemAsListDeserializer extends SingleItemAsL
 
     @Override
     public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) {
-        final JavaType type;
-        if (beanProperty != null)
-            type = beanProperty.getType();
-        else
-            type = deserializationContext.getContextualType();
-
-        return new TaskSearchRequestSingleItemAsListDeserializer((Class<? extends SingleItemAsList>) type.getRawClass());
+        return new TaskSearchRequestSingleItemAsListDeserializer((Class<? extends SingleItemAsList>) getItemClass(deserializationContext, beanProperty));
     }
 
     /**
@@ -52,18 +43,18 @@ public class TaskSearchRequestSingleItemAsListDeserializer extends SingleItemAsL
      * the object is a `SingleTaskSearchRequestAsList`, it processes each `TaskSearchRequest`
      * in the list by sanitizing the `fullText` field using `ElasticsearchQuerySanitizer`.
      *
-     * @param jsonParser the JSON parser used to parse the incoming JSON content
+     * @param jsonParser             the JSON parser used to parse the incoming JSON content
      * @param deserializationContext the context for deserialization, providing shared
-     *                                state and configuration
+     *                               state and configuration
      * @return the deserialized object, with sanitization applied to `TaskSearchRequest.fullText`
-     *         if applicable
-     * @throws IOException if an I/O error occurs during parsing
+     * if applicable
+     * @throws IOException              if an I/O error occurs during parsing
      * @throws IllegalArgumentException if the deserialization process encounters an error
      */
     @Override
     public Object deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, IllegalArgumentException {
         Object result = super.deserialize(jsonParser, deserializationContext);
-        if (isTaskSearchRequestWrapper(result)) {
+        if (isWrapperClass(result, SingleTaskSearchRequestAsList.class, TaskSearchRequest.class)) {
             List<TaskSearchRequest> list = ((SingleTaskSearchRequestAsList) result).getList();
             list.forEach(request ->
                     request.fullText = ElasticsearchQuerySanitizer.sanitize(request.fullText));
@@ -71,14 +62,4 @@ public class TaskSearchRequestSingleItemAsListDeserializer extends SingleItemAsL
         return result;
     }
 
-    protected boolean isTaskSearchRequestWrapper(Object object) {
-        try {
-            Type superClass = object.getClass().getGenericSuperclass();
-            return object instanceof SingleTaskSearchRequestAsList ||
-                    (superClass != null &&
-                            ((ParameterizedType) superClass).getActualTypeArguments()[0] == TaskSearchRequest.class);
-        } catch (Exception e) {
-            return false;
-        }
-    }
 }

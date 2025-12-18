@@ -59,17 +59,14 @@ public class ElasticsearchQuerySanitizer {
             return query;
         }
         Map<String, String> keywordsToEscape = excludeKeywords(exclude);
-        String sanitized = keywordsToEscape.entrySet().stream()
-                .reduce(query, (q, entry) -> StringUtils.replace(q, entry.getKey(), entry.getValue()), (q1, q2) -> q2);
+        String sanitized = StringUtils.replaceEach(query,
+                keywordsToEscape.keySet().toArray(new String[0]),
+                keywordsToEscape.values().toArray(new String[0]));
         log.trace("Sanitized query: {}", sanitized);
         return sanitized;
     }
 
     protected static Map<String, String> prepareReservedKeywords() {
-        if (RESERVED_CHARACTERS_TO_ESCAPE == null || RESERVED_CHARACTERS_TO_REMOVE == null) {
-            log.error("Set of reserved characters to escape or remove are null");
-            return new HashMap<>();
-        }
         Map<String, String> result = new HashMap<>();
         for (String reservedString : RESERVED_CHARACTERS_TO_ESCAPE) {
             String escaped = Arrays.stream(reservedString.split(""))
