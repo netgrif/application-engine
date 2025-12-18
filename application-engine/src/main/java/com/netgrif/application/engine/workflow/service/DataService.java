@@ -226,7 +226,15 @@ public class DataService implements IDataService {
     }
 
     /**
-     * todo javadoc
+     * Updates the data field's attributes of the provided task.
+     *
+     * @param task the task object of which the data are updated
+     * @param values information about how to update the data fields
+     * @param params additional information to be injected to the action delegate context
+     * @param runSafe if set to true, additional validations are going to be applied when updating the data fields. If
+     *                set to false, minimal restrictions are considered.
+     *
+     * @return outcome containing Case, Task and changes that have been made.
      * */
     @Override
     public SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params, boolean runSafe) {
