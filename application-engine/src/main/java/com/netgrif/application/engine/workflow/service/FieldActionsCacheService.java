@@ -158,7 +158,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     }
 
     @Override
-    public Map<String, List<CachedFunction>> getNamespaceFunctionCache() {
+    public Map<String, List<CachedFunction>> getGlobalFunctionsCache() {
         return new HashMap<>(globalFunctionsCache);
     }
 

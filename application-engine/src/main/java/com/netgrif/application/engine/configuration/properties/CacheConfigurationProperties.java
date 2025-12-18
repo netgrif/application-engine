@@ -49,7 +49,7 @@ public class CacheConfigurationProperties {
     /**
      * Default cache name for caching namespace functions.
      */
-    private String namespaceFunctions = "namespaceFunctions";
+    private String globalFunctions = "globalFunctions";
 
     /**
      * A list of additional custom cache names.
@@ -65,7 +65,7 @@ public class CacheConfigurationProperties {
      */
     public Set<String> getAllCaches() {
         Set<String> caches = new LinkedHashSet<>(Arrays.asList(petriNetById, petriNetByIdentifier, petriNetActive,
-                petriNetLatest, petriNetCache, loadedModules, namespaceFunctions));
+                petriNetLatest, petriNetCache, loadedModules, globalFunctions));
         caches.addAll(additional);
         return caches;
     }
