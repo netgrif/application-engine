@@ -7,10 +7,10 @@ import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldType;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedField;
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
-import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.IllegalArgumentWithChangedFieldsException;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
@@ -221,15 +221,16 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> setData(String taskId, ObjectNode dataBody, Locale locale) {
         try {
-            List<com.netgrif.application.engine.petrinet.domain.DataGroup> dataGroups = dataService.getDataGroups(taskId, locale).getData();
+            List<com.netgrif.application.engine.objects.petrinet.domain.DataGroup> dataGroups = dataService.getDataGroups(taskId, locale).getData();
             Set<String> referencedTaskIds = new HashSet<>();
             referencedTaskIds.add(taskId);
-            for (com.netgrif.application.engine.petrinet.domain.DataGroup dataGroup : dataGroups) {
+            for (com.netgrif.application.engine.objects.petrinet.domain.DataGroup dataGroup : dataGroups) {
                 Set<String> referencedTaskIdsByDataGroup = dataGroup.getFields().getContent().stream()
-                        .filter(localisedField -> localisedField.getType() == FieldType.TASK_REF
+                        .filter(someField -> someField instanceof LocalisedField localisedField
+                                && localisedField.getType() == FieldType.TASK_REF
                                 && localisedField.getValue() instanceof List
                                 && !((List<?>) localisedField.getValue()).isEmpty())
-                        .map(localisedField -> (List<String>) localisedField.getValue())
+                        .map(localisedField -> (List<String>) ((LocalisedField) localisedField).getValue())
                         .flatMap(List::stream)
                         .collect(Collectors.toSet());
                 referencedTaskIds.addAll(referencedTaskIdsByDataGroup);
