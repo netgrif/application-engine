@@ -1,7 +1,10 @@
 package com.netgrif.application.engine.workflow.utils;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.netgrif.application.engine.elastic.service.ElasticsearchQuerySanitizer;
 import com.netgrif.application.engine.utils.SingleItemAsList;
 import com.netgrif.application.engine.utils.SingleItemAsListDeserializer;
@@ -16,11 +19,22 @@ import java.util.List;
 public class TaskSearchRequestSingleItemAsListDeserializer extends SingleItemAsListDeserializer {
 
     protected TaskSearchRequestSingleItemAsListDeserializer() {
-        super();
+        this(null);
     }
 
     protected TaskSearchRequestSingleItemAsListDeserializer(Class<? extends SingleItemAsList> vc) {
         super(vc);
+    }
+
+    @Override
+    public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) {
+        final JavaType type;
+        if (beanProperty != null)
+            type = beanProperty.getType();
+        else
+            type = deserializationContext.getContextualType();
+
+        return new TaskSearchRequestSingleItemAsListDeserializer((Class<? extends SingleItemAsList>) type.getRawClass());
     }
 
     @Override

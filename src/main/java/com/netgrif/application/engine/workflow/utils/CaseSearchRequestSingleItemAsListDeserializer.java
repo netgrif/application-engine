@@ -1,26 +1,42 @@
 package com.netgrif.application.engine.workflow.utils;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.netgrif.application.engine.elastic.service.ElasticsearchQuerySanitizer;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
 import com.netgrif.application.engine.utils.SingleItemAsList;
 import com.netgrif.application.engine.utils.SingleItemAsListDeserializer;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 
+@Slf4j
 public class CaseSearchRequestSingleItemAsListDeserializer extends SingleItemAsListDeserializer {
 
     protected CaseSearchRequestSingleItemAsListDeserializer() {
-        super();
+        this(null);
     }
 
     protected CaseSearchRequestSingleItemAsListDeserializer(Class<? extends SingleItemAsList> vc) {
         super(vc);
+    }
+
+    @Override
+    public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) {
+        final JavaType type;
+        if (beanProperty != null)
+            type = beanProperty.getType();
+        else
+            type = deserializationContext.getContextualType();
+
+        return new CaseSearchRequestSingleItemAsListDeserializer((Class<? extends SingleItemAsList>) type.getRawClass());
     }
 
     @Override
