@@ -218,7 +218,6 @@ public abstract class AbstractTaskController {
             Set<String> referencedTaskIds = new HashSet<>();
             referencedTaskIds.add(taskId);
             for (com.netgrif.application.engine.petrinet.domain.DataGroup dataGroup : dataGroups) {
-                // todo 2303 NPE
                 Set<String> referencedTaskIdsByDataGroup = dataGroup.getFields().getContent().stream()
                         .filter(localisedField -> localisedField.getType() == FieldType.TASK_REF
                                 && localisedField.getValue() instanceof List
