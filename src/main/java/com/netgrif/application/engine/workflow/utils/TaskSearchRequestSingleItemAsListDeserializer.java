@@ -5,12 +5,15 @@ import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.netgrif.application.engine.elastic.service.ElasticsearchQuerySanitizer;
+import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
+import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
 import com.netgrif.application.engine.utils.SingleItemAsList;
 import com.netgrif.application.engine.utils.SingleItemAsListDeserializer;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -54,8 +57,13 @@ public class TaskSearchRequestSingleItemAsListDeserializer extends SingleItemAsL
     @Override
     public Object deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, IllegalArgumentException {
         Object result = super.deserialize(jsonParser, deserializationContext);
-        if (isWrapperClass(result, SingleTaskSearchRequestAsList.class, TaskSearchRequest.class)) {
-            List<TaskSearchRequest> list = ((SingleTaskSearchRequestAsList) result).getList();
+        if (isWrapperClass(result, SingleTaskSearchRequestAsList.class, TaskSearchRequest.class) ||
+                isWrapperClass(result, SingleElasticTaskSearchRequestAsList.class, ElasticTaskSearchRequest.class)) {
+            List<? extends TaskSearchRequest> list = result instanceof SingleTaskSearchRequestAsList ?
+                    ((SingleTaskSearchRequestAsList) result).getList() :
+                    (result instanceof SingleElasticTaskSearchRequestAsList ?
+                            ((SingleElasticTaskSearchRequestAsList) result).getList() :
+                            Collections.emptyList());
             list.forEach(request ->
                     request.fullText = ElasticsearchQuerySanitizer.sanitize(request.fullText));
         }
