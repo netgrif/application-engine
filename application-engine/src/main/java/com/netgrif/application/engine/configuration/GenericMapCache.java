@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.configuration;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.SimpleValueWrapper;
 
@@ -25,9 +26,9 @@ public class GenericMapCache<V> implements Cache {
         this.atomicMapRef = new AtomicReference<>(mapFactory.get());
     }
 
-    @Override public String getName() { return name; }
+    @Override public @NotNull String getName() { return name; }
 
-    @Override public Object getNativeCache() { return Map.copyOf(map()); }
+    @Override public @NotNull Object getNativeCache() { return Map.copyOf(map()); }
 
     @Override
     public <T> T get(Object key, Callable<T> loader) {

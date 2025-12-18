@@ -8,7 +8,7 @@ import groovy.lang.Closure;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CachingConfigurerSupport;
+import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.cache.interceptor.CacheResolver;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Configuration
 @EnableCaching
 @RequiredArgsConstructor
-public class CacheConfiguration extends CachingConfigurerSupport {
+public class CacheConfiguration implements CachingConfigurer {
     private final RunnerConfigurationProperties.FieldRunnerProperties fieldRunnerProperties;
     private final CacheConfigurationProperties properties;
 

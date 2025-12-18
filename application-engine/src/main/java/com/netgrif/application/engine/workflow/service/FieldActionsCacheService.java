@@ -58,20 +58,20 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
                 .map(function -> CachedFunction.build(shell, function))
                 .collect(Collectors.toList());
 
-        Cache namespaceFunctionsCache = getRequiredCache(properties.getNamespaceFunctions());
+        Cache globalFunctionsCache = getRequiredCache(properties.getGlobalFunctions());
 
         if (!functions.isEmpty()) {
             evaluateCachedFunctions(functions);
             globalFunctionsCache.put(petriNet.getIdentifier(), functions);
         } else {
-            globalFunctionsCache.remove(petriNet.getIdentifier());
+            globalFunctionsCache.evictIfPresent(petriNet.getIdentifier());
         }
     }
 
     @Override
     public void reloadCachedFunctions(String petriNetId) {
-        getRequiredCache(properties.getNamespaceFunctions()).evictIfPresent(petriNetId);
-        cachePetriNetFunctions(petriNetService.getNewestVersionByIdentifier(petriNetId));
+        getRequiredCache(properties.getGlobalFunctions()).evictIfPresent(petriNetId);
+        cachePetriNetFunctions(petriNetService.getActiveVersionByIdentifier(petriNetId));
     }
 
     @Override
@@ -172,7 +172,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public Map<String, List<CachedFunction>> getGlobalFunctionsCache() {
-        return new HashMap<>((Map) getRequiredCache(properties.getGlobalFunctions()).getNativeCache());
+        return new HashMap<>((Map<String, List<CachedFunction>>) getRequiredCache(properties.getGlobalFunctions()).getNativeCache());
     }
 
     @Override
