@@ -122,7 +122,7 @@ class PetriNetTest {
         def lastImport = petriNetService.importPetriNet(netResource4.inputStream, VersionType.PATCH, superCreator.loggedSuper)
         assert lastImport.getNet().version.toString() == "3.1.1"
 
-        Page<PetriNetReference> nets = petriNetService.getByIdentifier(zeroImport.getNet().identifier, Pageable.unpaged())
+        Page<PetriNet> nets = petriNetService.getByIdentifier(zeroImport.getNet().identifier, Pageable.unpaged())
         assert nets.getSize() == 5
     }
 
@@ -136,7 +136,7 @@ class PetriNetTest {
         try {
             petriNetService.importPetriNet(netResource3.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
         } catch (Exception e) {
-            assert e.getMessage() == "Provided Petri net version is already present in the system"
+            assert e.getMessage() == "A process [test] with such version [0.0.1] already exists"
         }
     }
 

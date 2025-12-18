@@ -266,7 +266,10 @@ public class FilterImportExportService implements IFilterImportExportService {
         filterFields.forEach(f -> {
             Task importedFilterTask = taskService.findOne(f);
             Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
-            PetriNet filterNet = petriNetService.getNewestVersionByIdentifier(FILTER_NET_IDENTIFIER);
+            PetriNet filterNet = petriNetService.getActiveVersionByIdentifier(FILTER_NET_IDENTIFIER);
+            if (filterNet == null) {
+                throw new IllegalStateException("No filter process found or active");
+            }
             List<String> requiredNets = filterCase.getDataSet().get(FIELD_FILTER).getAllowedNets();
             List<String> currentNets = petriNetService.getExistingPetriNetIdentifiersFromIdentifiersList(requiredNets);
             if (currentNets.size() < requiredNets.size()) {

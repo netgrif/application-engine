@@ -56,7 +56,7 @@ public class RunnerConfigurationProperties {
         /**
          * The size of the cache used for maintaining field runner namespaces.
          */
-        private int namespaceCacheSize = 500;
+        private int globalFunctionsCacheSize = 500;
     }
 
     /**

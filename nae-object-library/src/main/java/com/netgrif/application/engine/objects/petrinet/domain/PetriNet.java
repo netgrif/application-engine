@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.objects.petrinet.domain;
 
+import com.netgrif.application.engine.objects.annotations.Indexed;
 import com.netgrif.application.engine.objects.auth.domain.ActorRef;
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.reference.Referencable;
@@ -30,7 +31,7 @@ public abstract class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
-    private String identifier; //combination of identifier and version must be unique ... maybe use @CompoundIndex?
+    private String identifier; // todo: combination of identifier and version must be unique ... maybe use @CompoundIndex?
 
     @Getter
     @Setter
@@ -71,6 +72,11 @@ public abstract class PetriNet extends PetriNetObject {
     @Getter
     @Setter
     private Version version;
+
+    @Getter
+    @Setter
+    @Indexed
+    private boolean versionActive;
 
     @Getter
     @Setter
@@ -141,22 +147,23 @@ public abstract class PetriNet extends PetriNetObject {
         this.title = new I18nString("");
         this.importId = "";
         this.version = new Version();
-        defaultCaseName = new I18nString("");
-        initialized = false;
-        creationDate = LocalDateTime.now();
-        places = new LinkedHashMap<>();
-        transitions = new LinkedHashMap<>();
-        arcs = new LinkedHashMap<>();
-        dataSet = new LinkedHashMap<>();
-        roles = new LinkedHashMap<>();
-        negativeViewRoles = new LinkedList<>();
-        transactions = new LinkedHashMap<>();
-        processEvents = new LinkedHashMap<>();
-        caseEvents = new LinkedHashMap<>();
-        permissions = new HashMap<>();
-        userRefs = new HashMap<>();
-        functions = new LinkedList<>();
-        tags = new HashMap<>();
+        this.defaultCaseName = new I18nString("");
+        this.initialized = false;
+        this.creationDate = LocalDateTime.now();
+        this.places = new LinkedHashMap<>();
+        this.transitions = new LinkedHashMap<>();
+        this.arcs = new LinkedHashMap<>();
+        this.dataSet = new LinkedHashMap<>();
+        this.roles = new LinkedHashMap<>();
+        this.negativeViewRoles = new LinkedList<>();
+        this.transactions = new LinkedHashMap<>();
+        this.processEvents = new LinkedHashMap<>();
+        this.caseEvents = new LinkedHashMap<>();
+        this.permissions = new HashMap<>();
+        this.userRefs = new HashMap<>();
+        this.functions = new LinkedList<>();
+        this.tags = new HashMap<>();
+        this.makeInactive();
     }
 
     public PetriNet(PetriNet petriNet) {
@@ -167,6 +174,7 @@ public abstract class PetriNet extends PetriNetObject {
         this.title = petriNet.getTitle();
         this.importId = petriNet.getImportId();
         this.version = petriNet.getVersion();
+        this.versionActive = petriNet.isVersionActive();
         this.defaultCaseName = petriNet.getDefaultCaseName();
         this.defaultCaseNameExpression = petriNet.getDefaultCaseNameExpression();
         this.initials = petriNet.getInitials();
@@ -428,6 +436,14 @@ public abstract class PetriNet extends PetriNetObject {
 
     public boolean hasDynamicCaseName() {
         return defaultCaseNameExpression != null;
+    }
+
+    public void makeActive() {
+        this.setVersionActive(true);
+    }
+
+    public void makeInactive() {
+        this.setVersionActive(false);
     }
 
     @Override

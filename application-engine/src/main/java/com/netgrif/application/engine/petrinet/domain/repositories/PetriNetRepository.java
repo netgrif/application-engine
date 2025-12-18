@@ -6,6 +6,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 /**
@@ -33,6 +34,15 @@ public interface PetriNetRepository extends MongoRepository<PetriNet, String>, Q
     PetriNet findByIdentifierAndVersion(String identifier, Version version);
 
     /**
+     * Finds a {@link PetriNet} entity by its identifier and versionActive attribute
+     *
+     * @param identifier the unique identifier of the PetriNet.
+     * @param versionActive if true, the active version will be found, otherwise the inactive version
+     * @return the {@link PetriNet} entity matching the given identifier and versionActive attribute, or {@code null} if none found.
+     */
+    PetriNet findByIdentifierAndVersionActive(String identifier, boolean versionActive);
+
+    /**
      * Finds a paginated list of {@link PetriNet} entities by their identifier.
      *
      * @param identifier the unique identifier of the PetriNet.
@@ -56,4 +66,15 @@ public interface PetriNetRepository extends MongoRepository<PetriNet, String>, Q
      * @param id the unique ID of the PetriNet to delete.
      */
     void deleteBy_id(ObjectId id);
+
+
+    /**
+     * Finds a paginated list of {@link PetriNet} entities associated with a specific role ID.
+     *
+     * @param roleId   the ID of the role to filter PetriNets by
+     * @param pageable the pagination details
+     * @return a {@link Page} of {@link PetriNet} entities matching the specified role ID
+     */
+    @Query("{ 'roles.?0' : { $exists: true } }")
+    Page<PetriNet> findAllByRoleId(String roleId, Pageable pageable);
 }

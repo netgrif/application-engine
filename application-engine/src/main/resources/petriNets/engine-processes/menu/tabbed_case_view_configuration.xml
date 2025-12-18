@@ -229,7 +229,7 @@
         </options>
         <init>fulltext_advanced</init>
     </data>
-    <data type="text" immediate="true">
+    <data type="i18n" immediate="true">
         <id>create_case_button_title</id>
         <title name="create_case_button_title">"New case" button title</title>
     </data>

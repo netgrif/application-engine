@@ -37,4 +37,5 @@ public interface ProcessRoleService {
     Page<ProcessRole> findAllGlobalRoles(Pageable pageable);
     void deleteRolesOfNet(PetriNet net, LoggedUser loggedUser);
     void clearCache();
+    void deleteGlobalRole(String roleId, LoggedUser loggedUser);
 }

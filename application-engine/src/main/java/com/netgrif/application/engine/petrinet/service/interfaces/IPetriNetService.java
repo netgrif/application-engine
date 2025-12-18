@@ -150,12 +150,20 @@ public interface IPetriNetService {
     List<PetriNet> findAllById(List<String> ids);
 
     /**
-     * Retrieves the newest version of a {@link PetriNet} by its identifier.
+     * Retrieves the active version of a {@link PetriNet} by its identifier.
      *
      * @param identifier the unique identifier of the PetriNet
-     * @return the newest version of the {@link PetriNet} matching the provided identifier
+     * @return the active version of the {@link PetriNet} matching the provided identifier or null if not found
      */
-    PetriNet getNewestVersionByIdentifier(String identifier);
+    PetriNet getActiveVersionByIdentifier(String identifier);
+
+    /**
+     * Retrieves the latest version of a {@link PetriNet} by its identifier.
+     *
+     * @param identifier the unique identifier of the PetriNet
+     * @return the latest version of the {@link PetriNet} matching the provided identifier or null if not found
+     */
+    PetriNet getLatestVersionByIdentifier(String identifier);
 
     /**
      * Retrieves a paginated list of all {@link PetriNet} objects.
@@ -308,14 +316,14 @@ public interface IPetriNetService {
      */
     void deletePetriNet(String id, LoggedUser loggedUser);
 
+
     /**
-     * Deletes a PetriNet by its ID.
+     * Forcefully deletes a PetriNet process by its ID.
      *
-     * @param id the ID of the PetriNet to delete
+     * @param processId  the ID of the process to delete
      * @param loggedUser the user requesting the deletion
-     * @param force whether to force the deletion without running events
      */
-    void deletePetriNet(String id, LoggedUser loggedUser, boolean force);
+    void forceDeletePetriNet(String processId, LoggedUser loggedUser);
 
     /**
      * Runs the specified set of actions on a PetriNet.
@@ -341,4 +349,21 @@ public interface IPetriNetService {
      * @return a {@link PetriNetImportReference} linking the PetriNet
      */
     PetriNetImportReference getNetFromCase(String caseId);
+
+
+    /**
+     * Retrieves a paginated list of {@link PetriNet} objects associated with a specific role ID.
+     *
+     * @param roleId   the ID of the role to filter the PetriNets by
+     * @param pageable the pagination information
+     * @return a {@link Page} of {@link PetriNet} objects matching the role ID
+     */
+    /**
+     * Retrieves a paginated list of {@link PetriNet} objects associated with a specific role ID.
+     *
+     * @param roleId   the ID of the role to filter the PetriNets by
+     * @param pageable the pagination information
+     * @return a {@link Page} of {@link PetriNet} objects matching the role ID
+     */
+    Page<PetriNet> findAllByRoleId(String roleId, Pageable pageable);
 }

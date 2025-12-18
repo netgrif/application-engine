@@ -1,5 +1,8 @@
 package com.netgrif.application.engine.petrinet.service;
 
+import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleNotFoundException;
+import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleNotGlobalException;
+import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleReferencedException;
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
@@ -22,6 +25,9 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepositor
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import lombok.Getter;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +46,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     private static final Logger log = LoggerFactory.getLogger(ProcessRoleService.class);
 
     private final UserService userService;
+    @Getter
     private final ProcessRoleRepository processRoleRepository;
     private final PetriNetRepository netRepository;
     private final ApplicationEventPublisher publisher;
@@ -48,7 +55,12 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     private final ISecurityContextService securityContextService;
     private final GroupService groupService;
     private final RealmService realmService;
+    @Getter
     private final PaginationProperties paginationProperties;
+    @Getter
+    private final IWorkflowService workflowService;
+    @Getter
+    private final ITaskService taskService;
 
     private ProcessRole defaultRole;
     private ProcessRole anonymousRole;
@@ -57,7 +69,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
                               PetriNetRepository netRepository,
                               ApplicationEventPublisher publisher, RoleActionsRunner roleActionsRunner,
                               @Lazy IPetriNetService petriNetService, @Lazy UserService userService, ISecurityContextService securityContextService, @Lazy GroupService groupService,
-                              @Lazy RealmService realmService, @Lazy PaginationProperties paginationProperties) {
+                              @Lazy RealmService realmService, @Lazy PaginationProperties paginationProperties, @Lazy IWorkflowService workflowService, @Lazy ITaskService taskService) {
         this.processRoleRepository = processRoleRepository;
         this.netRepository = netRepository;
         this.publisher = publisher;
@@ -68,6 +80,8 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         this.groupService = groupService;
         this.realmService = realmService;
         this.paginationProperties = paginationProperties;
+        this.workflowService = workflowService;
+        this.taskService = taskService;
     }
 
     @Override
@@ -86,8 +100,8 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     }
 
     @Override
-    public void delete(String s) {
-        Optional<ProcessRole> processRole = processRoleRepository.findByCompositeId(s);
+    public void delete(String roleId) {
+        Optional<ProcessRole> processRole = processRoleRepository.findByCompositeId(roleId);
         processRole.ifPresent(processRoleRepository::delete);
     }
 
@@ -131,10 +145,6 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         Set<ProcessRole> rolesNewToUser = getRolesNewToActor(userOldRoles, requestedRoles);
         Set<ProcessRole> rolesRemovedFromUser = getRolesRemovedFromActor(userOldRoles, requestedRoles);
 
-        String idOfPetriNetContainingRole = getProcessIdRoleBelongsTo(rolesNewToUser, rolesRemovedFromUser);
-        if (!isGlobalFromFirstRole(rolesNewToUser) && !isGlobalFromFirstRole(rolesRemovedFromUser) && idOfPetriNetContainingRole == null) {
-            return;
-        }
 
         oldActorRoles.clear();
         oldActorRoles.addAll(updateRequestedRoles(userOldRoles, rolesNewToUser, rolesRemovedFromUser));
@@ -145,7 +155,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
         String userId = user.getStringId();
         securityContextService.saveToken(userId);
-        if (Objects.equals(userId, loggedUser.getId())) {
+        if (Objects.equals(userId, loggedUser.getStringId())) {
             loggedUser.getProcessRoles().clear();
             loggedUser.setProcessRoles(user.getProcessRoles());
             securityContextService.reloadSecurityContext(loggedUser);
@@ -400,7 +410,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     @Override
     public void deleteRolesOfNet(PetriNet net, LoggedUser loggedUser) {
         log.info("[" + net.getStringId() + "]: Initiating deletion of all roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
-        List<ProcessResourceId> deletedRoleIds = this.findAllByNetStringId(net.getStringId()).stream().filter(processRole -> processRole.getProcessId() != null).map(ProcessRole::get_id).collect(Collectors.toList());
+        List<ProcessResourceId> deletedRoleIds = this.findAllByNetStringId(net.getStringId()).stream().filter(processRole -> !processRole.isGlobal()).map(ProcessRole::get_id).collect(Collectors.toList());
         Set<String> deletedRoleStringIds = deletedRoleIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet());
 
         Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
@@ -439,9 +449,62 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         this.processRoleRepository.deleteAllBy_idIn(deletedRoleIds);
     }
 
+    @Override
     public void clearCache() {
         this.defaultRole = null;
         this.anonymousRole = null;
+    }
+
+    @Override
+    public void deleteGlobalRole(String roleId, LoggedUser loggedUser) {
+        ProcessRole processRole = this.findById(roleId);
+        if (processRole == null) {
+            throw new RoleNotFoundException("Role with id [%s] not found.".formatted(roleId));
+        }
+        if (!processRole.isGlobal()) {
+            throw new RoleNotGlobalException("Role with id [%s] is not global.".formatted(roleId));
+        }
+        if (ProcessRole.DEFAULT_ROLE.equals(processRole.getImportId()) || ProcessRole.ANONYMOUS_ROLE.equals(processRole.getImportId())) {
+            throw new IllegalArgumentException("Deleting core roles (DEFAULT/ANONYMOUS) is forbidden.");
+        }
+        if (isRoleReferenced(processRole)) {
+            throw new RoleReferencedException("Role with id [%s] is referenced by other processes. Please delete or update the process before deleting.".formatted(roleId));
+        }
+        log.info("Initiating deletion of global role with import ID [{}] and object ID [{}]", processRole.getImportId(), processRole.getStringId());
+        Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Pageable usersPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<Realm> realms;
+        do {
+            realms = realmService.getSmallRealm(realmPageable);
+            realms.forEach(realm -> {
+                Page<AbstractUser> users = userService.findAllByProcessRoles(Set.of(processRole.get_id()), realm.getName(), usersPageable);
+                while (users.hasContent()) {
+                    users.getContent().forEach(u -> removeRoleFromUser(u, processRole, loggedUser));
+                    users = userService.findAllByProcessRoles(Set.of(processRole.get_id()), realm.getName(), usersPageable);
+                }
+            });
+            realmPageable = realmPageable.next();
+        } while (realms.hasNext());
+        log.info("Deleting global role with import ID [{}] and object ID [{}]", processRole.getImportId(), processRole.getStringId());
+        this.processRoleRepository.delete(processRole);
+    }
+
+    protected boolean isRoleReferenced(ProcessRole processRole) {
+        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<PetriNet> petriNetPage = petriNetService.findAllByRoleId(processRole.getStringId(), pageable);
+        return petriNetPage.getTotalElements() > 0;
+    }
+
+    private void removeRoleFromUser(AbstractUser user, ProcessRole processRole, LoggedUser loggedUser) {
+        log.info("Removing global role with import ID [{}] and object ID [{}] from user [{}] with id [{}]", processRole.getImportId(), processRole.getStringId(), user.getFullName(), user.getStringId());
+        if (user.getProcessRoles().isEmpty()) {
+            return;
+        }
+        Set<ProcessResourceId> newRoles = user.getProcessRoles().stream()
+                .filter(role -> !role.getStringId().equals(processRole.getStringId()))
+                .map(ProcessRole::get_id)
+                .collect(Collectors.toSet());
+        this.assignRolesToUser(user, newRoles, loggedUser);
     }
 
     private ObjectId extractObjectId(String caseId) {

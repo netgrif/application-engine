@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -51,7 +54,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
             return;
         }
 
-        List<CachedFunction> functions = petriNet.getFunctions(FunctionScope.NAMESPACE).stream()
+        List<CachedFunction> functions = petriNet.getFunctions(FunctionScope.GLOBAL).stream()
                 .map(function -> CachedFunction.build(shell, function))
                 .collect(Collectors.toList());
 
@@ -59,9 +62,9 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
         if (!functions.isEmpty()) {
             evaluateCachedFunctions(functions);
-            namespaceFunctionsCache.put(petriNet.getIdentifier(), functions);
+            globalFunctionsCache.put(petriNet.getIdentifier(), functions);
         } else {
-            namespaceFunctionsCache.evictIfPresent(petriNet.getIdentifier());
+            globalFunctionsCache.remove(petriNet.getIdentifier());
         }
     }
 
@@ -109,6 +112,28 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     }
 
     @Override
+    public void cacheAllPetriNetFunctions() {
+        Pageable pageable = PageRequest.of(0, 500);
+        Page<PetriNet> page = petriNetService.getAll(pageable);
+
+        while (!page.isEmpty()) {
+            for (PetriNet petriNet : page) {
+                try {
+                    cachePetriNetFunctions(petriNet);
+                } catch (Exception e) {
+                    log.warn("Failed to cache functions for PetriNet id={}", petriNet.getStringId(), e);
+                }
+            }
+
+            if (!page.hasNext()) {
+                break;
+            }
+            pageable = pageable.next();
+            page = petriNetService.getAll(pageable);
+        }
+    }
+
+    @Override
     public void evaluateFunctions(List<Function> functions) {
         evaluateCachedFunctions(functions.stream().map(function -> CachedFunction.build(shell, function)).collect(Collectors.toList()));
     }
@@ -146,8 +171,8 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     }
 
     @Override
-    public Map<String, List<CachedFunction>> getNamespaceFunctionCache() {
-        return new HashMap<>((Map) getRequiredCache(properties.getNamespaceFunctions()).getNativeCache());
+    public Map<String, List<CachedFunction>> getGlobalFunctionsCache() {
+        return new HashMap<>((Map) getRequiredCache(properties.getGlobalFunctions()).getNativeCache());
     }
 
     @Override
@@ -156,8 +181,8 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     }
 
     @Override
-    public void clearNamespaceFunctionCache() {
-        getRequiredCache(properties.getNamespaceFunctions()).clear();
+    public void clearGlobalFunctionCache() {
+        getRequiredCache(properties.getGlobalFunctions()).clear();
     }
 
     @Override
