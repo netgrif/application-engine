@@ -10,14 +10,25 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
 import com.netgrif.application.engine.utils.SingleItemAsList;
 import com.netgrif.application.engine.utils.SingleItemAsListDeserializer;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 
-@Slf4j
+/**
+ * Custom deserializer for handling JSON deserialization of objects that extend
+ * the {@link SingleItemAsList} class, specifically designed for handling
+ * {@link CaseSearchRequest} and ensuring its fields are properly sanitized.
+ * <p>
+ * This deserializer extends the functionality of {@link SingleItemAsListDeserializer}
+ * to additionally process the deserialized objects that represent case search requests.
+ * It ensures that the `fullText` field in each case search request is sanitized
+ * using {@link ElasticsearchQuerySanitizer}.
+ * <p>
+ * It also provides a mechanism to dynamically determine the appropriate type
+ * using the contextual information during deserialization.
+ */
 public class CaseSearchRequestSingleItemAsListDeserializer extends SingleItemAsListDeserializer {
 
     protected CaseSearchRequestSingleItemAsListDeserializer() {
@@ -39,6 +50,20 @@ public class CaseSearchRequestSingleItemAsListDeserializer extends SingleItemAsL
         return new CaseSearchRequestSingleItemAsListDeserializer((Class<? extends SingleItemAsList>) type.getRawClass());
     }
 
+    /**
+     * Deserializes a JSON structure into an object, specifically handling instances that
+     * may extend the {@code SingleCaseSearchRequestAsList}. During deserialization, it
+     * sanitizes the `fullText` field in each {@code CaseSearchRequest} object for security
+     * purposes using {@code ElasticsearchQuerySanitizer}.
+     *
+     * @param jsonParser             the {@code JsonParser} used for reading the JSON input
+     * @param deserializationContext the {@code DeserializationContext} providing access
+     *                               to contextual information during deserialization
+     * @return the deserialized object, with sanitization applied if it is an instance of
+     * {@code SingleCaseSearchRequestAsList}
+     * @throws IOException              if any I/O error occurs during deserialization
+     * @throws IllegalArgumentException if the object could not be properly instantiated or deserialized
+     */
     @Override
     public Object deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, IllegalArgumentException {
         Object result = super.deserialize(jsonParser, deserializationContext);

@@ -16,6 +16,15 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 
+/**
+ * Custom deserializer for handling cases where single `TaskSearchRequest` items
+ * are sent as lists or standalone entities during JSON deserialization.
+ *
+ * This class extends the `SingleItemAsListDeserializer`, enabling support for
+ * deserialization scenarios where JSON may represent either a single item or a list of items.
+ * It ensures compatibility with `SingleTaskSearchRequestAsList` by sanitizing the `fullText` field
+ * in each `TaskSearchRequest` instance using the `ElasticsearchQuerySanitizer`.
+ */
 public class TaskSearchRequestSingleItemAsListDeserializer extends SingleItemAsListDeserializer {
 
     protected TaskSearchRequestSingleItemAsListDeserializer() {
@@ -37,6 +46,20 @@ public class TaskSearchRequestSingleItemAsListDeserializer extends SingleItemAsL
         return new TaskSearchRequestSingleItemAsListDeserializer((Class<? extends SingleItemAsList>) type.getRawClass());
     }
 
+    /**
+     * Deserializes a JSON input into an object while handling cases where a single
+     * `TaskSearchRequest` or a list of `TaskSearchRequest` objects is included. If
+     * the object is a `SingleTaskSearchRequestAsList`, it processes each `TaskSearchRequest`
+     * in the list by sanitizing the `fullText` field using `ElasticsearchQuerySanitizer`.
+     *
+     * @param jsonParser the JSON parser used to parse the incoming JSON content
+     * @param deserializationContext the context for deserialization, providing shared
+     *                                state and configuration
+     * @return the deserialized object, with sanitization applied to `TaskSearchRequest.fullText`
+     *         if applicable
+     * @throws IOException if an I/O error occurs during parsing
+     * @throws IllegalArgumentException if the deserialization process encounters an error
+     */
     @Override
     public Object deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, IllegalArgumentException {
         Object result = super.deserialize(jsonParser, deserializationContext);
