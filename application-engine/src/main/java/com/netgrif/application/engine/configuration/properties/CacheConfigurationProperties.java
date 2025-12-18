@@ -27,9 +27,14 @@ public class CacheConfigurationProperties {
     private String petriNetByIdentifier = "petriNetByIdentifier";
 
     /**
-     * Default cache name for caching the newest versions of Petri nets.
+     * Default cache name for caching the active versions of Petri nets.
      */
-    private String petriNetNewest = "petriNetNewest";
+    private String petriNetActive = "petriNetActive";
+
+    /**
+     * Default cache name for caching the latest versions of Petri nets.
+     */
+    private String petriNetLatest = "petriNetLatest";
 
     /**
      * Default cache name for general Petri net caching.
@@ -59,7 +64,8 @@ public class CacheConfigurationProperties {
      * @return a {@link Set} of all cache names.
      */
     public Set<String> getAllCaches() {
-        Set<String> caches = new LinkedHashSet<>(Arrays.asList(petriNetById, petriNetByIdentifier, petriNetNewest, petriNetCache, loadedModules, namespaceFunctions));
+        Set<String> caches = new LinkedHashSet<>(Arrays.asList(petriNetById, petriNetByIdentifier, petriNetActive,
+                petriNetLatest, petriNetCache, loadedModules, namespaceFunctions));
         caches.addAll(additional);
         return caches;
     }

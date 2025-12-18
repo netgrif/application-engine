@@ -1,29 +1,24 @@
 package com.netgrif.application.engine.petrinet.service
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.objects.auth.domain.ActorRef
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
-import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.User
-import com.netgrif.application.engine.objects.auth.domain.enums.UserState
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.auth.service.UserService
-import com.netgrif.application.engine.objects.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
+import com.netgrif.application.engine.objects.auth.domain.*
+import com.netgrif.application.engine.objects.auth.domain.enums.UserState
+import com.netgrif.application.engine.objects.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch
-import com.netgrif.application.engine.objects.petrinet.domain.UriContentType
-import com.netgrif.application.engine.objects.petrinet.domain.UriNode
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.objects.petrinet.domain.version.Version
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -39,6 +34,8 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+import static org.junit.jupiter.api.Assertions.assertThrows
+
 @Disabled
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -46,6 +43,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class PetriNetServiceTest {
 
     public static final String NET_FILE = "process_delete_test.xml"
+    public static final String VERSION_PROCESS_FILE_FORMAT = "petriNets/process_version_%s_0_0.xml"
     public static final String NET_SEARCH_FILE = "process_search_test.xml"
     public static final String CUSTOMER_USER_MAIL = "customer@netgrif.com"
 
@@ -106,7 +104,7 @@ class PetriNetServiceTest {
         long taskCount = taskRepository.count()
 
 
-        ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome testNetOptional = importProcess(NET_FILE, superCreator.getLoggedSuper())
         assert testNetOptional.getNet() != null
         assert petriNetRepository.count() == processCount + 1
         PetriNet testNet = testNetOptional.getNet()
@@ -150,14 +148,106 @@ class PetriNetServiceTest {
     }
 
     @Test
+    void testVersionsOnImport() {
+        ImportPetriNetEventOutcome outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("2"), superCreator.loggedSuper)
+        PetriNet petriNetV2 = outcome.getNet()
+        assert petriNetV2 != null
+        assert petriNetV2.versionActive
+        Version version = new Version()
+        version.setMajor(2)
+        assert petriNetV2.getVersion() == version
+        Thread.sleep(5000)
+        Optional<ElasticPetriNet> elasticPetriNetV2Optional = elasticPetriNetRepository.findById(petriNetV2.stringId)
+        assert elasticPetriNetV2Optional.isPresent()
+        assert elasticPetriNetV2Optional.get().isVersionActive()
+
+        outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("4"), superCreator.loggedSuper)
+        PetriNet petriNetV4 = outcome.getNet()
+        assert petriNetV4 != null
+        assert !petriNetService.get(petriNetV2.getObjectId()).isVersionActive()
+        assert petriNetV4.isVersionActive()
+        version = new Version()
+        version.setMajor(4)
+        assert petriNetV4.getVersion() == version
+        Thread.sleep(5000)
+        elasticPetriNetV2Optional = elasticPetriNetRepository.findById(petriNetV2.stringId)
+        assert !elasticPetriNetV2Optional.get().isVersionActive()
+        Optional<ElasticPetriNet> elasticPetriNetV4Optional = elasticPetriNetRepository.findById(petriNetV4.stringId)
+        assert elasticPetriNetV4Optional.isPresent()
+        assert elasticPetriNetV4Optional.get().isVersionActive()
+
+        assertThrows(IllegalArgumentException.class, {
+            // cannot import with lower version number than the highest
+            importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("1"), superCreator.loggedSuper)
+        })
+        assertThrows(IllegalArgumentException.class, {
+            // cannot import already existing version
+            importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("2"), superCreator.loggedSuper)
+        })
+
+        petriNetV2.makeActive()
+        petriNetV2 = petriNetService.save(petriNetV2).get()
+        assert petriNetV2.versionActive
+        petriNetV4.makeInactive()
+        petriNetV4 = petriNetService.save(petriNetV4).get()
+        assert !petriNetV4.versionActive
+
+        outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("5"), superCreator.loggedSuper)
+        PetriNet petriNetV5 = outcome.getNet()
+        assert petriNetV5 != null
+        assert !petriNetService.get(petriNetV2.getObjectId()).versionActive
+        assert !petriNetService.get(petriNetV4.getObjectId()).versionActive
+        assert petriNetV5.versionActive
+        version = new Version()
+        version.setMajor(5)
+        assert petriNetV5.getVersion() == version
+        Thread.sleep(5000)
+        elasticPetriNetV2Optional = elasticPetriNetRepository.findById(petriNetV2.stringId)
+        assert !elasticPetriNetV2Optional.get().versionActive
+        elasticPetriNetV4Optional = elasticPetriNetRepository.findById(petriNetV4.stringId)
+        assert !elasticPetriNetV4Optional.get().versionActive
+        Optional<ElasticPetriNet> elasticPetriNetV5Optional = elasticPetriNetRepository.findById(petriNetV5.stringId)
+        assert elasticPetriNetV5Optional.isPresent()
+        assert elasticPetriNetV5Optional.get().versionActive
+    }
+
+    @Test
+    void testVersionActiveOnDelete() {
+        ImportPetriNetEventOutcome outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("1"), superCreator.loggedSuper)
+        PetriNet processV1 = outcome.getNet()
+        outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("2"), superCreator.loggedSuper)
+        PetriNet processV2 = outcome.getNet()
+        outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("3"), superCreator.loggedSuper)
+        PetriNet processV3 = outcome.getNet()
+
+        assert !petriNetService.get(processV1.getObjectId()).versionActive
+        assert !petriNetService.get(processV2.getObjectId()).versionActive
+        assert petriNetService.get(processV3.getObjectId()).versionActive
+
+        petriNetService.deletePetriNet(processV2.getStringId(), superCreator.loggedSuper)
+
+        assert petriNetRepository.findById(processV2.getStringId()).isEmpty()
+        assert !petriNetService.get(processV1.getObjectId()).versionActive
+        assert petriNetService.get(processV3.getObjectId()).versionActive
+
+        petriNetService.deletePetriNet(processV3.getStringId(), superCreator.loggedSuper)
+
+        assert petriNetRepository.findById(processV3.getStringId()).isEmpty()
+        assert petriNetService.get(processV1.getObjectId()).versionActive
+
+        petriNetService.deletePetriNet(processV1.getStringId(), superCreator.loggedSuper)
+
+        assert petriNetRepository.findById(processV1.getStringId()).isEmpty()
+    }
+
+    @Test
     void processSearch() {
         long processCount = petriNetRepository.count()
 
-
         def user = userService.findUserByUsername(CUSTOMER_USER_MAIL, null)
         assert user != null && user.isPresent()
-        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        petriNetService.importPetriNet(stream(NET_SEARCH_FILE), VersionType.MAJOR, ActorTransformer.toLoggedUser(user.get()))
+        importProcess(NET_FILE, superCreator.getLoggedSuper())
+        importProcess(NET_SEARCH_FILE, ActorTransformer.toLoggedUser(user.get()))
 
         assert petriNetRepository.count() == processCount + 2
 
@@ -208,5 +298,9 @@ class PetriNetServiceTest {
         search8.setInitials("PST");
         search8.setAuthor(author);
         assert petriNetService.search(search8, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+    }
+
+    private ImportPetriNetEventOutcome importProcess(String filePath, LoggedUser author) {
+        return petriNetService.importPetriNet(stream(filePath), VersionType.MAJOR, author)
     }
 }
