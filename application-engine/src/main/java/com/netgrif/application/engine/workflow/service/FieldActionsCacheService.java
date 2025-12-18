@@ -99,7 +99,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     }
 
     @Override
-    public void cacheAllPetriNetsFunctions() {
+    public void cacheAllPetriNetFunctions() {
         Pageable pageable = PageRequest.of(0, 500);
         Page<PetriNet> page = petriNetService.getAll(pageable);
 

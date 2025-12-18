@@ -27,7 +27,7 @@ public interface IFieldActionsCacheService {
 
     void clearGlobalFunctionCache();
 
-    void cacheAllPetriNetsFunctions();
+    void cacheAllPetriNetFunctions();
 
     void clearFunctionCache();
 }
