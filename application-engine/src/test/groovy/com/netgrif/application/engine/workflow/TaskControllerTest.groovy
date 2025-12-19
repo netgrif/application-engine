@@ -154,13 +154,13 @@ class TaskControllerTest {
         Case testCase = helper.createCase("My case", setDataNet)
         String taskId = testCase.tasks.find { it.transition == "testSetDataFieldTypeRestriction" }.task
 
-        ObjectNode dataSet = populateDataset([(taskId):["taskRef_0": ["type": "taskRef", "value": [taskId]]]])
+        ObjectNode dataSet = populateNestedDataset([(taskId):["taskRef_0": ["type": "taskRef", "value": [taskId]]]])
         def response = taskController.setData(taskId, dataSet, Locale.default)
         assert response != null && response.content.outcome != null
         assert response.content.outcome.changedFields.changedFields.isEmpty()
         assert ((List<String>) workflowService.findOne(testCase.stringId).getDataField("taskRef_0").getValue()).isEmpty()
 
-        dataSet = populateDataset([(taskId):["caseRef_0": ["type": "caseRef", "value": [testCase.stringId]]]])
+        dataSet = populateNestedDataset([(taskId):["caseRef_0": ["type": "caseRef", "value": [testCase.stringId]]]])
         response = taskController.setData(taskId, dataSet, Locale.default)
         assert response != null && response.content.outcome != null
         assert response.content.outcome.changedFields.changedFields.isEmpty()
@@ -172,7 +172,7 @@ class TaskControllerTest {
         Case testCase = helper.createCase("My case", setDataNet)
         String taskId = testCase.tasks.find { it.transition == "data" }.task
 
-        ObjectNode dataSet = populateDataset([(taskId):["text_1": ["type": "text", "value": "awd"]]])
+        ObjectNode dataSet = populateNestedDataset([(taskId):["text_1": ["type": "text", "value": "awd"]]])
         def response = taskController.setData(taskId, dataSet, Locale.default)
         assert response != null && response.content.outcome == null
         assert response.content.error != null
@@ -196,14 +196,14 @@ class TaskControllerTest {
         workflowService.save(testCase2)
 
         String nestedOtherTaskId = testCase2.tasks.find { it.transition == "data" }.task
-        ObjectNode dataSet = populateDataset([(nestedOtherTaskId):["text_0": ["type": "text", "value": "awd"]]])
+        ObjectNode dataSet = populateNestedDataset([(nestedOtherTaskId):["text_0": ["type": "text", "value": "awd"]]])
         def response = taskController.setData(taskId, dataSet, Locale.default)
         assert response != null && response.content.outcome != null
         assert response.content.outcome.changedFields.changedFields.isEmpty()
         assert workflowService.findOne(testCase2.stringId).getDataField("text_0").getValue() == null
 
         String nestedTaskId = testCase3.tasks.find { it.transition == "data" }.task
-        dataSet = populateDataset([(nestedTaskId):["text_0": ["type": "text", "value": "awd"]]])
+        dataSet = populateNestedDataset([(nestedTaskId):["text_0": ["type": "text", "value": "awd"]]])
         response = taskController.setData(taskId, dataSet, Locale.default)
         assert response != null && response.content.outcome != null
         assert !response.content.outcome.changedFields.changedFields.isEmpty()
@@ -215,7 +215,7 @@ class TaskControllerTest {
         Case testCase = helper.createCase("My case", setDataNet)
         String taskId = testCase.tasks.find { it.transition == "testSetDataNonReferencedField" }.task
 
-        ObjectNode dataSet = populateDataset([(taskId):["text_1": ["type": "text", "value": "awd"]]])
+        ObjectNode dataSet = populateNestedDataset([(taskId):["text_1": ["type": "text", "value": "awd"]]])
         def response = taskController.setData(taskId, dataSet, Locale.default)
 
         assert response != null && response.content.outcome == null
@@ -302,7 +302,7 @@ class TaskControllerTest {
         return tasks
     }
 
-    static ObjectNode populateDataset(Map<String, Map<String, Map<String, String>>> data) {
+    static ObjectNode populateNestedDataset(Map<String, Map<String, Map<String, String>>> data) {
         ObjectMapper mapper = new ObjectMapper()
         String json = mapper.writeValueAsString(data)
         return mapper.readTree(json) as ObjectNode
