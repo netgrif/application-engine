@@ -925,6 +925,9 @@ public class TaskService implements ITaskService {
             }
         }
         mainOutcome = outcomes.remove(key);
+        if (mainOutcome == null) {
+            return null;
+        }
         mainOutcome.addOutcomes(new ArrayList<>(outcomes.values()));
         return mainOutcome;
     }
