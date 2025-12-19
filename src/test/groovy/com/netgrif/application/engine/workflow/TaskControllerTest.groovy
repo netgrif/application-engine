@@ -300,7 +300,7 @@ class TaskControllerTest {
         return tasks
     }
 
-    static ObjectNode populateNestedDataset(Map<String, Map<String, Map<String, String>>> data) {
+    static ObjectNode populateNestedDataset(Map<String, Map<String, Map<String, Object>>> data) {
         ObjectMapper mapper = new ObjectMapper()
         String json = mapper.writeValueAsString(data)
         return mapper.readTree(json) as ObjectNode
