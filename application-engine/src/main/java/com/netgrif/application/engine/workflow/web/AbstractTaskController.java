@@ -246,10 +246,7 @@ public abstract class AbstractTaskController {
                         fieldChangesEntry.getValue().deepCopy(), new HashMap<>(), true));
             });
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
-            if (mainOutcome == null) {
-                Task task = taskService.findOne(taskId);
-                mainOutcome = new SetDataEventOutcome(workflowService.findOne(task.getCaseId()), task);
-            }
+            mainOutcome = handleMainSetDataEventOutcome(mainOutcome, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set",
                     LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
         } catch (IllegalArgumentWithChangedFieldsException e) {
@@ -267,6 +264,7 @@ public abstract class AbstractTaskController {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
             outcomes.put(dataBody.getParentTaskId(), dataService.saveFile(dataBody.getParentTaskId(), dataBody.getFieldId(), multipartFile));
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
+            mainOutcome = handleMainSetDataEventOutcome(mainOutcome, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set",
                     LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
         } catch (IllegalArgumentWithChangedFieldsException e) {
@@ -299,7 +297,8 @@ public abstract class AbstractTaskController {
         Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
         outcomes.put(taskId, dataService.deleteFile(taskId, fieldId));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
-        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+        mainOutcome = handleMainSetDataEventOutcome(mainOutcome, taskId);
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set",
                 LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
@@ -307,7 +306,8 @@ public abstract class AbstractTaskController {
         Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
         outcomes.put(requestBody.getParentTaskId(), dataService.saveFiles(requestBody.getParentTaskId(), requestBody.getFieldId(), multipartFiles));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
-        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+        mainOutcome = handleMainSetDataEventOutcome(mainOutcome, taskId);
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set",
                 LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
@@ -331,7 +331,8 @@ public abstract class AbstractTaskController {
         Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
         outcomes.put(taskId, dataService.deleteFileByName(taskId, fieldId, name));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
-        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+        mainOutcome = handleMainSetDataEventOutcome(mainOutcome, taskId);
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set",
                 LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
@@ -346,5 +347,14 @@ public abstract class AbstractTaskController {
                 .ok()
                 .headers(headers)
                 .body(fileFieldInputStream != null ? new InputStreamResource(fileFieldInputStream.getInputStream()) : null);
+    }
+    
+    protected SetDataEventOutcome handleMainSetDataEventOutcome(SetDataEventOutcome mainOutcome, String taskId) {
+        if (mainOutcome == null) {
+            Task task = taskService.findOne(taskId);
+            return new SetDataEventOutcome(workflowService.findOne(task.getCaseId()), task);
+        } else {
+            return mainOutcome;
+        }
     }
 }
