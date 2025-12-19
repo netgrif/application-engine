@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.elastic.web.requestbodies;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.netgrif.application.engine.elastic.service.ElasticsearchQuerySanitizer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -60,7 +61,7 @@ public class CaseSearchRequest implements Serializable {
         }
         if (request.containsKey("author") && request.get("author") instanceof List) {
             List<Map<String, String>> authors = (List<Map<String, String>>) request.get("author");
-            this.author = authors.stream().map(map ->  {
+            this.author = authors.stream().map(map -> {
                 Author authorRequest = new Author();
                 if (map.containsKey("id"))
                     authorRequest.id = map.get("id");
@@ -75,7 +76,8 @@ public class CaseSearchRequest implements Serializable {
             this.data = (Map<String, String>) request.get("data");
         }
         if (request.containsKey("fullText") && request.get("fullText") instanceof String) {
-            this.fullText = (String) request.get("fullText");
+            String originalFullText = (String) request.get("fullText");
+            this.fullText = ElasticsearchQuerySanitizer.sanitize(originalFullText);
         }
         if (request.containsKey("transition") && request.get("transition") instanceof List) {
             this.transition = (List<String>) request.get("transition");
