@@ -24,6 +24,9 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.data
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.params.DeleteCaseParams;
+import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -119,14 +122,23 @@ public class ActionApiImpl implements ActionApi {
 
     @Override
     public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, AuthPrincipalDto authPrincipalDto, Map<String, String> params) {
-        LoggedUser loggedUser = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
         Locale locale = LocaleContextHolder.getLocale();
-        return workflowService.createCaseByIdentifier(identifier, title, color, loggedUser, locale, params);
+        return workflowService.createCase(CreateCaseParams.with()
+                .processIdentifier(identifier)
+                .title(title)
+                .color(color)
+                .author(resolveAbstractUser(authPrincipalDto))
+                .locale(locale)
+                .params(params)
+                .build());
     }
 
     @Override
     public DeleteCaseEventOutcome deleteCase(String caseId, Map<String, String> params) {
-        return workflowService.deleteCase(caseId, params);
+        return workflowService.deleteCase(DeleteCaseParams.with()
+                .useCaseId(caseId)
+                .params(params)
+                .build());
     }
 
     @Override
@@ -147,21 +159,33 @@ public class ActionApiImpl implements ActionApi {
     public AssignTaskEventOutcome assignTask(String taskId, AuthPrincipalDto authPrincipalDto, Map<String, String> params) throws TransitionNotExecutableException {
         Task task = taskService.findOne(taskId);
         AbstractUser user = resolveAbstractUser(authPrincipalDto);
-        return taskService.assignTask(task, user, params);
+        return taskService.assignTask(TaskParams.with()
+                .task(task)
+                .user(user)
+                .params(params)
+                .build());
     }
 
     @Override
     public CancelTaskEventOutcome cancelTask(String taskId, AuthPrincipalDto authPrincipalDto, Map<String, String> params) {
         Task task = taskService.findOne(taskId);
         AbstractUser user = resolveAbstractUser(authPrincipalDto);
-        return taskService.cancelTask(task, user, params);
+        return taskService.cancelTask(TaskParams.with()
+                .task(task)
+                .user(user)
+                .params(params)
+                .build());
     }
 
     @Override
     public FinishTaskEventOutcome finishTask(String taskId, AuthPrincipalDto authPrincipalDto, Map<String, String> params) throws TransitionNotExecutableException {
         Task task = taskService.findOne(taskId);
         AbstractUser user = resolveAbstractUser(authPrincipalDto);
-        return taskService.finishTask(task, user, params);
+        return taskService.finishTask(TaskParams.with()
+                .task(task)
+                .user(user)
+                .params(params)
+                .build());
     }
 
     @Override
