@@ -237,18 +237,15 @@ public class PetriNetController {
         }
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         asyncRunner.execute(() -> {
-            // todo 2235
             if (force) {
                 this.service.forceDeletePetriNet(DeletePetriNetParams.with()
                         .petriNetId(decodedProcessId)
                         .loggedUser(user)
-                        .force(force)
                         .build());
             } else {
                 this.service.deletePetriNet(DeletePetriNetParams.with()
                         .petriNetId(decodedProcessId)
                         .loggedUser(user)
-                        .force(force)
                         .build());
             }
         });

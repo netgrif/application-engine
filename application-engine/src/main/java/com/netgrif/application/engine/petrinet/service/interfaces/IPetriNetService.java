@@ -288,10 +288,12 @@ public interface IPetriNetService {
 
     /**
      * Forcefully deletes a PetriNet process by its ID.
-     * todo 2235
      *
-     * @param processId  the ID of the process to delete
-     * @param loggedUser the user requesting the deletion
+     * @param deletePetriNetParams parameters for petriNet removal
+     * <br>
+     * <b>Required parameters: petriNetId</b>
+     *
+     * @throws IllegalArgumentException if the PetriNet doesn't exist
      */
     void forceDeletePetriNet(DeletePetriNetParams deletePetriNetParams);
 

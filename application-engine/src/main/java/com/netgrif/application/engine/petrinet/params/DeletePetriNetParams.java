@@ -19,7 +19,4 @@ public class DeletePetriNetParams {
 
     /// User, who performs the process removal
     private LoggedUser loggedUser;
-
-    /// whether to force the removal without running events
-    private boolean force;
 }

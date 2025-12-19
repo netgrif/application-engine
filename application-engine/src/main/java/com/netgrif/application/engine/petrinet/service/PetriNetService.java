@@ -516,13 +516,16 @@ public class PetriNetService implements IPetriNetService {
     @Override
     @Transactional
     public void deletePetriNet(DeletePetriNetParams deletePetriNetParams) {
-        fillAndValidateAttributes(deletePetriNetParams);
-        // todo 2235
-//        @Override
-//        public void forceDeletePetriNet(String processId, LoggedUser loggedUser) {
-//            deletePetriNet(processId, loggedUser, true);
-//        }
+        doDeletePetriNet(deletePetriNetParams, false);
+    }
 
+    @Override
+    public void forceDeletePetriNet(DeletePetriNetParams deletePetriNetParams) {
+        doDeletePetriNet(deletePetriNetParams, true);
+    }
+
+    protected void doDeletePetriNet(DeletePetriNetParams deletePetriNetParams, boolean force) {
+        fillAndValidateAttributes(deletePetriNetParams);
 
         Optional<PetriNet> petriNetOptional = repository.findById(deletePetriNetParams.getPetriNetId());
         if (petriNetOptional.isEmpty()) {
@@ -533,7 +536,7 @@ public class PetriNetService implements IPetriNetService {
         log.info("[{}]: Initiating deletion of Petri net {} version {}", deletePetriNetParams.getPetriNetId(),
                 petriNet.getIdentifier(), petriNet.getVersion().toString());
 
-        workflowService.deleteInstancesOfPetriNet(petriNet, deletePetriNetParams.isForce());
+        workflowService.deleteInstancesOfPetriNet(petriNet, force);
         processRoleService.deleteRolesOfNet(petriNet, deletePetriNetParams.getLoggedUser());
 
         log.info("[{}]: User [{}] is deleting Petri net {} version {}", deletePetriNetParams.getPetriNetId(),
