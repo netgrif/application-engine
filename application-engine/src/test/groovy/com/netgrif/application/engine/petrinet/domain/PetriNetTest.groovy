@@ -159,7 +159,7 @@ class PetriNetTest {
                 .build())
         assert lastImport.getNet().version.toString() == "3.1.1"
 
-        Page<PetriNetReference> nets = petriNetService.getByIdentifier(zeroImport.getNet().identifier, Pageable.unpaged())
+        Page<PetriNet> nets = petriNetService.getByIdentifier(zeroImport.getNet().identifier, Pageable.unpaged())
         assert nets.getSize() == 5
     }
 

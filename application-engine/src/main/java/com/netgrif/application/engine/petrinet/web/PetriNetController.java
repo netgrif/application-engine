@@ -236,11 +236,22 @@ public class PetriNetController {
             return MessageResource.errorMessage("Deleting Petri net " + processId + " failed!");
         }
         LoggedUser user = (LoggedUser) auth.getPrincipal();
-        asyncRunner.execute(() -> this.service.deletePetriNet(DeletePetriNetParams.with()
-                .petriNetId(decodedProcessId)
-                .loggedUser(user)
-                .force(force)
-                .build()));
+        asyncRunner.execute(() -> {
+            // todo 2235
+            if (force) {
+                this.service.forceDeletePetriNet(DeletePetriNetParams.with()
+                        .petriNetId(decodedProcessId)
+                        .loggedUser(user)
+                        .force(force)
+                        .build());
+            } else {
+                this.service.deletePetriNet(DeletePetriNetParams.with()
+                        .petriNetId(decodedProcessId)
+                        .loggedUser(user)
+                        .force(force)
+                        .build());
+            }
+        });
         return MessageResource.successMessage("Petri net " + decodedProcessId + " is being deleted");
     }
 

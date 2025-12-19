@@ -174,7 +174,7 @@ class ImportHelper {
     }
 
     Map<String, ProcessRole> getProcessRoles(PetriNet net) {
-        List<ProcessRole> roles = processRoleService.findAll(net.stringId)
+        List<ProcessRole> roles = processRoleService.findAllByNetStringId(net.stringId)
         Map<String, ProcessRole> map = [:]
         net.roles.values().each { netRole ->
             map[netRole.name.getDefaultValue()] = roles.find { it.stringId == netRole.stringId }

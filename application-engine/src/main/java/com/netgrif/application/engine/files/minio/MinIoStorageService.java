@@ -73,11 +73,11 @@ public class MinIoStorageService implements IStorageService {
                             .object(path)
                             .build()
             );
-        } catch (ErrorResponseException e) {
+        } catch (ServerException e) {
             log.error(e.getMessage(), e);
-            if (e.response().code() == 404) {
+            if (e.statusCode() == 404) {
                 throw new FileNotFoundException("File " + path + " not found.");
-            } else if (e.response().code() == 400) {
+            } else if (e.statusCode() == 400) {
                 throw new BadRequestException("Getting file from minio failed.", e);
             } else {
                 throw new ServiceErrorException("Some http error from minio", e);

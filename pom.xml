@@ -6,7 +6,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine-parent</artifactId>
-    <version>7.0.0-RC9</version>
+    <version>7.0.0-RC10</version>
     <packaging>pom</packaging>
 
     <name>NETGRIF Application Engine parent</name>
@@ -67,12 +67,13 @@
         <jakarta.bind.version>4.0.2</jakarta.bind.version>
         <junit-jupiter.version>5.11.4</junit-jupiter.version>
         <bson.version>5.2.1</bson.version>
-        <spring.boot.version>3.4.4</spring.boot.version>
+        <spring.boot.version>3.5.8</spring.boot.version>
         <jackson.version>2.17.1</jackson.version>
-        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
         <querydsl.version>5.0.0</querydsl.version>
-        <protobuf.version>4.27.0</protobuf.version>
-        <grpc.version>1.64.0</grpc.version>
+        <protobuf.version>4.33.1</protobuf.version>
+        <grpc.version>1.69.1</grpc.version>
+        <commons-lang3.version>3.20.0</commons-lang3.version>
         <sonar.organization>netgrif-oss</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
@@ -89,19 +90,17 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-        <repository>
-            <id>mvnrepository1</id>
-            <url>https://maven.imagej.net/content/repositories/public/</url>
-        </repository>
-        <repository>
-            <id>mvnrepository2</id>
-            <url>https://repo.spring.io/plugins-release/</url>
-        </repository>
-        <repository>
-            <id>mulesoft</id>
-            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
-        </repository>
     </repositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <extensions>
@@ -142,7 +141,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.11.2</version>
+                <version>3.12.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-lang3</artifactId>
+                        <version>${commons-lang3.version}</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>

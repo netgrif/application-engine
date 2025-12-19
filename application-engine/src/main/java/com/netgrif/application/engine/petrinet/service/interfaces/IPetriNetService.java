@@ -287,6 +287,15 @@ public interface IPetriNetService {
     void deletePetriNet(DeletePetriNetParams deletePetriNetParams);
 
     /**
+     * Forcefully deletes a PetriNet process by its ID.
+     * todo 2235
+     *
+     * @param processId  the ID of the process to delete
+     * @param loggedUser the user requesting the deletion
+     */
+    void forceDeletePetriNet(DeletePetriNetParams deletePetriNetParams);
+
+    /**
      * Runs the specified set of actions on a PetriNet.
      *
      * @param actions the actions to execute

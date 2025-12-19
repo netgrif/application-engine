@@ -10,6 +10,7 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petr
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
 
 import java.util.stream.Collectors
@@ -24,7 +25,7 @@ class ActionMigration {
     @Autowired
     private UserService userService;
 
-    void migrateActions(String petriNetPath) {
+    void migrateActions(String petriNetPath, Pageable pageable = Pageable.unpaged()) {
         try (InputStream netStream = new ClassPathResource(petriNetPath).inputStream) {
             ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(ImportPetriNetParams.with()
                     .xmlFile(netStream)
@@ -38,7 +39,7 @@ class ActionMigration {
                 log.error(message)
                 throw new IllegalArgumentException(message)
             } else {
-                oldPetriNets = petriNetService.getByIdentifier(newPetriNet.getNet().importId)
+                oldPetriNets = petriNetService.getByIdentifier(newPetriNet.getNet().importId, pageable)
                         .stream().filter({ net -> (net.version != newPetriNet.getNet().version)})
                         .collect(Collectors.toList())
             }
