@@ -250,8 +250,11 @@ public class DataService implements IDataService {
         values.fields().forEachRemaining(entry -> {
             String fieldId = entry.getKey();
             if (runSafe) {
-                FieldType fieldType =  useCase.getField(fieldId).getType();
-                if (setDataForbiddenFieldTypes.contains(fieldType)) {
+                Field<?> field = useCase.getField(fieldId);
+                if (field == null) {
+                    throw new IllegalArgumentException("Such field with id [" + fieldId + "] does not exist in petri net [" + useCase.getPetriNetId() + "]");
+                }
+                if (setDataForbiddenFieldTypes.contains(field.getType())) {
                     return;
                 }
             }
