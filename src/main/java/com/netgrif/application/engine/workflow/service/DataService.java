@@ -230,13 +230,13 @@ public class DataService implements IDataService {
      * @param task the task object of which the data are updated
      * @param values information about how to update the data fields
      * @param params additional information to be injected to the action delegate context
-     * @param runSafe if set to true, additional validations are going to be applied when updating the data fields. If
+     * @param runStrict if set to true, additional validations are going to be applied when updating the data fields. If
      *                set to false, minimal restrictions are considered.
      *
      * @return outcome containing Case, Task and changes that have been made.
      * */
     @Override
-    public SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params, boolean runSafe) {
+    public SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params, boolean runStrict) {
         Case useCase = workflowService.findOne(task.getCaseId());
         IUser user = userService.getLoggedOrSystem();
 
@@ -248,7 +248,7 @@ public class DataService implements IDataService {
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
         values.fields().forEachRemaining(entry -> {
             String fieldId = entry.getKey();
-            if (runSafe) {
+            if (runStrict) {
                 Field<?> field = useCase.getField(fieldId);
                 if (field == null) {
                     throw new IllegalArgumentException("Such field with id [" + fieldId + "] does not exist in petri net [" + useCase.getPetriNetId() + "]");
@@ -259,7 +259,7 @@ public class DataService implements IDataService {
             }
             DataField dataField = useCase.getDataSet().get(fieldId);
             if (dataField != null) {
-                if (runSafe && !isDataFieldEditable(dataField, task.getTransitionId())) {
+                if (runStrict && !isDataFieldEditable(dataField, task.getTransitionId())) {
                     throw new IllegalArgumentException("Cannot edit data field [" + fieldId + "], which is not editable on transition [" + task.getTransitionId() + "].");
                 }
                 Field field = useCase.getPetriNet().getField(fieldId).get();
