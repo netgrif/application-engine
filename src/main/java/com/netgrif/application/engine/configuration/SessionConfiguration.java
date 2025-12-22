@@ -15,6 +15,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,12 @@ public class SessionConfiguration {
 
     @Value("${spring.session.redis.ssl:false}")
     private Boolean ssl;
+
+    @Value("${spring.session.redis.connection-timeout:2}")
+    private Long connectionTimeout; // duration in seconds
+
+    @Value("${spring.session.redis.read-timeout:2}")
+    private Long readTimeout; // duration in seconds
 
     @Value("${spring.redis.sentinel.master:#{null}}")
     private String sentinelMasterName;
@@ -75,6 +82,7 @@ public class SessionConfiguration {
             redisStandaloneConfiguration.setPassword(password);
         }
         JedisClientConfiguration clientConfiguration = jedisClientConfiguration();
+        log.debug("Redis standalone configuration: host: {}; port: {}; username: {}", hostName, port, username);
         return new JedisConnectionFactory(redisStandaloneConfiguration, clientConfiguration);
     }
 
@@ -101,14 +109,23 @@ public class SessionConfiguration {
         }
 
         JedisClientConfiguration clientConfiguration = jedisClientConfiguration();
+        log.debug("Redis sentinel configuration: master: {}; nodes: {}; username: {}", sentinelMasterName, sentinelNodes, username);
         return new JedisConnectionFactory(sentinelConfiguration, clientConfiguration);
     }
 
     protected JedisClientConfiguration jedisClientConfiguration() {
-        if (ssl) {
-            return JedisClientConfiguration.builder().useSsl().build();
+        JedisClientConfiguration.JedisClientConfigurationBuilder builder = JedisClientConfiguration.builder();
+        if (connectionTimeout != null && connectionTimeout != 0) {
+            builder = builder.connectTimeout(Duration.ofSeconds(connectionTimeout));
         }
-        return JedisClientConfiguration.defaultConfiguration();
+        if (readTimeout != null && readTimeout != 0) {
+            builder = builder.readTimeout(Duration.ofSeconds(readTimeout));
+        }
+        if (ssl) {
+            builder = builder.useSsl().and();
+        }
+        log.debug("Redis client configuration: connection timeout:{}; read timeout:{}; ssl:{}", connectionTimeout, readTimeout, ssl);
+        return builder.build();
     }
 
     private boolean hasCredentials(String username, String password) {
