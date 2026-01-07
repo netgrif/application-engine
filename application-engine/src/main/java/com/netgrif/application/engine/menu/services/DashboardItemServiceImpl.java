@@ -63,9 +63,9 @@ public class DashboardItemServiceImpl implements DashboardItemService {
         }
 
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
-        PetriNet petriNet = petriNetService.getActiveVersionByIdentifier(DashboardItemConstants.PROCESS_IDENTIFIER);
+        PetriNet petriNet = petriNetService.getDefaultVersionByIdentifier(DashboardItemConstants.PROCESS_IDENTIFIER);
         if (petriNet == null) {
-            throw new IllegalStateException("Dashboard item process not found or not active");
+            throw new IllegalStateException("Dashboard item process not found");
         }
         itemCase = workflowService.createCase(petriNet.getStringId(), body.getName().getDefaultValue(), "", loggedUser).getCase();
         ToDataSetOutcome outcome = body.toDataSet();

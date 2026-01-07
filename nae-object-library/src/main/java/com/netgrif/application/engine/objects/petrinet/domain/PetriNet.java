@@ -76,7 +76,7 @@ public abstract class PetriNet extends PetriNetObject {
     @Getter
     @Setter
     @Indexed
-    private boolean versionActive;
+    private boolean defaultVersion;
 
     @Getter
     @Setter
@@ -163,7 +163,7 @@ public abstract class PetriNet extends PetriNetObject {
         this.userRefs = new HashMap<>();
         this.functions = new LinkedList<>();
         this.tags = new HashMap<>();
-        this.makeInactive();
+        this.makeNonDefault();
     }
 
     public PetriNet(PetriNet petriNet) {
@@ -174,7 +174,7 @@ public abstract class PetriNet extends PetriNetObject {
         this.title = petriNet.getTitle();
         this.importId = petriNet.getImportId();
         this.version = petriNet.getVersion();
-        this.versionActive = petriNet.isVersionActive();
+        this.defaultVersion = petriNet.isDefaultVersion();
         this.defaultCaseName = petriNet.getDefaultCaseName();
         this.defaultCaseNameExpression = petriNet.getDefaultCaseNameExpression();
         this.initials = petriNet.getInitials();
@@ -438,12 +438,12 @@ public abstract class PetriNet extends PetriNetObject {
         return defaultCaseNameExpression != null;
     }
 
-    public void makeActive() {
-        this.setVersionActive(true);
+    public void makeDefault() {
+        this.setDefaultVersion(true);
     }
 
-    public void makeInactive() {
-        this.setVersionActive(false);
+    public void makeNonDefault() {
+        this.setDefaultVersion(false);
     }
 
     @Override

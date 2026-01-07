@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum ResourceNotFoundExceptionCode {
 
     DEFAULT_SYSTEM_GROUP_NOT_FOUND("defaultSystemGroupNotFound"),
-    DEFAULT_USER_GROUP_NOT_FOUND("defaultUserGroupNotFound");
+    DEFAULT_USER_GROUP_NOT_FOUND("defaultUserGroupNotFound"),
+    DEFAULT_PROCESS_NOT_FOUND("defaultProcessNotFound");
 
     private final String key;
 

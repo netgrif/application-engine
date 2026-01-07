@@ -67,13 +67,13 @@ class CachePetriNetServiceTest {
 
     @Test
     void cacheTest() {
-        assert cacheManager.getCache(cacheProperties.getPetriNetActive()).get("processDeleteTest") == null
+        assert cacheManager.getCache(cacheProperties.getPetriNetDefault()).get("processDeleteTest") == null
         ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert testNetOptional.getNet() != null
         PetriNet testNet = testNetOptional.getNet()
 
-        assert cacheManager.getCache(cacheProperties.getPetriNetActive()).get(testNet.getIdentifier()) == null
-        PetriNet test = petriNetService.getActiveVersionByIdentifier(testNet.getIdentifier())
-        assert cacheManager.getCache(cacheProperties.getPetriNetActive()).get(testNet.getIdentifier()).get().equals(test)
+        assert cacheManager.getCache(cacheProperties.getPetriNetDefault()).get(testNet.getIdentifier()) == null
+        PetriNet test = petriNetService.getDefaultVersionByIdentifier(testNet.getIdentifier())
+        assert cacheManager.getCache(cacheProperties.getPetriNetDefault()).get(testNet.getIdentifier()).get().equals(test)
     }
 }

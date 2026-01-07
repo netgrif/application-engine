@@ -65,9 +65,9 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
         }
         addReferencedMenuItems(body);
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
-        PetriNet petriNet = petriNetService.getActiveVersionByIdentifier(DashboardManagementConstants.PROCESS_IDENTIFIER);
+        PetriNet petriNet = petriNetService.getDefaultVersionByIdentifier(DashboardManagementConstants.PROCESS_IDENTIFIER);
         if (petriNet == null) {
-            throw new IllegalStateException("Dashboard management process not found or not active");
+            throw new IllegalStateException("Dashboard management process not found");
         }
         managementCase = workflowService.createCase(petriNet.getStringId(), body.getName().getDefaultValue(), "", loggedUser).getCase();
         ToDataSetOutcome outcome = body.toDataSet();
