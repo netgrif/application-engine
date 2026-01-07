@@ -47,7 +47,7 @@ public class CacheConfigurationProperties {
     private String loadedModules = "loadedModules";
 
     /**
-     * Default cache name for caching namespace functions.
+     * Default cache name for caching global functions.
      */
     private String globalFunctions = "globalFunctions";
 

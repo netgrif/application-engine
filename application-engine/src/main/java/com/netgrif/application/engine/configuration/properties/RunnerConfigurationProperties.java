@@ -54,7 +54,7 @@ public class RunnerConfigurationProperties {
         private int functionsCacheSize = 500;
 
         /**
-         * The size of the cache used for maintaining field runner namespaces.
+         * The size of the cache used for managing global Petri net functions.
          */
         private int globalFunctionsCacheSize = 500;
     }

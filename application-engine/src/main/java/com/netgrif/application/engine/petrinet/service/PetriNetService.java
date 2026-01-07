@@ -381,6 +381,13 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
+    public Page<PetriNet> getAllActive(Pageable pageable) {
+        Page<PetriNet> nets = repository.findAllByVersionActiveTrue(pageable);
+        nets.forEach(PetriNet::initializeArcs);
+        return nets;
+    }
+
+    @Override
     public FileSystemResource getFile(String netId, String title) {
         if (title == null || title.length() == 0) {
             Query query = Query.query(Criteria.where("_id").is(new ObjectId(netId)));

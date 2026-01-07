@@ -176,6 +176,8 @@ public interface IPetriNetService {
      */
     Page<PetriNet> getAll(Pageable pageable);
 
+    Page<PetriNet> getAllActive(Pageable pageable);
+
     /**
      * Retrieves a {@link FileSystemResource} representing a file associated with a {@link PetriNet}.
      *
