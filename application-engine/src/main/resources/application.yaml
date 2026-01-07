@@ -130,6 +130,9 @@ netgrif:
           enabled: 'false'
         env:
           enabled: 'true'
+      health:
+        elasticsearch:
+          enabled: 'false'
     logging:
       file:
         path: log

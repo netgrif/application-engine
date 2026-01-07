@@ -122,7 +122,7 @@ class PetriNetTest {
         def lastImport = petriNetService.importPetriNet(netResource4.inputStream, VersionType.PATCH, superCreator.loggedSuper)
         assert lastImport.getNet().version.toString() == "3.1.1"
 
-        Page<PetriNetReference> nets = petriNetService.getByIdentifier(zeroImport.getNet().identifier, Pageable.unpaged())
+        Page<PetriNet> nets = petriNetService.getByIdentifier(zeroImport.getNet().identifier, Pageable.unpaged())
         assert nets.getSize() == 5
     }
 

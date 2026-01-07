@@ -572,8 +572,11 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Transactional
-    public void deletePetriNet(String processId, LoggedUser loggedUser, boolean force) {
+    public void forceDeletePetriNet(String processId, LoggedUser loggedUser) {
+        deletePetriNet(processId, loggedUser, true);
+    }
+
+    protected void deletePetriNet(String processId, LoggedUser loggedUser, boolean force) {
         Optional<PetriNet> petriNetOptional = repository.findById(processId);
         if (petriNetOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find process with id [" + processId + "]");
@@ -582,7 +585,6 @@ public class PetriNetService implements IPetriNetService {
         PetriNet petriNet = petriNetOptional.get();
         log.info("[{}]: Initiating deletion of Petri net {} version {}", processId, petriNet.getIdentifier(), petriNet.getVersion().toString());
 
-        userService.removeRoleOfDeletedPetriNet(petriNet);
         workflowService.deleteInstancesOfPetriNet(petriNet, force);
         processRoleService.deleteRolesOfNet(petriNet, loggedUser);
 

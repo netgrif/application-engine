@@ -891,6 +891,13 @@ public class DataService implements IDataService {
                 }
                 value = FileFieldValue.fromString(node.get("value").asText());
                 break;
+            case "fileList":
+                if (node.get("value") == null || node.get("value").isNull()) {
+                    value = new FileListFieldValue();
+                    break;
+                }
+                value = parseFileListFieldValue(node);
+                break;
             case "caseRef":
                 List<String> list = parseListStringValues(node);
                 if (list == null) {
@@ -955,6 +962,17 @@ public class DataService implements IDataService {
     private UserListFieldValue makeUserListFieldValue(ObjectNode nodes) {
         Set<String> userIds = new LinkedHashSet<>(parseListStringValues(nodes));
         return new UserListFieldValue(userIds.stream().map(this::makeUserFieldValue).collect(Collectors.toSet()));
+    }
+
+    private FileListFieldValue parseFileListFieldValue(ObjectNode node) {
+        JsonNode valueNode = node.get("value");
+        if (valueNode == null || !valueNode.isArray()) {
+            return new FileListFieldValue();
+        }
+        ArrayNode arrayNode = (ArrayNode) valueNode;
+        List<String> fileListValueList = new ArrayList<>();
+        arrayNode.forEach(item -> fileListValueList.add(item.asText()));
+        return FileListFieldValue.fromList(fileListValueList);
     }
 
     private List<String> parseListStringValues(ObjectNode node) {
