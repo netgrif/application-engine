@@ -178,4 +178,28 @@ public class ElasticsearchQuerySanitizerTest {
         assertNotEquals(query, sanitized);
     }
 
+    @Test
+    void shouldNotModifyQueryWithoutReservedCharacters() {
+        String query = "simple search query";
+        String sanitized = ElasticsearchQuerySanitizer.sanitize(query);
+        // Note: space is a reserved character, so this will be escaped
+        assertEquals("simple\\ search\\ query", sanitized);
+    }
+
+    @Test
+    void shouldNotModifyQueryWithoutReservedCharactersExcludingSpace() {
+        String query = "simple search query";
+        String[] exclude = {" "};
+        String sanitized = ElasticsearchQuerySanitizer.sanitize(query, exclude);
+        // Note: space is a reserved character, so this will be escaped
+        assertEquals("simple search query", sanitized);
+    }
+
+    @Test
+    void shouldNotModifyQueryWithoutAnyReservedCharacters() {
+        String query = "simplesearchquery";
+        String sanitized = ElasticsearchQuerySanitizer.sanitize(query);
+        assertEquals("simplesearchquery", sanitized);
+    }
+
 }
