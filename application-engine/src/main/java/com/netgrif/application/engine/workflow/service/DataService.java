@@ -133,7 +133,8 @@ public class DataService implements IDataService {
         fieldsIds.forEach(fieldId -> {
             if (isForbidden(fieldId, transition, useCase.getDataField(fieldId)))
                 return;
-            Field<?> field = useCase.getPetriNet().getField(fieldId).get();
+            Field<?> field = useCase.getPetriNet().getField(fieldId).orElseThrow(() -> new IllegalStateException("Field with id [%s] is missing from process with id [%s]"
+                    .formatted(fieldId, useCase.getPetriNetId())));
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, params));
             publisher.publishEvent(new GetDataEvent(outcome, EventPhase.PRE, user));
 
@@ -153,7 +154,7 @@ public class DataService implements IDataService {
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 DataField dataField = useCase.getDataSet().get(fieldId);
                 if (dataField.isDisplayable(transition.getStringId())) {
-                    Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
+                    Field<?> validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
                     validationField.setBehavior(dataField.applyBehavior(transition.getStringId()));
                     DataFieldLogic dataRef = transition.getDataSet().get(fieldId);
                     if (dataRef.layoutExist() && dataRef.getLayout().layoutFilled()) {
@@ -164,7 +165,7 @@ public class DataService implements IDataService {
             } else {
                 DataFieldLogic dataRef = transition.getDataSet().get(fieldId);
                 if (dataRef.isDisplayable()) {
-                    Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
+                    Field<?> validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
                     validationField.setBehavior(dataRef.applyBehavior());
                     if (dataRef.layoutExist() && dataRef.getLayout().layoutFilled()) {
                         validationField.setLayout(dataRef.getLayout().clone());
