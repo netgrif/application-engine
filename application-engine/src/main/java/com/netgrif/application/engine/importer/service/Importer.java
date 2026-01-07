@@ -1349,7 +1349,6 @@ public class Importer {
         return tags;
     }
 
-    @Transactional
     protected Set<String> extractPluginDependencies() {
         HashSet<String> plugins = new HashSet<>();
         for (Action action: this.actions.values()) {

@@ -197,7 +197,10 @@ public abstract class PetriNet extends PetriNetObject {
         this.defaultRoleEnabled = petriNet.isDefaultRoleEnabled();
         this.anonymousRoleEnabled = petriNet.isAnonymousRoleEnabled();
         this.author = petriNet.getAuthor();
-        this.pluginDependencies = petriNet.getPluginDependencies();
+        Set<String> sourcePlugins = petriNet.getPluginDependencies();
+        this.pluginDependencies = sourcePlugins != null
+                ? new HashSet<>(sourcePlugins)
+                : new HashSet<>();
         initializeArcs();
     }
 
