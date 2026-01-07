@@ -102,7 +102,9 @@ public abstract class ElasticCase implements Serializable {
         viewUsers = new HashSet<>(useCase.getViewUsers());
         negativeViewUsers = new HashSet<>(useCase.getNegativeViewUsers());
         tags = new HashMap<>(useCase.getTags());
-
+        permissions = new HashMap<>(useCase.getPermissions());
+        users = new HashMap<>(useCase.getUsers());
+        userRefs = new HashMap<>(useCase.getUserRefs());
         dataSet = new HashMap<>();
         immediateData = useCase.getImmediateData().stream().map(ImmediateField::new).collect(Collectors.toList());
     }
