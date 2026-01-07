@@ -235,7 +235,8 @@ public class DataService implements IDataService {
                 return;
             }
 
-            Field<?> field = useCase.getPetriNet().getField(fieldId).get();
+            Field<?> field = useCase.getPetriNet().getField(fieldId).orElseThrow(() -> new IllegalStateException("Field with id [%s] is missing from process with id [%s]"
+                    .formatted(fieldId, useCase.getPetriNetId())));
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task, params));
             if (outcome.getMessage() == null) {
                 if (field.getEvents().containsKey(DataEventType.SET) &&
@@ -347,6 +348,10 @@ public class DataService implements IDataService {
                             }
                             resources.add(resource);
                             Field<?> field = net.getDataSet().get(dataFieldId);
+                            if (field == null) {
+                                throw new IllegalStateException("Field with id [%s] is missing from process with id [%s]"
+                                        .formatted(dataFieldId, useCase.getPetriNetId()));
+                            }
                             if (field.getType() == FieldType.TASK_REF
                                     && shouldResolveTaskRefData(field, transition.getDataSet().get(field.getStringId()))) {
                                 resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) resource, locale, collectedTaskIds, level));
@@ -668,7 +673,8 @@ public class DataService implements IDataService {
     }
 
     private List<EventOutcome> getChangedFieldByFileFieldContainer(String fieldId, Task referencingTask, Case useCase, Map<String, String> params) {
-        Field<?> field = useCase.getPetriNet().getField(fieldId).get();
+        Field<?> field = useCase.getPetriNet().getField(fieldId).orElseThrow(() -> new IllegalStateException("Field with id [%s] is missing from process with id [%s]"
+                .formatted(fieldId, useCase.getPetriNetId())));
         List<EventOutcome> outcomes = new ArrayList<>(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE,
                 useCase, referencingTask, params));
         outcomes.addAll(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, referencingTask, params));
