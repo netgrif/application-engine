@@ -350,11 +350,11 @@ public abstract class AbstractTaskController {
     }
     
     protected SetDataEventOutcome handleMainSetDataEventOutcome(SetDataEventOutcome mainOutcome, String taskId) {
-        if (mainOutcome == null) {
-            Task task = taskService.findOne(taskId);
-            return new SetDataEventOutcome(workflowService.findOne(task.getCaseId()), task);
-        } else {
+        if (mainOutcome != null) {
             return mainOutcome;
         }
+
+        Task task = taskService.findOne(taskId);
+        return new SetDataEventOutcome(workflowService.findOne(task.getCaseId()), task);
     }
 }
