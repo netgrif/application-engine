@@ -335,8 +335,6 @@ public class DataService implements IDataService {
         return outcome;
     }
 
-    private
-
     private boolean isDataFieldEditable(DataField dataField, String transId) {
         Map<String, Set<FieldBehavior>> behaviorMap = dataField.getBehavior();
         if (behaviorMap == null) {
