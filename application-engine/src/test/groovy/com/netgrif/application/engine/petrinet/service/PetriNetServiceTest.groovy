@@ -36,7 +36,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 
 import static org.junit.jupiter.api.Assertions.assertThrows
 
-@Disabled
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
@@ -98,6 +97,7 @@ class PetriNetServiceTest {
     }
 
     @Test
+    @Disabled
     void processImportAndDelete() {
         long processRoleCount = processRoleRepository.count()
         long processCount = petriNetRepository.count()
@@ -176,10 +176,15 @@ class PetriNetServiceTest {
         assert elasticPetriNetV4Optional.isPresent()
         assert elasticPetriNetV4Optional.get().isVersionActive()
 
-        assertThrows(IllegalArgumentException.class, {
-            // cannot import with lower version number than the highest
-            importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("1"), superCreator.loggedSuper)
-        })
+        outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("1"), superCreator.loggedSuper)
+        PetriNet petriNetV1 = outcome.getNet()
+        assert petriNetV1 != null
+        assert petriNetService.get(petriNetV4.getObjectId()).isVersionActive()
+        assert !petriNetV1.isVersionActive()
+        version = new Version()
+        version.setMajor(1)
+        assert petriNetV1.getVersion() == version
+
         assertThrows(IllegalArgumentException.class, {
             // cannot import already existing version
             importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("2"), superCreator.loggedSuper)
@@ -241,6 +246,7 @@ class PetriNetServiceTest {
     }
 
     @Test
+    @Disabled
     void processSearch() {
         long processCount = petriNetRepository.count()
 

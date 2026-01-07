@@ -200,35 +200,7 @@ public class PetriNetService implements IPetriNetService {
             return outcome;
         }
         PetriNet newProcess = importedProcess.get();
-        PetriNet inactivatedProcess = null;
-
-        if (newProcess.getVersion() != null && self.getPetriNet(newProcess.getIdentifier(), newProcess.getVersion()) != null) {
-            throw new IllegalArgumentException("A process [%s] with such version [%s] already exists"
-                    .formatted(newProcess.getIdentifier(), newProcess.getVersion()));
-        }
-        PetriNet existingLatestProcess = self.getLatestVersionByIdentifier(newProcess.getIdentifier());
-        if (existingLatestProcess == null && newProcess.getVersion() == null) {
-            newProcess.setVersion(new Version());
-        } else {
-            if (newProcess.getVersion() == null) {
-                newProcess.setVersion(existingLatestProcess.getVersion().clone());
-                newProcess.incrementVersion(releaseType);
-            } else if (existingLatestProcess != null && newProcess.getVersion().isLowerThan(existingLatestProcess.getVersion())) {
-                throw new IllegalArgumentException("Only higher versions of process [%s] are allowed to import. The requested version [%s] cannot be imported because the higher version [%s] already exists."
-                        .formatted(newProcess.getIdentifier(), newProcess.getVersion(), existingLatestProcess.getVersion()));
-            }
-            if (existingLatestProcess != null && existingLatestProcess.isVersionActive()) {
-                existingLatestProcess.makeInactive();
-                inactivatedProcess = existingLatestProcess;
-            } else {
-                PetriNet existingActiveProcess = self.getActiveVersionByIdentifier(newProcess.getIdentifier());
-                if (existingActiveProcess != null) {
-                    existingActiveProcess.makeInactive();
-                    inactivatedProcess = existingActiveProcess;
-                }
-            }
-        }
-        newProcess.makeActive();
+        PetriNet inactivatedProcess = checkAndHandleProcessVersion(newProcess, releaseType);
 
         processRoleService.saveAll(newProcess.getRoles().values());
         newProcess.setAuthor(ActorTransformer.toActorRef(author));
@@ -249,6 +221,62 @@ public class PetriNetService implements IPetriNetService {
         outcome.setNet(importedProcess.get());
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
         return outcome;
+    }
+
+    /**
+     * Validates the version of an importing process. This method can update 'newProces': initialize version,
+     * initialize activeness. This method can also update the current active process if needed.
+     *
+     * <h4>Version initialization logic</h4>
+     * <ul>
+     *     <li>Uploaded process becomes active only if its version is the highest</li>
+     *     <li>Only one process can be active. If the importing process is about to get active, the currently active
+     *     process becomes inactive</li>
+     *     <li>If no version is provided, it's initialized to 1.0.0 or by the existing highest version incremented
+     *     by 'releaseType' input parameter</li>
+     * </ul>
+     *
+     * @param newProcess A process to be checked and updated
+     * @param releaseType requested release type level. It's used for version initialization
+     *
+     * @return The process, which has been inactivated or null if no process was inactivated
+     *
+     * @throws IllegalArgumentException if the version already exists
+     * */
+    private PetriNet checkAndHandleProcessVersion(PetriNet newProcess, VersionType releaseType) {
+        PetriNet inactivatedProcess = null;
+
+        if (newProcess.getVersion() != null && self.getPetriNet(newProcess.getIdentifier(), newProcess.getVersion()) != null) {
+            throw new IllegalArgumentException("A process [%s] with such version [%s] already exists"
+                    .formatted(newProcess.getIdentifier(), newProcess.getVersion()));
+        }
+        PetriNet existingLatestProcess = self.getLatestVersionByIdentifier(newProcess.getIdentifier());
+        boolean inactivateCurrentActiveVersion = true;
+        if (existingLatestProcess == null && newProcess.getVersion() == null) {
+            newProcess.setVersion(new Version());
+        } else {
+            if (newProcess.getVersion() == null) {
+                newProcess.setVersion(existingLatestProcess.getVersion().clone());
+                newProcess.incrementVersion(releaseType);
+            } else if (existingLatestProcess != null && newProcess.getVersion().isLowerThan(existingLatestProcess.getVersion())) {
+                inactivateCurrentActiveVersion = false;
+            }
+            if (inactivateCurrentActiveVersion && existingLatestProcess != null && existingLatestProcess.isVersionActive()) {
+                existingLatestProcess.makeInactive();
+                inactivatedProcess = existingLatestProcess;
+            } else if (inactivateCurrentActiveVersion) {
+                PetriNet existingActiveProcess = self.getActiveVersionByIdentifier(newProcess.getIdentifier());
+                if (existingActiveProcess != null) {
+                    existingActiveProcess.makeInactive();
+                    inactivatedProcess = existingActiveProcess;
+                }
+            }
+        }
+        if (inactivateCurrentActiveVersion) {
+            newProcess.makeActive();
+        }
+
+        return inactivatedProcess;
     }
 
     @Override
