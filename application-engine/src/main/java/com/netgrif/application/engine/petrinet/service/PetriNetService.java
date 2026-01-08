@@ -215,10 +215,10 @@ public class PetriNetService implements IPetriNetService {
         if (processToMakeNonDefault != null) {
             doSaveInternal(processToMakeNonDefault);
         }
-        doSaveInternal(newProcess);
+        Optional<PetriNet> saveProcessOpt = doSaveInternal(newProcess);
 
         outcome.setOutcomes(eventService.runActions(newProcess.getPostUploadActions(), null, Optional.empty(), params));
-        outcome.setNet(importedProcess.get());
+        outcome.setNet(saveProcessOpt.orElseThrow());
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
         return outcome;
     }
