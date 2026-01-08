@@ -176,7 +176,12 @@ public interface IPetriNetService {
      */
     Page<PetriNet> getAll(Pageable pageable);
 
-    Page<PetriNet> getAllActive(Pageable pageable);
+    /**
+     * Retrieves all default version PetriNets
+     * @param pageable - the pagination information
+     * @return a paginated list of all default {@link PetriNet} objects
+     * */
+    Page<PetriNet> getAllDefault(Pageable pageable);
 
     /**
      * Retrieves a {@link FileSystemResource} representing a file associated with a {@link PetriNet}.

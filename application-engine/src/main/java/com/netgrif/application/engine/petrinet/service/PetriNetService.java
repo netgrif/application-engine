@@ -415,8 +415,8 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public Page<PetriNet> getAllActive(Pageable pageable) {
-        Page<PetriNet> nets = repository.findAllByVersionActiveTrue(pageable);
+    public Page<PetriNet> getAllDefault(Pageable pageable) {
+        Page<PetriNet> nets = repository.findAllByDefaultVersionTrue(pageable);
         nets.forEach(PetriNet::initializeArcs);
         return nets;
     }

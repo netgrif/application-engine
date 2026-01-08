@@ -101,7 +101,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     @Override
     public void cacheAllPetriNetFunctions() {
         Pageable pageable = PageRequest.of(0, 500);
-        Page<PetriNet> page = petriNetService.getAllActive(pageable);
+        Page<PetriNet> page = petriNetService.getAllDefault(pageable);
 
         while (!page.isEmpty()) {
             for (PetriNet petriNet : page) {
@@ -116,7 +116,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
                 break;
             }
             pageable = pageable.next();
-            page = petriNetService.getAll(pageable);
+            page = petriNetService.getAllDefault(pageable);
         }
     }
 

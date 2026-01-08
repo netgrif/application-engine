@@ -86,5 +86,5 @@ public interface PetriNetRepository extends MongoRepository<PetriNet, String>, Q
      *
      * @return a {@link Page} of active {@link PetriNet} entities
      * */
-    Page<PetriNet> findAllByVersionActiveTrue(Pageable pageable);
+    Page<PetriNet> findAllByDefaultVersionTrue(Pageable pageable);
 }

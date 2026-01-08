@@ -14,7 +14,7 @@ public class FunctionValidator implements IFunctionValidator {
     @Override
     public void checkDeprecatedAttributes(Function function) {
         if (function.getScope() != null && function.getScope().value().equals(NAMESPACE)) {
-            log.warn("Function scope [NAMESPACE] is deprecated. Replacing with [GLOBAL].]");
+            log.warn("Function scope [NAMESPACE] is deprecated. Replacing with [GLOBAL].");
             function.setScope(Scope.GLOBAL);
         }
     }
