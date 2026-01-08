@@ -59,11 +59,12 @@ public class TaskSearchRequestSingleItemAsListDeserializer extends SingleItemAsL
         Object result = super.deserialize(jsonParser, deserializationContext);
         if (isWrapperClass(result, SingleTaskSearchRequestAsList.class, TaskSearchRequest.class) ||
                 isWrapperClass(result, SingleElasticTaskSearchRequestAsList.class, ElasticTaskSearchRequest.class)) {
-            List<? extends TaskSearchRequest> list = result instanceof SingleTaskSearchRequestAsList ?
-                    ((SingleTaskSearchRequestAsList) result).getList() :
-                    (result instanceof SingleElasticTaskSearchRequestAsList ?
-                            ((SingleElasticTaskSearchRequestAsList) result).getList() :
-                            Collections.emptyList());
+            List<? extends TaskSearchRequest> list = Collections.emptyList();
+            if (result instanceof SingleTaskSearchRequestAsList) {
+                list = ((SingleTaskSearchRequestAsList) result).getList();
+            } else if (result instanceof SingleElasticTaskSearchRequestAsList) {
+                list = ((SingleElasticTaskSearchRequestAsList) result).getList();
+            }
             list.forEach(request ->
                     request.fullText = ElasticsearchQuerySanitizer.sanitize(request.fullText));
         }
