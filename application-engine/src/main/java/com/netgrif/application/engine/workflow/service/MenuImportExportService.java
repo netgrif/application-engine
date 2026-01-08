@@ -237,7 +237,7 @@ public class MenuImportExportService implements IMenuImportExportService {
                 String roleImportId = menuEntryRole.getRoleImportId();
                 String netImportId = menuEntryRole.getNetImportId();
                 if (netImportId != null) {
-                    PetriNet net = petriNetService.getActiveVersionByIdentifier(netImportId);
+                    PetriNet net = petriNetService.getDefaultVersionByIdentifier(netImportId);
                     if (net == null) {
                         resultMessage.append("\n- Missing net with import ID: \"").append(netImportId).append("\"").append("for role ").append(roleImportId).append("\n");
                         netCheck.set(false);
@@ -261,7 +261,7 @@ public class MenuImportExportService implements IMenuImportExportService {
         }
         //Creating new Case of preference_filter_item net and setting its data...
         Case menuItemCase = workflowService.createCase(
-                petriNetService.getActiveVersionByIdentifier("preference_filter_item").getStringId(),
+                petriNetService.getDefaultVersionByIdentifier("preference_filter_item").getStringId(),
                 item.getEntryName() + "_" + menuIdentifier,
                 "",
                 ActorTransformer.toLoggedUser(userService.getSystem())

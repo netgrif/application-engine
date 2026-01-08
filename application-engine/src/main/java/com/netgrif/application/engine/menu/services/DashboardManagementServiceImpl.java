@@ -8,6 +8,8 @@ import com.netgrif.application.engine.menu.services.interfaces.DashboardManageme
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.common.ResourceNotFoundException;
+import com.netgrif.application.engine.objects.common.ResourceNotFoundExceptionCode;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -65,9 +67,9 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
         }
         addReferencedMenuItems(body);
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
-        PetriNet petriNet = petriNetService.getActiveVersionByIdentifier(DashboardManagementConstants.PROCESS_IDENTIFIER);
+        PetriNet petriNet = petriNetService.getDefaultVersionByIdentifier(DashboardManagementConstants.PROCESS_IDENTIFIER);
         if (petriNet == null) {
-            throw new IllegalStateException("Dashboard management process not found or not active");
+            throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.DEFAULT_PROCESS_NOT_FOUND, "Dashboard management process not found");
         }
         managementCase = workflowService.createCase(petriNet.getStringId(), body.getName().getDefaultValue(), "", loggedUser).getCase();
         ToDataSetOutcome outcome = body.toDataSet();
