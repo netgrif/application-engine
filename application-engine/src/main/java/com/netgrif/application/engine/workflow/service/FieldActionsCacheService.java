@@ -161,16 +161,16 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public void clearActionCache() {
-        this.actionsCache = new MaxSizeHashMap<>(properties.getActionCacheSize());
+        this.actionsCache = Collections.synchronizedMap(new MaxSizeHashMap<>(properties.getActionCacheSize()));
     }
 
     @Override
     public void clearGlobalFunctionCache() {
-        this.globalFunctionsCache = new MaxSizeHashMap<>(properties.getGlobalFunctionsCacheSize());
+        this.globalFunctionsCache = Collections.synchronizedMap(new MaxSizeHashMap<>(properties.getGlobalFunctionsCacheSize()));
     }
 
     @Override
     public void clearFunctionCache() {
-        this.functionsCache = new MaxSizeHashMap<>(properties.getFunctionsCacheSize());
+        this.functionsCache = Collections.synchronizedMap(new MaxSizeHashMap<>(properties.getFunctionsCacheSize()));
     }
 }
