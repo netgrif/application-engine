@@ -38,9 +38,10 @@ public interface PetriNetRepository extends MongoRepository<PetriNet, String>, Q
      *
      * @param identifier the unique identifier of the PetriNet.
      * @param defaultVersion if true, the default version will be found, otherwise the non-default version will be found
+     * @param pageable the pagination details.
      * @return the {@link PetriNet} entity matching the given identifier and defaultVersion attribute, or {@code null} if none found.
      */
-    PetriNet findByIdentifierAndDefaultVersion(String identifier, boolean defaultVersion);
+    Page<PetriNet> findByIdentifierAndDefaultVersion(String identifier, boolean defaultVersion, Pageable pageable);
 
     /**
      * Finds a paginated list of {@link PetriNet} entities by their identifier.

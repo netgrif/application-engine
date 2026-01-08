@@ -341,7 +341,13 @@ public class PetriNetService implements IPetriNetService {
         if (identifier == null) {
             return null;
         }
-        return repository.findByIdentifierAndDefaultVersion(identifier, true);
+
+        List<PetriNet> result = repository.findByIdentifierAndDefaultVersion(identifier, true, PageRequest.of(0, 1)).getContent();
+        if (!result.isEmpty()) {
+            return result.getFirst();
+        }
+
+        return null;
     }
 
     @Override
