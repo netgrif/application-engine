@@ -20,10 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,9 +37,9 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     public FieldActionsCacheService(RunnerConfigurationProperties.FieldRunnerProperties properties, IGroovyShellFactory shellFactory) {
         this.properties = properties;
-        this.actionsCache = new MaxSizeHashMap<>(properties.getActionCacheSize());
-        this.functionsCache = new MaxSizeHashMap<>(properties.getFunctionsCacheSize());
-        this.globalFunctionsCache = new MaxSizeHashMap<>(properties.getGlobalFunctionsCacheSize());
+        this.actionsCache = Collections.synchronizedMap(new MaxSizeHashMap<>(properties.getActionCacheSize()));
+        this.functionsCache = Collections.synchronizedMap(new MaxSizeHashMap<>(properties.getFunctionsCacheSize()));
+        this.globalFunctionsCache = Collections.synchronizedMap(new MaxSizeHashMap<>(properties.getGlobalFunctionsCacheSize()));
         this.shell = shellFactory.getGroovyShell();
     }
 
@@ -100,7 +97,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public void cacheAllPetriNetFunctions() {
-        Pageable pageable = PageRequest.of(0, 500);
+        Pageable pageable = PageRequest.of(0, properties.getFunctionCachingPageSize());
         Page<PetriNet> page = petriNetService.getAllDefault(pageable);
 
         while (!page.isEmpty()) {
