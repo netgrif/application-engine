@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.configuration.CacheMapKeys;
-import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
+import com.netgrif.application.engine.configuration.properties.RunnerConfigurationProperties;
+import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap;
 import com.netgrif.application.engine.event.IGroovyShellFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.Function;
@@ -14,8 +14,6 @@ import groovy.lang.Closure;
 import groovy.lang.GroovyShell;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,16 +27,19 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FieldActionsCacheService implements IFieldActionsCacheService {
 
-    private final CacheConfigurationProperties properties;
-    private final CacheManager cacheManager;
+    private final RunnerConfigurationProperties.FieldRunnerProperties properties;
 
     private IPetriNetService petriNetService;
-
+    private Map<String, Closure> actionsCache;
+    private Map<String, List<CachedFunction>> globalFunctionsCache;
+    private Map<String, CachedFunction> functionsCache;
     private final GroovyShell shell;
 
-    public FieldActionsCacheService(CacheConfigurationProperties properties, CacheManager cacheManager, IGroovyShellFactory shellFactory) {
+    public FieldActionsCacheService(RunnerConfigurationProperties.FieldRunnerProperties properties, IGroovyShellFactory shellFactory) {
         this.properties = properties;
-        this.cacheManager = cacheManager;
+        this.actionsCache = Collections.synchronizedMap(new MaxSizeHashMap<>(properties.getActionCacheSize()));
+        this.functionsCache = Collections.synchronizedMap(new MaxSizeHashMap<>(properties.getFunctionsCacheSize()));
+        this.globalFunctionsCache = Collections.synchronizedMap(new MaxSizeHashMap<>(properties.getGlobalFunctionsCacheSize()));
         this.shell = shellFactory.getGroovyShell();
     }
 
@@ -58,63 +59,51 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
                 .map(function -> CachedFunction.build(shell, function))
                 .collect(Collectors.toList());
 
-        Cache globalFunctionsCache = getRequiredCache(properties.getGlobalFunctions());
-
         if (!functions.isEmpty()) {
             evaluateCachedFunctions(functions);
             globalFunctionsCache.put(petriNet.getIdentifier(), functions);
         } else {
-            globalFunctionsCache.evictIfPresent(petriNet.getIdentifier());
+            globalFunctionsCache.remove(petriNet.getIdentifier());
         }
     }
 
     @Override
-    public void reloadCachedFunctions(String petriNetId) {
-        getRequiredCache(properties.getGlobalFunctions()).evictIfPresent(petriNetId);
-        cachePetriNetFunctions(petriNetService.getDefaultVersionByIdentifier(petriNetId));
+    public void reloadCachedFunctions(String petriNetIdentifier) {
+        globalFunctionsCache.remove(petriNetIdentifier);
+        cachePetriNetFunctions(petriNetService.getDefaultVersionByIdentifier(petriNetIdentifier));
     }
 
     @Override
     public void reloadCachedFunctions(PetriNet petriNet) {
-        this.reloadCachedFunctions(petriNet.getIdentifier());
+        reloadCachedFunctions(petriNet.getIdentifier());
     }
 
     @Override
     public Closure getCompiledAction(Action action, boolean shouldRewriteCachedActions) {
         String stringId = action.getId().toString();
-        Cache actionsCache = getRequiredCache(CacheMapKeys.ACTIONS);
-        Object nativeActionsCache = actionsCache.getNativeCache();
-
-        if (nativeActionsCache instanceof Map<?, ?> map) {
-            if (shouldRewriteCachedActions || !map.containsKey(stringId) ) {
-                Closure code = (Closure) shell.evaluate("{-> " + action.getDefinition() + "}");
-                actionsCache.put(stringId, code);
-            }
+        if (shouldRewriteCachedActions || !actionsCache.containsKey(stringId)) {
+            Closure code = (Closure) shell.evaluate("{-> " + action.getDefinition() + "}");
+            actionsCache.put(stringId, code);
         }
-        return (Closure) actionsCache.get(stringId).get();
+        return actionsCache.get(stringId);
     }
 
     @Override
-    public List<CachedFunction> getCachedFunctions(List<Function> functions) {
+    public List<CachedFunction> getCachedFunctions(List<com.netgrif.application.engine.objects.petrinet.domain.Function> functions) {
         List<CachedFunction> cachedFunctions = new ArrayList<>(functions.size());
-        Cache functionsCache = getRequiredCache(CacheMapKeys.FUNCTIONS);
-        Object nativeFunctionsCache = functionsCache.getNativeCache();
-
-        if (nativeFunctionsCache instanceof Map<?, ?> map) {
-            functions.forEach(function -> {
-                if (!map.containsKey(function.getStringId())) {
-                    functionsCache.put(function.getStringId(), CachedFunction.build(shell, function));
-                }
-                cachedFunctions.add((CachedFunction) functionsCache.get(function.getStringId()).get());
-            });
-        }
+        functions.forEach(function -> {
+            if (!functionsCache.containsKey(function.getStringId())) {
+                functionsCache.put(function.getStringId(), CachedFunction.build(shell, function));
+            }
+            cachedFunctions.add(functionsCache.get(function.getStringId()));
+        });
         return cachedFunctions;
     }
 
     @Override
     public void cacheAllPetriNetFunctions() {
-        Pageable pageable = PageRequest.of(0, 500);
-        Page<PetriNet> page = petriNetService.getAll(pageable);
+        Pageable pageable = PageRequest.of(0, properties.getFunctionCachingPageSize());
+        Page<PetriNet> page = petriNetService.getAllDefault(pageable);
 
         while (!page.isEmpty()) {
             for (PetriNet petriNet : page) {
@@ -129,7 +118,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
                 break;
             }
             pageable = pageable.next();
-            page = petriNetService.getAll(pageable);
+            page = petriNetService.getAllDefault(pageable);
         }
     }
 
@@ -172,29 +161,21 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public Map<String, List<CachedFunction>> getGlobalFunctionsCache() {
-        return new HashMap<>((Map<String, List<CachedFunction>>) getRequiredCache(properties.getGlobalFunctions()).getNativeCache());
+        return new HashMap<>(globalFunctionsCache);
     }
 
     @Override
     public void clearActionCache() {
-        getRequiredCache(CacheMapKeys.ACTIONS).clear();
+        this.actionsCache = Collections.synchronizedMap(new MaxSizeHashMap<>(properties.getActionCacheSize()));
     }
 
     @Override
     public void clearGlobalFunctionCache() {
-        getRequiredCache(properties.getGlobalFunctions()).clear();
+        this.globalFunctionsCache = Collections.synchronizedMap(new MaxSizeHashMap<>(properties.getGlobalFunctionsCacheSize()));
     }
 
     @Override
     public void clearFunctionCache() {
-        getRequiredCache(CacheMapKeys.FUNCTIONS).clear();
-    }
-
-    private Cache getRequiredCache(String name) {
-        Cache cache = cacheManager.getCache(name);
-        if (cache == null) {
-            throw new IllegalStateException("Cache '" + name + "' is not configured");
-        }
-        return cache;
+        this.functionsCache = Collections.synchronizedMap(new MaxSizeHashMap<>(properties.getFunctionsCacheSize()));
     }
 }
