@@ -181,7 +181,7 @@ class PetriNetServiceTest {
 
         outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("1"), superCreator.loggedSuper)
         PetriNet petriNetV1 = outcome.getNet()
-        assertTrue(petriNetV1 != null)
+        assertNotNull(petriNetV1)
         assertTrue(petriNetService.get(petriNetV4.getObjectId()).isDefaultVersion())
         assertFalse(petriNetV1.isDefaultVersion())
         version = new Version()
@@ -202,7 +202,7 @@ class PetriNetServiceTest {
 
         outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("5"), superCreator.loggedSuper)
         PetriNet petriNetV5 = outcome.getNet()
-        assertTrue(petriNetV5 != null)
+        assertNotNull(petriNetV5)
         assertFalse(petriNetService.get(petriNetV2.getObjectId()).defaultVersion)
         assertFalse(petriNetService.get(petriNetV4.getObjectId()).defaultVersion)
         assertTrue(petriNetV5.defaultVersion)
