@@ -71,7 +71,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     @Override
     public void reloadCachedFunctions(String petriNetId) {
         getRequiredCache(properties.getGlobalFunctions()).evictIfPresent(petriNetId);
-        cachePetriNetFunctions(petriNetService.getActiveVersionByIdentifier(petriNetId));
+        cachePetriNetFunctions(petriNetService.getDefaultVersionByIdentifier(petriNetId));
     }
 
     @Override
