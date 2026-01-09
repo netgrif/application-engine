@@ -34,7 +34,10 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+import static org.junit.jupiter.api.Assertions.assertFalse
+import static org.junit.jupiter.api.Assertions.assertNotNull
 import static org.junit.jupiter.api.Assertions.assertThrows
+import static org.junit.jupiter.api.Assertions.assertTrue
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -151,39 +154,39 @@ class PetriNetServiceTest {
     void testVersionsOnImport() {
         ImportPetriNetEventOutcome outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("2"), superCreator.loggedSuper)
         PetriNet petriNetV2 = outcome.getNet()
-        assert petriNetV2 != null
-        assert petriNetV2.defaultVersion
+        assertNotNull(petriNetV2)
+        assertTrue(petriNetV2.defaultVersion)
         Version version = new Version()
         version.setMajor(2)
-        assert petriNetV2.getVersion() == version
+        assertTrue(petriNetV2.getVersion() == version)
         Thread.sleep(5000)
         Optional<ElasticPetriNet> elasticPetriNetV2Optional = elasticPetriNetRepository.findById(petriNetV2.stringId)
-        assert elasticPetriNetV2Optional.isPresent()
-        assert elasticPetriNetV2Optional.get().isDefaultVersion()
+        assertTrue(elasticPetriNetV2Optional.isPresent())
+        assertTrue(elasticPetriNetV2Optional.get().isDefaultVersion())
 
         outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("4"), superCreator.loggedSuper)
         PetriNet petriNetV4 = outcome.getNet()
-        assert petriNetV4 != null
-        assert !petriNetService.get(petriNetV2.getObjectId()).isDefaultVersion()
-        assert petriNetV4.isDefaultVersion()
+        assertNotNull(petriNetV4)
+        assertFalse(petriNetService.get(petriNetV2.getObjectId()).isDefaultVersion())
+        assertTrue(petriNetV4.isDefaultVersion())
         version = new Version()
         version.setMajor(4)
-        assert petriNetV4.getVersion() == version
+        assertTrue(petriNetV4.getVersion() == version)
         Thread.sleep(5000)
         elasticPetriNetV2Optional = elasticPetriNetRepository.findById(petriNetV2.stringId)
-        assert !elasticPetriNetV2Optional.get().isDefaultVersion()
+        assertFalse(elasticPetriNetV2Optional.get().isDefaultVersion())
         Optional<ElasticPetriNet> elasticPetriNetV4Optional = elasticPetriNetRepository.findById(petriNetV4.stringId)
-        assert elasticPetriNetV4Optional.isPresent()
-        assert elasticPetriNetV4Optional.get().isDefaultVersion()
+        assertTrue(elasticPetriNetV4Optional.isPresent())
+        assertTrue(elasticPetriNetV4Optional.get().isDefaultVersion())
 
         outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("1"), superCreator.loggedSuper)
         PetriNet petriNetV1 = outcome.getNet()
-        assert petriNetV1 != null
-        assert petriNetService.get(petriNetV4.getObjectId()).isDefaultVersion()
-        assert !petriNetV1.isDefaultVersion()
+        assertTrue(petriNetV1 != null)
+        assertTrue(petriNetService.get(petriNetV4.getObjectId()).isDefaultVersion())
+        assertFalse(petriNetV1.isDefaultVersion())
         version = new Version()
         version.setMajor(1)
-        assert petriNetV1.getVersion() == version
+        assertTrue(petriNetV1.getVersion() == version)
 
         assertThrows(IllegalArgumentException.class, {
             // cannot import already existing version
@@ -192,28 +195,28 @@ class PetriNetServiceTest {
 
         petriNetV2.makeDefault()
         petriNetV2 = petriNetService.save(petriNetV2).get()
-        assert petriNetV2.defaultVersion
+        assertTrue(petriNetV2.defaultVersion)
         petriNetV4.makeNonDefault()
         petriNetV4 = petriNetService.save(petriNetV4).get()
-        assert !petriNetV4.defaultVersion
+        assertFalse(petriNetV4.defaultVersion)
 
         outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("5"), superCreator.loggedSuper)
         PetriNet petriNetV5 = outcome.getNet()
-        assert petriNetV5 != null
-        assert !petriNetService.get(petriNetV2.getObjectId()).defaultVersion
-        assert !petriNetService.get(petriNetV4.getObjectId()).defaultVersion
-        assert petriNetV5.defaultVersion
+        assertTrue(petriNetV5 != null)
+        assertFalse(petriNetService.get(petriNetV2.getObjectId()).defaultVersion)
+        assertFalse(petriNetService.get(petriNetV4.getObjectId()).defaultVersion)
+        assertTrue(petriNetV5.defaultVersion)
         version = new Version()
         version.setMajor(5)
-        assert petriNetV5.getVersion() == version
+        assertTrue(petriNetV5.getVersion() == version)
         Thread.sleep(5000)
         elasticPetriNetV2Optional = elasticPetriNetRepository.findById(petriNetV2.stringId)
-        assert !elasticPetriNetV2Optional.get().defaultVersion
+        assertFalse(elasticPetriNetV2Optional.get().defaultVersion)
         elasticPetriNetV4Optional = elasticPetriNetRepository.findById(petriNetV4.stringId)
-        assert !elasticPetriNetV4Optional.get().defaultVersion
+        assertFalse(elasticPetriNetV4Optional.get().defaultVersion)
         Optional<ElasticPetriNet> elasticPetriNetV5Optional = elasticPetriNetRepository.findById(petriNetV5.stringId)
-        assert elasticPetriNetV5Optional.isPresent()
-        assert elasticPetriNetV5Optional.get().defaultVersion
+        assertTrue(elasticPetriNetV5Optional.isPresent())
+        assertTrue(elasticPetriNetV5Optional.get().defaultVersion)
     }
 
     @Test
@@ -225,24 +228,24 @@ class PetriNetServiceTest {
         outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("3"), superCreator.loggedSuper)
         PetriNet processV3 = outcome.getNet()
 
-        assert !petriNetService.get(processV1.getObjectId()).defaultVersion
-        assert !petriNetService.get(processV2.getObjectId()).defaultVersion
-        assert petriNetService.get(processV3.getObjectId()).defaultVersion
+        assertFalse(petriNetService.get(processV1.getObjectId()).defaultVersion)
+        assertFalse(petriNetService.get(processV2.getObjectId()).defaultVersion)
+        assertTrue(petriNetService.get(processV3.getObjectId()).defaultVersion)
 
         petriNetService.deletePetriNet(processV2.getStringId(), superCreator.loggedSuper)
 
-        assert petriNetRepository.findById(processV2.getStringId()).isEmpty()
-        assert !petriNetService.get(processV1.getObjectId()).defaultVersion
-        assert petriNetService.get(processV3.getObjectId()).defaultVersion
+        assertTrue(petriNetRepository.findById(processV2.getStringId()).isEmpty())
+        assertFalse(petriNetService.get(processV1.getObjectId()).defaultVersion)
+        assertTrue(petriNetService.get(processV3.getObjectId()).defaultVersion)
 
         petriNetService.deletePetriNet(processV3.getStringId(), superCreator.loggedSuper)
 
-        assert petriNetRepository.findById(processV3.getStringId()).isEmpty()
-        assert petriNetService.get(processV1.getObjectId()).defaultVersion
+        assertTrue(petriNetRepository.findById(processV3.getStringId()).isEmpty())
+        assertTrue(petriNetService.get(processV1.getObjectId()).defaultVersion)
 
         petriNetService.deletePetriNet(processV1.getStringId(), superCreator.loggedSuper)
 
-        assert petriNetRepository.findById(processV1.getStringId()).isEmpty()
+        assertTrue(petriNetRepository.findById(processV1.getStringId()).isEmpty())
     }
 
     @Test
