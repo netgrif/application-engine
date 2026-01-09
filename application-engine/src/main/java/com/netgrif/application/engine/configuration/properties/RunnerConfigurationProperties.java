@@ -57,14 +57,6 @@ public class RunnerConfigurationProperties {
          * The size of the cache used for managing global Petri net functions.
          */
         private int globalFunctionsCacheSize = 500;
-
-
-        /**
-         * The size of pages used for caching functions when processing large sets of data.
-         * This property determines the maximum number of functions to include in a single page during caching operations.
-         * Default value is 500.
-         */
-        private int functionCachingPageSize = 500;
     }
 
     /**

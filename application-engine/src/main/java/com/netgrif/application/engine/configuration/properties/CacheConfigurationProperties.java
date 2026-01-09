@@ -58,6 +58,13 @@ public class CacheConfigurationProperties {
     private List<String> additional = new ArrayList<>();
 
     /**
+     * The size of pages used for caching functions when processing large sets of data.
+     * This property determines the maximum number of functions to include in a single page during caching operations.
+     * Default value is 500.
+     */
+    private int functionCachingPageSize = 500;
+
+    /**
      * Retrieves a set of all configured cache names.
      * Includes the default caches and any additional user-defined cache names.
      *
