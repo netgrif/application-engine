@@ -34,13 +34,14 @@ public interface PetriNetRepository extends MongoRepository<PetriNet, String>, Q
     PetriNet findByIdentifierAndVersion(String identifier, Version version);
 
     /**
-     * Finds a {@link PetriNet} entity by its identifier and versionActive attribute
+     * Finds a page of {@link PetriNet} entities by its identifier and defaultVersion attribute
      *
      * @param identifier the unique identifier of the PetriNet.
-     * @param versionActive if true, the active version will be found, otherwise the inactive version
-     * @return the {@link PetriNet} entity matching the given identifier and versionActive attribute, or {@code null} if none found.
+     * @param defaultVersion if true, the default version will be found, otherwise the non-default version will be found
+     * @param pageable the pagination details.
+     * @return the page of {@link PetriNet} entities matching the given identifier and defaultVersion attribute
      */
-    PetriNet findByIdentifierAndVersionActive(String identifier, boolean versionActive);
+    Page<PetriNet> findByIdentifierAndDefaultVersion(String identifier, boolean defaultVersion, Pageable pageable);
 
     /**
      * Finds a paginated list of {@link PetriNet} entities by their identifier.

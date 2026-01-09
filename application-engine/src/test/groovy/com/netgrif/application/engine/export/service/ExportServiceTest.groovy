@@ -128,7 +128,7 @@ class ExportServiceTest {
         taskService.assignTask(ActorTransformer.toLoggedUser(userService.findByEmail(UserConstants.ADMIN_USER_EMAIL, null)), exportTask)
         Thread.sleep(20000)  //Elastic wait
 
-        def processId = petriNetService.getActiveVersionByIdentifier("export_test").stringId
+        def processId = petriNetService.getDefaultVersionByIdentifier("export_test").stringId
         def taskRequest = new ElasticTaskSearchRequest()
         taskRequest.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(processId)] as List
         taskRequest.transitionId = ["t4"] as List
@@ -146,7 +146,7 @@ class ExportServiceTest {
 
     @Test
     void buildDefaultCsvTaskHeaderTest(){
-        def processId = petriNetService.getActiveVersionByIdentifier("export_test").stringId
+        def processId = petriNetService.getDefaultVersionByIdentifier("export_test").stringId
         String exportTask = mainCase.tasks.find { it.transition == "t4" }.task
         taskService.assignTask(ActorTransformer.toLoggedUser(userService.findByEmail(UserConstants.ADMIN_USER_EMAIL, null)), exportTask)
         List<Task> task = taskRepository.findAll(QTask.task.processId.eq(processId).and(QTask.task.transitionId.eq("t4")))

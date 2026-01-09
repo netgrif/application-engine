@@ -150,12 +150,12 @@ public interface IPetriNetService {
     List<PetriNet> findAllById(List<String> ids);
 
     /**
-     * Retrieves the active version of a {@link PetriNet} by its identifier.
+     * Retrieves the default version of a {@link PetriNet} by its identifier.
      *
      * @param identifier the unique identifier of the PetriNet
-     * @return the active version of the {@link PetriNet} matching the provided identifier or null if not found
+     * @return the default version of the {@link PetriNet} matching the provided identifier or null if not found
      */
-    PetriNet getActiveVersionByIdentifier(String identifier);
+    PetriNet getDefaultVersionByIdentifier(String identifier);
 
     /**
      * Retrieves the latest version of a {@link PetriNet} by its identifier.

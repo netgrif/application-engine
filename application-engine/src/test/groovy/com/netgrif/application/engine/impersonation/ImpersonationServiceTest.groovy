@@ -311,7 +311,7 @@ class ImpersonationServiceTest {
     }
 
     def createConfigCase(AbstractUser user, String impersonator, List<String> roles = null, List<String> auths = null) {
-        def caze = helper.createCase("config", petriNetService.getActiveVersionByIdentifier(ImpersonationRunner.IMPERSONATION_CONFIG_PETRI_NET_IDENTIFIER))
+        def caze = helper.createCase("config", petriNetService.getDefaultVersionByIdentifier(ImpersonationRunner.IMPERSONATION_CONFIG_PETRI_NET_IDENTIFIER))
         def owner = new UserFieldValue(user)
         caze.dataSet["impersonated"].value = owner
         caze.dataSet["impersonated_email"].value = owner.username

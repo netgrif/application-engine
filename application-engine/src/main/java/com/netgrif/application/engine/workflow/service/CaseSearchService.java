@@ -280,7 +280,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
             // TODO JOFO: unpaged necessary?
             petriNets = petriNetService.getAll(Pageable.unpaged()).getContent();
         } else {
-            petriNets = processes.stream().map(process -> petriNetService.getActiveVersionByIdentifier(process)).collect(Collectors.toList());
+            petriNets = processes.stream().map(process -> petriNetService.getDefaultVersionByIdentifier(process)).collect(Collectors.toList());
         }
         if (petriNets.isEmpty())
             return null;

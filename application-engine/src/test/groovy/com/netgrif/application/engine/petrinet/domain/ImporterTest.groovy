@@ -130,7 +130,7 @@ class ImporterTest {
         assert net.places.size() == 0
 
         // ASSERT IMPORTED NET FROM REPO
-        net = petriNetService.getActiveVersionByIdentifier("new_model")
+        net = petriNetService.getDefaultVersionByIdentifier("new_model")
         assert net != null
         assert net.importId == "new_model"
         assert net.version.major == 1
@@ -204,7 +204,7 @@ class ImporterTest {
         assert net2.places.size() == 0
 
         // ASSERT NEW NET FROM REPO
-        net2 = petriNetService.getActiveVersionByIdentifier("new_model")
+        net2 = petriNetService.getDefaultVersionByIdentifier("new_model")
         assert net2 != null
         assert net2.importId == "new_model"
         assert net2.version.major == 2

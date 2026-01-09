@@ -17,10 +17,8 @@ import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Component;
 
@@ -424,7 +422,7 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
     }
 
     private Optional<Case> createFilterCase(String title, String icon, String filterType, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata, Map<String, String> titleTranslations, String originId, boolean viewOrigin, boolean isImported) {
-        PetriNet filterNet = this.petriNetService.getActiveVersionByIdentifier("filter");
+        PetriNet filterNet = this.petriNetService.getDefaultVersionByIdentifier("filter");
         if (filterNet == null) {
             return Optional.empty();
         }

@@ -139,7 +139,7 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public void evictAllCaches() {
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetById()), cacheProperties.getPetriNetById()).clear();
-        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetActive()), cacheProperties.getPetriNetActive()).clear();
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetDefault()), cacheProperties.getPetriNetDefault()).clear();
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetLatest()), cacheProperties.getPetriNetLatest()).clear();
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetCache()), cacheProperties.getPetriNetCache()).clear();
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetByIdentifier()), cacheProperties.getPetriNetByIdentifier()).clear();
@@ -147,7 +147,7 @@ public class PetriNetService implements IPetriNetService {
 
     public void evictCache(PetriNet net) {
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetById()), cacheProperties.getPetriNetById()).evict(net.getStringId());
-        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetActive()), cacheProperties.getPetriNetActive()).evict(net.getIdentifier());
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetDefault()), cacheProperties.getPetriNetDefault()).evict(net.getIdentifier());
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetLatest()), cacheProperties.getPetriNetLatest()).evict(net.getIdentifier());
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetCache()), cacheProperties.getPetriNetCache()).evict(net.getObjectId());
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetByIdentifier()), cacheProperties.getPetriNetByIdentifier()).evict(net.getIdentifier() + net.getVersion().toString());
@@ -200,35 +200,7 @@ public class PetriNetService implements IPetriNetService {
             return outcome;
         }
         PetriNet newProcess = importedProcess.get();
-        PetriNet inactivatedProcess = null;
-
-        if (newProcess.getVersion() != null && self.getPetriNet(newProcess.getIdentifier(), newProcess.getVersion()) != null) {
-            throw new IllegalArgumentException("A process [%s] with such version [%s] already exists"
-                    .formatted(newProcess.getIdentifier(), newProcess.getVersion()));
-        }
-        PetriNet existingLatestProcess = self.getLatestVersionByIdentifier(newProcess.getIdentifier());
-        if (existingLatestProcess == null && newProcess.getVersion() == null) {
-            newProcess.setVersion(new Version());
-        } else {
-            if (newProcess.getVersion() == null) {
-                newProcess.setVersion(existingLatestProcess.getVersion().clone());
-                newProcess.incrementVersion(releaseType);
-            } else if (existingLatestProcess != null && newProcess.getVersion().isLowerThan(existingLatestProcess.getVersion())) {
-                throw new IllegalArgumentException("Only higher versions of process [%s] are allowed to import. The requested version [%s] cannot be imported because the higher version [%s] already exists."
-                        .formatted(newProcess.getIdentifier(), newProcess.getVersion(), existingLatestProcess.getVersion()));
-            }
-            if (existingLatestProcess != null && existingLatestProcess.isVersionActive()) {
-                existingLatestProcess.makeInactive();
-                inactivatedProcess = existingLatestProcess;
-            } else {
-                PetriNet existingActiveProcess = self.getActiveVersionByIdentifier(newProcess.getIdentifier());
-                if (existingActiveProcess != null) {
-                    existingActiveProcess.makeInactive();
-                    inactivatedProcess = existingActiveProcess;
-                }
-            }
-        }
-        newProcess.makeActive();
+        PetriNet processToMakeNonDefault = checkAndHandleProcessVersion(newProcess, releaseType);
 
         processRoleService.saveAll(newProcess.getRoles().values());
         newProcess.setAuthor(ActorTransformer.toActorRef(author));
@@ -240,15 +212,71 @@ public class PetriNetService implements IPetriNetService {
         outcome.setOutcomes(eventService.runActions(newProcess.getPreUploadActions(), null, Optional.empty(), params));
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.PRE));
 
-        if (inactivatedProcess != null) {
-            doSaveInternal(inactivatedProcess);
+        if (processToMakeNonDefault != null) {
+            doSaveInternal(processToMakeNonDefault);
         }
-        doSaveInternal(newProcess);
+        Optional<PetriNet> saveProcessOpt = doSaveInternal(newProcess);
 
         outcome.setOutcomes(eventService.runActions(newProcess.getPostUploadActions(), null, Optional.empty(), params));
-        outcome.setNet(importedProcess.get());
+        outcome.setNet(saveProcessOpt.orElseThrow());
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
         return outcome;
+    }
+
+    /**
+     * Validates the version of an importing process. This method can update 'newProces': initialize version,
+     * initialize default version attribute. This method can also update the current default version of the process if needed.
+     *
+     * <h4>Version initialization logic</h4>
+     * <ul>
+     *     <li>Uploaded process becomes default only if its version is the highest</li>
+     *     <li>Only one process can be default. If the importing process is about to get default, the currently default
+     *     process becomes non-default</li>
+     *     <li>If no version is provided, it's initialized to 1.0.0 or by the existing highest version incremented
+     *     by 'releaseType' input parameter</li>
+     * </ul>
+     *
+     * @param newProcess A process to be checked and updated
+     * @param releaseType requested release type level. It's used for version initialization
+     *
+     * @return The process, which has been made non-default or null if no process updated
+     *
+     * @throws IllegalArgumentException if the version already exists
+     * */
+    private PetriNet checkAndHandleProcessVersion(PetriNet newProcess, VersionType releaseType) {
+        PetriNet processToMakeNonDefault = null;
+
+        if (newProcess.getVersion() != null && self.getPetriNet(newProcess.getIdentifier(), newProcess.getVersion()) != null) {
+            throw new IllegalArgumentException("A process [%s] with such version [%s] already exists"
+                    .formatted(newProcess.getIdentifier(), newProcess.getVersion()));
+        }
+        PetriNet existingLatestProcess = self.getLatestVersionByIdentifier(newProcess.getIdentifier());
+        boolean makeNonDefaultCurrentVersion = true;
+        if (existingLatestProcess == null && newProcess.getVersion() == null) {
+            newProcess.setVersion(new Version());
+        } else {
+            if (newProcess.getVersion() == null) {
+                newProcess.setVersion(existingLatestProcess.getVersion().clone());
+                newProcess.incrementVersion(releaseType);
+            } else if (existingLatestProcess != null && newProcess.getVersion().isLowerThan(existingLatestProcess.getVersion())) {
+                makeNonDefaultCurrentVersion = false;
+            }
+            if (makeNonDefaultCurrentVersion && existingLatestProcess != null && existingLatestProcess.isDefaultVersion()) {
+                existingLatestProcess.makeNonDefault();
+                processToMakeNonDefault = existingLatestProcess;
+            } else if (makeNonDefaultCurrentVersion) {
+                PetriNet existingActiveProcess = self.getDefaultVersionByIdentifier(newProcess.getIdentifier());
+                if (existingActiveProcess != null) {
+                    existingActiveProcess.makeNonDefault();
+                    processToMakeNonDefault = existingActiveProcess;
+                }
+            }
+        }
+        if (makeNonDefaultCurrentVersion) {
+            newProcess.makeDefault();
+        }
+
+        return processToMakeNonDefault;
     }
 
     @Override
@@ -308,12 +336,18 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Cacheable(value = "petriNetActive", unless = "#result == null")
-    public PetriNet getActiveVersionByIdentifier(String identifier) {
+    @Cacheable(value = "petriNetDefault", unless = "#result == null")
+    public PetriNet getDefaultVersionByIdentifier(String identifier) {
         if (identifier == null) {
             return null;
         }
-        return repository.findByIdentifierAndVersionActive(identifier, true);
+
+        List<PetriNet> result = repository.findByIdentifierAndDefaultVersion(identifier, true, PageRequest.of(0, 1)).getContent();
+        if (!result.isEmpty()) {
+            return result.getFirst();
+        }
+
+        return null;
     }
 
     @Override
@@ -459,7 +493,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public PetriNetReference getReference(String identifier, Version version, LoggedUser user, Locale locale) {
-        PetriNet net = version == null ? getActiveVersionByIdentifier(identifier) : getPetriNet(identifier, version);
+        PetriNet net = version == null ? getDefaultVersionByIdentifier(identifier) : getPetriNet(identifier, version);
         return net != null ? transformToReference(net, locale) : new PetriNetReference();
     }
 
@@ -593,13 +627,13 @@ public class PetriNetService implements IPetriNetService {
         repository.deleteBy_id(petriNet.getObjectId());
         evictCache(petriNet);
         functionCacheService.reloadCachedFunctions(petriNet);
-        if (petriNet.isVersionActive()) {
-            PetriNet toBeActivated = self.getLatestVersionByIdentifier(petriNet.getIdentifier());
-            if (toBeActivated != null) {
-                log.debug("The active version was removed. Activating the latest version of the process [{}] with id [{}]...",
-                        toBeActivated.getIdentifier(), toBeActivated.getStringId());
-                toBeActivated.makeActive();
-                save(toBeActivated);
+        if (petriNet.isDefaultVersion()) {
+            PetriNet processToMakeDefault = self.getLatestVersionByIdentifier(petriNet.getIdentifier());
+            if (processToMakeDefault != null) {
+                log.debug("The default version was removed. Making the latest version of the process [{}] with id [{}] as default...",
+                        processToMakeDefault.getIdentifier(), processToMakeDefault.getStringId());
+                processToMakeDefault.makeDefault();
+                save(processToMakeDefault);
             }
         }
         publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.POST));
