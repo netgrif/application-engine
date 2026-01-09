@@ -38,6 +38,9 @@ public class QuartzConfiguration {
     @Value("${nae.quartz.dbName:nae}")
     private String db;
 
+    @Value("${nae.quartz.mongoOptionWriteConcernW:majority}")
+    private String mongoOptionWriteConcernW;
+
     @Bean
     public Properties quartzProperties() throws IOException {
         PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
@@ -74,6 +77,7 @@ public class QuartzConfiguration {
             properties.setProperty("org.quartz.jobStore.mongoUri", uri);
         }
         properties.setProperty("org.quartz.jobStore.dbName", db);
+        properties.setProperty("org.quartz.jobStore.mongoOptionWriteConcernW", mongoOptionWriteConcernW);
         properties.setProperty("org.quartz.jobStore.class", "com.netgrif.quartz.mongodb.MongoDBJobStore");
         properties.setProperty("spring.quartz.properties.org.quartz.jobStore.isClustered", "false");
         properties.setProperty("org.quartz.jobStore.isClustered", "true");
