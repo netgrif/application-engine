@@ -2,7 +2,6 @@ package com.netgrif.application.engine.configuration;
 
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.configuration.properties.RunnerConfigurationProperties;
-import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap;
 import com.netgrif.application.engine.workflow.domain.CachedFunction;
 import groovy.lang.Closure;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ import org.springframework.context.annotation.Primary;
 
 
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -38,23 +36,15 @@ public class CacheConfiguration implements CachingConfigurer {
                 .map(ConcurrentMapCache::new)
                 .collect(Collectors.toCollection(ArrayList::new));
 
-
-        Supplier<Map<String, Closure>> actionsFactory =
-                () -> Collections.synchronizedMap(new MaxSizeHashMap<>(fieldRunnerProperties.getActionCacheSize()));
-
         caches.add(new GenericMapCache<>(
                 CacheMapKeys.ACTIONS,
                 Closure.class,
-                actionsFactory
+                fieldRunnerProperties.getActionCacheSize()
         ));
-
-        Supplier<Map<String, CachedFunction>> functionsFactory =
-                () -> Collections.synchronizedMap(new MaxSizeHashMap<>(fieldRunnerProperties.getFunctionsCacheSize()));
-
         caches.add(new GenericMapCache<>(
                 CacheMapKeys.FUNCTIONS,
                 CachedFunction.class,
-                functionsFactory
+                fieldRunnerProperties.getFunctionsCacheSize()
         ));
 
         SimpleCacheManager cacheManager = new SimpleCacheManager();
