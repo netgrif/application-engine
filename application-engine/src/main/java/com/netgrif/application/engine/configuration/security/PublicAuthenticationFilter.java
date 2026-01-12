@@ -10,6 +10,8 @@ import com.netgrif.application.engine.auth.service.RealmService;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.auth.service.AuthorityService;
+import com.netgrif.application.engine.utils.HttpReqRespUtils;
+import com.netgrif.application.engine.utils.HttpRequestParamConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,7 +28,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -60,7 +61,12 @@ public class PublicAuthenticationFilter extends NetgrifOncePerRequestFilter {
             return;
         }
 
-        Realm realm = realmService.getDefaultRealm().orElseThrow();
+        Realm realm = HttpReqRespUtils.extractRealmFromRequest(request);
+        if (realm == null) {
+            log.debug("Realm unavailable for public request; skipping anon auth");
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         log.debug("Loaded realm {} (publicAccess={})", realm.getName(), realm.isPublicAccess());
         if (!realm.isPublicAccess()) {
