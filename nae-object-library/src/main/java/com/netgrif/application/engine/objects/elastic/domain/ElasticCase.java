@@ -113,20 +113,20 @@ public abstract class ElasticCase implements Serializable {
         version++;
         lastModified = useCase.getLastModified();
         title = useCase.getTitle();
-        taskIds = useCase.getTaskIds();
-        taskMongoIds = useCase.getTaskMongoIds();
-        tasks = useCase.getTasks();
-        enabledRoles = useCase.getEnabledRoles();
-        viewRoles = useCase.getViewRoles();
-        viewUserRefs = useCase.getViewUserRefs();
-        negativeViewRoles = useCase.getNegativeViewRoles();
-        viewUsers = useCase.getViewUsers();
-        negativeViewUsers = useCase.getNegativeViewUsers();
-        tags = useCase.getTags();
-        permissions = useCase.getPermissions();
-        users = useCase.getUsers();
-        userRefs = useCase.getUserRefs();
-        dataSet = useCase.getDataSet();
-        immediateData = useCase.getImmediateData();
+        taskIds = new HashSet<>(useCase.getTaskIds());
+        taskMongoIds = new HashSet<>(useCase.getTaskMongoIds());
+        tasks = new HashSet<>(useCase.getTasks());
+        enabledRoles = new HashSet<>(useCase.getEnabledRoles());
+        viewRoles = new HashSet<>(useCase.getViewRoles());
+        viewUserRefs = new HashSet<>(useCase.getViewUserRefs());
+        negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
+        viewUsers = new HashSet<>(useCase.getViewUsers());
+        negativeViewUsers = new HashSet<>(useCase.getNegativeViewUsers());
+        tags = new HashMap<>(useCase.getTags());
+        permissions = new HashMap<>(useCase.getPermissions());
+        users = new HashMap<>(useCase.getUsers());
+        userRefs = new HashMap<>(useCase.getUserRefs());
+        dataSet = new HashMap<>(useCase.getDataSet());
+        immediateData = new ArrayList<>(useCase.getImmediateData());
     }
 }
