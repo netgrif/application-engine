@@ -134,6 +134,6 @@ public abstract class ElasticCase implements Serializable {
         if (map == null || map.isEmpty()) {
             return new HashMap<>();
         }
-        return map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue())));
+        return map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue() == null ? new HashMap<>() : new HashMap<>(e.getValue())));
     }
 }
