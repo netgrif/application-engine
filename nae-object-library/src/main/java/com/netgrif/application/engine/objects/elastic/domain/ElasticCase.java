@@ -102,9 +102,9 @@ public abstract class ElasticCase implements Serializable {
         viewUsers = new HashSet<>(useCase.getViewUsers());
         negativeViewUsers = new HashSet<>(useCase.getNegativeViewUsers());
         tags = new HashMap<>(useCase.getTags());
-        permissions = new HashMap<>(useCase.getPermissions());
-        users = new HashMap<>(useCase.getUsers());
-        userRefs = new HashMap<>(useCase.getUserRefs());
+        permissions = deepCopy(useCase.getPermissions());
+        users = deepCopy(useCase.getUsers());
+        userRefs = deepCopy(useCase.getUserRefs());
         dataSet = new HashMap<>();
         immediateData = useCase.getImmediateData().stream().map(ImmediateField::new).collect(Collectors.toList());
     }
@@ -123,10 +123,17 @@ public abstract class ElasticCase implements Serializable {
         viewUsers = new HashSet<>(useCase.getViewUsers());
         negativeViewUsers = new HashSet<>(useCase.getNegativeViewUsers());
         tags = new HashMap<>(useCase.getTags());
-        permissions = new HashMap<>(useCase.getPermissions());
-        users = new HashMap<>(useCase.getUsers());
-        userRefs = new HashMap<>(useCase.getUserRefs());
+        permissions = deepCopy(useCase.getPermissions());
+        users = deepCopy(useCase.getUsers());
+        userRefs = deepCopy(useCase.getUserRefs());
         dataSet = new HashMap<>(useCase.getDataSet());
         immediateData = new ArrayList<>(useCase.getImmediateData());
+    }
+
+    private static Map<String, Map<String, Boolean>> deepCopy(Map<String, Map<String, Boolean>> map) {
+        if (map == null || map.isEmpty()) {
+            return new HashMap<>();
+        }
+        return map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue())));
     }
 }
