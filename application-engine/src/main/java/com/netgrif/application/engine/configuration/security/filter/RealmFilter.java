@@ -26,7 +26,6 @@ import java.util.Optional;
  * */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class RealmFilter extends NetgrifOncePerRequestFilter {
 
     private final String REALM_ID_HEADER = "X-Realm-ID";
@@ -34,6 +33,10 @@ public class RealmFilter extends NetgrifOncePerRequestFilter {
     private final String REALM_NAME_BODY = "realName";
 
     private final RealmService realmService;
+
+    public RealmFilter(RealmService realmService) {
+        this.realmService = realmService;
+    }
 
     @Override
     protected void doFilterInternal(NetgrifHttpServletRequest request, HttpServletResponse response,
