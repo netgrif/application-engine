@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.objects.elastic.domain;
 
+import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
@@ -129,7 +130,9 @@ public abstract class ElasticCase implements Serializable {
         users = deepCopy(useCase.getUsers());
         userRefs = deepCopy(useCase.getUserRefs());
         dataSet = new HashMap<>(useCase.getDataSet());
-        immediateData = new ArrayList<>(useCase.getImmediateData());
+        immediateData = useCase.getImmediateData() == null ? new ArrayList<>() : useCase.getImmediateData().stream()
+                .map(field -> new ImmediateField(field.getStringId(), new I18nString(field.getName()), field.getType()))
+                .collect(Collectors.toList());
     }
 
     private static Map<String, Map<String, Boolean>> deepCopy(Map<String, Map<String, Boolean>> map) {

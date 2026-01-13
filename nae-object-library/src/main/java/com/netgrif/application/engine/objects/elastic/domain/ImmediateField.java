@@ -25,4 +25,10 @@ public class ImmediateField implements Serializable {
         this.name = field.getName();
         this.type = field.getType().getName();
     }
+
+    public ImmediateField(String stringId, I18nString name, String type) {
+        this.stringId = stringId;
+        this.name = name;
+        this.type = type;
+    }
 }
