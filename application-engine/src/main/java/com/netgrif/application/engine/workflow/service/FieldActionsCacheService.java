@@ -73,7 +73,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
         PetriNet petriNet = petriNetService.getDefaultVersionByIdentifier(processIdentifier);
         if (petriNet != null) {
             getRequiredCache(CacheMapKeys.GLOBAL_FUNCTIONS).evictIfPresent(processIdentifier);
-            cachePetriNetFunctions(petriNetService.getDefaultVersionByIdentifier(processIdentifier));
+            cachePetriNetFunctions(petriNet);
         }
     }
 
@@ -93,7 +93,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
             actionsCache.put(stringId, code);
             return code;
         }
-        return (Closure) actionsCache.get(stringId).get();
+        return (Closure) wrapper.get();
     }
 
     @Override
