@@ -79,7 +79,9 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public void reloadCachedGlobalFunctions(PetriNet petriNet) {
-        this.reloadCachedGlobalFunctions(petriNet.getIdentifier());
+        if (petriNet != null) {
+            this.reloadCachedGlobalFunctions(petriNet.getIdentifier());
+        }
     }
 
     @Override
