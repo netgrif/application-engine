@@ -58,7 +58,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
                 .map(function -> CachedFunction.build(shell, function))
                 .collect(Collectors.toList());
 
-        Cache globalFunctionsCache = getRequiredCache(properties.getGlobalFunctions());
+        Cache globalFunctionsCache = getRequiredCache(CacheMapKeys.GLOBAL_FUNCTIONS);
 
         if (!functions.isEmpty()) {
             evaluateCachedFunctions(functions);
@@ -69,11 +69,11 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     }
 
     @Override
-    public void reloadCachedGlobalFunctions(String petriNetId) {
-        PetriNet petriNet = petriNetService.getDefaultVersionByIdentifier(petriNetId);
+    public void reloadCachedGlobalFunctions(String processIdentifier) {
+        PetriNet petriNet = petriNetService.getDefaultVersionByIdentifier(processIdentifier);
         if (petriNet != null) {
-            getRequiredCache(properties.getGlobalFunctions()).evictIfPresent(petriNetId);
-            cachePetriNetFunctions(petriNetService.getDefaultVersionByIdentifier(petriNetId));
+            getRequiredCache(CacheMapKeys.GLOBAL_FUNCTIONS).evictIfPresent(processIdentifier);
+            cachePetriNetFunctions(petriNetService.getDefaultVersionByIdentifier(processIdentifier));
         }
     }
 
@@ -176,7 +176,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public Map<String, List<CachedFunction>> getGlobalFunctionsCache() {
-        Object nativeCache = getRequiredCache(properties.getGlobalFunctions()).getNativeCache();
+        Object nativeCache = getRequiredCache(CacheMapKeys.GLOBAL_FUNCTIONS).getNativeCache();
         if (nativeCache instanceof Map<?, ?> map) {
             @SuppressWarnings("unchecked")
             Map<String, List<CachedFunction>> typedMap = (Map<String, List<CachedFunction>>) map;
@@ -192,7 +192,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public void clearGlobalFunctionCache() {
-        getRequiredCache(properties.getGlobalFunctions()).clear();
+        getRequiredCache(CacheMapKeys.GLOBAL_FUNCTIONS).clear();
     }
 
     @Override
