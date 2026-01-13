@@ -115,7 +115,9 @@ public abstract class ElasticCase implements Serializable {
         title = useCase.getTitle();
         taskIds = new HashSet<>(useCase.getTaskIds());
         taskMongoIds = new HashSet<>(useCase.getTaskMongoIds());
-        tasks = new HashSet<>(useCase.getTasks());
+        tasks = useCase.getTasks() == null ? new HashSet<>() : useCase.getTasks().stream()
+                .map(tp -> new ElasticTaskPair(tp.getTask(), tp.getTransition()))
+                .collect(Collectors.toSet());
         enabledRoles = new HashSet<>(useCase.getEnabledRoles());
         viewRoles = new HashSet<>(useCase.getViewRoles());
         viewUserRefs = new HashSet<>(useCase.getViewUserRefs());
