@@ -7,9 +7,10 @@ import com.netgrif.application.engine.configuration.security.PublicAuthenticatio
 import com.netgrif.application.engine.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.application.engine.configuration.security.SecurityContextFilter;
 import com.netgrif.application.engine.configuration.security.filter.HostValidationRequestFilter;
-import com.netgrif.application.engine.configuration.security.filter.RealmFilter;
+import com.netgrif.application.engine.configuration.security.RealmFilter;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -24,7 +25,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
 import org.springframework.stereotype.Controller;
@@ -39,7 +39,6 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 
 
 @Slf4j
-@Controller
 @Configuration
 @EnableWebSecurity
 @Order(SecurityProperties.DEFAULT_FILTER_ORDER)
@@ -106,7 +105,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .addFilterAfter(hostValidationRequestFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(publicAuthenticationFilter, SecurityContextFilter.class)
                 .addFilterBefore(netgrifHttpRequestTransformFilter, BasicAuthenticationFilter.class)
-                .addFilterBefore(realmFilter, NetgrifHttpRequestTransformFilter.class)
+                .addFilterBefore(realmFilter, PublicAuthenticationFilter.class)
                 .authorizeHttpRequests(requestMatcherRegistry ->
                         requestMatcherRegistry
                                 .requestMatchers(getPatterns()).permitAll()

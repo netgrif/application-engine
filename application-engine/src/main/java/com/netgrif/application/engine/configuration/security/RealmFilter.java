@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.configuration.security.filter;
+package com.netgrif.application.engine.configuration.security;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.netgrif.application.engine.adapter.spring.configuration.filters.NetgrifOncePerRequestFilter;
@@ -11,7 +11,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;

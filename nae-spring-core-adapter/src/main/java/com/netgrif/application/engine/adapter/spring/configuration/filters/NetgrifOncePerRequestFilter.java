@@ -19,7 +19,7 @@ import java.util.Set;
  * */
 @Setter
 @Slf4j
-public abstract class NetgrifOncePerRequestFilter extends OncePerRequestFilter {
+public abstract class  NetgrifOncePerRequestFilter extends OncePerRequestFilter {
 
     /**
      * If initialized, the filter will be applied only if the request path is matched. Otherwise, it will just continue to the next filter.

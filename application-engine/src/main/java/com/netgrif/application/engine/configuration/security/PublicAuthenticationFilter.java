@@ -11,7 +11,6 @@ import com.netgrif.application.engine.configuration.properties.SecurityConfigura
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.utils.HttpReqRespUtils;
-import com.netgrif.application.engine.utils.HttpRequestParamConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
