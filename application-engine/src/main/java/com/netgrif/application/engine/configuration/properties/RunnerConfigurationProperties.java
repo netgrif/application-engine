@@ -18,11 +18,6 @@ public class RunnerConfigurationProperties {
     private ExpressionRunnerProperties expressionRunner = new ExpressionRunnerProperties();
 
     /**
-     * Configuration for the field runner, including action, function, and namespace cache sizes.
-     */
-    private FieldRunnerProperties fieldRunner = new FieldRunnerProperties();
-
-    /**
      * Configuration specific to the expression runner component.
      */
     @Data
@@ -36,28 +31,6 @@ public class RunnerConfigurationProperties {
 
     }
 
-    /**
-     * Configuration specific to the field runner component.
-     */
-    @Data
-    @ConfigurationProperties(prefix = "netgrif.engine.runner.field-runner")
-    public static class FieldRunnerProperties {
-
-        /**
-         * The size of the cache used for handling field runner actions.
-         */
-        private int actionCacheSize = 500;
-
-        /**
-         * The size of the cache used for managing field runner functions.
-         */
-        private int functionsCacheSize = 500;
-
-        /**
-         * The size of the cache used for managing global Petri net functions.
-         */
-        private int globalFunctionsCacheSize = 500;
-    }
 
     /**
      * Configuration specific to the application runner component.

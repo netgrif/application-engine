@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 @EnableCaching
 @RequiredArgsConstructor
 public class CacheConfiguration implements CachingConfigurer {
-    private final RunnerConfigurationProperties.FieldRunnerProperties fieldRunnerProperties;
     private final CacheConfigurationProperties properties;
 
     @Bean
@@ -39,12 +38,17 @@ public class CacheConfiguration implements CachingConfigurer {
         caches.add(new GenericMapCache<>(
                 CacheMapKeys.ACTIONS,
                 Closure.class,
-                fieldRunnerProperties.getActionCacheSize()
+                properties.getActionCacheSize()
         ));
         caches.add(new GenericMapCache<>(
                 CacheMapKeys.FUNCTIONS,
                 CachedFunction.class,
-                fieldRunnerProperties.getFunctionsCacheSize()
+                properties.getFunctionsCacheSize()
+        ));
+        caches.add(new GenericMapCache<>(
+                CacheMapKeys.GLOBAL_FUNCTIONS,
+                CachedFunction.class,
+                properties.getGlobalFunctionsCacheSize()
         ));
 
         SimpleCacheManager cacheManager = new SimpleCacheManager();
