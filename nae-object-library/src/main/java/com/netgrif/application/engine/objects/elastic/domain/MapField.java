@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -14,6 +15,14 @@ public abstract class MapField extends TextField {
 
     public String[] keyValue;
     public Map<String, I18nString> keyValueTranslations;
+
+    public MapField(MapField field) {
+        super(field);
+        this.keyValue = field.keyValue == null ? null : Arrays.copyOf(field.keyValue, field.keyValue.length);
+        this.keyValueTranslations = field.keyValueTranslations == null ? null
+                : field.keyValueTranslations.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> new I18nString(entry.getValue())));
+    }
 
     public MapField(Map.Entry<String, I18nString> valueTranslationPair) {
         this(List.of(valueTranslationPair));

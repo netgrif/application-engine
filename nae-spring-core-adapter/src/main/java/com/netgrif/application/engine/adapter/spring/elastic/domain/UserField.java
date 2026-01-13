@@ -8,6 +8,10 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 @NoArgsConstructor
 public class UserField extends com.netgrif.application.engine.objects.elastic.domain.UserField {
 
+    public UserField(UserField field) {
+        super(field);
+    }
+
     public UserField(UserMappingData value) {
         super(value);
     }
