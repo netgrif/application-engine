@@ -3,10 +3,16 @@ package com.netgrif.application.engine.adapter.spring.elastic.domain;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 
+import java.util.Arrays;
+
 import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
 @NoArgsConstructor
 public class UserListField extends com.netgrif.application.engine.objects.elastic.domain.UserListField {
+
+    public UserListField(UserListField field) {
+        super(field);
+    }
 
     public UserListField(UserMappingData[] values) {
         super(values);

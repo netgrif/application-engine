@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.objects.elastic.domain;
 
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
+import com.netgrif.application.engine.objects.utils.CopyConstructorUtil;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
@@ -114,22 +115,23 @@ public abstract class ElasticCase implements Serializable {
         version++;
         lastModified = useCase.getLastModified();
         title = useCase.getTitle();
-        taskIds = new HashSet<>(useCase.getTaskIds());
-        taskMongoIds = new HashSet<>(useCase.getTaskMongoIds());
+        taskIds = useCase.getTaskIds() == null ? new HashSet<>() : new HashSet<>(useCase.getTaskIds());
+        taskMongoIds = useCase.getTaskMongoIds() == null ? new HashSet<>() : new HashSet<>(useCase.getTaskMongoIds());
         tasks = useCase.getTasks() == null ? new HashSet<>() : useCase.getTasks().stream()
                 .map(tp -> new ElasticTaskPair(tp.getTask(), tp.getTransition()))
                 .collect(Collectors.toSet());
-        enabledRoles = new HashSet<>(useCase.getEnabledRoles());
-        viewRoles = new HashSet<>(useCase.getViewRoles());
-        viewUserRefs = new HashSet<>(useCase.getViewUserRefs());
-        negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
-        viewUsers = new HashSet<>(useCase.getViewUsers());
-        negativeViewUsers = new HashSet<>(useCase.getNegativeViewUsers());
-        tags = new HashMap<>(useCase.getTags());
+        enabledRoles = useCase.getEnabledRoles() == null ? new HashSet<>() : new HashSet<>(useCase.getEnabledRoles());
+        viewRoles = useCase.getViewRoles() == null ? new HashSet<>() : new HashSet<>(useCase.getViewRoles());
+        viewUserRefs = useCase.getViewUserRefs() == null ? new HashSet<>() : new HashSet<>(useCase.getViewUserRefs());
+        negativeViewRoles = useCase.getNegativeViewRoles() == null ? new HashSet<>() : new HashSet<>(useCase.getNegativeViewRoles());
+        viewUsers = useCase.getViewUsers() == null ? new HashSet<>() : new HashSet<>(useCase.getViewUsers());
+        negativeViewUsers = useCase.getNegativeViewUsers() == null ? new HashSet<>() : new HashSet<>(useCase.getNegativeViewUsers());
+        tags = useCase.getTags() == null ? new HashMap<>() : new HashMap<>(useCase.getTags());
         permissions = deepCopy(useCase.getPermissions());
         users = deepCopy(useCase.getUsers());
         userRefs = deepCopy(useCase.getUserRefs());
-        dataSet = new HashMap<>(useCase.getDataSet());
+        dataSet = useCase.getDataSet() == null ? new HashMap<>() : useCase.getDataSet().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> CopyConstructorUtil.copy(entry.getValue().getClass(), entry.getValue())));
         immediateData = useCase.getImmediateData() == null ? new ArrayList<>() : useCase.getImmediateData().stream()
                 .map(field -> new ImmediateField(field.getStringId(), new I18nString(field.getName()), field.getType()))
                 .collect(Collectors.toList());

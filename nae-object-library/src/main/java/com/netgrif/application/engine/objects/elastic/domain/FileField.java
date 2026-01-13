@@ -21,6 +21,13 @@ public abstract class FileField extends DataField {
 
     public String[] fileExtensionValue;
 
+    public FileField(FileField fileField) {
+        super(fileField);
+        this.filePath = fileField.getFilePath() == null ? null : Arrays.copyOf(fileField.filePath, fileField.filePath.length);
+        this.fileNameValue = fileField.getFileNameValue() == null ? null : Arrays.copyOf(fileField.fileNameValue, fileField.fileNameValue.length);
+        this.fileExtensionValue = fileField.getFileExtensionValue() == null ? null : Arrays.copyOf(fileField.fileExtensionValue, fileField.fileExtensionValue.length);
+    }
+
     public FileField(FileFieldValue value) {
         super(value.getName());
         this.filePath = new String[1];

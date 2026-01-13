@@ -13,6 +13,10 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.*;
 @NoArgsConstructor
 public class MapField extends com.netgrif.application.engine.objects.elastic.domain.MapField {
 
+    public MapField(MapField field) {
+        super(field);
+    }
+
     public MapField(Map.Entry<String, I18nString> valuePair) {
         super(valuePair);
     }
