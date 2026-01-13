@@ -633,7 +633,7 @@ public class PetriNetService implements IPetriNetService {
         publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.PRE));
         repository.deleteBy_id(petriNet.getObjectId());
         evictCache(petriNet);
-        functionCacheService.reloadCachedFunctions(petriNet);
+        functionCacheService.reloadCachedGlobalFunctions(petriNet);
         if (petriNet.isDefaultVersion()) {
             PetriNet processToMakeDefault = self.getLatestVersionByIdentifier(petriNet.getIdentifier());
             if (processToMakeDefault != null) {

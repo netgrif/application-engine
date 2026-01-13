@@ -69,27 +69,29 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     }
 
     @Override
-    public void reloadCachedFunctions(String petriNetId) {
-        getRequiredCache(properties.getGlobalFunctions()).evictIfPresent(petriNetId);
-        cachePetriNetFunctions(petriNetService.getDefaultVersionByIdentifier(petriNetId));
+    public void reloadCachedGlobalFunctions(String petriNetId) {
+        PetriNet petriNet = petriNetService.getDefaultVersionByIdentifier(petriNetId);
+        if (petriNet != null) {
+            getRequiredCache(properties.getGlobalFunctions()).evictIfPresent(petriNetId);
+            cachePetriNetFunctions(petriNetService.getDefaultVersionByIdentifier(petriNetId));
+        }
     }
 
     @Override
-    public void reloadCachedFunctions(PetriNet petriNet) {
-        this.reloadCachedFunctions(petriNet.getIdentifier());
+    public void reloadCachedGlobalFunctions(PetriNet petriNet) {
+        this.reloadCachedGlobalFunctions(petriNet.getIdentifier());
     }
 
     @Override
     public Closure getCompiledAction(Action action, boolean shouldRewriteCachedActions) {
         String stringId = action.getId().toString();
         Cache actionsCache = getRequiredCache(CacheMapKeys.ACTIONS);
-        Object nativeActionsCache = actionsCache.getNativeCache();
 
-        if (nativeActionsCache instanceof Map<?, ?> map) {
-            if (shouldRewriteCachedActions || !map.containsKey(stringId) ) {
-                Closure code = (Closure) shell.evaluate("{-> " + action.getDefinition() + "}");
-                actionsCache.put(stringId, code);
-            }
+        Cache.ValueWrapper wrapper = actionsCache.get(stringId);
+        if (shouldRewriteCachedActions || wrapper == null) {
+            Closure code = (Closure) shell.evaluate("{-> " + action.getDefinition() + "}");
+            actionsCache.put(stringId, code);
+            return code;
         }
         return (Closure) actionsCache.get(stringId).get();
     }
@@ -98,15 +100,17 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     public List<CachedFunction> getCachedFunctions(List<Function> functions) {
         List<CachedFunction> cachedFunctions = new ArrayList<>(functions.size());
         Cache functionsCache = getRequiredCache(CacheMapKeys.FUNCTIONS);
-        Object nativeFunctionsCache = functionsCache.getNativeCache();
-
-        if (nativeFunctionsCache instanceof Map<?, ?> map) {
-            functions.forEach(function -> {
-                if (!map.containsKey(function.getStringId())) {
-                    functionsCache.put(function.getStringId(), CachedFunction.build(shell, function));
-                }
-                cachedFunctions.add((CachedFunction) functionsCache.get(function.getStringId()).get());
-            });
+        
+        for (Function function : functions) {
+            Cache.ValueWrapper wrapper = functionsCache.get(function.getStringId());
+            CachedFunction cached;
+            if (wrapper == null) {
+                cached = CachedFunction.build(shell, function);
+                functionsCache.put(function.getStringId(), cached);
+            } else {
+                cached = (CachedFunction) wrapper.get();
+            }
+            cachedFunctions.add(cached);
         }
         return cachedFunctions;
     }
@@ -172,7 +176,13 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public Map<String, List<CachedFunction>> getGlobalFunctionsCache() {
-        return new HashMap<>((Map<String, List<CachedFunction>>) getRequiredCache(properties.getGlobalFunctions()).getNativeCache());
+        Object nativeCache = getRequiredCache(properties.getGlobalFunctions()).getNativeCache();
+        if (nativeCache instanceof Map<?, ?> map) {
+            @SuppressWarnings("unchecked")
+            Map<String, List<CachedFunction>> typedMap = (Map<String, List<CachedFunction>>) map;
+            return new HashMap<>(typedMap);
+        }
+        return Collections.emptyMap();
     }
 
     @Override
