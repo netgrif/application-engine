@@ -48,7 +48,7 @@ public class CacheConfigurationProperties {
     private String loadedModules = "loadedModules";
 
     /**
-     * Default cache name for caching global functions of PetriNet global scoped functions.
+     * Default cache name for caching PetriNet global-scoped functions.
      */
     private String globalFunctions = "globalFunctions";
 
