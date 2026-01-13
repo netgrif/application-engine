@@ -9,6 +9,8 @@ import com.google.common.collect.Lists;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
+import com.netgrif.application.engine.objects.common.ResourceNotFoundException;
+import com.netgrif.application.engine.objects.common.ResourceNotFoundExceptionCode;
 import com.netgrif.application.engine.workflow.domain.FilterDeserializer;
 import com.netgrif.application.engine.objects.workflow.domain.IllegalFilterFileException;
 import com.netgrif.application.engine.auth.service.UserService;
@@ -266,7 +268,10 @@ public class FilterImportExportService implements IFilterImportExportService {
         filterFields.forEach(f -> {
             Task importedFilterTask = taskService.findOne(f);
             Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
-            PetriNet filterNet = petriNetService.getNewestVersionByIdentifier(FILTER_NET_IDENTIFIER);
+            PetriNet filterNet = petriNetService.getDefaultVersionByIdentifier(FILTER_NET_IDENTIFIER);
+            if (filterNet == null) {
+                throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.DEFAULT_PROCESS_NOT_FOUND, "No filter process found or active");
+            }
             List<String> requiredNets = filterCase.getDataSet().get(FIELD_FILTER).getAllowedNets();
             List<String> currentNets = petriNetService.getExistingPetriNetIdentifiersFromIdentifiersList(requiredNets);
             if (currentNets.size() < requiredNets.size()) {

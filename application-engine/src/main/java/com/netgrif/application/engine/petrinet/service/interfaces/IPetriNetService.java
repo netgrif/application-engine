@@ -153,12 +153,20 @@ public interface IPetriNetService {
     List<PetriNet> findAllById(List<String> ids);
 
     /**
-     * Retrieves the newest version of a {@link PetriNet} by its identifier.
+     * Retrieves the default version of a {@link PetriNet} by its identifier.
      *
      * @param identifier the unique identifier of the PetriNet
-     * @return the newest version of the {@link PetriNet} matching the provided identifier
+     * @return the default version of the {@link PetriNet} matching the provided identifier or null if not found
      */
-    PetriNet getNewestVersionByIdentifier(String identifier);
+    PetriNet getDefaultVersionByIdentifier(String identifier);
+
+    /**
+     * Retrieves the latest version of a {@link PetriNet} by its identifier.
+     *
+     * @param identifier the unique identifier of the PetriNet
+     * @return the latest version of the {@link PetriNet} matching the provided identifier or null if not found
+     */
+    PetriNet getLatestVersionByIdentifier(String identifier);
 
     /**
      * Retrieves a paginated list of all {@link PetriNet} objects.

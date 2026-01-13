@@ -136,7 +136,7 @@ class PetriNetTest {
         try {
             petriNetService.importPetriNet(netResource3.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
         } catch (Exception e) {
-            assert e.getMessage() == "Provided Petri net version is already present in the system"
+            assert e.getMessage() == "A process [test] with such version [0.0.1] already exists"
         }
     }
 
