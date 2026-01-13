@@ -204,7 +204,6 @@ public class PetriNetService implements IPetriNetService {
 
         processRoleService.saveAll(newProcess.getRoles().values());
         newProcess.setAuthor(ActorTransformer.toActorRef(author));
-        functionCacheService.cachePetriNetFunctions(newProcess);
         Path savedPath = getImporter().saveNetFile(newProcess, new ByteArrayInputStream(xmlCopy.toByteArray()));
         xmlCopy.close();
         log.info("Petri net " + newProcess.getTitle() + " (" + newProcess.getInitials() + " v" + newProcess.getVersion() + ") imported successfully and saved in a folder: " + savedPath.toString());
@@ -216,6 +215,7 @@ public class PetriNetService implements IPetriNetService {
             doSaveInternal(processToMakeNonDefault);
         }
         Optional<PetriNet> saveProcessOpt = doSaveInternal(newProcess);
+        functionCacheService.cachePetriNetFunctions(newProcess);
 
         outcome.setOutcomes(eventService.runActions(newProcess.getPostUploadActions(), null, Optional.empty(), params));
         outcome.setNet(saveProcessOpt.orElseThrow());
@@ -410,6 +410,13 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public Page<PetriNet> getAll(Pageable pageable) {
         Page<PetriNet> nets = repository.findAll(pageable);
+        nets.forEach(PetriNet::initializeArcs);
+        return nets;
+    }
+
+    @Override
+    public Page<PetriNet> getAllDefault(Pageable pageable) {
+        Page<PetriNet> nets = repository.findAllByDefaultVersionTrue(pageable);
         nets.forEach(PetriNet::initializeArcs);
         return nets;
     }
