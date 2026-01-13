@@ -1,25 +1,24 @@
 package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.SimpleValueWrapper;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class GenericMapCache<V> implements Cache {
     private final String name;
     private final Class<V> valueType;
-    private final Map<String, V> map;
+    private final ConcurrentHashMap<String, V> map;
 
     public GenericMapCache(String name, Class<V> valueType, int cacheSize) {
         this.name = name;
         this.valueType = valueType;
-        this.map = Collections.synchronizedMap(new MaxSizeHashMap<>(cacheSize));
+        this.map = new ConcurrentHashMap<>(cacheSize);
     }
 
     @Override public @NotNull String getName() { return name; }
