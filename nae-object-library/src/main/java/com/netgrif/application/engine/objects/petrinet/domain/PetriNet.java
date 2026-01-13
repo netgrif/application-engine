@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.objects.petrinet.domain;
 
+import com.netgrif.application.engine.objects.annotations.Indexable;
 import com.netgrif.application.engine.objects.annotations.Indexed;
 import com.netgrif.application.engine.objects.auth.domain.ActorRef;
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.Arc;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Indexable
 @QueryEntity
 public abstract class PetriNet extends PetriNetObject {
 
@@ -58,6 +60,7 @@ public abstract class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
+    @Indexed
     private String initials;
 
     @Getter
@@ -140,6 +143,10 @@ public abstract class PetriNet extends PetriNetObject {
     @Setter
     private Map<String, String> tags;
 
+    @Getter
+    @Setter
+    private Set<String> pluginDependencies;
+
     public PetriNet() {
         this._id = new ObjectId();
         this.identifier = "Default";
@@ -163,6 +170,7 @@ public abstract class PetriNet extends PetriNetObject {
         this.userRefs = new HashMap<>();
         this.functions = new LinkedList<>();
         this.tags = new HashMap<>();
+        this.pluginDependencies = new HashSet<>();
         this.makeNonDefault();
     }
 
@@ -200,6 +208,10 @@ public abstract class PetriNet extends PetriNetObject {
         this.defaultRoleEnabled = petriNet.isDefaultRoleEnabled();
         this.anonymousRoleEnabled = petriNet.isAnonymousRoleEnabled();
         this.author = petriNet.getAuthor();
+        Set<String> sourcePlugins = petriNet.getPluginDependencies();
+        this.pluginDependencies = sourcePlugins != null
+                ? new HashSet<>(sourcePlugins)
+                : new HashSet<>();
         initializeArcs();
     }
 
