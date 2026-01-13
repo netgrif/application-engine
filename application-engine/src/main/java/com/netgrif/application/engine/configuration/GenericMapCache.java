@@ -15,10 +15,10 @@ public class GenericMapCache<V> implements Cache {
     private final Class<V> valueType;
     private final ConcurrentHashMap<String, V> map;
 
-    public GenericMapCache(String name, Class<V> valueType, int cacheSize) {
+    public GenericMapCache(String name, Class<V> valueType, int initialCapacity) {
         this.name = name;
         this.valueType = valueType;
-        this.map = new ConcurrentHashMap<>(cacheSize);
+        this.map = new ConcurrentHashMap<>(initialCapacity);
     }
 
     @Override public @NotNull String getName() { return name; }
