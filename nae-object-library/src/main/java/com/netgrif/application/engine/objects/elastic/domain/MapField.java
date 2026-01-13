@@ -20,8 +20,8 @@ public abstract class MapField extends TextField {
         super(field);
         this.keyValue = field.keyValue == null ? null : Arrays.copyOf(field.keyValue, field.keyValue.length);
         this.keyValueTranslations = field.keyValueTranslations == null ? null
-                : new HashMap<>(field.keyValueTranslations.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> new I18nString(entry.getValue()))));
+                : field.keyValueTranslations.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> new I18nString(entry.getValue())));
     }
 
     public MapField(Map.Entry<String, I18nString> valueTranslationPair) {

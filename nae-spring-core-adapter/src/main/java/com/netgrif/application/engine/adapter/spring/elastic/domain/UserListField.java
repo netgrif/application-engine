@@ -3,8 +3,6 @@ package com.netgrif.application.engine.adapter.spring.elastic.domain;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 
-import java.util.Arrays;
-
 import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
 @NoArgsConstructor

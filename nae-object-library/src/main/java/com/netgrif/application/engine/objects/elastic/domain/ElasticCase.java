@@ -108,7 +108,7 @@ public abstract class ElasticCase implements Serializable {
         users = deepCopy(useCase.getUsers());
         userRefs = deepCopy(useCase.getUserRefs());
         dataSet = new HashMap<>();
-        immediateData = useCase.getImmediateData().stream().map(ImmediateField::new).collect(Collectors.toList());
+        immediateData = useCase.getImmediateData() == null ? Collections.emptyList() : useCase.getImmediateData().stream().map(ImmediateField::new).collect(Collectors.toList());
     }
 
     public void update(ElasticCase useCase) {
@@ -131,6 +131,7 @@ public abstract class ElasticCase implements Serializable {
         users = deepCopy(useCase.getUsers());
         userRefs = deepCopy(useCase.getUserRefs());
         dataSet = useCase.getDataSet() == null ? new HashMap<>() : useCase.getDataSet().entrySet().stream()
+                .filter(entry -> entry.getValue() != null)
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> CopyConstructorUtil.copy(entry.getValue().getClass(), entry.getValue())));
         immediateData = useCase.getImmediateData() == null ? new ArrayList<>() : useCase.getImmediateData().stream()
                 .map(field -> new ImmediateField(field.getStringId(), new I18nString(field.getName()), field.getType()))
