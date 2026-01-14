@@ -5,6 +5,10 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
+import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
+import com.netgrif.application.engine.objects.petrinet.domain.Transition;
+import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.ArcImportReference;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
@@ -15,10 +19,6 @@ import com.netgrif.application.engine.objects.event.events.petrinet.ProcessDelet
 import com.netgrif.application.engine.objects.event.events.petrinet.ProcessDeployEvent;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.auth.service.GroupService;
-import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
-import com.netgrif.application.engine.objects.petrinet.domain.Transition;
-import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
@@ -633,7 +633,7 @@ public class PetriNetService implements IPetriNetService {
         publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.PRE));
         repository.deleteBy_id(petriNet.getObjectId());
         evictCache(petriNet);
-        functionCacheService.reloadCachedFunctions(petriNet);
+        functionCacheService.reloadCachedGlobalFunctions(petriNet);
         if (petriNet.isDefaultVersion()) {
             PetriNet processToMakeDefault = self.getLatestVersionByIdentifier(petriNet.getIdentifier());
             if (processToMakeDefault != null) {
@@ -669,4 +669,5 @@ public class PetriNetService implements IPetriNetService {
         }
         return obj;
     }
+
 }

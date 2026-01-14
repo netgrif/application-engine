@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.configuration.properties;
 
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -47,15 +48,36 @@ public class CacheConfigurationProperties {
     private String loadedModules = "loadedModules";
 
     /**
-     * Default cache name for caching global functions of PetriNet global scoped functions.
-     */
-    private String globalFunctions = "globalFunctions";
-
-    /**
      * A list of additional custom cache names.
      * Allows users to define their own cache names for specific use cases.
      */
     private List<String> additional = new ArrayList<>();
+
+    /**
+     * The size of pages used for caching functions when processing large sets of data.
+     * This property determines the maximum number of functions to include in a single page during caching operations.
+     * Default value is 500.
+     */
+    @Min(1)
+    private int functionCachingPageSize = 500;
+
+    /**
+     * The size of the cache used for handling field runner actions.
+     */
+    @Min(1)
+    private int actionCacheSize = 500;
+
+    /**
+     * The size of the cache used for managing field runner functions.
+     */
+    @Min(1)
+    private int functionsCacheSize = 500;
+
+    /**
+     * The size of the cache used for managing global Petri net functions.
+     */
+    @Min(1)
+    private int globalFunctionsCacheSize = 500;
 
     /**
      * Retrieves a set of all configured cache names.
@@ -65,7 +87,7 @@ public class CacheConfigurationProperties {
      */
     public Set<String> getAllCaches() {
         Set<String> caches = new LinkedHashSet<>(Arrays.asList(petriNetById, petriNetByIdentifier, petriNetDefault,
-                petriNetLatest, petriNetCache, loadedModules, globalFunctions));
+                petriNetLatest, petriNetCache, loadedModules));
         caches.addAll(additional);
         return caches;
     }

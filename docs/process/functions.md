@@ -4,7 +4,7 @@ This document contains information about new Petriflow functions introduced in N
 
 ## Overview
 
-Petriflow functions provide opportunity to declare your own functions without any changes in applications code. 
+Petriflow functions provide opportunity to declare your own functions without any changes in applications code.
 
 ### Scopes
 

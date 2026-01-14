@@ -13,7 +13,9 @@ public interface IFieldActionsCacheService {
 
     void cachePetriNetFunctions(PetriNet petriNet);
 
-    void reloadCachedFunctions(PetriNet petriNet);
+    void reloadCachedGlobalFunctions(String petriNetId);
+
+    void reloadCachedGlobalFunctions(PetriNet petriNet);
 
     Closure getCompiledAction(Action action, boolean shouldRewriteCachedActions);
 

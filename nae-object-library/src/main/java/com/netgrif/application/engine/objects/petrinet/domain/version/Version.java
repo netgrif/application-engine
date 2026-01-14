@@ -56,7 +56,7 @@ public class Version implements Serializable, Comparable<Version> {
      * Compares this version to the other version
      *
      * @param other other version to be compared with
-     * @return 0 if the versions equal, <0 if this is lower than other, >0 if this is higher than other</0>
+     * @return 0 if the versions equal, < 0 if this is lower than other, > 0 if this is higher than other
      */
     public int compareTo(Version other) {
         if (this.major != other.major) {
