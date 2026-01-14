@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
+import com.netgrif.application.engine.objects.event.events.petrinet.ProcessEvent;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.objects.petrinet.domain.Transition;
@@ -60,6 +61,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService.transformToReference;
@@ -208,8 +210,7 @@ public class PetriNetService implements IPetriNetService {
         xmlCopy.close();
         log.info("Petri net " + newProcess.getTitle() + " (" + newProcess.getInitials() + " v" + newProcess.getVersion() + ") imported successfully and saved in a folder: " + savedPath.toString());
 
-        outcome.setOutcomes(eventService.runActions(newProcess.getPreUploadActions(), null, Optional.empty(), params));
-        publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.PRE));
+        runActionAndPublishEvent(outcome, null, newProcess.getPreUploadActions(),  params, new ProcessDeployEvent(outcome, EventPhase.PRE));
 
         if (processToMakeNonDefault != null) {
             doSaveInternal(processToMakeNonDefault);
@@ -217,10 +218,29 @@ public class PetriNetService implements IPetriNetService {
         Optional<PetriNet> saveProcessOpt = doSaveInternal(newProcess);
         functionCacheService.cachePetriNetFunctions(newProcess);
 
-        outcome.setOutcomes(eventService.runActions(newProcess.getPostUploadActions(), null, Optional.empty(), params));
-        outcome.setNet(saveProcessOpt.orElseThrow());
-        publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
+        runActionAndPublishEvent(outcome, saveProcessOpt.orElseThrow(), newProcess.getPostUploadActions(), params, new ProcessDeployEvent(outcome, EventPhase.POST));
+
         return outcome;
+    }
+
+
+    /**
+     * Executes a list of actions associated with a Petri net and publishes a corresponding event after execution.
+     *
+     * <p>This method is responsible for running the specified actions using the event service, updating the
+     * provided {@link ImportPetriNetEventOutcome} instance with the outcomes of the executed actions,
+     * setting the processed Petri net, and publishing the given event through the application event publisher.</p>
+     *
+     * @param outcome     the {@link ImportPetriNetEventOutcome} instance where the results of the action executions are stored
+     * @param saveProcess the Petri net that has been processed and potentially saved
+     * @param actions     a list of {@link Action}s to be executed
+     * @param params      a map of key-value pairs containing execution parameters for the actions
+     * @param event       the {@link ProcessEvent} associated with the execution and used for event publication
+     */
+    protected void runActionAndPublishEvent(ImportPetriNetEventOutcome outcome, PetriNet saveProcess, List<Action> actions, Map<String, String> params, ProcessEvent event) {
+        outcome.setOutcomes(eventService.runActions(actions, null, Optional.empty(), params));
+        outcome.setNet(saveProcess);
+        publisher.publishEvent(event);
     }
 
     /**
