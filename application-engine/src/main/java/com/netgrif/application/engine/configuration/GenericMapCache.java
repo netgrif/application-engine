@@ -62,6 +62,10 @@ public class GenericMapCache<V> implements Cache {
 
     @Override
     public void put(Object key, Object value) {
+        if (value == null) {
+            evict(key);
+            return;
+        }
         map.put(String.valueOf(key), safeCast(value));
     }
 
