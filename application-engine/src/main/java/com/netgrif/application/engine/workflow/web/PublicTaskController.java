@@ -77,8 +77,7 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> assign(@PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
-        return super.assign(loggedUser, taskId, locale);
+        return super.assign(taskId, locale);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallFinish(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
@@ -92,8 +91,7 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> finish(@PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
-        return super.finish(loggedUser, taskId, locale);
+        return super.finish(taskId, locale);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallCancel(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
@@ -107,8 +105,7 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> cancel(@PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
-        return super.cancel(loggedUser, taskId, locale);
+        return super.cancel(taskId, locale);
     }
 
     @Override
@@ -203,9 +200,9 @@ public class PublicTaskController extends AbstractTaskController {
         return super.deleteNamedFile(requestBody.getParentTaskId(), requestBody.getFieldId(), requestBody.getFileName());
     }
 
-    @Operation(summary = "Generic task search on Mongo database")
-    @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        return super.searchPublic(ActorTransformer.toLoggedUser(userService.getLoggedUser()), pageable, searchBody, operation, assembler, locale);
-    }
+//    @Operation(summary = "Generic task search on Mongo database")
+//    @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+//    public PagedModel<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
+//        return super.searchPublic(ActorTransformer.toLoggedUser(userService.getLoggedUser()), pageable, searchBody, operation, assembler, locale);
+//    }
 }

@@ -2,6 +2,7 @@ package com.netgrif.application.engine.auth.web;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.InvalidUserTokenException;
@@ -131,8 +132,8 @@ public class AuthenticationController {
 
     @Operation(summary = "Verify validity of an authentication token")
     @GetMapping(value = "/verify", produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource verifyAuthToken(Authentication auth) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+    public MessageResource verifyAuthToken() {
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
         return MessageResource.successMessage("Auth Token successfully verified, for user [" + loggedUser.getId() + "] " + loggedUser.getName());
     }
 

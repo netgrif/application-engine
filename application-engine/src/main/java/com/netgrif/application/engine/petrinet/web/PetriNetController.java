@@ -2,9 +2,11 @@ package com.netgrif.application.engine.petrinet.web;
 
 import com.netgrif.application.engine.AsyncRunner;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.importer.service.Importer;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
@@ -82,6 +84,9 @@ public class PetriNetController {
     @Autowired
     private AsyncRunner asyncRunner;
 
+    @Autowired
+    private UserService userService;
+
     public static String decodeUrl(String s1) {
         try {
             if (s1 == null)
@@ -122,8 +127,8 @@ public class PetriNetController {
 
     @Operation(summary = "Get all processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
-    public ResponseEntity<Page<PetriNetReference>> getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Pageable pageable, Authentication auth, Locale locale) {
-        LoggedUser user = (LoggedUser) auth.getPrincipal();
+    public ResponseEntity<Page<PetriNetReference>> getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Pageable pageable, Locale locale) {
+        LoggedUser user = ActorTransformer.toLoggedUser(userService.getLoggedUser());
         if (identifier != null && version == null) {
             return ResponseEntity.ok(service.getReferencesByIdentifier(identifier, user, locale, pageable));
         } else if (identifier == null && version != null) {

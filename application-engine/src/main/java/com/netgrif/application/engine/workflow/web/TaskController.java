@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
@@ -62,8 +63,8 @@ public class TaskController extends AbstractTaskController {
     @Override
     @Operation(summary = "Get all tasks", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        return super.getAll(auth, pageable, assembler, locale);
+    public PagedModel<LocalisedTaskResource> getAll(Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.getAll(pageable, assembler, locale);
     }
 
     @Override
@@ -87,7 +88,7 @@ public class TaskController extends AbstractTaskController {
         return super.getOne(taskId, locale);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallAssign(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallAssign(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
     @Operation(summary = "Assign task",
             description = "Caller must be able to perform the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -96,12 +97,11 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EntityModel<EventOutcomeWithMessage> assign(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        return super.assign(loggedUser, taskId, locale);
+    public EntityModel<EventOutcomeWithMessage> assign(@PathVariable("id") String taskId, Locale locale) {
+        return super.assign(taskId, locale);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallDelegate(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallDelegate(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
     @Operation(summary = "Delegate task",
             description = "Caller must be able to delegate the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -110,12 +110,11 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EntityModel<EventOutcomeWithMessage> delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody String delegatedId, Locale locale) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        return super.delegate(loggedUser, taskId, delegatedId, locale);
+    public EntityModel<EventOutcomeWithMessage> delegate(@PathVariable("id") String taskId, @RequestBody String delegatedId, Locale locale) {
+        return super.delegate(taskId, delegatedId, locale);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallFinish(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallFinish(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
     @Operation(summary = "Finish task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -124,12 +123,11 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EntityModel<EventOutcomeWithMessage> finish(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        return super.finish(loggedUser, taskId, locale);
+    public EntityModel<EventOutcomeWithMessage> finish(@PathVariable("id") String taskId, Locale locale) {
+        return super.finish(taskId, locale);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallCancel(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallCancel(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
     @Operation(summary = "Cancel task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -138,44 +136,43 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EntityModel<EventOutcomeWithMessage> cancel(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        return super.cancel(loggedUser, taskId, locale);
+    public EntityModel<EventOutcomeWithMessage> cancel(@PathVariable("id") String taskId, Locale locale) {
+        return super.cancel(taskId, locale);
     }
 
     @Override
     @Operation(summary = "Get all tasks assigned to logged user", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/my", produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> getMy(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        return super.getMy(auth, pageable, assembler, locale);
+    public PagedModel<LocalisedTaskResource> getMy(Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.getMy(pageable, assembler, locale);
     }
 
     @Override
     @Operation(summary = "Get all finished tasks by logged user", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/my/finished", produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> getMyFinished(Pageable pageable, Authentication auth,  PagedResourcesAssembler<Task> assembler, Locale locale) {
-        return super.getMyFinished(pageable, auth, assembler, locale);
+    public PagedModel<LocalisedTaskResource> getMyFinished(Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.getMyFinished(pageable, assembler, locale);
     }
 
     @Override
     @Operation(summary = "Generic task search on Mongo database", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation,  PagedResourcesAssembler<Task> assembler, Locale locale) {
-        return super.search(auth, pageable, searchBody, operation, assembler, locale);
+    public PagedModel<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation,  PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.search(pageable, searchBody, operation, assembler, locale);
     }
 
     @Override
     @Operation(summary = "Generic task search on Elasticsearch database", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search_es", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, @RequestBody SingleElasticTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation,  PagedResourcesAssembler<Task> assembler, Locale locale) {
-        return super.searchElastic(auth, pageable, searchBody, operation, assembler, locale);
+    public PagedModel<LocalisedTaskResource> searchElastic(Pageable pageable, @RequestBody SingleElasticTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation,  PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.searchElastic(pageable, searchBody, operation, assembler, locale);
     }
 
     @Override
     @Operation(summary = "Count tasks by provided criteria", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/count", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public CountResponse count(@RequestBody SingleElasticTaskSearchRequestAsList query, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth, Locale locale) {
-        return super.count(query, operation, auth, locale);
+    public CountResponse count(@RequestBody SingleElasticTaskSearchRequestAsList query, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Locale locale) {
+        return super.count(query, operation, locale);
     }
 
     @Override
@@ -185,7 +182,7 @@ public class TaskController extends AbstractTaskController {
         return super.getData(taskId, locale);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveData(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveData(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
     @Operation(summary = "Set task data",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -195,11 +192,11 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
 
-    public EntityModel<EventOutcomeWithMessage> setData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> setData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody, Locale locale) {
         return super.setData(taskId, dataBody, locale);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
     @Operation(summary = "Upload file into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -208,7 +205,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EntityModel<EventOutcomeWithMessage> saveFile(Authentication auth, @PathVariable("id") String taskId, @RequestPart(value = "data") FileFieldRequest dataBody, @RequestPart(value = "file") MultipartFile multipartFile, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> saveFile(@PathVariable("id") String taskId, @RequestPart(value = "data") FileFieldRequest dataBody, @RequestPart(value = "file") MultipartFile multipartFile, Locale locale) {
         return super.saveFile(taskId, multipartFile, dataBody, locale);
     }
 
@@ -218,7 +215,7 @@ public class TaskController extends AbstractTaskController {
         return super.getFile(taskId, fieldId);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
     @Operation(summary = "Remove file from the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -227,11 +224,11 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EntityModel<EventOutcomeWithMessage> deleteFile(Authentication auth, @PathVariable("id") String taskId, @RequestBody FileFieldRequest requestBody) {
+    public EntityModel<EventOutcomeWithMessage> deleteFile(@PathVariable("id") String taskId, @RequestBody FileFieldRequest requestBody) {
         return super.deleteFile(requestBody.getParentTaskId(), requestBody.getFieldId());
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
     @Operation(summary = "Upload multiple files into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -240,7 +237,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EntityModel<EventOutcomeWithMessage> saveFiles(Authentication auth, @PathVariable("id") String taskId, @RequestPart(value = "data") FileFieldRequest requestBody, @RequestPart(value = "files") MultipartFile[] multipartFiles) {
+    public EntityModel<EventOutcomeWithMessage> saveFiles(@PathVariable("id") String taskId, @RequestPart(value = "data") FileFieldRequest requestBody, @RequestPart(value = "files") MultipartFile[] multipartFiles) {
         return super.saveFiles(taskId, multipartFiles, requestBody);
     }
 
@@ -250,7 +247,7 @@ public class TaskController extends AbstractTaskController {
         return super.getNamedFile(taskId, fieldId, fileName);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
     @Operation(summary = "Remove file from tasks file list field value",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -259,7 +256,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EntityModel<EventOutcomeWithMessage> deleteNamedFile(Authentication auth, @PathVariable("id") String taskId, @RequestBody FileFieldRequest requestBody) {
+    public EntityModel<EventOutcomeWithMessage> deleteNamedFile(@PathVariable("id") String taskId, @RequestBody FileFieldRequest requestBody) {
         return super.deleteNamedFile(requestBody.getParentTaskId(), requestBody.getFieldId(), requestBody.getFileName());
     }
 
