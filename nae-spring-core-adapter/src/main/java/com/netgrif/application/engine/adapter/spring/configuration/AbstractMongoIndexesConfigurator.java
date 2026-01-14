@@ -51,7 +51,7 @@ public abstract class AbstractMongoIndexesConfigurator {
         }
         addAnnotatedFields(collectionType, indexDefinitions);
         addConfiguredFields(collectionType, indexDefinitions);
-        indexDefinitions.forEach(indexOps::ensureIndex);
+        indexDefinitions.forEach(indexOps::createIndex);
     }
 
     private void addAnnotatedFields(Class<?> collectionType, List<IndexDefinition> indexDefinitions) {
