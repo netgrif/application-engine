@@ -64,6 +64,11 @@ public class ElasticCase extends com.netgrif.application.engine.objects.elastic.
         return super.getProcessId();
     }
 
+    @Field(type = Keyword)
+    public String getWorkspaceId() {
+        return super.getWorkspaceId();
+    }
+
     @Field(type = Date, format = DateFormat.date_hour_minute_second_millis)
     public LocalDateTime getCreationDate() {
         return super.getCreationDate();

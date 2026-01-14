@@ -68,7 +68,7 @@ public class ActorTransformer {
      */
     public static LoggedUser toLoggedUser(AbstractUser user, String workspaceId, String providerOrigin, Duration sessionTimeout) {
         LoggedUser loggedUser = toLoggedUser(user);
-        loggedUser.setWorkspaceId(workspaceId);
+        loggedUser.setActiveWorkspaceId(workspaceId);
         loggedUser.setProviderOrigin(providerOrigin);
         loggedUser.setSessionTimeout(sessionTimeout);
         return loggedUser;

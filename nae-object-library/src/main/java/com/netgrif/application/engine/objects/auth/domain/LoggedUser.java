@@ -27,9 +27,9 @@ import java.util.Set;
 public abstract class LoggedUser extends AbstractUser implements Serializable {
 
     /**
-     * The identifier of the workspace associated with the logged user.
+     * todo javadoc The identifier of the workspace associated with the logged user.
      */
-    private String workspaceId;
+    private String activeWorkspaceId;
 
     /**
      * The authentication provider origin from which the user was authenticated.
@@ -60,14 +60,16 @@ public abstract class LoggedUser extends AbstractUser implements Serializable {
      * @param lastName The user's last name
      * @param email The user's email address
      * @param avatar The user's avatar URL
-     * @param workspaceId The identifier of user's workspace
+     * @param activeWorkspaceId The identifier of user's workspace
      * @param providerOrigin The authentication provider origin
      * @param mfaMethods The set of enabled MFA methods
      * @param sessionTimeout The duration of session timeout
      */
-    public LoggedUser(ObjectId id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar, String workspaceId, String providerOrigin, Set<String> mfaMethods, Duration sessionTimeout) {
+    public LoggedUser(ObjectId id, String realmId, String username, String firstName, String middleName, String lastName,
+                      String email, String avatar, String activeWorkspaceId, String providerOrigin, Set<String> mfaMethods,
+                      Duration sessionTimeout) {
         super(id, realmId, username, firstName, middleName, lastName, email, avatar);
-        this.workspaceId = workspaceId;
+        this.activeWorkspaceId = activeWorkspaceId;
         this.providerOrigin = providerOrigin;
         this.mfaMethods = mfaMethods;
         this.sessionTimeout = sessionTimeout;
@@ -84,14 +86,14 @@ public abstract class LoggedUser extends AbstractUser implements Serializable {
      * @param lastName The user's last name
      * @param email The user's email address
      * @param avatar The user's avatar URL
-     * @param workspaceId The identifier of user's workspace
+     * @param activeWorkspaceId The identifier of user's workspace
      * @param providerOrigin The authentication provider origin
      * @param mfaMethods The set of enabled MFA methods
      * @param sessionTimeout The duration of session timeout
      */
-    public LoggedUser(String id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar, String workspaceId, String providerOrigin, Set<String> mfaMethods, Duration sessionTimeout) {
+    public LoggedUser(String id, String realmId, String username, String firstName, String middleName, String lastName, String email, String avatar, String activeWorkspaceId, String providerOrigin, Set<String> mfaMethods, Duration sessionTimeout) {
         super(id, realmId, username, firstName, middleName, lastName, email, avatar);
-        this.workspaceId = workspaceId;
+        this.activeWorkspaceId = activeWorkspaceId;
         this.providerOrigin = providerOrigin;
         this.mfaMethods = mfaMethods;
         this.sessionTimeout = sessionTimeout;

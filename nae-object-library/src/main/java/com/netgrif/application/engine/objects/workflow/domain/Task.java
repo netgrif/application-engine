@@ -48,6 +48,11 @@ public abstract class Task implements Serializable {
 
     @Getter
     @Setter
+    @Indexed
+    private String workspaceId;
+
+    @Getter
+    @Setter
     private TaskLayout layout;
 
     @Getter

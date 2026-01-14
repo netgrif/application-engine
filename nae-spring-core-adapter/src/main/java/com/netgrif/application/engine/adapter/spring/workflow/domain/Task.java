@@ -29,8 +29,19 @@ public class Task extends com.netgrif.application.engine.objects.workflow.domain
     }
 
     @Builder(builderMethodName = "with")
-    public Task(ProcessResourceId _id, String processId, String caseId, String transitionId, TaskLayout layout, I18nString title, String caseColor, String caseTitle, Integer priority, String userId, String userRealmId, AbstractUser user, List<Trigger> triggers, Map<String, Map<String, Boolean>> roles, Map<String, Map<String, Boolean>> userRefs, Map<String, Map<String, Boolean>> users, List<String> viewRoles, List<String> viewUserRefs, List<String> viewUsers, List<String> negativeViewRoles, List<String> negativeViewUsers, LocalDateTime startDate, LocalDateTime finishDate, String finishedBy, String transactionId, Boolean requiredFilled, LinkedHashSet<String> immediateDataFields, List<Field<?>> immediateData, String icon, AssignPolicy assignPolicy, DataFocusPolicy dataFocusPolicy, FinishPolicy finishPolicy, Map<EventType, I18nString> eventTitles, Map<String, Boolean> assignedUserPolicy, Map<String, Integer> consumedTokens, Map<String, String> tags) {
-        super(_id, processId, caseId, transitionId, layout, title, caseColor, caseTitle, priority, userId, userRealmId, user, triggers, roles, userRefs, users, viewRoles, viewUserRefs, viewUsers, negativeViewRoles, negativeViewUsers, startDate, finishDate, finishedBy, transactionId, requiredFilled, immediateDataFields, immediateData, icon, assignPolicy, dataFocusPolicy, finishPolicy, eventTitles, assignedUserPolicy, consumedTokens, tags);
+    public Task(ProcessResourceId _id, String processId, String caseId, String transitionId, TaskLayout layout, I18nString title,
+                String caseColor, String caseTitle, Integer priority, String userId, String userRealmId, AbstractUser user,
+                List<Trigger> triggers, Map<String, Map<String, Boolean>> roles, Map<String, Map<String, Boolean>> userRefs,
+                Map<String, Map<String, Boolean>> users, List<String> viewRoles, List<String> viewUserRefs, List<String> viewUsers,
+                List<String> negativeViewRoles, List<String> negativeViewUsers, LocalDateTime startDate, LocalDateTime finishDate,
+                String finishedBy, String transactionId, Boolean requiredFilled, LinkedHashSet<String> immediateDataFields,
+                List<Field<?>> immediateData, String icon, AssignPolicy assignPolicy, DataFocusPolicy dataFocusPolicy,
+                FinishPolicy finishPolicy, Map<EventType, I18nString> eventTitles, Map<String, Boolean> assignedUserPolicy,
+                Map<String, Integer> consumedTokens, Map<String, String> tags, String workspaceId) {
+        super(_id, processId, caseId, transitionId, workspaceId, layout, title, caseColor, caseTitle, priority, userId,
+                userRealmId, user, triggers, roles, userRefs, users, viewRoles, viewUserRefs, viewUsers, negativeViewRoles,
+                negativeViewUsers, startDate, finishDate, finishedBy, transactionId, requiredFilled, immediateDataFields,
+                immediateData, icon, assignPolicy, dataFocusPolicy, finishPolicy, eventTitles, assignedUserPolicy, consumedTokens, tags);
     }
 
     @Id

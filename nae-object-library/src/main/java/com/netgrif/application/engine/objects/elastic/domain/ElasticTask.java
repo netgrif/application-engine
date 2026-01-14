@@ -1,9 +1,5 @@
 package com.netgrif.application.engine.objects.elastic.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import lombok.*;
@@ -34,6 +30,8 @@ public abstract class ElasticTask implements Serializable {
     private String taskId;
 
     private String transitionId;
+
+    private String workspaceId;
 
     private I18nString title;
 
@@ -87,6 +85,7 @@ public abstract class ElasticTask implements Serializable {
         this.taskId = task.getStringId();
         this.caseId = task.getCaseId();
         this.transitionId = task.getTransitionId();
+        this.workspaceId = task.getWorkspaceId();
         this.title = task.getTitle();
         this.titleSortable = title.getDefaultValue();
         this.caseTitle = task.getCaseTitle();
@@ -111,6 +110,7 @@ public abstract class ElasticTask implements Serializable {
     }
 
     public void update(ElasticTask task) {
+        this.workspaceId = task.getWorkspaceId();
         this.title = task.getTitle();
         this.titleSortable = title.getDefaultValue();
         this.caseTitle = task.getCaseTitle();

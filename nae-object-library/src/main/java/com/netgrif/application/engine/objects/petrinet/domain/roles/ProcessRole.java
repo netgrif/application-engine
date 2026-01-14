@@ -45,6 +45,9 @@ public abstract class ProcessRole extends Imported {
     private String processIdentifier;
 
     @Setter
+    private String workspaceId;
+
+    @Setter
     private I18nString processTitle;
 
     @Setter
@@ -67,6 +70,7 @@ public abstract class ProcessRole extends Imported {
         this.name = processRole.name;
         this.processId = processRole.processId;
         this.processIdentifier = processRole.processIdentifier;
+        this.workspaceId = processRole.workspaceId;
         this.processTitle = processRole.processTitle;
         this.description = processRole.description;
         this.events = processRole.events;

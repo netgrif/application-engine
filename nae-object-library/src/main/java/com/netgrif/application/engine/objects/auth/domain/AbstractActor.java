@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
+import com.netgrif.application.engine.objects.auth.domain.enums.WorkspacePermission;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,14 +44,16 @@ public abstract class AbstractActor implements Serializable {
     /** Set of group identifiers this actor belongs to */
     protected Set<String> groupIds = new HashSet<>();
 
+    /** todo javadoc workspaceId:permission */
+    protected Map<String, WorkspacePermission> workspacePermissions = new HashMap<>();
+
     public AbstractActor(ObjectId id, String realmId) {
         this.id = id;
         this.realmId = realmId;
     }
 
     public AbstractActor(String stringId, String realmId) {
-        this.id = new ObjectId(stringId);
-        this.realmId = realmId;
+        this(new ObjectId(stringId), realmId);
     }
 
     /**
@@ -299,6 +302,33 @@ public abstract class AbstractActor implements Serializable {
         } else {
             this.groupIds.remove(groupId);
         }
+    }
+
+    /**
+     * todo javadoc
+     */
+    public void addWorkspacePermission(String workspaceId, WorkspacePermission permission) {
+        if (this.workspacePermissions == null) {
+            this.workspacePermissions = new HashMap<>();
+        }
+        if (workspaceId == null || permission == null) {
+            return;
+        }
+        // todo 2072 workspaceId regex validation
+        this.workspacePermissions.put(workspaceId, permission);
+    }
+
+    /**
+     * todo javadoc
+     */
+    public void removeWorkspacePermission(String workspaceId) {
+        if (this.workspacePermissions == null) {
+            this.workspacePermissions = new HashMap<>();
+        }
+        if (workspaceId == null) {
+            return;
+        }
+        this.workspacePermissions.remove(workspaceId);
     }
 
     /**

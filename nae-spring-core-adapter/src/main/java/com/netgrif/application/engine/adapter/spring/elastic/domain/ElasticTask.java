@@ -59,6 +59,12 @@ public class ElasticTask extends com.netgrif.application.engine.objects.elastic.
 
     @Field(type = Keyword)
     @Override
+    public String getWorkspaceId() {
+        return super.getWorkspaceId();
+    }
+
+    @Field(type = Keyword)
+    @Override
     public String getTitleSortable() {
         return super.getTitleSortable();
     }

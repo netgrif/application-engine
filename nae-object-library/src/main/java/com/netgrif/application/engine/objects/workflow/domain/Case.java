@@ -51,6 +51,10 @@ public abstract class Case implements Serializable {
     private String processIdentifier;
 
     @Setter
+    @Indexed
+    private String workspaceId;
+
+    @Setter
     @JsonIgnore
     private Map<String, Integer> activePlaces;
 
@@ -143,19 +147,20 @@ public abstract class Case implements Serializable {
     public Case(PetriNet petriNet) {
         this();
         this._id = new ProcessResourceId(petriNet.getObjectId());
-        petriNetObjectId = petriNet.getObjectId();
-        processIdentifier = petriNet.getIdentifier();
+        this.petriNetObjectId = petriNet.getObjectId();
+        this.processIdentifier = petriNet.getIdentifier();
         this.petriNet = petriNet;
-        activePlaces = petriNet.getActivePlaces();
-        immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
-        visualId = generateVisualId();
-        enabledRoles = new HashSet<>(petriNet.getRoles().keySet());
-        negativeViewRoles.addAll(petriNet.getNegativeViewRoles());
-        icon = petriNet.getIcon();
-        userRefs = petriNet.getUserRefs();
-        tags = new HashMap<>(petriNet.getTags());
+        this.activePlaces = petriNet.getActivePlaces();
+        this.immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
+        this.visualId = generateVisualId();
+        this.enabledRoles = new HashSet<>(petriNet.getRoles().keySet());
+        this.negativeViewRoles.addAll(petriNet.getNegativeViewRoles());
+        this.icon = petriNet.getIcon();
+        this.userRefs = petriNet.getUserRefs();
+        this.tags = new HashMap<>(petriNet.getTags());
+        this.workspaceId = petriNet.getWorkspaceId();
 
-        permissions = petriNet.getPermissions().entrySet().stream()
+        this.permissions = petriNet.getPermissions().entrySet().stream()
                 .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
                 .map(role -> {
                     Map<String, Boolean> permissionMap = new HashMap<>();

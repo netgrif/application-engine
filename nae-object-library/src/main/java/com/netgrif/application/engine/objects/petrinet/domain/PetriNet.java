@@ -37,6 +37,14 @@ public abstract class PetriNet extends PetriNetObject {
     private String uriNodeId;
 
     @Getter
+    @Setter
+    private String uri;
+
+    @Getter
+    @Setter // todo 2072 workspaceId regex validation
+    private String workspaceId;
+
+    @Getter
     private I18nString title;
 
     @Getter
@@ -141,22 +149,22 @@ public abstract class PetriNet extends PetriNetObject {
         this.title = new I18nString("");
         this.importId = "";
         this.version = new Version();
-        defaultCaseName = new I18nString("");
-        initialized = false;
-        creationDate = LocalDateTime.now();
-        places = new LinkedHashMap<>();
-        transitions = new LinkedHashMap<>();
-        arcs = new LinkedHashMap<>();
-        dataSet = new LinkedHashMap<>();
-        roles = new LinkedHashMap<>();
-        negativeViewRoles = new LinkedList<>();
-        transactions = new LinkedHashMap<>();
-        processEvents = new LinkedHashMap<>();
-        caseEvents = new LinkedHashMap<>();
-        permissions = new HashMap<>();
-        userRefs = new HashMap<>();
-        functions = new LinkedList<>();
-        tags = new HashMap<>();
+        this.defaultCaseName = new I18nString("");
+        this.initialized = false;
+        this.creationDate = LocalDateTime.now();
+        this.places = new LinkedHashMap<>();
+        this.transitions = new LinkedHashMap<>();
+        this.arcs = new LinkedHashMap<>();
+        this.dataSet = new LinkedHashMap<>();
+        this.roles = new LinkedHashMap<>();
+        this.negativeViewRoles = new LinkedList<>();
+        this.transactions = new LinkedHashMap<>();
+        this.processEvents = new LinkedHashMap<>();
+        this.caseEvents = new LinkedHashMap<>();
+        this.permissions = new HashMap<>();
+        this.userRefs = new HashMap<>();
+        this.functions = new LinkedList<>();
+        this.tags = new HashMap<>();
     }
 
     public PetriNet(PetriNet petriNet) {
@@ -164,6 +172,8 @@ public abstract class PetriNet extends PetriNetObject {
         this._id = petriNet.getObjectId();
         this.identifier = petriNet.getIdentifier();
         this.uriNodeId = petriNet.getUriNodeId();
+        this.uri = petriNet.getUri();
+        this.workspaceId = petriNet.getWorkspaceId();
         this.title = petriNet.getTitle();
         this.importId = petriNet.getImportId();
         this.version = petriNet.getVersion();
@@ -194,6 +204,8 @@ public abstract class PetriNet extends PetriNetObject {
         this.author = petriNet.getAuthor();
         initializeArcs();
     }
+
+    // todo 2072 workspaceId setter regex check
 
     public void addPlace(Place place) {
         this.places.put(place.getStringId(), place);

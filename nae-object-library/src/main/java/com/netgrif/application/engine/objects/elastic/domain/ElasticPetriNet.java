@@ -26,6 +26,10 @@ public abstract class ElasticPetriNet {
 
     private String uriNodeId;
 
+    private String uri;
+
+    private String workspaceId;
+
     private I18nField title;
 
     private String initials;
@@ -39,6 +43,8 @@ public abstract class ElasticPetriNet {
         this.identifier = net.getIdentifier();
         this.version = net.getVersion();
         this.uriNodeId = net.getUriNodeId();
+        this.uri = net.getUri();
+        this.workspaceId = net.getWorkspaceId();
         this.title = this.transformToField(net.getTitle());
         this.initials = net.getInitials();
         this.creationDate = net.getCreationDate();
@@ -49,6 +55,8 @@ public abstract class ElasticPetriNet {
         if (net.getUriNodeId() != null) {
             this.uriNodeId = net.getUriNodeId();
         }
+        this.uri = net.getUri();
+        this.workspaceId = net.getWorkspaceId();
         this.title = net.getTitle();
         this.initials = net.getInitials();
     }

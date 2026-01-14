@@ -35,6 +35,8 @@ public abstract class ElasticCase implements Serializable {
 
     private String processId;
 
+    private String workspaceId;
+
     private String title;
 
     private LocalDateTime creationDate;
@@ -84,6 +86,7 @@ public abstract class ElasticCase implements Serializable {
         lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
         processIdentifier = useCase.getProcessIdentifier();
         processId = useCase.getPetriNetId();
+        workspaceId = useCase.getWorkspaceId();
         visualId = useCase.getVisualId();
         title = useCase.getTitle();
         creationDate = useCase.getCreationDate().truncatedTo(ChronoUnit.MILLIS);
@@ -110,6 +113,7 @@ public abstract class ElasticCase implements Serializable {
     public void update(ElasticCase useCase) {
         version++;
         lastModified = useCase.getLastModified();
+        workspaceId = useCase.getWorkspaceId();
         title = useCase.getTitle();
         taskIds = useCase.getTaskIds();
         taskMongoIds = useCase.getTaskMongoIds();
