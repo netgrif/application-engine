@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.SimpleValueWrapper;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -85,7 +86,7 @@ public class GenericMapCache<V> implements Cache {
             return null;
         }
 
-        if (!valueType.isInstance(object)) {
+        if (object instanceof List && !valueType.isInstance(((List<?>) object).getFirst())) {
             throw new ClassCastException("Expected " + valueType.getName() + " but was " + object.getClass().getName());
         }
 
