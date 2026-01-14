@@ -11,14 +11,16 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
-public class GenericMapCache<V> implements Cache {
+public class GenericMapCache<V, E> implements Cache {
     private final String name;
     private final Class<V> valueType;
+    private final Class<E> elementType;
     private final ConcurrentHashMap<String, V> map;
 
-    public GenericMapCache(String name, Class<V> valueType, int initialCapacity) {
+    public GenericMapCache(String name, Class<V> valueType, Class<E> elementType, int initialCapacity) {
         this.name = name;
         this.valueType = valueType;
+        this.elementType = elementType;
         this.map = new ConcurrentHashMap<>(initialCapacity);
     }
 
@@ -81,15 +83,42 @@ public class GenericMapCache<V> implements Cache {
     }
 
     @SuppressWarnings("unchecked")
-    private V safeCast(Object object) {
-        if (object == null) {
+    private V safeCast(Object value) {
+        if (value == null) {
             return null;
         }
 
-        if (object instanceof List && !valueType.isInstance(((List<?>) object).getFirst())) {
-            throw new ClassCastException("Expected " + valueType.getName() + " but was " + object.getClass().getName());
+        if (valueType.isInstance(value)) {
+            return (V) value;
         }
 
-        return (V) object;
+        // Check if the value is a list and the cache type is List<Element>
+        if (value instanceof List && List.class.isAssignableFrom(valueType)) {
+            List<?> list = (List<?>) value;
+
+            // Check only if the list is non-empty
+            if (!list.isEmpty()) {
+                Object firstElement = list.getFirst();
+
+                // Validate element type
+                if (elementType != null && !elementType.isInstance(firstElement)) {
+                    throw new ClassCastException(
+                            String.format("Cannot cast list element of type %s to %s",
+                                    firstElement.getClass().getName(),
+                                    elementType.getName()
+                            )
+                    );
+                }
+            }
+
+            return (V) list; // Safe cast to desired list type
+        }
+
+        throw new ClassCastException(
+                String.format("Cannot cast value of type %s to %s",
+                        value.getClass().getName(),
+                        valueType.getName()
+                )
+        );
     }
 }
