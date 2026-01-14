@@ -128,8 +128,6 @@ public class PetriNetService implements IPetriNetService {
 
     protected IElasticPetriNetService elasticPetriNetService;
 
-    protected Map<String, List<Consumer<?>>> consumerMap;
-
     @Autowired
     public void setElasticPetriNetService(IElasticPetriNetService elasticPetriNetService, ApplicationEventPublisher publisher) {
         this.elasticPetriNetService = elasticPetriNetService;
