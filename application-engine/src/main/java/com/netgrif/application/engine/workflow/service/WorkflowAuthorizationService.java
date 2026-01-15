@@ -1,8 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -25,22 +23,22 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
     private IPetriNetService petriNetService;
 
     @Override
-    public boolean canCallDelete(LoggedUser user, String caseId) {
+    public boolean canCallDelete(AbstractUser user, String caseId) {
         Case requestedCase = workflowService.findOne(caseId);
         // TODO: impersonation
 //        Boolean rolePerm = userHasAtLeastOneRolePermission(userService.transformToUser((LoggedUserImpl) user.getSelfOrImpersonated()), requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
 //        Boolean userPerm = userHasUserListPermission(userService.transformToUser((LoggedUserImpl) user.getSelfOrImpersonated()), requestedCase, ProcessRolePermission.DELETE);
 //        return user.getSelfOrImpersonated().isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
-        Boolean rolePerm = userHasAtLeastOneRolePermission(ActorTransformer.toUser(user), requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
-        Boolean userPerm = userHasUserListPermission(ActorTransformer.toUser(user), requestedCase, ProcessRolePermission.DELETE);
+        Boolean rolePerm = userHasAtLeastOneRolePermission(user, requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
+        Boolean userPerm = userHasUserListPermission(user, requestedCase, ProcessRolePermission.DELETE);
         return user.isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
     }
 
     @Override
-    public boolean canCallCreate(LoggedUser user, String netId) {
+    public boolean canCallCreate(AbstractUser user, String netId) {
         PetriNet net = petriNetService.getPetriNet(netId);
         // TODO: impersonation
-        return user.isAdmin() || userHasAtLeastOneRolePermission(ActorTransformer.toUser(user), net, ProcessRolePermission.CREATE);
+        return user.isAdmin() || userHasAtLeastOneRolePermission(user, net, ProcessRolePermission.CREATE);
     }
 
     @Override

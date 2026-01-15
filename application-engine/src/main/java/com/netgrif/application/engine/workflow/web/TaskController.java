@@ -59,7 +59,7 @@ public class TaskController extends AbstractTaskController {
                           IElasticTaskService searchService,
                           IWorkflowService workflowService,
                           UserService userService) {
-        super(taskService, dataService, searchService, workflowService, userService);
+        super(taskService, dataService, workflowService, searchService, userService);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class TaskController extends AbstractTaskController {
         return super.getOne(taskId, locale);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallAssign(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallAssign(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Assign task",
             description = "Caller must be able to perform the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -103,7 +103,7 @@ public class TaskController extends AbstractTaskController {
         return super.assign(taskId, locale);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallDelegate(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallDelegate(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Delegate task",
             description = "Caller must be able to delegate the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -116,7 +116,7 @@ public class TaskController extends AbstractTaskController {
         return super.delegate(taskId, delegatedId, locale);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallFinish(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallFinish(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Finish task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -129,7 +129,7 @@ public class TaskController extends AbstractTaskController {
         return super.finish(taskId, locale);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallCancel(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallCancel(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Cancel task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -184,7 +184,7 @@ public class TaskController extends AbstractTaskController {
         return super.getData(taskId, locale);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveData(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveData(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Set task data",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -198,7 +198,7 @@ public class TaskController extends AbstractTaskController {
         return super.setData(taskId, dataBody, locale);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Upload file into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -217,7 +217,7 @@ public class TaskController extends AbstractTaskController {
         return super.getFile(taskId, fieldId);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Remove file from the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -230,7 +230,7 @@ public class TaskController extends AbstractTaskController {
         return super.deleteFile(requestBody.getParentTaskId(), requestBody.getFieldId());
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Upload multiple files into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -249,7 +249,7 @@ public class TaskController extends AbstractTaskController {
         return super.getNamedFile(taskId, fieldId, fileName);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(T(com.netgrif.application.engine.objects.auth.domain.ActorTransformer).toLoggedUser(@userService.getLoggedUser()), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Remove file from tasks file list field value",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})

@@ -31,7 +31,7 @@ public abstract class AbstractAuthorizationService {
         return aggregatePermissions;
     }
 
-    private void aggregatePermission(Set userProcessRoleIDs, Map.Entry<String, Map<String, Boolean>> role, Map<String, Boolean> aggregatePermissions) {
+    private void aggregatePermission(Set<String> userProcessRoleIDs, Map.Entry<String, Map<String, Boolean>> role, Map<String, Boolean> aggregatePermissions) {
         if (userProcessRoleIDs.contains(role.getKey())) {
             for (Map.Entry<String, Boolean> permission : role.getValue().entrySet()) {
                 if (aggregatePermissions.containsKey(permission.getKey())) {
