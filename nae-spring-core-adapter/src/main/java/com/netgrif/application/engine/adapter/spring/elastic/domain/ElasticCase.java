@@ -13,7 +13,7 @@ import java.util.Set;
 import static org.springframework.data.elasticsearch.annotations.FieldType.*;
 
 @NoArgsConstructor
-@Document(indexName = "#{@elasticCaseIndex}")
+@Document(indexName = "#{@elasticCaseIndex}", createIndex = false)
 public class ElasticCase extends com.netgrif.application.engine.objects.elastic.domain.ElasticCase {
 
     public ElasticCase(Case useCase) {

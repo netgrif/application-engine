@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.configuration.properties;
 
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -27,9 +28,14 @@ public class CacheConfigurationProperties {
     private String petriNetByIdentifier = "petriNetByIdentifier";
 
     /**
-     * Default cache name for caching the newest versions of Petri nets.
+     * Default cache name for caching the default versions of Petri nets.
      */
-    private String petriNetNewest = "petriNetNewest";
+    private String petriNetDefault = "petriNetDefault";
+
+    /**
+     * Default cache name for caching the latest versions of Petri nets.
+     */
+    private String petriNetLatest = "petriNetLatest";
 
     /**
      * Default cache name for general Petri net caching.
@@ -48,13 +54,40 @@ public class CacheConfigurationProperties {
     private List<String> additional = new ArrayList<>();
 
     /**
+     * The size of pages used for caching functions when processing large sets of data.
+     * This property determines the maximum number of functions to include in a single page during caching operations.
+     * Default value is 500.
+     */
+    @Min(1)
+    private int functionCachingPageSize = 500;
+
+    /**
+     * The size of the cache used for handling field runner actions.
+     */
+    @Min(1)
+    private int actionCacheSize = 500;
+
+    /**
+     * The size of the cache used for managing field runner functions.
+     */
+    @Min(1)
+    private int functionsCacheSize = 500;
+
+    /**
+     * The size of the cache used for managing global Petri net functions.
+     */
+    @Min(1)
+    private int globalFunctionsCacheSize = 500;
+
+    /**
      * Retrieves a set of all configured cache names.
      * Includes the default caches and any additional user-defined cache names.
      *
      * @return a {@link Set} of all cache names.
      */
     public Set<String> getAllCaches() {
-        Set<String> caches = new LinkedHashSet<>(Arrays.asList(petriNetById, petriNetByIdentifier, petriNetNewest, petriNetCache, loadedModules));
+        Set<String> caches = new LinkedHashSet<>(Arrays.asList(petriNetById, petriNetByIdentifier, petriNetDefault,
+                petriNetLatest, petriNetCache, loadedModules));
         caches.addAll(additional);
         return caches;
     }

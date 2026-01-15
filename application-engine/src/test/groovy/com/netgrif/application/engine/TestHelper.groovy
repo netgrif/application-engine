@@ -93,7 +93,7 @@ class TestHelper {
         roleService.clearCache()
         actionsCacheService.clearActionCache()
         actionsCacheService.clearFunctionCache()
-        actionsCacheService.clearNamespaceFunctionCache()
+        actionsCacheService.clearGlobalFunctionCache()
         petriNetService.evictAllCaches()
 
         defaultRoleRunner.run()

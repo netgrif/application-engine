@@ -58,17 +58,6 @@ public class CaseEventHandler extends AbstractMongoEventListener<Case> {
         }
 
         String objectId = ((Document)document.get("_id")).get("shortProcessId") + "-" + ((Document)document.get("_id")).get("objectId").toString();
-        if (objectId != null) {
-            service.remove(objectId);
-            return;
-        }
-
-        objectId = document.getObjectId("petriNetObjectId").toString();
-        if (objectId != null) {
-            service.removeByPetriNetId(objectId);
-            return;
-        }
-
-        throw new IllegalStateException("Case has been deleted neither by ID nor by process ID!");
+        service.remove(objectId);
     }
 }

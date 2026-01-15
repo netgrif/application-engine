@@ -12,6 +12,7 @@ import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +56,8 @@ public class UserServiceImpl implements UserService {
     private GroupConfigurationProperties groupConfigurationProperties;
 
     private AbstractUser systemUser;
+
+    private RealmService realmService;
 
     @Getter
     private PaginationProperties paginationProperties;
@@ -110,6 +113,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public void setPaginationProperties(PaginationProperties paginationProperties) {
         this.paginationProperties = paginationProperties;
+    }
+
+    @Autowired
+    public void setRealmService(RealmService realmService) {
+        this.realmService = realmService;
     }
 
     @Override
@@ -547,15 +555,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void removeRoleOfDeletedPetriNet(Set<ProcessRole> petriNetRoles) {
-        String defaultRealmCollection = collectionNameProvider.getDefaultRealmCollection();
+        Set<ProcessRole> nonGlobalPetriNetRoles = petriNetRoles.stream().filter(r -> !r.isGlobal()).collect(Collectors.toSet());
+        Collection<ProcessResourceId> roleIds = nonGlobalPetriNetRoles.stream().map(ProcessRole::get_id).collect(Collectors.toSet());
+        Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
         Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-        Collection<ProcessResourceId> roleIds = petriNetRoles.stream().map(ProcessRole::get_id).collect(Collectors.toSet());
-        Page<AbstractUser> users;
+        Page<Realm> realms;
         do {
-            users = searchUsersByRoleIds(roleIds, defaultRealmCollection, pageable);
-            users.getContent().forEach(u -> removeRoles(u, petriNetRoles));
-            pageable = pageable.next();
-        } while (users.hasNext());
+            realms = realmService.getSmallRealm(realmPageable);
+            for (Realm realm : realms.getContent()) {
+                Page<AbstractUser> users = searchUsersByRoleIds(roleIds, collectionNameProvider.getCollectionNameForRealm(realm.getName()), pageable);
+                while (users.hasContent()) {
+                    users.getContent().forEach(u -> removeRoles(u, nonGlobalPetriNetRoles));
+                    users = searchUsersByRoleIds(roleIds, collectionNameProvider.getCollectionNameForRealm(realm.getName()), pageable);
+                }
+            }
+            realmPageable = realmPageable.next();
+        } while (realms.hasNext());
     }
 
     @Override
@@ -592,6 +607,21 @@ public class UserServiceImpl implements UserService {
         saveUser(admin);
         log.debug("Admin [{}] now has [{}] process roles", admin.getUsername(), admin.getProcessRoles().size());
     }
+
+
+    /**
+     * Searches for users in the specified realm based on the provided predicate and pagination parameters.
+     *
+     * @param predicate the query conditions to filter users
+     * @param pageable  the pagination parameters for the search results
+     * @param realmId   the name of the realm, used to determine which collection to query
+     * @return a paginated list of users matching the predicate within the specified realm
+     */
+    @Override
+    public Page<User> search(Predicate predicate, Pageable pageable, String realmId) {
+        String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
+        return userRepository.findAllByQuery(predicate, pageable, mongoTemplate, collectionName);
+    } 
 
     protected User initializeNewUser(String username, String email, String firstName, String lastName, String password, String realmId) {
         log.trace("Initializing new user [{}] in realm [{}]", username, realmId);

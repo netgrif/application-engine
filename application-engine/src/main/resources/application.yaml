@@ -21,9 +21,10 @@ netgrif:
         index:
           petriNet: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_petrinet
           case: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_case
-          task: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_taks
+          task: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_task
       redis:
-        namespace: nae
+        session:
+          namespace: ${NETGRIF_ENGINE_DATA_REDIS_SESSION_NAMESPACE:netgrif}
         host: ${NETGRIF_ENGINE_DATA_REDIS_HOST:localhost}
         port: ${NETGRIF_ENGINE_DATA_REDIS_PORT:6379}
     jackson:
@@ -116,6 +117,7 @@ netgrif:
             prometheus: metric
           exposure:
             exclude: shutdown
+            include: "*"
       endpoint:
         health:
           show-details: when_authorized
@@ -128,8 +130,10 @@ netgrif:
           enabled: 'false'
         env:
           enabled: 'true'
+      health:
+        elasticsearch:
+          enabled: 'false'
     logging:
-      config: classpath:logback.xml
       file:
         path: log
       endpoints: 'true'

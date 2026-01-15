@@ -1024,8 +1024,8 @@ class ActionDelegate {
         return actualUser
     }
 
-    AbstractUser assignRole(String roleId, String netId, AbstractUser user = userService.loggedUser) {
-        List<PetriNet> nets = petriNetService.getByIdentifier(netId)
+    AbstractUser assignRole(String roleId, String netId, AbstractUser user = userService.loggedUser, Pageable pageable = Pageable.unpaged()) {
+        List<PetriNet> nets = petriNetService.getByIdentifier(netId, pageable).content
         nets.forEach({ net -> user = assignRole(roleId, net, user) })
         return user
     }
@@ -1045,8 +1045,8 @@ class ActionDelegate {
         return actualUser
     }
 
-    AbstractUser removeRole(String roleId, String netId, AbstractUser user = userService.loggedUser) {
-        List<PetriNet> nets = petriNetService.getByIdentifier(netId)
+    AbstractUser removeRole(String roleId, String netId, AbstractUser user = userService.loggedUser, Pageable pageable = Pageable.unpaged()) {
+        List<PetriNet> nets = petriNetService.getByIdentifier(netId, pageable).content
         nets.forEach({ net -> user = removeRole(roleId, net, user) })
         return user
     }
@@ -1321,7 +1321,12 @@ class ActionDelegate {
     }
 
     def changeUserByEmail(String email, String attribute, def cl) {
-        AbstractUser user = userService.findUserByUsername(email, null)
+        Optional<AbstractUser> userOptional = userService.findUserByUsername(email, null)
+        if (!userOptional.isPresent()) {
+            log.error("Cannot find user with email [" + email + "]")
+            return
+        }
+        AbstractUser user = userOptional.get()
         changeUser(user, attribute, cl)
     }
 
@@ -2126,6 +2131,7 @@ class ActionDelegate {
         caseViewBody.setAllowHeaderTableMode(true)
         caseViewBody.setShowCreateCaseButton(false)
         caseViewBody.setShowMoreMenu(true)
+        resolveDefaultHeaders(caseViewBody, defaultHeaders)
 
         TabbedSingleTaskViewBody taskViewBody = new TabbedSingleTaskViewBody()
         taskViewBody.setTransitionId(transitionId)
@@ -2169,15 +2175,18 @@ class ActionDelegate {
         caseViewBody.setAllowHeaderTableMode(true)
         caseViewBody.setShowCreateCaseButton(false)
         caseViewBody.setShowMoreMenu(true)
-
-        if (defaultHeaders == null) {
-            caseViewBody.setUseDefaultHeaders(false)
-        } else {
-            caseViewBody.setUseDefaultHeaders(true)
-            caseViewBody.setDefaultHeaders(defaultHeaders)
-        }
+        resolveDefaultHeaders(caseViewBody, defaultHeaders)
 
         return caseViewBody
+    }
+
+    protected static void resolveDefaultHeaders(TabbedCaseViewBody viewBody, List<String> defaultHeaders) {
+        if (defaultHeaders == null) {
+            viewBody.setUseDefaultHeaders(false)
+        } else {
+            viewBody.setUseDefaultHeaders(true)
+            viewBody.setDefaultHeaders(defaultHeaders)
+        }
     }
 
     protected ViewBody createLegacyMenuItemViews(Case filterCase, List<String> caseDefaultHeaders = null,
@@ -2192,7 +2201,7 @@ class ActionDelegate {
         if (filterBody.getType() == "Case") {
             ViewBody caseView = new TabbedCaseViewBody()
             caseView.setFilterBody(filterBody)
-            caseView.setDefaultHeaders(caseDefaultHeaders)
+            resolveDefaultHeaders(caseView, caseDefaultHeaders)
             caseView.setRequireTitleInCreation(true)
 
             ViewBody taskView = new TabbedTaskViewBody()
@@ -2417,7 +2426,7 @@ class ActionDelegate {
             if (role.isGlobal()) {
                 return [(role.importId + ":" + GLOBAL_ROLE), ("$role.name (🌍 Global role)" as String)]
             } else {
-                PetriNet net = petriNetService.get(new ObjectId(role.netId))
+                PetriNet net = petriNetService.get(new ObjectId(role.processId))
                 return [(role.importId + ":" + net.identifier), ("$role.name ($net.title)" as String)]
             }
         } as Map<String, I18nString>
@@ -2427,20 +2436,21 @@ class ActionDelegate {
         Map<String, PetriNet> temp = [:]
         return roles.collectEntries { entry ->
             if (entry.value == GLOBAL_ROLE) {
-                Set<ProcessRole> findGlobalRole = processRoleService.findAllByImportId(ProcessRole.GLOBAL + entry.key)
-                if (findGlobalRole == null || findGlobalRole.isEmpty()) {
+                List<ProcessRole> roleList = processRoleService.findAllByImportId(ProcessRole.GLOBAL + entry.key, Pageable.ofSize(1)).getContent()
+                if (roleList.isEmpty()) {
                     return
                 }
-                ProcessRole role = findGlobalRole.find { it.isGlobal() }
-                if (role == null) {
-                    return
-                }
+                ProcessRole role = roleList.getFirst()
                 return [(role.importId + ":" + GLOBAL_ROLE), ("$role.name (🌍 Global role)" as String)]
             } else {
                 if (!temp.containsKey(entry.value)) {
-                    temp.put(entry.value, petriNetService.getNewestVersionByIdentifier(entry.value))
+                    temp.put(entry.value, petriNetService.getDefaultVersionByIdentifier(entry.value))
                 }
                 PetriNet net = temp[entry.value]
+                if (net == null) {
+                    throw new IllegalArgumentException("The process with identifier [%s] could not be found when collecting roles."
+                            .formatted(entry.value))
+                }
                 ProcessRole role = net.roles.find { it.value.importId == entry.key }.value
                 return [(role.importId + ":" + net.identifier), ("$role.name ($net.title)" as String)]
             }

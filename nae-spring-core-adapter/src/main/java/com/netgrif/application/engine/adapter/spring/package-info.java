@@ -10,7 +10,7 @@
         Group.class,
         User.class
 })
-package com.netgrif.application.engine.auth;
+package com.netgrif.application.engine.adapter.spring;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.ProcessRole;

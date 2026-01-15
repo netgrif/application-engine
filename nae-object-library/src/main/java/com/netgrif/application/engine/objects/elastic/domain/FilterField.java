@@ -14,6 +14,11 @@ public abstract class FilterField extends FieldWithAllowedNetsField {
 
     public Map<String, Object> filterMetadata;
 
+    public FilterField(FilterField field) {
+        super(field);
+        this.filterMetadata = field.filterMetadata == null ? null : new HashMap<>(field.filterMetadata);
+    }
+
     public FilterField(String fullTextValue, String[] allowedNets, Map<String, Object> filterMetadata) {
         super(fullTextValue, allowedNets);
         this.filterMetadata = filterMetadata != null ? filterMetadata : new HashMap<>();

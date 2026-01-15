@@ -217,7 +217,7 @@
             <id>export</id>
             <actions phase="post">
                 <action id="action_2">
-                    def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
+                    def processId = petriNetService.getDefaultVersionByIdentifier("export_test").stringId
                     def config = new com.netgrif.application.engine.export.domain.ExportDataConfig()
                     config.setDataToExport(["immediate_multichoice","immediate_number", "text"] as LinkedHashSet)
                     exportTasksToFile({it.processId.eq(processId) &amp; it.transitionId.eq("t3")},"src/test/resources/csv/task_mongo_export.csv", config)

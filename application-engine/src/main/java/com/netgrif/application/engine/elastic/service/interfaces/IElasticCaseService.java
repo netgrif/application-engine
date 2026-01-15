@@ -23,6 +23,4 @@ public interface IElasticCaseService {
     long count(List<CaseSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection);
 
     void remove(String caseId);
-
-    void removeByPetriNetId(String processId);
 }

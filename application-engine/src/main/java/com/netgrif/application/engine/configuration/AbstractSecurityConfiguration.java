@@ -220,16 +220,16 @@ public abstract class AbstractSecurityConfiguration {
     }
 
     protected void configureSession(HttpSecurity http) throws Exception {
-        if (redisProperties.isEnabledLimitSession()) {
+        if (redisProperties.getSession().isEnabledLimitSession()) {
             http.sessionManagement(httpSecuritySessionManagementConfigurer -> {
-                httpSecuritySessionManagementConfigurer.maximumSessions(redisProperties.getMaxSession());
+                httpSecuritySessionManagementConfigurer.maximumSessions(redisProperties.getSession().getMaxSession());
                 httpSecuritySessionManagementConfigurer.sessionFixation().newSession();
             });
         }
     }
 
     protected void configureFilters(HttpSecurity http) {
-        if (redisProperties.isEnabledFilter()) {
+        if (redisProperties.getSession().isEnabledFilter()) {
 //            http.addFilterBefore(new LoginAttemptsFilter(), ChannelProcessingFilter.class);
         }
     }

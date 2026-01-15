@@ -12,6 +12,10 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 @NoArgsConstructor
 public class I18nField extends com.netgrif.application.engine.objects.elastic.domain.I18nField {
 
+    public I18nField(I18nField field) {
+        super(field);
+    }
+
     public I18nField(Set<String> keys, Set<String> values, Map<String, String> translations) {
         super(keys, values, translations);
     }

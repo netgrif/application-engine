@@ -10,6 +10,10 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.*;
 @NoArgsConstructor
 public class FilterField extends com.netgrif.application.engine.objects.elastic.domain.FilterField {
 
+    public FilterField(FilterField field) {
+        super(field);
+    }
+
     public FilterField(String value, String[] allowedNets, Map<String, Object> filterMetadata) {
         super(value, allowedNets, filterMetadata);
     }

@@ -15,6 +15,11 @@ public abstract class CaseField extends FieldWithAllowedNetsField {
 
     private List<String> caseValue;
 
+    public CaseField(CaseField field) {
+        super(field);
+        this.caseValue = field.caseValue == null ? null : new ArrayList<>(field.caseValue);
+    }
+
     public CaseField(String[] fullTextValue, String[] allowedNets) {
         super(fullTextValue, allowedNets);
         this.caseValue = Arrays.asList(fullTextValue);

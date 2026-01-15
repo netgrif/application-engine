@@ -13,19 +13,23 @@ public interface IFieldActionsCacheService {
 
     void cachePetriNetFunctions(PetriNet petriNet);
 
-    void reloadCachedFunctions(PetriNet petriNet);
+    void reloadCachedGlobalFunctions(String petriNetId);
+
+    void reloadCachedGlobalFunctions(PetriNet petriNet);
 
     Closure getCompiledAction(Action action, boolean shouldRewriteCachedActions);
 
     List<CachedFunction> getCachedFunctions(List<Function> functions);
 
-    Map<String, List<CachedFunction>> getNamespaceFunctionCache();
+    Map<String, List<CachedFunction>> getGlobalFunctionsCache();
 
     void evaluateFunctions(List<Function> functions);
 
     void clearActionCache();
 
-    void clearNamespaceFunctionCache();
+    void clearGlobalFunctionCache();
+
+    void cacheAllPetriNetFunctions();
 
     void clearFunctionCache();
 }

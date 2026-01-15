@@ -1,12 +1,15 @@
 package com.netgrif.application.engine.elastic.service;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.mapping.FieldType;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
+import com.netgrif.application.engine.elastic.domain.BulkOperationWrapper;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
@@ -22,13 +25,11 @@ import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetRefere
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import lombok.RequiredArgsConstructor;
+import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.*;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -36,7 +37,7 @@ import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.SearchHitSupport;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.core.query.Order;
+import org.springframework.data.elasticsearch.core.query.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -48,7 +49,6 @@ import static org.springframework.data.elasticsearch.client.elc.Queries.matchQue
 import static org.springframework.data.elasticsearch.client.elc.Queries.termQuery;
 
 @Service
-@RequiredArgsConstructor
 public class ElasticCaseService extends ElasticViewPermissionService implements IElasticCaseService {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticCaseService.class);
@@ -60,69 +60,65 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     protected IPetriNetService petriNetService;
     protected IWorkflowService workflowService;
     protected IElasticCasePrioritySearch iElasticCasePrioritySearch;
-
-    @Autowired
-    @Lazy
-    public void setWorkflowService(IWorkflowService workflowService) {
-        this.workflowService = workflowService;
-    }
-
-    @Autowired
-    @Lazy
-    public void setPetriNetService(IPetriNetService petriNetService) {
-        this.petriNetService = petriNetService;
-    }
-
-    @Autowired
     protected ApplicationEventPublisher publisher;
+    protected ElasticQueueManager caseElasticIndexQueueManager;
+    protected ElasticQueueManager caseElasticDeleteQueueManager;
 
-    @Autowired
-    public void setElasticCasePrioritySearch(IElasticCasePrioritySearch iElasticCasePrioritySearch) {
+    public ElasticCaseService(ElasticCaseRepository repository,
+                              ElasticsearchTemplate template,
+                              Executor executors,
+                              DataConfigurationProperties.ElasticsearchProperties elasticProperties,
+                              @Lazy IPetriNetService petriNetService,
+                              @Lazy IWorkflowService workflowService,
+                              IElasticCasePrioritySearch iElasticCasePrioritySearch,
+                              ApplicationEventPublisher publisher,
+                              ElasticsearchClient elasticsearchClient) {
+        this.repository = repository;
+        this.template = template;
+        this.executors = executors;
+        this.elasticProperties = elasticProperties;
+        this.petriNetService = petriNetService;
+        this.workflowService = workflowService;
         this.iElasticCasePrioritySearch = iElasticCasePrioritySearch;
+        this.publisher = publisher;
+        this.caseElasticIndexQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient, publisher);
+        this.caseElasticDeleteQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient, publisher);
+
     }
 
-    @Autowired
-    public void setElasticProperties(DataConfigurationProperties.ElasticsearchProperties elasticProperties) {
-        this.elasticProperties = elasticProperties;
+    @PreDestroy
+    private void stopQueues() {
+        caseElasticIndexQueueManager.shutdown();
+        caseElasticDeleteQueueManager.shutdown();
+        log.info("Queues for cases have been stopped");
     }
 
     @Override
     public void remove(String caseId) {
-        executors.execute(caseId, () -> {
-            repository.deleteAllById(caseId);
-            log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
-        });
-    }
-
-    @Override
-    public void removeByPetriNetId(String processId) {
-        executors.execute(processId, () -> {
-            repository.deleteAllByProcessId(processId);
-            log.info("[" + processId + "]: All cases of Petri Net with id \"" + processId + "\" deleted");
-        });
+        caseElasticDeleteQueueManager.push(new BulkOperationWrapper(
+                BulkOperation.of(op -> op.delete(d -> d.index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX)).id(caseId))),
+                null
+        ));
+        log.info("[{}]: Case \"{}\" queued for deletion", caseId, caseId);
     }
 
     @Override
     public void index(ElasticCase useCase) {
-        executors.execute(useCase.getId(), () -> {
-            try {
-                Optional<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> elasticCaseOptional = repository.findById(useCase.getId());
-                if (elasticCaseOptional.isEmpty()) {
-                    repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase) useCase);
-                } else {
-                    com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase elasticCase = elasticCaseOptional.get();
-                    elasticCase.update(useCase);
-                    repository.save(elasticCase);
-                }
-                log.debug("[" + useCase.getId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
-                publisher.publishEvent(new IndexCaseEvent(useCase));
-            } catch (InvalidDataAccessApiUsageException ignored) {
-                log.debug("[" + useCase.getId() + "]: Case \"" + useCase.getTitle() + "\" has duplicates, will be reindexed");
-                repository.deleteAllById(useCase.getId());
-                repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase) useCase);
-                log.debug("[" + useCase.getId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
-            }
-        });
+        Optional<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> elasticCaseOptional = repository.findById(useCase.getId());
+        if (elasticCaseOptional.isEmpty()) {
+            caseElasticIndexQueueManager.push(BulkOperationWrapper.builder()
+                    .operation(createIndexOperation(useCase))
+                    .publishableEvent(new IndexCaseEvent(useCase))
+                    .build());
+        } else {
+            com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase elasticCase = elasticCaseOptional.get();
+            elasticCase.update(useCase);
+            caseElasticIndexQueueManager.push(BulkOperationWrapper.builder()
+                    .operation(createIndexOperation(elasticCase))
+                    .publishableEvent(new IndexCaseEvent(elasticCase))
+                    .build());
+        }
+        log.debug("[{}]: Case \"{}\" queued for indexing", useCase.getId(), useCase.getTitle());
     }
 
     @Override
@@ -521,5 +517,12 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         List<Sort.Order> modifiedOrders = new ArrayList<>();
         pageable.getSort().iterator().forEachRemaining(order -> modifiedOrders.add(new Order(order.getDirection(), order.getProperty()).withUnmappedType("keyword")));
         return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()).withSort(Sort.by(modifiedOrders));
+    }
+
+    private BulkOperation createIndexOperation(ElasticCase useCase) {
+        return BulkOperation.of(op -> op.index(i -> i
+                .index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX))
+                .id(useCase.getId())
+                .document(template.getElasticsearchConverter().mapObject(useCase))));
     }
 }

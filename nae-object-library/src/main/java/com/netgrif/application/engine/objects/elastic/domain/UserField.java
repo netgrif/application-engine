@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
 @Data
@@ -22,6 +23,14 @@ public abstract class UserField extends DataField {
     private String[] userIdValue;
 
     private String[] userRealmIdValue;
+
+    public UserField(UserField field) {
+        super(field);
+        this.usernameValue = field.usernameValue == null ? null : Arrays.copyOf(field.usernameValue, field.usernameValue.length);
+        this.fullNameValue = field.fullNameValue == null ? null : Arrays.copyOf(field.fullNameValue, field.fullNameValue.length);
+        this.userIdValue = field.userIdValue == null ? null : Arrays.copyOf(field.userIdValue, field.userIdValue.length);
+        this.userRealmIdValue = field.userRealmIdValue == null ? null : Arrays.copyOf(field.userRealmIdValue, field.userRealmIdValue.length);
+    }
 
     public UserField(UserMappingData value) {
         super(String.format("%s %s", value.fullName, value.username));

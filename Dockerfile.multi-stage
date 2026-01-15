@@ -1,5 +1,5 @@
 # fetch dependencies
-FROM maven:3.9.7 AS deps
+FROM maven:3.9-eclipse-temurin-21 AS deps
 LABEL authors="Netgrif <devops@netgrif.com>"
 WORKDIR /nae
 COPY pom.xml .
@@ -8,11 +8,12 @@ COPY nae-spring-core-adapter/pom.xml nae-spring-core-adapter/pom.xml
 COPY nae-user-common/pom.xml nae-user-common/pom.xml
 COPY nae-user-ce/pom.xml nae-user-ce/pom.xml
 COPY application-engine/pom.xml application-engine/pom.xml
-RUN mvn -B -e org.apache.maven.plugins:maven-dependency-plugin:3.1.2:go-offline -DexcludeArtifactIds=nae-object-library,nae-spring-core-adapter,nae-user-common,nae-user-ce
+RUN mvn -B -e org.apache.maven.plugins:maven-dependency-plugin:3.7.0:resolve #-DexcludeArtifactIds=nae-object-library,nae-spring-core-adapter,nae-user-common,nae-user-ce
+RUN mvn -B -e org.apache.maven.plugins:maven-dependency-plugin:3.7.0:resolve-plugins #-DexcludeArtifactIds=nae-object-library,nae-spring-core-adapter,nae-user-common,nae-user-ce
 
 
 # build jar
-FROM maven:3.9.7 AS build
+FROM maven:3.9-eclipse-temurin-21 AS build
 LABEL authors="Netgrif <devops@netgrif.com>"
 WORKDIR /nae
 COPY --from=deps /root/.m2 /root/.m2
@@ -26,7 +27,7 @@ RUN mvn -B -e -DskipTests -P docker-build clean package install
 
 
 # prepare runtime
-FROM openjdk:21-jdk
+FROM eclipse-temurin:21-jdk
 LABEL authors="Netgrif <devops@netgrif.com>"
 LABEL org.opencontainers.image.authors="NETGRIF <devops@netgrif.com>"
 LABEL org.opencontainers.image.title="Netgrif Application Engine"
@@ -34,11 +35,12 @@ LABEL org.opencontainers.image.url="https://platform.netgrif.cloud"
 LABEL org.opencontainers.image.documentation="https://platform.netgrif.cloud/docs"
 LABEL org.opencontainers.image.vendor="NETGRIF"
 
-RUN mkdir -p /opt/netgrif/engine && adduser -M netgrif
+RUN mkdir -p /opt/netgrif/engine/modules && useradd -M netgrif
 COPY --from=build /nae/application-engine/target/app-exec.jar /opt/netgrif/engine/app.jar
 COPY --from=build /nae/application-engine/src/main/resources /opt/netgrif/engine/src/main/resources
 RUN chown -R netgrif /opt/netgrif/engine
 
 USER netgrif
+WORKDIR /opt/netgrif/engine
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","-Dfile.encoding=UTF-8","/app.jar"]
+ENTRYPOINT ["java","-jar","-Dfile.encoding=UTF-8","app.jar"]

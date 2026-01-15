@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk
+FROM eclipse-temurin:21-jdk
 LABEL authors="Netgrif <devops@netgrif.com>"
 LABEL org.opencontainers.image.authors="NETGRIF <devops@netgrif.com>"
 LABEL org.opencontainers.image.title="Netgrif Application Engine"
