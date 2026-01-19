@@ -128,7 +128,7 @@ class ImportHelper {
     }
 
     Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = ActorTransformer.toLoggedUser(userService.getSystem())) {
-        PetriNet petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
+        PetriNet petriNet = petriNetService.getDefaultVersionByIdentifier(identifier)
         if (!petriNet) {
             return createNet(filename, release, author)
         }
@@ -249,7 +249,7 @@ class ImportHelper {
     }
 
     Optional<PetriNet> importProcessOnce(String message, String netIdentifier, String netFileName) {
-        PetriNet filter = petriNetService.getNewestVersionByIdentifier(netIdentifier)
+        PetriNet filter = petriNetService.getDefaultVersionByIdentifier(netIdentifier)
         if (filter != null) {
             log.info("${message} has already been imported.")
             return Optional.of(filter)

@@ -118,6 +118,7 @@ netgrif:
             prometheus: metric
           exposure:
             exclude: shutdown
+            include: "*"
       endpoint:
         health:
           show-details: when_authorized

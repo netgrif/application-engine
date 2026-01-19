@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.objects.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netgrif.application.engine.objects.annotations.Indexable;
 import com.netgrif.application.engine.objects.annotations.Indexed;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @QueryEntity
+@Indexable
 @AllArgsConstructor
 public abstract class Task implements Serializable {
 

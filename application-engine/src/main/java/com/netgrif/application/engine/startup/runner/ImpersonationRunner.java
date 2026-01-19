@@ -39,7 +39,7 @@ public class ImpersonationRunner implements ApplicationEngineStartupRunner {
     }
 
     public Optional<PetriNet> importProcess(final String message, String netIdentifier, String netFileName) {
-        PetriNet foundNet = petriNetService.getNewestVersionByIdentifier(netIdentifier);
+        PetriNet foundNet = petriNetService.getDefaultVersionByIdentifier(netIdentifier);
         if (foundNet != null) {
             log.info("{} has already been imported.", message);
             return Optional.of(foundNet);

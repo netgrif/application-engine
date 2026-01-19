@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.objects.petrinet.domain;
 
+import com.netgrif.application.engine.objects.annotations.Indexable;
+import com.netgrif.application.engine.objects.annotations.Indexed;
 import com.netgrif.application.engine.objects.auth.domain.ActorRef;
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.reference.Referencable;
@@ -24,13 +26,14 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Indexable
 @QueryEntity
 public abstract class PetriNet extends PetriNetObject {
 
 
     @Getter
     @Setter
-    private String identifier; //combination of identifier and version must be unique ... maybe use @CompoundIndex?
+    private String identifier; // todo: combination of identifier and version must be unique ... maybe use @CompoundIndex?
 
     @Getter
     @Setter
@@ -65,6 +68,7 @@ public abstract class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
+    @Indexed
     private String initials;
 
     @Getter
@@ -79,6 +83,11 @@ public abstract class PetriNet extends PetriNetObject {
     @Getter
     @Setter
     private Version version;
+
+    @Getter
+    @Setter
+    @Indexed
+    private boolean defaultVersion;
 
     @Getter
     @Setter
@@ -142,6 +151,10 @@ public abstract class PetriNet extends PetriNetObject {
     @Setter
     private Map<String, String> tags;
 
+    @Getter
+    @Setter
+    private Set<String> pluginDependencies;
+
     public PetriNet() {
         this._id = new ObjectId();
         this.identifier = "Default";
@@ -165,6 +178,8 @@ public abstract class PetriNet extends PetriNetObject {
         this.userRefs = new HashMap<>();
         this.functions = new LinkedList<>();
         this.tags = new HashMap<>();
+        this.pluginDependencies = new HashSet<>();
+        this.makeNonDefault();
     }
 
     public PetriNet(PetriNet petriNet) {
@@ -177,6 +192,7 @@ public abstract class PetriNet extends PetriNetObject {
         this.title = petriNet.getTitle();
         this.importId = petriNet.getImportId();
         this.version = petriNet.getVersion();
+        this.defaultVersion = petriNet.isDefaultVersion();
         this.defaultCaseName = petriNet.getDefaultCaseName();
         this.defaultCaseNameExpression = petriNet.getDefaultCaseNameExpression();
         this.initials = petriNet.getInitials();
@@ -202,10 +218,12 @@ public abstract class PetriNet extends PetriNetObject {
         this.defaultRoleEnabled = petriNet.isDefaultRoleEnabled();
         this.anonymousRoleEnabled = petriNet.isAnonymousRoleEnabled();
         this.author = petriNet.getAuthor();
+        Set<String> sourcePlugins = petriNet.getPluginDependencies();
+        this.pluginDependencies = sourcePlugins != null
+                ? new HashSet<>(sourcePlugins)
+                : new HashSet<>();
         initializeArcs();
     }
-
-    // todo 2072 workspaceId setter regex check
 
     public void addPlace(Place place) {
         this.places.put(place.getStringId(), place);
@@ -440,6 +458,14 @@ public abstract class PetriNet extends PetriNetObject {
 
     public boolean hasDynamicCaseName() {
         return defaultCaseNameExpression != null;
+    }
+
+    public void makeDefault() {
+        this.setDefaultVersion(true);
+    }
+
+    public void makeNonDefault() {
+        this.setDefaultVersion(false);
     }
 
     @Override

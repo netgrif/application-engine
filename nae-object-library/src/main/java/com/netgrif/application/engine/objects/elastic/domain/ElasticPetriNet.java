@@ -24,6 +24,8 @@ public abstract class ElasticPetriNet {
 
     private Version version;
 
+    private boolean defaultVersion;
+
     private String uriNodeId;
 
     private String uri;
@@ -42,6 +44,7 @@ public abstract class ElasticPetriNet {
         this.id = net.getStringId();
         this.identifier = net.getIdentifier();
         this.version = net.getVersion();
+        this.defaultVersion = net.isDefaultVersion();
         this.uriNodeId = net.getUriNodeId();
         this.uri = net.getUri();
         this.workspaceId = net.getWorkspaceId();
@@ -52,6 +55,7 @@ public abstract class ElasticPetriNet {
 
     public void update(ElasticPetriNet net) {
         this.version = net.getVersion();
+        this.defaultVersion = net.isDefaultVersion();
         if (net.getUriNodeId() != null) {
             this.uriNodeId = net.getUriNodeId();
         }

@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.adapter.spring.configuration;
 
+import com.netgrif.application.engine.objects.annotations.Indexable;
 import com.netgrif.application.engine.objects.annotations.Indexed;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -36,7 +37,7 @@ public abstract class AbstractMongoIndexesConfigurator {
     public void resolveIndexes() {
         mappingContext.getPersistentEntities()
                 .stream()
-                .filter(it -> it.isAnnotationPresent(Document.class) && !getEntityIndexBlacklist().contains(it.getType()))
+                .filter(it -> it.isAnnotationPresent(Indexable.class) && !getEntityIndexBlacklist().contains(it.getType()))
                 .forEach(mongoPersistentEntity -> resolveIndexes(mongoPersistentEntity.getCollection(), mongoPersistentEntity.getType()));
     }
 
@@ -50,7 +51,7 @@ public abstract class AbstractMongoIndexesConfigurator {
         }
         addAnnotatedFields(collectionType, indexDefinitions);
         addConfiguredFields(collectionType, indexDefinitions);
-        indexDefinitions.forEach(indexOps::ensureIndex);
+        indexDefinitions.forEach(indexOps::createIndex);
     }
 
     private void addAnnotatedFields(Class<?> collectionType, List<IndexDefinition> indexDefinitions) {

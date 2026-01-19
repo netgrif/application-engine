@@ -1,10 +1,7 @@
 package com.netgrif.application.engine.petrinet.service.interfaces;
 
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
-import com.netgrif.application.engine.objects.petrinet.domain.Transition;
-import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
+import com.netgrif.application.engine.objects.petrinet.domain.*;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingIconKeyException;
@@ -153,12 +150,20 @@ public interface IPetriNetService {
     List<PetriNet> findAllById(List<String> ids);
 
     /**
-     * Retrieves the newest version of a {@link PetriNet} by its identifier.
+     * Retrieves the default version of a {@link PetriNet} by its identifier.
      *
      * @param identifier the unique identifier of the PetriNet
-     * @return the newest version of the {@link PetriNet} matching the provided identifier
+     * @return the default version of the {@link PetriNet} matching the provided identifier or null if not found
      */
-    PetriNet getNewestVersionByIdentifier(String identifier);
+    PetriNet getDefaultVersionByIdentifier(String identifier);
+
+    /**
+     * Retrieves the latest version of a {@link PetriNet} by its identifier.
+     *
+     * @param identifier the unique identifier of the PetriNet
+     * @return the latest version of the {@link PetriNet} matching the provided identifier or null if not found
+     */
+    PetriNet getLatestVersionByIdentifier(String identifier);
 
     /**
      * Retrieves a paginated list of all {@link PetriNet} objects.
@@ -167,6 +172,13 @@ public interface IPetriNetService {
      * @return a paginated list of all {@link PetriNet} objects
      */
     Page<PetriNet> getAll(Pageable pageable);
+
+    /**
+     * Retrieves all default version PetriNets
+     * @param pageable - the pagination information
+     * @return a paginated list of all default {@link PetriNet} objects
+     * */
+    Page<PetriNet> getAllDefault(Pageable pageable);
 
     /**
      * Retrieves a {@link FileSystemResource} representing a file associated with a {@link PetriNet}.
