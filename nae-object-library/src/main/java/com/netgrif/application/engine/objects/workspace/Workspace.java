@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 /** todo javadoc */
 @Getter
-public class Workspace implements Serializable {
+public abstract class Workspace implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -673503926854227584L;
