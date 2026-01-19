@@ -1,14 +1,12 @@
 package com.netgrif.application.engine.workspace.service;
 
 import com.netgrif.application.engine.objects.workspace.Workspace;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
 import static com.netgrif.application.engine.objects.workspace.DefaultWorkspaceConstants.*;
 
 // todo javadoc
 @Service
-@ConditionalOnMissingBean
 public class MockWorkspaceService implements WorkspaceService {
 
     private final Workspace defaultWorkspace;
