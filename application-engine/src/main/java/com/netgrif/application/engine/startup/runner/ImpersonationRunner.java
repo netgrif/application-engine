@@ -30,6 +30,7 @@ public class ImpersonationRunner implements ApplicationEngineStartupRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        // todo 2072 check if workspaceId is initialized by petriNetService
         createConfigNets();
     }
 

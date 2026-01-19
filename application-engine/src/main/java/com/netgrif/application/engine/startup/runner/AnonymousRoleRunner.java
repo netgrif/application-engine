@@ -2,11 +2,10 @@ package com.netgrif.application.engine.startup.runner;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
-import com.netgrif.application.engine.objects.petrinet.domain.events.Event;
-import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
+import com.netgrif.application.engine.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -23,6 +22,7 @@ import java.util.LinkedHashMap;
 public class AnonymousRoleRunner implements ApplicationEngineStartupRunner {
 
     private final ProcessRoleService processRoleService;
+    private final WorkspaceService workspaceService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -37,7 +37,8 @@ public class AnonymousRoleRunner implements ApplicationEngineStartupRunner {
         anonymousRole.setImportId(ProcessRole.ANONYMOUS_ROLE);
         anonymousRole.setName(new I18nString(ProcessRole.ANONYMOUS_ROLE));
         anonymousRole.setDescription("Anonymous system process role");
-        anonymousRole.setEvents(new LinkedHashMap<EventType, Event>());
+        anonymousRole.setEvents(new LinkedHashMap<>());
+        anonymousRole.setWorkspaceId(workspaceService.getDefault().getId());
         processRoleService.save(anonymousRole);
     }
 

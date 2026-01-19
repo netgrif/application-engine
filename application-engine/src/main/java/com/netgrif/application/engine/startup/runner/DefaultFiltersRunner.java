@@ -57,6 +57,7 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
     public void run(ApplicationArguments args) throws Exception {
         if (!filterConfigurationProperties.isCreateDefaultFilters()) return;
         // All cases
+        // todo 2072 check if workspaceId is initialized by workflowService.createCase
         createCaseFilter("All cases", "assignment", FILTER_VISIBILITY_PUBLIC, "", new ArrayList<String>(),
                 new HashMap<>(Map.of(
                         "predicateMetadata", new ArrayList<>(),

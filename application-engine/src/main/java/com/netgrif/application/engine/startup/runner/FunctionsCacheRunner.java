@@ -21,7 +21,7 @@ public class FunctionsCacheRunner implements ApplicationEngineStartupRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        log.info("Namespace function caching started");
+        log.info("Global function caching started");
         // TODO JOFO: unpaged necessary?
         petriNetService.getAll(Pageable.unpaged()).forEach(cacheService::cachePetriNetFunctions);
     }

@@ -37,6 +37,7 @@ public class DefaultDashboardRunner implements ApplicationEngineStartupRunner {
         DashboardManagementBody dashboardItemBody = new DashboardManagementBody("main_dashboard", new I18nString("Main Dashboard", Map.of("sk", "Hlavný Dashboard", "de", "Haupt-Dashboard")));
         dashboardItemBody.setLogoutDashboard(true);
 
+        // todo 2072 check if workspaceId is initialized by workflowService.createCase
         return dashboardManagementService.createDashboardManagement(dashboardItemBody);
     }
 }
