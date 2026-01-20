@@ -332,6 +332,11 @@ public abstract class AbstractActor implements Serializable {
         this.workspacePermissions.remove(workspaceId);
     }
 
+    // todo javadoc
+    public void setWorkspacePermissions(Map<String, WorkspacePermission> workspacePermissions) {
+        this.workspacePermissions = workspacePermissions == null ? new HashMap<>() : new HashMap<>(workspacePermissions);
+    }
+
     /**
      * Checks if the actor has admin authority.
      * @return true if the actor has admin authority, false otherwise
