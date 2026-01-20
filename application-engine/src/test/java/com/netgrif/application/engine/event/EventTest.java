@@ -4,7 +4,6 @@ package com.netgrif.application.engine.event;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.event.dispatchers.CaseDispatcher;
 import com.netgrif.application.engine.objects.event.dispatchers.common.AbstractDispatcher;
-import com.netgrif.application.engine.objects.event.events.workflow.CaseEvent;
 import com.netgrif.application.engine.objects.event.events.workflow.CreateCaseEvent;
 import com.netgrif.application.engine.objects.event.listeners.Listener;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
@@ -20,13 +19,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
 import java.util.EventObject;
-import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -54,15 +54,19 @@ public class EventTest {
     void beforeAll() {
         helper.truncateDbs();
         Optional<PetriNet> netOptional = importHelper.createNet("all_data.xml");
-        assert netOptional.isPresent();
+        assertTrue(netOptional.isPresent());
         this.net = netOptional.get();
     }
 
 
     @Test
     void testCreateCaseEventMultiplicity() {
-        List<CreateCaseEvent> casesPreEvents = new ArrayList<>();
-        List<CreateCaseEvent> casesPostEvents = new ArrayList<>();
+        AtomicInteger preEventsCounter = new AtomicInteger(0);
+        AtomicInteger postEventsCounter = new AtomicInteger(0);
+        AtomicReference<Object> createCaseEventRef = new AtomicReference<>();
+        CountDownLatch latch = new CountDownLatch(2);
+        AtomicReference<Throwable> asyncException = new AtomicReference<>();
+
         Listener listener = new Listener() {
             @Override
             public <E extends EventObject> void onEvent(E event, AbstractDispatcher dispatcher) {
@@ -71,22 +75,41 @@ public class EventTest {
 
             @Override
             public <E extends EventObject> void onAsyncEvent(E event, AbstractDispatcher dispatcher) {
-                assertEquals(CreateCaseEvent.class, event.getClass());
-                CreateCaseEvent createCaseEvent = (CreateCaseEvent) event;
-                assertNotNull(createCaseEvent);
-                assertNotNull(createCaseEvent.getEventPhase());
-                if (createCaseEvent.getEventPhase()==EventPhase.PRE) {
-                    casesPreEvents.add(createCaseEvent);
-                } else {
-                    casesPostEvents.add(createCaseEvent);
+                try {
+                    createCaseEventRef.set(event);
+                    CreateCaseEvent createCaseEvent = (CreateCaseEvent) event;
+                    if (createCaseEvent.getEventPhase() == EventPhase.PRE) {
+                        preEventsCounter.incrementAndGet();
+                    } else {
+                        postEventsCounter.incrementAndGet();
+                    }
+                } catch (Throwable e) {
+                    asyncException.set(e);
+                } finally {
+                    latch.countDown();
                 }
-
             }
         };
         listener.register(caseDispatcher, CreateCaseEvent.class, AbstractDispatcher.DispatchMethod.ASYNC);
         workflowService.createCase(net.getStringId(), null, null, superCreator.getLoggedSuper());
 
-        assertEquals(1, casesPreEvents.size(), "Expected exactly one PRE phase event");
-        assertEquals(1, casesPostEvents.size(), "Expected exactly one POST phase event");
+        boolean completed = false;
+        try {
+            completed = latch.await(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            fail("Interrupted while waiting for async events to complete");
+        }
+        assertTrue(completed, "Async events did not complete within timeout");
+
+        if (asyncException.get() != null) {
+            fail("Exception in async event handler: " + asyncException.get().getMessage(), asyncException.get());
+        }
+
+        Object eventObj = createCaseEventRef.get();
+        assertNotNull(eventObj, "Expected non-null event object");
+        assertEquals(CreateCaseEvent.class, eventObj.getClass(), "Expected CreateCaseEvent class");
+        assertNotNull(((CreateCaseEvent) eventObj).getEventPhase(), "Expected non-null Phase Enum");
+        assertEquals(1, preEventsCounter.get(), "Expected exactly one PRE phase event");
+        assertEquals(1, postEventsCounter.get(), "Expected exactly one POST phase event");
     }
 }
