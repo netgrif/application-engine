@@ -241,12 +241,13 @@ public abstract class AbstractActor implements Serializable {
     /**
      * Adds a process role to the actor.
      * @param role the process role to add
+     * @return true if the collection has been changed
      */
-    public void addProcessRole(ProcessRole role) {
+    public boolean addProcessRole(ProcessRole role) {
         if (this.processRoles == null) {
             this.processRoles = new HashSet<>();
         }
-        this.processRoles.add(role);
+        return this.processRoles.add(role);
     }
 
     /**

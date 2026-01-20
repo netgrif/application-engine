@@ -2,7 +2,9 @@ package com.netgrif.application.engine.auth.domain;
 
 
 import com.netgrif.application.engine.objects.auth.domain.Realm;
+import com.netgrif.application.engine.objects.workspace.Workspace;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 @Getter
@@ -10,6 +12,8 @@ public class NetgrifAuthenticationToken extends UsernamePasswordAuthenticationTo
 
     private final String realmName;
     private final Realm realm;
+    @Setter
+    private Workspace workspace;
 
     public NetgrifAuthenticationToken(Object principal, Object credentials, String realmName) {
         super(principal, credentials);
