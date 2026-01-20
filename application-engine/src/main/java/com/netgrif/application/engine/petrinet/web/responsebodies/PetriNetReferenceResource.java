@@ -14,11 +14,11 @@ public class PetriNetReferenceResource extends EntityModel<PetriNetReference> {
 
     private void buildLinks() {
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                        .methodOn(PetriNetController.class).getOne(getContent().getStringId(), null, null))
+                        .methodOn(PetriNetController.class).getOne(getContent().getStringId(), null))
                 .withSelfRel());
 
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                        .methodOn(PetriNetController.class).getOne(getContent().getIdentifier(), getContent().getVersion(), null, null))
+                        .methodOn(PetriNetController.class).getOne(getContent().getIdentifier(), getContent().getVersion(), null))
                 .withRel("identifier"));
 
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder

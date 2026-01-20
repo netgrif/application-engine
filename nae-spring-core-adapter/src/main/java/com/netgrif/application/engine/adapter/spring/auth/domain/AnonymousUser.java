@@ -36,7 +36,7 @@ public class AnonymousUser extends AbstractUser {
      * @param anonymousAuthority the authority to be assigned if no specific authorities are provided
      */
     public AnonymousUser(AnonymousUserRef ref, Authority anonymousAuthority) {
-        this.id = new ObjectId();
+        this.id = new ObjectId(ref.getId());
         this.realmId = ref.getRealmId();
         this.username = "anonymous@" + this.realmId;
         this.firstName = ref.getDisplayName();
