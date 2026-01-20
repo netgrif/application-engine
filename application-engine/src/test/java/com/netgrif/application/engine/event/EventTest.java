@@ -51,7 +51,7 @@ public class EventTest {
     private PetriNet net;
 
     @BeforeEach
-    void beforeAll() {
+    void beforeEach() {
         helper.truncateDbs();
         Optional<PetriNet> netOptional = importHelper.createNet("all_data.xml");
         assertTrue(netOptional.isPresent());
@@ -86,6 +86,7 @@ public class EventTest {
                 } catch (Throwable e) {
                     asyncException.set(e);
                 } finally {
+
                     latch.countDown();
                 }
             }
@@ -111,5 +112,6 @@ public class EventTest {
         assertNotNull(((CreateCaseEvent) eventObj).getEventPhase(), "Expected non-null Phase Enum");
         assertEquals(1, preEventsCounter.get(), "Expected exactly one PRE phase event");
         assertEquals(1, postEventsCounter.get(), "Expected exactly one POST phase event");
+        caseDispatcher.unregisterListener(listener, CreateCaseEvent.class, AbstractDispatcher.DispatchMethod.ASYNC);
     }
 }
