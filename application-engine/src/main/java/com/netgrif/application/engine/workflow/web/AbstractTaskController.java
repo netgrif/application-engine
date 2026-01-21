@@ -221,7 +221,7 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> setData(String taskId, ObjectNode dataBody, Locale locale) {
         try {
-            List<com.netgrif.application.engine.objects.petrinet.domain.DataGroup> dataGroups = dataService.getDataGroups(taskId, locale).getData();
+            List<com.netgrif.application.engine.objects.petrinet.domain.DataGroup> dataGroups = dataService.getDataGroups(taskId, locale, false).getData();
             Set<String> referencedTaskIds = new HashSet<>();
             referencedTaskIds.add(taskId);
             for (com.netgrif.application.engine.objects.petrinet.domain.DataGroup dataGroup : dataGroups) {
