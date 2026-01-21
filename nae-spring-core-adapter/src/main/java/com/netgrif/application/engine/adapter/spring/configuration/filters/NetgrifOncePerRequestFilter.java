@@ -30,7 +30,8 @@ public abstract class  NetgrifOncePerRequestFilter extends OncePerRequestFilter 
                                              FilterChain filterChain) throws ServletException, IOException;
 
     @Override
-    protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response,
+    protected void doFilterInternal(@NotNull HttpServletRequest request,
+                                    @NotNull HttpServletResponse response,
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
         if (requestNotMatches(request)) {
             log.trace("Request did not match the required URIs: {}", this.requestMatcher);

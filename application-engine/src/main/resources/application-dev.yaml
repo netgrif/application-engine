@@ -28,7 +28,7 @@ netgrif:
     swagger:
       enabled: true
     security:
-      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/v3/api-docs,/v3/api-docs/**,/swagger-ui.html,/swagger-ui/**,/api/**,/manage/**,/api/users/me,/api/users/preferences
+      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/v3/api-docs,/v3/api-docs/**,/swagger-ui.html,/swagger-ui/**,/api/petrinet/public/**,/api/workflow/public/**,/api/task/public/**,/manage/**,/api/users/me,/api/users/preferences
     management:
       health:
         ldap:

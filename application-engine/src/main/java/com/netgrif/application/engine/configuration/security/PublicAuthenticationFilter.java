@@ -6,7 +6,6 @@ import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.adapter.spring.configuration.filters.NetgrifOncePerRequestFilter;
 import com.netgrif.application.engine.adapter.spring.configuration.filters.requests.NetgrifHttpServletRequest;
 import com.netgrif.application.engine.auth.service.AnonymousUserRefService;
-import com.netgrif.application.engine.auth.service.RealmService;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.auth.service.AuthorityService;
@@ -35,15 +34,12 @@ public class PublicAuthenticationFilter extends NetgrifOncePerRequestFilter {
 
     private final AnonymousUserRefService anonymousUserRefService;
     private final AuthorityService authorityService;
-    private final RealmService realmService;
 
     public PublicAuthenticationFilter(AnonymousUserRefService anonymousUserRefService,
                                       AuthorityService authorityService,
-                                      RealmService realmService,
                                       SecurityConfigurationProperties securityConfigurationProperties) {
         this.anonymousUserRefService = anonymousUserRefService;
         this.authorityService = authorityService;
-        this.realmService = realmService;
         setRequestMatcher(Arrays.stream(securityConfigurationProperties.getServerPatterns()).map(AntPathRequestMatcher::new).collect(Collectors.toSet()));
     }
 

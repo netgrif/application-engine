@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.petrinet.web.PetriNetController;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -30,7 +29,7 @@ public class PetriNetReferenceResource extends EntityModel<PetriNetReference> {
                 .withRel("transaction"));
 
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                        .methodOn(PetriNetController.class).getNetFile(getContent().getStringId(), getContent().getTitle(), null, null))
+                        .methodOn(PetriNetController.class).getNetFile(getContent().getStringId(), getContent().getTitle(), null))
                 .withRel("file"));
     }
 }

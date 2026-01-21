@@ -85,7 +85,7 @@ netgrif:
         expiration: 900000
         algorithm: RSA
         private-key: classpath:certificates/private.der
-      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/v3/api-docs/public,/manage/**,/api/users/me,/api/users/preferences
+      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/v3/api-docs/public,/manage/**,/api/users/me,/api/users/preferences,/api/petrinet/public/**,/api/workflow/public/**,/api/task/public/**
       providers: NetgrifBasicAuthenticationProvider
     swagger:
       enabled: false

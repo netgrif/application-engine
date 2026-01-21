@@ -97,9 +97,9 @@ class TestHelper {
         petriNetService.evictAllCaches()
 
         defaultRoleRunner.run()
+        anonymousRoleRunner.run()
         elasticsearchRunner.run()
         defaultRealmRunner.run()
-        anonymousRoleRunner.run()
         systemUserRunner.run()
         groupRunner.run()
         filterRunner.run()
