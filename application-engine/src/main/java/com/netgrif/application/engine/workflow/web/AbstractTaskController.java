@@ -3,6 +3,7 @@ package com.netgrif.application.engine.workflow.web;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
@@ -10,6 +11,8 @@ import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.Sin
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedField;
+import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
+import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.IllegalArgumentWithChangedFieldsException;
@@ -66,7 +69,7 @@ public abstract class AbstractTaskController {
 
     public PagedModel<LocalisedTaskResource> getAll(Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
-        Page<Task> page = taskService.getAll(loggedUser, pageable, locale);
+        Page<Task> page = taskService.search(Collections.emptyList(), pageable, loggedUser, locale, Boolean.FALSE);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .getAll(pageable, assembler, locale)).withRel("all");
         PagedModel<LocalisedTaskResource> resources = assembler.toModel(page, new TaskResourceAssembler(locale), selfLink);
@@ -75,7 +78,9 @@ public abstract class AbstractTaskController {
     }
 
     public PagedModel<LocalisedTaskResource> getAllByCases(List<String> cases, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        Page<Task> page = taskService.findByCases(pageable, cases);
+        List<TaskSearchRequest> requests = cases.stream().map(c -> TaskSearchRequest.from().useCase(List.of(TaskSearchCaseRequest.builder().id(c).build())).build()).toList();
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
+        Page<Task> page = taskService.search(requests, pageable, loggedUser, locale, false);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .getAllByCases(cases, pageable, assembler, locale)).withRel("case");
         PagedModel<LocalisedTaskResource> resources = assembler.toModel(page, new TaskResourceAssembler(locale), selfLink);
