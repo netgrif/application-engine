@@ -48,7 +48,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -111,15 +110,25 @@ public class DataService implements IDataService {
 
     @Override
     public GetDataEventOutcome getData(String taskId) {
-        return getData(taskId, new HashMap<>());
+        return getData(taskId, true);
+    }
+
+    @Override
+    public GetDataEventOutcome getData(String taskId, boolean eventsEnabled) {
+        return getData(taskId, new HashMap<>(), eventsEnabled);
     }
 
     @Override
     public GetDataEventOutcome getData(String taskId, Map<String, String> params) {
+        return getData(taskId, params, true);
+    }
+
+    @Override
+    public GetDataEventOutcome getData(String taskId, Map<String, String> params, boolean eventsEnabled) {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
 
-        return getData(task, useCase, params);
+        return getData(task, useCase, params, eventsEnabled);
     }
 
     @Override
@@ -128,7 +137,17 @@ public class DataService implements IDataService {
     }
 
     @Override
+    public GetDataEventOutcome getData(Task task, Case useCase, boolean eventsEnabled) {
+        return getData(task, useCase, new HashMap<>(), eventsEnabled);
+    }
+
+    @Override
     public GetDataEventOutcome getData(Task task, Case useCase, Map<String, String> params) {
+        return getData(task, useCase, params, true);
+    }
+
+    @Override
+    public GetDataEventOutcome getData(Task task, Case useCase, Map<String, String> params, boolean eventsEnabled) {
         log.info("[" + useCase.getStringId() + "]: Getting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
         AbstractUser user = userService.getLoggedOrSystem();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
@@ -143,8 +162,10 @@ public class DataService implements IDataService {
             if (isForbidden(fieldId, transition, useCase.getDataField(fieldId)))
                 return;
             Field field = useCase.getPetriNet().getField(fieldId).get();
-            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, params));
-            publisher.publishEvent(new GetDataEvent(outcome, EventPhase.PRE, user));
+            if (eventsEnabled) {
+                outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, params));
+                publisher.publishEvent(new GetDataEvent(outcome, EventPhase.PRE, user));
+            }
 
             if (outcome.getMessage() == null) {
                 Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
@@ -176,8 +197,10 @@ public class DataService implements IDataService {
                     dataSetFields.add(validationField);
                 }
             }
-            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task, params));
-            publisher.publishEvent(new GetDataEvent(outcome, EventPhase.POST, user));
+            if (eventsEnabled) {
+                outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task, params));
+                publisher.publishEvent(new GetDataEvent(outcome, EventPhase.POST, user));
+            }
         });
 
         workflowService.save(useCase);
@@ -350,7 +373,17 @@ public class DataService implements IDataService {
     }
 
     @Override
+    public GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, boolean eventsEnabled) {
+        return getDataGroups(taskId, locale, new HashSet<>(), 0, null, eventsEnabled);
+    }
+
+    @Override
     public GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, Set<String> collectedTaskIds, int level, String parentTaskRefId) {
+        return getDataGroups(taskId, locale, collectedTaskIds, level, parentTaskRefId, true);
+    }
+
+    @Override
+    public GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, Set<String> collectedTaskIds, int level, String parentTaskRefId, boolean eventsEnabled) {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
         PetriNet net = useCase.getPetriNet();
@@ -359,7 +392,7 @@ public class DataService implements IDataService {
         log.info("Getting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level);
         List<DataGroup> resultDataGroups = new ArrayList<>();
 
-        List<Field<?>> data = getData(task, useCase).getData();
+        List<Field<?>> data = getData(task, useCase, eventsEnabled).getData();
         Map<String, Field<?>> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
         List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map((dg) -> (DataGroup) new com.netgrif.application.engine.adapter.spring.workflow.domain.DataGroup((com.netgrif.application.engine.adapter.spring.workflow.domain.DataGroup) dg)).toList();
         for (DataGroup dataGroup : dataGroups) {
@@ -383,7 +416,7 @@ public class DataService implements IDataService {
                     }
                     resources.add(resource);
                     if (field.getType() == FieldType.TASK_REF && shouldResolveTaskRefData(field, transition.getDataSet().get(field.getStringId()))) {
-                        resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), locale, collectedTaskIds, level));
+                        resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), locale, collectedTaskIds, level, eventsEnabled));
                     }
                 }
             }
@@ -409,7 +442,7 @@ public class DataService implements IDataService {
                 && component.getProperties().get(propertyName).equals(propertyValue);
     }
 
-    private List<DataGroup> collectTaskRefDataGroups(TaskField taskRefField, Locale locale, Set<String> collectedTaskIds, int level) {
+    private List<DataGroup> collectTaskRefDataGroups(TaskField taskRefField, Locale locale, Set<String> collectedTaskIds, int level, boolean eventsEnabled) {
         List<String> taskIds = taskRefField.getValue();
         List<DataGroup> groups = new ArrayList<>();
 
@@ -417,7 +450,7 @@ public class DataService implements IDataService {
             taskIds = taskIds.stream().filter(id -> !collectedTaskIds.contains(id)).collect(Collectors.toList());
             taskIds.forEach(id -> {
                 collectedTaskIds.add(id);
-                List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1, taskRefField.getStringId()).getData();
+                List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1, taskRefField.getStringId(), eventsEnabled).getData();
                 resolveTaskRefBehavior(taskRefField, taskRefDataGroups);
                 groups.addAll(taskRefDataGroups);
             });
