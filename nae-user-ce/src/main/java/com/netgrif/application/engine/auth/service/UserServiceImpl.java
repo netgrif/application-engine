@@ -389,12 +389,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(String userId, String realmId, UpdateUserRequest userUpdate) {
         if(userId == null) {
-            log.info("Cannot update user, userId is null");
+            log.warn("Cannot update user, userId is null");
             return null;
         }
         User user = findById(userId, realmId);
         if(user == null) {
-            log.info("User with id [{}] does not exist", userId);
+            log.warn("User with id [{}] does not exist", userId);
             return null;
         }
         return this.update(user, userUpdate);
