@@ -572,11 +572,6 @@ public class PetriNetService implements IPetriNetService {
         return obj;
     }
 
-    protected void evaluateRules(Event event) {
-        publisher.publishEvent(event);
-
-    }
-
     protected void fillAndValidateAttributes(ImportPetriNetParams importPetriNetParams) throws IllegalArgumentException {
         if (importPetriNetParams.getXmlFile() == null) {
             throw new IllegalArgumentException("No Petriflow source file provided.");
