@@ -641,7 +641,7 @@ public class PetriNetService implements IPetriNetService {
         processRoleService.deleteRolesOfNet(petriNet, deletePetriNetParams.getLoggedUser());
 
         log.info("[{}]: User [{}] is deleting Petri net {} version {}", deletePetriNetParams.getPetriNetId(),
-                userService.getLoggedOrSystem().getStringId(), petriNet.getIdentifier(), petriNet.getVersion().toString());
+                deletePetriNetParams.getLoggedUser().getStringId(), petriNet.getIdentifier(), petriNet.getVersion().toString());
         publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.PRE));
         repository.deleteBy_id(petriNet.getObjectId());
         evictCache(petriNet);

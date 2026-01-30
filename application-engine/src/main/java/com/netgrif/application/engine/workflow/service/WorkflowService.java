@@ -566,7 +566,7 @@ public class WorkflowService implements IWorkflowService {
                 Field clone = fieldFactory.buildImmediateField(useCase, fieldId);
                 immediateData.add(clone);
             } catch (Exception e) {
-                log.error("Could not built immediate field [{}]", fieldId);
+                log.error("Could not built immediate field [{}]", fieldId, e);
             }
         });
         LongStream.range(0L, immediateData.size()).forEach(index -> immediateData.get((int) index).setOrder(index));
