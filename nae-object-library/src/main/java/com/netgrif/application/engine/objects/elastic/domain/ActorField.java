@@ -23,6 +23,14 @@ public abstract class ActorField extends DataField {
     protected List<String> actorIdValue;
     protected List<String> actorRealmIdValue;
 
+    public ActorField(ActorField field) {
+        super(field);
+        this.usernameValue = field.usernameValue == null ? null : new ArrayList<>(field.usernameValue);
+        this.fullNameValue = field.fullNameValue == null ? null : new ArrayList<>(field.fullNameValue);
+        this.actorIdValue = field.actorIdValue == null ? null : new ArrayList<>(field.actorIdValue);
+        this.actorRealmIdValue = field.actorRealmIdValue == null ? null : new ArrayList<>(field.actorRealmIdValue);
+    }
+
     public ActorField(ActorMappingData mappingData) {
         this(List.of(mappingData));
     }

@@ -232,8 +232,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformTaskField(com.netgrif.application.engine.objects.workflow.domain.DataField dataField) {
-        String[] referencedTasks = ((List<String>) dataField.getValue()).toArray(new String[0]);
-        return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.TaskField(referencedTasks));
+        return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.TaskField((List<String>) dataField.getValue()));
     }
 
     protected Optional<DataField> transformDateField

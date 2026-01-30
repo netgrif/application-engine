@@ -12,6 +12,10 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 @NoArgsConstructor
 public class ActorField extends com.netgrif.application.engine.objects.elastic.domain.ActorField {
 
+    public ActorField(ActorField field) {
+        super(field);
+    }
+
     public ActorField(ActorMappingData value) {
         super(value);
     }
