@@ -386,8 +386,8 @@ public class WorkflowService implements IWorkflowService {
     public DeleteCaseEventOutcome deleteCase(DeleteCaseParams deleteCaseParams) {
         fillAndValidateAttributes(deleteCaseParams);
 
-        DeleteCaseEventOutcome outcome = null;
         Case useCase = deleteCaseParams.getUseCase();
+        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, new ArrayList<>());
 
         if (!deleteCaseParams.isForce()) {
             outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(),
