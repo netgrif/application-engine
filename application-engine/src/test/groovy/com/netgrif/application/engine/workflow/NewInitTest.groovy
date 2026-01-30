@@ -52,7 +52,7 @@ class NewInitTest {
                 .author(superCreator.getLoggedSuper())
                 .build())
         Case initTestCase = workflowService.createCase(CreateCaseParams.with()
-                .process(petriNetService.getNewestVersionByIdentifier("new_init_test"))
+                .process(petriNetService.getDefaultVersionByIdentifier("new_init_test"))
                 .title("New init test")
                 .color("")
                 .author(superCreator.loggedSuper)
