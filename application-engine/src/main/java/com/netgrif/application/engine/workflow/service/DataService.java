@@ -67,6 +67,8 @@ import java.util.stream.LongStream;
 @Service
 public class DataService implements IDataService {
 
+    private static final Set<FieldType> setDataForbiddenFieldTypes = Set.of(FieldType.TASK_REF, FieldType.CASE_REF);
+
     @Autowired
     protected ApplicationEventPublisher publisher;
 
@@ -219,6 +221,22 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params) {
+        return setData(task, values, params, false);
+    }
+
+    /**
+     * Updates the data field's attributes of the provided task.
+     *
+     * @param task the task object of which the data are updated
+     * @param values information about how to update the data fields
+     * @param params additional information to be injected to the action delegate context
+     * @param runStrict if set to true, additional validations are going to be applied when updating the data fields. If
+     *                set to false, minimal restrictions are considered.
+     *
+     * @return outcome containing Case, Task and changes that have been made.
+     * */
+    @Override
+    public SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params, boolean runStrict) {
         Case useCase = workflowService.findOne(task.getCaseId());
         AbstractUser user = userService.getLoggedOrSystem();
 
@@ -233,6 +251,18 @@ public class DataService implements IDataService {
             DataField dataField = useCase.getDataSet().get(fieldId);
             if (dataField == null) {
                 return;
+            }
+            if (runStrict) {
+                if (!isDataFieldEditable(dataField, task.getTransitionId())) {
+                    throw new IllegalArgumentException("Cannot edit data field [" + fieldId + "], which is not editable on transition [" + task.getTransitionId() + "].");
+                }
+                Field<?> field = useCase.getField(fieldId);
+                if (field == null) {
+                    throw new IllegalArgumentException("Such field with id [" + fieldId + "] does not exist in petri net [" + useCase.getPetriNetId() + "]");
+                }
+                if (setDataForbiddenFieldTypes.contains(field.getType())) {
+                    return;
+                }
             }
 
             Field<?> field = useCase.getPetriNet().getField(fieldId).orElseThrow(() -> new IllegalStateException("Field with id [%s] is missing from process with id [%s]"
@@ -305,6 +335,15 @@ public class DataService implements IDataService {
         outcome.setCase(workflowService.save(useCase));
         publisher.publishEvent(new SetDataEvent(outcome));
         return outcome;
+    }
+
+    private boolean isDataFieldEditable(DataField dataField, String transId) {
+        Map<String, Set<FieldBehavior>> behaviorMap = dataField.getBehavior();
+        if (behaviorMap == null) {
+            return false;
+        }
+        Set<FieldBehavior> behaviorSet = behaviorMap.get(transId);
+        return behaviorSet != null && behaviorSet.contains(FieldBehavior.EDITABLE);
     }
 
     @Override

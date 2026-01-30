@@ -239,7 +239,7 @@ public class MenuImportExportService implements IMenuImportExportService {
                 String roleImportId = menuEntryRole.getRoleImportId();
                 String netImportId = menuEntryRole.getNetImportId();
                 if (netImportId != null) {
-                    PetriNet net = petriNetService.getNewestVersionByIdentifier(netImportId);
+                    PetriNet net = petriNetService.getDefaultVersionByIdentifier(netImportId);
                     if (net == null) {
                         resultMessage.append("\n- Missing net with import ID: \"").append(netImportId).append("\"").append("for role ").append(roleImportId).append("\n");
                         netCheck.set(false);

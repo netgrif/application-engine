@@ -60,6 +60,7 @@ public class PetriNet extends com.netgrif.application.engine.objects.petrinet.do
         return super.getRoles();
     }
 
+    // todo: delete clone method if not needed
 //    @Override
 //    public PetriNet clone() {
 //        PetriNet clone = new PetriNet();

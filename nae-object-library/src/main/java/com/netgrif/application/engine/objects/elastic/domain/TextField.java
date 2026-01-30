@@ -11,6 +11,11 @@ public abstract class TextField extends DataField {
 
     public String[] textValue;
 
+    public TextField(TextField field) {
+        super(field);
+        this.textValue = field.textValue == null ? null : field.textValue.clone();
+    }
+
     public TextField(String value) {
         super(value);
         this.textValue = new String[1];

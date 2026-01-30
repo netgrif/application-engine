@@ -424,7 +424,7 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
     }
 
     private Optional<Case> createFilterCase(String title, String icon, String filterType, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata, Map<String, String> titleTranslations, String originId, boolean viewOrigin, boolean isImported) {
-        PetriNet filterNet = this.petriNetService.getNewestVersionByIdentifier("filter");
+        PetriNet filterNet = this.petriNetService.getDefaultVersionByIdentifier("filter");
         if (filterNet == null) {
             return Optional.empty();
         }

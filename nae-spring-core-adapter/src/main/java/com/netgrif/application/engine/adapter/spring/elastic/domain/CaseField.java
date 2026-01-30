@@ -10,6 +10,10 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 @NoArgsConstructor
 public class CaseField extends com.netgrif.application.engine.objects.elastic.domain.CaseField {
 
+    public CaseField(CaseField field) {
+        super(field);
+    }
+
     public CaseField(String[] values, String[] allowedNets) {
         super(values, allowedNets);
     }

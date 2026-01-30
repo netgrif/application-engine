@@ -77,7 +77,7 @@ abstract class FieldActionsRunner {
         actionsCacheService.getCachedFunctions(functions).each {
             actionDelegate.metaClass."${it.function.name}" << it.code
         }
-        actionsCacheService.getNamespaceFunctionCache().each { entry ->
+        actionsCacheService.getGlobalFunctionsCache().each { entry ->
             def namespace = [:]
             entry.getValue().each {
                 namespace["${it.function.name}"] = it.code.rehydrate(actionDelegate, it.code.owner, it.code.thisObject)

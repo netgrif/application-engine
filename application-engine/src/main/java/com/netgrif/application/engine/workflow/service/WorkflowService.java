@@ -343,7 +343,7 @@ public class WorkflowService implements IWorkflowService {
             if (createCaseParams.getProcessId() != null) {
                 petriNet = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet((com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet) petriNetService.get(new ObjectId(createCaseParams.getProcessId())));
             } else if (createCaseParams.getProcessIdentifier() != null) {
-                petriNet = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet((com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet) petriNetService.getNewestVersionByIdentifier(createCaseParams.getProcessIdentifier()));
+                petriNet = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet((com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet) petriNetService.getDefaultVersionByIdentifier(createCaseParams.getProcessIdentifier()));
             } else {
                 throw new IllegalArgumentException("Could not find the process for the Case from provided inputs on case creation.");
             }

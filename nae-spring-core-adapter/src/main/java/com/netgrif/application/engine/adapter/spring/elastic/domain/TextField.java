@@ -12,6 +12,10 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 @EqualsAndHashCode(callSuper = true)
 public class TextField extends com.netgrif.application.engine.objects.elastic.domain.TextField {
 
+    public TextField(TextField field) {
+        super(field);
+    }
+
     public TextField(String value) {
         super(value);
     }
