@@ -527,11 +527,11 @@ public class WorkflowService implements IWorkflowService {
                     if (taskField.getDefaultValue() != null && !taskField.getDefaultValue().isEmpty() && taskDataField.getValue() != null
                             && taskDataField.getValue().equals(taskField.getDefaultValue())) {
                         taskDataField.setValue(new ArrayList<>());
+                        anyDataFieldChanged.set(true);
                         useCase.getTasks().stream()
                                 .filter(taskPair -> (taskField.getDefaultValue().contains(taskPair.getTransition())))
                                 .forEach(taskPair -> {
                                     ((List<String>) taskDataField.getValue()).add(taskPair.getTask());
-                                    anyDataFieldChanged.set(true);
                                 });
                     }
                 });
