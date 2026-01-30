@@ -23,7 +23,7 @@ public abstract class DataField implements Serializable {
     }
 
     DataField(String fulltextValue) {
-        this(List.of(fulltextValue));
+        this(fulltextValue == null ? new ArrayList<>() : List.of(fulltextValue));
     }
 
     DataField(List<String> fulltextValue) {

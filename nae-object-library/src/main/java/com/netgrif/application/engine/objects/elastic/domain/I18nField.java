@@ -22,7 +22,7 @@ public abstract class I18nField extends TextField {
     }
 
     public I18nField(Set<String> keys, Set<String> values, Map<String, String> translations) {
-        super(new ArrayList<>(values));
+        super(values == null ? null : new ArrayList<>(values));
         this.keyValue = keys;
         this.translations = translations;
     }
