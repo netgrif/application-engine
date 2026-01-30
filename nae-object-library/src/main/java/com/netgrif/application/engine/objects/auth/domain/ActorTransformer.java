@@ -55,6 +55,7 @@ public class ActorTransformer {
         loggedUser.setProcessRoles(user.getProcessRoles());
         loggedUser.setAttributes(user.getAttributes());
         loggedUser.setGroupIds(user.getGroupIds());
+        loggedUser.setActiveWorkspaceId(user.getActiveWorkspaceId());
         loggedUser.setWorkspacePermissions(user.getWorkspacePermissions());
         return loggedUser;
     }

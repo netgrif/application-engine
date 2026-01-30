@@ -7,6 +7,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.utils.FullPageRequest;
@@ -62,13 +63,13 @@ public class ImporterTest {
 
     @Test
     public void importPetriNet() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        petriNetService.importPetriNet(new ImportPetriNetParams(new FileInputStream("src/test/resources/prikladFM_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()));
         assertNetProperlyImported();
     }
 
     @Test
     public void priorityTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/priority_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new ImportPetriNetParams(new FileInputStream("src/test/resources/priority_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()));
         assert outcome.getNet() != null;
 
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), outcome.getNet().getTitle().getDefaultValue(), "color", superCreator.getLoggedSuper());
@@ -78,19 +79,19 @@ public class ImporterTest {
 
     @Test
     public void dataGroupTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new ImportPetriNetParams(new FileInputStream("src/test/resources/datagroup_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()));
 
         assert outcome.getNet() != null;
     }
 
     @Test
     public void readArcImportTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/read_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        petriNetService.importPetriNet(new ImportPetriNetParams(new FileInputStream("src/test/resources/read_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()));
     }
 
     @Test
     public void externalMappingTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new ImportPetriNetParams(new FileInputStream("src/test/resources/mapping_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()));
 
         assertExternalMappingImport(outcome.getNet());
     }
@@ -102,7 +103,7 @@ public class ImporterTest {
 
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/invalid_data_ref_layout.xml");
 
-        assertThatThrownBy(() -> petriNetService.importPetriNet(fileInputStream, VersionType.MAJOR, loggedUser))
+        assertThatThrownBy(() -> petriNetService.importPetriNet(new ImportPetriNetParams(fileInputStream, VersionType.MAJOR, loggedUser)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("doesn't have a layout");
 

@@ -27,11 +27,6 @@ import java.util.Set;
 public abstract class LoggedUser extends AbstractUser implements Serializable {
 
     /**
-     * todo javadoc The identifier of the workspace associated with the logged user.
-     */
-    private String activeWorkspaceId;
-
-    /**
      * The authentication provider origin from which the user was authenticated.
      */
     private String providerOrigin;

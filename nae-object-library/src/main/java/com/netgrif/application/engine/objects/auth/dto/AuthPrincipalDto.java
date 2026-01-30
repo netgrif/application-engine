@@ -18,6 +18,8 @@ public class AuthPrincipalDto implements Serializable {
 
     private String realmId;
 
+    private String activeWorkspaceId;
+
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @JsonIgnore

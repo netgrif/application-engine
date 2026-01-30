@@ -477,7 +477,9 @@ public class UserServiceImpl implements UserService {
     public AbstractUser getLoggedUser() {
         LoggedUser loggedUser = getLoggedUserFromContext();
         Optional<AbstractUser> userOptional = findUserByUsername(loggedUser.getUsername(), loggedUser.getRealmId());
-        AbstractUser user = userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] in realm [%s] is not present in the system.".formatted(loggedUser.getUsername(), loggedUser.getRealmId())));
+        AbstractUser user = userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] in realm [%s] is not present in the system."
+                .formatted(loggedUser.getUsername(), loggedUser.getRealmId())));
+        user.setActiveWorkspaceId(loggedUser.getActiveWorkspaceId());
         // TODO: impersonation
 //        if (loggedUser.isImpersonating()) {
 //            IUser impersonated = transformToUser((LoggedUserImpl) loggedUser.getImpersonated());
@@ -572,6 +574,12 @@ public class UserServiceImpl implements UserService {
     public AbstractUser createSystemUser() {
         User system = (User) findByEmail(UserConstants.SYSTEM_USER_EMAIL, null);
         if (system == null) {
+            Authority adminAuthority = authorityService.getOrCreate(Authority.admin);
+            Authority systemAuthority = authorityService.getOrCreate(Authority.systemAdmin);
+            Set<Authority> authorities = new HashSet<>();
+            authorities.add(adminAuthority);
+            authorities.add(systemAuthority);
+
             system = new User();
             system.setUsername(UserConstants.SYSTEM_USER_EMAIL);
             system.setEmail(UserConstants.SYSTEM_USER_EMAIL);
@@ -579,6 +587,7 @@ public class UserServiceImpl implements UserService {
             system.setFirstName(UserConstants.SYSTEM_USER_NAME);
             system.setLastName(UserConstants.SYSTEM_USER_SURNAME);
             system.setState(UserState.ACTIVE);
+            system.setAuthoritySet(authorities);
             saveUser(system);
         }
         return system;

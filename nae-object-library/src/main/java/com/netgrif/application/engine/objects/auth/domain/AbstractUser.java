@@ -21,6 +21,12 @@ import org.bson.types.ObjectId;
 public abstract class AbstractUser extends AbstractActor {
 
     /**
+     * todo javadoc The identifier of the workspace associated with the logged user.
+     */
+    // TODO: implement adapter class and mark this attribute as Transient
+    protected String activeWorkspaceId;
+
+    /**
      * Username used for authentication and identification
      */
     @NotNull

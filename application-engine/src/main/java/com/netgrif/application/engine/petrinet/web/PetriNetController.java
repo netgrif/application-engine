@@ -13,6 +13,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingI
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
@@ -104,12 +105,15 @@ public class PetriNetController {
     })
     @PostMapping(value = "/import", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> importPetriNet(
-            @RequestParam(value = "file", required = true) MultipartFile multipartFile,
+            @RequestParam(value = "file") MultipartFile multipartFile,
             @RequestParam(value = "meta", required = false) String releaseType,
+            @RequestParam(value = "workspaceId", required = false) String workspaceId,
             Authentication auth, Locale locale) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
             VersionType release = releaseType == null ? VersionType.MAJOR : VersionType.valueOf(releaseType.trim().toUpperCase());
-            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(multipartFile.getInputStream(), release, (LoggedUser) auth.getPrincipal());
+            ImportPetriNetParams importPetriNetParams = new ImportPetriNetParams(multipartFile.getInputStream(), release, (LoggedUser) auth.getPrincipal());
+            importPetriNetParams.setWorkspaceId(workspaceId);
+            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(importPetriNetParams);
             return EventOutcomeWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully",
                     LocalisedEventOutcomeFactory.from(importPetriNetOutcome, locale));
         } catch (IOException | IllegalArgumentException e) {
