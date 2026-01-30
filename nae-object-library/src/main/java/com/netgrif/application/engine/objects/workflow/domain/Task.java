@@ -327,8 +327,7 @@ public abstract class Task implements Serializable {
         this.viewUsers.clear();
         this.users.forEach((role, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
-                viewUsers.add(role);
-                isModified.set(true);
+                isModified.set(viewUsers.add(role));
             }
         });
         return isModified.get();

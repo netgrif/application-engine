@@ -173,6 +173,8 @@ public class PetriNetService implements IPetriNetService {
     @Transactional
     public ImportPetriNetEventOutcome importPetriNet(ImportPetriNetParams importPetriNetParams) throws IOException,
             MissingPetriNetMetaDataException, MissingIconKeyException {
+        fillAndValidateAttributes(importPetriNetParams);
+
         ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
         ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
         IOUtils.copy(importPetriNetParams.getXmlFile(), xmlCopy);

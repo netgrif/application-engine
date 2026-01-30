@@ -88,7 +88,6 @@ class ExportServiceTest {
                 && headerSplit.contains("immediate_number")
                 && !headerSplit.contains("text"))
         taskService.cancelTask(new TaskParams(exportTask, ActorTransformer.toLoggedUser(userService.getLoggedOrSystem())))
-        taskService.cancelTask(new TaskParams(exportTask, ActorTransformer.toLoggedUser(userService.getLoggedOrSystem())))
     }
 
     @Test

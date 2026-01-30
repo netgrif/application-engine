@@ -324,8 +324,7 @@ public abstract class Case implements Serializable {
         this.viewUsers.clear();
         this.users.forEach((user, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
-                viewUsers.add(user);
-                isModified.set(true);
+                isModified.set(viewUsers.add(user));
             }
         });
         return isModified.get();
