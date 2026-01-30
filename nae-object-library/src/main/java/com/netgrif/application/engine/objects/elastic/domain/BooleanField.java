@@ -12,6 +12,11 @@ public abstract class BooleanField extends DataField {
 
     protected Boolean booleanValue;
 
+    public BooleanField(BooleanField field) {
+        super(field);
+        this.booleanValue = field.booleanValue;
+    }
+
     public BooleanField(Boolean value) {
         super(value.toString());
         this.booleanValue = value;

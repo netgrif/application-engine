@@ -72,6 +72,8 @@ public class DataService implements IDataService {
 
     public static final int MONGO_ID_LENGTH = 24;
 
+    private static final Set<FieldType> setDataForbiddenFieldTypes = Set.of(FieldType.TASK_REF, FieldType.CASE_REF);
+
     @Autowired
     protected ApplicationEventPublisher publisher;
 
@@ -224,6 +226,22 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params) {
+        return setData(task, values, params, false);
+    }
+
+    /**
+     * Updates the data field's attributes of the provided task.
+     *
+     * @param task the task object of which the data are updated
+     * @param values information about how to update the data fields
+     * @param params additional information to be injected to the action delegate context
+     * @param runStrict if set to true, additional validations are going to be applied when updating the data fields. If
+     *                set to false, minimal restrictions are considered.
+     *
+     * @return outcome containing Case, Task and changes that have been made.
+     * */
+    @Override
+    public SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params, boolean runStrict) {
         Case useCase = workflowService.findOne(task.getCaseId());
         AbstractUser user = userService.getLoggedOrSystem();
 
@@ -236,75 +254,98 @@ public class DataService implements IDataService {
         values.fields().forEachRemaining(entry -> {
             String fieldId = entry.getKey();
             DataField dataField = useCase.getDataSet().get(fieldId);
-            if (dataField != null) {
-                Field field = useCase.getPetriNet().getField(fieldId).get();
-                outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task, params));
-                if (outcome.getMessage() == null) {
-                    Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
-                    if (field.getEvents().containsKey(DataEventType.SET) &&
-                            ((DataEvent) field.getEvents().get(DataEventType.SET)).getMessage() != null) {
-                        outcome.setMessage(((DataEvent) field.getEvents().get(DataEventType.SET)).getMessage());
-                    } else if (dataSet.containsKey(fieldId)
-                            && dataSet.get(fieldId).getEvents().containsKey(DataEventType.SET)
-                            && dataSet.get(fieldId).getEvents().get(DataEventType.SET).getMessage() != null) {
-                        outcome.setMessage(dataSet.get(fieldId).getEvents().get(DataEventType.SET).getMessage());
-                    }
-                }
-                boolean modified = false;
-                ChangedField changedField = new ChangedField();
-                changedField.setId(fieldId);
-                Object newValue = parseFieldsValues(entry.getValue(), dataField, task.getStringId());
-                if (entry.getValue().has("value") || getFieldTypeFromNode((ObjectNode) entry.getValue()).equals("button")) {
-                    dataField.setValue(newValue);
-                    changedField.addAttribute("value", newValue);
-                    modified = true;
-                }
-                List<String> allowedNets = parseAllowedNetsValue(entry.getValue());
-                if (allowedNets != null) {
-                    dataField.setAllowedNets(allowedNets);
-                    changedField.addAttribute("allowedNets", allowedNets);
-                    modified = true;
-                }
-                String fieldType = getFieldTypeFromNode((ObjectNode) entry.getValue());
-                Map<String, Object> filterMetadata = parseFilterMetadataValue((ObjectNode) entry.getValue(), fieldType);
-                if (filterMetadata != null) {
-                    dataField.setFilterMetadata(filterMetadata);
-                    changedField.addAttribute("filterMetadata", filterMetadata);
-                    modified = true;
-                }
-                Map<String, I18nString> options = parseOptionsNode(entry.getValue(), fieldType);
-                if (options != null) {
-                    setDataFieldOptions(options, dataField, changedField, fieldType);
-                    modified = true;
-                }
-                Set<I18nString> choices = parseChoicesNode((ObjectNode) entry.getValue(), fieldType);
-                if (choices != null) {
-                    dataField.setChoices(choices);
-                    changedField.addAttribute("choices", choices.stream().map(i18nString -> i18nString.getTranslation(LocaleContextHolder.getLocale())).collect(Collectors.toSet()));
-                    modified = true;
-                }
-                Map<String, String> properties = parseProperties(entry.getValue());
-                if (properties != null) {
-                    outcome.addOutcome(this.changeComponentProperties(useCase, task, field.getStringId(), properties));
-                    modified = true;
-                }
-                if (modified) {
-                    dataField.setLastModified(LocalDateTime.now());
-                }
-                if (dataConfigurationProperties.getValidation().isSetDataEnabled()) {
-                    validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), dataField);
-                }
-                outcome.addChangedField(fieldId, changedField);
-                workflowService.save(useCase);
-                publisher.publishEvent(new SetDataEvent(outcome, EventPhase.PRE, user));
-                outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, params));
-                applyFieldConnectedChanges(useCase, field);
+            if (dataField == null) {
+                return;
             }
+            if (runStrict) {
+                if (!isDataFieldEditable(dataField, task.getTransitionId())) {
+                    throw new IllegalArgumentException("Cannot edit data field [" + fieldId + "], which is not editable on transition [" + task.getTransitionId() + "].");
+                }
+                Field<?> field = useCase.getField(fieldId);
+                if (field == null) {
+                    throw new IllegalArgumentException("Such field with id [" + fieldId + "] does not exist in petri net [" + useCase.getPetriNetId() + "]");
+                }
+                if (setDataForbiddenFieldTypes.contains(field.getType())) {
+                    return;
+                }
+            }
+
+            Field field = useCase.getPetriNet().getField(fieldId).get();
+            outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task, params));
+            if (outcome.getMessage() == null) {
+                Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
+                if (field.getEvents().containsKey(DataEventType.SET) &&
+                        ((DataEvent) field.getEvents().get(DataEventType.SET)).getMessage() != null) {
+                    outcome.setMessage(((DataEvent) field.getEvents().get(DataEventType.SET)).getMessage());
+                } else if (dataSet.containsKey(fieldId)
+                        && dataSet.get(fieldId).getEvents().containsKey(DataEventType.SET)
+                        && dataSet.get(fieldId).getEvents().get(DataEventType.SET).getMessage() != null) {
+                    outcome.setMessage(dataSet.get(fieldId).getEvents().get(DataEventType.SET).getMessage());
+                }
+            }
+            boolean modified = false;
+            ChangedField changedField = new ChangedField();
+            changedField.setId(fieldId);
+            Object newValue = parseFieldsValues(entry.getValue(), dataField, task.getStringId());
+            if (entry.getValue().has("value") || getFieldTypeFromNode((ObjectNode) entry.getValue()).equals("button")) {
+                dataField.setValue(newValue);
+                changedField.addAttribute("value", newValue);
+                modified = true;
+            }
+            List<String> allowedNets = parseAllowedNetsValue(entry.getValue());
+            if (allowedNets != null) {
+                dataField.setAllowedNets(allowedNets);
+                changedField.addAttribute("allowedNets", allowedNets);
+                modified = true;
+            }
+            String fieldType = getFieldTypeFromNode((ObjectNode) entry.getValue());
+            Map<String, Object> filterMetadata = parseFilterMetadataValue((ObjectNode) entry.getValue(), fieldType);
+            if (filterMetadata != null) {
+                dataField.setFilterMetadata(filterMetadata);
+                changedField.addAttribute("filterMetadata", filterMetadata);
+                modified = true;
+            }
+            Map<String, I18nString> options = parseOptionsNode(entry.getValue(), fieldType);
+            if (options != null) {
+                setDataFieldOptions(options, dataField, changedField, fieldType);
+                modified = true;
+            }
+            Set<I18nString> choices = parseChoicesNode((ObjectNode) entry.getValue(), fieldType);
+            if (choices != null) {
+                dataField.setChoices(choices);
+                changedField.addAttribute("choices", choices.stream().map(i18nString -> i18nString.getTranslation(LocaleContextHolder.getLocale())).collect(Collectors.toSet()));
+                modified = true;
+            }
+            Map<String, String> properties = parseProperties(entry.getValue());
+            if (properties != null) {
+                outcome.addOutcome(this.changeComponentProperties(useCase, task, field.getStringId(), properties));
+                modified = true;
+            }
+            if (modified) {
+                dataField.setLastModified(LocalDateTime.now());
+            }
+            if (dataConfigurationProperties.getValidation().isSetDataEnabled()) {
+                validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), dataField);
+            }
+            outcome.addChangedField(fieldId, changedField);
+            workflowService.save(useCase);
+            publisher.publishEvent(new SetDataEvent(outcome, EventPhase.PRE, user));
+            outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, params));
+            applyFieldConnectedChanges(useCase, field);
         });
         updateDataset(useCase);
         outcome.setCase(workflowService.save(useCase));
         publisher.publishEvent(new SetDataEvent(outcome));
         return outcome;
+    }
+
+    private boolean isDataFieldEditable(DataField dataField, String transId) {
+        Map<String, Set<FieldBehavior>> behaviorMap = dataField.getBehavior();
+        if (behaviorMap == null) {
+            return false;
+        }
+        Set<FieldBehavior> behaviorSet = behaviorMap.get(transId);
+        return behaviorSet != null && behaviorSet.contains(FieldBehavior.EDITABLE);
     }
 
     @Override

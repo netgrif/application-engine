@@ -15,6 +15,10 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 @EqualsAndHashCode(callSuper = true)
 public class ButtonField extends com.netgrif.application.engine.objects.elastic.domain.ButtonField {
 
+    public ButtonField(ButtonField field) {
+        super(field);
+    }
+
     public ButtonField(Integer value) {
         super(value);
     }

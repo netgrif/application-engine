@@ -21,6 +21,10 @@ public class StringCollectionField extends com.netgrif.application.engine.object
         super(Arrays.asList(values));
     }
 
+    public StringCollectionField(StringCollectionField field) {
+        super(field);
+    }
+
     public StringCollectionField(List<String> values) {
         super(values);
     }

@@ -14,6 +14,10 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 @NoArgsConstructor
 public class DateField extends com.netgrif.application.engine.objects.elastic.domain.DateField {
 
+    public DateField(DateField field) {
+        super(field);
+    }
+
     public DateField(String value, LocalDateTime dateTime) {
         super(value, dateTime);
     }

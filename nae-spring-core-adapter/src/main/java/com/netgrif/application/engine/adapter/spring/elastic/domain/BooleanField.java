@@ -14,6 +14,11 @@ public class BooleanField extends com.netgrif.application.engine.objects.elastic
     @Field(type = Boolean)
     public Boolean booleanValue;
 
+    public BooleanField(BooleanField field) {
+        super(field);
+        this.booleanValue = field.booleanValue;
+    }
+
     public BooleanField(Boolean value) {
         super(value);
         this.booleanValue = value;

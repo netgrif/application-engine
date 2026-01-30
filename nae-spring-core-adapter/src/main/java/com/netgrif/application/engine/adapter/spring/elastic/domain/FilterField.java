@@ -17,6 +17,10 @@ public class FilterField extends com.netgrif.application.engine.objects.elastic.
         this(value, Arrays.asList(allowedNets), filterMetadata);
     }
 
+    public FilterField(FilterField field) {
+        super(field);
+    }
+
     public FilterField(String value, List<String> allowedNets, Map<String, Object> filterMetadata) {
         super(value, allowedNets, filterMetadata);
     }

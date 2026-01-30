@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.objects.elastic.domain;
 
+import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
+import com.netgrif.application.engine.objects.utils.CopyConstructorUtil;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
@@ -102,27 +104,44 @@ public abstract class ElasticCase implements Serializable {
         viewActors = new HashSet<>(useCase.getViewActors());
         negativeViewActors = new HashSet<>(useCase.getNegativeViewActors());
         tags = new HashMap<>(useCase.getTags());
-
+        permissions = deepCopy(useCase.getPermissions());
+        actors = deepCopy(useCase.getActors());
+        actorRefs = deepCopy(useCase.getActorRefs());
         dataSet = new HashMap<>();
-        immediateData = useCase.getImmediateData().stream().map(ImmediateField::new).collect(Collectors.toList());
+        immediateData = useCase.getImmediateData() == null ? Collections.emptyList() : useCase.getImmediateData().stream().map(ImmediateField::new).collect(Collectors.toList());
     }
 
     public void update(ElasticCase useCase) {
         version++;
         lastModified = useCase.getLastModified();
         title = useCase.getTitle();
-        taskIds = useCase.getTaskIds();
-        taskMongoIds = useCase.getTaskMongoIds();
-        tasks = useCase.getTasks();
-        enabledRoles = useCase.getEnabledRoles();
-        viewRoles = useCase.getViewRoles();
-        viewActorRefs = useCase.getViewActorRefs();
-        negativeViewRoles = useCase.getNegativeViewRoles();
-        viewActors = useCase.getViewActors();
-        negativeViewActors = useCase.getNegativeViewActors();
-        tags = useCase.getTags();
+        taskIds = useCase.getTaskIds() == null ? new HashSet<>() : new HashSet<>(useCase.getTaskIds());
+        taskMongoIds = useCase.getTaskMongoIds() == null ? new HashSet<>() : new HashSet<>(useCase.getTaskMongoIds());
+        tasks = useCase.getTasks() == null ? new HashSet<>() : useCase.getTasks().stream()
+                .map(tp -> new ElasticTaskPair(tp.getTask(), tp.getTransition()))
+                .collect(Collectors.toSet());
+        enabledRoles = useCase.getEnabledRoles() == null ? new HashSet<>() : new HashSet<>(useCase.getEnabledRoles());
+        viewRoles = useCase.getViewRoles() == null ? new HashSet<>() : new HashSet<>(useCase.getViewRoles());
+        viewActorRefs = useCase.getViewActorRefs() == null ? new HashSet<>() : new HashSet<>(useCase.getViewActorRefs());
+        negativeViewRoles = useCase.getNegativeViewRoles() == null ? new HashSet<>() : new HashSet<>(useCase.getNegativeViewRoles());
+        viewActors = useCase.getViewActors() == null ? new HashSet<>() : new HashSet<>(useCase.getViewActors());
+        negativeViewActors = useCase.getNegativeViewActors() == null ? new HashSet<>() : new HashSet<>(useCase.getNegativeViewActors());
+        tags = useCase.getTags() == null ? new HashMap<>() : new HashMap<>(useCase.getTags());
+        permissions = deepCopy(useCase.getPermissions());
+        actors = deepCopy(useCase.getActors());
+        actorRefs = deepCopy(useCase.getActorRefs());
+        dataSet = useCase.getDataSet() == null ? new HashMap<>() : useCase.getDataSet().entrySet().stream()
+                .filter(entry -> entry.getValue() != null)
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> CopyConstructorUtil.copy(entry.getValue().getClass(), entry.getValue())));
+        immediateData = useCase.getImmediateData() == null ? new ArrayList<>() : useCase.getImmediateData().stream()
+                .map(field -> new ImmediateField(field.getStringId(), new I18nString(field.getName()), field.getType()))
+                .collect(Collectors.toList());
+    }
 
-        dataSet = useCase.getDataSet();
-        immediateData = useCase.getImmediateData();
+    private static Map<String, Map<String, Boolean>> deepCopy(Map<String, Map<String, Boolean>> map) {
+        if (map == null || map.isEmpty()) {
+            return new HashMap<>();
+        }
+        return map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue() == null ? new HashMap<>() : new HashMap<>(e.getValue())));
     }
 }

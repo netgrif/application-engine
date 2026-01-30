@@ -18,6 +18,10 @@ public abstract class DataField implements Serializable {
 
     protected List<String> fulltextValue = new ArrayList<>();
 
+    DataField(DataField dataField) {
+        this(dataField.fulltextValue == null ? new ArrayList<>() : new ArrayList<>(dataField.fulltextValue));
+    }
+
     DataField(String fulltextValue) {
         this(List.of(fulltextValue));
     }

@@ -20,6 +20,8 @@ public class PetriNetSearch {
 
     private String defaultCaseName;
 
+    private Boolean defaultVersion;
+
     private String initials;
 
     private List<String> group;

@@ -4,6 +4,7 @@ import com.netgrif.application.engine.objects.elastic.domain.*;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.TaskField;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -75,6 +76,8 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return this.transformFilterFieldField(caseField, (com.netgrif.application.engine.objects.petrinet.domain.dataset.FilterField) netField);
         } else if (netField instanceof com.netgrif.application.engine.objects.petrinet.domain.dataset.StringCollectionField) {
             return this.transformStringCollectionField(caseField, (com.netgrif.application.engine.objects.petrinet.domain.dataset.StringCollectionField) netField);
+        } else if (netField instanceof com.netgrif.application.engine.objects.petrinet.domain.dataset.TaskField) {
+            return this.transformTaskField(caseField);
         } else {
             String string = caseField.getValue().toString();
             if (string == null)
@@ -226,6 +229,11 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
                 .map(ActorFieldValue::buildMappingData)
                 .toList();
         return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.ActorListField(actorMappingDataList));
+    }
+
+    protected Optional<DataField> transformTaskField(com.netgrif.application.engine.objects.workflow.domain.DataField dataField) {
+        String[] referencedTasks = ((List<String>) dataField.getValue()).toArray(new String[0]);
+        return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.TaskField(referencedTasks));
     }
 
     protected Optional<DataField> transformDateField

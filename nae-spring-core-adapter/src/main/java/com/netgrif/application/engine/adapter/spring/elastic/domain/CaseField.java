@@ -16,6 +16,10 @@ public class CaseField extends com.netgrif.application.engine.objects.elastic.do
         this(Arrays.asList(values), Arrays.asList(allowedNets));
     }
 
+    public CaseField(CaseField field) {
+        super(field);
+    }
+
     public CaseField(List<String> values, List<String> allowedNets) {
         super(values, allowedNets);
     }

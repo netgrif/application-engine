@@ -15,6 +15,12 @@ public abstract class I18nField extends TextField {
     protected Set<String> keyValue;
     protected Map<String, String> translations;
 
+    public I18nField(I18nField field) {
+        super(field);
+        this.keyValue = field.keyValue == null ? null : new HashSet<>(field.keyValue);
+        this.translations = field.translations == null ? null : new HashMap<>(field.translations);
+    }
+
     public I18nField(Set<String> keys, Set<String> values, Map<String, String> translations) {
         super(new ArrayList<>(values));
         this.keyValue = keys;

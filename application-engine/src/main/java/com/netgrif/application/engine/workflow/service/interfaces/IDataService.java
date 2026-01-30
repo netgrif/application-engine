@@ -41,6 +41,8 @@ public interface IDataService {
 
     SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params);
 
+    SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params, boolean runStrict);
+
     FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview) throws FileNotFoundException;
 
     FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview, Map<String, String> params) throws FileNotFoundException;
