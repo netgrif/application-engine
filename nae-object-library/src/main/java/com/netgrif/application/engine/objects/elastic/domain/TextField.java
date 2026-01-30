@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -15,7 +16,7 @@ public abstract class TextField extends DataField {
 
     public TextField(TextField field) {
         super(field);
-        this.textValue = field.textValue == null ? null : field.textValue.clone();
+        this.textValue = field.textValue == null ? null : new ArrayList<>(field.textValue);
     }
 
     public TextField(String value) {

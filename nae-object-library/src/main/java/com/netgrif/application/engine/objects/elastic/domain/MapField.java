@@ -18,7 +18,7 @@ public abstract class MapField extends TextField {
 
     public MapField(MapField field) {
         super(field);
-        this.keyValue = field.keyValue == null ? null : Arrays.copyOf(field.keyValue, field.keyValue.length);
+        this.keyValue = field.keyValue == null ? null : new ArrayList<>(field.keyValue);
         this.keyValueTranslations = field.keyValueTranslations == null ? null
                 : field.keyValueTranslations.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> new I18nString(entry.getValue())));

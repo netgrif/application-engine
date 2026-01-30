@@ -22,7 +22,7 @@ public abstract class FilterField extends FieldWithAllowedNetsField {
 
     public FilterField(String fullTextValue, List<String> allowedNets, Map<String, Object> filterMetadata) {
         super(fullTextValue, allowedNets);
-        this.filterMetadata = filterMetadata != null ? filterMetadata : null;
+        this.filterMetadata = filterMetadata;
     }
 
     @Override
