@@ -5,7 +5,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
-    <version>6.4.0-TEMP.4</version>
+    <version>6.4.0-TEMP.5</version>
     <packaging>jar</packaging>
 
     <name>NETGRIF Application Engine</name>
@@ -425,7 +425,7 @@
         <dependency>
             <groupId>com.netgrif</groupId>
             <artifactId>quartz-mongodb-connector</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.1</version>
         </dependency>
 
         <!-- OpenAPI 3 / Swagger Docs -->
