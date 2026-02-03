@@ -3,9 +3,11 @@ package com.netgrif.application.engine.workflow
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
 import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
 import com.netgrif.application.engine.objects.auth.domain.User
@@ -19,6 +21,7 @@ import com.netgrif.application.engine.objects.workflow.domain.DataField
 import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.security.service.SecurityContextService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.utils.FullPageRequest
@@ -37,6 +40,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Page
 import org.springframework.mock.web.MockMultipartFile
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
@@ -102,15 +107,21 @@ class TaskControllerTest {
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
-        userService.saveUser(new User(
+        def user = new User(
                 firstName: "Dummy",
                 lastName: "Netgrif",
                 username: DUMMY_USER_MAIL,
                 email: DUMMY_USER_MAIL,
                 password: "superAdminPassword",
                 state: UserState.ACTIVE,
-                authoritySet: [authorityService.getOrCreate(Authority.user)] as Set<Authority>,
-                processRoles: [] as Set<ProcessRole>), null)
+                authoritySet: [authorityService.getOrCreate(Authority.user), authorityService.getOrCreate(Authority.admin)] as Set<Authority>,
+                processRoles: [] as Set<ProcessRole>)
+
+        user = userService.saveUser(user)
+
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(user), ActorTransformer.toLoggedUser(user).getPassword(), ActorTransformer.toLoggedUser(user).getAuthoritySet() as Set<AuthorityImpl>);
+        SecurityContextHolder.getContext().setAuthentication(token)
+
         importNets()
     }
 

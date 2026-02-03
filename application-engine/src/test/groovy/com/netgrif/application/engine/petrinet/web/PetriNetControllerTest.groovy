@@ -94,7 +94,7 @@ class PetriNetControllerTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
-        def simpleUser = importHelper.createUser(new User(firstName: "Role", lastName: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        def simpleUser = importHelper.createUser(new User(username: "simple", firstName: "Role", lastName: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])
@@ -102,7 +102,7 @@ class PetriNetControllerTest {
         userAuth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(simpleUser), "password",  [auths.get("user")] as List<AuthorityImpl>)
         userAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        def adminUser = importHelper.createUser(new User(firstName: "Admin", lastName: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
+        def adminUser = importHelper.createUser(new User(username: "admin", firstName: "Admin", lastName: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("admin")] as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])
