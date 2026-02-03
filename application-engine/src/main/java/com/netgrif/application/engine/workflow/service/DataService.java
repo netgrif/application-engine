@@ -155,7 +155,7 @@ public class DataService implements IDataService {
         fieldsIds.forEach(fieldId -> {
             if (isForbidden(fieldId, transition, useCase.getDataField(fieldId)))
                 return;
-            Field field = useCase.getPetriNet().getField(fieldId).orElseThrow(() -> new IllegalStateException("Field with id [%s] is missing from process with id [%s]"
+            Field<?> field = useCase.getPetriNet().getField(fieldId).orElseThrow(() -> new IllegalStateException("Field with id [%s] is missing from process with id [%s]"
                     .formatted(fieldId, useCase.getPetriNetId())));
             if (eventsEnabled) {
                 outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, params));
@@ -164,8 +164,8 @@ public class DataService implements IDataService {
 
             if (outcome.getMessage() == null) {
                 if (field.getEvents().containsKey(DataEventType.GET)
-                        &&((DataEvent) field.getEvents().get(DataEventType.GET)).getMessage() != null) {
-                    outcome.setMessage(((DataEvent) field.getEvents().get(DataEventType.GET)).getMessage());
+                        && field.getEvents().get(DataEventType.GET).getMessage() != null) {
+                    outcome.setMessage(field.getEvents().get(DataEventType.GET).getMessage());
                 } else {
                     Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
                     DataFieldLogic dataRef = dataSet.get(fieldId);
