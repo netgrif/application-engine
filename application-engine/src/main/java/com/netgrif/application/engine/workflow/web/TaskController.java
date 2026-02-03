@@ -20,6 +20,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -76,7 +78,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Override
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Get tasks of the case", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = {"/case/{id}", "/public/case/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<TaskReference> getTasksOfCase(@PathVariable("id") String caseId, Locale locale) {
