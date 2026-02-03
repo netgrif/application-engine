@@ -1,127 +1,111 @@
 package com.netgrif.application.engine.configuration.security;
 
-import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl;
+import com.netgrif.application.engine.adapter.spring.auth.domain.AnonymousUser;
+import com.netgrif.application.engine.adapter.spring.auth.domain.AnonymousUserRef;
+import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
+import com.netgrif.application.engine.adapter.spring.configuration.filters.NetgrifOncePerRequestFilter;
+import com.netgrif.application.engine.adapter.spring.configuration.filters.requests.NetgrifHttpServletRequest;
+import com.netgrif.application.engine.auth.service.AnonymousUserRefService;
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.auth.service.AuthorityService;
-import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
-import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
+import com.netgrif.application.engine.utils.HttpReqRespUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
-import org.springframework.security.authentication.AnonymousAuthenticationProvider;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.AuthenticationDetailsSource;
-import org.springframework.security.authentication.ProviderManager;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
-public class PublicAuthenticationFilter extends OncePerRequestFilter {
+@Component
+public class PublicAuthenticationFilter extends NetgrifOncePerRequestFilter {
 
-    private final static String JWT_HEADER_NAME = "X-Jwt-Token";
-    private final static String BEARER = "Bearer ";
-    private final static String USER = "user";
-    private final ProviderManager authenticationManager;
-    private final AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
-    private final String[] anonymousAccessUrls;
-    private final String[] exceptions;
-
-    private final IJwtService jwtService;
-    private final UserService userService;
+    private final AnonymousUserRefService anonymousUserRefService;
     private final AuthorityService authorityService;
 
-    public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider,
-                                      String[] urls, String[] exceptions, IJwtService jwtService,
-                                      UserService userService, AuthorityService authorityService) {
-        this.authenticationManager = authenticationManager;
-        this.authenticationManager.getProviders().add(provider);
-        this.anonymousAccessUrls = urls;
-        this.exceptions = exceptions;
-        this.jwtService = jwtService;
-        this.userService = userService;
+    public PublicAuthenticationFilter(AnonymousUserRefService anonymousUserRefService,
+                                      AuthorityService authorityService,
+                                      SecurityConfigurationProperties securityConfigurationProperties) {
+        this.anonymousUserRefService = anonymousUserRefService;
         this.authorityService = authorityService;
+        setRequestMatcher(Arrays.stream(securityConfigurationProperties.getServerPatterns()).map(AntPathRequestMatcher::new).collect(Collectors.toSet()));
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (isPublicApi(request.getRequestURI())) {
-            String jwtToken = resolveValidToken(request, response);
-            authenticate(request, jwtToken);
-            response.setHeader(JWT_HEADER_NAME, BEARER + jwtToken);
-            log.info("Anonymous user was authenticated.");
+    protected void doFilterInternal(NetgrifHttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        String path = request.getRequestURI();
+        log.trace("PublicAnonymousAuthFilter handling {}", path);
+
+        Authentication current = SecurityContextHolder.getContext().getAuthentication();
+        if (current != null && current.isAuthenticated()) {
+            log.debug("Existing authenticated principal: {}", current.getPrincipal());
+            filterChain.doFilter(request, response);
+            return;
         }
+
+        Realm realm = HttpReqRespUtils.extractRealmFromRequest(request);
+        if (realm == null) {
+            log.debug("Realm unavailable for public request; skipping anon auth");
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        log.debug("Loaded realm {} (publicAccess={})", realm.getName(), realm.isPublicAccess());
+        if (!realm.isPublicAccess()) {
+            log.debug("Public access disabled for realm {}; skipping anon auth", realm.getName());
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        try {
+            log.trace("Performing anonymous public auth for realm {}", realm.getName());
+            Optional<AnonymousUserRef> refOpt = anonymousUserRefService.getRef(realm.getName());
+            if (refOpt.isEmpty()) {
+                log.debug("AnonymousUserRef missing for realm {}; skipping anon auth", realm.getName());
+                filterChain.doFilter(request, response);
+                return;
+            }
+            AnonymousUserRef ref = refOpt.get();
+            Authority anonAuthority = authorityService.getOrCreate(Authority.anonymous);
+            log.debug("Using AnonymousUserRef id {} for realm {}", ref.getId(), realm.getName());
+
+            AnonymousUser anonymousUser = new AnonymousUser(ref, anonAuthority);
+            LoggedUserImpl userDetails = (LoggedUserImpl) ActorTransformer.toLoggedUser(anonymousUser);
+            userDetails.setSessionTimeout(realm.getPublicSessionTimeout());
+            log.debug("Created anonymous user details for user: {}", userDetails.getUsername());
+
+            AnonymousAuthenticationToken token = new AnonymousAuthenticationToken(
+                    "engine",
+                    userDetails,
+                    userDetails.getAuthorities()
+            );
+            token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(token);
+            log.debug("Anonymous public auth succeeded for realm {}", realm.getName());
+        } catch (Exception ex) {
+            log.debug("Anonymous public auth failed for realm {}: {}", realm.getName(), ex.getMessage(), ex);
+        }
+
         filterChain.doFilter(request, response);
     }
 
-    private void authenticate(HttpServletRequest request, String jwtToken) {
-        AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(
-                "anonymous-user",
-                jwtService.getLoggedUser(jwtToken, Authority.anonymous),
-                Collections.singleton((AuthorityImpl) authorityService.getOrCreate(Authority.anonymous))
-        );
-        authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
-        Authentication authResult = this.authenticationManager.authenticate(authRequest);
-        SecurityContextHolder.getContext().setAuthentication(authResult);
-    }
-
-    private String resolveValidToken(HttpServletRequest request, HttpServletResponse response) {
-        String jwtHeader = request.getHeader(JWT_HEADER_NAME);
-        String jwtToken = null;
-
-        if (jwtHeader == null || !jwtHeader.startsWith(BEARER)) {
-            log.warn("There is no JWT token or token is invalid.");
-            LoggedUser loggedUser = resolveLoggedUser(jwtToken);
-            jwtToken = jwtService.tokenFrom(Collections.emptyMap(), loggedUser.getUsername(), Map.of(USER, loggedUser));
-        } else {
-            jwtToken = jwtHeader.replace(BEARER, "");
-        }
-
-        if (jwtService.isTokenExpired(jwtToken)) {
-            LoggedUser loggedUser = resolveLoggedUser(jwtToken);
-            jwtToken = jwtService.tokenFrom(Collections.emptyMap(), loggedUser.getUsername(), Map.of(USER, loggedUser));
-        }
-        return jwtToken;
-    }
-
-    private LoggedUser resolveLoggedUser(String existingToken) {
-        LoggedUser loggedUser;
-        if (existingToken != null) {
-            loggedUser = jwtService.getLoggedUser(existingToken, Authority.anonymous);
-        } else {
-            loggedUser = createAnonymousUser();
-        }
-        loggedUser.setPassword("N/A");
-        return loggedUser;
-    }
-
-    private LoggedUser createAnonymousUser() {
-        User anonymousUser = new User();
-        anonymousUser.setState(UserState.ACTIVE);
-        anonymousUser = (User) userService.saveUser(anonymousUser, null);
-        return ActorTransformer.toLoggedUser(anonymousUser);
-    }
-
-    private boolean isPublicApi(String path) {
-        for (String url : this.anonymousAccessUrls) {
-            if (path.matches(url.replace("*", ".*?"))) {
-                for (String ex : this.exceptions) {
-                    if (path.matches(ex.replace("*", ".*?"))) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
+    @Bean
+    public FilterRegistrationBean<PublicAuthenticationFilter> publicAnonymousAuthFilterFilterRegistrationBean(PublicAuthenticationFilter filter) {
+        FilterRegistrationBean<PublicAuthenticationFilter> registration = new FilterRegistrationBean<>(filter);
+        registration.setEnabled(false);
+        return registration;
     }
 }

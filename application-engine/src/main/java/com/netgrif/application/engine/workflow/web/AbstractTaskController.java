@@ -3,12 +3,16 @@ package com.netgrif.application.engine.workflow.web;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedField;
+import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
+import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.IllegalArgumentWithChangedFieldsException;
@@ -25,6 +29,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.web.responsebodies.*;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -47,6 +52,7 @@ import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 public abstract class AbstractTaskController {
 
     public static final Logger log = LoggerFactory.getLogger(TaskController.class);
@@ -61,32 +67,20 @@ public abstract class AbstractTaskController {
 
     private final UserService userService;
 
-    public AbstractTaskController(ITaskService taskService,
-                                  IDataService dataService,
-                                  IElasticTaskService searchService,
-                                  IWorkflowService workflowService,
-                                  UserService userService) {
-        this.taskService = taskService;
-        this.dataService = dataService;
-        this.searchService = searchService;
-        this.workflowService = workflowService;
-        this.userService = userService;
-    }
-
-
-    public PagedModel<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        Page<Task> page = taskService.getAll(loggedUser, pageable, locale);
+    public PagedModel<LocalisedTaskResource> getAll(Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
+        Page<Task> page = taskService.search(Collections.emptyList(), pageable, loggedUser, locale, Boolean.FALSE);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .getAll(auth, pageable, assembler, locale)).withRel("all");
+                .getAll(pageable, assembler, locale)).withRel("all");
         PagedModel<LocalisedTaskResource> resources = assembler.toModel(page, new TaskResourceAssembler(locale), selfLink);
         ResourceLinkAssembler.addLinks(resources, Task.class, selfLink.getRel().toString());
         return PagedModel.of(page.stream().map(t -> new LocalisedTaskResource(new com.netgrif.application.engine.workflow.web.responsebodies.Task(t, locale))).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), page.getTotalElements()));
     }
 
     public PagedModel<LocalisedTaskResource> getAllByCases(List<String> cases, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        Page<Task> page = taskService.findByCases(pageable, cases);
-
+        List<TaskSearchRequest> requests = cases.stream().map(c -> TaskSearchRequest.from().useCase(List.of(TaskSearchCaseRequest.builder().id(c).build())).build()).toList();
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
+        Page<Task> page = taskService.search(requests, pageable, loggedUser, locale, false);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .getAllByCases(cases, pageable, assembler, locale)).withRel("case");
         PagedModel<LocalisedTaskResource> resources = assembler.toModel(page, new TaskResourceAssembler(locale), selfLink);
@@ -105,8 +99,9 @@ public abstract class AbstractTaskController {
         return new LocalisedTaskResource(new com.netgrif.application.engine.workflow.web.responsebodies.Task(task, locale));
     }
 
-    public EntityModel<EventOutcomeWithMessage> assign(LoggedUser loggedUser, String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> assign(String taskId, Locale locale) {
         try {
+            LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getName(),
                     LocalisedEventOutcomeFactory.from(taskService.assignTask(loggedUser, taskId), locale));
         } catch (TransitionNotExecutableException e) {
@@ -115,8 +110,9 @@ public abstract class AbstractTaskController {
         }
     }
 
-    public EntityModel<EventOutcomeWithMessage> delegate(LoggedUser loggedUser, String taskId, String delegatedId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> delegate(String taskId, String delegatedId, Locale locale) {
         try {
+            LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]",
                     LocalisedEventOutcomeFactory.from(taskService.delegateTask(loggedUser, delegatedId, taskId), locale));
         } catch (Exception e) {
@@ -125,9 +121,9 @@ public abstract class AbstractTaskController {
         }
     }
 
-    public EntityModel<EventOutcomeWithMessage> finish(LoggedUser loggedUser, String taskId, Locale locale) {
-
+    public EntityModel<EventOutcomeWithMessage> finish(String taskId, Locale locale) {
         try {
+            LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " finished",
                     LocalisedEventOutcomeFactory.from(taskService.finishTask(loggedUser, taskId), locale));
         } catch (Exception e) {
@@ -140,8 +136,9 @@ public abstract class AbstractTaskController {
         }
     }
 
-    public EntityModel<EventOutcomeWithMessage> cancel(LoggedUser loggedUser, String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> cancel(String taskId, Locale locale) {
         try {
+            LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " canceled",
                     LocalisedEventOutcomeFactory.from(taskService.cancelTask(loggedUser, taskId), locale));
         } catch (Exception e) {
@@ -154,53 +151,56 @@ public abstract class AbstractTaskController {
         }
     }
 
-    public PagedModel<LocalisedTaskResource> getMy(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        Page<Task> page = taskService.findByUser(pageable, userService.transformToUser(((LoggedUserImpl) auth.getPrincipal())));
+    public PagedModel<LocalisedTaskResource> getMy(Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        Page<Task> page = taskService.findByUser(pageable, userService.getLoggedUser());
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .getMy(auth, pageable, assembler, locale)).withRel("my");
+                .getMy(pageable, assembler, locale)).withRel("my");
         PagedModel<LocalisedTaskResource> resources = assembler.toModel(page, new TaskResourceAssembler(locale), selfLink);
         ResourceLinkAssembler.addLinks(resources, Task.class, selfLink.getRel().toString());
         return PagedModel.of(page.stream().map(t -> new LocalisedTaskResource(new com.netgrif.application.engine.workflow.web.responsebodies.Task(t, locale))).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), page.getTotalElements()));
     }
 
-    public PagedModel<LocalisedTaskResource> getMyFinished(Pageable pageable, Authentication auth, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        Page<Task> page = taskService.findByUser(pageable, userService.transformToUser(((LoggedUserImpl) auth.getPrincipal())));
+    public PagedModel<LocalisedTaskResource> getMyFinished(Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        Page<Task> page = taskService.findByUser(pageable, userService.getLoggedUser());
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .getMyFinished(pageable, auth, assembler, locale)).withRel("finished");
+                .getMyFinished(pageable, assembler, locale)).withRel("finished");
         PagedModel<LocalisedTaskResource> resources = assembler.toModel(page, new TaskResourceAssembler(locale), selfLink);
         ResourceLinkAssembler.addLinks(resources, Task.class, selfLink.getRel().toString());
         return PagedModel.of(page.stream().map(t -> new LocalisedTaskResource(new com.netgrif.application.engine.workflow.web.responsebodies.Task(t, locale))).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), page.getTotalElements()));
     }
 
-    public PagedModel<LocalisedTaskResource> search(Authentication auth, Pageable pageable, SingleTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        Page<Task> tasks = taskService.search(searchBody.getList(), pageable, (LoggedUser) auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);
-        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .search(auth, pageable, searchBody, operation, assembler, locale)).withRel("search");
-        PagedModel<LocalisedTaskResource> resources = assembler.toModel(tasks, new TaskResourceAssembler(locale), selfLink);
-        ResourceLinkAssembler.addLinks(resources, Task.class, selfLink.getRel().toString());
-        return PagedModel.of(tasks.stream().map(t -> new LocalisedTaskResource(new com.netgrif.application.engine.workflow.web.responsebodies.Task(t, locale))).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), tasks.getTotalElements()));
-    }
-
-    public PagedModel<LocalisedTaskResource> searchPublic(LoggedUser loggedUser, Pageable pageable, SingleTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
+    public PagedModel<LocalisedTaskResource> search(Pageable pageable, SingleTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
         Page<Task> tasks = taskService.search(searchBody.getList(), pageable, loggedUser, locale, operation == MergeFilterOperation.AND);
-        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicTaskController.class)
-                .searchPublic(loggedUser, pageable, searchBody, operation, assembler, locale)).withRel("search");
-        PagedModel<LocalisedTaskResource> resources = assembler.toModel(tasks, new TaskResourceAssembler(locale), selfLink);
-        ResourceLinkAssembler.addLinks(resources, Task.class, selfLink.getRel().toString());
-        return PagedModel.of(tasks.stream().map(t -> new LocalisedTaskResource(new com.netgrif.application.engine.workflow.web.responsebodies.Task(t, locale))).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), tasks.getTotalElements()));
-    }
-
-    public PagedModel<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, SingleElasticTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        Page<Task> tasks = searchService.search(searchBody.getList(), (LoggedUser) auth.getPrincipal(), pageable, locale, operation == MergeFilterOperation.AND);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .searchElastic(auth, pageable, searchBody, operation, assembler, locale)).withRel("search_es");
+                .search(pageable, searchBody, operation, assembler, locale)).withRel("search");
         PagedModel<LocalisedTaskResource> resources = assembler.toModel(tasks, new TaskResourceAssembler(locale), selfLink);
         ResourceLinkAssembler.addLinks(resources, Task.class, selfLink.getRel().toString());
         return PagedModel.of(tasks.stream().map(t -> new LocalisedTaskResource(new com.netgrif.application.engine.workflow.web.responsebodies.Task(t, locale))).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), tasks.getTotalElements()));
     }
 
-    public CountResponse count(SingleElasticTaskSearchRequestAsList query, MergeFilterOperation operation, Authentication auth, Locale locale) {
-        long count = searchService.count(query.getList(), (LoggedUser) auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);
+//    public PagedModel<LocalisedTaskResource> searchPublic(LoggedUser loggedUser, Pageable pageable, SingleTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
+//        Page<Task> tasks = taskService.search(searchBody.getList(), pageable, loggedUser, locale, operation == MergeFilterOperation.AND);
+//        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicTaskController.class)
+//                .searchPublic(loggedUser, pageable, searchBody, operation, assembler, locale)).withRel("search");
+//        PagedModel<LocalisedTaskResource> resources = assembler.toModel(tasks, new TaskResourceAssembler(locale), selfLink);
+//        ResourceLinkAssembler.addLinks(resources, Task.class, selfLink.getRel().toString());
+//        return PagedModel.of(tasks.stream().map(t -> new LocalisedTaskResource(new com.netgrif.application.engine.workflow.web.responsebodies.Task(t, locale))).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), tasks.getTotalElements()));
+//    }
+
+    public PagedModel<LocalisedTaskResource> searchElastic(Pageable pageable, SingleElasticTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
+        Page<Task> tasks = searchService.search(searchBody.getList(), loggedUser, pageable, locale, operation == MergeFilterOperation.AND);
+        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
+                .searchElastic(pageable, searchBody, operation, assembler, locale)).withRel("search_es");
+        PagedModel<LocalisedTaskResource> resources = assembler.toModel(tasks, new TaskResourceAssembler(locale), selfLink);
+        ResourceLinkAssembler.addLinks(resources, Task.class, selfLink.getRel().toString());
+        return PagedModel.of(tasks.stream().map(t -> new LocalisedTaskResource(new com.netgrif.application.engine.workflow.web.responsebodies.Task(t, locale))).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), tasks.getTotalElements()));
+    }
+
+    public CountResponse count(SingleElasticTaskSearchRequestAsList query, MergeFilterOperation operation, Locale locale) {
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
+        long count = searchService.count(query.getList(), loggedUser, locale, operation == MergeFilterOperation.AND);
         return CountResponse.taskCount(count);
     }
 

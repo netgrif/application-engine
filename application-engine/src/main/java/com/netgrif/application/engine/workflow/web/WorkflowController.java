@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.workflow.web;
 
+import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
@@ -23,9 +25,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.InputStreamResource;
@@ -43,11 +46,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
@@ -61,93 +62,92 @@ import java.util.Map;
         matchIfMissing = true
 )
 @Tag(name = "Workflow")
+@RequiredArgsConstructor
 public class WorkflowController {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowController.class.getName());
 
-    @Autowired
-    private IWorkflowService workflowService;
+    private final IWorkflowService workflowService;
 
-    @Autowired
-    private ITaskService taskService;
+    private final ITaskService taskService;
 
-    @Autowired
-    private IElasticCaseService elasticCaseService;
+    private final IElasticCaseService elasticCaseService;
 
-    @Autowired
-    private IDataService dataService;
+    private final IDataService dataService;
+
+    private final UserService userService;
 
 
-    @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @workflowAuthorizationService.canCallCreate(@userService.getLoggedUser(), #body.netId)")
     @Operation(summary = "Create new case", security = {@SecurityRequirement(name = "BasicAuth")})
-    @PostMapping(value = "/case", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+    @PostMapping(value = {"/case", "/public/case"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Locale locale) {
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
         try {
             CreateCaseEventOutcome outcome = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
             return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getCase().getStringId() + " was created succesfully",
                     LocalisedEventOutcomeFactory.from(outcome, locale));
-        } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
+        } catch (Exception e) {
             log.error("Creating case failed:", e);
             return EventOutcomeWithMessageResource.errorMessage("Creating case failed" + e.getMessage());
         }
     }
 
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Get all cases of the system, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/all", produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> getAll(Pageable pageable, PagedResourcesAssembler<Case> assembler) {
         Page<Case> cases = workflowService.getAll(pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                 .getAll(pageable, assembler)).withRel("all");
-        PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
+        return getCaseResources(pageable, assembler, cases, selfLink);
     }
 
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Generic case search with QueryDSL predicate, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/search2", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> search2(@QuerydslPredicate(root = Case.class) Predicate predicate, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
         Page<Case> cases = workflowService.search(predicate, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                 .search2(predicate, pageable, assembler)).withRel("search2");
-        PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
+        return getCaseResources(pageable, assembler, cases, selfLink);
     }
 
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Generic case search on Elasticsearch database, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<CaseResource> search(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
-        LoggedUser user = (LoggedUser) auth.getPrincipal();
+    public PagedModel<CaseResource> search(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Locale locale) {
+        LoggedUser user = ActorTransformer.toLoggedUser(userService.getLoggedUser());
 
         Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, locale, operation == MergeFilterOperation.AND);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
-                .search(searchBody, operation, pageable, assembler, auth, locale)).withRel("search");
+                .search(searchBody, operation, pageable, assembler, locale)).withRel("search");
 
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, ElasticCase.class, selfLink.getRel().toString());
         return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
     }
 
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Generic case search on Mongo database, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/search_mongo", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<CaseResource> searchMongo(@RequestBody Map<String, Object> searchBody, Pageable pageable, Authentication auth, PagedResourcesAssembler<Case> assembler, Locale locale) {
-        Page<Case> cases = workflowService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal(), locale);
+    public PagedModel<CaseResource> searchMongo(@RequestBody Map<String, Object> searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Locale locale) {
+        Page<Case> cases = workflowService.search(searchBody, pageable, ActorTransformer.toLoggedUser(userService.getLoggedUser()), locale);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
-                .searchMongo(searchBody, pageable, auth, assembler, locale)).withRel("search");
-        PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
+                .searchMongo(searchBody, pageable, assembler, locale)).withRel("search");
+        return getCaseResources(pageable, assembler, cases, selfLink);
     }
 
 
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Get count of the cases", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/count", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public CountResponse count(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth, Locale locale) {
-        long count = elasticCaseService.count(searchBody.getList(), (LoggedUser) auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);
+    public CountResponse count(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Locale locale) {
+        long count = elasticCaseService.count(searchBody.getList(), ActorTransformer.toLoggedUser(userService.getLoggedUser()), locale, operation == MergeFilterOperation.AND);
         return CountResponse.caseCount(count);
     }
 
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Get case by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public CaseResource getOne(@PathVariable("id") String caseId) {
@@ -157,15 +157,14 @@ public class WorkflowController {
         return new CaseResource(aCase);
     }
 
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Get all cases by user that created them, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
     @RequestMapping(value = "/case/author/{id}", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> findAllByAuthor(@PathVariable("id") String authorId, @RequestBody String petriNet, PagedResourcesAssembler<Case> assembler, Pageable pageable) {
         Page<Case> cases = workflowService.findAllByAuthor(authorId, petriNet, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                 .findAllByAuthor(authorId, petriNet, assembler, pageable)).withRel("author");
-        PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
+        return getCaseResources(pageable, assembler, cases, selfLink);
     }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
@@ -179,51 +178,32 @@ public class WorkflowController {
     })
     public MessageResource reloadTasks(@PathVariable("id") String caseId) {
         try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8);
             Case aCase = workflowService.findOne(caseId);
             taskService.reloadTasks(aCase);
-
             return MessageResource.successMessage("Task reloaded in case [" + caseId + "]");
         } catch (Exception e) {
-            log.error("Reloading tasks of case [" + caseId + "] failed:", e);
+            log.error("Reloading tasks of case [{}] failed:", caseId, e);
             return MessageResource.errorMessage("Reloading tasks in case " + caseId + " has failed!");
         }
     }
 
-//    @Deprecated
-//    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
-//    @Operation(summary = "Get all case data", security = {@SecurityRequirement(name = "BasicAuth")})
-//    @GetMapping(value = "/case/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
-//    public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
-//        try {
-//            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-//            return new DataFieldsResource(workflowService.getData(caseId), locale);
-//        } catch (UnsupportedEncodingException e) {
-//            log.error("Getting all case data of [" + caseId + "] failed:", e);
-//            return new DataFieldsResource(new ArrayList<>(), locale);
-//        }
-//    }
-
-    @PreAuthorize("@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN') && @workflowAuthorizationService.canCallDelete(@userService.getLoggedUser(), #caseId)")
     @Operation(summary = "Delete case", security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public EntityModel<EventOutcomeWithMessage> deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
-        try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            DeleteCaseEventOutcome outcome;
-            if (deleteSubtree) {
-                outcome = workflowService.deleteSubtreeRootedAt(caseId);
-            } else {
-                outcome = workflowService.deleteCase(caseId);
-            }
-            return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted",
-                    LocalisedEventOutcomeFactory.from(outcome, LocaleContextHolder.getLocale()));
-        } catch (UnsupportedEncodingException e) {
-            log.error("Deleting case [" + caseId + "] failed:", e);
-            return EventOutcomeWithMessageResource.errorMessage("Deleting case " + caseId + " has failed!");
+    public EntityModel<EventOutcomeWithMessage> deleteCase(@PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
+        caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8);
+        DeleteCaseEventOutcome outcome;
+        if (deleteSubtree) {
+            outcome = workflowService.deleteSubtreeRootedAt(caseId);
+        } else {
+            outcome = workflowService.deleteCase(caseId);
         }
+        return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted",
+                LocalisedEventOutcomeFactory.from(outcome, LocaleContextHolder.getLocale()));
     }
 
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Download case file field value", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/{id}/file", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String caseId, @RequestParam("fieldId") String fieldId) throws FileNotFoundException {
@@ -242,6 +222,7 @@ public class WorkflowController {
                 .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
     }
 
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Download one file from cases file list field value", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/{id}/file/named", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFileByName(@PathVariable("id") String caseId, @RequestParam("fieldId") String fieldId, @RequestParam("fileName") String name) throws FileNotFoundException {
@@ -258,5 +239,12 @@ public class WorkflowController {
                 .ok()
                 .headers(headers)
                 .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
+    }
+
+    @NotNull
+    private PagedModel<CaseResource> getCaseResources(Pageable pageable, PagedResourcesAssembler<Case> assembler, Page<Case> cases, Link selfLink) {
+        PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
+        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
+        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
     }
 }

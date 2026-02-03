@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.configuration.security.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.Attribute;
@@ -10,6 +11,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.jackson.io.JacksonSerializer;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -34,12 +36,14 @@ public class JwtService implements IJwtService {
     private final SecurityConfigurationProperties.JwtProperties properties;
     private final ProcessRoleService roleService;
     private final AuthorityService authorityService;
+    private ObjectMapper objectMapper;
 
     @PostConstruct
     private void resolveSecret() {
+        configureObjectMapper();
         try {
             PrivateKeyReader reader = new PrivateKeyReader(properties.getAlgorithm());
-            secret = reader.get(properties.getPrivateKey().getFile().getPath()).getEncoded();
+            secret = reader.get(properties.getPrivateKey()).getEncoded();
         } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             log.error("Error while resolving secret key: " + e.getMessage(), e);
         }
@@ -56,6 +60,7 @@ public class JwtService implements IJwtService {
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + properties.getExpiration()))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .serializeToJsonWith(new JacksonSerializer<>(objectMapper))
                 .compact();
     }
 
@@ -73,12 +78,13 @@ public class JwtService implements IJwtService {
         LinkedHashMap<String, Object> userMap = (LinkedHashMap<String, Object>) extractAllClaims(token).get("user");
 
         LoggedUser user = new LoggedUserImpl();
-        user.setId(userMap.get("id").toString());
-        user.setUsername(userMap.get("username").toString());
-        user.setPassword(userMap.get("password").toString());
+        user.setId((String) userMap.get("stringId"));
+        user.setUsername((String) userMap.get("username"));
+        user.setFirstName((String) userMap.get("firstName"));
+        user.setMiddleName((String) userMap.get("middleName"));
+        user.setLastName((String) userMap.get("lastName"));
         user.setAuthoritySet(Collections.singleton(authorityService.getOrCreate(authority)));
         user.setProcessRoles(Collections.singleton(roleService.getAnonymousRole()));
-        user.setFirstName(userMap.get("firstName").toString());
         user.getAttributes().put("anonymous", new Attribute<>(true, false));
 
         return user;
@@ -104,5 +110,10 @@ public class JwtService implements IJwtService {
 
     private Key getSignInKey() {
         return Keys.hmacShaKeyFor(secret);
+    }
+
+    private void configureObjectMapper() {
+        objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
     }
 }
