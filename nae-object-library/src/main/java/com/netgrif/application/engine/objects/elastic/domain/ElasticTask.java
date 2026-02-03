@@ -51,6 +51,10 @@ public abstract class ElasticTask implements Serializable {
 
     private String userRealmId;
 
+    private String userFullName;
+    
+    private String username;
+
     private LocalDateTime startDate;
 
     private String transactionId;
@@ -93,8 +97,12 @@ public abstract class ElasticTask implements Serializable {
         this.caseTitleSortable = this.caseTitle;
         if (task.getPriority() != null)
             this.priority = task.getPriority();
-        this.userId = task.getUserId();
-        this.userRealmId = task.getUserRealmId();
+        if (task.getAssignee() != null) {
+            this.userId = task.getAssignee().getId();
+            this.userRealmId = task.getAssignee().getRealmId();
+            this.username = task.getAssignee().getUsername();
+            this.userFullName = task.getAssignee().getFullName();
+        }
         this.startDate = task.getStartDate();
         this.roles = task.getRoles();
         this.userRefs = task.getUserRefs();
@@ -118,6 +126,8 @@ public abstract class ElasticTask implements Serializable {
         this.priority = task.getPriority();
         this.userId = task.getUserId();
         this.userRealmId = task.getUserRealmId();
+        this.userFullName = task.getUserFullName();
+        this.username = task.getUsername();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles();
         this.viewRoles = task.getViewRoles();

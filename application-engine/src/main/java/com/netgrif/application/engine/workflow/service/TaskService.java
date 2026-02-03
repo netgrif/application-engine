@@ -192,8 +192,7 @@ public class TaskService implements ITaskService {
 
         startExecution(transition, useCase);
         // TODO: impersonation
-        task.setUserId(user.getStringId());
-        task.setUserRealmId(user.getRealmId());
+        task.setAssignee(ActorTransformer.toActorRef(user));
         task.setStartDate(LocalDateTime.now());
         // TODO: impersonation
         task.setUser(user);
@@ -279,8 +278,7 @@ public class TaskService implements ITaskService {
         finishExecution(transition, useCase.getStringId());
         task.setFinishDate(LocalDateTime.now());
         task.setFinishedBy(task.getUserId());
-        task.setUserId(null);
-        task.setUserRealmId(null);
+        task.setAssignee(null);
 
         useCase = workflowService.findOne(useCase.getStringId());
         save(task);
@@ -403,8 +401,7 @@ public class TaskService implements ITaskService {
                 });
         workflowService.updateMarking(useCase);
 
-        task.setUserId(null);
-        task.setUserRealmId(null);
+        task.setAssignee(null);
         task.setStartDate(null);
         task = save(task);
         workflowService.save(useCase);
@@ -457,8 +454,7 @@ public class TaskService implements ITaskService {
 
     protected void delegate(AbstractUser delegated, Task task, Case useCase) throws TransitionNotExecutableException {
         if (task.getUserId() != null) {
-            task.setUserId(delegated.getStringId());
-            task.setUserRealmId(delegated.getRealmId());
+            task.setAssignee(ActorTransformer.toActorRef(delegated));
             task.setUser(delegated);
             save(task);
         } else {
