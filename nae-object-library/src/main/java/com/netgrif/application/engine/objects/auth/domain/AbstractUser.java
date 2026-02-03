@@ -55,7 +55,7 @@ public abstract class AbstractUser extends AbstractActor {
     protected String avatar;
 
     /**
-     * Boolean that marks user as internal
+     * Enumeration that marks the type of a user
      */
     protected UserType type;
 
