@@ -164,8 +164,8 @@ public class DataService implements IDataService {
 
             if (outcome.getMessage() == null) {
                 if (field.getEvents().containsKey(DataEventType.GET)
-                        && field.getEvents().get(DataEventType.GET).getMessage() != null) {
-                    outcome.setMessage(field.getEvents().get(DataEventType.GET).getMessage());
+                        &&((DataEvent) field.getEvents().get(DataEventType.GET)).getMessage() != null) {
+                    outcome.setMessage(((DataEvent) field.getEvents().get(DataEventType.GET)).getMessage());
                 } else {
                     Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
                     DataFieldLogic dataRef = dataSet.get(fieldId);
