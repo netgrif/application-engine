@@ -6,11 +6,14 @@ import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import lombok.Data;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -23,7 +26,13 @@ import java.util.Set;
  */
 @Data
 @Document(collection = "anonym_user")
-public class AnonymousUserRef {
+public class AnonymousUserRef implements Serializable {
+
+    /**
+     * Serial version UID for ensuring compatibility during deserialization.
+     */
+    @Serial
+    private static final long serialVersionUID = 1239812903890129012L;
 
     /**
      * Unique identifier for the anonymous user.
@@ -64,16 +73,29 @@ public class AnonymousUserRef {
      * Set of process roles assigned to this anonymous user.
      * @see ProcessRole
      */
+    /**
+     * Set of process roles associated with this anonymous user.
+     * These roles determine task permissions and access levels.
+     *
+     * @see ProcessRole
+     */
     private Set<ProcessRole> processRoles = new HashSet<>();
 
     /**
      * Set of group identifiers this anonymous user belongs to.
+     */
+    /**
+     * Set of unique identifiers representing the groups this user belongs to.
      */
     private Set<String> groupIds = new HashSet<>();
 
     /**
      * Duration after which the anonymous user session times out.
      * Default value is 30 minutes.
+     */
+    /**
+     * Duration representing the session timeout for this anonymous user.
+     * This field is transient and not persisted in the database.
      */
     private transient Duration sessionTimeout = Duration.ofMinutes(30);
 
@@ -83,6 +105,11 @@ public class AnonymousUserRef {
      * @see Group
      */
     @BsonIgnore
+    /**
+     * Set of groups this anonymous user is associated with.
+     * This field is ignored during database persistence.
+     * @see Group
+     */
     private Set<Group> groups = new HashSet<>();
 
     /**

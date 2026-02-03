@@ -27,6 +27,6 @@ public class AuthorizationService implements IAuthorizationService {
         // TODO: impersonation
 //        LoggedUser loggedUser = userService.getLoggedUserFromContext().getSelfOrImpersonated();
         LoggedUser loggedUser = userService.getLoggedUserFromContext();
-        return loggedUser.getAuthoritySet().stream().anyMatch(it -> Arrays.stream(authority).anyMatch(a -> it.getAuthority().contains(a)));
+        return loggedUser.getAuthoritySet().stream().anyMatch(it -> Arrays.stream(authority).anyMatch(a -> it.getAuthority().equals(a)));
     }
 }

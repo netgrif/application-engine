@@ -68,7 +68,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Override
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
     @Operation(summary = "Get all tasks by cases", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = {"/case", "/public/case"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<LocalisedTaskResource> getAllByCases(@RequestBody List<String> cases, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {

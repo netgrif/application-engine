@@ -61,6 +61,20 @@ public class ActorTransformer {
          * @return newly created AbstractUser instance
          */
         AbstractUser create();
+
+
+        /**
+         * Creates a new AbstractUser instance based on the provided LoggedUser instance.
+         * By default, this method throws an IllegalStateException, and must be explicitly
+         * implemented by the concrete UserFactory implementation.
+         *
+         * @param loggedUser the LoggedUser containing user details
+         * @return newly created AbstractUser instance representing the same user
+         * @throws IllegalStateException if the method is not implemented
+         */
+        default AbstractUser create(LoggedUser loggedUser) {
+            throw new IllegalStateException("Method is not implemented");
+        }
     }
 
     /**
@@ -91,7 +105,7 @@ public class ActorTransformer {
      * @return a new AbstractUser instance with copied user data
      */
     public static AbstractUser toUser(LoggedUser loggedUser) {
-        User user = (User) userFactory.create();
+        AbstractUser user = userFactory.create(loggedUser);
         user.setId(loggedUser.getStringId());
         user.setRealmId(loggedUser.getRealmId());
         user.setUsername(loggedUser.getUsername());
