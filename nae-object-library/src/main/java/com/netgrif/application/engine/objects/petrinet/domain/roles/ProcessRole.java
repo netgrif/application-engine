@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.objects.petrinet.domain.roles;
 
+import com.netgrif.application.engine.objects.annotations.Indexed;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.Imported;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
@@ -45,6 +46,7 @@ public abstract class ProcessRole extends Imported {
     private String processIdentifier;
 
     @Setter
+    @Indexed
     private String workspaceId;
 
     @Setter

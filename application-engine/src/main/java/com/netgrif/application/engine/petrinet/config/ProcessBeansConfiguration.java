@@ -8,6 +8,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runne
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.ProcessRoleServiceImpl;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.auth.service.UserService;
@@ -37,7 +38,7 @@ public class ProcessBeansConfiguration {
                                                  @Lazy IWorkflowService workflowService,
                                                  @Lazy ITaskService taskService
                                                  ) {
-        return new com.netgrif.application.engine.petrinet.service.ProcessRoleService(
+        return new ProcessRoleServiceImpl(
                 processRoleRepository,
                 petriNetRepository,
                 publisher,

@@ -19,7 +19,6 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.conte
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.RoleActionsRunner;
 import com.netgrif.application.engine.objects.petrinet.domain.events.Event;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
-import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -39,16 +38,14 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-public class ProcessRoleService implements com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService {
+public class ProcessRoleServiceImpl implements com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService {
 
-    private static final Logger log = LoggerFactory.getLogger(ProcessRoleService.class);
+    private static final Logger log = LoggerFactory.getLogger(ProcessRoleServiceImpl.class);
 
     private final UserService userService;
     @Getter
     private final ProcessRoleRepository processRoleRepository;
-    private final PetriNetRepository netRepository;
     private final ApplicationEventPublisher publisher;
     private final RoleActionsRunner roleActionsRunner;
     private final IPetriNetService petriNetService;
@@ -65,13 +62,11 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     private ProcessRole defaultRole;
     private ProcessRole anonymousRole;
 
-    public ProcessRoleService(ProcessRoleRepository processRoleRepository,
-                              PetriNetRepository netRepository,
-                              ApplicationEventPublisher publisher, RoleActionsRunner roleActionsRunner,
-                              @Lazy IPetriNetService petriNetService, @Lazy UserService userService, ISecurityContextService securityContextService, @Lazy GroupService groupService,
-                              @Lazy RealmService realmService, @Lazy PaginationProperties paginationProperties, @Lazy IWorkflowService workflowService, @Lazy ITaskService taskService) {
+    public ProcessRoleServiceImpl(ProcessRoleRepository processRoleRepository,
+                                  ApplicationEventPublisher publisher, RoleActionsRunner roleActionsRunner,
+                                  @Lazy IPetriNetService petriNetService, @Lazy UserService userService, ISecurityContextService securityContextService, @Lazy GroupService groupService,
+                                  @Lazy RealmService realmService, @Lazy PaginationProperties paginationProperties, @Lazy IWorkflowService workflowService, @Lazy ITaskService taskService) {
         this.processRoleRepository = processRoleRepository;
-        this.netRepository = netRepository;
         this.publisher = publisher;
         this.roleActionsRunner = roleActionsRunner;
         this.petriNetService = petriNetService;
@@ -86,56 +81,101 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     @Override
     public ProcessRole save(ProcessRole processRole) {
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
+
+        if (processRole.getWorkspaceId() == null
+                || (!processRole.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin())) {
+            throw new IllegalArgumentException("Cannot save the role with different workspace. ProcessRole workspace: %s, LoggedUser workspace: %s"
+                    .formatted(processRole.getWorkspaceId(), loggedUser.getActiveWorkspaceId()));
+        }
+
         return processRoleRepository.save(processRole);
     }
 
     @Override
     public Page<ProcessRole> getAll(Pageable pageable) {
-        return processRoleRepository.findAll(pageable);
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        if (loggedUser.isAdmin()) {
+            return processRoleRepository.findAll(pageable);
+        } else {
+            return processRoleRepository.findAllByWorkspaceId(loggedUser.getActiveWorkspaceId(), pageable);
+        }
     }
 
     @Override
     public Optional<ProcessRole> get(ProcessResourceId processResourceId) {
-        return processRoleRepository.findByCompositeId(processResourceId.getStringId());
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        if (loggedUser.isAdmin()) {
+            return processRoleRepository.findByCompositeId(processResourceId.getStringId());
+        } else {
+            return processRoleRepository.findByCompositeIdAndWorkspaceId(processResourceId.getStringId(), loggedUser.getActiveWorkspaceId());
+        }
     }
 
     @Override
     public void delete(String roleId) {
-        Optional<ProcessRole> processRole = processRoleRepository.findByCompositeId(roleId);
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        Optional<ProcessRole> processRole;
+        if (loggedUser.isAdmin()) {
+            processRole = processRoleRepository.findByCompositeId(roleId);
+        } else {
+            processRole = processRoleRepository.findByCompositeIdAndWorkspaceId(roleId, loggedUser.getActiveWorkspaceId());
+        }
         processRole.ifPresent(processRoleRepository::delete);
     }
 
     @Override
     public void deleteAll(Collection<String> collection) {
-        Set<ProcessRole> processRoles = processRoleRepository.findAllByIdsSet(collection);
-        processRoleRepository.deleteAll(processRoles);
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        Set<ProcessRole> processRoles;
+        if (loggedUser.isAdmin()) {
+            processRoles = processRoleRepository.findAllByIdsSet(collection);
+        } else {
+            processRoles = processRoleRepository.findAllByIdsSetAndWorkspaceId(collection, loggedUser.getActiveWorkspaceId());
+        }
+        if (!processRoles.isEmpty()) {
+            processRoleRepository.deleteAll(processRoles);
+        }
     }
 
     @Override
     public void deleteAll() {
-        processRoleRepository.deleteAll();
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        if (loggedUser.isAdmin()) {
+            processRoleRepository.deleteAll();
+        } else {
+            processRoleRepository.deleteAllByWorkspaceId(loggedUser.getActiveWorkspaceId());
+        }
     }
-
 
     @Override
     public void assignRolesToUser(AbstractUser user, Collection<ProcessResourceId> processResourceIds, LoggedUser loggedUser) {
+        // todo 2072 loggedUser as parameter! shouldn't be
         assignRolesToUser(user, processResourceIds, loggedUser, new HashMap<>());
     }
 
     @Override
     public void assignRolesToUser(AbstractUser user, Collection<ProcessResourceId> requestedRolesIds, LoggedUser loggedUser, Map<String, String> map) {
-        assignRolesToActor(user.getProcessRoles(), requestedRolesIds);
+        // todo 2072 loggedUser as parameter! shouldn't be
+        assignRolesToActor(user.getProcessRoles(), requestedRolesIds, loggedUser);
         saveUserAndReloadContext(user, loggedUser);
     }
 
     @Override
     public void assignRolesToGroup(Group group, Collection<ProcessResourceId> requestedRolesIds) {
-        assignRolesToActor(group.getProcessRoles(), requestedRolesIds);
+        assignRolesToActor(group.getProcessRoles(), requestedRolesIds, userService.getLoggedOrSystem());
         groupService.save(group);
     }
 
-    protected void assignRolesToActor(Collection<ProcessRole> oldActorRoles, Collection<ProcessResourceId> requestedRolesIds) {
-        List<ProcessRole> requestedRoles = this.findByIds(requestedRolesIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet()));
+    protected void assignRolesToActor(Collection<ProcessRole> oldActorRoles, Collection<ProcessResourceId> requestedRolesIds, AbstractUser loggedUser) {
+        Set<ProcessRole> requestedRoles;
+        if (loggedUser.isAdmin()) {
+            requestedRoles = processRoleRepository.findAllByIdsSet(requestedRolesIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet()));
+        } else {
+            requestedRoles = processRoleRepository.findAllByIdsSetAndWorkspaceId(requestedRolesIds.stream()
+                    .map(ProcessResourceId::toString)
+                    .collect(Collectors.toSet()), loggedUser.getActiveWorkspaceId());
+        }
         if (requestedRoles.isEmpty() && !requestedRolesIds.isEmpty())
             throw new IllegalArgumentException("No process roles found.");
         if (requestedRoles.size() != requestedRolesIds.size())
@@ -145,6 +185,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         Set<ProcessRole> rolesNewToUser = getRolesNewToActor(userOldRoles, requestedRoles);
         Set<ProcessRole> rolesRemovedFromUser = getRolesRemovedFromActor(userOldRoles, requestedRoles);
 
+        // todo: should execute actions?
 
         oldActorRoles.clear();
         oldActorRoles.addAll(updateRequestedRoles(userOldRoles, rolesNewToUser, rolesRemovedFromUser));
@@ -183,32 +224,27 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         return new HashSet<>(userRolesAfterPreActions);
     }
 
-    protected String getProcessIdRoleBelongsTo(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles) {
-
-        if (!newRoles.isEmpty()) {
-            return getProcessIdFromFirstRole(newRoles);
-        }
-
-        if (!removedRoles.isEmpty()) {
-            return getProcessIdFromFirstRole(removedRoles);
-        }
-
-        return null;
-    }
-
-    protected String getProcessIdFromFirstRole(Set<ProcessRole> newRoles) {
-        return newRoles.iterator().next().getProcessId();
-    }
-
     @Override
     public List<ProcessRole> findAllByIds(Collection<ProcessResourceId> collection) {
-        return new ArrayList<>(processRoleRepository.findAllByIdsSet(collection.stream().map(ProcessResourceId::getStringId).collect(Collectors.toList())));
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        if (loggedUser.isAdmin()) {
+            return new ArrayList<>(processRoleRepository.findAllByIdsSet(collection.stream().map(ProcessResourceId::getStringId).collect(Collectors.toList())));
+        } else {
+            return new ArrayList<>(processRoleRepository.findAllByIdsSetAndWorkspaceId(collection.stream()
+                    .map(ProcessResourceId::getStringId)
+                    .collect(Collectors.toList()), loggedUser.getActiveWorkspaceId()));
+        }
     }
 
     @Override
     public List<ProcessRole> saveAll(Collection<ProcessRole> entities) {
-        return StreamSupport.stream(entities.spliterator(), false).map(processRole -> {
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        return entities.stream().map(processRole -> {
             if (!processRole.isGlobal() || findAllByImportId(processRole.getImportId(), Pageable.ofSize(1)).isEmpty()) {
+                if (processRole.getWorkspaceId() == null
+                        || (!processRole.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin())) {
+                    return null;
+                }
                 return processRoleRepository.save(processRole);
             }
             return null;
@@ -217,8 +253,15 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     @Override
     public List<ProcessRole> findByIds(Collection<String> ids) {
-        return new ArrayList<>(processRoleRepository.findAllByIdsSet(ids));
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        if (loggedUser.isAdmin()) {
+            return new ArrayList<>(processRoleRepository.findAllByIdsSet(ids));
+        } else {
+            return new ArrayList<>(processRoleRepository.findAllByIdsSetAndWorkspaceId(ids, loggedUser.getActiveWorkspaceId()));
+        }
     }
+
+    // todo: unused private methods
 
     private Set<ProcessRole> updateRequestedRoles(AbstractUser user, Set<ProcessRole> rolesNewToUser, Set<ProcessRole> rolesRemovedFromUser) {
         Set<ProcessRole> userRolesAfterPreActions = user.getProcessRoles();
@@ -226,31 +269,6 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         userRolesAfterPreActions.removeAll(rolesRemovedFromUser);
 
         return new HashSet<>(userRolesAfterPreActions);
-    }
-
-    private String getPetriNetIdRoleBelongsTo(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles) {
-
-        if (!newRoles.isEmpty()) {
-            return getPetriNetIdFromFirstRole(newRoles);
-        }
-
-        if (!removedRoles.isEmpty()) {
-            return getPetriNetIdFromFirstRole(removedRoles);
-        }
-
-        return null;
-    }
-
-    private boolean isGlobalFromFirstRole(Set<ProcessRole> roles) {
-        if (roles.isEmpty()) {
-            return false;
-        }
-        ProcessRole role = roles.iterator().next();
-        return role.isGlobal();
-    }
-
-    private String getPetriNetIdFromFirstRole(Set<ProcessRole> newRoles) {
-        return newRoles.iterator().next().getProcessId();
     }
 
     private void replaceUserRolesAndPublishEvent(Set<String> requestedRolesIds, AbstractUser user, Set<ProcessRole> requestedRoles) {
@@ -333,31 +351,54 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     @Override
     public Page<ProcessRole> findAll(Pageable pageable) {
-        return processRoleRepository.findAll(pageable);
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        if (loggedUser.isAdmin()) {
+            return processRoleRepository.findAll(pageable);
+        } else {
+            return processRoleRepository.findAllByWorkspaceId(loggedUser.getActiveWorkspaceId(), pageable);
+        }
     }
 
     @Override
     public Page<ProcessRole> findAllGlobalRoles(Pageable pageable) {
-        return processRoleRepository.findAllByGlobalIsTrue(pageable);
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        if (loggedUser.isAdmin()) {
+            return processRoleRepository.findAllByGlobalIsTrue(pageable);
+        } else {
+            return processRoleRepository.findAllByGlobalIsTrueAndWorkspaceId(loggedUser.getActiveWorkspaceId(), pageable);
+        }
     }
 
     @Override
     public List<ProcessRole> findAllByNetStringId(String netStringId) {
-        Optional<PetriNet> netOptional = netRepository.findById(netStringId);
-        if (netOptional.isEmpty())
+        PetriNet petriNet = petriNetService.getPetriNet(netStringId);
+        if (petriNet == null)
             throw new IllegalArgumentException("Could not find model with id [" + netStringId + "]");
-        return new ArrayList<>(netOptional.get().getRoles().values());
+        return new ArrayList<>(petriNet.getRoles().values());
     }
 
     @Override
     public ProcessRole findById(String id) {
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
         ObjectId objectId = extractObjectId(id);
-        return processRoleRepository.findByIdObjectId(objectId).orElse(null);
+        if (loggedUser.isAdmin()) {
+            return processRoleRepository.findByIdObjectId(objectId)
+                    .orElse(null);
+        } else {
+            return processRoleRepository.findByIdObjectIdAndWorkspaceId(objectId, loggedUser.getActiveWorkspaceId())
+                    .orElse(null);
+        }
     }
 
     @Override
     public ProcessRole findById(ProcessResourceId processResourceId) {
-        return processRoleRepository.findByCompositeId(processResourceId.getStringId()).orElse(null);
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        if (loggedUser.isAdmin()) {
+            return processRoleRepository.findByCompositeId(processResourceId.getStringId()).orElse(null);
+        } else {
+            return processRoleRepository.findByCompositeIdAndWorkspaceId(processResourceId.getStringId(),
+                    loggedUser.getActiveWorkspaceId()).orElse(null);
+        }
     }
 
     @Override
@@ -389,7 +430,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     /**
      * @param importId id from a process of a role
      * @return a process role object
-     * @deprecated use {@link ProcessRoleService#findAllByImportId(String, Pageable)} instead
+     * @deprecated use {@link ProcessRoleServiceImpl#findAllByImportId(String, Pageable)} instead
      */
     @Deprecated(forRemoval = true, since = "6.2.0")
     @Override
