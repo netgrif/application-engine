@@ -2,10 +2,12 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -39,11 +41,25 @@ class DynamicCaseNameTest {
 
     @Test
     void testInitValues() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_case_name_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        Case useCase = workflowService.createCase(optNet.getNet().stringId, null, "", superCreator.loggedSuper, Locale.forLanguageTag("sk-SK")).getCase()
+        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/dynamic_case_name_test.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
+        Case useCase = workflowService.createCase(CreateCaseParams.with()
+                .process(optNet.getNet())
+                .color("")
+                .author(superCreator.loggedSuper)
+                .locale(Locale.forLanguageTag("sk-SK"))
+                .build()).getCase()
         assert useCase.title == "SK text value 6"
 
-        Case useCase2 = workflowService.createCase(optNet.getNet().stringId, null, "", superCreator.loggedSuper, Locale.ENGLISH).getCase()
+        Case useCase2 = workflowService.createCase(CreateCaseParams.with()
+                .process(optNet.getNet())
+                .color("")
+                .author(superCreator.loggedSuper)
+                .locale(Locale.ENGLISH)
+                .build()).getCase()
         assert useCase2.title == "EN text value 6"
     }
 }

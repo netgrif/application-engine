@@ -19,6 +19,8 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.startup.runner.MenuProcessRunner
+import com.netgrif.application.engine.workflow.params.DeleteCaseParams
+import com.netgrif.application.engine.workflow.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -256,26 +258,26 @@ class MenuItemApiTest {
         String newIdentifier = "new_identifier"
 
         String duplicateTaskId = testFolder.tasks.find { it.transition == "duplicate_item" }.task
-        taskService.assignTask(duplicateTaskId)
+        taskService.assignTask(new TaskParams(duplicateTaskId))
 
         assertThrows(IllegalArgumentException.class, () -> {
             testFolder.dataSet[MenuItemConstants.FIELD_DUPLICATE_TITLE].value = new I18nString("")
             testFolder.dataSet[MenuItemConstants.FIELD_DUPLICATE_IDENTIFIER].value = newIdentifier
             testFolder = workflowService.save(testFolder)
-            taskService.finishTask(duplicateTaskId)
+            taskService.finishTask(new TaskParams(duplicateTaskId))
         })
 
         assertThrows(IllegalArgumentException.class, () -> {
             testFolder.dataSet[MenuItemConstants.FIELD_DUPLICATE_TITLE].value = new I18nString(newTitle)
             testFolder.dataSet[MenuItemConstants.FIELD_DUPLICATE_IDENTIFIER].value = "new_menu_item"
             testFolder = workflowService.save(testFolder)
-            taskService.finishTask(duplicateTaskId)
+            taskService.finishTask(new TaskParams(duplicateTaskId))
         })
 
         testFolder.dataSet[MenuItemConstants.FIELD_DUPLICATE_TITLE].value = new I18nString(newTitle)
         testFolder.dataSet[MenuItemConstants.FIELD_DUPLICATE_IDENTIFIER].value = newIdentifier
         testFolder = workflowService.save(testFolder)
-        taskService.finishTask(duplicateTaskId)
+        taskService.finishTask(new TaskParams(duplicateTaskId))
 
         Case duplicated = workflowService.searchOne(QCase.case$.processIdentifier.eq("menu_item")
                 .and(QCase.case$.dataSet.get(MenuItemConstants.FIELD_IDENTIFIER).value.eq(newIdentifier)))
@@ -335,7 +337,7 @@ class MenuItemApiTest {
         String tabbedTaskViewId = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseView, TabbedCaseViewConstants.FIELD_VIEW_CONFIGURATION_ID)
         assert tabbedTaskViewId != null
 
-        workflowService.deleteCase(testFolder)
+        workflowService.deleteCase(new DeleteCaseParams(testFolder))
         sleep(2000)
         netgrifFolder = workflowService.findOne(netgrifFolderId)
         assert !(netgrifFolder.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value as ArrayList).contains(testFolder.stringId)

@@ -7,6 +7,8 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.acti
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.objects.petrinet.domain.version.Version;
+import com.netgrif.application.engine.petrinet.params.DeletePetriNetParams;
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetImportReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
@@ -18,7 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -65,47 +66,19 @@ public interface IPetriNetService {
     }
 
     /**
-     * Imports a PetriNet from XML input. 
-     * 
-     * @param xmlFile the input stream of the XML file
-     * @param releaseType the type of release
-     * @param user the user performing the import
-     * @return an {@link ImportPetriNetEventOutcome} representing the result
-     * @throws IOException if an I/O error occurs
-     * @throws MissingPetriNetMetaDataException if metadata is incomplete
-     * @throws MissingIconKeyException if an icon key is missing
-     * @deprecated Use {@link #importPetriNet(InputStream, VersionType, LoggedUser)} instead.
-     */
-    @Deprecated
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
-
-    /**
      * Imports a PetriNet from XML input.
      *
-     * @param xmlFile the input stream of the XML file
-     * @param releaseType the type of release {@link VersionType}
-     * @param user the user performing the import
-     * @return an {@link ImportPetriNetEventOutcome} representing the result
-     * @throws IOException if an I/O error occurs
-     * @throws MissingPetriNetMetaDataException if metadata is incomplete
-     * @throws MissingIconKeyException if an icon key is missing
-     */
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
-
-
-    /**
-     * Imports a PetriNet from XML input.
+     * @param importPetriNetParams parameters for PetriNet import
+     * <br>
+     * <b>Required parameters: xmlFile, releaseType, author</b>
      *
-     * @param xmlFile the input stream of the XML file
-     * @param releaseType the type of release {@link VersionType}
-     * @param user the user performing the import
-     * @param params additional parameters
      * @return an {@link ImportPetriNetEventOutcome} representing the result
-     * @throws IOException if an I/O error occurs
-     * @throws MissingPetriNetMetaDataException if metadata is incomplete
-     * @throws MissingIconKeyException if an icon key is missing
+     * @throws IOException                      if an error occurs while processing the XML file
+     * @throws MissingPetriNetMetaDataException if metadata is missing from the PetriNet
+     * @throws MissingIconKeyException          if an icon key is missing
      */
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+    ImportPetriNetEventOutcome importPetriNet(ImportPetriNetParams importPetriNetParams) throws IOException,
+            MissingPetriNetMetaDataException, MissingIconKeyException;
 
     /**
      * Saves a PetriNet object.
@@ -316,21 +289,26 @@ public interface IPetriNetService {
     List<PetriNet> get(List<String> petriNetIds);
 
     /**
-     * Deletes a PetriNet by its ID.
+     * Deletes a PetriNet instance by its process ID.
      *
-     * @param id the ID of the PetriNet to delete
-     * @param loggedUser the user requesting the deletion
+     * @param deletePetriNetParams parameters for petriNet removal
+     * <br>
+     * <b>Required parameters: petriNetId</b>
+     *
+     * @throws IllegalArgumentException if the PetriNet doesn't exist
      */
-    void deletePetriNet(String id, LoggedUser loggedUser);
-
+    void deletePetriNet(DeletePetriNetParams deletePetriNetParams);
 
     /**
      * Forcefully deletes a PetriNet process by its ID.
      *
-     * @param processId  the ID of the process to delete
-     * @param loggedUser the user requesting the deletion
+     * @param deletePetriNetParams parameters for petriNet removal
+     * <br>
+     * <b>Required parameters: petriNetId</b>
+     *
+     * @throws IllegalArgumentException if the PetriNet doesn't exist
      */
-    void forceDeletePetriNet(String processId, LoggedUser loggedUser);
+    void forceDeletePetriNet(DeletePetriNetParams deletePetriNetParams);
 
     /**
      * Runs the specified set of actions on a PetriNet.
@@ -365,12 +343,6 @@ public interface IPetriNetService {
      * @param pageable the pagination information
      * @return a {@link Page} of {@link PetriNet} objects matching the role ID
      */
-    /**
-     * Retrieves a paginated list of {@link PetriNet} objects associated with a specific role ID.
-     *
-     * @param roleId   the ID of the role to filter the PetriNets by
-     * @param pageable the pagination information
-     * @return a {@link Page} of {@link PetriNet} objects matching the role ID
-     */
     Page<PetriNet> findAllByRoleId(String roleId, Pageable pageable);
+
 }
