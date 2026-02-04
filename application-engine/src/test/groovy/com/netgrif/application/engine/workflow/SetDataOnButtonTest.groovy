@@ -5,11 +5,13 @@ import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
 import com.netgrif.application.engine.objects.workflow.domain.Task
+import com.netgrif.application.engine.workflow.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -67,7 +69,13 @@ class SetDataOnButtonTest {
     @BeforeEach
     void initNet() {
         testHelper.truncateDbs()
-        net = petriNetService.importPetriNet(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR, ActorTransformer.toLoggedUser(userService.getLoggedOrSystem())).getNet()
+        new FileInputStream(RESOURCE_PATH).withCloseable { inputStream ->
+            net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                    .xmlFile(inputStream)
+                    .releaseType(VersionType.MAJOR)
+                    .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+                    .build()).getNet()
+        }
         assert net != null
     }
 
@@ -83,8 +91,8 @@ class SetDataOnButtonTest {
         Task parentTask = taskService.searchOne(QTask.task.caseTitle.eq(PARENT_CASE) & QTask.task.transitionId.eq(TEST_TRANSITION))
         assert parentTask != null
 
-        taskService.assignTask(parentTask.getStringId())
-        taskService.finishTask(parentTask.getStringId())
+        taskService.assignTask(new TaskParams(parentTask.getStringId()))
+        taskService.finishTask(new TaskParams(parentTask.getStringId()))
 
         childCase = workflowService.findOne(childCase.getStringId())
 

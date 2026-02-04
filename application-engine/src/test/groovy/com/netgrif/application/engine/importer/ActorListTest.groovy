@@ -4,6 +4,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -57,8 +58,12 @@ class ActorListTest {
     }
 
     @Test
-    void testActorList() throws MissingPetriNetMetaDataException, IOException {
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/actor_list.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+    void testUserList() throws MissingPetriNetMetaDataException, IOException {
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/actor_list.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build());
 
         assert net.getNet() != null
         Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("Actor List"))

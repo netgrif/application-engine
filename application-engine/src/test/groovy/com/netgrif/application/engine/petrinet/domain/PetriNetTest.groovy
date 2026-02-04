@@ -9,6 +9,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.arcs.InhibitorArc
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.ReadArc
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.ResetArc
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -67,7 +68,11 @@ class PetriNetTest {
     void testClone() {
         int beforeImportNet = processRoleRepository.count()
 
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(netResource.inputStream)
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
 
         assert netOptional.getNet() != null
 
@@ -88,13 +93,25 @@ class PetriNetTest {
 
     @Test
     void testVersioning() {
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(netResource.inputStream)
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert netOptional.getNet() != null
 
-        def netOptional2 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional2 = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(netResource.inputStream)
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert netOptional2.getNet() != null
 
-        def netOptional3 = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional3 = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(netResource2.inputStream)
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert netOptional3.getNet() != null
 
         Page<PetriNetReference> nets = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK, Pageable.unpaged())
@@ -105,21 +122,41 @@ class PetriNetTest {
 
     @Test
     void testVersion() {
-        def zeroImport = petriNetService.importPetriNet(netResource3.inputStream, VersionType.PATCH, superCreator.loggedSuper)
+        def zeroImport = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(netResource3.inputStream)
+                .releaseType(VersionType.PATCH)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert zeroImport.getNet() != null
         assert zeroImport.getNet().version.toString() == "0.0.1"
 
-        def firstImport = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def firstImport = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(netResource.inputStream)
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert firstImport.getNet() != null
         assert firstImport.getNet().version.toString() == "1.0.0"
 
-        def secondImport = petriNetService.importPetriNet(netResource.inputStream, VersionType.MINOR, superCreator.loggedSuper)
+        def secondImport = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(netResource.inputStream)
+                .releaseType(VersionType.MINOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert secondImport.getNet().version.toString() == "1.1.0"
 
-        def thirdImport = petriNetService.importPetriNet(netResource.inputStream, VersionType.PATCH, superCreator.loggedSuper)
+        def thirdImport = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(netResource.inputStream)
+                .releaseType(VersionType.PATCH)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert thirdImport.getNet().version.toString() == "1.1.1"
 
-        def lastImport = petriNetService.importPetriNet(netResource4.inputStream, VersionType.PATCH, superCreator.loggedSuper)
+        def lastImport = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(netResource4.inputStream)
+                .releaseType(VersionType.PATCH)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert lastImport.getNet().version.toString() == "3.1.1"
 
         Page<PetriNet> nets = petriNetService.getByIdentifier(zeroImport.getNet().identifier, Pageable.unpaged())
@@ -129,12 +166,20 @@ class PetriNetTest {
 
     @Test
     void testVersioningConflicts() {
-        def zeroImport = petriNetService.importPetriNet(netResource3.inputStream, VersionType.PATCH, superCreator.loggedSuper)
+        def zeroImport = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(netResource3.inputStream)
+                .releaseType(VersionType.PATCH)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert zeroImport.getNet() != null
         assert zeroImport.getNet().version.toString() == "0.0.1"
 
         try {
-            petriNetService.importPetriNet(netResource3.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+            petriNetService.importPetriNet(ImportPetriNetParams.with()
+                    .xmlFile(netResource3.inputStream)
+                    .releaseType(VersionType.MAJOR)
+                    .author(superCreator.getLoggedSuper())
+                    .build())
         } catch (Exception e) {
             assert e.getMessage() == "A process [test] with such version [0.0.1] already exists"
         }

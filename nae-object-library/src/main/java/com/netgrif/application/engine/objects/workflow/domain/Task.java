@@ -23,6 +23,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @QueryEntity
 @Indexable
@@ -314,14 +315,22 @@ public abstract class Task implements Serializable {
         });
     }
 
-    public void resolveViewActors() {
+    /**
+     * Initializes {@link #viewUsers} collection. Any user defined in {@link #users} with permission {@link RolePermission#VIEW}
+     * of true value is added to the {@link #viewUsers} collection.
+     *
+     * @return true if the {@link #viewUsers} was modified, false otherwise
+     */
+    public boolean resolveViewActors() {
         getViewActors();
+        AtomicBoolean isModified = new AtomicBoolean(!this.viewActors.isEmpty());
         this.viewActors.clear();
         this.actors.forEach((actorId, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
-                viewActors.add(actorId);
+                isModified.set(viewActors.add(actorId));
             }
         });
+        return isModified.get();
     }
 
     private void compareExistingActorPermissions(String actorId, Map<String, Boolean> permissions) {

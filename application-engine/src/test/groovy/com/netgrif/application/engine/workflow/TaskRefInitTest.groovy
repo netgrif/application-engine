@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.objects.workflow.domain.Case
@@ -45,8 +46,16 @@ class TaskRefInitTest {
     @BeforeEach
     void initNet() {
         testHelper.truncateDbs()
-        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskref_init.xml"), VersionType.MAJOR, ActorTransformer.toLoggedUser(userService.getLoggedOrSystem())).getNet()
-        autoTrigger = petriNetService.importPetriNet(new FileInputStream("src/test/resources/autotrigger_taskref.xml"), VersionType.MAJOR, ActorTransformer.toLoggedUser(userService.getLoggedOrSystem())).getNet()
+        net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/taskref_init.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+                .build()).getNet()
+        autoTrigger = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/autotrigger_taskref.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+                .build()).getNet()
         assert net != null
     }
 

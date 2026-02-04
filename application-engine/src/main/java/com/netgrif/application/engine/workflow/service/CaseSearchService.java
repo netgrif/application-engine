@@ -234,7 +234,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
                             break;
                     }
                 } catch (IllegalArgumentException e) {
-                    log.error("Unrecognized Field type " + entry.getKey());
+                    log.error("Unrecognized Field type {}", entry.getKey());
                 }
             } else {
                 predicates.add(QCase.case$.dataSet.get((String) k).value.eq(v));
@@ -353,7 +353,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     private static BooleanExpression caseIdString(String caseId) {
-        return caseId.equals("") ? QCase.case$._id.isNull() : QCase.case$._id.eq(new ProcessResourceId(caseId));
+        return caseId.isEmpty() ? QCase.case$._id.isNull() : QCase.case$._id.eq(new ProcessResourceId(caseId));
     }
 
     public Predicate group(Object query, LoggedUser user, Locale locale) {
@@ -364,7 +364,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
             processQuery.setGroup(new ArrayList<>(Arrays.asList((String) query)));
         }
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
-        if (groupProcesses.size() == 0)
+        if (groupProcesses.isEmpty())
             return null;
 
         List<Predicate> processQueries = groupProcesses.stream().map(PetriNetReference::getIdentifier).map(QCase.case$.processIdentifier::eq).collect(Collectors.toList());
