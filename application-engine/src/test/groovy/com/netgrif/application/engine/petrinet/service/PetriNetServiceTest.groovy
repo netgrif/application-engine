@@ -16,6 +16,8 @@ import com.netgrif.application.engine.objects.petrinet.domain.version.Version
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.application.engine.petrinet.params.DeletePetriNetParams
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -220,7 +222,7 @@ class PetriNetServiceTest {
     }
 
     @Test
-    void testVersionActiveOnDelete() {
+    void testVersionDefaultOnDelete() {
         ImportPetriNetEventOutcome outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("1"), superCreator.loggedSuper)
         PetriNet processV1 = outcome.getNet()
         outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("2"), superCreator.loggedSuper)
@@ -232,18 +234,18 @@ class PetriNetServiceTest {
         assertFalse(petriNetService.get(processV2.getObjectId()).defaultVersion)
         assertTrue(petriNetService.get(processV3.getObjectId()).defaultVersion)
 
-        petriNetService.deletePetriNet(processV2.getStringId(), superCreator.loggedSuper)
+        petriNetService.deletePetriNet(new DeletePetriNetParams(processV2.getStringId(), superCreator.loggedSuper))
 
         assertTrue(petriNetRepository.findById(processV2.getStringId()).isEmpty())
         assertFalse(petriNetService.get(processV1.getObjectId()).defaultVersion)
         assertTrue(petriNetService.get(processV3.getObjectId()).defaultVersion)
 
-        petriNetService.deletePetriNet(processV3.getStringId(), superCreator.loggedSuper)
+        petriNetService.deletePetriNet(new DeletePetriNetParams(processV3.getStringId(), superCreator.loggedSuper))
 
         assertTrue(petriNetRepository.findById(processV3.getStringId()).isEmpty())
         assertTrue(petriNetService.get(processV1.getObjectId()).defaultVersion)
 
-        petriNetService.deletePetriNet(processV1.getStringId(), superCreator.loggedSuper)
+        petriNetService.deletePetriNet(new DeletePetriNetParams(processV1.getStringId(), superCreator.loggedSuper))
 
         assertTrue(petriNetRepository.findById(processV1.getStringId()).isEmpty())
     }
@@ -310,6 +312,6 @@ class PetriNetServiceTest {
     }
 
     private ImportPetriNetEventOutcome importProcess(String filePath, LoggedUser author) {
-        return petriNetService.importPetriNet(stream(filePath), VersionType.MAJOR, author)
+        return petriNetService.importPetriNet(new ImportPetriNetParams(stream(filePath), VersionType.MAJOR, author))
     }
 }

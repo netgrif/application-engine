@@ -10,6 +10,8 @@ import com.netgrif.application.engine.files.StorageResolverService;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.workflow.domain.FilterDeserializer;
 import com.netgrif.application.engine.workflow.domain.IllegalMenuFileException;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IMenuImportExportService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
@@ -21,7 +23,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.Multichoic
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.utils.InputStreamToString;
 import com.netgrif.application.engine.objects.workflow.domain.*;
@@ -68,9 +69,6 @@ public class MenuImportExportService implements IMenuImportExportService {
 
     @Autowired
     IPetriNetService petriNetService;
-
-    @Autowired
-    DefaultFiltersRunner defaultFiltersRunner;
 
     @Autowired
     private ITaskService taskService;
@@ -192,11 +190,15 @@ public class MenuImportExportService implements IMenuImportExportService {
             Task importedFilterTask = taskService.findOne(taskId);
             Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
             try {
-                taskService.assignTask(importedFilterTask.getStringId());
-                taskService.finishTask(importedFilterTask.getStringId());
+                taskService.assignTask(TaskParams.with()
+                        .task(importedFilterTask)
+                        .build());
+                taskService.finishTask(TaskParams.with()
+                        .task(importedFilterTask)
+                        .build());
                 workflowService.save(filterCase);
             } catch (TransitionNotExecutableException e) {
-                log.error("Failed to execute \"import_filter\" task with id: " + taskId, e);
+                log.error("Failed to execute \"import_filter\" task with id: {}", taskId, e);
             }
         });
 
@@ -260,24 +262,27 @@ public class MenuImportExportService implements IMenuImportExportService {
             });
         }
         //Creating new Case of preference_filter_item net and setting its data...
-        Case menuItemCase = workflowService.createCase(
-                petriNetService.getDefaultVersionByIdentifier("preference_filter_item").getStringId(),
-                item.getEntryName() + "_" + menuIdentifier,
-                "",
-                ActorTransformer.toLoggedUser(userService.getSystem())
-        ).getCase();
+        Case menuItemCase = workflowService.createCase(CreateCaseParams.with()
+                .processIdentifier("preference_filter_item")
+                .title("%s_%s".formatted(item.getEntryName(), menuIdentifier))
+                .color("")
+                .author(ActorTransformer.toLoggedUser(userService.getSystem()))
+                .build()).getCase();
 
         QTask qTask = new QTask("task");
         Task task = taskService.searchOne(qTask.transitionId.eq("init").and(qTask.caseId.eq(menuItemCase.getStringId())));
         try {
-            taskService.assignTask(task, userService.getLoggedUser());
+            taskService.assignTask(TaskParams.with()
+                    .task(task)
+                    .user(userService.getLoggedUser())
+                    .build());
             menuItemCase.getDataSet().get(MENU_IDENTIFIER).setValue(menuIdentifier);
             menuItemCase.getDataSet().get(PARENT_ID).setValue(parentId);
             menuItemCase.getDataSet().get(ALLOWED_ROLES).setOptions(allowedRoles);
             menuItemCase.getDataSet().get(BANNED_ROLES).setOptions(bannedRoles);
             workflowService.save(menuItemCase);
         } catch (TransitionNotExecutableException e) {
-            log.error("Failed to execute \"init\" task on preference filter item case with id: " + menuItemCase.getStringId(), e);
+            log.error("Failed to execute \"init\" task on preference filter item case with id: {}", menuItemCase.getStringId(), e);
             netCheck.set(false);
             resultMessage.append("- Failed to execute \"init\" task");
         }

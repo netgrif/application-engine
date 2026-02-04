@@ -1,19 +1,19 @@
 package com.netgrif.application.engine.action
 
-import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
-import com.netgrif.application.engine.auth.service.RealmService
-import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
+import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
 import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
-import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.MongoTemplate
-import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -108,10 +107,18 @@ class AssignActionTest {
     }
 
     private void createMainAndSecondaryNet() {
-        def mainNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/assignRoleMainNet_test_.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def mainNet = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/assignRoleMainNet_test_.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert mainNet.getNet() != null
 
-        def secondaryNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/assignRoleSecondaryNet_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def secondaryNet = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/assignRoleSecondaryNet_test.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert secondaryNet.getNet() != null
 
         this.mainNet = mainNet.getNet()

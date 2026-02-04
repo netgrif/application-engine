@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Getter
@@ -193,26 +194,29 @@ public abstract class Case implements Serializable {
         List<MapOptionsField<I18nString, ?>> dynamicOptionsFields = new LinkedList<>();
         List<ChoiceField<?>> dynamicChoicesFields = new LinkedList<>();
         petriNet.getDataSet().forEach((key, field) -> {
+            DataField dataField;
             if (field.isDynamicDefaultValue()) {
                 dynamicInitFields.add(field);
-                this.dataSet.put(key, new DataField());
+                dataField = new DataField();
+                this.dataSet.put(key, dataField);
             } else {
-                this.dataSet.put(key, new DataField(field.getDefaultValue()));
+                dataField = new DataField(field.getDefaultValue());
+                this.dataSet.put(key, dataField);
             }
             if (field.getComponent() != null) {
-                this.dataSet.get(key).setComponent(field.getComponent());
+                dataField.setComponent(field.getComponent());
             }
             if (field instanceof UserField) {
-                this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
+                dataField.setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
             }
             if (field instanceof UserListField) {
-                this.dataSet.get(key).setChoices(((UserListField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
+                dataField.setChoices(((UserListField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
             }
             if (field instanceof FieldWithAllowedNets) {
-                this.dataSet.get(key).setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());
+                dataField.setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());
             }
             if (field instanceof FilterField) {
-                this.dataSet.get(key).setFilterMetadata(((FilterField) field).getFilterMetadata());
+                dataField.setFilterMetadata(((FilterField) field).getFilterMetadata());
             }
             if (field instanceof MapOptionsField && ((MapOptionsField) field).isDynamic()) {
                 dynamicOptionsFields.add((MapOptionsField<I18nString, ?>) field);
@@ -309,13 +313,21 @@ public abstract class Case implements Serializable {
         });
     }
 
-    public void resolveViewUsers() {
+    /**
+     * Initializes {@link #viewUsers} collection. Any user defined in {@link #users} with permission {@link RolePermission#VIEW}
+     * of true value is added to the {@link #viewUsers} collection.
+     *
+     * @return true if the {@link #viewUsers} was modified, false otherwise
+     */
+    public boolean resolveViewUsers() {
+        AtomicBoolean isModified = new AtomicBoolean(!this.viewUsers.isEmpty());
         this.viewUsers.clear();
         this.users.forEach((user, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
-                viewUsers.add(user);
+                isModified.set(viewUsers.add(user));
             }
         });
+        return isModified.get();
     }
 
     private void compareExistingUserPermissions(String userId, Map<String, Boolean> permissions) {

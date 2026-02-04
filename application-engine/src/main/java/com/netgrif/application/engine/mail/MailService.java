@@ -74,7 +74,7 @@ public class MailService implements IMailService {
         MimeMessage email = buildEmail(mailDraft);
         mailSender.send(email);
 
-        log.info("Registration email sent to [" + user.getEmail() + "] with token [" + model.get(TOKEN) + "], expiring on [" + model.get(EXPIRATION) + "]");
+        log.info("Registration email sent to [{}] with a token expiring on [{}]", user.getEmail(), model.get(EXPIRATION));
     }
 
     @Override
@@ -94,7 +94,7 @@ public class MailService implements IMailService {
         MimeMessage email = buildEmail(mailDraft);
         mailSender.send(email);
 
-        log.info("Reset email sent to [" + user.getEmail() + "] with token [" + model.get(TOKEN) + "], expiring on [" + model.get(EXPIRATION) + "]");
+        log.info("Reset email sent to [{}] with a token expiring on [{}]", user.getEmail(), model.get(EXPIRATION));
     }
 
     @Override
@@ -115,7 +115,7 @@ public class MailService implements IMailService {
         mailSender.send(email);
 
         String formattedRecipients = StringUtils.join(mailDraft.getTo(), ", ");
-        log.info("Email sent to [" + formattedRecipients + "]");
+        log.info("Email sent to [{}]", formattedRecipients);
     }
 
     protected MimeMessage buildEmail(MailDraft draft) throws MessagingException, IOException, TemplateException {

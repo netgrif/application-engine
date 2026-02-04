@@ -73,12 +73,12 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
                     elasticNet.update(net);
                     repository.save(elasticNet);
                 }
-                log.debug("[" + net.getId() + "]: PetriNet \"" + net.getTitle() + "\" indexed");
+                log.debug("[{}]: PetriNet \"{}\" indexed", net.getId(), net.getTitle());
             } catch (InvalidDataAccessApiUsageException ignored) {
-                log.debug("[" + net.getId() + "]: PetriNet \"" + net.getTitle() + "\" has duplicates, will be reindexed");
+                log.debug("[{}]: PetriNet \"{}\" has duplicates, will be reindexed", net.getId(), net.getTitle());
                 repository.deleteAllById(net.getId());
                 repository.save((com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticPetriNet) net);
-                log.debug("[" + net.getId() + "]: PetriNet \"" + net.getTitle() + "\" indexed");
+                log.debug("[{}]: PetriNet \"{}\" indexed", net.getId(), net.getTitle());
             }
         });
     }
@@ -92,7 +92,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
     public void remove(String id) {
         executors.execute(id, () -> {
             repository.deleteAllById(id);
-            log.info("[" + id + "]: PetriNet \"" + id + "\" deleted");
+            log.info("[{}]: PetriNet \"{}\" deleted", id, id);
         });
     }
 
