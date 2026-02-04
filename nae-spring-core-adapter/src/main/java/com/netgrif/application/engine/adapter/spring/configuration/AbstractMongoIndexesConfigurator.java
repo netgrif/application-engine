@@ -38,7 +38,11 @@ public abstract class AbstractMongoIndexesConfigurator {
         mappingContext.getPersistentEntities()
                 .stream()
                 .filter(it -> it.isAnnotationPresent(Indexable.class) && !getEntityIndexBlacklist().contains(it.getType()))
-                .forEach(mongoPersistentEntity -> mongoTemplate.createCollection(mongoPersistentEntity.getCollection()));
+                .forEach(mongoPersistentEntity -> {
+                    if (!mongoTemplate.collectionExists(mongoPersistentEntity.getCollection())) {
+                        mongoTemplate.createCollection(mongoPersistentEntity.getCollection());
+                    }
+                });
     }
 
     public void resolveIndexes() {
