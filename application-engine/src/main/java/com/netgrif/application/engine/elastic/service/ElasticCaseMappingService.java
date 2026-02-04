@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.elastic.service;
 
+
 import com.netgrif.application.engine.objects.elastic.domain.UserField;
 import com.netgrif.application.engine.objects.elastic.domain.UserListField;
 import com.netgrif.application.engine.objects.elastic.domain.*;
@@ -165,7 +166,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
                 translations.add((String) value);
             } else {
                 // TODO vyhodit exception?
-                log.error("MultichoiceField has element value of illegal type! Expected: I18nString, Found: " + value.getClass().getCanonicalName());
+                log.error("MultichoiceField has element value of illegal type! Expected: I18nString, Found: {}", value.getClass().getCanonicalName());
             }
         });
         return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.TextField(translations.toArray(new String[0])));
@@ -182,7 +183,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return Optional.of(values);
         } else {
             // TODO error?
-            log.error("Multichoice field has value of illegal type! Expected: Set, Found: " + multichoice.getValue().getClass().getCanonicalName());
+            log.error("Multichoice field has value of illegal type! Expected: Set, Found: {}", multichoice.getValue().getClass().getCanonicalName());
             return Optional.empty();
         }
     }
@@ -196,7 +197,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.TextField((String) value));
         } else {
             // TODO vyhodit exception?
-            log.error("Enumeration field has value of illegal type! Expected: I18nString, Found: " + value.getClass().getCanonicalName());
+            log.error("Enumeration field has value of illegal type! Expected: I18nString, Found: {}", value.getClass().getCanonicalName());
             return Optional.empty();
         }
     }
@@ -266,7 +267,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return formatDateField(LocalDateTime.of(transformed.toLocalDate(), LocalTime.MIDNIGHT));
         } else {
             // TODO throw error?
-            log.error(String.format("Unsupported DateField value type (%s)! Skipping indexation...", dateField.getValue().getClass().getCanonicalName()));
+            log.error("Unsupported DateField value type ({})! Skipping indexation...", dateField.getValue().getClass().getCanonicalName());
             return Optional.empty();
         }
     }
@@ -280,7 +281,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return formatDateField(this.transformDateValueField(dateTimeField));
         } else {
             // TODO throw error?
-            log.error(String.format("Unsupported DateTimeField value type (%s)! Skipping indexation...", dateTimeField.getValue().getClass().getCanonicalName()));
+            log.error("Unsupported DateTimeField value type ({})! Skipping indexation...", dateTimeField.getValue().getClass().getCanonicalName());
             return Optional.empty();
         }
     }
@@ -323,7 +324,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
     protected Optional<DataField> transformOtherFields
             (com.netgrif.application.engine.objects.workflow.domain.DataField otherField, Field netField) {
-        log.warn("Field of type " + netField.getClass().getCanonicalName() + " is not supported for indexation by default. Indexing the toString() representation of its value...");
+        log.warn("Field of type {} is not supported for indexation by default. Indexing the toString() representation of its value...", netField.getClass().getCanonicalName());
         return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.TextField(otherField.getValue().toString()));
     }
 }

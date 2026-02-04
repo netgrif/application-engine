@@ -84,7 +84,7 @@
             }
 
             async.run {
-                workflowService.deleteCase(viewIdAsList[0])
+                deleteCase(viewIdAsList[0])
             }
         }
     </function>
@@ -329,7 +329,7 @@
                             view_configuration_id: f.view_configuration_id;
 
                             if (view_configuration_id.value != null &amp;&amp; !view_configuration_id.value.isEmpty()) {
-                                workflowService.deleteCase(view_configuration_id.value[0])
+                                deleteCase(view_configuration_id.value[0])
                             }
 
                             if (view_configuration_type.value == null || view_configuration_type.value == "") {

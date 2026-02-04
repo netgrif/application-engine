@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
 import com.netgrif.application.engine.auth.service.UserService
@@ -18,9 +17,11 @@ import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.objects.workflow.domain.Case
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
+import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest
 import io.minio.BucketExistsArgs
@@ -213,7 +214,11 @@ class FileListFieldTest {
     }
 
     PetriNet getNet() {
-        def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileListField.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/remoteFileListField.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert netOptional.getNet() != null
         return netOptional.getNet()
     }
@@ -222,7 +227,12 @@ class FileListFieldTest {
         PetriNet net = getNet()
         AbstractUser user = userService.findUserByUsername(UserConstants.ADMIN_USER_USERNAME, null).get()
         assert user != null
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", ActorTransformer.toLoggedUser(user)).getCase()
+        Case useCase = workflowService.createCase(CreateCaseParams.with()
+                .process(net)
+                .title("Test file from file list download")
+                .color("black")
+                .author(ActorTransformer.toLoggedUser(user))
+                .build()).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), ActorTransformer.toLoggedUser(user))
 
         MockMultipartFile file

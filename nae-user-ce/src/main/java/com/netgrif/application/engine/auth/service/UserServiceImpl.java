@@ -147,7 +147,7 @@ public class UserServiceImpl implements UserService {
     public Optional<AbstractUser> findUserByUsername(String username, String realmId) {
         log.debug("Finding user by username [{}] in realm [{}]", username, realmId);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
-        Optional<AbstractUser> userOpt = userRepository.findByUsername(username, mongoTemplate, collectionName).map(user -> (AbstractUser) user);
+        Optional<AbstractUser> userOpt = userRepository.findByUsername(username, mongoTemplate, collectionName).map(user -> user);
         if (userOpt.isPresent()) {
             log.debug("User [{}] found in realm [{}]", username, realmId);
         } else {
@@ -214,7 +214,7 @@ public class UserServiceImpl implements UserService {
         setDisablePassword(user);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
         userRepository.saveUser(user, mongoTemplate, collectionName);
-        log.info("User [{}] from third-party [{}] successfully created in realm [{}]", username, realmId);
+        log.info("User [{}] from third-party auth [{}] successfully created in realm [{}]", username, authMethod, realmId);
         return user;
     }
 

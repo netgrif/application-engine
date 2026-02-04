@@ -66,6 +66,7 @@ public class RegistrationService implements IRegistrationService {
 
         Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
         Page<User> users;
+        int totalReset = 0;
         do {
             users = userService.findAllByStateAndExpirationDateBefore(UserState.BLOCKED, LocalDateTime.now(), null, pageable);
             if (users == null || users.isEmpty()) {
@@ -78,11 +79,12 @@ public class RegistrationService implements IRegistrationService {
                 user.setExpirationDate(null);
             });
             userService.saveUsers(users.getContent().stream().map(AbstractUser.class::cast).toList());
+            totalReset += users.getContent().size();
 
             pageable = pageable.next();
         } while (users.hasNext());
 
-        log.info("Reset " + users.getContent().size() + " expired user tokens");
+        log.info("Reset {} expired user tokens", totalReset);
     }
 
     @Override
@@ -90,13 +92,13 @@ public class RegistrationService implements IRegistrationService {
         user.setPassword(newPassword);
         encodeUserPassword(user);
         userService.saveUser(user, null);
-        log.info("Changed password for user " + user.getEmail() + ".");
+        log.info("Changed password for user {}.", user.getEmail());
     }
 
     @Override
     public boolean verifyToken(String token) {
         try {
-            log.info("Verifying token:" + token);
+            log.debug("Verifying token: {}", token);
             String[] tokenParts = decodeToken(token);
             User user = (User) userService.findByEmail(tokenParts[0], null);
             return user != null && Objects.equals(user.getToken(), tokenParts[1]) && user.getExpirationDate().isAfter(LocalDateTime.now());
@@ -128,12 +130,12 @@ public class RegistrationService implements IRegistrationService {
             if (user.isActive()) {
                 return null;
             }
-            log.info("Renewing old user [" + newUser.email + "]");
+            log.info("Renewing old user [{}]", newUser.email);
         } else {
             user = new User();
             user.setEmail(newUser.email);
             user.setUsername(newUser.email);
-            log.info("Creating new user [" + newUser.email + "]");
+            log.info("Creating new user [{}]", newUser.email);
         }
         user.setToken(generateTokenKey());
         user.setPassword("");
@@ -159,7 +161,7 @@ public class RegistrationService implements IRegistrationService {
     @Override
     public AbstractUser registerUser(RegistrationRequest registrationRequest) throws InvalidUserTokenException {
         String email = decodeToken(registrationRequest.token)[0];
-        log.info("Registering user " + email);
+        log.info("Registering user {}", email);
         User user = (User) userService.findByEmail(email, null);
         if (user == null) {
             return null;
@@ -173,16 +175,16 @@ public class RegistrationService implements IRegistrationService {
         user.setExpirationDate(null);
         user.setState(UserState.ACTIVE);
 
-        return (AbstractUser) userService.saveUser(user, null);
+        return userService.saveUser(user, null);
     }
 
     @Override
     public AbstractUser resetPassword(String email) {
-        log.info("Resetting password of " + email);
+        log.info("Resetting password of {}", email);
         User user = (User) userService.findByEmail(email, null);
         if (user == null || !user.isActive()) {
             String state = user == null ? "Non-existing" : "Inactive";
-            log.info(state + " user [" + email + "] tried to reset his password");
+            log.info("{} user [{}] tried to reset his password", state, email);
             return null;
         }
 
@@ -190,12 +192,12 @@ public class RegistrationService implements IRegistrationService {
         user.setPassword(null);
         user.setToken(generateTokenKey());
         user.setExpirationDate(generateExpirationDate());
-        return (AbstractUser) userService.saveUser(user, null);
+        return userService.saveUser(user, null);
     }
 
     @Override
     public AbstractUser recover(String email, String newPassword) {
-        log.info("Recovering user " + email);
+        log.info("Recovering user {}", email);
         User user = (User) userService.findByEmail(email, null);
         if (user == null) {
             return null;
@@ -206,7 +208,7 @@ public class RegistrationService implements IRegistrationService {
         user.setToken(null);
         user.setExpirationDate(null);
 
-        return (AbstractUser) userService.saveUser(user, null);
+        return userService.saveUser(user, null);
     }
 
     @Override

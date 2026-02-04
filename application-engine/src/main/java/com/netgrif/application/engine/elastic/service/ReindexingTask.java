@@ -72,7 +72,7 @@ public class ReindexingTask {
 
     @Scheduled(cron = "#{springElasticsearchReindex}")
     public void reindex() {
-        log.info("Reindexing stale cases: started reindexing after " + lastRun);
+        log.info("Reindexing stale cases: started reindexing after {}", lastRun);
 
         elasticIndexService.bulkIndex(false, lastRun, null, null);
 
@@ -84,7 +84,7 @@ public class ReindexingTask {
     }
 
     private void reindexPage(Predicate predicate, int page, long numOfPages, boolean forced) {
-        log.info("Reindexing " + (page + 1) + " / " + numOfPages);
+        log.info("Reindexing {} / {}", page + 1, numOfPages);
         Page<Case> cases = this.workflowService.search(predicate, PageRequest.of(page, pageSize));
 
         for (Case aCase : cases) {

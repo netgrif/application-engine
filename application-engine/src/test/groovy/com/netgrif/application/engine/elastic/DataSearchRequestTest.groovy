@@ -2,23 +2,20 @@ package com.netgrif.application.engine.elastic
 
 import com.netgrif.application.engine.MockService
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.ChoiceField
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldValue
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileListFieldValue
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.*
+import com.netgrif.application.engine.objects.workflow.domain.Case
+import com.netgrif.application.engine.objects.workflow.domain.Task
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.objects.workflow.domain.Case
-import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
-import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -96,7 +93,14 @@ class DataSearchRequestTest {
     void before() {
         testHelper.truncateDbs()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def net = null
+        new FileInputStream("src/test/resources/all_data.xml").withCloseable {inputStream ->
+            net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                    .xmlFile(inputStream)
+                    .releaseType(VersionType.MAJOR)
+                    .author(superCreator.getLoggedSuper())
+                    .build())
+        }
         assert net.getNet() != null
 
         def users = userService.findAllUsers(null, Pageable.ofSize(100))
