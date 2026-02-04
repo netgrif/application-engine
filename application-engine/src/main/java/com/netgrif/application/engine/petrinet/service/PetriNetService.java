@@ -173,7 +173,7 @@ public class PetriNetService implements IPetriNetService {
     @Transactional
     public ImportPetriNetEventOutcome importPetriNet(ImportPetriNetParams importPetriNetParams) throws IOException,
             MissingPetriNetMetaDataException, MissingIconKeyException {
-        validateAttributes(importPetriNetParams);
+        fillAndValidateAttributes(importPetriNetParams);
 
         ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
         ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
@@ -192,7 +192,7 @@ public class PetriNetService implements IPetriNetService {
         log.info("Petri net {} ({} v{}) imported successfully and saved in a folder: {}", newProcess.getTitle(),
                 newProcess.getInitials(), newProcess.getVersion(), savedPath);
 
-        runActionAndPublishEvent(outcome, null, newProcess.getPreUploadActions(),  importPetriNetParams.getParams(),
+        runActionAndPublishEvent(outcome, null, newProcess.getPreUploadActions(), importPetriNetParams.getParams(),
                 new ProcessDeployEvent(outcome, EventPhase.PRE));
 
         if (processToMakeNonDefault != null) {
@@ -239,13 +239,12 @@ public class PetriNetService implements IPetriNetService {
      *     by 'releaseType' input parameter</li>
      * </ul>
      *
-     * @param newProcess A process to be checked and updated
+     * @param newProcess  A process to be checked and updated
      * @param releaseType requested release type level. It's used for version initialization
-     *
      * @return The process, which has been made non-default or null if no process updated
-     *
      * @throws IllegalArgumentException if the version already exists
-     * */
+     *
+     */
     private PetriNet checkAndHandleProcessVersion(PetriNet newProcess, VersionType releaseType) {
         PetriNet processToMakeNonDefault = null;
 
@@ -626,7 +625,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     protected void doDeletePetriNet(DeletePetriNetParams deletePetriNetParams, boolean force) {
-        validateAttributes(deletePetriNetParams);
+        fillAndValidateAttributes(deletePetriNetParams);
 
         Optional<PetriNet> petriNetOptional = repository.findById(deletePetriNetParams.getPetriNetId());
         if (petriNetOptional.isEmpty()) {
@@ -682,7 +681,7 @@ public class PetriNetService implements IPetriNetService {
         return obj;
     }
 
-    protected void validateAttributes(ImportPetriNetParams importPetriNetParams) throws IllegalArgumentException {
+    protected void fillAndValidateAttributes(ImportPetriNetParams importPetriNetParams) throws IllegalArgumentException {
         if (importPetriNetParams.getXmlFile() == null) {
             throw new IllegalArgumentException("No Petriflow source file provided.");
         }
@@ -694,7 +693,7 @@ public class PetriNetService implements IPetriNetService {
         }
     }
 
-    protected void validateAttributes(DeletePetriNetParams deletePetriNetParams) throws IllegalArgumentException {
+    protected void fillAndValidateAttributes(DeletePetriNetParams deletePetriNetParams) throws IllegalArgumentException {
         if (deletePetriNetParams.getPetriNetId() == null) {
             throw new IllegalArgumentException("No petriNet identifier was provided.");
         }
