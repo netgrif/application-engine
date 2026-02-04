@@ -10,6 +10,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -92,7 +93,11 @@ public class EventTest {
             }
         };
         listener.register(caseDispatcher, CreateCaseEvent.class, AbstractDispatcher.DispatchMethod.ASYNC);
-        workflowService.createCase(net.getStringId(), null, null, superCreator.getLoggedSuper());
+        CreateCaseParams params = CreateCaseParams.with()
+                .process(net)
+                .author(superCreator.getLoggedSuper())
+                .build();
+        workflowService.createCase(params);
 
         boolean completed = false;
         try {
