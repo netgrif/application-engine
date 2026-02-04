@@ -27,11 +27,13 @@ public class MongoDbRunner implements ApplicationEngineStartupRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         if (mongoProperties.getDrop()) {
-            if (mongoProperties.getHost() != null && mongoProperties.getPort() != null)
+            if (mongoProperties.getHost() != null && mongoProperties.getPort() != null) {
                 log.info("Dropping Mongo database {}:{}/{}", mongoProperties.getHost(), mongoProperties.getPort(), mongoProperties.getDatabase());
-            else if (mongoProperties.getUri() != null)
+            } else if (mongoProperties.getUri() != null) {
                 log.info("Dropping Mongo database {}", mongoProperties.getUri());
+            }
             mongoTemplate.getDb().drop();
+            mongoIndexesConfigurator.resolveCollections();
         }
         if (mongoProperties.getRunnerEnsureIndex()) {
             mongoIndexesConfigurator.resolveIndexes();

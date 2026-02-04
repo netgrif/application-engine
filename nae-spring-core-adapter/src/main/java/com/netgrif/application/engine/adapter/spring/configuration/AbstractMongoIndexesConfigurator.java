@@ -34,6 +34,13 @@ public abstract class AbstractMongoIndexesConfigurator {
     public abstract MultiValueMap<Class<?>, String> getIndexes();
     public abstract List<Class<?>> getEntityIndexBlacklist();
 
+    public void resolveCollections() {
+        mappingContext.getPersistentEntities()
+                .stream()
+                .filter(it -> it.isAnnotationPresent(Indexable.class) && !getEntityIndexBlacklist().contains(it.getType()))
+                .forEach(mongoPersistentEntity -> mongoTemplate.createCollection(mongoPersistentEntity.getCollection()));
+    }
+
     public void resolveIndexes() {
         mappingContext.getPersistentEntities()
                 .stream()
