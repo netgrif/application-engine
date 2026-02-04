@@ -264,24 +264,14 @@ public class WorkflowService implements IWorkflowService {
     private boolean resolveActorRefPermissions(Case useCase, String actorFieldId, Map<String, Boolean> permission) {
         List<String> actorIds = getExistingActors((ActorListFieldValue) useCase.getDataSet().get(actorFieldId).getValue());
         if (actorIds != null && !actorIds.isEmpty()) {
-            if (permission.containsKey("view") && !permission.get("view")) {
-                return useCase.getNegativeViewActors().addAll(actorIds);
-            } else {
-                useCase.addActors(new HashSet<>(actorIds), permission);
-                return true;
+            useCase.addActors(new HashSet<>(actorIds), permission);
+            if (permission.containsKey(ProcessRolePermission.VIEW.getValue()) && !permission.get(ProcessRolePermission.VIEW.getValue())) {
+                useCase.getNegativeViewActors().addAll(actorIds);
             }
+            return true;
         }
         return false;
     }
-//    private void resolveActorRefPermissions(Case useCase, String actorFieldId, Map<String, Boolean> permission) {
-//        List<String> actorIds = getExistingActors((ActorListFieldValue) useCase.getDataSet().get(actorFieldId).getValue());
-//        if (actorIds != null && !actorIds.isEmpty()) {
-//            useCase.addActors(new HashSet<>(actorIds), permission);
-//            if (permission.containsKey(ProcessRolePermission.VIEW.getValue()) && !permission.get(ProcessRolePermission.VIEW.getValue())) {
-//                useCase.getNegativeViewActors().addAll(actorIds);
-//            }
-//        }
-//    }
 
     private List<String> getExistingActors(ActorListFieldValue actorListFieldValue) {
         if (actorListFieldValue == null) {

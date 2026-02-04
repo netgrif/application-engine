@@ -18,6 +18,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.objects.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.utils.DateUtils;
@@ -833,18 +834,18 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Task resolveUserRef(Task task, Case useCase) {
-        AtomicBoolean isTaskModified = new AtomicBoolean(!task.getActors().isEmpty() || !task.getNegativeViewUsers().isEmpty());
+    public Task resolveActorRef(Task task, Case useCase) {
+        AtomicBoolean isTaskModified = new AtomicBoolean(!task.getActors().isEmpty() || !task.getNegativeViewActors().isEmpty());
         task.getActors().clear();
         task.getNegativeViewActors().clear();
         task.getActorRefs().forEach((actorFieldId, permission) -> {
             List<String> actorIds = getExistingActors((ActorListFieldValue) useCase.getDataSet().get(actorFieldId).getValue());
-            if (actorIds != null && !actorIds.isEmpty() && permission.containsKey("view") && !permission.get("view")) {
-                task.getNegativeViewActors().addAll(actorIds);
-                isTaskModified.set(true);
-            } else if (actorIds != null && !actorIds.isEmpty()) {
+            if (actorIds != null && !actorIds.isEmpty()) {
                 task.addActors(new HashSet<>(actorIds), permission);
                 isTaskModified.set(true);
+                if (permission.containsKey(RolePermission.VIEW.getValue()) && !permission.get(RolePermission.VIEW.getValue())) {
+                    task.getNegativeViewActors().addAll(actorIds);
+                }
             }
         });
         if (task.resolveViewActors()) {
@@ -855,22 +856,6 @@ public class TaskService implements ITaskService {
         }
         return task;
     }
-
-//    public Task resolveActorRef(Task task, Case useCase) {
-//        task.getActors().clear();
-//        task.getNegativeViewActors().clear();
-//        task.getActorRefs().forEach((actorFieldId, permission) -> {
-//            List<String> actorIds = getExistingActors((ActorListFieldValue) useCase.getDataSet().get(actorFieldId).getValue());
-//            if (actorIds != null && !actorIds.isEmpty()) {
-//                task.addActors(new HashSet<>(actorIds), permission);
-//                if (permission.containsKey(RolePermission.VIEW.getValue()) && !permission.get(RolePermission.VIEW.getValue())) {
-//                    task.getNegativeViewActors().addAll(actorIds);
-//                }
-//            }
-//        });
-//        task.resolveViewActors();
-//        return taskRepository.save(task);
-//    }
 
     private List<String> getExistingActors(ActorListFieldValue actorListFieldValue) {
         if (actorListFieldValue == null) {

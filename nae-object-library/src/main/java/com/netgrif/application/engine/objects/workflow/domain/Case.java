@@ -319,7 +319,7 @@ public abstract class Case implements Serializable {
      *
      * @return true if the {@link #viewActors} was modified, false otherwise
      */
-    public boolean resolveViewUsers() {
+    public boolean resolveViewActors() {
         AtomicBoolean isModified = new AtomicBoolean(!this.viewActors.isEmpty());
         this.viewActors.clear();
         this.actors.forEach((actor, perms) -> {

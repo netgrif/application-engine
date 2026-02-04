@@ -5,7 +5,6 @@ import com.netgrif.application.engine.objects.elastic.domain.*;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.TaskField;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

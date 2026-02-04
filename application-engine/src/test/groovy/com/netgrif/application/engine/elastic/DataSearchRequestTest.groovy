@@ -14,11 +14,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.*
 import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.ChoiceField
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldValue
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileListFieldValue
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorListFieldValue
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
