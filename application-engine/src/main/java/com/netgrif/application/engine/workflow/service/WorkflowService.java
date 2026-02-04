@@ -304,12 +304,12 @@ public class WorkflowService implements IWorkflowService {
         outcome.addOutcomes(eventService.runActions(petriNet.getPostCreateActions(), useCase, Optional.empty(),
                 createCaseParams.getParams()));
 
-        useCase = evaluateRules(new CreateCaseEvent(new CreateCaseEventOutcome(useCase, outcome.getOutcomes()), EventPhase.POST));
+        CreateCaseEventOutcome eventOutcome = new CreateCaseEventOutcome(useCase, outcome.getOutcomes());
+        eventOutcome.setMessage(outcome.getMessage());
+        useCase = evaluateRules(new CreateCaseEvent(eventOutcome, EventPhase.POST));
 
         outcome.setCase(setImmediateDataFields(useCase));
         addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
-        publisher.publishEvent(new CreateCaseEvent(outcome, EventPhase.POST));
-
         return outcome;
     }
 
