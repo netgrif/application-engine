@@ -22,7 +22,7 @@ public interface IEventService {
 
     List<EventOutcome> runActions(List<Action> actions, Map<String, String> params);
 
-    List<EventOutcome> processDataEvents(Field field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task, Map<String, String> params);
+    List<EventOutcome> processDataEvents(Field<?> field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task, Map<String, String> params);
 
     List<EventOutcome> runEventActions(Case useCase, Task task, List<Action> actions, DataEventType trigger, Map<String, String> params);
 

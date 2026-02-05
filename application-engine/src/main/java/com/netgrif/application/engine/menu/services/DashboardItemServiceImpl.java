@@ -20,6 +20,8 @@ import com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.Das
 import com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.DashboardItemConstants;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ImportHelper;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -65,11 +67,12 @@ public class DashboardItemServiceImpl implements DashboardItemService {
         }
 
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
-        PetriNet petriNet = petriNetService.getDefaultVersionByIdentifier(DashboardItemConstants.PROCESS_IDENTIFIER);
-        if (petriNet == null) {
-            throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.DEFAULT_PROCESS_NOT_FOUND, "Dashboard item process not found");
-        }
-        itemCase = workflowService.createCase(petriNet.getStringId(), body.getName().getDefaultValue(), "", loggedUser).getCase();
+        itemCase = workflowService.createCase(CreateCaseParams.with()
+                .processIdentifier(DashboardItemConstants.PROCESS_IDENTIFIER)
+                .title(body.getName().getDefaultValue())
+                .color("")
+                .author(loggedUser)
+                .build()).getCase();
         ToDataSetOutcome outcome = body.toDataSet();
         itemCase = setDataWithExecute(itemCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());
         return itemCase;
@@ -115,9 +118,15 @@ public class DashboardItemServiceImpl implements DashboardItemService {
         AbstractUser loggedUser = userService.getLoggedOrSystem();
         String taskId = MenuItemUtils.findTaskIdInCase(useCase, transId);
         Task task = taskService.findOne(taskId);
-        task = taskService.assignTask(task, loggedUser).getTask();
+        task = taskService.assignTask(TaskParams.with()
+                .task(task)
+                .user(loggedUser)
+                .build()).getTask();
         task = dataService.setData(task, ImportHelper.populateDataset((Map) dataSet)).getTask();
-        return taskService.finishTask(task, loggedUser).getCase();
+        return taskService.finishTask(TaskParams.with()
+                .task(task)
+                .user(loggedUser)
+                .build()).getCase();
     }
 
     protected Case findCase(String processIdentifier, String query) {
