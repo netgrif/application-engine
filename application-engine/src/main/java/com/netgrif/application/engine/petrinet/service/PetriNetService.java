@@ -191,7 +191,7 @@ public class PetriNetService implements IPetriNetService {
         xmlCopy.close();
         log.info("Petri net {} ({} v{}) imported successfully and saved in a folder: {}", newProcess.getTitle(),
                 newProcess.getInitials(), newProcess.getVersion(), savedPath);
-
+        functionCacheService.cacheAllPetriNetFunctions();
         runActionAndPublishEvent(outcome, null, newProcess.getPreUploadActions(), importPetriNetParams.getParams(),
                 new ProcessDeployEvent(outcome, EventPhase.PRE));
 
