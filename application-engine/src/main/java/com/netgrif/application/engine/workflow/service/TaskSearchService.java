@@ -36,7 +36,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
             return null;
         } else if (!isIntersection) {
             singleQueries = singleQueries.stream().filter(Objects::nonNull).collect(Collectors.toList());
-            if (singleQueries.size() == 0) {
+            if (singleQueries.isEmpty()) {
                 // all queries result in an empty set => the entire result is an empty set
                 return null;
             }
@@ -278,7 +278,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
         PetriNetSearch processQuery = new PetriNetSearch();
         processQuery.setGroup(request.group);
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
-        if (groupProcesses.size() == 0)
+        if (groupProcesses.isEmpty())
             return true;
 
         query.and(

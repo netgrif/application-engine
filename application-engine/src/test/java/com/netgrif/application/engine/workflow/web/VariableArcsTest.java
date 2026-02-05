@@ -13,6 +13,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.startup.ImportHelper;
@@ -24,6 +25,8 @@ import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
@@ -110,7 +113,11 @@ public class VariableArcsTest {
         repository.deleteAll();
         assertNotNull(processRoleService.getDefaultRole());
         testHelper.truncateDbs();
-        ImportPetriNetEventOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), VersionType.MAJOR, superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = service.importPetriNet(ImportPetriNetParams.with()
+                    .xmlFile(new FileInputStream(NET_PATH))
+                    .releaseType(VersionType.MAJOR)
+                    .author(superCreator.getLoggedSuper())
+                .build());
 
         assert outcome.getNet() != null;
         PetriNet net = outcome.getNet();
@@ -136,7 +143,12 @@ public class VariableArcsTest {
 
         List<Arc> arcs = this.loaded.getArcs().values().stream().flatMap(List::stream).collect(Collectors.toList());
         assert arcs.size() > 0;
-        CreateCaseEventOutcome caseOutcome = workflowService.createCase(this.loaded.getStringId(), "VARTEST", "red", mock.mockLoggedUser());
+        CreateCaseEventOutcome caseOutcome = workflowService.createCase(CreateCaseParams.with()
+                .process(this.loaded)
+                .title("VARTEST")
+                .color("red")
+                .author(mock.mockLoggedUser())
+                .build());
 
         assert caseOutcome.getCase().getPetriNet().getArcs()
                 .values()
@@ -159,11 +171,17 @@ public class VariableArcsTest {
     private void assertInhibArcsFinishTask(List<TaskReference> tasks) throws TransitionNotExecutableException {
         for (TaskReference taskRef : tasks) {
             Task task = taskService.findOne(taskRef.getStringId());
-            taskService.assignTask(task, testUser);
+            taskService.assignTask(TaskParams.with()
+                    .task(task)
+                    .user(testUser)
+                    .build());
             finishCase = workflowService.findOne(task.getCaseId());
             assert !finishCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_start") &&
                     !finishCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_res");
-            taskService.finishTask(task, testUser);
+            taskService.finishTask(TaskParams.with()
+                    .task(task)
+                    .user(testUser)
+                    .build());
             finishCase = workflowService.findOne(task.getCaseId());
             assert !finishCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_start") &&
                     finishCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_res");
@@ -175,12 +193,18 @@ public class VariableArcsTest {
             Task task = taskService.findOne(taskRef.getStringId());
             int markingBeforeAssign = 0;
             markingBeforeAssign = finishCase.getActivePlaces().get(task.getTitle().getDefaultValue() + "_start");
-            taskService.assignTask(task, testUser);
+            taskService.assignTask(TaskParams.with()
+                    .task(task)
+                    .user(testUser)
+                    .build());
             finishCase = workflowService.findOne(task.getCaseId());
 
             assert markingBeforeAssign == finishCase.getActivePlaces().get(task.getTitle().getDefaultValue() + "_start");
 
-            taskService.finishTask(task, testUser);
+            taskService.finishTask(TaskParams.with()
+                    .task(task)
+                    .user(testUser)
+                    .build());
             finishCase = workflowService.findOne(task.getCaseId());
 
             assert markingBeforeAssign == finishCase.getActivePlaces().get(task.getTitle().getDefaultValue() + "_start") &&
@@ -192,12 +216,18 @@ public class VariableArcsTest {
         List<TaskReference> filteredTasks = tasks.stream().filter(task -> task.getTitle().contains(arcType)).collect(Collectors.toList());
         for (TaskReference taskRef : filteredTasks) {
             Task task = taskService.findOne(taskRef.getStringId());
-            taskService.assignTask(task, testUser);
+            taskService.assignTask(TaskParams.with()
+                    .task(task)
+                    .user(testUser)
+                    .build());
             finishCase = workflowService.findOne(task.getCaseId());
 
             assert !finishCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_start");
 
-            taskService.finishTask(task, testUser);
+            taskService.finishTask(TaskParams.with()
+                    .task(task)
+                    .user(testUser)
+                    .build());
             finishCase = workflowService.findOne(task.getCaseId());
 
             assert !finishCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_start") &&
@@ -209,12 +239,18 @@ public class VariableArcsTest {
         List<TaskReference> filteredTasks = tasks.stream().filter(task -> task.getTitle().equals("var_arc_out") || task.getTitle().equals("place_var_arc_out")).collect(Collectors.toList());
         for (TaskReference taskRef : filteredTasks) {
             Task task = taskService.findOne(taskRef.getStringId());
-            taskService.assignTask(task, testUser);
+            taskService.assignTask(TaskParams.with()
+                    .task(task)
+                    .user(testUser)
+                    .build());
             finishCase = workflowService.findOne(task.getCaseId());
 
             assert !finishCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_end");
 
-            taskService.finishTask(task, testUser);
+            taskService.finishTask(TaskParams.with()
+                    .task(task)
+                    .user(testUser)
+                    .build());
             finishCase = workflowService.findOne(task.getCaseId());
 
             assert finishCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_end") &&
@@ -250,7 +286,10 @@ public class VariableArcsTest {
             if (!arcType.equals("inhib")) {
                 tokensBeforeAssign = cancelCase.getActivePlaces().get(task.getTitle().getDefaultValue() + "_start");
             }
-            taskService.assignTask(task, testUser);
+            taskService.assignTask(TaskParams.with()
+                    .task(task)
+                    .user(testUser)
+                    .build());
             cancelCase = workflowService.findOne(task.getCaseId());
             assert !cancelCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_res");
             if (arcType.equals("read")) {
@@ -266,11 +305,20 @@ public class VariableArcsTest {
             if (task.getTitle().getDefaultValue().contains("ref")) {
                 QTask qTask = new QTask("task");
                 Task addTokensTask = taskService.searchOne(qTask.transitionId.eq("add_tokens").and(qTask.caseId.eq(cancelCase.getStringId())));
-                taskService.assignTask(ActorTransformer.toLoggedUser(testUser), addTokensTask.getStringId());
-                taskService.finishTask(addTokensTask, testUser);
+                taskService.assignTask(TaskParams.with()
+                        .task(addTokensTask)
+                        .user(testUser)
+                        .build());
+                taskService.finishTask(TaskParams.with()
+                        .task(addTokensTask)
+                        .user(testUser)
+                        .build());
             }
             int tokensAfterCancel = 0;
-            taskService.cancelTask(task, testUser);
+            taskService.cancelTask(TaskParams.with()
+                    .task(task)
+                    .user(testUser)
+                    .build());
             cancelCase = workflowService.findOne(task.getCaseId());
             if (!arcType.equals("inhib")) {
                 tokensAfterCancel = cancelCase.getActivePlaces().get(task.getTitle().getDefaultValue() + "_start");
@@ -290,8 +338,14 @@ public class VariableArcsTest {
             if (task.getTitle().getDefaultValue().contains("ref")) {
                 QTask qTask = new QTask("task");
                 Task removeTokensTask = taskService.searchOne(qTask.transitionId.eq("remove_tokens").and(qTask.caseId.eq(cancelCase.getStringId())));
-                taskService.assignTask(ActorTransformer.toLoggedUser(testUser), removeTokensTask.getStringId());
-                taskService.finishTask(removeTokensTask, testUser);
+                taskService.assignTask(TaskParams.with()
+                        .task(removeTokensTask)
+                        .user(testUser)
+                        .build());
+                taskService.finishTask(TaskParams.with()
+                        .task(removeTokensTask)
+                        .user(testUser)
+                        .build());
                 tasksAfterPlaceRefReset = taskService.findAllByCase(cancelCase.getStringId(), LocaleContextHolder.getLocale());
             }
         }
@@ -301,12 +355,18 @@ public class VariableArcsTest {
         List<TaskReference> filteredTasks = tasks.stream().filter(task -> task.getTitle().equals("var_arc_out") || task.getTitle().equals("place_var_arc_out")).collect(Collectors.toList());
         for (TaskReference taskRef : filteredTasks) {
             Task task = taskService.findOne(taskRef.getStringId());
-            taskService.assignTask(task, testUser);
+            taskService.assignTask(TaskParams.with()
+                    .task(task)
+                    .user(testUser)
+                    .build());
             cancelCase = workflowService.findOne(task.getCaseId());
 
             assert !cancelCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_end");
 
-            taskService.cancelTask(task, testUser);
+            taskService.cancelTask(TaskParams.with()
+                    .task(task)
+                    .user(testUser)
+                    .build());
             cancelCase = workflowService.findOne(task.getCaseId());
 
             assert !cancelCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_res");

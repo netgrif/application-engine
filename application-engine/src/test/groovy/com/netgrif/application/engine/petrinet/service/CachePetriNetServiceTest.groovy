@@ -9,6 +9,7 @@ import com.netgrif.application.engine.configuration.properties.CacheConfiguratio
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -68,7 +69,11 @@ class CachePetriNetServiceTest {
     @Test
     void cacheTest() {
         assert cacheManager.getCache(cacheProperties.getPetriNetDefault()).get("processDeleteTest") == null
-        ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(stream(NET_FILE))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert testNetOptional.getNet() != null
         PetriNet testNet = testNetOptional.getNet()
 

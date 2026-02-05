@@ -11,6 +11,7 @@ import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -82,7 +83,11 @@ class PetriNetControllerTest {
     void before() {
         testHelper.truncateDbs()
 
-        def net = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(stream(NET_FILE))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert net.getNet() != null
 
         this.net = net.getNet()

@@ -15,6 +15,7 @@ import com.netgrif.application.engine.startup.runner.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.objects.workflow.domain.*
 import com.netgrif.application.engine.objects.workflow.domain.filter.FilterImportExportList
+import com.netgrif.application.engine.workflow.params.TaskParams
 import com.netgrif.application.engine.workflow.service.UserFilterSearchService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
@@ -165,7 +166,7 @@ class FilterImportExportTest {
                         "value": importedTasksIds
                 ]
         ]))
-        this.taskService.finishTask(importTask, dummyUser)
+        this.taskService.finishTask(new TaskParams(importTask.getStringId(), dummyUser))
         Thread.sleep(1000)
         filterCases = this.userFilterSearchService.autocompleteFindFilters("")
         List<String> filterCasesNames = filterCases.stream().map({ filterCase -> filterCase.title }).collect(Collectors.toList())
