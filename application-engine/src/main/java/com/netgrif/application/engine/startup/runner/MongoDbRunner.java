@@ -22,7 +22,7 @@ public class MongoDbRunner implements ApplicationEngineStartupRunner {
 
     private final MongoTemplate mongoTemplate;
 
-    private final MongoCollectionConfigurator mongoIndexesConfigurator;
+    private final MongoCollectionConfigurator mongoCollectionConfigurator;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -33,10 +33,10 @@ public class MongoDbRunner implements ApplicationEngineStartupRunner {
                 log.info("Dropping Mongo database {}", mongoProperties.getUri());
             }
             mongoTemplate.getDb().drop();
-            mongoIndexesConfigurator.resolveCollections();
+            mongoCollectionConfigurator.resolveCollections();
         }
         if (mongoProperties.getRunnerEnsureIndex()) {
-            mongoIndexesConfigurator.resolveIndexes();
+            mongoCollectionConfigurator.resolveIndexes();
         }
     }
 
