@@ -5,5 +5,5 @@ import java.lang.annotation.*;
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-public @interface Indexable {
+public @interface EnsureCollection {
 }
