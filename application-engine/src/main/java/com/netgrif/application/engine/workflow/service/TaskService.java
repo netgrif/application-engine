@@ -759,7 +759,7 @@ public class TaskService implements ITaskService {
     public Page<Task> findByUser(Pageable pageable, AbstractUser user) {
         // TODO: impersonation
 //        return loadUsers(taskRepository.findByUserId(pageable, user.getSelfOrImpersonated().getStringId()));
-        return loadUsers(taskRepository.findByUserId(pageable, user.getStringId()));
+        return loadUsers(taskRepository.findByAssignee_Id(pageable, user.getStringId()));
     }
 
     @Override

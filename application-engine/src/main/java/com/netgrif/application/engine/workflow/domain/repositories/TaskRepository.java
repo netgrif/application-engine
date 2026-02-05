@@ -26,9 +26,9 @@ public interface TaskRepository extends MongoRepository<Task, String>, QuerydslP
 
     List<Task> findAllByTransitionIdIn(Collection<String> ids);
 
-    Page<Task> findByUserId(Pageable pageable, String userId);
+    Page<Task> findByAssignee_Id(Pageable pageable, String userId);
 
-    List<Task> findByUserIdAndFinishDateNotNull(Long userId);
+    List<Task> findByAssignee_Id_AndFinishDateNotNull(String userId);
 
     Task findByTransitionIdAndCaseId(String transitionId, String caseId);
 
@@ -36,7 +36,7 @@ public interface TaskRepository extends MongoRepository<Task, String>, QuerydslP
 
     List<Task> findAllBy_idIn(Iterable<ProcessResourceId> id);
 
-    void deleteAllByCaseIdAndUserIdIsNull(String caseId);
+    void deleteAllByCaseIdAndAssignee_Id_IsNull(String caseId);
 
     void deleteAllByCaseIdAndFinishDateIsNotNull(String caseId);
 
