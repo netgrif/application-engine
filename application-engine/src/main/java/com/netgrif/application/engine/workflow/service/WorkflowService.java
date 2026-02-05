@@ -285,9 +285,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale, Map<String, String> params) {
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier);
+        PetriNet net = petriNetService.getDefaultVersionByIdentifier(identifier);
         if (net == null) {
-            throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
+            throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not have default version.");
         }
         return this.createCase(net.getStringId(), title != null && !title.equals("") ? title : net.getDefaultCaseName().getTranslation(locale), color, user, params);
     }
@@ -299,7 +299,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Map<String, String> params) {
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier);
+        PetriNet net = petriNetService.getDefaultVersionByIdentifier(identifier);
         if (net == null) {
             throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
         }
@@ -308,7 +308,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user) {
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier);
+        PetriNet net = petriNetService.getDefaultVersionByIdentifier(identifier);
         if (net == null) {
             throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
         }

@@ -12,6 +12,10 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 @EqualsAndHashCode(callSuper = true)
 public class FileField extends com.netgrif.application.engine.objects.elastic.domain.FileField {
 
+    public FileField(FileField field) {
+        super(field);
+    }
+
     public FileField(FileFieldValue value) {
         super(value);
     }

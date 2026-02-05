@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -13,6 +14,11 @@ import java.util.List;
 public abstract class FieldWithAllowedNetsField extends DataField {
 
     public String[] allowedNets;
+
+    public FieldWithAllowedNetsField(FieldWithAllowedNetsField field) {
+        super(field);
+        this.allowedNets = field.allowedNets == null ? null : Arrays.copyOf(field.allowedNets, field.allowedNets.length);
+    }
 
     public FieldWithAllowedNetsField(String fullTextValue, String[] allowedNets) {
         super(fullTextValue);

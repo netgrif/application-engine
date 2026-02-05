@@ -118,6 +118,7 @@ netgrif:
             prometheus: metric
           exposure:
             exclude: shutdown
+            include: "*"
       endpoint:
         health:
           show-details: when_authorized
@@ -130,6 +131,9 @@ netgrif:
           enabled: 'false'
         env:
           enabled: 'true'
+      health:
+        elasticsearch:
+          enabled: 'false'
     logging:
       file:
         path: log

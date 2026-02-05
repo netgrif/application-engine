@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,6 +18,12 @@ public abstract class I18nField extends DataField {
     public String[] keyValue;
 
     public Map<String, String> translations;
+
+    public I18nField(I18nField field) {
+        super(field);
+        this.keyValue = field.keyValue == null ? null : Arrays.copyOf(field.keyValue, field.keyValue.length);
+        this.translations = field.translations == null ? null : new HashMap<>(field.translations);
+    }
 
     public I18nField(Set<String> keys, Set<String> values, Map<String, String> translations) {
         super(values.toArray(new String[0]));

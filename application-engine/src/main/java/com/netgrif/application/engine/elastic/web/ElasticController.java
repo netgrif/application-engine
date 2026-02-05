@@ -123,7 +123,7 @@ public class ElasticController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     @PostMapping(value = "/reindex/bulk", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MessageResource bulkReindex(IndexParams indexParams) {
+    public MessageResource bulkReindex(@RequestBody IndexParams indexParams) {
         try {
             indexService.bulkIndex(indexParams.isIndexAll(), indexParams.getLastRun(), indexParams.getCaseBatchSize(), indexParams.getTaskBatchSize());
             return MessageResource.successMessage("Success");

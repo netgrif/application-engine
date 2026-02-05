@@ -13,6 +13,10 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 @EqualsAndHashCode(callSuper = true)
 public class StringCollectionField extends com.netgrif.application.engine.objects.elastic.domain.StringCollectionField {
 
+    public StringCollectionField(StringCollectionField field) {
+        super(field);
+    }
+
     public StringCollectionField(String[] values) {
         super(values);
     }

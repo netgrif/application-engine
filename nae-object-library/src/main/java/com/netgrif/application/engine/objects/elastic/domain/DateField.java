@@ -18,6 +18,12 @@ public abstract class DateField extends DataField {
 
     public Long timestampValue;
 
+    public DateField(DateField field) {
+        super(field);
+        this.dateValue = field.dateValue;
+        this.timestampValue = field.timestampValue;
+    }
+
     public DateField(String value, LocalDateTime dateTime) {
         super(value);
         this.dateValue = dateTime;

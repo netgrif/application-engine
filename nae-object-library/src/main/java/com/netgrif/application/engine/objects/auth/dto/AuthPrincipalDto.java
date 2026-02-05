@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.objects.auth.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -20,5 +21,6 @@ public class AuthPrincipalDto implements Serializable {
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore
     private String sessionId;
 }

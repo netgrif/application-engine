@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.Arrays;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,6 +20,14 @@ public abstract class UserListField extends UserField {
     private String[] userIdValue;
 
     private String[] userRealmIdValue;
+
+    public UserListField(UserListField field) {
+        super(field);
+        this.usernameValue = field.usernameValue == null ? null : Arrays.copyOf(field.usernameValue, field.usernameValue.length);
+        this.fullNameValue = field.fullNameValue == null ? null : Arrays.copyOf(field.fullNameValue, field.fullNameValue.length);
+        this.userIdValue = field.userIdValue == null ? null : Arrays.copyOf(field.userIdValue, field.userIdValue.length);
+        this.userRealmIdValue = field.userRealmIdValue == null ? null : Arrays.copyOf(field.userRealmIdValue, field.userRealmIdValue.length);
+    }
 
     public UserListField(UserMappingData[] values) {
         super(values);

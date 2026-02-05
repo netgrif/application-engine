@@ -112,7 +112,7 @@ class ImportHelper {
     }
 
     Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = ActorTransformer.toLoggedUser(userService.getSystem())) {
-        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author, uriNodeId)
+        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author)
     }
 
     Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = ActorTransformer.toLoggedUser(userService.getSystem())) {
@@ -128,7 +128,7 @@ class ImportHelper {
     }
 
     Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = ActorTransformer.toLoggedUser(userService.getSystem())) {
-        PetriNet petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
+        PetriNet petriNet = petriNetService.getDefaultVersionByIdentifier(identifier)
         if (!petriNet) {
             return createNet(filename, release, author)
         }
@@ -167,7 +167,7 @@ class ImportHelper {
     }
 
     Map<String, ProcessRole> getProcessRoles(PetriNet net) {
-        List<ProcessRole> roles = processRoleService.findAll(net.stringId)
+        List<ProcessRole> roles = processRoleService.findAllByNetStringId(net.stringId)
         Map<String, ProcessRole> map = [:]
         net.roles.values().each { netRole ->
             map[netRole.name.getDefaultValue()] = roles.find { it.stringId == netRole.stringId }
@@ -249,7 +249,7 @@ class ImportHelper {
     }
 
     Optional<PetriNet> importProcessOnce(String message, String netIdentifier, String netFileName) {
-        PetriNet filter = petriNetService.getNewestVersionByIdentifier(netIdentifier)
+        PetriNet filter = petriNetService.getDefaultVersionByIdentifier(netIdentifier)
         if (filter != null) {
             log.info("${message} has already been imported.")
             return Optional.of(filter)

@@ -28,13 +28,18 @@ public class OpenApiConfiguration {
 
     private BuildProperties buildProperties;
 
-    @Autowired
+    @Autowired(required = false)
     public void setBuildProperties(BuildProperties buildProperties) {
         this.buildProperties = buildProperties;
     }
 
     @Bean
     public OpenAPI applicationEngineOpenApi() {
+
+        String version = (buildProperties != null)
+                ? buildProperties.getVersion()
+                : "7.0.0";
+
         return new OpenAPI()
                 .components(new Components()
                         .addSecuritySchemes("BasicAuth",
@@ -42,7 +47,7 @@ public class OpenApiConfiguration {
                 .info(new Info()
                         .title("Netgrif Application Engine")
                         .description("Web services used in every Netgrif application engine project.")
-                        .version(buildProperties.getVersion())
+                        .version(version)
                         .license(new License()
                                 .name("NETGRIF Community License")
                                 .url("https://netgrif.com/license")))
