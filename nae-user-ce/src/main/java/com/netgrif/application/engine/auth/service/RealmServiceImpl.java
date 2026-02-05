@@ -2,7 +2,7 @@ package com.netgrif.application.engine.auth.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netgrif.application.engine.adapter.spring.configuration.AbstractMongoIndexesConfigurator;
+import com.netgrif.application.engine.adapter.spring.configuration.AbstractMongoCollectionConfigurator;
 import com.netgrif.application.engine.auth.provider.AbstractAuthConfig;
 import com.netgrif.application.engine.auth.provider.AuthMethodProvider;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
@@ -44,12 +44,12 @@ public class RealmServiceImpl implements RealmService {
     @Autowired
     private AnonymousUserRefService anonymousUserRefService;
 
-    private AbstractMongoIndexesConfigurator mongoIndexesConfigurator;
+    private AbstractMongoCollectionConfigurator mongoIndexesConfigurator;
 
     private CollectionNameProvider collectionNameProvider;
 
     @Autowired
-    public void setMongoIndexesConfigurator(AbstractMongoIndexesConfigurator mongoIndexesConfigurator) {
+    public void setMongoIndexesConfigurator(AbstractMongoCollectionConfigurator mongoIndexesConfigurator) {
         this.mongoIndexesConfigurator = mongoIndexesConfigurator;
     }
 

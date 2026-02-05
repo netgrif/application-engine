@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.adapter.spring.configuration;
 
-import com.netgrif.application.engine.objects.annotations.Indexable;
+import com.netgrif.application.engine.objects.annotations.EnsureCollection;
 import com.netgrif.application.engine.objects.annotations.Indexed;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -19,13 +19,13 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 @Slf4j
-public abstract class AbstractMongoIndexesConfigurator {
+public abstract class AbstractMongoCollectionConfigurator {
 
     private final MongoTemplate mongoTemplate;
     private final MappingContext<? extends MongoPersistentEntity<?>, MongoPersistentProperty> mappingContext;
     private final IndexResolver resolver;
 
-    public AbstractMongoIndexesConfigurator(MongoTemplate mongoTemplate) {
+    public AbstractMongoCollectionConfigurator(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
         this.mappingContext = mongoTemplate.getConverter().getMappingContext();
         this.resolver = new MongoPersistentEntityIndexResolver(mappingContext);
@@ -37,7 +37,7 @@ public abstract class AbstractMongoIndexesConfigurator {
     public void resolveCollections() {
         mappingContext.getPersistentEntities()
                 .stream()
-                .filter(it -> it.isAnnotationPresent(Indexable.class) && !getEntityIndexBlacklist().contains(it.getType()))
+                .filter(it -> it.isAnnotationPresent(EnsureCollection.class) && !getEntityIndexBlacklist().contains(it.getType()))
                 .forEach(mongoPersistentEntity -> {
                     if (!mongoTemplate.collectionExists(mongoPersistentEntity.getCollection())) {
                         mongoTemplate.createCollection(mongoPersistentEntity.getCollection());
@@ -48,7 +48,7 @@ public abstract class AbstractMongoIndexesConfigurator {
     public void resolveIndexes() {
         mappingContext.getPersistentEntities()
                 .stream()
-                .filter(it -> it.isAnnotationPresent(Indexable.class) && !getEntityIndexBlacklist().contains(it.getType()))
+                .filter(it -> it.isAnnotationPresent(EnsureCollection.class) && !getEntityIndexBlacklist().contains(it.getType()))
                 .forEach(mongoPersistentEntity -> resolveIndexes(mongoPersistentEntity.getCollection(), mongoPersistentEntity.getType()));
     }
 
