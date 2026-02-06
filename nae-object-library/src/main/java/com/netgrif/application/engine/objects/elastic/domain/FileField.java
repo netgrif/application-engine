@@ -45,19 +45,25 @@ public abstract class FileField extends DataField {
             this.fileNameValue.add(extracted.name);
             this.fileExtensionValue.add(extracted.extension);
             this.fulltextValue.add(fileFieldValue.getName());
-            this.filePath.add(fileFieldValue.getPath());
+            if (fileFieldValue.getPath() != null) {
+                this.filePath.add(fileFieldValue.getPath());
+            }
         }
     }
 
     @Override
     public Object getValue() {
         if (this.fileNameValue != null && this.fileNameValue.size() == 1) {
+            String filePath = this.filePath != null && !this.filePath.isEmpty() && this.filePath.getFirst() != null ? this.filePath.getFirst() : "";
             return new FileFieldValue(nameWithExtension(this.fileNameValue.getFirst(), this.fileExtensionValue.getFirst()),
-                    this.filePath.getFirst());
+                    filePath);
         } else if (this.fileNameValue != null && this.fileNameValue.size() > 1) {
             return IntStream.range(0, this.fileNameValue.size())
-                    .mapToObj(i -> new FileFieldValue(nameWithExtension(this.fileNameValue.get(i), this.fileExtensionValue.get(i)),
-                            this.filePath.get(i))).toList();
+                    .mapToObj(i -> {
+                        String filePath = this.filePath != null && this.filePath.size() >= i + 1 && this.filePath.get(i) != null ? this.filePath.get(i) : "";
+                        return new FileFieldValue(nameWithExtension(this.fileNameValue.get(i), this.fileExtensionValue.get(i)),
+                                filePath);
+                    }).toList();
         }
         return null;
     }

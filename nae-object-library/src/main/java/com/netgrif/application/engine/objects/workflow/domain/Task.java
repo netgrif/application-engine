@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.objects.annotations.EnsureCollection;
 import com.netgrif.application.engine.objects.annotations.Indexed;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorRef;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
@@ -69,12 +70,10 @@ public abstract class Task implements Serializable {
     @Setter
     private Integer priority;
 
+    @Getter
     @Setter
     @Indexed
-    private String userId;
-
-    @Setter
-    private String userRealmId;
+    private ActorRef assignee;
 
     @Getter
     @Setter
@@ -281,12 +280,12 @@ public abstract class Task implements Serializable {
 
     @JsonIgnore
     public String getUserId() {
-        return userId;
+        return assignee != null ? assignee.getId() : null;
     }
 
     @JsonIgnore
     public String getUserRealmId() {
-        return userRealmId;
+        return assignee != null ? assignee.getRealmId() : null;
     }
 
     public String getTranslatedEventTitle(EventType assign, Locale locale) {
