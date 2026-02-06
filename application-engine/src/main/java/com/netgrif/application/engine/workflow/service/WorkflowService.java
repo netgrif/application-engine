@@ -319,12 +319,12 @@ public class WorkflowService implements IWorkflowService {
         outcome.addOutcomes(eventService.runActions(petriNet.getPostCreateActions(), useCase, Optional.empty(),
                 createCaseParams.getParams()));
 
-        useCase = evaluateRules(new CreateCaseEvent(new CreateCaseEventOutcome(useCase, outcome.getOutcomes()), EventPhase.POST));
+        CreateCaseEventOutcome eventOutcome = new CreateCaseEventOutcome(useCase, outcome.getOutcomes());
+        eventOutcome.setMessage(outcome.getMessage());
+        useCase = evaluateRules(new CreateCaseEvent(eventOutcome, EventPhase.POST));
 
         outcome.setCase(setImmediateDataFields(useCase));
         addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
-        publisher.publishEvent(new CreateCaseEvent(outcome, EventPhase.POST));
-
         return outcome;
     }
 
@@ -355,9 +355,9 @@ public class WorkflowService implements IWorkflowService {
         }
         if (createCaseParams.getProcess() == null) {
             PetriNet petriNet;
-            if (createCaseParams.getProcessId() != null) {
+            if (createCaseParams.getProcessId() != null && !createCaseParams.getProcessId().isEmpty()) {
                 petriNet = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet((com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet) petriNetService.get(new ObjectId(createCaseParams.getProcessId())));
-            } else if (createCaseParams.getProcessIdentifier() != null) {
+            } else if (createCaseParams.getProcessIdentifier() != null && !createCaseParams.getProcessIdentifier().isEmpty()) {
                 PetriNet originNet = petriNetService.getDefaultVersionByIdentifier(createCaseParams.getProcessIdentifier());
                 if (originNet == null) {
                     throw new IllegalArgumentException("Could not find the process for the Case from provided inputs on case creation.");

@@ -2,7 +2,7 @@ package com.netgrif.application.engine.auth.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netgrif.application.engine.adapter.spring.configuration.AbstractMongoIndexesConfigurator;
+import com.netgrif.application.engine.adapter.spring.configuration.AbstractMongoCollectionConfigurator;
 import com.netgrif.application.engine.auth.provider.AbstractAuthConfig;
 import com.netgrif.application.engine.auth.provider.AuthMethodProvider;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
@@ -44,13 +44,13 @@ public class RealmServiceImpl implements RealmService {
     @Autowired
     private AnonymousUserRefService anonymousUserRefService;
 
-    private AbstractMongoIndexesConfigurator mongoIndexesConfigurator;
+    private AbstractMongoCollectionConfigurator mongoCollectionConfigurator;
 
     private CollectionNameProvider collectionNameProvider;
 
     @Autowired
-    public void setMongoIndexesConfigurator(AbstractMongoIndexesConfigurator mongoIndexesConfigurator) {
-        this.mongoIndexesConfigurator = mongoIndexesConfigurator;
+    public void setMongoCollectionConfigurator(AbstractMongoCollectionConfigurator mongoCollectionConfigurator) {
+        this.mongoCollectionConfigurator = mongoCollectionConfigurator;
     }
 
     @Lazy
@@ -78,7 +78,7 @@ public class RealmServiceImpl implements RealmService {
         if (!mongoTemplate.collectionExists(collectionName)) {
             try {
                 mongoTemplate.createCollection(collectionName);
-                mongoIndexesConfigurator.resolveIndexes(collectionName, User.class);
+                mongoCollectionConfigurator.resolveIndexes(collectionName, User.class);
             } catch (Exception e) {
                 log.error("Error occurred while creating collection for realm {}", realm.getName(), e);
                 realmRepository.delete(realm);

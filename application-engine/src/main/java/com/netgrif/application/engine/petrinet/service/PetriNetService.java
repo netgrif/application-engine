@@ -173,7 +173,7 @@ public class PetriNetService implements IPetriNetService {
     @Transactional
     public ImportPetriNetEventOutcome importPetriNet(ImportPetriNetParams importPetriNetParams) throws IOException,
             MissingPetriNetMetaDataException, MissingIconKeyException {
-        fillAndValidateAttributes(importPetriNetParams);
+        validateAttributes(importPetriNetParams);
 
         ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
         ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
@@ -191,7 +191,7 @@ public class PetriNetService implements IPetriNetService {
         xmlCopy.close();
         log.info("Petri net {} ({} v{}) imported successfully and saved in a folder: {}", newProcess.getTitle(),
                 newProcess.getInitials(), newProcess.getVersion(), savedPath);
-
+        functionCacheService.cacheAllPetriNetFunctions();
         runActionAndPublishEvent(outcome, null, newProcess.getPreUploadActions(), importPetriNetParams.getParams(),
                 new ProcessDeployEvent(outcome, EventPhase.PRE));
 
@@ -644,7 +644,7 @@ public class PetriNetService implements IPetriNetService {
         publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.PRE));
         repository.deleteBy_id(petriNet.getObjectId());
         evictCache(petriNet);
-        functionCacheService.reloadCachedGlobalFunctions(petriNet);
+        functionCacheService.removeCachedPetriNetFunctions(petriNet.getIdentifier());
         if (petriNet.isDefaultVersion()) {
             PetriNet processToMakeDefault = self.getLatestVersionByIdentifier(petriNet.getIdentifier());
             if (processToMakeDefault != null) {
@@ -681,7 +681,7 @@ public class PetriNetService implements IPetriNetService {
         return obj;
     }
 
-    protected void fillAndValidateAttributes(ImportPetriNetParams importPetriNetParams) throws IllegalArgumentException {
+    protected void validateAttributes(ImportPetriNetParams importPetriNetParams) throws IllegalArgumentException {
         if (importPetriNetParams.getXmlFile() == null) {
             throw new IllegalArgumentException("No Petriflow source file provided.");
         }

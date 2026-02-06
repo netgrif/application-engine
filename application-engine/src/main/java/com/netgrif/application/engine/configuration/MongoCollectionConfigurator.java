@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.adapter.spring.configuration.AbstractMongoIndexesConfigurator;
+import com.netgrif.application.engine.adapter.spring.configuration.AbstractMongoCollectionConfigurator;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -11,12 +11,12 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class MongoIndexesConfigurator extends AbstractMongoIndexesConfigurator {
+public class MongoCollectionConfigurator extends AbstractMongoCollectionConfigurator {
 
     private final DataConfigurationProperties.MongoProperties mongoProperties;
 
-    public MongoIndexesConfigurator(MongoTemplate mongoTemplate,
-                                    DataConfigurationProperties.MongoProperties mongoProperties) {
+    public MongoCollectionConfigurator(MongoTemplate mongoTemplate,
+                                       DataConfigurationProperties.MongoProperties mongoProperties) {
         super(mongoTemplate);
         this.mongoProperties = mongoProperties;
     }
