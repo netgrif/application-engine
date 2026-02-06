@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
@@ -166,8 +167,7 @@ public class TaskService implements ITaskService {
 
         startExecution(transition, useCase);
         // TODO: impersonation
-        task.setUserId(user.getStringId());
-        task.setUserRealmId(user.getRealmId());
+        task.setAssignee(ActorTransformer.toActorRef(user));
         task.setStartDate(LocalDateTime.now());
         // TODO: impersonation
         task.setUser(user);
@@ -398,8 +398,7 @@ public class TaskService implements ITaskService {
                 });
         workflowService.updateMarking(useCase);
 
-        task.setUserId(null);
-        task.setUserRealmId(null);
+        task.setAssignee(null);
         task.setStartDate(null);
 
         useCase = workflowService.save(useCase);
@@ -452,8 +451,7 @@ public class TaskService implements ITaskService {
 
     protected Case delegate(AbstractUser delegated, Task task, Case useCase, Transition transition) throws TransitionNotExecutableException {
         if (task.getUserId() != null) {
-            task.setUserId(delegated.getStringId());
-            task.setUserRealmId(delegated.getRealmId());
+            task.setAssignee(ActorTransformer.toActorRef(delegated));
             task.setUser(delegated);
             save(task);
             return useCase;
@@ -572,8 +570,7 @@ public class TaskService implements ITaskService {
 
         task.setFinishDate(LocalDateTime.now());
         task.setFinishedBy(task.getUserId());
-        task.setUserId(null);
-        task.setUserRealmId(null);
+        task.setAssignee(null);
 
         save(task);
         return workflowService.save(useCase);
@@ -762,7 +759,7 @@ public class TaskService implements ITaskService {
     public Page<Task> findByUser(Pageable pageable, AbstractUser user) {
         // TODO: impersonation
 //        return loadUsers(taskRepository.findByUserId(pageable, user.getSelfOrImpersonated().getStringId()));
-        return loadUsers(taskRepository.findByUserId(pageable, user.getStringId()));
+        return loadUsers(taskRepository.findByAssignee_Id(pageable, user.getStringId()));
     }
 
     @Override

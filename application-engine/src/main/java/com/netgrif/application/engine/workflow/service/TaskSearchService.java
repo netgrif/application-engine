@@ -221,7 +221,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     public Predicate userQuery(String userId) {
-        return QTask.task.userId.eq(userId);
+        return QTask.task.assignee.id.eq(userId);
     }
 
     private void buildProcessQuery(TaskSearchRequest request, BooleanBuilder query) {
