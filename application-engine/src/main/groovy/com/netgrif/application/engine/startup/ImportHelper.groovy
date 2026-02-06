@@ -10,6 +10,8 @@ import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import com.netgrif.application.engine.workflow.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -118,7 +120,11 @@ class ImportHelper {
 
     Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = ActorTransformer.toLoggedUser(userService.getSystem())) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        def outcome = petriNetService.importPetriNet(new ImportPetriNetParams(netStream, release, author))
+        def outcome = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(netStream)
+                .releaseType(release)
+                .author(author)
+                .build())
         PetriNet petriNet = outcome.getNet()
         if (petriNet == null) {
                 log.warn("Import of [$fileName] produced no PetriNet object")
@@ -154,12 +160,12 @@ class ImportHelper {
 //    }
 
 
-    ProcessRole getProcessRoleByImportId(PetriNet net, String roleId) {
+    static ProcessRole getProcessRoleByImportId(PetriNet net, String roleId) {
         ProcessRole role = net.roles.values().find { it -> it.importId == roleId }
         return role
     }
 
-    Map<String, ProcessRole> getProcessRolesByImportId(PetriNet net, Map<String, String> importId) {
+    static Map<String, ProcessRole> getProcessRolesByImportId(PetriNet net, Map<String, String> importId) {
         HashMap<String, ProcessRole> roles = new HashMap<>()
         importId.each { it ->
             roles.put(it.getKey(), getProcessRoleByImportId(net, it.getValue()))
@@ -186,7 +192,12 @@ class ImportHelper {
     }
 
     Case createCase(String title, PetriNet net, LoggedUser user) {
-        return workflowService.createCase(net.getStringId(), title, "", user).getCase()
+        return workflowService.createCase(CreateCaseParams.with()
+                .process(net)
+                .title(title)
+                .color("")
+                .author(user)
+                .build()).getCase()
     }
 
     Case createCase(String title, PetriNet net) {
@@ -204,7 +215,10 @@ class ImportHelper {
 //    }
 
     AssignTaskEventOutcome assignTask(String taskTitle, String caseId, LoggedUser author) {
-        return taskService.assignTask(author, getTaskId(taskTitle, caseId))
+        return taskService.assignTask(TaskParams.with()
+                .taskId(getTaskId(taskTitle, caseId))
+                .user(author)
+                .build())
     }
 
     AssignTaskEventOutcome assignTaskToSuper(String taskTitle, String caseId) {
@@ -212,7 +226,10 @@ class ImportHelper {
     }
 
     FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedUser author) {
-        return taskService.finishTask(author, getTaskId(taskTitle, caseId))
+        return taskService.finishTask(TaskParams.with()
+                .taskId(getTaskId(taskTitle, caseId))
+                .user(author)
+                .build())
     }
 
     FinishTaskEventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
@@ -220,7 +237,10 @@ class ImportHelper {
     }
 
     CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedUser user) {
-        return taskService.cancelTask(user, getTaskId(taskTitle, caseId))
+        return taskService.cancelTask(TaskParams.with()
+                .taskId(getTaskId(taskTitle, caseId))
+                .user(user)
+                .build())
     }
 
     CancelTaskEventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.objects.petrinet.domain;
 
-import com.netgrif.application.engine.objects.annotations.Indexable;
+import com.netgrif.application.engine.objects.annotations.EnsureCollection;
 import com.netgrif.application.engine.objects.annotations.Indexed;
 import com.netgrif.application.engine.objects.auth.domain.ActorRef;
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.Arc;
@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Indexable
+@EnsureCollection
 @QueryEntity
 public abstract class PetriNet extends PetriNetObject {
 

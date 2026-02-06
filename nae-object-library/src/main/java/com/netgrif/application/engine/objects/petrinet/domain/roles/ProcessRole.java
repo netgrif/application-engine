@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.objects.petrinet.domain.roles;
 
+import com.netgrif.application.engine.objects.annotations.EnsureCollection;
 import com.netgrif.application.engine.objects.annotations.Indexed;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.Imported;
@@ -20,6 +21,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @Getter
+@EnsureCollection
 @QueryEntity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public abstract class ProcessRole extends Imported {
@@ -31,6 +33,7 @@ public abstract class ProcessRole extends Imported {
     public static final String GLOBAL = "global_";
 
     @Setter
+    @Indexed
     private boolean global;
 
     @Getter
@@ -40,9 +43,11 @@ public abstract class ProcessRole extends Imported {
     private I18nString name;
 
     @Setter
+    @Indexed
     private String processId;
 
     @Setter
+    @Indexed
     private String processIdentifier;
 
     @Setter

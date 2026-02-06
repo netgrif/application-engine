@@ -7,6 +7,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.acti
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.objects.petrinet.domain.version.Version;
+import com.netgrif.application.engine.petrinet.params.DeletePetriNetParams;
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetImportReference;
@@ -286,21 +287,26 @@ public interface IPetriNetService {
     List<PetriNet> get(List<String> petriNetIds);
 
     /**
-     * Deletes a PetriNet by its ID.
+     * Deletes a PetriNet instance by its process ID.
      *
-     * @param id the ID of the PetriNet to delete
-     * @param loggedUser the user requesting the deletion
+     * @param deletePetriNetParams parameters for petriNet removal
+     * <br>
+     * <b>Required parameters: petriNetId</b>
+     *
+     * @throws IllegalArgumentException if the PetriNet doesn't exist
      */
-    void deletePetriNet(String id, LoggedUser loggedUser);
-
+    void deletePetriNet(DeletePetriNetParams deletePetriNetParams);
 
     /**
      * Forcefully deletes a PetriNet process by its ID.
      *
-     * @param processId  the ID of the process to delete
-     * @param loggedUser the user requesting the deletion
+     * @param deletePetriNetParams parameters for petriNet removal
+     * <br>
+     * <b>Required parameters: petriNetId</b>
+     *
+     * @throws IllegalArgumentException if the PetriNet doesn't exist
      */
-    void forceDeletePetriNet(String processId, LoggedUser loggedUser);
+    void forceDeletePetriNet(DeletePetriNetParams deletePetriNetParams);
 
     /**
      * Runs the specified set of actions on a PetriNet.
@@ -335,12 +341,6 @@ public interface IPetriNetService {
      * @param pageable the pagination information
      * @return a {@link Page} of {@link PetriNet} objects matching the role ID
      */
-    /**
-     * Retrieves a paginated list of {@link PetriNet} objects associated with a specific role ID.
-     *
-     * @param roleId   the ID of the role to filter the PetriNets by
-     * @param pageable the pagination information
-     * @return a {@link Page} of {@link PetriNet} objects matching the role ID
-     */
     Page<PetriNet> findAllByRoleId(String roleId, Pageable pageable);
+
 }

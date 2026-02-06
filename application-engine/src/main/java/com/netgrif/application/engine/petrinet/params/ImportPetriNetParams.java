@@ -18,6 +18,7 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder(builderMethodName = "with")
 public class ImportPetriNetParams {
+
     /// Input stream of the process XML file.
     private InputStream xmlFile;
 

@@ -13,6 +13,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingI
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
+import com.netgrif.application.engine.petrinet.params.DeletePetriNetParams;
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
@@ -111,9 +112,12 @@ public class PetriNetController {
             Authentication auth, Locale locale) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
             VersionType release = releaseType == null ? VersionType.MAJOR : VersionType.valueOf(releaseType.trim().toUpperCase());
-            ImportPetriNetParams importPetriNetParams = new ImportPetriNetParams(multipartFile.getInputStream(), release, (LoggedUser) auth.getPrincipal());
-            importPetriNetParams.setWorkspaceId(workspaceId);
-            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(importPetriNetParams);
+            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(ImportPetriNetParams.with()
+                    .xmlFile(multipartFile.getInputStream())
+                    .releaseType(release)
+                    .workspaceId(workspaceId)
+                    .author((LoggedUser) auth.getPrincipal())
+                    .build());
             return EventOutcomeWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully",
                     LocalisedEventOutcomeFactory.from(importPetriNetOutcome, locale));
         } catch (IOException | IllegalArgumentException e) {
@@ -188,7 +192,7 @@ public class PetriNetController {
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileResource.getFilename() + Importer.FILE_EXTENSION + "\"");
         response.setHeader("Content-Length", String.valueOf(fileResource.getFile().length()));
-        log.info("Downloading Petri net file: " + fileResource.getFilename() + " [" + netId + "]");
+        log.info("Downloading Petri net file: {} [{}]", fileResource.getFilename(), netId);
         return fileResource;
     }
 
@@ -230,15 +234,21 @@ public class PetriNetController {
     public MessageResource deletePetriNet(@PathVariable("id") String processId, @RequestParam(required = false) boolean force, Authentication auth) {
         String decodedProcessId = decodeUrl(processId);
         if (Objects.equals(decodedProcessId, "")) {
-            log.error("Deleting Petri net [" + processId + "] failed: could not decode process ID from URL");
+            log.error("Deleting Petri net [{}] failed: could not decode process ID from URL", processId);
             return MessageResource.errorMessage("Deleting Petri net " + processId + " failed!");
         }
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         asyncRunner.execute(() -> {
             if (force) {
-                service.forceDeletePetriNet(decodedProcessId, user);
+                this.service.forceDeletePetriNet(DeletePetriNetParams.with()
+                        .petriNetId(decodedProcessId)
+                        .loggedUser(user)
+                        .build());
             } else {
-                service.deletePetriNet(decodedProcessId, user);
+                this.service.deletePetriNet(DeletePetriNetParams.with()
+                        .petriNetId(decodedProcessId)
+                        .loggedUser(user)
+                        .build());
             }
         });
         return MessageResource.successMessage("Petri net " + decodedProcessId + " is being deleted");

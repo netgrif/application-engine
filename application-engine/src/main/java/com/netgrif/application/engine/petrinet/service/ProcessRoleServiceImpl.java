@@ -113,7 +113,10 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
     }
 
     @Override
-    public void delete(String roleId) {
+    public void delete(String compositeId) {
+        if (compositeId == null) {
+            return;
+        }
         AbstractUser loggedUser = userService.getLoggedOrSystem();
         Optional<ProcessRole> processRole;
         if (loggedUser.isAdmin()) {
@@ -151,13 +154,7 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
     @Override
     public void assignRolesToUser(AbstractUser user, Collection<ProcessResourceId> processResourceIds, LoggedUser loggedUser) {
         // todo 2072 loggedUser as parameter! shouldn't be
-        assignRolesToUser(user, processResourceIds, loggedUser, new HashMap<>());
-    }
-
-    @Override
-    public void assignRolesToUser(AbstractUser user, Collection<ProcessResourceId> requestedRolesIds, LoggedUser loggedUser, Map<String, String> map) {
-        // todo 2072 loggedUser as parameter! shouldn't be
-        assignRolesToActor(user.getProcessRoles(), requestedRolesIds, loggedUser);
+        assignRolesToActor(user.getProcessRoles(), processResourceIds, loggedUser);
         saveUserAndReloadContext(user, loggedUser);
     }
 
@@ -466,7 +463,8 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public void deleteRolesOfNet(PetriNet net, LoggedUser loggedUser) {
-        log.info("[" + net.getStringId() + "]: Initiating deletion of all roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
+        log.info("[{}]: Initiating deletion of all roles of Petri net {} version {}", net.getStringId(), net.getIdentifier(),
+                net.getVersion().toString());
         List<ProcessResourceId> deletedRoleIds = this.findAllByNetStringId(net.getStringId()).stream()
                 .filter(processRole -> !processRole.isGlobal())
                 .map(ProcessRole::get_id)
@@ -485,7 +483,8 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
                     users = this.userService.findAllByProcessRoles(new HashSet<>(deletedRoleIds), realm.getName(), usersPageable);
 
                     for (AbstractUser user : users) {
-                        log.info("[" + net.getStringId() + "]: Removing deleted roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString() + " from user " + user.getFullName() + " with id " + user.getStringId());
+                        log.info("[{}]: Removing deleted roles of Petri net {} version {} from user {} with id {}",
+                                net.getStringId(), net.getIdentifier(), net.getVersion().toString(), user.getFullName(), user.getStringId());
 
                         if (user.getProcessRoles().isEmpty()) {
                             continue;
@@ -505,7 +504,8 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
             realmPageable = realmPageable.next();
         } while (realms.hasNext());
 
-        log.info("[" + net.getStringId() + "]: Deleting all roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
+        log.info("[{}]: Deleting all roles of Petri net {} version {}", net.getStringId(), net.getIdentifier(),
+                net.getVersion().toString());
         this.processRoleRepository.deleteAllBy_idIn(deletedRoleIds);
     }
 
@@ -530,7 +530,8 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
         if (isRoleReferenced(processRole)) {
             throw new RoleReferencedException("Role with id [%s] is referenced by other processes. Please delete or update the process before deleting.".formatted(roleId));
         }
-        log.info("Initiating deletion of global role with import ID [{}] and object ID [{}]", processRole.getImportId(), processRole.getStringId());
+        log.info("Initiating deletion of global role with import ID [{}] and object ID [{}]", processRole.getImportId(),
+                processRole.getStringId());
         Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
         Pageable usersPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
         Page<Realm> realms;
@@ -550,13 +551,14 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
     }
 
     protected boolean isRoleReferenced(ProcessRole processRole) {
-        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Pageable pageable = PageRequest.of(0, 1);
         Page<PetriNet> petriNetPage = petriNetService.findAllByRoleId(processRole.getStringId(), pageable);
         return petriNetPage.getTotalElements() > 0;
     }
 
     private void removeRoleFromUser(AbstractUser user, ProcessRole processRole, LoggedUser loggedUser) {
-        log.info("Removing global role with import ID [{}] and object ID [{}] from user [{}] with id [{}]", processRole.getImportId(), processRole.getStringId(), user.getFullName(), user.getStringId());
+        log.info("Removing global role with import ID [{}] and object ID [{}] from user [{}] with id [{}]",
+                processRole.getImportId(), processRole.getStringId(), user.getFullName(), user.getStringId());
         if (user.getProcessRoles().isEmpty()) {
             return;
         }

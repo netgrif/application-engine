@@ -27,11 +27,19 @@ public interface IDataService {
 
     GetDataEventOutcome getData(String taskId);
 
+    GetDataEventOutcome getData(String taskId, boolean eventsEnabled);
+
     GetDataEventOutcome getData(String taskId, Map<String, String> params);
+
+    GetDataEventOutcome getData(String taskId, Map<String, String> params, boolean eventsEnabled);
 
     GetDataEventOutcome getData(Task task, Case useCase);
 
+    GetDataEventOutcome getData(Task task, Case useCase, boolean eventsEnabled);
+
     GetDataEventOutcome getData(Task task, Case useCase, Map<String, String> params);
+
+    GetDataEventOutcome getData(Task task, Case useCase, Map<String, String> params, boolean eventsEnabled);
 
     SetDataEventOutcome setData(String taskId, ObjectNode values);
 
@@ -51,7 +59,11 @@ public interface IDataService {
 
     FileFieldInputStream getFileByName(Case useCase, FileListField field, String name, Map<String, String> params) throws FileNotFoundException;
 
+    GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, boolean eventsEnabled);
+
     GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, Set<String> collectedTaskIds, int level, String parentTaskRefId);
+
+    GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, Set<String> collectedTaskIds, int level, String parentTaskRefId, boolean eventsEnabled);
 
     FileFieldInputStream getFileByTask(String taskId, String fieldId, boolean forPreview) throws FileNotFoundException;
 

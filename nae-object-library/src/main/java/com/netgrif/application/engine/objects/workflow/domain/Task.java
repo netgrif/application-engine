@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.objects.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netgrif.application.engine.objects.annotations.Indexable;
+import com.netgrif.application.engine.objects.annotations.EnsureCollection;
 import com.netgrif.application.engine.objects.annotations.Indexed;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
@@ -23,9 +23,10 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @QueryEntity
-@Indexable
+@EnsureCollection
 @AllArgsConstructor
 public abstract class Task implements Serializable {
 
@@ -319,14 +320,22 @@ public abstract class Task implements Serializable {
         });
     }
 
-    public void resolveViewUsers() {
+    /**
+     * Initializes {@link #viewUsers} collection. Any user defined in {@link #users} with permission {@link RolePermission#VIEW}
+     * of true value is added to the {@link #viewUsers} collection.
+     *
+     * @return true if the {@link #viewUsers} was modified, false otherwise
+     */
+    public boolean resolveViewUsers() {
         getViewUsers();
+        AtomicBoolean isModified = new AtomicBoolean(!this.viewUsers.isEmpty());
         this.viewUsers.clear();
         this.users.forEach((role, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
-                viewUsers.add(role);
+                isModified.set(viewUsers.add(role));
             }
         });
+        return isModified.get();
     }
 
     private void compareExistingUserPermissions(String userId, Map<String, Boolean> permissions) {
