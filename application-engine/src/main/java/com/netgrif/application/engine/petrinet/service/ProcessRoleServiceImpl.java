@@ -120,9 +120,9 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
         AbstractUser loggedUser = userService.getLoggedOrSystem();
         Optional<ProcessRole> processRole;
         if (loggedUser.isAdmin()) {
-            processRole = processRoleRepository.findByCompositeId(roleId);
+            processRole = processRoleRepository.findByCompositeId(compositeId);
         } else {
-            processRole = processRoleRepository.findByCompositeIdAndWorkspaceId(roleId, loggedUser.getActiveWorkspaceId());
+            processRole = processRoleRepository.findByCompositeIdAndWorkspaceId(compositeId, loggedUser.getActiveWorkspaceId());
         }
         processRole.ifPresent(processRoleRepository::delete);
     }
