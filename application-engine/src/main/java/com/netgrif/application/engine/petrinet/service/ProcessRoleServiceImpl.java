@@ -43,7 +43,7 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     private static final Logger log = LoggerFactory.getLogger(ProcessRoleServiceImpl.class);
 
-    private final UserService userService;
+    protected final UserService userService;
     @Getter
     private final ProcessRoleRepository processRoleRepository;
     private final ApplicationEventPublisher publisher;
@@ -435,23 +435,42 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
     @Deprecated(forRemoval = true, since = "6.2.0")
     @Override
     public ProcessRole findByImportId(String importId) {
-        return processRoleRepository.findByImportId(importId).orElse(null);
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        if (loggedUser.isAdmin()) {
+            return processRoleRepository.findByImportId(importId).orElse(null);
+        } else {
+            return processRoleRepository.findByImportIdAndWorkspaceId(importId, loggedUser.getActiveWorkspaceId())
+                    .orElse(null);
+        }
     }
 
     @Override
     public Page<ProcessRole> findAllByImportId(String importId, Pageable pageable) {
-        return processRoleRepository.findAllByImportId(importId, pageable);
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        if (loggedUser.isAdmin()) {
+            return processRoleRepository.findAllByImportId(importId, pageable);
+        } else {
+            return processRoleRepository.findAllByImportIdAndWorkspaceId(importId, loggedUser.getActiveWorkspaceId(), pageable);
+        }
     }
 
     @Override
     public Page<ProcessRole> findAllByDefaultName(String name, Pageable pageable) {
-        return processRoleRepository.findAllByName_DefaultValue(name, pageable);
+        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        if (loggedUser.isAdmin()) {
+            return processRoleRepository.findAllByName_DefaultValue(name, pageable);
+        } else {
+            return processRoleRepository.findAllByName_DefaultValueAndWorkspaceId(name, loggedUser.getActiveWorkspaceId(), pageable);
+        }
     }
 
     @Override
     public void deleteRolesOfNet(PetriNet net, LoggedUser loggedUser) {
         log.info("[" + net.getStringId() + "]: Initiating deletion of all roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
-        List<ProcessResourceId> deletedRoleIds = this.findAllByNetStringId(net.getStringId()).stream().filter(processRole -> !processRole.isGlobal()).map(ProcessRole::get_id).collect(Collectors.toList());
+        List<ProcessResourceId> deletedRoleIds = this.findAllByNetStringId(net.getStringId()).stream()
+                .filter(processRole -> !processRole.isGlobal())
+                .map(ProcessRole::get_id)
+                .collect(Collectors.toList());
         Set<String> deletedRoleStringIds = deletedRoleIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet());
 
         Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());

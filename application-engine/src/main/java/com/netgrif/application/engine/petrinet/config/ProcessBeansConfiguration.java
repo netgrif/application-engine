@@ -40,7 +40,6 @@ public class ProcessBeansConfiguration {
                                                  ) {
         return new ProcessRoleServiceImpl(
                 processRoleRepository,
-                petriNetRepository,
                 publisher,
                 roleActionsRunner,
                 petriNetService,

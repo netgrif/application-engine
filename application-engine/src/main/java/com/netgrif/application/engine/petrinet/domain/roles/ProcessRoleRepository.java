@@ -30,6 +30,15 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
     Optional<ProcessRole> findByImportId(String importId);
 
     /**
+     * Finds a {@link ProcessRole} by its import ID and workspace ID.
+     *
+     * @param importId the import ID to search for
+     * @param workspaceId the ID of the workspace
+     * @return an {@link Optional} containing the found {@link ProcessRole}, if any
+     */
+    Optional<ProcessRole> findByImportIdAndWorkspaceId(String importId, String workspaceId);
+
+    /**
      * Finds a paginated list of all {@link ProcessRole} entities associated with a specific process ID.
      *
      * @param netId    the process ID
@@ -51,6 +60,16 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
     Page<ProcessRole> findAllByName_DefaultValue(String name, Pageable pageable);
 
     /**
+     * Finds a paginated list of all {@link ProcessRole} entities by their default name value.
+     *
+     * @param name     the default name value
+     * @param workspaceId the ID of the workspace
+     * @param pageable the pageable object for pagination settings
+     * @return a {@link Page} of {@link ProcessRole} entities
+     */
+    Page<ProcessRole> findAllByName_DefaultValueAndWorkspaceId(String name, String workspaceId, Pageable pageable);
+
+    /**
      * Finds a paginated list of all {@link ProcessRole} entities by their import ID with pagination.
      *
      * @param importId the import ID to filter
@@ -58,6 +77,16 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
      * @return a {@link Page} of {@link ProcessRole} entities
      */
     Page<ProcessRole> findAllByImportId(String importId, Pageable pageable);
+
+    /**
+     * Finds a paginated list of all {@link ProcessRole} entities by their import ID and workspace ID with pagination.
+     *
+     * @param importId the import ID to filter
+     * @param workspaceId the ID of the workspace
+     * @param pageable the pageable object for pagination settings
+     * @return a {@link Page} of {@link ProcessRole} entities
+     */
+    Page<ProcessRole> findAllByImportIdAndWorkspaceId(String importId, String workspaceId, Pageable pageable);
 
     /**
      * Finds a paginated list of all global {@link ProcessRole} entities where the global flag is set to true.
