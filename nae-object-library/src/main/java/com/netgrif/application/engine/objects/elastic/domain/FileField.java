@@ -33,7 +33,9 @@ public abstract class FileField extends DataField {
         this.fileNameValue = new String[1];
         this.fileExtensionValue = new String[1];
         FileNameAndExtension extracted = this.extractFileExtensionFromName(value.getName());
-        this.filePath[0] = value.getPath();
+        if (value.getPath() != null) {
+            this.filePath[0] = value.getPath();
+        }
         this.fileNameValue[0] = extracted.name;
         this.fileExtensionValue[0] = extracted.extension;
     }
@@ -48,7 +50,9 @@ public abstract class FileField extends DataField {
             this.fileNameValue[i] = extracted.name;
             this.fileExtensionValue[i] = extracted.extension;
             super.fulltextValue[i] = values[i].getName();
-            this.filePath[i] = values[i].getPath();
+            if (values[i].getPath() != null) {
+                this.filePath[i] = values[i].getPath();
+            }
         }
     }
 
