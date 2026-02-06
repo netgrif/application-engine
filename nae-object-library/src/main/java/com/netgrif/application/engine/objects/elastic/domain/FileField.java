@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.Arrays;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 @Data
 @NoArgsConstructor
@@ -43,20 +42,26 @@ public abstract class FileField extends DataField {
         super(new String[values.length]);
         this.fileNameValue = new String[values.length];
         this.fileExtensionValue = new String[values.length];
+        this.filePath = new String[values.length];
         for (int i = 0; i < values.length; i++) {
             FileNameAndExtension extracted = this.extractFileExtensionFromName(values[i].getName());
             this.fileNameValue[i] = extracted.name;
             this.fileExtensionValue[i] = extracted.extension;
             super.fulltextValue[i] = values[i].getName();
+            this.filePath[i] = values[i].getPath();
         }
     }
 
     @Override
     public Object getValue() {
         if (fileNameValue != null && fileNameValue.length == 1) {
-            return new FileFieldValue(fileNameValue[0] + "." + fileExtensionValue[0], filePath[0]);
+            String filePath = this.filePath != null && this.filePath.length >= 1 && this.filePath[0] != null ? this.filePath[0] : "";
+            return new FileFieldValue(fileNameValue[0] + "." + fileExtensionValue[0], filePath);
         } else if (fileNameValue != null && fileNameValue.length > 1) {
-            return IntStream.range(0, fileNameValue.length).mapToObj(i -> new FileFieldValue(fileNameValue[i] + "." + fileExtensionValue[i], filePath[i])).toList();
+            return IntStream.range(0, fileNameValue.length).mapToObj(i -> {
+                String filePath = this.filePath != null && this.filePath.length >= i + 1 && this.filePath[i] != null ? this.filePath[i] : "";
+                return new FileFieldValue(fileNameValue[i] + "." + fileExtensionValue[i], filePath);
+            }).toList();
         }
         return null;
     }
