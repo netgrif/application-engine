@@ -45,9 +45,7 @@ public abstract class FileField extends DataField {
             this.fileNameValue.add(extracted.name);
             this.fileExtensionValue.add(extracted.extension);
             this.fulltextValue.add(fileFieldValue.getName());
-            if (fileFieldValue.getPath() != null) {
-                this.filePath.add(fileFieldValue.getPath());
-            }
+            this.filePath.add(fileFieldValue.getPath() != null ? fileFieldValue.getPath() : "");
         }
     }
 
