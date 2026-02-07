@@ -3,6 +3,7 @@ package com.netgrif.application.engine.objects.auth.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import lombok.ToString;
 
 import java.io.Serial;

@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.objects.elastic.domain;
 
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -10,7 +9,7 @@ import java.util.Arrays;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public abstract class StringCollectionField extends TextField {
+public abstract class StringCollectionField extends DataField {
 
     public String[] collectionValue;
 

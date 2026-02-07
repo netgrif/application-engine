@@ -51,8 +51,6 @@ public abstract class ElasticCase implements Serializable {
 
     private String authorUsername;
 
-    private List<ImmediateField> immediateData;
-
     private Map<String, DataField> dataSet;
 
     private Set<String> taskIds;
@@ -81,6 +79,8 @@ public abstract class ElasticCase implements Serializable {
 
     private Map<String, String> tags;
 
+    private NodeInfo nodeInfo;
+
     public ElasticCase(Case useCase) {
         id = useCase.getStringId();
         lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
@@ -108,7 +108,6 @@ public abstract class ElasticCase implements Serializable {
         users = deepCopy(useCase.getUsers());
         userRefs = deepCopy(useCase.getUserRefs());
         dataSet = new HashMap<>();
-        immediateData = useCase.getImmediateData() == null ? Collections.emptyList() : useCase.getImmediateData().stream().map(ImmediateField::new).collect(Collectors.toList());
     }
 
     public void update(ElasticCase useCase) {
@@ -133,9 +132,6 @@ public abstract class ElasticCase implements Serializable {
         dataSet = useCase.getDataSet() == null ? new HashMap<>() : useCase.getDataSet().entrySet().stream()
                 .filter(entry -> entry.getValue() != null)
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> CopyConstructorUtil.copy(entry.getValue().getClass(), entry.getValue())));
-        immediateData = useCase.getImmediateData() == null ? new ArrayList<>() : useCase.getImmediateData().stream()
-                .map(field -> new ImmediateField(field.getStringId(), new I18nString(field.getName()), field.getType()))
-                .collect(Collectors.toList());
     }
 
     private static Map<String, Map<String, Boolean>> deepCopy(Map<String, Map<String, Boolean>> map) {
