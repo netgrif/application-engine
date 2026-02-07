@@ -8,17 +8,16 @@ import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.springframework.data.elasticsearch.client.elc.Queries.termQuery;
 
 public abstract class ElasticViewPermissionService {
 
     protected void buildViewPermissionQuery(BoolQuery.Builder query, LoggedUser user) {
         BoolQuery.Builder viewPermsExists = new BoolQuery.Builder()
                 .should(should -> should.exists(ExistsQuery.of(builder -> builder.field("viewRoles"))))
-                .should(should -> should.exists(ExistsQuery.of(builder -> builder.field("viewUserRefs"))));
+                .should(should -> should.exists(ExistsQuery.of(builder -> builder.field("viewActorRefs"))));
         BoolQuery.Builder viewPermNotExistsBuilder = new BoolQuery.Builder()
                 .mustNot(mustNot -> mustNot.bool(viewPermsExists.build()));
 
@@ -33,17 +32,17 @@ public abstract class ElasticViewPermissionService {
         /* Positive view role set-minus negative view role */
         BoolQuery positiveRoleSetMinusNegativeRole = setMinus(positiveViewRole, negativeViewRole);
 
-        /* Build positive view userList query */
-        BoolQuery positiveViewUser = buildPositiveViewUser(viewPermNotExists, user);
+        /* Build positive view actorList query */
+        BoolQuery positiveViewActor = buildPositiveViewActor(viewPermNotExists, user);
 
-        /* Role query union positive view userList */
-        BoolQuery roleSetMinusPositiveUserList = union(positiveRoleSetMinusNegativeRole, positiveViewUser);
+        /* Role query union positive view actorList */
+        BoolQuery roleSetMinusPositiveActorList = union(positiveRoleSetMinusNegativeRole, positiveViewActor);
 
-        /* Build negative view userList query */
-        BoolQuery negativeViewUser = buildNegativeViewUser(user);
+        /* Build negative view actorList query */
+        BoolQuery negativeViewActor = buildNegativeViewActor(user);
 
-        /* Role-UserListPositive set-minus negative view userList */
-        BoolQuery permissionQuery = setMinus(roleSetMinusPositiveUserList, negativeViewUser);
+        /* Role-UserListPositive set-minus negative view actorList */
+        BoolQuery permissionQuery = setMinus(roleSetMinusPositiveActorList, negativeViewActor);
 
         query.filter(permissionQuery._toQuery());
     }
@@ -76,16 +75,26 @@ public abstract class ElasticViewPermissionService {
         return negativeViewRole.build();
     }
 
-    private BoolQuery buildPositiveViewUser(BoolQuery viewPermNotExists, LoggedUser user) {
+    private BoolQuery buildPositiveViewActor(BoolQuery viewPermNotExists, LoggedUser user) {
+        TermsQueryField actorIdsQueryField = buildTermsQueryFieldOfUser(user);
         return new BoolQuery.Builder()
                 .should(viewPermNotExists._toQuery())
-                .filter(termQuery("viewUsers", user.getStringId())._toQuery())
+                .filter(QueryBuilders.terms(term -> term.field("viewActors").terms(actorIdsQueryField)))
                 .build();
     }
 
-    private BoolQuery buildNegativeViewUser(LoggedUser user) {
+    private BoolQuery buildNegativeViewActor(LoggedUser user) {
+        TermsQueryField actorIdsQueryField = buildTermsQueryFieldOfUser(user);
         return new BoolQuery.Builder()
-                .mustNot(termQuery("negativeViewUsers", user.getStringId())._toQuery())
+                .mustNot(QueryBuilders.terms(term -> term.field("negativeViewActors").terms(actorIdsQueryField)))
+                .build();
+    }
+
+    private TermsQueryField buildTermsQueryFieldOfUser(LoggedUser loggedUser) {
+        Set<String> actorIds = loggedUser.getGroupIds() == null ? new HashSet<>() : new HashSet<>(loggedUser.getGroupIds());
+        actorIds.add(loggedUser.getStringId());
+        return new TermsQueryField.Builder()
+                .value(actorIds.stream().map(FieldValue::of).toList())
                 .build();
     }
 

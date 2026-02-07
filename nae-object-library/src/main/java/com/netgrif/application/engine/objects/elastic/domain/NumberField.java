@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public abstract class NumberField extends DataField {
 
-    public Double numberValue;
+    protected Double numberValue;
 
     public NumberField(NumberField field) {
         super(field);
@@ -23,6 +23,6 @@ public abstract class NumberField extends DataField {
     }
 
     public Object getValue() {
-        return numberValue;
+        return this.numberValue;
     }
 }

@@ -11,8 +11,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class WorkflowAuthorizationService extends AbstractAuthorizationService implements IWorkflowAuthorizationService {
@@ -70,16 +69,14 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
 
     @Override
     public Boolean userHasUserListPermission(AbstractUser user, Case useCase, ProcessRolePermission... permissions) {
-        if (useCase.getUserRefs() == null || useCase.getUserRefs().isEmpty())
-            return null;
-
-        // TODO: impersonation user.getSelfOrImpersonated().getStringId()
-        if (!useCase.getUsers().containsKey(user.getStringId())) {
+        if (useCase.getActorRefs() == null || useCase.getActorRefs().isEmpty()) {
             return null;
         }
 
-        // TODO: impersonation
-        Map<String, Boolean> userPermissions = useCase.getUsers().get(user.getStringId());
+        Map<String, Boolean> userPermissions = findUserPermissions(useCase, user);
+        if (userPermissions == null) {
+            return null;
+        }
 
         for (ProcessRolePermission permission : permissions) {
             Boolean perm = userPermissions.get(permission.toString());
@@ -89,5 +86,9 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
         }
         return Arrays.stream(permissions)
                 .anyMatch(permission -> hasPermission(userPermissions.get(permission.toString())));
+    }
+
+    private Map<String, Boolean> findUserPermissions(Case useCase, AbstractUser user) {
+        return findUserPermissions(useCase.getActors(), user);
     }
 }

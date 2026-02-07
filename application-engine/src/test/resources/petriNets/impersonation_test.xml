@@ -30,7 +30,7 @@
 		<id>file_0</id>
 		<title/>
 	</data>
-	<data type="userList" immediate="true">
+	<data type="actorList" immediate="true">
 		<id>user_list</id>
 		<title/>
 	</data>
@@ -108,11 +108,11 @@
 		<x>580</x>
 		<y>300</y>
 		<label/>
-		<userRef>
+		<actorRef>
 			<id>user_list</id>
 			<logic>
 				<perform>true</perform>
 			</logic>
-		</userRef>
+		</actorRef>
 	</transition>
 </document>

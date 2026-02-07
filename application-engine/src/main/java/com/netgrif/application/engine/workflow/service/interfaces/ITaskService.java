@@ -75,9 +75,9 @@ public interface ITaskService {
 
     DelegateTaskEventOutcome delegateTask(DelegateTaskParams delegateTaskParams) throws TransitionNotExecutableException;
 
-    void resolveUserRef(Case useCase);
+    void resolveActorRef(Case useCase);
 
-    Task resolveUserRef(Task task, Case useCase);
+    Task resolveActorRef(Task task, Case useCase);
 
     void delete(List<Task> tasks, Case useCase);
 

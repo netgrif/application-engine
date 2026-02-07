@@ -29,7 +29,7 @@
         <init dynamic="true">java.time.LocalDateTime.now()</init>
     </data>
 
-    <data type="user" immediate="true">
+    <data type="actor" immediate="true">
         <id>user</id>
         <title>user</title>
         <init dynamic="true">

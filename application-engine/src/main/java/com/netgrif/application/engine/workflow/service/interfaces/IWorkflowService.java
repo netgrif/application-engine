@@ -29,7 +29,7 @@ public interface IWorkflowService {
 
     Page<Case> getAll(Pageable pageable);
 
-    Case resolveUserRef(Case useCase, boolean canSaveUseCase);
+    Case resolveActorRef(Case useCase, boolean canSaveUseCase);
 
     CreateCaseEventOutcome createCase(CreateCaseParams createCaseParams);
 

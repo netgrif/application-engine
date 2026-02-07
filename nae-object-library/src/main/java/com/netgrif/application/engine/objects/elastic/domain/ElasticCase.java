@@ -63,21 +63,21 @@ public abstract class ElasticCase implements Serializable {
 
     private Map<String, Map<String, Boolean>> permissions;
 
-    private Map<String, Map<String, Boolean>> userRefs;
+    private Map<String, Map<String, Boolean>> actorRefs;
 
-    private Map<String, Map<String, Boolean>> users;
+    private Map<String, Map<String, Boolean>> actors;
 
     private Set<String> enabledRoles;
 
     private Set<String> viewRoles;
 
-    private Set<String> viewUserRefs;
+    private Set<String> viewActorRefs;
 
     private Set<String> negativeViewRoles;
 
-    private Set<String> viewUsers;
+    private Set<String> viewActors;
 
-    private Set<String> negativeViewUsers;
+    private Set<String> negativeViewActors;
 
     private Map<String, String> tags;
 
@@ -99,14 +99,14 @@ public abstract class ElasticCase implements Serializable {
         tasks = useCase.getTasks() == null ? Collections.emptySet() : useCase.getTasks().stream().map(tp -> new ElasticTaskPair(tp.getTask(), tp.getTransition())).collect(Collectors.toSet());
         enabledRoles = new HashSet<>(useCase.getEnabledRoles());
         viewRoles = new HashSet<>(useCase.getViewRoles());
-        viewUserRefs = new HashSet<>(useCase.getViewUserRefs());
+        viewActorRefs = new HashSet<>(useCase.getViewActorRefs());
         negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
-        viewUsers = new HashSet<>(useCase.getViewUsers());
-        negativeViewUsers = new HashSet<>(useCase.getNegativeViewUsers());
+        viewActors = new HashSet<>(useCase.getViewActors());
+        negativeViewActors = new HashSet<>(useCase.getNegativeViewActors());
         tags = new HashMap<>(useCase.getTags());
         permissions = deepCopy(useCase.getPermissions());
-        users = deepCopy(useCase.getUsers());
-        userRefs = deepCopy(useCase.getUserRefs());
+        actors = deepCopy(useCase.getActors());
+        actorRefs = deepCopy(useCase.getActorRefs());
         dataSet = new HashMap<>();
         immediateData = useCase.getImmediateData() == null ? Collections.emptyList() : useCase.getImmediateData().stream().map(ImmediateField::new).collect(Collectors.toList());
     }
@@ -122,14 +122,14 @@ public abstract class ElasticCase implements Serializable {
                 .collect(Collectors.toSet());
         enabledRoles = useCase.getEnabledRoles() == null ? new HashSet<>() : new HashSet<>(useCase.getEnabledRoles());
         viewRoles = useCase.getViewRoles() == null ? new HashSet<>() : new HashSet<>(useCase.getViewRoles());
-        viewUserRefs = useCase.getViewUserRefs() == null ? new HashSet<>() : new HashSet<>(useCase.getViewUserRefs());
+        viewActorRefs = useCase.getViewActorRefs() == null ? new HashSet<>() : new HashSet<>(useCase.getViewActorRefs());
         negativeViewRoles = useCase.getNegativeViewRoles() == null ? new HashSet<>() : new HashSet<>(useCase.getNegativeViewRoles());
-        viewUsers = useCase.getViewUsers() == null ? new HashSet<>() : new HashSet<>(useCase.getViewUsers());
-        negativeViewUsers = useCase.getNegativeViewUsers() == null ? new HashSet<>() : new HashSet<>(useCase.getNegativeViewUsers());
+        viewActors = useCase.getViewActors() == null ? new HashSet<>() : new HashSet<>(useCase.getViewActors());
+        negativeViewActors = useCase.getNegativeViewActors() == null ? new HashSet<>() : new HashSet<>(useCase.getNegativeViewActors());
         tags = useCase.getTags() == null ? new HashMap<>() : new HashMap<>(useCase.getTags());
         permissions = deepCopy(useCase.getPermissions());
-        users = deepCopy(useCase.getUsers());
-        userRefs = deepCopy(useCase.getUserRefs());
+        actors = deepCopy(useCase.getActors());
+        actorRefs = deepCopy(useCase.getActorRefs());
         dataSet = useCase.getDataSet() == null ? new HashMap<>() : useCase.getDataSet().entrySet().stream()
                 .filter(entry -> entry.getValue() != null)
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> CopyConstructorUtil.copy(entry.getValue().getClass(), entry.getValue())));

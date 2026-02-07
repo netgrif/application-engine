@@ -5,6 +5,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
 @Data
@@ -20,19 +23,24 @@ public class TextField extends com.netgrif.application.engine.objects.elastic.do
         super(value);
     }
 
+    @Deprecated
     public TextField(String[] values) {
+        this(Arrays.asList(values));
+    }
+
+    public TextField(List<String> values) {
         super(values);
     }
 
     @Override
     @Field(type = Text)
-    public String[] getFulltextValue() {
+    public List<String> getFulltextValue() {
         return super.getFulltextValue();
     }
 
     @Override
     @Field(type = Text)
-    public String[] getTextValue() {
+    public List<String> getTextValue() {
         return super.getTextValue();
     }
 }

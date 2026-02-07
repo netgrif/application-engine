@@ -88,13 +88,13 @@ public class ElasticTask extends com.netgrif.application.engine.objects.elastic.
     }
 
     @Field(type = Flattened)
-    public Map<String, Map<String, Boolean>> getUsers() {
-        return super.getUsers();
+    public Map<String, Map<String, Boolean>> getActors() {
+        return super.getActors();
     }
 
     @Field(type = Flattened)
-    public Map<String, Map<String, Boolean>> getUserRefs() {
-        return super.getUserRefs();
+    public Map<String, Map<String, Boolean>> getActorRefs() {
+        return super.getActorRefs();
     }
 
     @Field(type = Flattened)
@@ -104,8 +104,8 @@ public class ElasticTask extends com.netgrif.application.engine.objects.elastic.
 
     @Field(type = Keyword)
     @Override
-    public Set<String> getViewUserRefs() {
-        return super.getViewUserRefs();
+    public Set<String> getViewActorRefs() {
+        return super.getViewActorRefs();
     }
 
     @Field(type = Keyword)
@@ -122,14 +122,14 @@ public class ElasticTask extends com.netgrif.application.engine.objects.elastic.
 
     @Field(type = Keyword)
     @Override
-    public Set<String> getViewUsers() {
-        return super.getViewUsers();
+    public Set<String> getViewActors() {
+        return super.getViewActors();
     }
 
     @Field(type = Keyword)
     @Override
-    public Set<String> getNegativeViewUsers() {
-        return super.getNegativeViewUsers();
+    public Set<String> getNegativeViewActors() {
+        return super.getNegativeViewActors();
     }
 
     @Field(type = Keyword)

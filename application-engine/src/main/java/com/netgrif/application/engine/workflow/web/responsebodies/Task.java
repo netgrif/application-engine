@@ -86,7 +86,7 @@ public class Task {
         this.priority = task.getPriority();
         this.assignee = task.getAssignee();
         this.roles = task.getRoles();
-        this.users = task.getUsers();
+        this.users = task.getActors();
         this.startDate = task.getStartDate();
         this.finishDate = task.getFinishDate();
         this.finishedBy = task.getFinishedBy();

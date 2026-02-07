@@ -1,9 +1,5 @@
 package com.netgrif.application.engine.objects.elastic.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import lombok.*;
@@ -61,19 +57,19 @@ public abstract class ElasticTask implements Serializable {
 
     private Map<String, Map<String, Boolean>> roles;
 
-    private Map<String, Map<String, Boolean>> userRefs;
+    private Map<String, Map<String, Boolean>> actorRefs;
 
-    private Map<String, Map<String, Boolean>> users;
+    private Map<String, Map<String, Boolean>> actors;
 
-    private Set<String> viewUserRefs;
+    private Set<String> viewActorRefs;
 
     private Set<String> viewRoles;
 
     private Set<String> negativeViewRoles;
 
-    private Set<String> viewUsers;
+    private Set<String> viewActors;
 
-    private Set<String> negativeViewUsers;
+    private Set<String> negativeViewActors;
 
     private String icon;
 
@@ -105,13 +101,13 @@ public abstract class ElasticTask implements Serializable {
         }
         this.startDate = task.getStartDate();
         this.roles = task.getRoles();
-        this.userRefs = task.getUserRefs();
-        this.users = task.getUsers();
+        this.actorRefs = task.getActorRefs();
+        this.actors = task.getActors();
         this.viewRoles = new HashSet<>(task.getViewRoles());
-        this.viewUserRefs = new HashSet<>(task.getViewUserRefs());
+        this.viewActorRefs = new HashSet<>(task.getViewActorRefs());
         this.negativeViewRoles = new HashSet<>(task.getNegativeViewRoles());
-        this.viewUsers = new HashSet<>(task.getViewUsers());
-        this.negativeViewUsers = new HashSet<>(task.getNegativeViewUsers());
+        this.viewActors = new HashSet<>(task.getViewActors());
+        this.negativeViewActors = new HashSet<>(task.getNegativeViewActors());
         this.assignPolicy = task.getAssignPolicy().toString();
         this.dataFocusPolicy = task.getDataFocusPolicy().toString();
         this.finishPolicy = task.getFinishPolicy().toString();
@@ -131,10 +127,10 @@ public abstract class ElasticTask implements Serializable {
         this.startDate = task.getStartDate();
         this.roles = task.getRoles();
         this.viewRoles = task.getViewRoles();
-        this.viewUserRefs = task.getViewUserRefs();
+        this.viewActorRefs = task.getViewActorRefs();
         this.negativeViewRoles = task.getNegativeViewRoles();
-        this.viewUsers = task.getViewUsers();
-        this.negativeViewUsers = task.getNegativeViewUsers();
+        this.viewActors = task.getViewActors();
+        this.negativeViewActors = task.getNegativeViewActors();
         this.tags = task.getTags();
     }
 }

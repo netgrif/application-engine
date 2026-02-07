@@ -5,21 +5,24 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public abstract class StringCollectionField extends TextField {
+public abstract class StringCollectionField extends DataField {
 
-    public String[] collectionValue;
+    protected List<String> collectionValue;
 
     public StringCollectionField(StringCollectionField field) {
         super(field);
-        this.collectionValue = field.collectionValue == null ? null : Arrays.copyOf(field.collectionValue, field.collectionValue.length);
+        this.collectionValue = field.collectionValue == null ? null : new ArrayList<>(field.collectionValue);
     }
 
-    public StringCollectionField(String[] values) {
+
+    public StringCollectionField(List<String> values) {
         super(values);
         this.collectionValue = values;
     }
