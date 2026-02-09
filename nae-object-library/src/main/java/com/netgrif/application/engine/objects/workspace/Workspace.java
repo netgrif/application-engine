@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Getter
 public abstract class Workspace implements Serializable {
 
-    public static final String FORBIDDEN_ID = "JozefMachacJeTlsty";
+    public static final String FORBIDDEN_ID = "fxhvyihxmgmkpnfwrykmr";
 
     @Serial
     private static final long serialVersionUID = -673503926854227584L;
