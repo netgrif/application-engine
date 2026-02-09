@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 
 @Slf4j
 @Component
-@RunnerOrder(50)
+@RunnerOrder(70)
 @RequiredArgsConstructor
 public class AnonymousRoleRunner implements ApplicationEngineStartupRunner {
 

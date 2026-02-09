@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@RunnerOrder(69)
+@RunnerOrder(49)
 @RequiredArgsConstructor
 @ConditionalOnProperty(value = "realm.create-default", matchIfMissing = true)
 public class DefaultRealmRunner implements ApplicationEngineStartupRunner {

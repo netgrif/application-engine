@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 @Slf4j
 @Component
 @Profile("!update")
-@RunnerOrder(40)
+@RunnerOrder(60)
 @RequiredArgsConstructor
 public class DefaultRoleRunner implements ApplicationEngineStartupRunner {
 

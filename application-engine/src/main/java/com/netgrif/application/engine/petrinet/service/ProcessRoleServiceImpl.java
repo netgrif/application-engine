@@ -81,10 +81,10 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public ProcessRole save(ProcessRole processRole) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
         if (processRole.getWorkspaceId() == null
-                || (!processRole.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin())) {
+                || (loggedUser != null && !processRole.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin())) {
             throw new IllegalArgumentException("Cannot save the role with different workspace. ProcessRole workspace: %s, LoggedUser workspace: %s"
                     .formatted(processRole.getWorkspaceId(), loggedUser.getActiveWorkspaceId()));
         }
@@ -94,8 +94,8 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public Page<ProcessRole> getAll(Pageable pageable) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
-        if (loggedUser.isAdmin()) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
             return processRoleRepository.findAll(pageable);
         } else {
             return processRoleRepository.findAllByWorkspaceId(loggedUser.getActiveWorkspaceId(), pageable);
@@ -104,8 +104,8 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public Optional<ProcessRole> get(ProcessResourceId processResourceId) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
-        if (loggedUser.isAdmin()) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
             return processRoleRepository.findByCompositeId(processResourceId.getStringId());
         } else {
             return processRoleRepository.findByCompositeIdAndWorkspaceId(processResourceId.getStringId(), loggedUser.getActiveWorkspaceId());
@@ -117,9 +117,9 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
         if (compositeId == null) {
             return;
         }
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
         Optional<ProcessRole> processRole;
-        if (loggedUser.isAdmin()) {
+        if (loggedUser == null || loggedUser.isAdmin()) {
             processRole = processRoleRepository.findByCompositeId(compositeId);
         } else {
             processRole = processRoleRepository.findByCompositeIdAndWorkspaceId(compositeId, loggedUser.getActiveWorkspaceId());
@@ -129,9 +129,9 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public void deleteAll(Collection<String> collection) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
         Set<ProcessRole> processRoles;
-        if (loggedUser.isAdmin()) {
+        if (loggedUser == null || loggedUser.isAdmin()) {
             processRoles = processRoleRepository.findAllByIdsSet(collection);
         } else {
             processRoles = processRoleRepository.findAllByIdsSetAndWorkspaceId(collection, loggedUser.getActiveWorkspaceId());
@@ -143,8 +143,8 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public void deleteAll() {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
-        if (loggedUser.isAdmin()) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
             processRoleRepository.deleteAll();
         } else {
             processRoleRepository.deleteAllByWorkspaceId(loggedUser.getActiveWorkspaceId());
@@ -166,7 +166,7 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     protected void assignRolesToActor(Collection<ProcessRole> oldActorRoles, Collection<ProcessResourceId> requestedRolesIds, AbstractUser loggedUser) {
         Set<ProcessRole> requestedRoles;
-        if (loggedUser.isAdmin()) {
+        if (loggedUser == null || loggedUser.isAdmin()) {
             requestedRoles = processRoleRepository.findAllByIdsSet(requestedRolesIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet()));
         } else {
             requestedRoles = processRoleRepository.findAllByIdsSetAndWorkspaceId(requestedRolesIds.stream()
@@ -223,8 +223,8 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public List<ProcessRole> findAllByIds(Collection<ProcessResourceId> collection) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
-        if (loggedUser.isAdmin()) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
             return new ArrayList<>(processRoleRepository.findAllByIdsSet(collection.stream().map(ProcessResourceId::getStringId).collect(Collectors.toList())));
         } else {
             return new ArrayList<>(processRoleRepository.findAllByIdsSetAndWorkspaceId(collection.stream()
@@ -235,11 +235,11 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public List<ProcessRole> saveAll(Collection<ProcessRole> entities) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
         return entities.stream().map(processRole -> {
             if (!processRole.isGlobal() || findAllByImportId(processRole.getImportId(), Pageable.ofSize(1)).isEmpty()) {
                 if (processRole.getWorkspaceId() == null
-                        || (!processRole.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin())) {
+                        || (loggedUser != null && !processRole.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin())) {
                     return null;
                 }
                 return processRoleRepository.save(processRole);
@@ -250,8 +250,8 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public List<ProcessRole> findByIds(Collection<String> ids) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
-        if (loggedUser.isAdmin()) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
             return new ArrayList<>(processRoleRepository.findAllByIdsSet(ids));
         } else {
             return new ArrayList<>(processRoleRepository.findAllByIdsSetAndWorkspaceId(ids, loggedUser.getActiveWorkspaceId()));
@@ -348,8 +348,8 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public Page<ProcessRole> findAll(Pageable pageable) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
-        if (loggedUser.isAdmin()) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
             return processRoleRepository.findAll(pageable);
         } else {
             return processRoleRepository.findAllByWorkspaceId(loggedUser.getActiveWorkspaceId(), pageable);
@@ -358,8 +358,8 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public Page<ProcessRole> findAllGlobalRoles(Pageable pageable) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
-        if (loggedUser.isAdmin()) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
             return processRoleRepository.findAllByGlobalIsTrue(pageable);
         } else {
             return processRoleRepository.findAllByGlobalIsTrueAndWorkspaceId(loggedUser.getActiveWorkspaceId(), pageable);
@@ -376,9 +376,9 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public ProcessRole findById(String id) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
         ObjectId objectId = extractObjectId(id);
-        if (loggedUser.isAdmin()) {
+        if (loggedUser == null || loggedUser.isAdmin()) {
             return processRoleRepository.findByIdObjectId(objectId)
                     .orElse(null);
         } else {
@@ -389,8 +389,8 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public ProcessRole findById(ProcessResourceId processResourceId) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
-        if (loggedUser.isAdmin()) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
             return processRoleRepository.findByCompositeId(processResourceId.getStringId()).orElse(null);
         } else {
             return processRoleRepository.findByCompositeIdAndWorkspaceId(processResourceId.getStringId(),
@@ -432,8 +432,8 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
     @Deprecated(forRemoval = true, since = "6.2.0")
     @Override
     public ProcessRole findByImportId(String importId) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
-        if (loggedUser.isAdmin()) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
             return processRoleRepository.findByImportId(importId).orElse(null);
         } else {
             return processRoleRepository.findByImportIdAndWorkspaceId(importId, loggedUser.getActiveWorkspaceId())
@@ -443,8 +443,8 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public Page<ProcessRole> findAllByImportId(String importId, Pageable pageable) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
-        if (loggedUser.isAdmin()) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
             return processRoleRepository.findAllByImportId(importId, pageable);
         } else {
             return processRoleRepository.findAllByImportIdAndWorkspaceId(importId, loggedUser.getActiveWorkspaceId(), pageable);
@@ -453,8 +453,8 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public Page<ProcessRole> findAllByDefaultName(String name, Pageable pageable) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
-        if (loggedUser.isAdmin()) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
             return processRoleRepository.findAllByName_DefaultValue(name, pageable);
         } else {
             return processRoleRepository.findAllByName_DefaultValueAndWorkspaceId(name, loggedUser.getActiveWorkspaceId(), pageable);

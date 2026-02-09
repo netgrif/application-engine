@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@RunnerOrder(70)
+@RunnerOrder(50)
 @RequiredArgsConstructor
 @ConditionalOnProperty(value = "admin.create-system-user", matchIfMissing = true)
 public class SystemUserRunner implements ApplicationEngineStartupRunner {

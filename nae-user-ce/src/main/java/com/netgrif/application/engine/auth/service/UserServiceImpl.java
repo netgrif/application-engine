@@ -464,18 +464,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public AbstractUser getLoggedOrSystem() {
         try {
-            if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof String) {
+            if (SecurityContextHolder.getContext().getAuthentication() == null
+                    || SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof String) {
                 return getSystem();
             }
             return getLoggedUser();
-        } catch (NullPointerException e) {
+        } catch (Exception e) {
             return getSystem();
         }
     }
 
+    // todo javadoc
     @Override
     public AbstractUser getLoggedUser() {
         LoggedUser loggedUser = getLoggedUserFromContext();
+        if (loggedUser == null) {
+            return null;
+        }
         Optional<AbstractUser> userOptional = findUserByUsername(loggedUser.getUsername(), loggedUser.getRealmId());
         AbstractUser user = userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] in realm [%s] is not present in the system."
                 .formatted(loggedUser.getUsername(), loggedUser.getRealmId())));
@@ -499,9 +504,15 @@ public class UserServiceImpl implements UserService {
         return systemUser;
     }
 
+    // todo javadoc
     @Override
     public LoggedUser getLoggedUserFromContext() {
-        return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (SecurityContextHolder.getContext().getAuthentication() != null
+                && SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof LoggedUser loggedUser) {
+            return loggedUser;
+        } else {
+            return null;
+        }
     }
 
     @Override

@@ -159,9 +159,9 @@ public class PetriNetService implements IPetriNetService {
     // todo 20720 cacheable
 //    @Cacheable(value = "petriNetCache")
     public PetriNet get(ObjectId petriNetId) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
         Optional<PetriNet> optionalPetriNet;
-        if (loggedUser.isAdmin()) {
+        if (loggedUser == null || loggedUser.isAdmin()) {
             optionalPetriNet = repository.findById(petriNetId.toString());
         } else {
             optionalPetriNet = repository.findBy_idAndWorkspaceId(petriNetId, loggedUser.getActiveWorkspaceId());
@@ -299,10 +299,10 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public Optional<PetriNet> save(PetriNet petriNet) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
         if (petriNet.getWorkspaceId() == null
-                || (!petriNet.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin()) ) {
+                || (loggedUser != null && !petriNet.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin()) ) {
             throw new IllegalArgumentException("Cannot save the petriNet with different workspace. PetriNet workspace: %s, LoggedUser workspace: %s"
                     .formatted(petriNet.getWorkspaceId(), loggedUser.getActiveWorkspaceId()));
         }
@@ -328,10 +328,10 @@ public class PetriNetService implements IPetriNetService {
     // todo 20720 cacheable
 //    @Cacheable(value = "petriNetById")
     public PetriNet getPetriNet(String id) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
         Optional<PetriNet> optionalPetriNet;
-        if (loggedUser.isAdmin()) {
+        if (loggedUser == null || loggedUser.isAdmin()) {
             optionalPetriNet = repository.findById(id);
         } else {
             optionalPetriNet = repository.findBy_idAndWorkspaceId(new ObjectId(id), loggedUser.getActiveWorkspaceId());
@@ -352,10 +352,10 @@ public class PetriNetService implements IPetriNetService {
             return null;
         }
 
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
         PetriNet net;
-        if (loggedUser.isAdmin()) {
+        if (loggedUser == null || loggedUser.isAdmin()) {
             net = repository.findByIdentifierAndVersion(identifier, version);
         } else {
             net = repository.findByIdentifierAndVersionAndWorkspaceId(identifier, version, loggedUser.getActiveWorkspaceId());
@@ -370,10 +370,10 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public Page<PetriNet> getByIdentifier(String identifier, Pageable pageable) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
         Page<PetriNet> nets;
-        if (loggedUser.isAdmin()) {
+        if (loggedUser == null || loggedUser.isAdmin()) {
             nets = repository.findByIdentifier(identifier, pageable);
         } else {
             nets = repository.findByIdentifierAndWorkspaceId(identifier, loggedUser.getActiveWorkspaceId(), pageable);
@@ -385,10 +385,10 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public List<PetriNet> findAllById(List<String> ids) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
         List<PetriNet> nets;
-        if (loggedUser.isAdmin()) {
+        if (loggedUser == null || loggedUser.isAdmin()) {
             nets = repository.findAllById(ids);
         } else {
             nets = repository.findAllBy_idInAndWorkspaceId(ids.stream().map(ObjectId::new).toList(), loggedUser.getActiveWorkspaceId());
@@ -405,10 +405,10 @@ public class PetriNetService implements IPetriNetService {
             return null;
         }
 
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
         List<PetriNet> result;
-        if (loggedUser.isAdmin()) {
+        if (loggedUser == null || loggedUser.isAdmin()) {
             result = repository.findByIdentifierAndDefaultVersion(identifier, true,
                     PageRequest.of(0, 1)).getContent();
         } else {
@@ -431,10 +431,10 @@ public class PetriNetService implements IPetriNetService {
             return null;
         }
 
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
         List<PetriNet> processes;
-        if (loggedUser.isAdmin()) {
+        if (loggedUser == null || loggedUser.isAdmin()) {
             processes = repository.findByIdentifier(identifier, PageRequest.of(0, 1,
                     Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
         } else {
@@ -457,10 +457,10 @@ public class PetriNetService implements IPetriNetService {
      */
     @Override
     public List<String> getExistingPetriNetIdentifiersFromIdentifiersList(List<String> identifiers) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
         Criteria matchCriteria = Criteria.where("identifier").in(identifiers);
-        if (!loggedUser.isAdmin()) {
+        if (loggedUser != null && !loggedUser.isAdmin()) {
             matchCriteria.and("workspaceId").is(loggedUser.getActiveWorkspaceId());
         }
 
@@ -494,10 +494,10 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public Page<PetriNet> findAllByRoleId(String roleId, Pageable pageable) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
         Page<PetriNet> nets;
-        if (loggedUser.isAdmin()) {
+        if (loggedUser == null || loggedUser.isAdmin()) {
             nets = repository.findAllByRoleId(roleId, pageable);
         } else {
             nets = repository.findAllByRoleIdAndWorkspaceId(roleId, loggedUser.getActiveWorkspaceId(), pageable);
@@ -509,10 +509,10 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public Page<PetriNet> getAll(Pageable pageable) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
         Page<PetriNet> nets;
-        if (loggedUser.isAdmin()) {
+        if (loggedUser == null || loggedUser.isAdmin()) {
             nets = repository.findAll(pageable);
         } else {
             nets = repository.findAllByWorkspaceId(loggedUser.getActiveWorkspaceId(), pageable);
@@ -524,10 +524,10 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public Page<PetriNet> getAllDefault(Pageable pageable) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
         Page<PetriNet> nets;
-        if (loggedUser.isAdmin()) {
+        if (loggedUser == null || loggedUser.isAdmin()) {
             nets = repository.findAllByDefaultVersionTrue(pageable);
         } else {
             nets = repository.findAllByDefaultVersionTrueAndWorkspaceId(loggedUser.getActiveWorkspaceId(), pageable);
@@ -539,10 +539,10 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public FileSystemResource getFile(String netId, String title) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
         Criteria criteria = Criteria.where("_id").is(new ObjectId(netId));
         Query query = Query.query(criteria);
-        if (!loggedUser.isAdmin()) {
+        if (loggedUser != null && !loggedUser.isAdmin()) {
             criteria.and("workspaceId").is(loggedUser.getActiveWorkspaceId());
         }
         if (title == null || title.isEmpty()) {
@@ -573,11 +573,11 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public Page<PetriNetReference> getReferencesByVersion(Version version, LoggedUser user, Locale locale, Pageable pageable) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
         Page<PetriNetReference> references;
         if (version != null) {
-            if (loggedUser.isAdmin()) {
+            if (loggedUser == null || loggedUser.isAdmin()) {
                 references = repository.findAllByVersion(version, pageable).map(net -> transformToReference(net, locale));
             } else {
                 references = repository.findAllByVersionAndWorkspaceId(version, loggedUser.getActiveWorkspaceId(), pageable)
@@ -597,7 +597,7 @@ public class PetriNetService implements IPetriNetService {
                 );
             }
 
-            if (!loggedUser.isAdmin()) {
+            if (loggedUser != null && !loggedUser.isAdmin()) {
                 // todo 2072 test
                 aggregation.getPipeline()
                         .add(Aggregation.match(Criteria.where("workspaceId").is(loggedUser.getActiveWorkspaceId())));
@@ -616,7 +616,7 @@ public class PetriNetService implements IPetriNetService {
                     groupByIdentifier,
                     Aggregation.count().as("total")
             );
-            if (!loggedUser.isAdmin()) {
+            if (loggedUser != null && !loggedUser.isAdmin()) {
                 countAggregation.getPipeline()
                         .add(Aggregation.match(Criteria.where("workspaceId").is(loggedUser.getActiveWorkspaceId())));
             }
@@ -639,10 +639,10 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public List<PetriNetReference> getReferencesByUsersProcessRoles(LoggedUser user, Locale locale) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
         Criteria criteria = getProcessRolesCriteria(user);
-        if (!loggedUser.isAdmin()) {
+        if (loggedUser != null && !loggedUser.isAdmin()) {
             criteria.and("workspaceId").is(loggedUser.getActiveWorkspaceId());
         }
 
@@ -671,11 +671,11 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public List<DataFieldReference> getDataFieldReferences(List<TransitionReference> transitions, Locale locale) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
         Iterable<PetriNet> nets;
         Collection<String> ids = transitions.stream().map(TransitionReference::getPetriNetId).collect(Collectors.toList());
-        if (loggedUser.isAdmin()) {
+        if (loggedUser == null || loggedUser.isAdmin()) {
              nets = repository.findAllById(ids);
         } else {
             nets = repository.findAllBy_idInAndWorkspaceId(ids.stream().map(ObjectId::new).toList(), loggedUser.getActiveWorkspaceId());
@@ -700,9 +700,9 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public Optional<PetriNet> findByImportId(String id) {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
-        if (loggedUser.isAdmin()) {
+        if (loggedUser == null || loggedUser.isAdmin()) {
             return Optional.ofNullable(repository.findByImportId(id));
         } else {
             return Optional.ofNullable(repository.findByImportIdAndWorkspaceId(id, loggedUser.getActiveWorkspaceId()));

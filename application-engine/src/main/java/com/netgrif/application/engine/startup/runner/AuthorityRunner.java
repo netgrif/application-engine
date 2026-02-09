@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@RunnerOrder(60)
+@RunnerOrder(40)
 @RequiredArgsConstructor
 public class AuthorityRunner implements ApplicationEngineStartupRunner {
 
