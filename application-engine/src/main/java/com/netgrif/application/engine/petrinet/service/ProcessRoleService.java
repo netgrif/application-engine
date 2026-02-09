@@ -126,9 +126,9 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     }
 
     @Override
-    public void assignRolesToGroup(Group group, Collection<ProcessResourceId> requestedRolesIds) {
+    public Group assignRolesToGroup(Group group, Collection<ProcessResourceId> requestedRolesIds) {
         assignRolesToActor(group.getProcessRoles(), requestedRolesIds);
-        groupService.save(group);
+        return groupService.save(group);
     }
 
     protected void assignRolesToActor(Collection<ProcessRole> oldActorRoles, Collection<ProcessResourceId> requestedRolesIds) {

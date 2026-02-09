@@ -33,7 +33,9 @@ import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.menu.services.interfaces.DashboardItemService
 import com.netgrif.application.engine.menu.services.interfaces.DashboardManagementService
 import com.netgrif.application.engine.menu.services.interfaces.IMenuItemService
+import com.netgrif.application.engine.objects.auth.domain.Group
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser
+import com.netgrif.application.engine.objects.auth.domain.QGroup
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.Transition
@@ -47,6 +49,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.objects.petrinet.domain.version.Version
 import com.netgrif.application.engine.objects.utils.MenuItemUtils
 import com.netgrif.application.engine.objects.workflow.domain.Case
+import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId
 import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.ChangeCasePropertyOutcome
@@ -2855,5 +2858,54 @@ class ActionDelegate {
         StorageField<?> storageField = (StorageField<?>) field
         IStorageService storageService = storageResolverService.resolve(storageField.storageType)
         return storageService.getPath(aCase.stringId, fileFieldId, fileName)
+    }
+
+    Group findGroupByIdentifier(String identifier) {
+        return groupService.findByIdentifier(identifier).orElse(null)
+    }
+
+    Group findGroupById(String groupId) {
+        return groupService.findById(groupId)
+    }
+
+    Page<Group> findGroups(Closure<Predicate> predicate = {it.identifier.isNotNull()}, Pageable pageable = Pageable.unpaged()) {
+        QGroup qGroup = new QGroup("group")
+        return groupService.findByPredicate(predicate(qGroup), pageable)
+    }
+
+    Group createGroup(String identifier, String title = "", AbstractUser owner = userService.getLoggedOrSystem()) {
+        return groupService.create(identifier, title, owner)
+    }
+
+    void deleteGroup(Group group) {
+        groupService.delete(group)
+    }
+
+    Group saveGroup(Group group) {
+        return groupService.save(group)
+    }
+
+    Group addUserToGroup(String userId, String groupId, String realmId) {
+        return groupService.addUser(userId, groupId, realmId)
+    }
+
+    Group removeUserFromGroup(String userId, String realmId, String groupId) {
+        return groupService.removeUser(userId, realmId, groupId)
+    }
+
+    Group assignAuthorityToGroup(String groupId, String authorityId) {
+        return groupService.assignAuthority(groupId, authorityId)
+    }
+
+    Group removeAuthorityFromGroup(String groupId, String authorityId) {
+        return groupService.removeAuthority(groupId, authorityId)
+    }
+
+    Group addRoleToGroup(String groupId, String roleId) {
+        return groupService.addRole(groupId, roleId)
+    }
+
+    Group removeRoleFromGroup(String groupId, String roleId) {
+        return groupService.removeRole(groupId, roleId)
     }
 }

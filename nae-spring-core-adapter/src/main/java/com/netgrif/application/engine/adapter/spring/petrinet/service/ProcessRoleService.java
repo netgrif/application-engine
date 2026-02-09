@@ -20,7 +20,7 @@ public interface ProcessRoleService {
     void deleteAll(Collection<String> ids);
     void deleteAll();
     void assignRolesToUser(AbstractUser user, Collection<ProcessResourceId> roleIds, LoggedUser loggedUser);
-    void assignRolesToGroup(Group group, Collection<ProcessResourceId> requestedRolesIds);
+    Group assignRolesToGroup(Group group, Collection<ProcessResourceId> requestedRolesIds);
     ProcessRole getDefaultRole();
     ProcessRole getAnonymousRole();
 

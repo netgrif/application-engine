@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.auth.service;
 
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
@@ -9,6 +10,9 @@ import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.auth.dto.GroupSearchDto;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundException;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundExceptionCode;
+import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -46,6 +50,8 @@ public class GroupServiceImpl implements GroupService {
 
     private MongoTemplate mongoTemplate;
 
+    private ProcessRoleService processRoleService;
+
     @Autowired
     public void setCollectionNameProvider(CollectionNameProvider collectionNameProvider) {
         this.collectionNameProvider = collectionNameProvider;
@@ -79,6 +85,12 @@ public class GroupServiceImpl implements GroupService {
     @Autowired
     public void setPaginationProperties(PaginationProperties paginationProperties) {
         this.paginationProperties = paginationProperties;
+    }
+
+    @Lazy
+    @Autowired
+    public void setProcessRoleService(ProcessRoleService processRoleService) {
+        this.processRoleService = processRoleService;
     }
 
     @Override
@@ -122,7 +134,11 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group save(Group group) {
-        log.debug("Saving group: [{}]", group.getStringId());
+        if (groupRepository.existsById(group.getStringId())) {
+            log.info("Updating group: [{}]", group.getIdentifier());
+        } else {
+            log.info("Saving new group: [{}]", group.getIdentifier());
+        }
         group.setModifiedAt(LocalDateTime.now());
         return groupRepository.save(group);
     }
@@ -223,8 +239,8 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group addUser(AbstractUser user, String groupIdentifier) {
-        Group group = findByIdentifier(groupIdentifier).orElseThrow(() -> new IllegalArgumentException("Group with identifier [%s] not found. ".formatted(groupIdentifier)));
+    public Group addUser(AbstractUser user, String groupId) {
+        Group group = findById(groupId);
         return addUser(user, group);
     }
 
@@ -238,8 +254,13 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group removeUser(AbstractUser user, String groupIdentifier) {
-        Group group = findByIdentifier(groupIdentifier).orElseThrow(() -> new IllegalArgumentException("Group with identifier [%s] not found. ".formatted(groupIdentifier)));
+    public Group removeUser(String userId, String realmId, String groupId) {
+        return removeUser(userService.findById(userId, realmId), groupId);
+    }
+
+    @Override
+    public Group removeUser(AbstractUser user, String groupId) {
+        Group group = findById(groupId);
         return removeUser(user, group);
     }
 
@@ -290,12 +311,20 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    public Group removeAuthority(String groupId, String authorityId) {
+        Group group = findById(groupId);
+        group.removeAuthority(authorityService.getOne(authorityId));
+        return save(group);
+    }
+
+    @Override
     public Pair<Group, Group> addSubgroup(String parentGroupId, String childGroupId) {
         if (parentGroupId.equals(childGroupId)) {
             throw new IllegalArgumentException("Trying to add group to itself [%s]!".formatted(parentGroupId));
         }
         Group parentGroup = this.findById(parentGroupId);
-        return this.addSubgroup(parentGroup, childGroupId);
+        Group childGroup = this.findById(childGroupId);
+        return this.addSubgroup(parentGroup, childGroup);
     }
 
     @Override
@@ -325,6 +354,47 @@ public class GroupServiceImpl implements GroupService {
         parentGroup.addSubGroupId(childGroup.getStringId());
         childGroup.addGroupId(parentGroup.getStringId());
         log.info("Adding group [{}] to parent group [{}]", childGroup.getStringId(), parentGroup.getStringId());
+        this.save(parentGroup);
+        this.save(childGroup);
+        return Pair.of(parentGroup, childGroup);
+    }
+
+    @Override
+    public Pair<Group, Group> removeSubgroup(String parentGroupId, String childGroupId) {
+        if (parentGroupId.equals(childGroupId)) {
+            throw new IllegalArgumentException("Trying to remove group from itself [%s]!".formatted(parentGroupId));
+        }
+        Group parentGroup = this.findById(parentGroupId);
+        Group childGroup = this.findById(childGroupId);
+        return this.removeSubgroup(parentGroup, childGroup);
+    }
+
+    @Override
+    public Pair<Group, Group> removeSubgroup(Group parentGroup, String childGroupId) {
+        if (parentGroup.getStringId().equals(childGroupId)) {
+            throw new IllegalArgumentException("Trying to remove group from itself [%s]!".formatted(parentGroup.getStringId()));
+        }
+        Group childGroup = this.findById(childGroupId);
+        return this.removeSubgroup(parentGroup, childGroup);
+    }
+
+    @Override
+    public Pair<Group, Group> removeSubgroup(String parentGroupId, Group childGroup) {
+        if (childGroup.getStringId().equals(parentGroupId)) {
+            throw new IllegalArgumentException("Trying to remove group from itself [%s]!".formatted(childGroup.getStringId()));
+        }
+        Group parentGroup = this.findById(parentGroupId);
+        return this.removeSubgroup(parentGroup, childGroup);
+    }
+
+    @Override
+    public Pair<Group, Group> removeSubgroup(Group parentGroup, Group childGroup) {
+        if (parentGroup.getStringId().equals(childGroup.getStringId())) {
+            throw new IllegalArgumentException("Trying to remove group from itself [%s]!".formatted(parentGroup.getStringId()));
+        }
+        parentGroup.removeSubgroupId(childGroup.getStringId());
+        childGroup.removeGroupId(parentGroup.getStringId());
+        log.info("Removing group [{}] from parent group [{}]", childGroup.getStringId(), parentGroup.getStringId());
         this.save(parentGroup);
         this.save(childGroup);
         return Pair.of(parentGroup, childGroup);
@@ -389,6 +459,32 @@ public class GroupServiceImpl implements GroupService {
         long count = mongoTemplate.count(query, Group.class);
         List<Group> groups = mongoTemplate.find(query.with(pageable), Group.class);
         return new PageImpl<>(groups, pageable, count);
+    }
+
+    @Override
+    public Group addRole(String groupId, String roleId) {
+        Group group = findById(groupId);
+        ProcessRole role = processRoleService.findById(new ProcessResourceId(roleId));
+        return addRole(group, role);
+    }
+
+    @Override
+    public Group addRole(Group group, ProcessRole processRole) {
+        group.addProcessRole(processRole);
+        return save(group);
+    }
+
+    @Override
+    public Group removeRole(String groupId, String roleId) {
+        Group group = findById(groupId);
+        ProcessRole role = processRoleService.findById(new ProcessResourceId(roleId));
+        return removeRole(group, role);
+    }
+
+    @Override
+    public Group removeRole(Group group, ProcessRole processRole) {
+        group.removeProcessRole(processRole);
+        return save(group);
     }
 
     protected String getGroupOwnerEmail(Group groupCase) {
