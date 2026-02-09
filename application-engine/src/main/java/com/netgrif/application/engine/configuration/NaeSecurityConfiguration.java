@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.configuration;
 
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
+import com.netgrif.application.engine.configuration.security.filter.PostAuthenticationWorkspaceFilter;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.UserService;
@@ -12,6 +13,7 @@ import com.netgrif.application.engine.configuration.security.filter.HostValidati
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
+import com.netgrif.application.engine.workspace.service.WorkspaceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -37,7 +39,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 
-import java.util.HashSet;
 import java.util.List;
 
 import static org.springframework.http.HttpMethod.OPTIONS;
@@ -76,6 +77,9 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired
     protected IImpersonationService impersonationService;
+
+    @Autowired
+    protected WorkspaceService workspaceService;
 
     @Autowired
     private List<AuthenticationProvider> authenticationProviders;
@@ -118,6 +122,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(impersonationRequestFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(hostValidationRequestFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(postAuthenticationWorkspaceFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(requestMatcherRegistry ->
                         requestMatcherRegistry
                                 .requestMatchers(getPatterns()).permitAll()
@@ -196,5 +201,9 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     private ImpersonationRequestFilter impersonationRequestFilter() {
         return new ImpersonationRequestFilter(impersonationService);
+    }
+
+    private PostAuthenticationWorkspaceFilter postAuthenticationWorkspaceFilter() {
+        return new PostAuthenticationWorkspaceFilter(workspaceService);
     }
 }
