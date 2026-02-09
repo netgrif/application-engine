@@ -27,17 +27,17 @@ public class MapField extends com.netgrif.application.engine.objects.elastic.dom
 
     @Override
     @Field(type = Text)
-    public String[] getFulltextValue() {
+    public List<String> getFulltextValue() {
         return super.getFulltextValue();
     }
 
     @Field(type = Keyword)
-    public String[] getKeyValue() {
+    public List<String> getKeyValue() {
         return super.getKeyValue();
     }
 
     @Field(type = Flattened, index = false)
     public Map<String, I18nString> getKeyValueTranslations() {
-        return super.keyValueTranslations;
+        return super.getKeyValueTranslations();
     }
 }

@@ -20,12 +20,12 @@
         <title>Admin Role</title>
     </role>
 
-    <usersRef>
+    <actorRef>
         <id>user_list_1</id>
         <caseLogic>
             <view>true</view>
         </caseLogic>
-    </usersRef>
+    </actorRef>
 
     <!-- PROCESS USER REFS -->
     <!-- DATA -->
@@ -37,11 +37,11 @@
         <id>remove</id>
         <title>Remove from user ref</title>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>user_list_1</id>
         <title>User list 1</title>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>user_list_2</id>
         <title>User list 2</title>
     </data>
@@ -66,12 +66,12 @@
                 <view>true</view>
             </logic>
         </roleRef>
-        <usersRef>
+        <actorRef>
             <id>user_list_1</id>
             <logic>
                 <view>true</view>
             </logic>
-        </usersRef>
+        </actorRef>
         <dataRef>
             <id>email</id>
             <logic>

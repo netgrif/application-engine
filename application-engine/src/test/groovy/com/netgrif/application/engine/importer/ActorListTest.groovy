@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.importer
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
@@ -28,25 +29,28 @@ import java.util.stream.Collectors
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
-class UserListTest {
+class ActorListTest {
 
     @Autowired
-    private TestHelper testHelper;
+    private TestHelper testHelper
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreatorRunner superCreator;
+    private SuperCreatorRunner superCreator
 
     @Autowired
-    private CaseRepository caseRepository;
+    private CaseRepository caseRepository
 
     @Autowired
-    private IDataService dataService;
+    private IDataService dataService
 
     @Autowired
-    private ITaskService taskService;
+    private GroupService groupService
+
+    @Autowired
+    private ITaskService taskService
 
     @BeforeEach
     void before() {
@@ -56,27 +60,37 @@ class UserListTest {
     @Test
     void testUserList() throws MissingPetriNetMetaDataException, IOException {
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(ImportPetriNetParams.with()
-                .xmlFile(new FileInputStream("src/test/resources/user_list.xml"))
+                .xmlFile(new FileInputStream("src/test/resources/actor_list.xml"))
                 .releaseType(VersionType.MAJOR)
                 .author(superCreator.getLoggedSuper())
                 .build());
 
-        assert net.getNet() != null;
-        Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("User List"));
+        assert net.getNet() != null
+        Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("Actor List"))
 
-        assert caseOpt.isPresent();
-        assert caseOpt.get().getDataSet().get("text").getValue() == "Its working...";
+        assert caseOpt.isPresent()
+        assert caseOpt.get().getDataSet().get("text").getValue() == "Its working..."
 
         Task task = taskService.findByCases(new FullPageRequest(), Collections.singletonList(caseOpt.get().getStringId())).stream().collect(Collectors.toList()).get(0)
 
         dataService.setData(task.stringId, ImportHelper.populateDataset([
                 "users_1": [
                         "value": [superCreator.getSuperUser().getStringId()],
-                        "type" : "userList"
+                        "type" : "actorList"
                 ]
         ]))
 
-        assert taskService.findById(task.stringId).users.get(superCreator.getSuperUser().getStringId())
-        assert caseRepository.findById(caseOpt.get().stringId).get().users.get(superCreator.getSuperUser().getStringId())
+        assert taskService.findById(task.stringId).actors.get(superCreator.getSuperUser().getStringId())
+        assert caseRepository.findById(caseOpt.get().stringId).get().actors.get(superCreator.getSuperUser().getStringId())
+
+        dataService.setData(task.stringId, ImportHelper.populateDataset([
+                "users_1": [
+                        "value": [groupService.getDefaultSystemGroup().getStringId()],
+                        "type" : "actorList"
+                ]
+        ]))
+
+        assert taskService.findById(task.stringId).actors.get(groupService.getDefaultSystemGroup().getStringId())
+        assert caseRepository.findById(caseOpt.get().stringId).get().actors.get(groupService.getDefaultSystemGroup().getStringId())
     }
 }

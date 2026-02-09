@@ -20,7 +20,7 @@
             change id value { useCase.stringId }
         </action>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>author</id>
         <title>Group Author</title>
     </data>
@@ -35,7 +35,7 @@
             workflowService.save(useCase)
         </action>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>user_selection</id>
         <title>Select user</title>
         <placeholder>No user selected</placeholder>

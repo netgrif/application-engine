@@ -36,7 +36,7 @@
         <id>8</id>
         <title>Oddelenie</title>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>9</id>
         <title>Odovzdávajúci</title>
         <values>1</values>
@@ -86,13 +86,13 @@
         <id>20</id>
         <title>Dátum vrátenia</title>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>21</id>
         <title>Vypožičal</title>
         <values>1</values>
         <values>2</values>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>22</id>
         <title>Vrátil</title>
         <values>1</values>
@@ -130,7 +130,7 @@
         <id>30</id>
         <title>Klientské číslo</title>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>31</id>
         <title>Odovzdal</title>
         <values>1</values>
@@ -140,13 +140,13 @@
         <id>32</id>
         <title>Počet škatúľ</title>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>33</id>
         <title>Kuriér</title>
         <values>1</values>
         <values>2</values>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>34</id>
         <title>Spracoval</title>
         <values>1</values>
@@ -161,13 +161,13 @@
         <id>36</id>
         <title>Počet uvedený v systéme</title>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>37</id>
         <title>Založil</title>
         <values>1</values>
         <values>2</values>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>38</id>
         <title>Zapísal do systému</title>
         <values>1</values>

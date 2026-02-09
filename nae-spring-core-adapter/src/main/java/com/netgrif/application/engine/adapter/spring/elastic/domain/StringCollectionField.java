@@ -5,6 +5,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
@@ -13,23 +16,28 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 @EqualsAndHashCode(callSuper = true)
 public class StringCollectionField extends com.netgrif.application.engine.objects.elastic.domain.StringCollectionField {
 
+    @Deprecated
+    public StringCollectionField(String[] values) {
+        super(Arrays.asList(values));
+    }
+
     public StringCollectionField(StringCollectionField field) {
         super(field);
     }
 
-    public StringCollectionField(String[] values) {
+    public StringCollectionField(List<String> values) {
         super(values);
     }
 
     @Override
     @Field(type = Text)
-    public String[] getFulltextValue() {
+    public List<String> getFulltextValue() {
         return super.getFulltextValue();
     }
 
     @Override
     @Field(type = Keyword)
-    public String[] getCollectionValue() {
+    public List<String> getCollectionValue() {
         return super.getCollectionValue();
     }
 

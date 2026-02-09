@@ -8,15 +8,15 @@
 	<!-- ROLES -->
 	<!-- PROCESS ROLE REFS -->
 	<!-- PROCESS USER REFS -->
-	<usersRef>
+	<actorRef>
 		<id>userList</id>
 		<caseLogic>
 			<view>true</view>
 			<delete>true</delete>
 		</caseLogic>
-	</usersRef>
+	</actorRef>
 	<!-- DATA -->
-	<data type="userList">
+	<data type="actorList">
 		<id>userList</id>
 		<title></title>
 	</data>
@@ -30,13 +30,13 @@
 			<offset>0</offset>
 		</layout>
 		<label></label>
-		<usersRef>
+		<actorRef>
 			<id>userList</id>
 			<logic>
 				<view>true</view>
 				<delegate>true</delegate>
 			</logic>
-		</usersRef>
+		</actorRef>
 	</transition>
 	<!-- PLACES -->
 	<!-- ARCS -->

@@ -5,6 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 
+import java.util.List;
+
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
@@ -13,19 +15,19 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 @EqualsAndHashCode(callSuper = true)
 public class TaskField extends com.netgrif.application.engine.objects.elastic.domain.TaskField {
 
-    public TaskField(String[] values) {
+    public TaskField(List<String> values) {
         super(values);
     }
 
     @Override
     @Field(type = Text)
-    public String[] getFulltextValue() {
+    public List<String> getFulltextValue() {
         return super.getFulltextValue();
     }
 
     @Override
     @Field(type = Keyword)
-    public String[] getTaskRefValue() {
+    public List<String> getTaskRefValue() {
         return super.getTaskRefValue();
     }
 }

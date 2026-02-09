@@ -10,8 +10,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class TaskAuthorizationService extends AbstractAuthorizationService implements ITaskAuthorizationService {
@@ -48,16 +47,14 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     @Override
     public Boolean userHasUserListPermission(AbstractUser user, Task task, RolePermission... permissions) {
-        if (task.getUserRefs() == null || task.getUserRefs().isEmpty())
-            return null;
-
-        // TODO: impersonation user.getSelfOrImpersonated().getStringId()
-        if (!task.getUsers().containsKey(user.getStringId())) {
+        if (task.getActorRefs() == null || task.getActorRefs().isEmpty()) {
             return null;
         }
 
-        // TODO: impersonation user.getSelfOrImpersonated().getStringId()
-        Map<String, Boolean> userPermissions = task.getUsers().get(user.getStringId());
+        Map<String, Boolean> userPermissions = findUserPermissions(task, user);
+        if (userPermissions == null) {
+            return null;
+        }
 
         for (RolePermission permission : permissions) {
             Boolean perm = userPermissions.get(permission.toString());
@@ -206,5 +203,9 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     public boolean canCallSaveFile(LoggedUser loggedUser, String taskId) {
         // TODO: impersonation loggedUser.getSelfOrImpersonated().isAdmin()
         return loggedUser.isAdmin() || isAssignee(loggedUser, taskId);
+    }
+
+    private Map<String, Boolean> findUserPermissions(Task task, AbstractUser user) {
+        return findUserPermissions(task.getActors(), user);
     }
 }

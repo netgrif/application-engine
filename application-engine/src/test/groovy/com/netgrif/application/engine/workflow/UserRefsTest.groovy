@@ -73,7 +73,7 @@ class UserRefsTest {
             _case = dataService.setData(taskId, ImportHelper.populateDataset([
                     "user_list_1": [
                             "value": [id],
-                            "type": "userList"
+                            "type": "actorList"
                     ]
             ] as Map)).getCase()
             newCases.add(workflowService.save(_case))
@@ -83,7 +83,7 @@ class UserRefsTest {
 
     @Test
     void testCases() {
-        newCases.eachWithIndex { Case entry, int i -> assert entry.users.get(userIds.get(i)) != null }
+        newCases.eachWithIndex { Case entry, int i -> assert entry.actors.get(userIds.get(i)) != null }
     }
 
 
