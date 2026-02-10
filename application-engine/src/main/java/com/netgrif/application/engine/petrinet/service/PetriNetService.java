@@ -562,17 +562,17 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public Page<PetriNetReference> getReferences(LoggedUser user, Locale locale, Pageable pageable) {
+    public Page<PetriNetReference> getReferences(Locale locale, Pageable pageable) {
         return getAll(pageable).map(net -> transformToReference(net, locale));
     }
 
     @Override
-    public Page<PetriNetReference> getReferencesByIdentifier(String identifier, LoggedUser user, Locale locale, Pageable pageable) {
+    public Page<PetriNetReference> getReferencesByIdentifier(String identifier, Locale locale, Pageable pageable) {
         return getByIdentifier(identifier, pageable).map(net -> transformToReference(net, locale));
     }
 
     @Override
-    public Page<PetriNetReference> getReferencesByVersion(Version version, LoggedUser user, Locale locale, Pageable pageable) {
+    public Page<PetriNetReference> getReferencesByVersion(Version version, Locale locale, Pageable pageable) {
         LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
         Page<PetriNetReference> references;
@@ -609,7 +609,7 @@ public class PetriNetService implements IPetriNetService {
                         Document versionDoc = doc.get("version", Document.class);
                         Version refVersion = new Version(versionDoc.getLong("major"), versionDoc.getLong("minor"),
                                 versionDoc.getLong("patch"));
-                        return getReference(doc.getString("_id"), refVersion, user, locale);
+                        return getReference(doc.getString("_id"), refVersion, locale);
                     })
                     .collect(Collectors.toList());
             Aggregation countAggregation = Aggregation.newAggregation(
@@ -638,12 +638,17 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNetReference> getReferencesByUsersProcessRoles(LoggedUser user, Locale locale) {
+    public List<PetriNetReference> getReferencesByUsersProcessRoles(Locale locale) {
         LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
-        Criteria criteria = getProcessRolesCriteria(user);
-        if (loggedUser != null && !loggedUser.isAdmin()) {
-            criteria.and("workspaceId").is(loggedUser.getActiveWorkspaceId());
+        Criteria criteria;
+        if (loggedUser != null) {
+            criteria = getProcessRolesCriteria(loggedUser);
+            if (!loggedUser.isAdmin()) {
+                criteria.and("workspaceId").is(loggedUser.getActiveWorkspaceId());
+            }
+        } else {
+            criteria = new Criteria();
         }
 
         Query query = Query.query(criteria);
@@ -653,13 +658,13 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public PetriNetReference getReference(String identifier, Version version, LoggedUser user, Locale locale) {
+    public PetriNetReference getReference(String identifier, Version version, Locale locale) {
         PetriNet net = version == null ? self.getDefaultVersionByIdentifier(identifier) : self.getPetriNet(identifier, version);
         return net != null ? transformToReference(net, locale) : new PetriNetReference();
     }
 
     @Override
-    public List<TransitionReference> getTransitionReferences(List<String> netIds, LoggedUser user, Locale locale) {
+    public List<TransitionReference> getTransitionReferences(List<String> netIds, Locale locale) {
         Iterable<PetriNet> nets = get(netIds);
         List<TransitionReference> references = new ArrayList<>();
 
@@ -710,14 +715,15 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public Page<PetriNetReference> search(PetriNetSearch criteriaClass, LoggedUser user, Pageable pageable, Locale locale) {
+    public Page<PetriNetReference> search(PetriNetSearch criteriaClass, Pageable pageable, Locale locale) {
         Query query = new Query();
         Query queryTotal = new Query();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 
         // TODO: resolve impersonation
-        if (!user.isAdmin()) {
-            Criteria criteria = getProcessRolesCriteria(user);
-            criteria.and("workspaceId").is(user.getActiveWorkspaceId());
+        if (loggedUser != null && !loggedUser.isAdmin()) {
+            Criteria criteria = getProcessRolesCriteria(loggedUser);
+            criteria.and("workspaceId").is(loggedUser.getActiveWorkspaceId());
             query.addCriteria(criteria);
         }
 //        if (!user.getSelfOrImpersonated().isAdmin())

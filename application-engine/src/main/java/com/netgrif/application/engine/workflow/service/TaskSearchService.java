@@ -28,7 +28,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
         // TODO: impersonation
 //        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
         LoggedUser loggedOrImpersonated = user;
-        List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, loggedOrImpersonated, locale)).collect(Collectors.toList());
+        List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
             // one of the queries evaluates to empty set => the entire result is an empty set
@@ -102,7 +102,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
 
-    private Predicate buildSingleQuery(TaskSearchRequest request, LoggedUser user, Locale locale) {
+    private Predicate buildSingleQuery(TaskSearchRequest request, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
 
         buildStringIdQuery(request, builder);
@@ -114,7 +114,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
         buildFullTextQuery(request, builder);
         buildTransitionQuery(request, builder);
         buildTagsQuery(request, builder);
-        boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, builder);
+        boolean resultAlwaysEmpty = buildGroupQuery(request, locale, builder);
 
         if (resultAlwaysEmpty)
             return null;
@@ -270,13 +270,13 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return QTask.task.transitionId.eq(transitionId);
     }
 
-    public boolean buildGroupQuery(TaskSearchRequest request, LoggedUser user, Locale locale, BooleanBuilder query) {
+    public boolean buildGroupQuery(TaskSearchRequest request, Locale locale, BooleanBuilder query) {
         if (request.group == null || request.group.isEmpty())
             return false;
 
         PetriNetSearch processQuery = new PetriNetSearch();
         processQuery.setGroup(request.group);
-        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
+        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, new FullPageRequest(), locale).getContent();
         if (groupProcesses.isEmpty())
             return true;
 

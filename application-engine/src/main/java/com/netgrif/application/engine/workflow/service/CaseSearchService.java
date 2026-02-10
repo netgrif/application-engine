@@ -64,7 +64,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
 //        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
 
         if (requestQuery.containsKey(PETRINET)) {
-            builder.and(petriNet(requestQuery.get(PETRINET), user, locale));
+            builder.and(petriNet(requestQuery.get(PETRINET), locale));
         }
         if (requestQuery.containsKey(AUTHOR)) {
             builder.and(author(requestQuery.get(AUTHOR)));
@@ -88,7 +88,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
             builder.and(caseId(requestQuery.get(CASE_ID)));
         }
         if (requestQuery.containsKey(GROUP)) {
-            Predicate groupPredicate = group(requestQuery.get(GROUP), user, locale);
+            Predicate groupPredicate = group(requestQuery.get(GROUP), locale);
             if (groupPredicate != null) {
                 builder.and(groupPredicate);
             } else {
@@ -139,8 +139,8 @@ public class CaseSearchService extends MongoSearchService<Case> {
         return QCase.case$.negativeViewActors.contains(actorId);
     }
 
-    public Predicate petriNet(Object query, LoggedUser user, Locale locale) {
-        List<PetriNetReference> allowedNets = petriNetService.getReferencesByUsersProcessRoles(user, locale);
+    public Predicate petriNet(Object query, Locale locale) {
+        List<PetriNetReference> allowedNets = petriNetService.getReferencesByUsersProcessRoles(locale);
         if (query instanceof ArrayList) {
             List<Predicate> expressions = (List<Predicate>) ((ArrayList) query).stream().filter(q -> q instanceof HashMap).map(q -> petriNetObject((HashMap<String, String>) q, allowedNets)).collect(Collectors.toList());
             return constructPredicateTree(expressions, BooleanBuilder::or);
@@ -356,14 +356,14 @@ public class CaseSearchService extends MongoSearchService<Case> {
         return caseId.isEmpty() ? QCase.case$._id.isNull() : QCase.case$._id.eq(new ProcessResourceId(caseId));
     }
 
-    public Predicate group(Object query, LoggedUser user, Locale locale) {
+    public Predicate group(Object query, Locale locale) {
         PetriNetSearch processQuery = new PetriNetSearch();
         if (query instanceof List) {
             processQuery.setGroup((List<String>) query);
         } else if (query instanceof String) {
             processQuery.setGroup(new ArrayList<>(Arrays.asList((String) query)));
         }
-        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
+        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, new FullPageRequest(), locale).getContent();
         if (groupProcesses.isEmpty())
             return null;
 

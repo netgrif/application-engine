@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
 import com.netgrif.application.engine.petrinet.web.PetriNetController;
-import com.netgrif.application.engine.petrinet.web.responsebodies.TransitionReference;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
@@ -17,6 +16,6 @@ public class TransitionReferencesResource extends CollectionModel<TransitionRefe
 
     private void buildLinks() {
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
-                .getTransitionReferences(new ArrayList<>(), null, null)).withSelfRel());
+                .getTransitionReferences(new ArrayList<>(), null)).withSelfRel());
     }
 }

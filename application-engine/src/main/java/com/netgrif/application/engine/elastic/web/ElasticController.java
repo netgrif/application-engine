@@ -102,7 +102,7 @@ public class ElasticController {
 
                 for (int page = 0; page < numOfPages; page++) {
                     log.info("Indexing page {}", page + 1);
-                    Predicate predicate = searchService.buildQuery(searchBody, user, locale);
+                    Predicate predicate = searchService.buildQuery(searchBody, locale);
                     reindexingTask.forceReindexPage(predicate, page, numOfPages);
                 }
             }

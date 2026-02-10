@@ -130,38 +130,39 @@ public class PetriNetController {
 
     @Operation(summary = "Get all processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
-    public ResponseEntity<Page<PetriNetReference>> getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Pageable pageable, Authentication auth, Locale locale) {
-        LoggedUser user = (LoggedUser) auth.getPrincipal();
+    public ResponseEntity<Page<PetriNetReference>> getAll(@RequestParam(value = "indentifier", required = false) String identifier,
+                                                          @RequestParam(value = "version", required = false) String version,
+                                                          Pageable pageable, Locale locale) {
         if (identifier != null && version == null) {
-            return ResponseEntity.ok(service.getReferencesByIdentifier(identifier, user, locale, pageable));
+            return ResponseEntity.ok(service.getReferencesByIdentifier(identifier, locale, pageable));
         } else if (identifier == null && version != null) {
-            return ResponseEntity.ok(service.getReferencesByVersion(converter.convert(version), user, locale, pageable));
+            return ResponseEntity.ok(service.getReferencesByVersion(converter.convert(version), locale, pageable));
         } else if (identifier != null) {
-            PetriNetReference reference = service.getReference(identifier, converter.convert(version), user, locale);
+            PetriNetReference reference = service.getReference(identifier, converter.convert(version), locale);
             return ResponseEntity.ok(new PageImpl<>(Collections.singletonList(reference), pageable, reference.getIdentifier().isEmpty() ? 0 : 1));
         } else {
-            return ResponseEntity.ok(service.getReferences(user, locale, pageable));
+            return ResponseEntity.ok(service.getReferences(locale, pageable));
         }
     }
 
     @Operation(summary = "Get process by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public PetriNetReferenceResource getOne(@PathVariable("id") String id, Authentication auth, Locale locale) {
+    public PetriNetReferenceResource getOne(@PathVariable("id") String id, Locale locale) {
         return new PetriNetReferenceResource(IPetriNetService.transformToReference(service.getPetriNet(decodeUrl(id)), locale));
     }
 
     @Operation(summary = "Get process by identifier and version", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{identifier}/{version}", produces = MediaTypes.HAL_JSON_VALUE)
-    public PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Authentication auth, Locale locale) {
+    public PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Locale locale) {
         String resolvedIdentifier = Base64.isBase64(identifier) ? new String(Base64.decodeBase64(identifier)) : identifier;
-        return new PetriNetReferenceResource(service.getReference(resolvedIdentifier, converter.convert(version), (LoggedUser) auth.getPrincipal(), locale));
+        return new PetriNetReferenceResource(service.getReference(resolvedIdentifier, converter.convert(version), locale));
     }
 
     @Operation(summary = "Get transitions of processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/transitions", produces = MediaTypes.HAL_JSON_VALUE)
-    public TransitionReferencesResource getTransitionReferences(@RequestParam List<String> ids, Authentication auth, Locale locale) {
+    public TransitionReferencesResource getTransitionReferences(@RequestParam List<String> ids, Locale locale) {
         ids.forEach(id -> id = decodeUrl(id));
-        return new TransitionReferencesResource(service.getTransitionReferences(ids, (LoggedUser) auth.getPrincipal(), locale));
+        return new TransitionReferencesResource(service.getTransitionReferences(ids, locale));
     }
 
     @Operation(summary = "Get data fields of transitions", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -199,9 +200,8 @@ public class PetriNetController {
     @Operation(summary = "Search processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search", produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
-    ResponseEntity<Page<PetriNetReferenceResource>> searchPetriNets(@RequestBody PetriNetSearch criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
-        LoggedUser user = (LoggedUser) auth.getPrincipal();
-        Page<PetriNetReference> nets = service.search(criteria, user, pageable, locale);
+    ResponseEntity<Page<PetriNetReferenceResource>> searchPetriNets(@RequestBody PetriNetSearch criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
+        Page<PetriNetReference> nets = service.search(criteria, pageable, locale);
         return ResponseEntity.ok(new PageImpl<>(nets.stream().map(PetriNetReferenceResource::new).toList(), pageable, nets.getTotalElements()));
     }
 

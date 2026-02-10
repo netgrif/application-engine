@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.petrinet.service.interfaces;
 
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.*;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
@@ -163,64 +162,58 @@ public interface IPetriNetService {
     /**
      * Retrieves a paginated list of PetriNet references accessible by the given user.
      *
-     * @param user the logged-in user
      * @param locale the locale for translations
      * @param pageable the pagination information
      * @return a {@link Page} of {@link PetriNetReference} objects
      */ 
-    Page<PetriNetReference> getReferences(LoggedUser user, Locale locale, Pageable pageable);
+    Page<PetriNetReference> getReferences(Locale locale, Pageable pageable);
 
     /**
      * Retrieves a paginated list of {@link PetriNetReference} objects by their identifier.
      *
      * @param identifier the unique identifier of the PetriNet
-     * @param user the logged-in user making the request
      * @param locale the locale for translations
      * @param pageable the pagination information
      * @return a paginated list of {@link PetriNetReference} objects
      */
-    Page<PetriNetReference> getReferencesByIdentifier(String identifier, LoggedUser user, Locale locale, Pageable pageable);
+    Page<PetriNetReference> getReferencesByIdentifier(String identifier, Locale locale, Pageable pageable);
 
     /**
      * Retrieves a paginated list of {@link PetriNetReference} objects by version.
      *
      * @param version the {@link Version} of the PetriNet
-     * @param user the logged-in user making the request
      * @param locale the locale for translations
      * @param pageable the pagination information
      * @return a paginated list of {@link PetriNetReference} objects
      */
-    Page<PetriNetReference> getReferencesByVersion(Version version, LoggedUser user, Locale locale, Pageable pageable);
+    Page<PetriNetReference> getReferencesByVersion(Version version, Locale locale, Pageable pageable);
 
     /**
      * Retrieves a list of {@link PetriNetReference} objects accessible by the user's process roles.
      *
-     * @param user the logged-in user making the request
      * @param locale the locale for translations
      * @return a list of {@link PetriNetReference} objects accessible by the user
      */
-    List<PetriNetReference> getReferencesByUsersProcessRoles(LoggedUser user, Locale locale);
+    List<PetriNetReference> getReferencesByUsersProcessRoles(Locale locale);
 
     /**
      * Retrieves a single {@link PetriNetReference} by identifier and version.
      *
      * @param identifier the unique identifier of the PetriNet
      * @param version the {@link Version} of the PetriNet
-     * @param user the logged-in user making the request
      * @param locale the locale for translations
      * @return the {@link PetriNetReference} object corresponding to the given identifier and version
      */
-    PetriNetReference getReference(String identifier, Version version, LoggedUser user, Locale locale);
+    PetriNetReference getReference(String identifier, Version version, Locale locale);
 
     /**
      * Retrieves a list of {@link TransitionReference} objects for the given PetriNet IDs.
      *
      * @param netsIds the list of PetriNet IDs for which to retrieve transitions
-     * @param user the logged-in user making the request
      * @param locale the locale for translations
      * @return a list of {@link TransitionReference} objects for the given PetriNet IDs
      */
-    List<TransitionReference> getTransitionReferences(List<String> netsIds, LoggedUser user, Locale locale);
+    List<TransitionReference> getTransitionReferences(List<String> netsIds, Locale locale);
 
     /**
      * Retrieves a list of {@link DataFieldReference} objects for the given transition references.
@@ -235,12 +228,11 @@ public interface IPetriNetService {
      * Performs a search for {@link PetriNetReference} objects based on the provided criteria.
      *
      * @param criteria the {@link PetriNetSearch} criteria to filter results
-     * @param user the logged-in user making the request
      * @param pageable the pagination information
      * @param locale the locale for translations
      * @return a paginated list of {@link PetriNetReference} objects matching the criteria
      */
-    Page<PetriNetReference> search(PetriNetSearch criteria, LoggedUser user, Pageable pageable, Locale locale);
+    Page<PetriNetReference> search(PetriNetSearch criteria, Pageable pageable, Locale locale);
 
     /**
      * Finds a {@link PetriNet} by its import ID.

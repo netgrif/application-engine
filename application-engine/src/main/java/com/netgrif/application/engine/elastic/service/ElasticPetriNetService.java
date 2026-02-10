@@ -115,7 +115,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
         // TODO: impersonation
 //        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
         LoggedUser loggedOrImpersonated = user;
-        NativeQuery query = buildQuery(requests, loggedOrImpersonated, pageable, locale, isIntersection);
+        NativeQuery query = buildQuery(requests, pageable, locale, isIntersection);
         List<PetriNet> netPage;
         long total;
         if (query != null) {
@@ -132,9 +132,9 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
         return new PageImpl<>(netPage.stream().map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()), pageable, total);
     }
 
-    protected NativeQuery buildQuery(PetriNetSearch request, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+    protected NativeQuery buildQuery(PetriNetSearch request, Pageable pageable, Locale locale, Boolean isIntersection) {
         List<BoolQuery.Builder> singleQueries = new LinkedList<>();
-        singleQueries.add(buildSingleQuery(request, user, locale));
+        singleQueries.add(buildSingleQuery(request, locale));
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
             // one of the queries evaluates to empty set => the entire result is an empty set
@@ -157,11 +157,11 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
                 .build();
     }
 
-    protected BoolQuery.Builder buildSingleQuery(PetriNetSearch request, LoggedUser user, Locale locale) {
+    protected BoolQuery.Builder buildSingleQuery(PetriNetSearch request, Locale locale) {
         BoolQuery.Builder query = new BoolQuery.Builder();
 
         buildFullTextQuery(request, query);
-        boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
+        boolean resultAlwaysEmpty = buildGroupQuery(request, locale, query);
         if (resultAlwaysEmpty) {
             return null;
         }
@@ -184,14 +184,14 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
         query.must(fullTextQuery._toQuery());
     }
 
-    protected boolean buildGroupQuery(PetriNetSearch request, LoggedUser user, Locale locale, BoolQuery.Builder query) {
+    protected boolean buildGroupQuery(PetriNetSearch request, Locale locale, BoolQuery.Builder query) {
         if (request.getGroup() == null || request.getGroup().isEmpty()) {
             return false;
         }
 
         PetriNetSearch processQuery = new PetriNetSearch();
         processQuery.setGroup(request.getGroup());
-        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
+        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, new FullPageRequest(), locale).getContent();
         if (groupProcesses.isEmpty())
             return true;
 

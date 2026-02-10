@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 @Service
 public class ConfigurableMenuService implements IConfigurableMenuService {
 
+    // todo: refactor
+
     protected final String GLOBAL_ROLE = "GLOBAL_ROLE";
 
     @Autowired
@@ -52,10 +54,9 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
      */
     @Override
     public Map<String, I18nString> getNetsByAuthorAsMapOptions(AbstractUser author, Locale locale) {
-        LoggedUser loggedAuthor = ActorTransformer.toLoggedUser(author);
         PetriNetSearch requestQuery = new PetriNetSearch();
         requestQuery.setAuthor(ActorTransformer.toActorRef(author));
-        List<PetriNetReference> nets = this.petriNetService.search(requestQuery, loggedAuthor, new FullPageRequest(), locale).getContent();
+        List<PetriNetReference> nets = this.petriNetService.search(requestQuery, new FullPageRequest(), locale).getContent();
 
         Map<String, I18nString> options = new LinkedHashMap<>();
         options.put("GLOBAL_ROLE", new I18nString("🌍 Global role"));
