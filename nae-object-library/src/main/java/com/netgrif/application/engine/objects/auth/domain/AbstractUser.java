@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
+import com.netgrif.application.engine.objects.workspace.Workspace;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -211,6 +212,15 @@ public abstract class AbstractUser extends AbstractActor {
     @Override
     public String getName() {
         return String.join(" ", firstName, lastName).trim();
+    }
+
+    // todo javadoc
+    public String getActiveWorkspaceId() {
+        if (isAdmin()) {
+            return "";
+        } else {
+            return this.activeWorkspaceId == null || this.activeWorkspaceId.isEmpty() ? Workspace.FORBIDDEN_ID : this.activeWorkspaceId;
+        }
     }
 
     /**
