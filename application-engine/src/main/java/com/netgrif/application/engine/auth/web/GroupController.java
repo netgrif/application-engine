@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewGroupRequest;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.dto.GroupDto;
 import com.netgrif.application.engine.objects.auth.dto.SearchGroupDto;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.Group;
 import io.swagger.v3.oas.annotations.Operation;
@@ -126,7 +127,7 @@ public class GroupController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PutMapping
-    public ResponseEntity<Group> updateGroup(@RequestBody Group group) {
+    public ResponseEntity<GroupDto> updateGroup(@RequestBody GroupDto group) {
 
         return ResponseEntity.ok(group);
     }
