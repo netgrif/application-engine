@@ -2,7 +2,7 @@ package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Group;
-import com.netgrif.application.engine.objects.auth.dto.GroupSearchDto;
+import com.netgrif.application.engine.objects.auth.dto.SearchGroupDto;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import org.springframework.data.mongodb.core.query.Query;
 import com.querydsl.core.types.Predicate;
@@ -238,7 +238,7 @@ public interface GroupService {
      * @param authorityId ID of the authority to assign
      * @return the updated {@link Group}
      */
-    Group assignAuthority(String groupId, String authorityId);
+    Group addAuthority(String groupId, String authorityId);
 
 
     /**
@@ -375,11 +375,11 @@ public interface GroupService {
     /**
      * Searches for groups based on the provided search criteria and pageable details.
      *
-     * @param searchDto the search criteria encapsulated in a {@link GroupSearchDto}
+     * @param searchDto the search criteria encapsulated in a {@link SearchGroupDto}
      * @param pageable pagination information for the results
      * @return a page of {@link Group} objects that match the search criteria
      */
-    Page<Group> search(GroupSearchDto searchDto, Pageable pageable);
+    Page<Group> search(SearchGroupDto searchDto, Pageable pageable);
 
     /**
      * Adds a role to a specified group.

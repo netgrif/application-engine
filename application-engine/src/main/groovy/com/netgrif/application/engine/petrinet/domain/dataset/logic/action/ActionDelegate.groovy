@@ -49,7 +49,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.objects.petrinet.domain.version.Version
 import com.netgrif.application.engine.objects.utils.MenuItemUtils
 import com.netgrif.application.engine.objects.workflow.domain.Case
-import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId
 import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.ChangeCasePropertyOutcome
@@ -2893,8 +2892,8 @@ class ActionDelegate {
         return groupService.removeUser(userId, realmId, groupId)
     }
 
-    Group assignAuthorityToGroup(String groupId, String authorityId) {
-        return groupService.assignAuthority(groupId, authorityId)
+    Group addAuthorityToGroup(String groupId, String authorityId) {
+        return groupService.addAuthority(groupId, authorityId)
     }
 
     Group removeAuthorityFromGroup(String groupId, String authorityId) {
