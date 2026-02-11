@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
+import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
@@ -59,10 +60,17 @@ public class CaseSearchService extends MongoSearchService<Case> {
     @Autowired
     private IPetriNetService petriNetService;
 
-    public Predicate buildQuery(Map<String, Object> requestQuery, LoggedUser user, Locale locale) {
+    @Autowired
+    private UserService userService;
+
+    public Predicate buildQuery(Map<String, Object> requestQuery, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
 //        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
 
+        if (loggedUser != null && !loggedUser.isAdmin()) {
+            builder.and(workspaceId(loggedUser.getActiveWorkspaceId()));
+        }
         if (requestQuery.containsKey(PETRINET)) {
             builder.and(petriNet(requestQuery.get(PETRINET), locale));
         }
@@ -95,11 +103,14 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 return null;
             }
         }
-        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(user));
-        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(user));
-        permissionConstraints.or(buildViewActorQueryConstraint(user));
-        permissionConstraints.andNot(buildNegativeViewActorsQueryConstraint(user));
-        builder.and(permissionConstraints);
+        if (loggedUser != null) {
+            BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedUser));
+            permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(loggedUser));
+            permissionConstraints.or(buildViewActorQueryConstraint(loggedUser));
+            permissionConstraints.andNot(buildNegativeViewActorsQueryConstraint(loggedUser));
+            builder.and(permissionConstraints);
+        }
+
         return builder;
     }
 
@@ -350,6 +361,10 @@ public class CaseSearchService extends MongoSearchService<Case> {
             return caseIdString((String) query);
         }
         return null;
+    }
+
+    public Predicate workspaceId(String workspaceId) {
+        return QCase.case$.workspaceId.eq(workspaceId);
     }
 
     private static BooleanExpression caseIdString(String caseId) {

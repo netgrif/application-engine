@@ -19,7 +19,6 @@ import com.netgrif.application.engine.event.services.EvaluationService;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.objects.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -94,9 +93,6 @@ public class WorkflowService implements IWorkflowService {
     protected FieldFactory fieldFactory;
 
     @Autowired
-    protected FieldActionsRunner actionsRunner;
-
-    @Autowired
     protected UserService userService;
 
     @Autowired
@@ -128,6 +124,13 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case save(Case useCase) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (useCase.getWorkspaceId() == null
+                || (loggedUser != null && !useCase.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin())) {
+            throw new IllegalArgumentException("Cannot save the useCase with different workspace. UseCase workspace: %s, LoggedUser workspace: %s"
+                    .formatted(useCase.getWorkspaceId(), loggedUser.getActiveWorkspaceId()));
+        }
+
         if (useCase.getPetriNet() == null) {
             setPetriNet(useCase);
         }
@@ -153,8 +156,14 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case findOneNoNet(String caseId) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
         ObjectId objectId = extractObjectId(caseId);
-        Optional<Case> caseOptional = repository.findByIdObjectId(objectId);
+        Optional<Case> caseOptional;
+        if (loggedUser == null || loggedUser.isAdmin()) {
+            caseOptional = repository.findByIdObjectId(objectId);
+        } else {
+            caseOptional = repository.findByIdObjectIdAndWorkspaceId(objectId, loggedUser.getActiveWorkspaceId());
+        }
         if (caseOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
         }
@@ -163,6 +172,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public List<Case> findAllById(List<String> ids) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
         List<ObjectId> objectIds = ids.stream()
                 .map(id -> {
                     String[] parts = id.split(ProcessResourceId.ID_SEPARATOR);
@@ -173,9 +183,13 @@ public class WorkflowService implements IWorkflowService {
                 })
                 .collect(Collectors.toList());
 
-        List<Case> cases = repository.findAllByObjectIdsIn(objectIds).stream()
-                .filter(Objects::nonNull)
-                .toList();
+        List<Case> cases;
+        if (loggedUser == null || loggedUser.isAdmin()) {
+            cases = repository.findAllByObjectIdsIn(objectIds).stream().filter(Objects::nonNull).toList();
+        } else {
+            cases = repository.findAllByObjectIdsInAndWorkspaceId(objectIds, loggedUser.getActiveWorkspaceId()).stream()
+                    .filter(Objects::nonNull).toList();
+        }
 
         Map<String, Case> caseMap = cases.stream()
                 .collect(Collectors.toMap(Case::getStringId, caze -> caze));
@@ -195,7 +209,13 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> getAll(Pageable pageable) {
-        Page<Case> page = repository.findAll(pageable);
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        Page<Case> page;
+        if (loggedUser == null || loggedUser.isAdmin()) {
+            page = repository.findAll(pageable);
+        } else {
+            page = repository.findAllByWorkspaceId(loggedUser.getActiveWorkspaceId(), pageable);
+        }
         page.getContent().forEach(this::setPetriNet);
         decryptDataSets(page.getContent());
         return setImmediateDataFields(page);
@@ -203,14 +223,20 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> search(Predicate predicate, Pageable pageable) {
-        Page<Case> page = repository.findAll(predicate, pageable);
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        Page<Case> page;
+        if (loggedUser == null || loggedUser.isAdmin()) {
+            page = repository.findAll(predicate, pageable);
+        } else {
+            page = repository.findAllByWorkspaceId(predicate, loggedUser.getActiveWorkspaceId(), pageable, mongoTemplate);
+        }
         page.getContent().forEach(this::setPetriNet);
         return setImmediateDataFields(page);
     }
 
     @Override
-    public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale) {
-        Predicate searchPredicate = searchService.buildQuery(request, user, locale);
+    public Page<Case> search(Map<String, Object> request, Pageable pageable, Locale locale) {
+        Predicate searchPredicate = searchService.buildQuery(request, locale);
         Page<Case> page;
         if (searchPredicate != null) {
             page = repository.findAll(searchPredicate, pageable);
@@ -223,8 +249,8 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public long count(Map<String, Object> request, LoggedUser user, Locale locale) {
-        Predicate searchPredicate = searchService.buildQuery(request, user, locale);
+    public long count(Map<String, Object> request, Locale locale) {
+        Predicate searchPredicate = searchService.buildQuery(request, locale);
         if (searchPredicate != null) {
             return repository.count(searchPredicate);
         } else {
@@ -389,7 +415,14 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> findAllByAuthor(String authorId, String petriNet, Pageable pageable) {
-        String queryString = "{author.id:" + authorId + ", petriNet:{$ref:\"petriNet\",$id:{$oid:\"" + petriNet + "\"}}}";
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        String queryString;
+        if (loggedUser == null || loggedUser.isAdmin()) {
+            queryString = "{author.id:" + authorId + ", petriNet:{$ref:\"petriNet\",$id:{$oid:\"" + petriNet + "\"}}}";
+        } else {
+            queryString = "{author.id:" + authorId + ", petriNet:{$ref:\"petriNet\",$id:{$oid:\"" + petriNet + "\"}}, workspaceId:" +
+                    loggedUser.getActiveWorkspaceId() + "}";
+        }
         BasicQuery query = new BasicQuery(queryString);
         query = (BasicQuery) query.with(pageable);
         List<Case> cases = mongoTemplate.find(query, Case.class);
@@ -478,7 +511,13 @@ public class WorkflowService implements IWorkflowService {
             return true;
         }
         ObjectId objectId = extractObjectId(caseId);
-        Optional<Case> caseOptional = repository.findByIdObjectId(objectId);
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        Optional<Case> caseOptional;
+        if (loggedUser == null || loggedUser.isAdmin()) {
+            caseOptional = repository.findByIdObjectId(objectId);
+        } else {
+            caseOptional = repository.findByIdObjectIdAndWorkspaceId(objectId, loggedUser.getActiveWorkspaceId());
+        }
         if (caseOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
         }

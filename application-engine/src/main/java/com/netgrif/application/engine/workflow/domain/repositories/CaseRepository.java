@@ -3,15 +3,20 @@ package com.netgrif.application.engine.workflow.domain.repositories;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuery;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,12 +31,18 @@ public interface CaseRepository extends MongoRepository<Case, String>, QuerydslP
     @Query("{ '_id.objectId': { $in: ?0 } }")
     List<Case> findAllByObjectIdsIn(List<ObjectId> objectIds);
 
+    @Query("{ '_id.objectId': { $in: ?0 }, 'workspaceId': ?1 }")
+    List<Case> findAllByObjectIdsInAndWorkspaceId(List<ObjectId> objectIds, String workspaceId);
+
     List<Case> findAllByPetriNetObjectId(ObjectId petriNetObjectId);
 
     void deleteAllByPetriNetObjectId(ObjectId petriNetObjectId);
 
     @Query("{ '_id.objectId': ?0 }")
     Optional<Case> findByIdObjectId(ObjectId objectId);
+
+    @Query("{ '_id.objectId': ?0, 'workspaceId': ?1 }")
+    Optional<Case> findByIdObjectIdAndWorkspaceId(ObjectId objectId, String workspaceId);
 
     default Optional<Case> findById(String compositeId) {
         String[] parts = compositeId.split(ProcessResourceId.ID_SEPARATOR);
@@ -46,6 +57,20 @@ public interface CaseRepository extends MongoRepository<Case, String>, QuerydslP
 
     @Query("{ '_id.shortProcessId': ?0, '_id.objectId': ?1 }")
     Optional<Case> findByNetworkIdAndObjectId(String ProcessId, ObjectId objectId);
+
+    Page<Case> findAllByWorkspaceId(String workspaceId, Pageable pageable);
+
+    default Page<Case> findAllByWorkspaceId(Predicate predicate, String workspaceId, Pageable pageable, MongoTemplate mongoTemplate) {
+        // todo 2072 test
+        Assert.notNull(predicate, "Predicate must not be null");
+        Assert.notNull(pageable, "Pageable must not be null");
+
+        Predicate finalPredicate = ExpressionUtils.and(predicate, new QCase("case").workspaceId.eq(workspaceId));
+
+        SpringDataMongodbQuery<Case> query = new SpringDataMongodbQuery<>(mongoTemplate, Case.class, "case")
+                .where(finalPredicate);
+        return query.fetchPage(pageable);
+    }
 
     @Override
     default void customize(QuerydslBindings bindings, QCase qCase) {

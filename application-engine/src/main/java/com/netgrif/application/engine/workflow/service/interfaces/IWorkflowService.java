@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
@@ -51,9 +50,9 @@ public interface IWorkflowService {
 
     Map<String, I18nString> listToMap(List<Case> cases);
 
-    Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale);
+    Page<Case> search(Map<String, Object> request, Pageable pageable, Locale locale);
 
-    long count(Map<String, Object> request, LoggedUser user, Locale locale);
+    long count(Map<String, Object> request, Locale locale);
 
     boolean removeTasksFromCase(List<Task> tasks, String caseId);
 

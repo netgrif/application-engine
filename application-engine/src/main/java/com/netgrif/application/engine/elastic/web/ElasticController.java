@@ -3,7 +3,6 @@ package com.netgrif.application.engine.elastic.web;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import com.netgrif.application.engine.elastic.web.requestbodies.IndexParams;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.ReindexingTask;
 import com.netgrif.application.engine.workflow.service.CaseSearchService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -18,12 +17,10 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -89,16 +86,15 @@ public class ElasticController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public MessageResource reindex(@RequestBody Map<String, Object> searchBody, Authentication auth, Locale locale) {
+    public MessageResource reindex(@RequestBody Map<String, Object> searchBody, Locale locale) {
         try {
-            LoggedUser user = (LoggedUser) auth.getPrincipal();
-            long count = workflowService.count(searchBody, user, locale);
+            long count = workflowService.count(searchBody, locale);
 
             if (count == 0) {
                 log.info("No cases to reindex");
             } else {
                 long numOfPages = (count / elasticsearchProperties.getReindexExecutor().getSize()) + 1;
-                log.info("Reindexing cases: " + numOfPages + " pages");
+                log.info("Reindexing cases: {} pages", numOfPages);
 
                 for (int page = 0; page < numOfPages; page++) {
                     log.info("Indexing page {}", page + 1);
