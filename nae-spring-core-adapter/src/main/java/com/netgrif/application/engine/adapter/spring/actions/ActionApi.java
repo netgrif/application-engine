@@ -139,12 +139,11 @@ public interface ActionApi {
      * Searches for tasks using elastic search queries.
      *
      * @param elasticStringQueries a list of queries for filtering tasks
-     * @param authPrincipalDto     the authorization principal used for the search
      * @param pageable             the pagination information
      * @param isIntersection       true to intersect results of all queries; false for union
      * @return a page of tasks matching the criteria
      */
-    Page<Task> searchTasks(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection);
+    Page<Task> searchTasks(List<String> elasticStringQueries, Pageable pageable, Boolean isIntersection);
 
     /**
      * Assigns a specific task to a user.

@@ -145,12 +145,11 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
-    public Page<Task> searchTasks(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection) {
+    public Page<Task> searchTasks(List<String> elasticStringQueries, Pageable pageable, Boolean isIntersection) {
         boolean intersect = Boolean.TRUE.equals(isIntersection);
         List<ElasticTaskSearchRequest> taskSearchRequests = elasticStringQueries.stream().map(query -> ElasticTaskSearchRequest.builder().query(query).build()).toList();
-        LoggedUser loggedUser = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
         Locale locale = LocaleContextHolder.getLocale();
-        return elasticTaskService.search(taskSearchRequests, loggedUser, pageable, locale, intersect);
+        return elasticTaskService.search(taskSearchRequests, pageable, locale, intersect);
     }
 
     @Override

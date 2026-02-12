@@ -39,7 +39,7 @@ public class ResourceLinkAssembler {
                     .searchElastic(null, null, null, null, null, null)).withRel("search_es"));
         if (!selfRel.equalsIgnoreCase("count"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                    .count(null, null, null, null)).withRel("count"));
+                    .count(null, null, null)).withRel("count"));
     }
 
     private static void addCasesLinks(PagedModel pagedResources, String selfRel) {
