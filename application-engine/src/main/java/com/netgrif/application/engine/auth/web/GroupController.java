@@ -5,11 +5,12 @@ import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRol
 import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.dto.request.group.CreateGroupRequestDto;
 import com.netgrif.application.engine.objects.dto.request.group.GroupSearchRequestDto;
 import com.netgrif.application.engine.objects.dto.request.group.UpdateGroupRequestDto;
+import com.netgrif.application.engine.objects.dto.response.group.GroupDto;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
-import com.netgrif.application.engine.orgstructure.web.responsebodies.Group;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,13 +58,13 @@ public class GroupController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Group> getGroup(@PathVariable String id) {
+    public ResponseEntity<GroupDto> getGroup(@PathVariable String id, Locale locale) {
         if (id == null || id.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
         try {
-            com.netgrif.application.engine.objects.auth.domain.Group group = groupService.findById(id);
-            return ResponseEntity.ok(new Group(group.getStringId(), group.getDisplayName()));
+            Group group = groupService.findById(id);
+            return ResponseEntity.ok(GroupDto.fromGroup(group, locale));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
@@ -76,10 +78,10 @@ public class GroupController {
             @ApiResponse(responseCode = "500", description = "Internal server error"),
     })
     @GetMapping("/search")
-    public ResponseEntity<Page<Group>> searchGroups(GroupSearchRequestDto searchDto, Pageable pageable) {
+    public ResponseEntity<Page<GroupDto>> searchGroups(GroupSearchRequestDto searchDto, Pageable pageable, Locale locale) {
         try {
-            Page<com.netgrif.application.engine.objects.auth.domain.Group> groups = groupService.search(searchDto, pageable);
-            return ResponseEntity.ok(groups.map(group -> new Group(group.getStringId(), group.getDisplayName())));
+            Page<Group> groups = groupService.search(searchDto, pageable);
+            return ResponseEntity.ok(groups.map(group -> GroupDto.fromGroup(group, locale)));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -116,7 +118,7 @@ public class GroupController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseMessage> deleteGroup(@PathVariable @Size(min = 24, max = 24) String id) {
         try {
-            com.netgrif.application.engine.objects.auth.domain.Group group = groupService.findById(id);
+            Group group = groupService.findById(id);
             groupService.delete(group);
             return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Group with id [%s] deleted successfully".formatted(id)));
         } catch (IllegalArgumentException e) {
@@ -137,7 +139,7 @@ public class GroupController {
     @PutMapping
     public ResponseEntity<ResponseMessage> updateGroup(@RequestBody UpdateGroupRequestDto groupUpdate) {
         try {
-            com.netgrif.application.engine.objects.auth.domain.Group group = groupService.findById(groupUpdate.id());
+            Group group = groupService.findById(groupUpdate.id());
             if (groupUpdate.identifier() != null) {
                 group.setIdentifier(groupUpdate.identifier());
             }
@@ -164,7 +166,7 @@ public class GroupController {
     })
     public ResponseEntity<ResponseMessage> assignRolesToUser(@PathVariable("id") String groupId, @RequestBody Set<String> roleIds) {
         try {
-            com.netgrif.application.engine.objects.auth.domain.Group group = groupService.findById(groupId);
+            Group group = groupService.findById(groupId);
             processRoleService.assignRolesToGroup(group, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()));
             log.info("Process roles {} assigned to group with id [{}]", roleIds, groupId);
             return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Selected roles assigned to group " + groupId));
