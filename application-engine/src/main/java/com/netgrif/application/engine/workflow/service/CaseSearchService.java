@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.workflow.service;
 
+import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask;
 import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
@@ -65,12 +67,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     public Predicate buildQuery(Map<String, Object> requestQuery, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
-        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
 //        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
 
-        if (loggedUser != null && !loggedUser.isAdmin()) {
-            builder.and(workspaceId(loggedUser.getActiveWorkspaceId()));
-        }
         if (requestQuery.containsKey(PETRINET)) {
             builder.and(petriNet(requestQuery.get(PETRINET), locale));
         }
@@ -103,13 +102,15 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 return null;
             }
         }
-        if (loggedUser != null) {
-            BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedUser));
-            permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(loggedUser));
-            permissionConstraints.or(buildViewActorQueryConstraint(loggedUser));
-            permissionConstraints.andNot(buildNegativeViewActorsQueryConstraint(loggedUser));
-            builder.and(permissionConstraints);
+        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedUser));
+        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(loggedUser));
+        permissionConstraints.or(buildViewActorQueryConstraint(loggedUser));
+        permissionConstraints.andNot(buildNegativeViewActorsQueryConstraint(loggedUser));
+        if (!loggedUser.isAdmin()) {
+            // todo 2072 test
+            permissionConstraints.and(buildWorkspaceQueryConstraint(loggedUser));
         }
+        builder.and(permissionConstraints);
 
         return builder;
     }
@@ -363,8 +364,8 @@ public class CaseSearchService extends MongoSearchService<Case> {
         return null;
     }
 
-    public Predicate workspaceId(String workspaceId) {
-        return QCase.case$.workspaceId.eq(workspaceId);
+    protected Predicate buildWorkspaceQueryConstraint(LoggedUser user) {
+        return QTask.task.workspaceId.eq(user.getActiveWorkspaceId());
     }
 
     private static BooleanExpression caseIdString(String caseId) {
