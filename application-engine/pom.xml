@@ -370,6 +370,12 @@
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
         </dependency>
 
+        <!-- Spring Validator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
         <!-- Drools -->
         <!--        <dependency>-->
         <!--            <groupId>org.kie</groupId>-->
@@ -503,11 +509,6 @@
         </dependency>
 
         <!-- For Configuration Properties -->
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>6.2.3.Final</version>
-        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson</groupId>
             <artifactId>jackson-base</artifactId>
