@@ -127,8 +127,8 @@ public class WorkflowService implements IWorkflowService {
         LoggedUser loggedUser = userService.getLoggedUserFromContext();
         if (useCase.getWorkspaceId() == null
                 || (loggedUser != null && !useCase.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin())) {
-            throw new IllegalArgumentException("Cannot save the useCase with different workspace. UseCase workspace: %s, LoggedUser workspace: %s"
-                    .formatted(useCase.getWorkspaceId(), loggedUser.getActiveWorkspaceId()));
+            throw new IllegalArgumentException("Cannot save the useCase [%s] with different workspace. UseCase workspace: %s, LoggedUser workspace: %s"
+                    .formatted(useCase.getStringId(), useCase.getWorkspaceId(), loggedUser == null ? "" : loggedUser.getActiveWorkspaceId()));
         }
 
         if (useCase.getPetriNet() == null) {

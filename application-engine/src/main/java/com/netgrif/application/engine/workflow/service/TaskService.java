@@ -41,6 +41,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
+import com.querydsl.core.types.ExpressionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -325,7 +326,13 @@ public class TaskService implements ITaskService {
      */
     @Override
     public void cancelTasksWithoutReload(Set<String> transitions, String caseId, Map<String, String> params) {
-        List<Task> tasks = taskRepository.findAllByTransitionIdInAndCaseId(transitions, caseId);
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        List<Task> tasks;
+        if (loggedUser == null || loggedUser.isAdmin()) {
+            tasks = taskRepository.findAllByTransitionIdInAndCaseId(transitions, caseId);
+        } else {
+            tasks = taskRepository.findAllByTransitionIdInAndCaseIdAndWorkspaceId(transitions, caseId, loggedUser.getActiveWorkspaceId());
+        }
         Case useCase = null;
         for (Task task : tasks) {
             if (task.getUserId() == null) {
@@ -610,17 +617,13 @@ public class TaskService implements ITaskService {
         log.info("[{}]: executeTransition [{}] in case [{}]", useCase.getStringId(), task.getTransitionId(), useCase.getTitle());
         try {
             log.info("assignTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
-            assignTask(TaskParams.with()
-                    .task(task)
-                    .build());
+            assignTask(new TaskParams(task));
 
             log.info("getData [{}] in case [{}]", task.getTitle(), useCase.getTitle());
             dataService.getData(task.getStringId());
 
             log.info("finishTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
-            finishTask(TaskParams.with()
-                    .task(task)
-                    .build());
+            finishTask(new TaskParams(task));
         } catch (Exception e) {
             log.error("Execution of task [{}] in case [{}] failed: ", task.getTitle(), useCase.getTitle(), e);
         }
@@ -671,8 +674,9 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable, Locale locale) {
+    public Page<Task> getAll(Pageable pageable, Locale locale) {
         List<Task> tasks;
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
         // TODO: impersonation
 //        LoggedUser loggedOrImpersonated = loggedUser.getSelfOrImpersonated();
         LoggedUser loggedOrImpersonated = loggedUser;
@@ -692,7 +696,15 @@ public class TaskService implements ITaskService {
                 queryBuilder.deleteCharAt(queryBuilder.length() - 1);
             else
                 queryBuilder.append("{}");
-            queryBuilder.append("]}");
+            if (loggedOrImpersonated.isAdmin()) {
+                queryBuilder.append("]}");
+            } else {
+                // todo 2072 test
+                queryBuilder.append("],\"workspaceId\":");
+                queryBuilder.append("\"");
+                queryBuilder.append(loggedOrImpersonated.getActiveWorkspaceId());
+                queryBuilder.append("\"}");
+            }
             BasicQuery query = new BasicQuery(queryBuilder.toString());
             query = (BasicQuery) query.with(pageable);
             tasks = mongoTemplate.find(query, Task.class);
@@ -702,8 +714,8 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Page<Task> search(List<TaskSearchRequest> requests, Pageable pageable, LoggedUser user, Locale locale, Boolean isIntersection) {
-        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
+    public Page<Task> search(List<TaskSearchRequest> requests, Pageable pageable, Locale locale, Boolean isIntersection) {
+        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, locale, isIntersection);
         if (searchPredicate != null) {
             Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
             page = loadUsers(page);
@@ -715,8 +727,8 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public long count(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
-        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
+    public long count(List<TaskSearchRequest> requests, Locale locale, Boolean isIntersection) {
+        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, locale, isIntersection);
         if (searchPredicate != null) {
             return taskRepository.count(searchPredicate);
         } else {
@@ -726,7 +738,12 @@ public class TaskService implements ITaskService {
 
     @Override
     public Page<Task> findByCases(Pageable pageable, List<String> cases) {
-        return loadUsers(taskRepository.findByCaseIdIn(pageable, cases));
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
+            return loadUsers(taskRepository.findByCaseIdIn(pageable, cases));
+        } else {
+            return loadUsers(taskRepository.findByCaseIdInAndWorkspaceId(pageable, cases, loggedUser.getActiveWorkspaceId()));
+        }
     }
 
     @Override
@@ -748,12 +765,26 @@ public class TaskService implements ITaskService {
         }
         String objectIdPart = parts[1];
         ObjectId objectId = new ObjectId(objectIdPart);
-        return taskRepository.findByIdObjectId(objectId);
+
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
+            return taskRepository.findByIdObjectId(objectId);
+        } else {
+            return taskRepository.findByIdObjectIdAndWorkspaceId(objectId, loggedUser.getActiveWorkspaceId());
+        }
     }
 
     @Override
     public List<Task> findAllById(List<String> ids) {
-        return taskRepository.findAllBy_idIn(ids.stream().map(ProcessResourceId::new).toList()).stream()
+        List<ProcessResourceId> taskResourceIds = ids.stream().map(ProcessResourceId::new).toList();
+        List<Task> tasks;
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
+            tasks = taskRepository.findAllBy_idIn(taskResourceIds);
+        } else {
+            tasks = taskRepository.findAllBy_idInAndWorkspaceId(taskResourceIds, loggedUser.getActiveWorkspaceId());
+        }
+        return tasks.stream()
                 .filter(Objects::nonNull)
                 .sorted(Ordering.explicit(ids).onResultOf(Task::getStringId))
                 .peek(this::setUser)
@@ -762,50 +793,88 @@ public class TaskService implements ITaskService {
 
     @Override
     public Page<Task> findByUser(Pageable pageable, AbstractUser user) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
         // TODO: impersonation
-//        return loadUsers(taskRepository.findByUserId(pageable, user.getSelfOrImpersonated().getStringId()));
-        return loadUsers(taskRepository.findByAssignee_Id(pageable, user.getStringId()));
+        if (loggedUser == null || loggedUser.isAdmin()) {
+            return loadUsers(taskRepository.findByAssignee_Id(pageable, user.getStringId()));
+        } else {
+            return loadUsers(taskRepository.findByAssignee_IdAndWorkspaceId(pageable, user.getStringId(), loggedUser.getActiveWorkspaceId()));
+        }
     }
 
     @Override
     public Page<Task> findByTransitions(Pageable pageable, List<String> transitions) {
-        return loadUsers(taskRepository.findByTransitionIdIn(pageable, transitions));
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
+            return loadUsers(taskRepository.findByTransitionIdIn(pageable, transitions));
+        } else {
+            return loadUsers(taskRepository.findByTransitionIdInAndWorkspaceId(pageable, transitions, loggedUser.getActiveWorkspaceId()));
+        }
     }
 
     @Override
     public Page<Task> searchAll(com.querydsl.core.types.Predicate predicate) {
-        Page<Task> tasks = taskRepository.findAll(predicate, new FullPageRequest());
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        com.querydsl.core.types.Predicate finalPredicate = predicate;
+
+        if (loggedUser != null && !loggedUser.isAdmin()) {
+            finalPredicate = ExpressionUtils.and(predicate, new QTask("task").workspaceId.eq(loggedUser.getActiveWorkspaceId()));
+        }
+
+        Page<Task> tasks = taskRepository.findAll(finalPredicate, new FullPageRequest());
         return loadUsers(tasks);
     }
 
     @Override
     public Page<Task> search(com.querydsl.core.types.Predicate predicate, Pageable pageable) {
-        Page<Task> tasks = taskRepository.findAll(predicate, pageable);
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        com.querydsl.core.types.Predicate finalPredicate = predicate;
+
+        if (loggedUser != null && !loggedUser.isAdmin()) {
+            finalPredicate = ExpressionUtils.and(predicate, new QTask("task").workspaceId.eq(loggedUser.getActiveWorkspaceId()));
+        }
+
+        Page<Task> tasks = taskRepository.findAll(finalPredicate, pageable);
         return loadUsers(tasks);
     }
 
     @Override
     public Task searchOne(com.querydsl.core.types.Predicate predicate) {
-        Page<Task> tasks = taskRepository.findAll(predicate, PageRequest.of(0, 1));
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        com.querydsl.core.types.Predicate finalPredicate = predicate;
+
+        if (loggedUser != null && !loggedUser.isAdmin()) {
+            finalPredicate = ExpressionUtils.and(predicate, new QTask("task").workspaceId.eq(loggedUser.getActiveWorkspaceId()));
+        }
+
+        Page<Task> tasks = taskRepository.findAll(finalPredicate, PageRequest.of(0, 1));
         if (tasks.getTotalElements() > 0)
             return tasks.getContent().getFirst();
+
         return null;
     }
 
     @Override
     public List<TaskReference> findAllByCase(String caseId, Locale locale) {
-        return taskRepository.findAllByCaseId(caseId).stream()
+        return findAllByCase(caseId).stream()
                 .map(task -> new TaskReference(task.getStringId(), task.getTitle().getTranslation(locale), task.getTransitionId()))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Task> findAllByCase(String caseId) {
-        return taskRepository.findAllByCaseId(caseId);
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
+            return taskRepository.findAllByCaseId(caseId);
+        } else {
+            return taskRepository.findAllByCaseIdAndWorkspaceId(caseId, loggedUser.getActiveWorkspaceId());
+        }
     }
 
     @Override
     public Task save(Task task) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        throwIfTaskOfDifferentWorkspace(List.of(task), loggedUser, "save");
         task = taskRepository.save(task);
         elasticTaskService.index(this.taskMappingService.transform(task));
         return task;
@@ -816,6 +885,8 @@ public class TaskService implements ITaskService {
         if (tasks.isEmpty()) {
             return tasks;
         }
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        throwIfTaskOfDifferentWorkspace(tasks, loggedUser, "save");
         tasks = taskRepository.saveAll(tasks);
         tasks.forEach(task -> elasticTaskService.index(this.taskMappingService.transform(task)));
         return tasks;
@@ -849,7 +920,7 @@ public class TaskService implements ITaskService {
             isTaskModified.set(true);
         }
         if (isTaskModified.get()) {
-            return taskRepository.save(task);
+            return save(task);
         }
         return task;
     }
@@ -917,8 +988,8 @@ public class TaskService implements ITaskService {
         ProcessRole anonymousRole = processRoleService.getAnonymousRole();
         for (Map.Entry<String, Map<String, Boolean>> entry : transition.getRoles().entrySet()) {
             if (useCase.getEnabledRoles().contains(entry.getKey())
-                    || defaultRole.getStringId().equals(entry.getKey())
-                    || anonymousRole.getStringId().equals(entry.getKey())) {
+                    || defaultRole != null && defaultRole.getStringId().equals(entry.getKey())
+                    || anonymousRole != null && anonymousRole.getStringId().equals(entry.getKey())) {
                 task.addRole(entry.getKey(), entry.getValue());
             }
         }
@@ -965,6 +1036,14 @@ public class TaskService implements ITaskService {
         if (tasks.isEmpty()) {
             return;
         }
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (useCase.getWorkspaceId() == null
+                || (loggedUser != null && !useCase.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin())) {
+            throw new IllegalArgumentException("Cannot remove tasks from the useCase [%s] with different workspace. UseCase workspace: %s, LoggedUser workspace: %s"
+                    .formatted(useCase.getStringId(), useCase.getWorkspaceId(), loggedUser == null ? "" : loggedUser.getActiveWorkspaceId()));
+        }
+        throwIfTaskOfDifferentWorkspace(tasks, loggedUser, "remove");
+
         workflowService.removeTasksFromCase(tasks, useCase);
         log.info("[{}]: Tasks of case {} are being deleted", useCase.getStringId(), useCase.getTitle());
         taskRepository.deleteAll(tasks);
@@ -978,6 +1057,8 @@ public class TaskService implements ITaskService {
 
     @Override
     public void delete(List<Task> tasks, String caseId, boolean force) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        throwIfTaskOfDifferentWorkspace(tasks, loggedUser, "remove");
         if (!force) {
             workflowService.removeTasksFromCase(tasks, caseId);
         }
@@ -993,12 +1074,22 @@ public class TaskService implements ITaskService {
 
     @Override
     public void deleteTasksByCase(String caseId, boolean force) {
-        delete(taskRepository.findAllByCaseId(caseId), caseId, force);
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
+            delete(taskRepository.findAllByCaseId(caseId), caseId, force);
+        } else {
+            delete(taskRepository.findAllByCaseIdAndWorkspaceId(caseId, loggedUser.getActiveWorkspaceId()), caseId, force);
+        }
     }
 
     @Override
     public void deleteTasksByPetriNetId(String petriNetId) {
-        taskRepository.deleteAllByProcessId(petriNetId);
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser == null || loggedUser.isAdmin()) {
+            taskRepository.deleteAllByProcessId(petriNetId);
+        } else {
+            taskRepository.deleteAllByProcessIdAndWorkspaceId(petriNetId, loggedUser.getActiveWorkspaceId());
+        }
     }
 
     private void setUser(Task task) {
@@ -1029,5 +1120,16 @@ public class TaskService implements ITaskService {
         }
         mainOutcome.addOutcomes(new ArrayList<>(outcomes.values()));
         return mainOutcome;
+    }
+
+    private void throwIfTaskOfDifferentWorkspace(List<Task> tasks, LoggedUser loggedUser, String actionMsg) {
+        tasks.forEach(task -> {
+            if (task.getWorkspaceId() == null
+                    || (loggedUser != null && !task.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin())) {
+                throw new IllegalArgumentException("Cannot %s the task [%s] with different workspace. Task workspace: %s, LoggedUser workspace: %s"
+                        .formatted(actionMsg, task.getStringId(), task.getWorkspaceId(),
+                                loggedUser == null ? "" : loggedUser.getActiveWorkspaceId()));
+            }
+        });
     }
 }

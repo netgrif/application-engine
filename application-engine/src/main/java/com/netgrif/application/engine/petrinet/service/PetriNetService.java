@@ -303,8 +303,8 @@ public class PetriNetService implements IPetriNetService {
 
         if (petriNet.getWorkspaceId() == null
                 || (loggedUser != null && !petriNet.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin()) ) {
-            throw new IllegalArgumentException("Cannot save the petriNet with different workspace. PetriNet workspace: %s, LoggedUser workspace: %s"
-                    .formatted(petriNet.getWorkspaceId(), loggedUser.getActiveWorkspaceId()));
+            throw new IllegalArgumentException("Cannot save the petriNet [%s] with different workspace. PetriNet workspace: %s, LoggedUser workspace: %s"
+                    .formatted(petriNet.getStringId(), petriNet.getWorkspaceId(), loggedUser == null ? "" : loggedUser.getActiveWorkspaceId()));
         }
 
         return doSaveInternal(petriNet);

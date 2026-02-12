@@ -85,8 +85,8 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
         if (processRole.getWorkspaceId() == null
                 || (loggedUser != null && !processRole.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin())) {
-            throw new IllegalArgumentException("Cannot save the role with different workspace. ProcessRole workspace: %s, LoggedUser workspace: %s"
-                    .formatted(processRole.getWorkspaceId(), loggedUser.getActiveWorkspaceId()));
+            throw new IllegalArgumentException("Cannot save the role [%s] with different workspace. ProcessRole workspace: %s, LoggedUser workspace: %s"
+                    .formatted(processRole.getStringId(), processRole.getWorkspaceId(), loggedUser.getActiveWorkspaceId()));
         }
 
         return processRoleRepository.save(processRole);

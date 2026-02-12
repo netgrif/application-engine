@@ -20,13 +20,21 @@ public interface TaskRepository extends MongoRepository<Task, String>, QuerydslP
 
     List<Task> findAllByCaseId(String id);
 
+    List<Task> findAllByCaseIdAndWorkspaceId(String id, String workspaceId);
+
     Page<Task> findByCaseIdIn(Pageable pageable, Collection<String> ids);
 
+    Page<Task> findByCaseIdInAndWorkspaceId(Pageable pageable, Collection<String> ids, String workspaceId);
+
     Page<Task> findByTransitionIdIn(Pageable pageable, Collection<String> ids);
+
+    Page<Task> findByTransitionIdInAndWorkspaceId(Pageable pageable, Collection<String> ids, String workspaceId);
 
     List<Task> findAllByTransitionIdIn(Collection<String> ids);
 
     Page<Task> findByAssignee_Id(Pageable pageable, String userId);
+
+    Page<Task> findByAssignee_IdAndWorkspaceId(Pageable pageable, String userId, String workspaceId);
 
     List<Task> findByAssignee_IdAndFinishDateNotNull(String userId);
 
@@ -34,7 +42,11 @@ public interface TaskRepository extends MongoRepository<Task, String>, QuerydslP
 
     List<Task> findAllByTransitionIdInAndCaseId(Collection<String> transitionIds, String caseId);
 
+    List<Task> findAllByTransitionIdInAndCaseIdAndWorkspaceId(Collection<String> transitionIds, String caseId, String workspaceId);
+
     List<Task> findAllBy_idIn(Iterable<ProcessResourceId> id);
+
+    List<Task> findAllBy_idInAndWorkspaceId(Iterable<ProcessResourceId> id, String workspaceId);
 
     void deleteAllByCaseIdAndAssignee_IdIsNull(String caseId);
 
@@ -44,8 +56,13 @@ public interface TaskRepository extends MongoRepository<Task, String>, QuerydslP
 
     void deleteAllByProcessId(String processId);
 
+    void deleteAllByProcessIdAndWorkspaceId(String processId, String workspaceId);
+
     @Query("{ '_id.objectId': ?0 }")
     Optional<Task> findByIdObjectId(ObjectId objectId);
+
+    @Query("{ '_id.objectId': ?0, 'workspaceId': ?1 }")
+    Optional<Task> findByIdObjectIdAndWorkspaceId(ObjectId objectId, String workspaceId);
 
     @Override
     default void customize(QuerydslBindings bindings, QTask qTask) {
