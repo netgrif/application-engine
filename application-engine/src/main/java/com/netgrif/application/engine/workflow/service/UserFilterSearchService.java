@@ -38,7 +38,6 @@ public class UserFilterSearchService implements IUserFilterSearchService {
                                 .transition(Collections.singletonList("view_filter"))
                                 .build()
                 ),
-                ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
                 PageRequest.of(0, 100),
                 LocaleContextHolder.getLocale(),
                 true);

@@ -126,9 +126,8 @@ public class WorkflowController {
     @Operation(summary = "Generic case search on Elasticsearch database, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> search(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
-        LoggedUser user = (LoggedUser) auth.getPrincipal();
 
-        Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, locale, operation == MergeFilterOperation.AND);
+        Page<Case> cases = elasticCaseService.search(searchBody.getList(), pageable, locale, operation == MergeFilterOperation.AND);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                 .search(searchBody, operation, pageable, assembler, auth, locale)).withRel("search");
 
@@ -151,8 +150,8 @@ public class WorkflowController {
 
     @Operation(summary = "Get count of the cases", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/count", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public CountResponse count(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth, Locale locale) {
-        long count = elasticCaseService.count(searchBody.getList(), (LoggedUser) auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);
+    public CountResponse count(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Locale locale) {
+        long count = elasticCaseService.count(searchBody.getList(), locale, operation == MergeFilterOperation.AND);
         return CountResponse.caseCount(count);
     }
 

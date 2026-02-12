@@ -106,18 +106,16 @@ public class ActionApiImpl implements ActionApi {
     public Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection) {
         boolean intersect = Boolean.TRUE.equals(isIntersection);
         List<CaseSearchRequest> caseSearchRequests = elasticStringQueries.stream().map(query -> CaseSearchRequest.builder().query(query).build()).toList();
-        LoggedUser loggedUser = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
         Locale locale = LocaleContextHolder.getLocale();
-        return elasticCaseService.search(caseSearchRequests, loggedUser, pageable, locale, intersect);
+        return elasticCaseService.search(caseSearchRequests, pageable, locale, intersect);
     }
 
     @Override
     public Long countCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Boolean isIntersection) {
         boolean intersect = Boolean.TRUE.equals(isIntersection);
         List<CaseSearchRequest> caseSearchRequests = elasticStringQueries.stream().map(query -> CaseSearchRequest.builder().query(query).build()).toList();
-        LoggedUser loggedUser = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
         Locale locale = LocaleContextHolder.getLocale();
-        return elasticCaseService.count(caseSearchRequests, loggedUser, locale, intersect);
+        return elasticCaseService.count(caseSearchRequests, locale, intersect);
     }
 
     @Override

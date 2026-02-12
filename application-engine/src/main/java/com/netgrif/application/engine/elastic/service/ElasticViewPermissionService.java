@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.springframework.data.elasticsearch.client.elc.Queries.termQuery;
+
 public abstract class ElasticViewPermissionService {
 
     protected void buildViewPermissionQuery(BoolQuery.Builder query, LoggedUser user) {
@@ -41,10 +43,15 @@ public abstract class ElasticViewPermissionService {
         /* Build negative view actorList query */
         BoolQuery negativeViewActor = buildNegativeViewActor(user);
 
-        /* Role-UserListPositive set-minus negative view actorList */
+        /* Role-ActorListPositive set-minus negative view actorList */
         BoolQuery permissionQuery = setMinus(roleSetMinusPositiveActorList, negativeViewActor);
 
-        query.filter(permissionQuery._toQuery());
+        if (user.isAdmin()) {
+            query.filter(permissionQuery._toQuery());
+        } else {
+            // todo 2072 test
+            query.filter(permissionQuery._toQuery()).filter(buildWorkspace(user)._toQuery());
+        }
     }
 
     private BoolQuery buildPositiveViewRoleQuery(BoolQuery viewPermNotExists, LoggedUser user) {
@@ -95,6 +102,12 @@ public abstract class ElasticViewPermissionService {
         actorIds.add(loggedUser.getStringId());
         return new TermsQueryField.Builder()
                 .value(actorIds.stream().map(FieldValue::of).toList())
+                .build();
+    }
+
+    private BoolQuery buildWorkspace(LoggedUser loggedUser) {
+        return new BoolQuery.Builder()
+                .must(termQuery("workspaceId", loggedUser.getActiveWorkspaceId()))
                 .build();
     }
 

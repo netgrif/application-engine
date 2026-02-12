@@ -102,39 +102,32 @@ public class ExportService implements IExportService {
 
     @Override
     public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile) throws FileNotFoundException {
-        return fillCsvCaseData(requests, outFile, null, ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+        return fillCsvCaseData(requests, outFile, null, exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
     }
 
     @Override
     public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config) throws FileNotFoundException {
-        return fillCsvCaseData(requests, outFile, config,  ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+        return fillCsvCaseData(requests, outFile, config, exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+    }
+
+    @Override
+    public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, int pageSize) throws FileNotFoundException {
+        return fillCsvCaseData(requests, outFile, config, pageSize, LocaleContextHolder.getLocale(), false);
     }
 
     @Override
     public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config,
-                                        LoggedUser user) throws FileNotFoundException {
-        return fillCsvCaseData(requests, outFile, config, user, exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+                                        int pageSize, Locale locale) throws FileNotFoundException {
+        return fillCsvCaseData(requests, outFile, config, pageSize, locale, false);
     }
 
     @Override
     public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config,
-                                        LoggedUser user, int pageSize) throws FileNotFoundException {
-        return fillCsvCaseData(requests, outFile, config, user, pageSize, LocaleContextHolder.getLocale(), false);
-    }
-
-    @Override
-    public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config,
-                                        LoggedUser user, int pageSize, Locale locale) throws FileNotFoundException {
-        return fillCsvCaseData(requests, outFile, config, user, pageSize, locale, false);
-    }
-
-    @Override
-    public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config,
-                                        LoggedUser user, int pageSize, Locale locale, Boolean isIntersection) throws FileNotFoundException {
-        int numOfPages = (int) ((elasticCaseService.count(requests, user, locale, isIntersection) / pageSize) + 1);
+                                        int pageSize, Locale locale, Boolean isIntersection) throws FileNotFoundException {
+        int numOfPages = (int) ((elasticCaseService.count(requests, locale, isIntersection) / pageSize) + 1);
         List<Case> exportCases = new ArrayList<>();
         for (int i = 0; i < numOfPages; i++) {
-            exportCases.addAll(elasticCaseService.search(requests, user, PageRequest.of(i, pageSize), locale, isIntersection).toList());
+            exportCases.addAll(elasticCaseService.search(requests, PageRequest.of(i, pageSize), locale, isIntersection).toList());
         }
         return buildCaseCsv(exportCases, config, outFile);
     }

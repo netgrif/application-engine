@@ -8,8 +8,11 @@ import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
+import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.domain.BulkOperationWrapper;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
@@ -56,6 +59,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     protected final ElasticCaseRepository repository;
     protected final ElasticsearchTemplate template;
     protected final Executor executors;
+    protected final UserService userService;
     protected DataConfigurationProperties.ElasticsearchProperties elasticProperties;
     protected IPetriNetService petriNetService;
     protected IWorkflowService workflowService;
@@ -66,7 +70,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     public ElasticCaseService(ElasticCaseRepository repository,
                               ElasticsearchTemplate template,
-                              Executor executors,
+                              Executor executors, UserService userService,
                               DataConfigurationProperties.ElasticsearchProperties elasticProperties,
                               @Lazy IPetriNetService petriNetService,
                               @Lazy IWorkflowService workflowService,
@@ -76,6 +80,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         this.repository = repository;
         this.template = template;
         this.executors = executors;
+        this.userService = userService;
         this.elasticProperties = elasticProperties;
         this.petriNetService = petriNetService;
         this.workflowService = workflowService;
@@ -127,16 +132,17 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     @Override
-    public Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+    public Page<Case> search(List<CaseSearchRequest> requests, Pageable pageable, Locale locale, Boolean isIntersection) {
         if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
-        log.debug("Searching for query with logged user [{}]", user.getId());
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
+        log.debug("Searching for query with logged user [{}]", loggedUser.getId());
         // TODO: impersonation
 //        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-        LoggedUser loggedOrImpersonated = user;
+//        LoggedUser loggedOrImpersonated = user;
 //        pageable = resolveUnmappedSortAttributes(pageable);
-        NativeQuery query = buildQuery(requests, loggedOrImpersonated, pageable, locale, isIntersection);
+        NativeQuery query = buildQuery(requests, loggedUser, pageable, locale, isIntersection);
         List<Case> casePage;
         long total;
         if (query != null) {
@@ -154,14 +160,15 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     @Override
-    public long count(List<CaseSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
+    public long count(List<CaseSearchRequest> requests, Locale locale, Boolean isIntersection) {
         if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
         // TODO: impersonation
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
 //        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-        LoggedUser loggedOrImpersonated = user;
+        LoggedUser loggedOrImpersonated = loggedUser;
         NativeQuery query = buildQuery(requests, loggedOrImpersonated, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase.class);
@@ -177,7 +184,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             // one of the queries evaluates to empty set => the entire result is an empty set
             return null;
         } else if (!isIntersection) {
-            singleQueries = singleQueries.stream().filter(Objects::nonNull).collect(Collectors.toList());
+            singleQueries = singleQueries.stream().filter(Objects::nonNull).toList();
             if (singleQueries.isEmpty()) {
                 // all queries result in an empty set => the entire result is an empty set
                 return null;
