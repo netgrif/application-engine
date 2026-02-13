@@ -34,7 +34,7 @@ public class ProcessRoleController {
 
     private final ProcessRoleService processRoleService;
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @Operation(summary = "Delete global role",
             security = {@SecurityRequirement(name = "X-Auth-Token")})
     @Parameter(name = "id", description = "Id of the global role to be deleted", required = true, example = "GcdIZcAPUc6jh7i2-68d683f80dc9384aa6791a64")

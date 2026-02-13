@@ -251,7 +251,7 @@ public class UserController {
 //        }
 //    }
 //
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @Operation(summary = "Get all authorities of the system",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "X-Auth-Token")})
@@ -265,7 +265,7 @@ public class UserController {
         return ResponseEntity.ok(authorityService.findAll(Pageable.unpaged()).stream().toList());
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @Operation(summary = "Assign authority to the user",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "X-Auth-Token")})

@@ -176,7 +176,7 @@ public class WorkflowController {
         return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @Operation(summary = "Reload tasks of case",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})

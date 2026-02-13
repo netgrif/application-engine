@@ -89,7 +89,7 @@ public class GroupController {
         }
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @Operation(summary = "Creates new group", description = "Creates new group according to parameters in request body", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Group created successfully"),
@@ -109,7 +109,7 @@ public class GroupController {
         return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Group created successfully"));
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @Operation(summary = "Deletes group", description = "Deletes group according to incoming ID", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Group deleted successfully"),
@@ -130,7 +130,7 @@ public class GroupController {
         }
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @Operation(summary = "Updates group", description = "Updates group according to incoming parameters", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Group updated successfully"),
@@ -157,7 +157,7 @@ public class GroupController {
         }
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @Operation(summary = "Assign roles to the group", description = "Assigns roles based on request body to group based on roleIds", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @PatchMapping(value = "/{id}/roles/assign", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
@@ -166,7 +166,7 @@ public class GroupController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<ResponseMessage> assignRolesToUser(@PathVariable("id") String groupId, @RequestBody Set<String> roleIds) {
+    public ResponseEntity<ResponseMessage> assignRolesToGroup(@PathVariable("id") String groupId, @RequestBody Set<String> roleIds) {
         try {
             Group group = groupService.findById(groupId);
             processRoleService.assignRolesToGroup(group, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()));
@@ -179,7 +179,7 @@ public class GroupController {
         }
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @Operation(summary = "Adds roles to the group", description = "Adds roles based on request body to group based on roleIds", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @PatchMapping(value = "/{id}/roles/add", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
@@ -188,7 +188,7 @@ public class GroupController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<ResponseMessage> addRolesToUser(@PathVariable("id") String groupId, @RequestBody Set<String> roleIds) {
+    public ResponseEntity<ResponseMessage> addRolesToGroup(@PathVariable("id") String groupId, @RequestBody Set<String> roleIds) {
         try {
             roleIds.forEach(roleId -> groupService.addRole(groupId, roleId));
             log.info("Process roles {} added to group with id [{}]", roleIds, groupId);
@@ -200,7 +200,7 @@ public class GroupController {
         }
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @Operation(summary = "Revokes roles to the group", description = "Revokes roles based on request body from group based on id", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @PatchMapping(value = "/{id}/roles/revoke", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
@@ -209,7 +209,7 @@ public class GroupController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<ResponseMessage> revokeRolesFromUser(@PathVariable("id") String groupId, @RequestBody Set<String> roleIds) {
+    public ResponseEntity<ResponseMessage> revokeRolesFromGroup(@PathVariable("id") String groupId, @RequestBody Set<String> roleIds) {
         try {
             roleIds.forEach(roleId -> groupService.removeRole(groupId, roleId));
             log.info("Process roles {} revoked from group with id [{}]", roleIds, groupId);
@@ -221,7 +221,7 @@ public class GroupController {
         }
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @Operation(summary = "Adds authority to the group", description = "Adds authority based on request body to group based on id", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @PatchMapping(value = "/{id}/authorities/add", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
@@ -230,7 +230,7 @@ public class GroupController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<ResponseMessage> addAuthorityToUser(@PathVariable("id") String groupId, @RequestBody Set<String> authorityIds) {
+    public ResponseEntity<ResponseMessage> addAuthorityToGroup(@PathVariable("id") String groupId, @RequestBody Set<String> authorityIds) {
         try {
             authorityIds.forEach(authorityId -> groupService.addAuthority(groupId, authorityId));
             log.info("Authorities {} added to group with id [{}]", authorityIds, groupId);
@@ -242,7 +242,7 @@ public class GroupController {
         }
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @Operation(summary = "Revokes authority from the group", description = "Revokes authority based on request body from group based on roleIds", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @PatchMapping(value = "/{id}/authorities/revoke", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
