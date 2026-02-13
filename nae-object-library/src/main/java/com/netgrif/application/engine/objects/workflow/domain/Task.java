@@ -14,6 +14,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.policies.DataFocus
 import com.netgrif.application.engine.objects.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.objects.workflow.domain.triggers.Trigger;
+import com.netgrif.application.engine.objects.workspace.Workspaceable;
 import com.querydsl.core.annotations.QueryEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,7 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @QueryEntity
 @EnsureCollection
 @AllArgsConstructor
-public abstract class Task implements Serializable {
+public abstract class Task implements Serializable, Workspaceable {
 
     @Serial
     private static final long serialVersionUID = -7112277728921547546L;
