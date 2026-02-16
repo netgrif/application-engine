@@ -32,7 +32,7 @@ public abstract class CaseRepositoryImpl implements CaseRepository {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         // TODO: impersonation
 //        List<PetriNetReference> nets = petriNetService.getReferencesByUsersProcessRoles(((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated(), null);
-        List<PetriNetReference> nets = petriNetService.getReferencesByUsersProcessRoles(((LoggedUser) auth.getPrincipal()), null);
+        List<PetriNetReference> nets = petriNetService.getReferencesByUsersProcessRoles(null);
         Set<String> netIds = nets.stream().map(Reference::getStringId).collect(Collectors.toSet());
         Set<String> netIdentifiers = nets.stream().map(PetriNetReference::getIdentifier).collect(Collectors.toSet());
 

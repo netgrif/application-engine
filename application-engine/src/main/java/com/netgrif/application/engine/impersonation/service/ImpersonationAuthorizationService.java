@@ -157,7 +157,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     }
 
     protected Page<Case> findCases(CaseSearchRequest request, Pageable pageable) {
-        return elasticCaseService.search(Collections.singletonList(request), ActorTransformer.toLoggedUser(userService.getSystem()), pageable, Locale.getDefault(), false);
+        return elasticCaseService.search(Collections.singletonList(request), pageable, Locale.getDefault(), false);
     }
 
     protected boolean isValidAndContainsUser(Case config, String id) {

@@ -8,6 +8,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.acti
 import com.netgrif.application.engine.objects.petrinet.domain.events.Event;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
+import com.netgrif.application.engine.objects.workspace.Workspaceable;
 import com.querydsl.core.annotations.QueryEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -24,7 +25,7 @@ import java.util.Map;
 @EnsureCollection
 @QueryEntity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public abstract class ProcessRole extends Imported {
+public abstract class ProcessRole extends Imported implements Workspaceable {
 
     public static final String DEFAULT_ROLE = "default";
 

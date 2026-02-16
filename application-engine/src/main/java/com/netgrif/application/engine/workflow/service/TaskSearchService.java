@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
+import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -24,10 +26,14 @@ public class TaskSearchService extends MongoSearchService<Task> {
     @Autowired
     private IPetriNetService petriNetService;
 
-    public Predicate buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
+    @Autowired
+    private UserService userService;
+
+    public Predicate buildQuery(List<TaskSearchRequest> requests, Locale locale, Boolean isIntersection) {
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
         // TODO: impersonation
 //        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-        LoggedUser loggedOrImpersonated = user;
+        LoggedUser loggedOrImpersonated = loggedUser;
         List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
@@ -51,8 +57,16 @@ public class TaskSearchService extends MongoSearchService<Task> {
         permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
         permissionConstraints.or(buildViewActorQueryConstraint(loggedOrImpersonated));
         permissionConstraints.andNot(buildNegativeViewActorsQueryConstraint(loggedOrImpersonated));
+        if (!loggedOrImpersonated.isAdmin()) {
+            // todo 2072 test
+            permissionConstraints.and(buildWorkspaceQueryConstraint(loggedOrImpersonated));
+        }
         builder.and(permissionConstraints);
         return builder;
+    }
+
+    protected Predicate buildWorkspaceQueryConstraint(LoggedUser user) {
+        return QTask.task.workspaceId.eq(user.getActiveWorkspaceId());
     }
 
     protected Predicate buildRolesQueryConstraint(LoggedUser user) {

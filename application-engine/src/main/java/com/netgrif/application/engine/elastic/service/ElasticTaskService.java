@@ -3,7 +3,9 @@ package com.netgrif.application.engine.elastic.service;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import com.google.common.collect.ImmutableList;
+import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticJob;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
@@ -19,13 +21,11 @@ import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
-import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -42,7 +42,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
@@ -57,6 +56,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     protected ITaskService taskService;
     protected ElasticsearchTemplate template;
     protected DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
+    protected UserService userService;
 
     @Autowired
     protected ElasticsearchTemplate elasticsearchTemplate;
@@ -93,6 +93,11 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     @Autowired
     public void setElasticsearchProperties(DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties) {
         this.elasticsearchProperties = elasticsearchProperties;
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
     /**
@@ -140,10 +145,10 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     }
 
     @Override
-    public Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+    public Page<Task> search(List<ElasticTaskSearchRequest> requests, Pageable pageable, Locale locale, Boolean isIntersection) {
         // TODO: impersonation
 //        NativeQuery query = buildQuery(requests, user.getSelfOrImpersonated(), pageable, locale, isIntersection);
-        NativeQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
+        NativeQuery query = buildQuery(requests, pageable, locale, isIntersection);
         List<Task> taskPage;
         long total;
         if (query != null) {
@@ -160,10 +165,10 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     }
 
     @Override
-    public long count(List<ElasticTaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
+    public long count(List<ElasticTaskSearchRequest> requests, Locale locale, Boolean isIntersection) {
         // TODO: impersonation
 //        NativeQuery query = buildQuery(requests, user.getSelfOrImpersonated(), new FullPageRequest(), locale, isIntersection);
-        NativeQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
+        NativeQuery query = buildQuery(requests, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask.class);
         } else {
@@ -171,15 +176,17 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         }
     }
 
-    protected NativeQuery buildQuery(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
-        List<BoolQuery.Builder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
+    protected NativeQuery buildQuery(List<ElasticTaskSearchRequest> requests, Pageable pageable, Locale locale, Boolean isIntersection) {
+        // TODO: impersonation
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
+        List<BoolQuery.Builder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, loggedUser, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
             // one of the queries evaluates to empty set => the entire result is an empty set
             return null;
         } else if (!isIntersection) {
-            singleQueries = singleQueries.stream().filter(Objects::nonNull).collect(Collectors.toList());
-            if (singleQueries.size() == 0) {
+            singleQueries = singleQueries.stream().filter(Objects::nonNull).toList();
+            if (singleQueries.isEmpty()) {
                 // all queries result in an empty set => the entire result is an empty set
                 return null;
             }

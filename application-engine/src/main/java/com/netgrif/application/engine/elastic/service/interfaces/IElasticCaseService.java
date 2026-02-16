@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.elastic.service.interfaces;
 
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
@@ -18,9 +17,9 @@ public interface IElasticCaseService {
 
     void indexNow(ElasticCase useCase);
 
-    Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection);
+    Page<Case> search(List<CaseSearchRequest> requests, Pageable pageable, Locale locale, Boolean isIntersection);
 
-    long count(List<CaseSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection);
+    long count(List<CaseSearchRequest> requests, Locale locale, Boolean isIntersection);
 
     void remove(String caseId);
 }

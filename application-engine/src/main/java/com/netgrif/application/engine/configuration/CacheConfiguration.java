@@ -1,16 +1,15 @@
 package com.netgrif.application.engine.configuration;
 
+import com.netgrif.application.engine.configuration.cache.NaeCacheManager;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.workflow.domain.CachedFunction;
 import groovy.lang.Closure;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.cache.interceptor.CacheResolver;
-import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -28,7 +27,7 @@ public class CacheConfiguration implements CachingConfigurer {
     @Bean
     @Primary
     @Override
-    public CacheManager cacheManager() {
+    public NaeCacheManager cacheManager() {
         Set<String> cacheNames = properties.getAllCaches();
         List<Cache> caches = cacheNames.stream()
                 .map(ConcurrentMapCache::new)
@@ -53,7 +52,7 @@ public class CacheConfiguration implements CachingConfigurer {
                 properties.getGlobalFunctionsCacheSize()
         ));
 
-        SimpleCacheManager cacheManager = new SimpleCacheManager();
+        NaeCacheManager cacheManager = new NaeCacheManager();
         cacheManager.setCaches(caches);
         return cacheManager;
     }

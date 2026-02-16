@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.configuration;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
-import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository;
 import com.netgrif.application.engine.elastic.service.ElasticCaseService;
 import com.netgrif.application.engine.elastic.service.ElasticTaskService;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
@@ -37,6 +37,7 @@ public class ElasticServiceConfiguration {
     private final IElasticCasePrioritySearch elasticCasePrioritySearch;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ElasticsearchClient elasticsearchClient;
+    private final UserService userService;
 
     @Bean
     @Primary
@@ -61,6 +62,7 @@ public class ElasticServiceConfiguration {
                 caseRepository,
                 elasticsearchTemplate,
                 executor(),
+                userService,
                 elasticsearchProperties,
                 petriNetService,
                 workflowService,
@@ -82,6 +84,7 @@ public class ElasticServiceConfiguration {
                 caseRepository,
                 elasticsearchTemplate,
                 reindexingTaskCaseExecutor(),
+                userService,
                 elasticsearchProperties,
                 petriNetService,
                 workflowService,

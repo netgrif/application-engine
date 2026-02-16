@@ -17,6 +17,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.petrinet.domain.version.Version;
 import com.netgrif.application.engine.objects.utils.CopyConstructorUtil;
 import com.netgrif.application.engine.objects.workflow.domain.DataField;
+import com.netgrif.application.engine.objects.workspace.Workspaceable;
 import com.querydsl.core.annotations.QueryEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
 
 @EnsureCollection
 @QueryEntity
-public abstract class PetriNet extends PetriNetObject {
+public abstract class PetriNet extends PetriNetObject implements Workspaceable {
 
 
     @Getter

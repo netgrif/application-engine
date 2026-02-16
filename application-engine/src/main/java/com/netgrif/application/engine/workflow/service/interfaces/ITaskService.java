@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
@@ -26,11 +25,11 @@ public interface ITaskService {
 
     Task findOne(String taskId);
 
-    Page<Task> getAll(LoggedUser loggedUser, Pageable pageable, Locale locale);
+    Page<Task> getAll(Pageable pageable, Locale locale);
 
-    Page<Task> search(List<TaskSearchRequest> requests, Pageable pageable, LoggedUser user, Locale locale, Boolean isIntersection);
+    Page<Task> search(List<TaskSearchRequest> requests, Pageable pageable, Locale locale, Boolean isIntersection);
 
-    long count(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection);
+    long count(List<TaskSearchRequest> requests, Locale locale, Boolean isIntersection);
 
     Page<Task> findByCases(Pageable pageable, List<String> cases);
 

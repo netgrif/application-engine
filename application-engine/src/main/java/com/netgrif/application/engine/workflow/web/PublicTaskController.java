@@ -210,6 +210,6 @@ public class PublicTaskController extends AbstractTaskController {
     @Operation(summary = "Generic task search on Mongo database")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        return super.searchPublic(ActorTransformer.toLoggedUser(userService.getLoggedUser()), pageable, searchBody, operation, assembler, locale);
+        return super.searchPublic(pageable, searchBody, operation, assembler, locale);
     }
 }

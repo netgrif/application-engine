@@ -134,7 +134,7 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
                 .process(Collections.singletonList(new CaseSearchRequest.PetriNet(processIdentifier)))
                 .query(query)
                 .build();
-        Page<Case> resultPage = elasticCaseService.search(java.util.List.of(request), ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
+        Page<Case> resultPage = elasticCaseService.search(java.util.List.of(request),
                 PageRequest.of(0, 1), Locale.getDefault(), false);
 
         return resultPage.hasContent() ? resultPage.getContent().get(0) : null;

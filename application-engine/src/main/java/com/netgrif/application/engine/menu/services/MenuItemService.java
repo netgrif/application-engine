@@ -397,7 +397,7 @@ public class MenuItemService implements IMenuItemService {
                 .process(Collections.singletonList(new CaseSearchRequest.PetriNet(processIdentifier)))
                 .query(query)
                 .build();
-        Page<Case> resultPage = elasticCaseService.search(List.of(request), ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
+        Page<Case> resultPage = elasticCaseService.search(List.of(request),
                 PageRequest.of(0, 1), Locale.getDefault(), false);
 
         return resultPage.hasContent() ? resultPage.getContent().get(0) : null;
@@ -408,8 +408,7 @@ public class MenuItemService implements IMenuItemService {
                 .process(Collections.singletonList(new CaseSearchRequest.PetriNet(processIdentifier)))
                 .query(query)
                 .build();
-        return elasticCaseService.count(List.of(request), ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
-                Locale.getDefault(), false);
+        return elasticCaseService.count(List.of(request), Locale.getDefault(), false);
     }
 
     protected Case duplicateView(Case viewCase) throws TransitionNotExecutableException {

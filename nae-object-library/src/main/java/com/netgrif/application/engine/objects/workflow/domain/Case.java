@@ -9,6 +9,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.objects.workflow.service.InitValueExpressionEvaluator;
+import com.netgrif.application.engine.objects.workspace.Workspaceable;
 import com.querydsl.core.annotations.QueryEntity;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 @Getter
 @EnsureCollection
 @QueryEntity
-public abstract class Case implements Serializable {
+public abstract class Case implements Serializable, Workspaceable {
 
     @Serial
     private static final long serialVersionUID = 3687481049847498422L;

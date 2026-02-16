@@ -2,7 +2,7 @@ package com.netgrif.application.engine.petrinet.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.configuration.cache.NaeCacheManager;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
@@ -13,7 +13,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.objects.petrinet.domain.Transition;
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
-import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.ArcImportReference;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
@@ -46,7 +45,6 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.*;
@@ -106,7 +104,7 @@ public class PetriNetService implements IPetriNetService {
     protected IEventService eventService;
 
     @Autowired
-    protected CacheManager cacheManager;
+    protected NaeCacheManager cacheManager;
 
     @Autowired
     protected CacheConfigurationProperties cacheProperties;
@@ -156,11 +154,13 @@ public class PetriNetService implements IPetriNetService {
      * Get read only Petri net.
      */
     @Override
-    // todo 20720 cacheable
-//    @Cacheable(value = "petriNetCache")
     public PetriNet get(ObjectId petriNetId) {
         LoggedUser loggedUser = userService.getLoggedUserFromContext();
-        Optional<PetriNet> optionalPetriNet;
+        Optional<PetriNet> optionalPetriNet = cacheManager.getFromCache(cacheProperties.getPetriNetCache(), petriNetId, loggedUser);
+        if (optionalPetriNet.isPresent()) {
+            return optionalPetriNet.get();
+        }
+
         if (loggedUser == null || loggedUser.isAdmin()) {
             optionalPetriNet = repository.findById(petriNetId.toString());
         } else {
@@ -170,6 +170,7 @@ public class PetriNetService implements IPetriNetService {
         if (optionalPetriNet.isEmpty()) {
             throw new IllegalArgumentException("Petri net with id [" + petriNetId + "] not found");
         }
+        cacheManager.putToCache(cacheProperties.getPetriNetById(), petriNetId, optionalPetriNet.get());
         return optionalPetriNet.get();
     }
 
@@ -303,8 +304,8 @@ public class PetriNetService implements IPetriNetService {
 
         if (petriNet.getWorkspaceId() == null
                 || (loggedUser != null && !petriNet.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin()) ) {
-            throw new IllegalArgumentException("Cannot save the petriNet with different workspace. PetriNet workspace: %s, LoggedUser workspace: %s"
-                    .formatted(petriNet.getWorkspaceId(), loggedUser.getActiveWorkspaceId()));
+            throw new IllegalArgumentException("Cannot save the petriNet [%s] with different workspace. PetriNet workspace: %s, LoggedUser workspace: %s"
+                    .formatted(petriNet.getStringId(), petriNet.getWorkspaceId(), loggedUser == null ? "" : loggedUser.getActiveWorkspaceId()));
         }
 
         return doSaveInternal(petriNet);
@@ -325,12 +326,13 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    // todo 20720 cacheable
-//    @Cacheable(value = "petriNetById")
     public PetriNet getPetriNet(String id) {
         LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        Optional<PetriNet> optionalPetriNet = cacheManager.getFromCache(cacheProperties.getPetriNetById(), id, loggedUser);
+        if (optionalPetriNet.isPresent()) {
+            return optionalPetriNet.get();
+        }
 
-        Optional<PetriNet> optionalPetriNet;
         if (loggedUser == null || loggedUser.isAdmin()) {
             optionalPetriNet = repository.findById(id);
         } else {
@@ -341,18 +343,22 @@ public class PetriNetService implements IPetriNetService {
             throw new IllegalArgumentException("No Petri net with id: " + id + " was found.");
         }
         optionalPetriNet.get().initializeArcs();
+        cacheManager.putToCache(cacheProperties.getPetriNetById(), id, optionalPetriNet.get());
         return optionalPetriNet.get();
     }
 
     @Override
-    // todo 20720 cacheable
-//    @Cacheable(value = "petriNetByIdentifier", key = "#identifier+#version.toString()", unless = "#result == null")
     public PetriNet getPetriNet(String identifier, Version version) {
         if (identifier == null || version == null) {
             return null;
         }
 
         LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        String cacheKey = identifier + version;
+        Optional<PetriNet> optionalPetriNet = cacheManager.getFromCache(cacheProperties.getPetriNetByIdentifier(), cacheKey, loggedUser);
+        if (optionalPetriNet.isPresent()) {
+            return optionalPetriNet.get();
+        }
 
         PetriNet net;
         if (loggedUser == null || loggedUser.isAdmin()) {
@@ -365,6 +371,7 @@ public class PetriNetService implements IPetriNetService {
             return null;
         }
         net.initializeArcs();
+        cacheManager.putToCache(cacheProperties.getPetriNetByIdentifier(), cacheKey, net);
         return net;
     }
 
@@ -398,14 +405,16 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    // todo 2072 cacheable
-//    @Cacheable(value = "petriNetDefault", unless = "#result == null")
     public PetriNet getDefaultVersionByIdentifier(String identifier) {
         if (identifier == null) {
             return null;
         }
 
         LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        Optional<PetriNet> optionalPetriNet = cacheManager.getFromCache(cacheProperties.getPetriNetDefault(), identifier, loggedUser);
+        if (optionalPetriNet.isPresent()) {
+            return optionalPetriNet.get();
+        }
 
         List<PetriNet> result;
         if (loggedUser == null || loggedUser.isAdmin()) {
@@ -417,21 +426,25 @@ public class PetriNetService implements IPetriNetService {
         }
 
         if (!result.isEmpty()) {
-            return result.getFirst();
+            PetriNet net = result.getFirst();
+            cacheManager.putToCache(cacheProperties.getPetriNetDefault(), identifier, net);
+            return net;
         }
 
         return null;
     }
 
     @Override
-    // todo 2072 cacheable
-//    @Cacheable(value = "petriNetLatest", unless = "#result == null")
     public PetriNet getLatestVersionByIdentifier(String identifier) {
         if (identifier == null) {
             return null;
         }
 
         LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        Optional<PetriNet> optionalPetriNet = cacheManager.getFromCache(cacheProperties.getPetriNetLatest(), identifier, loggedUser);
+        if (optionalPetriNet.isPresent()) {
+            return optionalPetriNet.get();
+        }
 
         List<PetriNet> processes;
         if (loggedUser == null || loggedUser.isAdmin()) {
@@ -446,7 +459,9 @@ public class PetriNetService implements IPetriNetService {
         if (processes.isEmpty()) {
             return null;
         }
-        return processes.getFirst();
+        PetriNet net = processes.getFirst();
+        cacheManager.putToCache(cacheProperties.getPetriNetLatest(), identifier, net);
+        return net;
     }
 
     /**
