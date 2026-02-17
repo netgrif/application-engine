@@ -14,8 +14,6 @@ import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.event.events.petrinet.ProcessDeleteEvent;
 import com.netgrif.application.engine.objects.event.events.petrinet.ProcessDeployEvent;
-import com.netgrif.application.engine.petrinet.params.DeletePetriNetParams;
-import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.objects.event.events.petrinet.ProcessEvent;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
@@ -30,6 +28,8 @@ import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
+import com.netgrif.application.engine.petrinet.params.DeletePetriNetParams;
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
@@ -556,10 +556,10 @@ public class PetriNetService implements IPetriNetService {
         Query queryTotal = new Query();
 
         if (!user.isAdmin()) {
-            query.addCriteria(getProcessRolesCriteria(user));
             if (user.isProcessAccessDeny()) {
                 return Page.empty();
             }
+            query.addCriteria(getProcessRolesCriteria(user));
             Criteria impersonatedProcessesCriteria = getImpersonatedProcessesCriteria(user);
             if (impersonatedProcessesCriteria != null) {
                 query.addCriteria(impersonatedProcessesCriteria);
@@ -649,7 +649,7 @@ public class PetriNetService implements IPetriNetService {
         processRoleService.deleteRolesOfNet(petriNet, deletePetriNetParams.getLoggedUser());
 
         log.info("[{}]: User [{}] is deleting Petri net {} version {}", deletePetriNetParams.getPetriNetId(),
-                deletePetriNetParams.getLoggedUser().getStringId(), petriNet.getIdentifier(), petriNet.getVersion().toString());
+                deletePetriNetParams.getLoggedUser().getSelfOrImpersonatedStringId(), petriNet.getIdentifier(), petriNet.getVersion().toString());
         publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.PRE));
         repository.deleteBy_id(petriNet.getObjectId());
         evictCache(petriNet);
@@ -717,7 +717,7 @@ public class PetriNetService implements IPetriNetService {
             throw new IllegalArgumentException("No petriNet identifier was provided.");
         }
         if (deletePetriNetParams.getLoggedUser() == null) {
-            deletePetriNetParams.setLoggedUser(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()));
+            deletePetriNetParams.setLoggedUser(userService.getLoggedOrSystem());
         }
     }
 

@@ -1,44 +1,37 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
-import com.netgrif.application.engine.auth.service.GroupService;
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorFieldValue;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorListFieldValue;
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.event.events.task.*;
 import com.netgrif.application.engine.objects.petrinet.domain.*;
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.ArcOrderComparator;
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.ResetArc;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorFieldValue;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorListFieldValue;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.application.engine.objects.workflow.domain.Case;
-import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
-import com.netgrif.application.engine.objects.workflow.domain.Task;
-import com.netgrif.application.engine.objects.workflow.domain.TaskPair;
+import com.netgrif.application.engine.objects.workflow.domain.*;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.*;
-import com.netgrif.application.engine.workflow.domain.outcomes.ReloadTaskOutcome;
-import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.objects.workflow.domain.triggers.TimeTrigger;
 import com.netgrif.application.engine.objects.workflow.domain.triggers.Trigger;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
-import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
+import com.netgrif.application.engine.workflow.domain.outcomes.ReloadTaskOutcome;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.params.DelegateTaskParams;
 import com.netgrif.application.engine.workflow.params.TaskParams;
@@ -130,11 +123,12 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, AbstractUser user, Map<String, String> params) throws TransitionNotExecutableException {
+        LoggedUser loggedUser = user instanceof LoggedUser ? (LoggedUser) user : ActorTransformer.toLoggedUser(user);
         List<AssignTaskEventOutcome> outcomes = new ArrayList<>();
         for (Task task : tasks) {
             outcomes.add(assignTask(TaskParams.with()
                     .task(task)
-                    .user(user)
+                    .user(loggedUser)
                     .params(params)
                     .build()));
         }
@@ -148,6 +142,7 @@ public class TaskService implements ITaskService {
         Case useCase = taskParams.getUseCase();
         Task task = taskParams.getTask();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+        LoggedUser loggedUser = taskParams.getUser();
 
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreAssignActions(), useCase,
                 task, transition, taskParams.getParams()));
@@ -164,9 +159,9 @@ public class TaskService implements ITaskService {
 
         publisher.publishEvent(new AssignTaskEvent(outcome, EventPhase.POST, taskParams.getUser()));
         addMessageToOutcome(transition, EventType.ASSIGN, outcome);
-        String userMessage = user instanceof LoggedUser loggedUser && loggedUser.isImpersonating()
+        String userMessage = loggedUser.isImpersonating()
                 ? "[" + loggedUser.getUsername() + "] in realm [" + loggedUser.getRealmId() + "]. Impersonation for user [" + loggedUser.getImpersonatedUser().getUsername() + "]"
-                : "[" + user.getUsername() + "] in realm [" + user.getRealmId() + "]";
+                : "[" + loggedUser.getUsername() + "] in realm [" + loggedUser.getRealmId() + "]";
         log.info("[{}]: Task [{}] in case [{}] assigned to {}", useCase.getStringId(), task.getTitle(), useCase.getTitle(), userMessage);
 
         return outcome;
@@ -187,7 +182,7 @@ public class TaskService implements ITaskService {
             task.setAssignee(ActorTransformer.toActorRef(user));
             userMessage = "[" + user.getUsername() + "] in realm [" + user.getRealmId() + "]";
         }
-        log.info("[{}]: Assigning task [{}] to user {}", useCaseId, task.getTitle(), userMessage);
+        log.info("[{}]: Assigning task [{}] to user {}", useCase.getStringId(), task.getTitle(), userMessage);
 
         useCase = workflowService.save(useCase);
         save(task);
@@ -205,11 +200,12 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, AbstractUser user, Map<String, String> params) throws TransitionNotExecutableException {
+        LoggedUser loggedUser = user instanceof LoggedUser ? (LoggedUser) user : ActorTransformer.toLoggedUser(user);
         List<FinishTaskEventOutcome> outcomes = new ArrayList<>();
         for (Task task : tasks) {
             outcomes.add(finishTask(TaskParams.with()
                     .task(task)
-                    .user(user)
+                    .user(loggedUser)
                     .params(params)
                     .build()));
         }
@@ -222,7 +218,7 @@ public class TaskService implements ITaskService {
 
         Task task = taskParams.getTask();
         Case useCase = taskParams.getUseCase();
-        AbstractUser user = taskParams.getUser();
+        LoggedUser user = taskParams.getUser();
 
         if (task.getUserId() == null) {
             throw new IllegalArgumentException("Task with id=%s is not assigned to any user.".formatted(task.getStringId()));
@@ -232,8 +228,8 @@ public class TaskService implements ITaskService {
         }
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
-        String userMessage = user instanceof LoggedUser loggedUser && loggedUser.isImpersonating()
-                ? "[" + loggedUser.getUsername() + "] in realm [" + loggedUser.getRealmId() + "]. Impersonation for user [" + loggedUser.getImpersonatedUser().getUsername() + "]"
+        String userMessage = user.isImpersonating()
+                ? "[" + user.getUsername() + "] in realm [" + user.getRealmId() + "]. Impersonation for user [" + user.getImpersonatedUser().getUsername() + "]"
                 : "[" + user.getUsername() + "] in realm [" + user.getRealmId() + "]";
         log.info("[{}]: Finishing task [{}] to user {}", useCase.getStringId(), task.getTitle(), userMessage);
 
@@ -273,11 +269,12 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, AbstractUser user, Map<String, String> params) {
+        LoggedUser loggedUser = user instanceof LoggedUser ? (LoggedUser) user : ActorTransformer.toLoggedUser(user);
         List<CancelTaskEventOutcome> outcomes = new ArrayList<>();
         for (Task task : tasks) {
             outcomes.add(cancelTask(TaskParams.with()
                     .task(task)
-                    .user(user)
+                    .user(loggedUser)
                     .params(params)
                     .build()));
         }
@@ -290,11 +287,11 @@ public class TaskService implements ITaskService {
 
         Task task = taskParams.getTask();
         Case useCase = taskParams.getUseCase();
-        AbstractUser user = taskParams.getUser();
+        LoggedUser user = taskParams.getUser();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
-        String userMessage = user instanceof LoggedUser loggedUser && loggedUser.isImpersonating()
-                ? "[" + loggedUser.getUsername() + "] in realm [" + loggedUser.getRealmId() + "]. Impersonation for user [" + loggedUser.getImpersonatedUser().getUsername() + "]"
+        String userMessage = user.isImpersonating()
+                ? "[" + user.getUsername() + "] in realm [" + user.getRealmId() + "]. Impersonation for user [" + user.getImpersonatedUser().getUsername() + "]"
                 : "[" + user.getUsername() + "] in realm [" + user.getRealmId() + "]";
         log.info("[{}]: Canceling task [{}] to user {}", useCase.getStringId(), task.getTitle(), userMessage);
 
@@ -391,7 +388,7 @@ public class TaskService implements ITaskService {
             if (delegator == null) {
                 delegator = userService.getLoggedOrSystem();
             }
-            taskParams.setDelegator(delegator);
+            taskParams.setDelegator(delegator instanceof LoggedUser loggedUser ? loggedUser : ActorTransformer.toLoggedUser(delegator));
         }
         if (taskParams.getNewAssignee() == null) {
             if (taskParams.getNewAssigneeId() == null) {
@@ -432,15 +429,15 @@ public class TaskService implements ITaskService {
         fillAndValidateAttributes(delegateTaskParams);
 
         AbstractUser newAssignee = delegateTaskParams.getNewAssignee();
-        AbstractUser delegator = delegateTaskParams.getDelegator();
+        LoggedUser delegator = delegateTaskParams.getDelegator();
         Task task = delegateTaskParams.getTask();
         Case useCase = delegateTaskParams.getUseCase();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
-        String userMessage = loggedUser.isImpersonating()
-                ? "[" + loggedUser.getUsername() + "] in realm [" + loggedUser.getRealmId() + "]. Impersonation for user [" + loggedUser.getImpersonatedUser().getUsername() + "]"
-                : "[" + loggedUser.getUsername() + "] in realm [" + loggedUser.getRealmId() + "]";
-        log.info("[{}]: Delegating task [{}] to user [{}] from user {}", useCase.getStringId(), task.getTitle(), delegatedUser.getEmail(), userMessage);
+        String userMessage = delegator.isImpersonating()
+                ? "[" + delegator.getUsername() + "] in realm [" + delegator.getRealmId() + "]. Impersonation for user [" + delegator.getImpersonatedUser().getUsername() + "]"
+                : "[" + delegator.getUsername() + "] in realm [" + delegator.getRealmId() + "]";
+        log.info("[{}]: Delegating task [{}] to user [{}] from user {}", useCase.getStringId(), task.getTitle(), newAssignee.getEmail(), userMessage);
 
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreDelegateActions(), useCase,
                 task, transition, delegateTaskParams.getParams()));
@@ -465,7 +462,7 @@ public class TaskService implements ITaskService {
 
         addMessageToOutcome(transition, EventType.DELEGATE, outcome);
         publisher.publishEvent(new DelegateTaskEvent(outcome, EventPhase.POST, delegator, newAssignee.getStringId()));
-        log.info("Task [{}] in case [{}] assigned to {} was delegated to [{}]", task.getTitle(), useCase.getTitle(), userMessage, delegatedUser.getEmail());
+        log.info("Task [{}] in case [{}] assigned to {} was delegated to [{}]", task.getTitle(), useCase.getTitle(), userMessage, newAssignee.getEmail());
 
         return outcome;
     }
@@ -502,10 +499,9 @@ public class TaskService implements ITaskService {
      * </tr>
      * </table>
      *
-     * @param useCase useCase for which to reload tasks
+     * @param useCase      useCase for which to reload tasks
      * @param lazyCaseSave if set to true, the useCase is saved only if any task is about to be executed. If set to false
      *                     the useCase is saved every time this method is called.
-     *
      * @return {@link ReloadTaskOutcome}, which holds the information if any task was executed and if the useCase was saved
      */
     @SuppressWarnings("StatementWithEmptyBody")

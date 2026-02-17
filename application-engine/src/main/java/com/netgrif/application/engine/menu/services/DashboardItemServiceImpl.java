@@ -6,9 +6,6 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSer
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.menu.services.interfaces.DashboardItemService;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.objects.common.ResourceNotFoundException;
-import com.netgrif.application.engine.objects.common.ResourceNotFoundExceptionCode;
-import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.objects.utils.MenuItemUtils;
 import com.netgrif.application.engine.objects.workflow.domain.Case;

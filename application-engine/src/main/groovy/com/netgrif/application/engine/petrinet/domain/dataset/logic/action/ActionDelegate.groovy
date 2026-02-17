@@ -1011,7 +1011,7 @@ class ActionDelegate {
 
     Task assignTask(String transitionId, Case aCase = useCase, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        LoggedUser loggedUser = author instanceof LoggedUser ? (LoggedUser) author : ActorTransformer.toLoggedUser(author)
+        LoggedUser loggedUser = user instanceof LoggedUser ? (LoggedUser) user : ActorTransformer.toLoggedUser(user)
         AssignTaskEventOutcome outcome = taskService.assignTask(TaskParams.with()
                 .taskId(taskId)
                 .user(loggedUser)
@@ -1022,9 +1022,10 @@ class ActionDelegate {
     }
 
     Task assignTask(Task task, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        LoggedUser loggedUser = user instanceof LoggedUser ? (LoggedUser) user : ActorTransformer.toLoggedUser(user)
         return addTaskOutcomeAndReturnTask(taskService.assignTask(TaskParams.with()
                 .task(task)
-                .user(user)
+                .user(loggedUser)
                 .params(params)
                 .build()))
     }
@@ -1035,7 +1036,7 @@ class ActionDelegate {
 
     Task cancelTask(String transitionId, Case aCase = useCase, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        LoggedUser loggedUser = author instanceof LoggedUser ? (LoggedUser) author : ActorTransformer.toLoggedUser(author)
+        LoggedUser loggedUser = user instanceof LoggedUser ? (LoggedUser) user : ActorTransformer.toLoggedUser(user)
         return addTaskOutcomeAndReturnTask(taskService.cancelTask(TaskParams.with()
                 .taskId(taskId)
                 .user(loggedUser)
@@ -1044,9 +1045,10 @@ class ActionDelegate {
     }
 
     Task cancelTask(Task task, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        LoggedUser loggedUser = user instanceof LoggedUser ? (LoggedUser) user : ActorTransformer.toLoggedUser(user)
         return addTaskOutcomeAndReturnTask(taskService.cancelTask(TaskParams.with()
                 .task(task)
-                .user(user)
+                .user(loggedUser)
                 .params(params)
                 .build()))
     }
@@ -1071,9 +1073,10 @@ class ActionDelegate {
     }
 
     void finishTask(Task task, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        LoggedUser loggedUser = user instanceof LoggedUser ? (LoggedUser) user : ActorTransformer.toLoggedUser(user)
         addTaskOutcomeAndReturnTask(taskService.finishTask(TaskParams.with()
                 .task(task)
-                .user(user)
+                .user(loggedUser)
                 .params(params)
                 .build()))
     }
@@ -1108,44 +1111,44 @@ class ActionDelegate {
         refs.find { it.transitionId == transitionId }.stringId
     }
 
-    AbstractUser assignRole(String roleMongoId, AbstractUser user = userService.loggedUser) {
+    AbstractUser assignRole(String roleMongoId, AbstractUser user = userService.loggedUserFromContext) {
         AbstractUser actualUser = userService.addRole(user, roleMongoId)
         return actualUser
     }
 
-    AbstractUser assignRole(String roleId, String netId, AbstractUser user = userService.loggedUser, Pageable pageable = Pageable.unpaged()) {
+    AbstractUser assignRole(String roleId, String netId, AbstractUser user = userService.loggedUserFromContext, Pageable pageable = Pageable.unpaged()) {
         List<PetriNet> nets = petriNetService.getByIdentifier(netId, pageable).content
         nets.forEach({ net -> user = assignRole(roleId, net, user) })
         return user
     }
 
-    AbstractUser assignRole(String roleId, PetriNet net, AbstractUser user = userService.loggedUser) {
+    AbstractUser assignRole(String roleId, PetriNet net, AbstractUser user = userService.loggedUserFromContext) {
         AbstractUser actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         return actualUser
     }
 
-    AbstractUser assignRole(String roleId, String netId, Version version, AbstractUser user = userService.loggedUser) {
+    AbstractUser assignRole(String roleId, String netId, Version version, AbstractUser user = userService.loggedUserFromContext) {
         PetriNet net = petriNetService.getPetriNet(netId, version)
         return assignRole(roleId, net, user)
     }
 
-    AbstractUser removeRole(String roleMongoId, AbstractUser user = userService.loggedUser) {
+    AbstractUser removeRole(String roleMongoId, AbstractUser user = userService.loggedUserFromContext) {
         AbstractUser actualUser = userService.removeRole(user, roleMongoId)
         return actualUser
     }
 
-    AbstractUser removeRole(String roleId, String netId, AbstractUser user = userService.loggedUser, Pageable pageable = Pageable.unpaged()) {
+    AbstractUser removeRole(String roleId, String netId, AbstractUser user = userService.loggedUserFromContext, Pageable pageable = Pageable.unpaged()) {
         List<PetriNet> nets = petriNetService.getByIdentifier(netId, pageable).content
         nets.forEach({ net -> user = removeRole(roleId, net, user) })
         return user
     }
 
-    AbstractUser removeRole(String roleId, PetriNet net, AbstractUser user = userService.loggedUser) {
+    AbstractUser removeRole(String roleId, PetriNet net, AbstractUser user = userService.loggedUserFromContext) {
         AbstractUser actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         return actualUser
     }
 
-    AbstractUser removeRole(String roleId, String netId, Version version, AbstractUser user = userService.loggedUser) {
+    AbstractUser removeRole(String roleId, String netId, Version version, AbstractUser user = userService.loggedUserFromContext) {
         PetriNet net = petriNetService.getPetriNet(netId, version)
         return removeRole(roleId, net, user)
     }
@@ -1237,7 +1240,7 @@ class ActionDelegate {
     }
 
     AbstractUser loggedUser() {
-        return userService.loggedUser
+        return userService.loggedUserFromContext
     }
 
     void saveFileToField(Case targetCase, String targetTransitionId, String targetFieldId, String filename, String storagePath = null) {

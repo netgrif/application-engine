@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRolePermission;
@@ -11,7 +10,8 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
 
 @Service
 public class WorkflowAuthorizationService extends AbstractAuthorizationService implements IWorkflowAuthorizationService {
@@ -28,7 +28,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
             return true;
         }
         Case requestedCase = workflowService.findOne(caseId);
-        Boolean processPerm = user.hasProcessAccess(requestedCase.getProcessIdentifier());
+        boolean processPerm = user.hasProcessAccess(requestedCase.getProcessIdentifier());
         if (!processPerm) {
             return false;
         }
@@ -46,12 +46,12 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
         if (user.isAdmin()) {
             return true;
         }
-        Boolean processPerm = user.hasProcessAccess(net.getIdentifier());
+        PetriNet net = petriNetService.getPetriNet(netId);
+        boolean processPerm = user.hasProcessAccess(net.getIdentifier());
         if (!processPerm) {
             return false;
         }
 
-        PetriNet net = petriNetService.getPetriNet(netId);
         return userHasAtLeastOneRolePermission(user, net, ProcessRolePermission.CREATE);
     }
 
@@ -90,7 +90,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
                 .anyMatch(permission -> hasPermission(userPermissions.get(permission.toString())));
     }
 
-    private Map<String, Boolean> findUserPermissions(Case useCase, AbstractUser user) {
-        return findUserPermissions(useCase.getActors(), user);
+    private Map<String, Boolean> findUserPermissions(Case useCase, LoggedUser user) {
+        return findUserPermissions(useCase.getActors(), user.getSelfOrImpersonated());
     }
 }

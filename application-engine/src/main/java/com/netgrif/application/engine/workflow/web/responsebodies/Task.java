@@ -41,6 +41,10 @@ public class Task {
 
     private ActorRef assignee;
 
+    private String impersonatorUserId;
+
+    private String impersonatorUsername;
+
     private Map<String, Map<String, Boolean>> roles;
 
     private Map<String, Map<String, Boolean>> users;
@@ -88,6 +92,8 @@ public class Task {
         this.caseTitle = task.getCaseTitle();
         this.priority = task.getPriority();
         this.assignee = task.getAssignee();
+        this.impersonatorUserId = task.getImpersonatorUserId();
+        this.impersonatorUsername = task.getImpersonatorUsername();
         this.roles = task.getRoles();
         this.users = task.getActors();
         this.startDate = task.getStartDate();

@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.petrinet.params;
 
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
+import com.netgrif.application.engine.petrinet.service.PetriNetService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,17 +27,18 @@ public class ImportPetriNetParams {
 
     /**
      * Release type of the process
+     *
      * @see VersionType
      */
     private VersionType releaseType;
 
     /// Author of the process
-    private AbstractUser author;
+    private LoggedUser author;
 
     @Builder.Default
     private Map<String, String> params = new HashMap<>();
 
-    public ImportPetriNetParams(InputStream xmlFile, VersionType releaseType, AbstractUser author, String uriNodeId) {
+    public ImportPetriNetParams(InputStream xmlFile, VersionType releaseType, LoggedUser author, String uriNodeId) {
         this.xmlFile = xmlFile;
         this.releaseType = releaseType;
         this.author = author;
@@ -45,7 +46,7 @@ public class ImportPetriNetParams {
         this.params = new HashMap<>();
     }
 
-    public ImportPetriNetParams(InputStream xmlFile, VersionType releaseType, AbstractUser author) {
+    public ImportPetriNetParams(InputStream xmlFile, VersionType releaseType, LoggedUser author) {
         this(xmlFile, releaseType, author, null);
     }
 }

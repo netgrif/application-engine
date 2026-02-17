@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
@@ -12,13 +11,17 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
 
 @Service
 public class TaskAuthorizationService extends AbstractAuthorizationService implements ITaskAuthorizationService {
 
     @Autowired
     private ITaskService taskService;
+
+    @Autowired
+    private IWorkflowService workflowService;
 
     @Override
     public Boolean userHasAtLeastOneRolePermission(LoggedUser user, Task task, RolePermission... permissions) {
@@ -80,7 +83,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
         }
         Task currentTask = taskService.findById(taskId);
         Case caze = workflowService.findOne(currentTask.getCaseId());
-        Boolean processPerm = loggedUser.hasProcessAccess(caze.getProcessIdentifier());
+        boolean processPerm = loggedUser.hasProcessAccess(caze.getProcessIdentifier());
         if (!processPerm) {
             return false;
         }
@@ -101,7 +104,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
         }
         Task currentTask = taskService.findById(taskId);
         Case caze = workflowService.findOne(currentTask.getCaseId());
-        Boolean processPerm = loggedUser.hasProcessAccess(caze.getProcessIdentifier());
+        boolean processPerm = loggedUser.hasProcessAccess(caze.getProcessIdentifier());
         if (!processPerm) {
             return false;
         }
@@ -138,7 +141,8 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     /**
      * To return true, the task should not have set up the assigned user policy for cancel to "false"
-     * */
+     *
+     */
     private boolean canAssignedCancel(Task task) {
         return task.getAssignedUserPolicy() == null || task.getAssignedUserPolicy().get("cancel") == null
                 || task.getAssignedUserPolicy().get("cancel");
@@ -148,7 +152,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     @Override
     public boolean canCallCancel(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException {
         Task currentTask = taskService.findById(taskId);
-        if (!isAssigned(taskId)) {
+        if (!isAssigned(currentTask)) {
             throw new IllegalTaskStateException("Task with ID '%s' cannot be canceled, because it is not assigned!".formatted(taskId));
         }
         if (loggedUser.isAdmin()) {
@@ -179,8 +183,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
         return loggedUser.isAdmin() || isAssignee(loggedUser, currentTask);
     }
 
-    // TODO NOW JOFO!!!
     private Map<String, Boolean> findUserPermissions(Task task, LoggedUser user) {
-        return findUserPermissions(task.getActors(), user);
+        return findUserPermissions(task.getActors(), user.getSelfOrImpersonated());
     }
 }

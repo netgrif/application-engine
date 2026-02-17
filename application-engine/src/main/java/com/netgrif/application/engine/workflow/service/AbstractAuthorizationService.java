@@ -46,8 +46,7 @@ public abstract class AbstractAuthorizationService {
         }
     }
 
-    protected Map<String, Boolean> findUserPermissions(Map<String, Map<String, Boolean>> docPermissions, AbstractUser user) {
-        // TODO: impersonation
+    protected Map<String, Boolean> findUserPermissions(Map<String, Map<String, Boolean>> docPermissions, LoggedUser user) {
         if (docPermissions == null) {
             return null;
         }
