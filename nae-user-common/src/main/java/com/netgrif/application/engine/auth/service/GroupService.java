@@ -13,6 +13,7 @@ import org.springframework.data.util.Pair;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Service interface for managing user groups in the application.
@@ -146,6 +147,18 @@ public interface GroupService {
      */
     Group getDefaultSystemGroup();
 
+
+    /**
+     * Assigns a set of users to a group based on its ID.
+     * <p>
+     * This method updates the membership of the specified group by adding the provided user IDs.
+     *
+     * @param groupId the ID of the group to which the users will be assigned
+     * @param userIds a set of user IDs to assign to the group
+     * @return the updated {@link Group} object including the newly assigned users
+     */
+    Group assignUsersToGroup(String groupId, Set<String> userIds);
+
     /**
      * Adds a user to a group within a specific realm.
      *
@@ -261,7 +274,7 @@ public interface GroupService {
      * @param childGroupIds the list of IDs of the subgroups to be assigned to the parent group
      * @return the updated {@link Group} representing the parent group with its new subgroup assignments
      */
-    Group assignSubgroups(String parentGroupId, List<String> childGroupIds);
+    Group assignSubgroups(String parentGroupId, Set<String> childGroupIds);
 
     /**
      * Adds a subgroup relationship between two groups.

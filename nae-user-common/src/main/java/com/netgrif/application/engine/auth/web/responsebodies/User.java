@@ -28,7 +28,7 @@ public class User {
     private Set<Authority> authorities;
     private Set<ProcessRole> processRoles;
     private Set<ProcessRole> negativeProcessRoles;
-    private Set<String> nextGroups;
+    private Set<String> groupIds;
     private User impersonated;
     private LocalDateTime createdAt;
     private Map<String, Attribute<?>> attributes;
@@ -76,7 +76,7 @@ public class User {
     public static User createUser(AbstractUser user) {
         User result = new User(user);
         result.setAuthorities(user.getAuthoritySet());
-        result.setNextGroups(user.getGroupIds());
+        result.setGroupIds(user.getGroupIds());
         return result;
     }
 }

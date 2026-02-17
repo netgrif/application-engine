@@ -228,6 +228,22 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    public Group assignUsersToGroup(String groupId, Set<String> userIds) {
+        Group group = this.findById(groupId);
+        Set<String> currentGroupMemberIds = group.getMemberIds();
+
+        Set<String> removableMemberIds = new HashSet<>(currentGroupMemberIds);
+        removableMemberIds.removeAll(userIds);
+
+        Set<String> newMemberIds = new HashSet<>(userIds);
+        newMemberIds.removeAll(currentGroupMemberIds);
+
+        removableMemberIds.forEach(toBeRemovedId -> removeUser(userService.findById(toBeRemovedId, group.getRealmId()), group));
+        newMemberIds.forEach(toBeAddedId -> addUser(userService.findById(toBeAddedId, group.getRealmId()), group));
+        return group;
+    }
+
+    @Override
     public Group addUser(String userId, String groupId, String realmId) {
         return addUser(userService.findById(userId, realmId), groupId);
     }
@@ -318,12 +334,19 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group assignSubgroups(String parentGroupId, List<String> childGroupIds) {
+    public Group assignSubgroups(String parentGroupId, Set<String> childGroupIds) {
         Group parentGroup = this.findById(parentGroupId);
         Set<String> currentSubgroupIds = parentGroup.getSubgroupIds();
 
+        Set<String> removableGroupIds = new HashSet<>(currentSubgroupIds);
+        removableGroupIds.removeAll(childGroupIds);
 
-        return null;
+        Set<String> newSubgroupIds = new HashSet<>(childGroupIds);
+        newSubgroupIds.removeAll(currentSubgroupIds);
+
+        removableGroupIds.forEach(toBeRemovedId -> removeSubgroup(parentGroupId, toBeRemovedId));
+        newSubgroupIds.forEach(toBeAddedId -> addSubgroup(parentGroupId, toBeAddedId));
+        return parentGroup;
     }
 
     @Override

@@ -79,7 +79,7 @@ public class GroupController {
             @ApiResponse(responseCode = "200", description = "Page of groups found"),
             @ApiResponse(responseCode = "500", description = "Internal server error"),
     })
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<Page<GroupDto>> searchGroups(GroupSearchRequestDto searchDto, Pageable pageable, Locale locale) {
         try {
             Page<Group> groups = groupService.search(searchDto, pageable);
@@ -251,7 +251,7 @@ public class GroupController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<ResponseMessage> revokeAuthorityFromUser(@PathVariable("id") String groupId, @RequestBody Set<String> authorityIds) {
+    public ResponseEntity<ResponseMessage> revokeAuthorityFromGroup(@PathVariable("id") String groupId, @RequestBody Set<String> authorityIds) {
         try {
             authorityIds.forEach(authorityId -> groupService.removeAuthority(groupId, authorityId));
             log.info("Authorities {} revoked from group with id [{}]", authorityIds, groupId);
@@ -273,7 +273,15 @@ public class GroupController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<ResponseMessage> assignSubgroupsToGroup(@PathVariable("id") String groupId, @RequestBody Set<String> subgroupIds) {
-
+        try {
+            groupService.assignSubgroups(groupId, subgroupIds);
+            log.info("Subgroups {} assigned to group with id [{}]", subgroupIds, groupId);
+            return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Selected subgroups was successfully assigned to group"));
+        } catch (IllegalArgumentException e) {
+            String message = "Adding subgroups to group [" + groupId + "] has failed!";
+            log.error(message, e);
+            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Adding subgroups to group " + groupId + " has failed!"));
+        }
     }
 
     @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
