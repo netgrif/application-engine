@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.objects.workspace;
 
+import com.netgrif.application.engine.objects.annotations.EnsureCollection;
 import com.netgrif.application.engine.objects.annotations.Indexed;
 import com.netgrif.application.engine.objects.auth.domain.ActorRef;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import java.util.regex.Pattern;
 
 /** todo javadoc */
 @Getter
+@EnsureCollection
 public abstract class Workspace implements Serializable {
 
     public static final String FORBIDDEN_ID = "fxhvyihxmgmkpnfwrykmr";

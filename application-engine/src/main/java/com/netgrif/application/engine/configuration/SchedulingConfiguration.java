@@ -13,6 +13,8 @@ public class SchedulingConfiguration {
 
     @Bean
     public TaskScheduler taskScheduler() {
-        return new DelegatingSecurityContextTaskScheduler(new ThreadPoolTaskScheduler());
+        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+        threadPoolTaskScheduler.initialize();
+        return new DelegatingSecurityContextTaskScheduler(threadPoolTaskScheduler);
     }
 }

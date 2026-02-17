@@ -36,6 +36,7 @@ public class MongoDbRunner implements ApplicationEngineStartupRunner {
             mongoCollectionConfigurator.resolveCollections();
         }
         if (mongoProperties.getRunnerEnsureIndex()) {
+            log.info("Ensuring indexes for MongoDB entities...");
             mongoCollectionConfigurator.resolveIndexes();
         }
     }
