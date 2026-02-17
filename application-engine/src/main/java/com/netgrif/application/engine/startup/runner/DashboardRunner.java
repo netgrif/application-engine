@@ -27,7 +27,6 @@ public class DashboardRunner implements ApplicationEngineStartupRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        // todo 2072 check if workspaceId is initialized by petriNetService
         helper.importProcessOnce("Petri net for dashboard", DASHBOARD_NET_IDENTIFIER, DASHBOARD_FILE_NAME);
         helper.importProcessOnce("Petri net for dashboard tile", DASHBOARD_TILE_NET_IDENTIFIER, DASHBOARD_TILE_FILE_NAME);
     }

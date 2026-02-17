@@ -28,7 +28,6 @@ public class MenuProcessRunner implements ApplicationEngineStartupRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        // todo 2072 check if workspaceId is initialized by petriNetService
         helper.importProcessOnce("Petri net for filter preferences", MENU_NET_IDENTIFIER, MENU_ITEM_FILE_NAME);
         createConfigurationNets();
     }
