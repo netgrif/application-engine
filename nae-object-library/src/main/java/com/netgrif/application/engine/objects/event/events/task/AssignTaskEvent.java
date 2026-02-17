@@ -21,7 +21,8 @@ public class AssignTaskEvent extends TaskEvent {
 
     @Override
     public String getMessage() {
-        return "AssignTaskEvent: Task [" + (taskEventOutcome.getTask() == null ? MISSING_IDENTIFIER : taskEventOutcome.getTask().getStringId()) + "] assigned";
+        return "AssignTaskEvent: Task [%s] assigned"
+                .formatted(taskEventOutcome.getTask() == null ? MISSING_IDENTIFIER : taskEventOutcome.getTask().getStringId());
     }
 
     @Override

@@ -11,17 +11,15 @@ public class SetDataEvent extends DataEvent {
     protected SetDataEventOutcome eventOutcome;
 
     public SetDataEvent(SetDataEventOutcome eventOutcome) {
-        super(eventOutcome);
-        this.eventOutcome = eventOutcome;
+        this(eventOutcome, null, null);
     }
 
     public SetDataEvent(SetDataEventOutcome eventOutcome, AbstractUser user) {
-        super(eventOutcome, user);
-        this.eventOutcome = eventOutcome;
+        this(eventOutcome, null, user);
     }
 
     public SetDataEvent(SetDataEventOutcome eventOutcome, EventPhase eventPhase, AbstractUser user) {
-        super(eventOutcome, eventPhase, user);
+        super(eventOutcome, eventPhase, user, getWorkspaceIdFromResource(eventOutcome.getCase()));
         this.eventOutcome = eventOutcome;
     }
 

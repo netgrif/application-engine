@@ -9,12 +9,12 @@ public abstract class UserEvent extends Event {
 
     protected final LoggedUser user;
 
-    public UserEvent() {
-        this(null);
+    protected UserEvent() {
+        this(null, null);
     }
 
-    public UserEvent(LoggedUser user) {
-        super(user);
+    protected UserEvent(LoggedUser user, String workspaceId) {
+        super(user, workspaceId);
         this.user = user;
     }
 }

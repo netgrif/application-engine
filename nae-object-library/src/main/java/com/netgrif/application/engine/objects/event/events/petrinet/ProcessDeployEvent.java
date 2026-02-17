@@ -10,12 +10,13 @@ public class ProcessDeployEvent extends ProcessEvent {
     protected final ImportPetriNetEventOutcome eventOutcome;
 
     public ProcessDeployEvent(ImportPetriNetEventOutcome eventOutcome, EventPhase eventPhase) {
-        super(eventOutcome, eventPhase);
+        super(eventOutcome, eventPhase, getWorkspaceIdFromResource(eventOutcome.getNet()));
         this.eventOutcome = eventOutcome;
     }
 
     @Override
     public String getMessage() {
-        return "ProcessDeployEvent: PetriNet [" +  (eventOutcome.getNet() == null ? MISSING_IDENTIFIER : eventOutcome.getNet().getIdentifier()) +"] imported";
+        return "ProcessDeployEvent: PetriNet [%s] imported"
+                .formatted(eventOutcome.getNet() == null ? MISSING_IDENTIFIER : eventOutcome.getNet().getIdentifier());
     }
 }

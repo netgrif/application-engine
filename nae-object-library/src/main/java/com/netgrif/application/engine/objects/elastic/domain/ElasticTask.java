@@ -2,6 +2,7 @@ package com.netgrif.application.engine.objects.elastic.domain;
 
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
+import com.netgrif.application.engine.objects.workspace.Workspaceable;
 import lombok.*;
 
 import java.io.Serial;
@@ -15,7 +16,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class ElasticTask implements Serializable {
+public abstract class ElasticTask implements Serializable, Workspaceable {
 
     @Serial
     private static final long serialVersionUID = 8399390623172906801L;

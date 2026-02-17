@@ -14,13 +14,12 @@ public class UserRoleChangeEvent extends UserEvent {
     protected final Collection<ProcessRole> roles;
 
     public UserRoleChangeEvent(LoggedUser user, Collection<ProcessRole> roles) {
-        super(user);
+        super(user, null);
         this.roles = roles;
     }
 
     public UserRoleChangeEvent(AbstractUser user, Collection<ProcessRole> roles) {
-        super(ActorTransformer.toLoggedUser(user));
-        this.roles = roles;
+        this(ActorTransformer.toLoggedUser(user), roles);
     }
 
     @Override

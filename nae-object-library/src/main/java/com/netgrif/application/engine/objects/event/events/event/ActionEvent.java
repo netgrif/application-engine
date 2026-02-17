@@ -17,9 +17,8 @@ public abstract class ActionEvent extends Event {
     private final Map<String, String> transitionIds;
     private RunPhase phase;
 
-
-    public ActionEvent(Action action) {
-        super(action);
+    protected ActionEvent(Action action, String workspaceId) {
+        super(action, workspaceId);
         this.importId = action.getImportId();
         this.id = action.getId();
         this.fieldIds = action.getFieldIds();

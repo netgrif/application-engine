@@ -10,12 +10,12 @@ public class IndexCaseEvent extends Event {
     protected final ElasticCase elasticCase;
 
     public IndexCaseEvent(ElasticCase elasticCase) {
-        super(elasticCase);
+        super(elasticCase, getWorkspaceIdFromResource(elasticCase));
         this.elasticCase = elasticCase;
     }
 
     @Override
     public String getMessage() {
-        return "IndexCaseEvent: Case [" + elasticCase.getId() + "] indexed";
+        return "IndexCaseEvent: Case [%s] indexed".formatted(elasticCase.getId());
     }
 }

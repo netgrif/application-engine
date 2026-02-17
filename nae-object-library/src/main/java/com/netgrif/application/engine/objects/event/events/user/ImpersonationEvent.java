@@ -7,19 +7,18 @@ import lombok.Getter;
 public class ImpersonationEvent extends UserEvent {
 
     @Getter
-    private LoggedUser impersonated;
-
+    private final LoggedUser impersonated;
     private final RunPhase runPhase;
 
     public ImpersonationEvent(LoggedUser user, LoggedUser impersonated, RunPhase runPhase) {
-        super(user);
+        super(user, null);
         this.impersonated = impersonated;
         this.runPhase = runPhase;
     }
 
     @Override
     public String getMessage() {
-        return "User " + (user.getUsername() == null ? MISSING_IDENTIFIER : user.getUsername()) + " is impersonating: " +
-                (impersonated.getUsername() == null ? MISSING_IDENTIFIER : impersonated.getUsername()) + " phase: " + runPhase;
+        return "User %s is impersonating: %s phase: %s".formatted(user.getUsername() == null ? MISSING_IDENTIFIER : user.getUsername(),
+                impersonated.getUsername() == null ? MISSING_IDENTIFIER : impersonated.getUsername(), runPhase);
     }
 }

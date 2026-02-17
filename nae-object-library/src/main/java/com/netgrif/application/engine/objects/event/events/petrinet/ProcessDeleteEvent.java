@@ -10,12 +10,12 @@ public class ProcessDeleteEvent extends ProcessEvent {
     protected PetriNet petriNet;
 
     public ProcessDeleteEvent(PetriNet petriNet, EventPhase phase) {
-        super(petriNet, phase);
+        super(petriNet, phase, getWorkspaceIdFromResource(petriNet));
         this.petriNet = petriNet;
     }
 
     @Override
     public String getMessage() {
-        return "ProcessDeleteEvent: PetriNet [" + petriNet.getIdentifier() + "] deleted";
+        return "ProcessDeleteEvent: PetriNet [%s] deleted".formatted(petriNet.getIdentifier());
     }
 }

@@ -13,25 +13,21 @@ public abstract class TaskEvent extends Event {
 
     protected final TaskEventOutcome taskEventOutcome;
 
-    private AbstractUser user;
+    private final AbstractUser user;
 
-    public TaskEvent(TaskEventOutcome eventOutcome, EventPhase phase) {
-        super(eventOutcome, phase);
-        this.taskEventOutcome = eventOutcome;
+    protected TaskEvent(TaskEventOutcome eventOutcome, EventPhase phase) {
+        this(eventOutcome, phase, null);
     }
 
-    public TaskEvent(TaskEventOutcome eventOutcome, AbstractUser user) {
-        super(eventOutcome);
-        this.taskEventOutcome = eventOutcome;
-        this.user = user;
+    protected TaskEvent(TaskEventOutcome eventOutcome, AbstractUser user) {
+        this(eventOutcome, null, user);
     }
 
-    public TaskEvent(TaskEventOutcome eventOutcome, EventPhase phase, AbstractUser user) {
-        super(eventOutcome, phase);
+    protected TaskEvent(TaskEventOutcome eventOutcome, EventPhase phase, AbstractUser user) {
+        super(eventOutcome, phase, getWorkspaceIdFromResource(eventOutcome.getCase()));
         this.taskEventOutcome = eventOutcome;
         this.user = user;
     }
-
 
     public abstract EventType getEventType();
 

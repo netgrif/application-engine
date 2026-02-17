@@ -6,13 +6,12 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.case
 public class CreateCaseEvent extends CaseEvent {
 
     public CreateCaseEvent(CreateCaseEventOutcome caseEventOutcome, EventPhase phase) {
-        super(caseEventOutcome, phase);
+        super(caseEventOutcome, phase, getWorkspaceIdFromResource(caseEventOutcome.getCase()));
     }
 
     @Override
     public String getMessage() {
-        return "CreateCaseEvent: Case [" +
-                (caseEventOutcome.getCase() == null ? MISSING_IDENTIFIER : caseEventOutcome.getCase().getStringId())
-                + "] created";
+        return "CreateCaseEvent: Case [%s] created"
+                .formatted(caseEventOutcome.getCase() == null ? MISSING_IDENTIFIER : caseEventOutcome.getCase().getStringId());
     }
 }

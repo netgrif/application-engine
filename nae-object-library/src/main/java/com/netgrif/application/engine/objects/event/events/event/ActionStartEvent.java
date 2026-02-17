@@ -10,14 +10,14 @@ public class ActionStartEvent  extends ActionEvent {
 
     private final DataEventType trigger;
 
-    public ActionStartEvent(Action action) {
-        super(action);
+    public ActionStartEvent(Action action, String workspaceId) {
+        super(action, workspaceId);
         this.trigger = action.getTrigger();
         setPhase(RunPhase.START);
     }
 
     @Override
     public String getMessage() {
-        return String.format("ActionStartEvent: trigger %s id [%s] phase: %s", trigger, getId(), getPhase());
+        return "ActionStartEvent: trigger %s id [%s] phase: %s".formatted(trigger, getId(), getPhase());
     }
 }
