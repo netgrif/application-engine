@@ -262,4 +262,58 @@ public class GroupController {
             return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Revoking authorities to group " + groupId + " has failed!"));
         }
     }
+
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
+    @Operation(summary = "Assigns subgroups to group", description = "Removes existing subgroups and assigns new ones to group based on path param and request body", security = {@SecurityRequirement(name = "X-Auth-Token")})
+    @PatchMapping(value = "/{id}/groups/assign", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Selected subgroups was successfully assigned to group"),
+            @ApiResponse(responseCode = "400", description = "Requested group or groups with defined id do not exist"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<ResponseMessage> assignSubgroupsToGroup(@PathVariable("id") String groupId, @RequestBody Set<String> subgroupIds) {
+
+    }
+
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
+    @Operation(summary = "Adds subgroups to group", description = "Add subgroups to group based on path param and request body", security = {@SecurityRequirement(name = "X-Auth-Token")})
+    @PatchMapping(value = "/{id}/groups/add", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Selected subgroups was successfully added to group"),
+            @ApiResponse(responseCode = "400", description = "Requested group or groups with defined id do not exist"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<ResponseMessage> addSubgroupsToGroup(@PathVariable("id") String groupId, @RequestBody Set<String> subgroupIds) {
+        try {
+            subgroupIds.forEach(subgroupId -> groupService.addSubgroup(groupId, subgroupId));
+            log.info("Subgroups {} added to group with id [{}]", subgroupIds, groupId);
+            return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Selected subgroups was successfully added to group"));
+        } catch (IllegalArgumentException e) {
+            String message = "Adding subgroups to group [" + groupId + "] has failed!";
+            log.error(message, e);
+            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Adding subgroups to group " + groupId + " has failed!"));
+        }
+    }
+
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
+    @Operation(summary = "Removes subgroups from group", description = "Removes subgroups from group based on path param and request body", security = {@SecurityRequirement(name = "X-Auth-Token")})
+    @PatchMapping(value = "/{id}/groups/remove", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Selected subgroups was successfully removed from group"),
+            @ApiResponse(responseCode = "400", description = "Requested group or groups with defined id do not exist"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<ResponseMessage> removeSubgroupsFromGroup(@PathVariable("id") String groupId, @RequestBody Set<String> subgroupIds) {
+        try {
+            log.info("Subgroups {} removed from group with id [{}]", subgroupIds, groupId);
+            return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Selected subgroups was successfully removed from group"));
+        } catch (IllegalArgumentException e) {
+            String message = "Removing subgroups from group [" + groupId + "] has failed!";
+            log.error(message, e);
+            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Removing subgroups from group " + groupId + " has failed!"));
+        }
+    }
 }

@@ -250,6 +250,19 @@ public interface GroupService {
      */
     Group removeAuthority(String groupId, String authorityId);
 
+
+    /**
+     * Assigns multiple subgroups to a parent group.
+     * <p>
+     * This method establishes relationships between the specified child groups
+     * and the parent group identified by its ID.
+     *
+     * @param parentGroupId the ID of the parent group to which subgroups will be assigned
+     * @param childGroupIds the list of IDs of the subgroups to be assigned to the parent group
+     * @return the updated {@link Group} representing the parent group with its new subgroup assignments
+     */
+    Group assignSubgroups(String parentGroupId, List<String> childGroupIds);
+
     /**
      * Adds a subgroup relationship between two groups.
      *

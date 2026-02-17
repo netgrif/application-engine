@@ -318,6 +318,15 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    public Group assignSubgroups(String parentGroupId, List<String> childGroupIds) {
+        Group parentGroup = this.findById(parentGroupId);
+        Set<String> currentSubgroupIds = parentGroup.getSubgroupIds();
+
+
+        return null;
+    }
+
+    @Override
     public Pair<Group, Group> addSubgroup(String parentGroupId, String childGroupId) {
         if (parentGroupId.equals(childGroupId)) {
             throw new IllegalArgumentException("Trying to add group to itself [%s]!".formatted(parentGroupId));
@@ -444,6 +453,10 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Page<Group> search(GroupSearchRequestDto searchDto, Pageable pageable) {
         List<Criteria> filters = new ArrayList<>();
+        if (searchDto != null && searchDto.ids() != null && !searchDto.ids().isEmpty()) {
+            Criteria criteria = Criteria.where("_id").in(searchDto.ids());
+            filters.add(criteria);
+        }
         if (searchDto != null && searchDto.fullText() != null && !searchDto.fullText().isBlank()) {
             Criteria criteria = new Criteria().orOperator(
                     Criteria.where("identifier").regex(searchDto.fullText(), "i"),

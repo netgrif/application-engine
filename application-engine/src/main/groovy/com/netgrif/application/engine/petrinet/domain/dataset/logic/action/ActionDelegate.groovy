@@ -100,6 +100,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import com.netgrif.application.engine.objects.utils.Nullable
+import org.springframework.data.util.Pair
 
 import java.time.ZoneId
 import java.util.stream.Collectors
@@ -2906,5 +2907,13 @@ class ActionDelegate {
 
     Group removeRoleFromGroup(String groupId, String roleId) {
         return groupService.removeRole(groupId, roleId)
+    }
+
+    Pair<Group, Group> addSubGroup(String groupId, String subGroupId) {
+        return groupService.addSubgroup(groupId, subGroupId)
+    }
+
+    Pair<Group, Group> removeSubGroup(String groupId, String subGroupId) {
+        return groupService.removeSubgroup(groupId, subGroupId)
     }
 }
