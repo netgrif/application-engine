@@ -1,14 +1,18 @@
 package com.netgrif.application.engine.permissions
 
 import com.netgrif.application.engine.auth.service.AuthorityService
+import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.User
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
+import com.netgrif.application.engine.workflow.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.params.DeleteCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -59,6 +63,9 @@ class QueryDSLViewPermissionTest {
     private AuthorityService authorityService
 
     @Autowired
+    private GroupService groupService
+
+    @Autowired
     private IDataService dataService
 
     @Autowired
@@ -72,13 +79,21 @@ class QueryDSLViewPermissionTest {
     private Authority userAuthority
 
     @BeforeEach
-    void inti() {
+    void init() {
         testHelper.truncateDbs()
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/view_permission_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/view_permission_test.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert net.getNet() != null
         this.net = net.getNet()
 
-        ImportPetriNetEventOutcome netWithUserRefs = petriNetService.importPetriNet(new FileInputStream("src/test/resources/view_permission_with_userRefs_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome netWithUserRefs = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/view_permission_with_userRefs_test.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert netWithUserRefs.getNet() != null
         this.netWithUserRefs = netWithUserRefs.getNet()
 
@@ -90,17 +105,27 @@ class QueryDSLViewPermissionTest {
 
     @Test
     void testSearchQueryDSLViewWithoutRole() {
-        Case case_ = workflowService.createCase(net.getStringId(), "Permission test", "", ActorTransformer.toLoggedUser(testUser)).getCase()
+        Case case_ = workflowService.createCase(CreateCaseParams.with()
+                .process(net)
+                .title("Permission test")
+                .color("")
+                .author(ActorTransformer.toLoggedUser(testUser))
+                .build()).getCase()
         Page<Case> casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
                 PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale())
 
         assert casePage.getContent().size() == 0
-        workflowService.deleteCase(case_.getStringId())
+        workflowService.deleteCase(new DeleteCaseParams(case_.getStringId()))
     }
 
     @Test
     void testSearchQueryDSLViewWithUserWithPosRole() {
-        Case case_ = workflowService.createCase(net.getStringId(), "Permission test", "", ActorTransformer.toLoggedUser(testUser)).getCase()
+        Case case_ = workflowService.createCase(CreateCaseParams.with()
+                .process(net)
+                .title("Permission test")
+                .color("")
+                .author(ActorTransformer.toLoggedUser(testUser))
+                .build()).getCase()
         ProcessRole posViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_pos_role")
         userService.addRole(testUser, posViewRole.getStringId())
 
@@ -109,12 +134,17 @@ class QueryDSLViewPermissionTest {
 
         assert casePage.getContent().size() == 1 && casePage.getContent()[0].stringId == case_.stringId
         userService.removeRole(testUser, posViewRole.getStringId())
-        workflowService.deleteCase(case_.getStringId())
+        workflowService.deleteCase(new DeleteCaseParams(case_.getStringId()))
     }
 
     @Test
     void testSearchQueryDSLViewWithUserWithNegRole() {
-        Case case_ = workflowService.createCase(net.getStringId(), "Permission test", "", ActorTransformer.toLoggedUser(testUser)).getCase()
+        Case case_ = workflowService.createCase(CreateCaseParams.with()
+                .process(net)
+                .title("Permission test")
+                .color("")
+                .author(ActorTransformer.toLoggedUser(testUser))
+                .build()).getCase()
         ProcessRole negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
         userService.addRole(testUser, negViewRole.getStringId())
 
@@ -123,64 +153,126 @@ class QueryDSLViewPermissionTest {
 
         assert casePage.getContent().size() == 0 && case_.negativeViewRoles.contains(negViewRole.stringId)
         userService.removeRole(testUser, negViewRole.getStringId())
-        workflowService.deleteCase(case_.getStringId())
+        workflowService.deleteCase(new DeleteCaseParams(case_.getStringId()))
     }
 
     @Test
-    void testSearchQueryDSLViewWithoutUserRef() {
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", ActorTransformer.toLoggedUser(testUser)).getCase()
+    void testSearchQueryDSLViewWithoutActorRef() {
+        Case case_ = workflowService.createCase(CreateCaseParams.with()
+                .process(netWithUserRefs)
+                .title("Permission test")
+                .color("")
+                .author(ActorTransformer.toLoggedUser(testUser))
+                .build()).getCase()
         Page<Case> casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
                 PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale())
 
         assert casePage.getContent().size() == 0
-        workflowService.deleteCase(case_.getStringId())
+        workflowService.deleteCase(new DeleteCaseParams(case_.getStringId()))
     }
 
     @Test
-    void testSearchQueryDSLViewWithPosUserRef() {
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", ActorTransformer.toLoggedUser(testUser)).getCase()
+    void testSearchQueryDSLViewWithPosActorRef() {
+        Case case_ = workflowService.createCase(CreateCaseParams.with()
+                .process(netWithUserRefs)
+                .title("Permission test")
+                .color("")
+                .author(ActorTransformer.toLoggedUser(testUser))
+                .build()).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "view_ul_pos": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
-        case_ = workflowService.save(case_)
-        sleep(4000)
-
         Page<Case> casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
                 PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale())
+        assert casePage.getContent().size() == 1 && casePage.getContent()[0].stringId == case_.stringId && case_.viewActors.contains(testUser.getStringId())
 
-        assert casePage.getContent().size() == 1 && casePage.getContent()[0].stringId == case_.stringId && case_.viewUsers.contains(testUser.getStringId())
-        workflowService.deleteCase(case_.getStringId())
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_pos": [
+                        "value": [],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
+                PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale())
+        assert casePage.getContent().size() == 0
+
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_pos": [
+                        "value": [groupService.getDefaultSystemGroup().stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
+                PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale())
+        assert casePage.getContent().size() == 1 && casePage.getContent()[0].stringId == case_.stringId
+                && case_.viewActors.contains(groupService.getDefaultSystemGroup().getStringId())
+
+        workflowService.deleteCase(new DeleteCaseParams(case_.getStringId()))
     }
 
     @Test
-    void testSearchTaskQueryDSLViewWithPosUserRef() {
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", ActorTransformer.toLoggedUser(testUser)).getCase()
+    void testSearchTaskQueryDSLViewWithPosActorRef() {
+        Case case_ = workflowService.createCase(CreateCaseParams.with()
+                .process(netWithUserRefs)
+                .title("Permission test")
+                .color("")
+                .author(ActorTransformer.toLoggedUser(testUser))
+                .build()).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "view_ul_pos": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
-        case_ = workflowService.save(case_)
-        sleep(4000)
-
         TaskSearchRequest request = new TaskSearchRequest()
         request.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(netWithUserRefs.getStringId())]
         Page<Task> taskPage = taskService.search([request],
                 PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale(), false)
+        assert taskPage.getContent().size() == 1 && taskPage.content[0].caseId == case_.stringId && taskPage.content[0].viewActors.contains(testUser.getStringId())
 
-        assert taskPage.getContent().size() == 1 && taskPage.content[0].caseId == case_.stringId && taskPage.content[0].viewUsers.contains(testUser.getStringId())
-        workflowService.deleteCase(case_.getStringId())
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_pos": [
+                        "value": [],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        request = new TaskSearchRequest()
+        request.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(netWithUserRefs.getStringId())]
+        taskPage = taskService.search([request], PageRequest.of(0, 20),
+                ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale(), false)
+        assert taskPage.getContent().size() == 0
+
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_pos": [
+                        "value": [groupService.getDefaultSystemGroup().stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        request = new TaskSearchRequest()
+        request.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(netWithUserRefs.getStringId())]
+        taskPage = taskService.search([request], PageRequest.of(0, 20),
+                ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale(), false)
+        assert taskPage.getContent().size() == 1 && taskPage.content[0].caseId == case_.stringId
+                && taskPage.content[0].viewActors.contains(groupService.getDefaultSystemGroup().stringId)
+
+        workflowService.deleteCase(new DeleteCaseParams(case_.getStringId()))
     }
 
     @Test
     void testSearchTaskQueryDSLViewWithUserWithPosRole() {
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", ActorTransformer.toLoggedUser(testUser)).getCase()
+        Case case_ = workflowService.createCase(CreateCaseParams.with()
+                .process(netWithUserRefs)
+                .title("Permission test")
+                .color("")
+                .author(ActorTransformer.toLoggedUser(testUser))
+                .build()).getCase()
         ProcessRole posViewRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "view_pos_role")
         userService.addRole(testUser, posViewRole.getStringId())
 
@@ -191,50 +283,100 @@ class QueryDSLViewPermissionTest {
 
         assert taskPage.getContent().size() == 1 && taskPage.getContent()[0].caseId == case_.stringId
         userService.removeRole(testUser, posViewRole.getStringId())
-        workflowService.deleteCase(case_.getStringId())
+        workflowService.deleteCase(new DeleteCaseParams(case_.getStringId()))
     }
 
     @Test
-    void testSearchQueryDSLViewWithNegUserRef() {
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", ActorTransformer.toLoggedUser(testUser)).getCase()
+    void testSearchQueryDSLViewWithNegActorRef() {
+        Case case_ = workflowService.createCase(CreateCaseParams.with()
+                .process(netWithUserRefs)
+                .title("Permission test")
+                .color("")
+                .author(ActorTransformer.toLoggedUser(testUser))
+                .build()).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+
         case_ = dataService.setData(taskId, ImportHelper.populateDataset([
                 "view_ul_neg": [
                         "value": [testUser.stringId],
-                        "type": "userList"
+                        "type": "actorList"
+                ],
+                "view_ul_pos": [
+                        "value": [testUser.stringId],
+                        "type": "actorList"
                 ]
         ] as Map)).getCase()
-        case_ = workflowService.save(case_)
-        sleep(4000)
-
         Page<Case> casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
                 PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale())
+        assert casePage.getContent().size() == 0 && case_.negativeViewActors.contains(testUser.getStringId())
 
-        assert casePage.getContent().size() == 0 && case_.negativeViewUsers.contains(testUser.getStringId())
-        workflowService.deleteCase(case_.getStringId())
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_neg": [
+                        "value": [],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
+                PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale())
+        assert casePage.getContent().size() == 1 && case_.negativeViewActors.isEmpty()
+
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_neg": [
+                        "value": [groupService.getDefaultSystemGroup().stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
+                PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale())
+        assert casePage.getContent().size() == 0 && case_.negativeViewActors.contains(groupService.getDefaultSystemGroup().stringId)
+
+        workflowService.deleteCase(new DeleteCaseParams(case_.getStringId()))
     }
 
     @Test
-    void testSearchQueryDSLViewWithNegRoleAndPosUserRef() {
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", ActorTransformer.toLoggedUser(testUser)).getCase()
+    void testSearchQueryDSLViewWithNegRoleAndPosActorRef() {
+        Case case_ = workflowService.createCase(CreateCaseParams.with()
+                .process(netWithUserRefs)
+                .title("Permission test")
+                .color("")
+                .author(ActorTransformer.toLoggedUser(testUser))
+                .build()).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
-        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
-                "view_ul_pos": [
-                        "value": [testUser.stringId],
-                        "type": "userList"
-                ]
-        ] as Map)).getCase()
 
         ProcessRole negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
         userService.addRole(testUser, negViewRole.getStringId())
-        case_ = workflowService.save(case_)
-        sleep(4000)
 
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_pos": [
+                        "value": [testUser.stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
         Page<Case> casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
                 PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale())
+        assert casePage.getContent().size() == 1 && case_.viewActors.contains(testUser.stringId)
 
-        assert casePage.getContent().size() == 1 && case_.viewUsers.contains(testUser.stringId)
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_pos": [
+                        "value": [],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
+                PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale())
+        assert casePage.getContent().size() == 0 && case_.viewActors.isEmpty()
+
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_pos": [
+                        "value": [groupService.getDefaultSystemGroup().stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
+                PageRequest.of(0, 20), ActorTransformer.toLoggedUser(testUser), LocaleContextHolder.getLocale())
+        assert casePage.getContent().size() == 1 && case_.viewActors.contains(groupService.getDefaultSystemGroup().stringId)
+
         userService.removeRole(testUser, negViewRole.getStringId())
-        workflowService.deleteCase(case_.getStringId())
+        workflowService.deleteCase(new DeleteCaseParams(case_.getStringId()))
     }
 }

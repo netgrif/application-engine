@@ -4,6 +4,7 @@ import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
@@ -55,8 +56,16 @@ class ProcessRoleServiceTest {
     void shouldFindAllProcessRoles() throws IOException, MissingPetriNetMetaDataException {
         Page<ProcessRole> roles = processRoleService.findAll(Pageable.unpaged());
         long originalRoles = roles.getTotalElements();
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/role_all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/all_data.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build());
+        petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/role_all_data.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build());
         roles = processRoleService.findAll(Pageable.unpaged());
         assertNotNull(roles);
         assertFalse(roles.isEmpty());
@@ -65,7 +74,11 @@ class ProcessRoleServiceTest {
 
     @Test
     void shouldFindAllProcessRolesByPetriNet() throws IOException, MissingPetriNetMetaDataException {
-        ImportPetriNetEventOutcome eventOutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome eventOutcome = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/all_data.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build());
         List<ProcessRole> roles = processRoleService.findAllByNetStringId(eventOutcome.getNet().getStringId());
         assertNotNull(roles);
         assertFalse(roles.isEmpty());
@@ -92,7 +105,11 @@ class ProcessRoleServiceTest {
 
     @Test
     void shouldFindAllProcessRolesByImportId() throws IOException, MissingPetriNetMetaDataException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/all_data.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build());
         Page<ProcessRole> roles = processRoleService.findAllByImportId(ROLE_IMPORT_ID, Pageable.unpaged());
         assertNotNull(roles);
         assertFalse(roles.isEmpty());
@@ -102,7 +119,11 @@ class ProcessRoleServiceTest {
 
     @Test
     void shouldFindAllProcessRolesByName() throws IOException, MissingPetriNetMetaDataException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/all_data.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build());
         Page<ProcessRole> roles = processRoleService.findAllByDefaultName("Process role", Pageable.unpaged());
         assertNotNull(roles);
         assertFalse(roles.isEmpty());

@@ -19,6 +19,9 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
     public static final String ID_SEPARATOR = "-";
     public static final String NONE_SHORT_ID_VALUE = "NONE";
 
+    // todo resolve warnings, reuse 1 constructor implementation instead of multiple constructor implementations
+    // todo add example values to javadoc
+
     private ObjectId objectId;
     private String shortProcessId;
 

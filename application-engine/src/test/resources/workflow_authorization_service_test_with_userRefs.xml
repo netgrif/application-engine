@@ -28,18 +28,18 @@
             <create>false</create>
         </caseLogic>
     </roleRef>
-    <userRef>
+    <actorRef>
         <id>neg_user_list</id>
         <caseLogic>
             <delete>false</delete>
         </caseLogic>
-    </userRef>
-    <userRef>
+    </actorRef>
+    <actorRef>
         <id>pos_user_list</id>
         <caseLogic>
             <delete>true</delete>
         </caseLogic>
-    </userRef>
+    </actorRef>
     <role>
         <id>delete_pos_role</id>
         <name>delete role</name>
@@ -56,11 +56,11 @@
         <id>create_neg_role</id>
         <name>create role</name>
     </role>
-    <data type="userList">
+    <data type="actorList">
         <id>pos_user_list</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>neg_user_list</id>
         <title/>
     </data>

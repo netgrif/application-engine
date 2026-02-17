@@ -29,7 +29,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
             Field from = (Field) fieldReference.getFrom();
             Case useCase = (Case) caseReference.getFrom();
 
-            log.error("[" + useCase.getStringId() + "] Could not parse value of field [" + from.getStringId() + "], value [" + from.getValue() + "]");
+            log.error("[{}] Could not parse value of field [{}], value [{}]", useCase.getStringId(), from.getStringId(), from.getValue());
         } catch (Exception e) {
             log.warn("Unrecognized exception: ", e);
         }

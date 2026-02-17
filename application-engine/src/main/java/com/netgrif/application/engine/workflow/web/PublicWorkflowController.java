@@ -6,6 +6,7 @@ import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateCaseBody;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,11 +49,17 @@ public class PublicWorkflowController {
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Locale locale) {
         LoggedUser loggedUser = userService.getLoggedUserFromContext();
         try {
-            CreateCaseEventOutcome outcome = this.workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
+            CreateCaseEventOutcome outcome = this.workflowService.createCase(CreateCaseParams.with()
+                    .processId(body.netId)
+                    .title(body.title)
+                    .color(body.color)
+                    .author(loggedUser)
+                    .locale(locale)
+                    .build());
             return EventOutcomeWithMessageResource.successMessage("Case created successfully",
                     LocalisedEventOutcomeFactory.from(outcome, locale));
         } catch (Exception e) {
-            log.error("Creating case failed:" + e.getMessage(), e);
+            log.error("Creating case failed: {}", e.getMessage(), e);
             return EventOutcomeWithMessageResource.errorMessage("Creating case failed: " + e.getMessage());
         }
     }

@@ -4,25 +4,26 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public abstract class TextField extends DataField {
 
-    public String[] textValue;
+    protected List<String> textValue;
 
     public TextField(TextField field) {
         super(field);
-        this.textValue = field.textValue == null ? null : field.textValue.clone();
+        this.textValue = field.textValue == null ? null : new ArrayList<>(field.textValue);
     }
 
     public TextField(String value) {
-        super(value);
-        this.textValue = new String[1];
-        this.textValue[0] = value;
+        this(value != null ? List.of(value) : List.of());
     }
 
-    public TextField(String[] values) {
+    public TextField(List<String> values) {
         super(values);
         this.textValue = values;
     }

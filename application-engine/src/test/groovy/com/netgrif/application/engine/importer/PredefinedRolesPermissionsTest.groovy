@@ -6,6 +6,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRolePermission
 import com.netgrif.application.engine.objects.petrinet.domain.roles.RolePermission
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -14,6 +15,7 @@ import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.objects.workflow.domain.TaskPair
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
@@ -445,13 +447,22 @@ class PredefinedRolesPermissionsTest {
     }
 
     private NetCaseTask importAndCreate(Resource model) {
-        ImportPetriNetEventOutcome importOutcome = petriNetService.importPetriNet(model.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        ImportPetriNetEventOutcome importOutcome = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(model.inputStream)
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.loggedSuper)
+                .build())
 
         assert importOutcome.getNet() != null
 
         PetriNet net = importOutcome.getNet()
 
-        CreateCaseEventOutcome createCaseOutcome = workflowService.createCase(net.stringId, '', '', superCreator.loggedSuper)
+        CreateCaseEventOutcome createCaseOutcome = workflowService.createCase(CreateCaseParams.with()
+                .process(net)
+                .title('')
+                .color('')
+                .author(superCreator.loggedSuper)
+                .build())
         assert createCaseOutcome.getCase() != null
         Case aCase = createCaseOutcome.getCase()
 

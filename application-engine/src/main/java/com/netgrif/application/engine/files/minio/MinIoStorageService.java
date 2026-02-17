@@ -83,7 +83,7 @@ public class MinIoStorageService implements IStorageService {
                 throw new ServiceErrorException("Some http error from minio", e);
             }
         } catch (InvalidKeyException e) {
-            log.error("Key " + path + " is corrupted.", e);
+            log.error("Key {} is corrupted.", path, e);
             throw new BadRequestException("Key " + path + " is corrupted.", e);
         } catch (Exception e) {
             log.error("Some internal error from minio", e);

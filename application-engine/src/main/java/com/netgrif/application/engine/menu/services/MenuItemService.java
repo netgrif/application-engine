@@ -24,6 +24,9 @@ import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner;
 import com.netgrif.application.engine.startup.runner.FilterRunner;
 import com.netgrif.application.engine.startup.runner.MenuProcessRunner;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.params.DeleteCaseParams;
+import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -500,7 +503,9 @@ public class MenuItemService implements IMenuItemService {
     }
 
     protected void removeView(Case viewCase) {
-        workflowService.deleteCase(viewCase);
+        workflowService.deleteCase(DeleteCaseParams.with()
+                .useCase(viewCase)
+                .build());
         log.trace("Removed configuration view case [{}].", viewCase.getStringId());
     }
 
@@ -661,7 +666,12 @@ public class MenuItemService implements IMenuItemService {
     }
 
     protected Case createCase(String identifier, String title, LoggedUser loggedUser) {
-        return workflowService.createCaseByIdentifier(identifier, title, "", loggedUser).getCase();
+        return workflowService.createCase(CreateCaseParams.with()
+                .processIdentifier(identifier)
+                .title(title)
+                .color("")
+                .author(loggedUser)
+                .build()).getCase();
     }
 
     protected Case setData(Case useCase, String transId, Map<String, Map<String, Object>> dataSet) {
@@ -679,9 +689,15 @@ public class MenuItemService implements IMenuItemService {
         AbstractUser loggedUser = userService.getLoggedOrSystem();
         String taskId = MenuItemUtils.findTaskIdInCase(useCase, transId);
         Task task = taskService.findOne(taskId);
-        task = taskService.assignTask(task, loggedUser).getTask();
+        task = taskService.assignTask(TaskParams.with()
+                .task(task)
+                .user(loggedUser)
+                .build()).getTask();
         task = dataService.setData(task, ImportHelper.populateDataset((Map) dataSet)).getTask();
-        return taskService.finishTask(task, loggedUser).getCase();
+        return taskService.finishTask(TaskParams.with()
+                .task(task)
+                .user(loggedUser)
+                .build()).getCase();
     }
 
     protected String nameFromPath(String path) {

@@ -33,6 +33,7 @@ import com.netgrif.application.engine.menu.services.interfaces.DashboardManageme
 import com.netgrif.application.engine.menu.services.interfaces.IMenuItemService
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
+import com.netgrif.application.engine.objects.auth.domain.Group
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
@@ -50,10 +51,13 @@ import com.netgrif.application.engine.objects.utils.Nullable
 import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.ChangeCasePropertyOutcome
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
 import com.netgrif.application.engine.objects.workflow.domain.menu.FilterBody
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody
@@ -71,7 +75,11 @@ import com.netgrif.application.engine.plugin.meta.PluginHolder
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.runner.FilterRunner
+import com.netgrif.application.engine.startup.runner.MenuProcessRunner
 import com.netgrif.application.engine.utils.FullPageRequest
+import com.netgrif.application.engine.workflow.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.params.DeleteCaseParams
+import com.netgrif.application.engine.workflow.params.TaskParams
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.InitValueExpressionEvaluator
 import com.netgrif.application.engine.workflow.service.TaskService
@@ -627,9 +635,12 @@ class ActionDelegate {
     }
 
     private addTaskOutcomes(Task task, Map dataSet) {
-        this.outcomes.add(taskService.assignTask(task.stringId))
-        this.outcomes.add(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>)))
-        this.outcomes.add(taskService.finishTask(task.stringId))
+        AssignTaskEventOutcome assignOutcome = taskService.assignTask(new TaskParams(task.stringId))
+        this.outcomes.add(assignOutcome)
+        SetDataEventOutcome setDataOutcome = dataService.setData(assignOutcome.getTask(), ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>))
+        this.outcomes.add(setDataOutcome)
+        FinishTaskEventOutcome finishOutcome = taskService.finishTask(new TaskParams(setDataOutcome.getTask()))
+        this.outcomes.add(finishOutcome)
     }
 
     List<String> searchCases(Closure<Predicate> predicates) {
@@ -781,10 +792,27 @@ class ActionDelegate {
             if (field instanceof NumberField) {
                 value = value as Double
             }
-            if (field instanceof UserListField && (value instanceof String[] || value instanceof List)) {
-                LinkedHashSet<UserFieldValue> users = new LinkedHashSet<>()
-                value.each { id -> users.add(new UserFieldValue(userService.findById(id as String, null))) }
-                value = new UserListFieldValue(users)
+            if (field instanceof ActorListField && (value instanceof String[] || value instanceof List)) {
+                LinkedHashSet<ActorFieldValue> actorFieldValues = new LinkedHashSet<>()
+                value.each { id ->
+                    AbstractUser user = userService.findById(id as String, null)
+                    if (user != null) {
+                        actorFieldValues.add(new UserFieldValue(user))
+                    } else {
+                        Group group = groupService.findById((String) id)
+                        actorFieldValues.add(new GroupFieldValue(group))
+                    }
+                }
+                value = new ActorListFieldValue(actorFieldValues)
+            }
+            if (field instanceof ActorField && value instanceof String) {
+                AbstractUser user = userService.findById(value, null)
+                if (user != null) {
+                    value = new UserFieldValue(user)
+                } else {
+                    Group group = groupService.findById(value)
+                    value = new GroupFieldValue(group)
+                }
             }
 //            if (field instanceof TaskField && targetTask.isPresent()) {
 //                dataService.validateTaskRefValue(value, targetTask.get().getStringId());
@@ -869,6 +897,8 @@ class ActionDelegate {
                 }
                 taskService.save(tasks)
             }
+
+            outcomes.add(new ChangeCasePropertyOutcome(useCase))
         }]
     }
 
@@ -937,28 +967,66 @@ class ActionDelegate {
         return workflowService.findOne(stringId)
     }
 
-    Case createCase(String identifier, String title = null, String color = "", AbstractUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
+    Case createCase(String identifier, String title = null, String color = "", AbstractUser author = userService.loggedOrSystem,
+                    Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
         LoggedUser loggedUser = author instanceof LoggedUser ? (LoggedUser) author : ActorTransformer.toLoggedUser(author)
-        return workflowService.createCaseByIdentifier(identifier, title, color, loggedUser, locale, params).getCase()
-    }
-
-    Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", AbstractUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
-        LoggedUser loggedUser = author instanceof LoggedUser ? (LoggedUser) author : ActorTransformer.toLoggedUser(author)
-        CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, loggedUser, params)
+        CreateCaseEventOutcome outcome = workflowService.createCase(CreateCaseParams.with()
+                .processIdentifier(identifier)
+                .title(title)
+                .color(color)
+                .author(loggedUser)
+                .locale(locale)
+                .params(params)
+                .build())
         this.outcomes.add(outcome)
         return outcome.getCase()
     }
 
+    Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "",
+                    AbstractUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
+        LoggedUser loggedUser = author instanceof LoggedUser ? (LoggedUser) author : ActorTransformer.toLoggedUser(author)
+        CreateCaseEventOutcome outcome = workflowService.createCase(CreateCaseParams.with()
+                .process(net)
+                .title(title)
+                .color(color)
+                .author(loggedUser)
+                .locale(locale)
+                .params(params)
+                .build())
+        this.outcomes.add(outcome)
+        return outcome.getCase()
+    }
+
+    Case deleteCase(Case useCase) {
+        DeleteCaseEventOutcome outcome = workflowService.deleteCase(new DeleteCaseParams(useCase))
+        this.outcomes.add(outcome)
+        return outcome.case
+    }
+
+    Case deleteCase(String caseId) {
+        DeleteCaseEventOutcome outcome = workflowService.deleteCase(new DeleteCaseParams(caseId))
+        this.outcomes.add(outcome)
+        return outcome.case
+    }
+
     Task assignTask(String transitionId, Case aCase = useCase, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        LoggedUser loggedUser = user instanceof LoggedUser ? (LoggedUser) user : ActorTransformer.toLoggedUser(user)
-        AssignTaskEventOutcome outcome = taskService.assignTask(loggedUser, taskId, params)
+        LoggedUser loggedUser = author instanceof LoggedUser ? (LoggedUser) author : ActorTransformer.toLoggedUser(author)
+        AssignTaskEventOutcome outcome = taskService.assignTask(TaskParams.with()
+                .taskId(taskId)
+                .user(loggedUser)
+                .params(params)
+                .build())
         this.outcomes.add(outcome)
         return outcome.getTask()
     }
 
     Task assignTask(Task task, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        return addTaskOutcomeAndReturnTask(taskService.assignTask(task, user, params))
+        return addTaskOutcomeAndReturnTask(taskService.assignTask(TaskParams.with()
+                .task(task)
+                .user(user)
+                .params(params)
+                .build()))
     }
 
     void assignTasks(List<Task> tasks, AbstractUser assignee = userService.loggedOrSystem, Map<String, String> params = [:]) {
@@ -967,12 +1035,20 @@ class ActionDelegate {
 
     Task cancelTask(String transitionId, Case aCase = useCase, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        LoggedUser loggedUser = user instanceof LoggedUser ? (LoggedUser) user : ActorTransformer.toLoggedUser(user)
-        return addTaskOutcomeAndReturnTask(taskService.cancelTask(loggedUser, taskId, params))
+        LoggedUser loggedUser = author instanceof LoggedUser ? (LoggedUser) author : ActorTransformer.toLoggedUser(author)
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(TaskParams.with()
+                .taskId(taskId)
+                .user(loggedUser)
+                .params(params)
+                .build()))
     }
 
     Task cancelTask(Task task, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, user, params))
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(TaskParams.with()
+                .task(task)
+                .user(user)
+                .params(params)
+                .build()))
     }
 
     void cancelTasks(List<Task> tasks, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
@@ -987,11 +1063,19 @@ class ActionDelegate {
     void finishTask(String transitionId, Case aCase = useCase, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
         LoggedUser loggedUser = user instanceof LoggedUser ? (LoggedUser) user : ActorTransformer.toLoggedUser(user)
-        addTaskOutcomeAndReturnTask(taskService.finishTask(loggedUser, taskId, params))
+        addTaskOutcomeAndReturnTask(taskService.finishTask(TaskParams.with()
+                .taskId(taskId)
+                .user(loggedUser)
+                .params(params)
+                .build()))
     }
 
     void finishTask(Task task, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        addTaskOutcomeAndReturnTask(taskService.finishTask(task, user, params))
+        addTaskOutcomeAndReturnTask(taskService.finishTask(TaskParams.with()
+                .task(task)
+                .user(user)
+                .params(params)
+                .build()))
     }
 
     void finishTasks(List<Task> tasks, AbstractUser finisher = userService.loggedOrSystem, Map<String, String> params = [:]) {
@@ -1083,6 +1167,7 @@ class ActionDelegate {
         return addSetDataOutcomeToOutcomes(dataService.setData(taskId, ImportHelper.populateDataset(dataSet), params))
     }
 
+    // todo: remove all deprecated
     @Deprecated
     SetDataEventOutcome setDataWithPropagation(String transitionId, Case caze, Map dataSet) {
         Task task = taskService.findOne(caze.tasks.find { it.transition == transitionId }.task)
@@ -1125,8 +1210,7 @@ class ActionDelegate {
 
     Map<String, Field> getData(String taskId, Map<String, String> params = [:]) {
         Task task = taskService.findById(taskId)
-        def useCase = workflowService.findOne(task.caseId)
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, params)))
+        return getData(task, params)
     }
 
     Map<String, Field> getData(Transition transition, Map<String, String> params = [:]) {
@@ -1375,8 +1459,10 @@ class ActionDelegate {
 
     void deleteUser(String email) {
         AbstractUser user = userService.findByEmail(email, null)
-        if (user == null)
+        if (user == null) {
             log.error("Cannot find user with email [" + email + "]")
+            return
+        }
         deleteUser(user)
     }
 
@@ -1394,12 +1480,12 @@ class ActionDelegate {
     }
 
     AbstractUser findUserByEmail(String email) {
-        AbstractUser user = userService.findUserByUsername(email, null)
-        if (user == null) {
+        Optional<AbstractUser> userOpt = userService.findUserByUsername(email, null)
+        if (userOpt.isEmpty()) {
             log.error("Cannot find user with email [" + email + "]")
             return null
         } else {
-            return user
+            return userOpt.get()
         }
     }
 
@@ -1719,7 +1805,7 @@ class ActionDelegate {
      * @return
      */
     def deleteFilter(Case filter) {
-        workflowService.deleteCase(filter.stringId)
+        workflowService.deleteCase(new DeleteCaseParams(filter.stringId))
     }
 
     /**
@@ -1957,7 +2043,7 @@ class ActionDelegate {
      */
     def deleteMenuItem(Case item) {
         async.run {
-            workflowService.deleteCase(item.stringId)
+            workflowService.deleteCase(new DeleteCaseParams(item.stringId))
         }
     }
 
@@ -2750,12 +2836,12 @@ class ActionDelegate {
 
         options.putAll(splitPathList.collectEntries { [(it): new I18nString(it)] })
 
-        Case caseByPath = findCaseElastic("processIdentifier:$FilterRunner.MENU_NET_IDENTIFIER AND dataSet.nodePath.textValue.keyword:\"$path\"")
+        Case caseByPath = findCaseElastic("processIdentifier:$MenuProcessRunner.MENU_NET_IDENTIFIER AND dataSet.nodePath.textValue.keyword:\"$path\"")
         Set<String> childrenIds = caseByPath.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value as Set
         if (!childrenIds.isEmpty()) {
             for (String id : childrenIds) {
                 Case childFolderCase = workflowService.findOne(id)
-                options.put(childFolderCase.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS.value].value as String, new I18nString(childFolderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_NAME.value].value as String))
+                options.put(childFolderCase.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS.value].value as String, new I18nString(childFolderCase.dataSet[MenuItemConstants.FIELD_NODE_NAME.value].value as String))
             }
         }
 

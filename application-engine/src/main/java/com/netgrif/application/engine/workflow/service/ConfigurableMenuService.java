@@ -35,9 +35,6 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     private IPetriNetService petriNetService;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private StringToVersionConverter converter;
 
     @Autowired

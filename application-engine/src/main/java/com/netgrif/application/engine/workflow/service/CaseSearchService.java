@@ -6,6 +6,7 @@ import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorFieldValue;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
@@ -94,12 +95,11 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 return null;
             }
         }
-
         LoggedUser impersonationUser = user.getSelfOrImpersonated();
         BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(impersonationUser));
         permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(impersonationUser));
-        permissionConstraints.or(buildViewUserQueryConstraint(impersonationUser));
-        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(impersonationUser));
+        permissionConstraints.or(buildViewActorQueryConstraint(impersonationUser));
+        permissionConstraints.andNot(buildNegativeViewActorsQueryConstraint(impersonationUser));
         builder.and(permissionConstraints);
         BooleanExpression impersonatedProcessesConstraints = buildImpersonatedProcessesConstraint(user);
         if (impersonatedProcessesConstraints != null) {
@@ -114,16 +114,16 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     public Predicate viewRoleQuery(String role) {
-        return QCase.case$.viewUserRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewRoles.contains(role));
+        return QCase.case$.viewActorRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewRoles.contains(role));
     }
 
-    protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
-        Predicate roleConstraints = viewUserQuery(user.getStringId());
-        return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
+    protected Predicate buildViewActorQueryConstraint(LoggedUser user) {
+        List<Predicate> userConstraints = getActorIdsOfUser(user).stream().map(this::viewActorQuery).toList();
+        return constructPredicateTree(userConstraints, BooleanBuilder::or);
     }
 
-    public Predicate viewUserQuery(String userId) {
-        return QCase.case$.viewUserRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewUsers.contains(userId));
+    public Predicate viewActorQuery(String actorId) {
+        return QCase.case$.viewActorRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewActors.contains(actorId));
     }
 
     protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {
@@ -135,13 +135,13 @@ public class CaseSearchService extends MongoSearchService<Case> {
         return QCase.case$.negativeViewRoles.contains(role);
     }
 
-    protected Predicate buildNegativeViewUsersQueryConstraint(LoggedUser user) {
-        Predicate roleConstraints = negativeViewUserQuery(user.getStringId());
-        return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
+    protected Predicate buildNegativeViewActorsQueryConstraint(LoggedUser user) {
+        List<Predicate> userConstraints = getActorIdsOfUser(user).stream().map(this::negativeViewActorQuery).toList();
+        return constructPredicateTree(userConstraints, BooleanBuilder::or);
     }
 
-    public Predicate negativeViewUserQuery(String userId) {
-        return QCase.case$.negativeViewUsers.contains(userId);
+    public Predicate negativeViewActorQuery(String actorId) {
+        return QCase.case$.negativeViewActors.contains(actorId);
     }
 
     public Predicate petriNet(Object query, LoggedUser user, Locale locale) {
@@ -247,15 +247,15 @@ public class CaseSearchService extends MongoSearchService<Case> {
                     FieldType type = FieldType.fromString(entry.getKey());
 
                     switch (type) {
-                        case USER:
-                            Path valuePath = Expressions.simplePath(UserFieldValue.class, QCase.case$.dataSet.get((String) k), "value");
+                        case ACTOR:
+                            Path valuePath = Expressions.simplePath(ActorFieldValue.class, QCase.case$.dataSet.get((String) k), "value");
                             Path idPath = Expressions.stringPath(valuePath, "id");
                             Expression<Long> constant = Expressions.constant(Long.valueOf("" + fieldValue));
                             predicates.add(Expressions.predicate(Ops.EQ, idPath, constant));
                             break;
                     }
                 } catch (IllegalArgumentException e) {
-                    log.error("Unrecognized Field type " + entry.getKey());
+                    log.error("Unrecognized Field type {}", entry.getKey());
                 }
             } else {
                 predicates.add(QCase.case$.dataSet.get((String) k).value.eq(v));
@@ -374,7 +374,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     private static BooleanExpression caseIdString(String caseId) {
-        return caseId.equals("") ? QCase.case$._id.isNull() : QCase.case$._id.eq(new ProcessResourceId(caseId));
+        return caseId.isEmpty() ? QCase.case$._id.isNull() : QCase.case$._id.eq(new ProcessResourceId(caseId));
     }
 
     public Predicate group(Object query, LoggedUser user, Locale locale) {
@@ -385,7 +385,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
             processQuery.setGroup(new ArrayList<>(Arrays.asList((String) query)));
         }
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
-        if (groupProcesses.size() == 0)
+        if (groupProcesses.isEmpty())
             return null;
 
         List<Predicate> processQueries = groupProcesses.stream().map(PetriNetReference::getIdentifier).map(QCase.case$.processIdentifier::eq).collect(Collectors.toList());

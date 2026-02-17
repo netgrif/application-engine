@@ -11,6 +11,8 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.case
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.params.DeleteCaseParams;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -84,7 +86,13 @@ public class WorkflowController {
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            CreateCaseEventOutcome outcome = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
+            CreateCaseEventOutcome outcome = workflowService.createCase(CreateCaseParams.with()
+                    .processId(body.netId)
+                    .title(body.title)
+                    .color(body.color)
+                    .author(loggedUser)
+                    .locale(locale)
+                    .build());
             return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getCase().getStringId() + " was created succesfully",
                     LocalisedEventOutcomeFactory.from(outcome, locale));
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
@@ -180,13 +188,13 @@ public class WorkflowController {
     })
     public MessageResource reloadTasks(@PathVariable("id") String caseId) {
         try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8);
             Case aCase = workflowService.findOne(caseId);
-            taskService.reloadTasks(aCase);
+            taskService.reloadTasks(aCase, false);
 
             return MessageResource.successMessage("Task reloaded in case [" + caseId + "]");
         } catch (Exception e) {
-            log.error("Reloading tasks of case [" + caseId + "] failed:", e);
+            log.error("Reloading tasks of case [{}] failed:", caseId, e);
             return MessageResource.errorMessage("Reloading tasks in case " + caseId + " has failed!");
         }
     }
@@ -210,17 +218,19 @@ public class WorkflowController {
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
         try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8);
             DeleteCaseEventOutcome outcome;
             if (deleteSubtree) {
                 outcome = workflowService.deleteSubtreeRootedAt(caseId);
             } else {
-                outcome = workflowService.deleteCase(caseId);
+                outcome = workflowService.deleteCase(DeleteCaseParams.with()
+                        .useCaseId(caseId)
+                        .build());
             }
             return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted",
                     LocalisedEventOutcomeFactory.from(outcome, LocaleContextHolder.getLocale()));
-        } catch (UnsupportedEncodingException e) {
-            log.error("Deleting case [" + caseId + "] failed:", e);
+        } catch (Exception e) {
+            log.error("Deleting case [{}] failed:", caseId, e);
             return EventOutcomeWithMessageResource.errorMessage("Deleting case " + caseId + " has failed!");
         }
     }

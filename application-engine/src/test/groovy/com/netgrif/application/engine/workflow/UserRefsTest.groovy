@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.objects.workflow.domain.Case
@@ -55,7 +56,11 @@ class UserRefsTest {
     @BeforeEach
     void before() {
         helper.truncateDbs()
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/userrefs_test.xml"), VersionType.MAJOR, ActorTransformer.toLoggedUser(userService.getLoggedOrSystem())).getNet()
+        def net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/userrefs_test.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+                .build()).getNet()
         assert net
         netId = net.getStringId()
         def userEmails = ["super@netgrif.com", "engine@netgrif.com"]
@@ -68,7 +73,7 @@ class UserRefsTest {
             _case = dataService.setData(taskId, ImportHelper.populateDataset([
                     "user_list_1": [
                             "value": [id],
-                            "type": "userList"
+                            "type": "actorList"
                     ]
             ] as Map)).getCase()
             newCases.add(workflowService.save(_case))
@@ -78,7 +83,7 @@ class UserRefsTest {
 
     @Test
     void testCases() {
-        newCases.eachWithIndex { Case entry, int i -> assert entry.users.get(userIds.get(i)) != null }
+        newCases.eachWithIndex { Case entry, int i -> assert entry.actors.get(userIds.get(i)) != null }
     }
 
 

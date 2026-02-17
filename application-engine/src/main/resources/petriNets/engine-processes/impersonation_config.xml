@@ -77,13 +77,13 @@
 			<view>true</view>
 		</caseLogic>
 	</roleRef>
-	<userRef>
+	<actorRef>
 		<id>config_owner</id>
 		<caseLogic>
 			<delete>true</delete>
 			<view>true</view>
 		</caseLogic>
-	</userRef>
+	</actorRef>
 	<caseEvents>
 		<event type="create">
 			<id>create</id>
@@ -93,11 +93,11 @@
                     impersonated: f.impersonated,
                     config_owner: f.config_owner;
 
-					def user = userService.loggedOrSystem
-					change impersonated value { new com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue(user.stringId, user.firstName, user.lastName, user.username) }
-					change impersonated_email value { user.username }
+				def user = userService.loggedOrSystem
+				change impersonated value { new com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue(user.stringId, user.firstName, user.lastName, user.username) }
+				change impersonated_email value { user.username }
 
-					change config_owner value { new com.netgrif.application.engine.objects.petrinet.domain.dataset.UserListFieldValue([impersonated.value]) }
+				change config_owner value { new com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorListFieldValue([impersonated.value]) }
 				</action>
 
 				<action>
@@ -147,7 +147,7 @@
 			</actions>
 		</event>
 	</data>
-	<data type="userList">
+	<data type="actorList">
 		<id>config_owner</id>
 		<title/>
 	</data>
@@ -193,7 +193,7 @@
 			</actions>
 		</event>
 	</data>
-	<data type="user" immediate="true">
+	<data type="actor" immediate="true">
 		<id>impersonated</id>
 		<title name="impersonated">User to impersonate</title>
 		<event type="set">
@@ -363,7 +363,7 @@
 				<perform>true</perform>
 			</logic>
 		</roleRef>
-		<userRef>
+		<actorRef>
 			<id>config_owner</id>
 			<logic>
 				<view>true</view>
@@ -372,7 +372,7 @@
 				<delegate>true</delegate>
 				<perform>true</perform>
 			</logic>
-		</userRef>
+		</actorRef>
 		<dataGroup>
 			<id>t2_0</id>
 			<cols>4</cols>
@@ -546,7 +546,7 @@
 				<perform>true</perform>
 			</logic>
 		</roleRef>
-		<userRef>
+		<actorRef>
 			<id>config_owner</id>
 			<logic>
 				<view>true</view>
@@ -555,7 +555,7 @@
 				<delegate>true</delegate>
 				<perform>true</perform>
 			</logic>
-		</userRef>
+		</actorRef>
 
 		<event type="assign">
 			<id>assign</id>
@@ -602,7 +602,7 @@
 				<perform>true</perform>
 			</logic>
 		</roleRef>
-		<userRef>
+		<actorRef>
 			<id>config_owner</id>
 			<logic>
 				<view>true</view>
@@ -611,7 +611,7 @@
 				<delegate>true</delegate>
 				<perform>true</perform>
 			</logic>
-		</userRef>
+		</actorRef>
 
 		<dataGroup>
 			<id>t4_0</id>

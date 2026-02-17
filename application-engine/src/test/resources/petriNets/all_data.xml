@@ -176,17 +176,17 @@
         <title>File List</title>
     </data>
 
-    <data type="user" immediate="true">
+    <data type="actor" immediate="true">
         <id>user</id>
         <title>User</title>
     </data>
 
-    <data type="userList">
+    <data type="actorList">
         <id>userList1</id>
         <title>UserList</title>
     </data>
 
-    <data type="userList">
+    <data type="actorList">
         <id>userList2</id>
         <title>UserList</title>
     </data>

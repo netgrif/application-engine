@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRolePermission;
@@ -10,8 +11,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class WorkflowAuthorizationService extends AbstractAuthorizationService implements IWorkflowAuthorizationService {
@@ -24,18 +24,35 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
 
     @Override
     public boolean canCallDelete(LoggedUser user, String caseId) {
+        if (user.isAdmin()) {
+            return true;
+        }
         Case requestedCase = workflowService.findOne(caseId);
-        Boolean rolePerm = userHasAtLeastOneRolePermission(user.getSelfOrImpersonated(), requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
-        Boolean userPerm = userHasUserListPermission(user.getSelfOrImpersonated(), requestedCase, ProcessRolePermission.DELETE);
-        boolean processPerm = user.hasProcessAccess(requestedCase.getProcessIdentifier());
-        return user.isAdmin() || (processPerm && (userPerm == null ? (rolePerm != null && rolePerm) : userPerm));
+        Boolean processPerm = user.hasProcessAccess(requestedCase.getProcessIdentifier());
+        if (!processPerm) {
+            return false;
+        }
+        Boolean userPerm = userHasUserListPermission(user, requestedCase, ProcessRolePermission.DELETE);
+        if (userPerm != null) {
+            return userPerm;
+        }
+
+        Boolean rolePerm = userHasAtLeastOneRolePermission(user, requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
+        return rolePerm != null && rolePerm;
     }
 
     @Override
     public boolean canCallCreate(LoggedUser user, String netId) {
+        if (user.isAdmin()) {
+            return true;
+        }
+        Boolean processPerm = user.hasProcessAccess(net.getIdentifier());
+        if (!processPerm) {
+            return false;
+        }
+
         PetriNet net = petriNetService.getPetriNet(netId);
-        boolean processPerm = user.hasProcessAccess(net.getIdentifier());
-        return user.isAdmin() || (processPerm && userHasAtLeastOneRolePermission(user, net, ProcessRolePermission.CREATE));
+        return userHasAtLeastOneRolePermission(user, net, ProcessRolePermission.CREATE);
     }
 
     @Override
@@ -48,19 +65,20 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
             }
         }
 
-        return Arrays.stream(permissions).anyMatch(permission -> hasPermission(aggregatePermissions.get(permission.toString())));
+        return Arrays.stream(permissions)
+                .anyMatch(permission -> hasPermission(aggregatePermissions.get(permission.toString())));
     }
 
     @Override
     public Boolean userHasUserListPermission(LoggedUser user, Case useCase, ProcessRolePermission... permissions) {
-        if (useCase.getUserRefs() == null || useCase.getUserRefs().isEmpty())
-            return null;
-
-        if (!useCase.getUsers().containsKey(user.getSelfOrImpersonatedStringId())) {
+        if (useCase.getActorRefs() == null || useCase.getActorRefs().isEmpty()) {
             return null;
         }
 
-        Map<String, Boolean> userPermissions = useCase.getUsers().get(user.getSelfOrImpersonatedStringId());
+        Map<String, Boolean> userPermissions = findUserPermissions(useCase, user);
+        if (userPermissions == null) {
+            return null;
+        }
 
         for (ProcessRolePermission permission : permissions) {
             Boolean perm = userPermissions.get(permission.toString());
@@ -68,6 +86,11 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
                 return false;
             }
         }
-        return Arrays.stream(permissions).anyMatch(permission -> hasPermission(userPermissions.get(permission.toString())));
+        return Arrays.stream(permissions)
+                .anyMatch(permission -> hasPermission(userPermissions.get(permission.toString())));
+    }
+
+    private Map<String, Boolean> findUserPermissions(Case useCase, AbstractUser user) {
+        return findUserPermissions(useCase.getActors(), user);
     }
 }

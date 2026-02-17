@@ -1,9 +1,10 @@
 package com.netgrif.application.engine.objects.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netgrif.application.engine.objects.annotations.Indexable;
+import com.netgrif.application.engine.objects.annotations.EnsureCollection;
 import com.netgrif.application.engine.objects.annotations.Indexed;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorRef;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
@@ -23,9 +24,10 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @QueryEntity
-@Indexable
+@EnsureCollection
 @AllArgsConstructor
 public abstract class Task implements Serializable {
 
@@ -73,12 +75,10 @@ public abstract class Task implements Serializable {
     @Setter
     private Integer priority;
 
+    @Getter
     @Setter
     @Indexed
-    private String userId;
-
-    @Setter
-    private String userRealmId;
+    private ActorRef assignee;
 
     @Getter
     @Setter
@@ -101,26 +101,26 @@ public abstract class Task implements Serializable {
 
     @Getter
     @Setter
-    private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
+    private Map<String, Map<String, Boolean>> actorRefs = new HashMap<>();
 
     @Getter
     @Setter
-    private Map<String, Map<String, Boolean>> users = new HashMap<>();
+    private Map<String, Map<String, Boolean>> actors = new HashMap<>();
 
     @Setter
     private List<String> viewRoles = new LinkedList<>();
 
     @Setter
-    private List<String> viewUserRefs = new LinkedList<>();
+    private List<String> viewActorRefs = new LinkedList<>();
 
     @Setter
-    private List<String> viewUsers = new LinkedList<>();
+    private List<String> viewActors = new LinkedList<>();
 
     @Setter
     private List<String> negativeViewRoles = new LinkedList<>();
 
     @Setter
-    private List<String> negativeViewUsers = new LinkedList<>();
+    private List<String> negativeViewActors = new LinkedList<>();
 
     @Getter
     @Setter
@@ -219,18 +219,18 @@ public abstract class Task implements Serializable {
         return viewRoles;
     }
 
-    public List<String> getViewUserRefs() {
-        if (viewUserRefs == null) {
-            viewUserRefs = new LinkedList<>();
+    public List<String> getViewActorRefs() {
+        if (viewActorRefs == null) {
+            viewActorRefs = new LinkedList<>();
         }
-        return viewUserRefs;
+        return viewActorRefs;
     }
 
-    public List<String> getViewUsers() {
-        if (viewUsers == null) {
-            viewUsers = new LinkedList<>();
+    public List<String> getViewActors() {
+        if (viewActors == null) {
+            viewActors = new LinkedList<>();
         }
-        return viewUsers;
+        return viewActors;
     }
 
     public List<String> getNegativeViewRoles() {
@@ -240,11 +240,11 @@ public abstract class Task implements Serializable {
         return negativeViewRoles;
     }
 
-    public List<String> getNegativeViewUsers() {
-        if (negativeViewUsers == null) {
-            negativeViewUsers = new LinkedList<>();
+    public List<String> getNegativeViewActors() {
+        if (negativeViewActors == null) {
+            negativeViewActors = new LinkedList<>();
         }
-        return negativeViewUsers;
+        return negativeViewActors;
     }
 
     public void addRole(String roleId, Map<String, Boolean> permissions) {
@@ -258,16 +258,16 @@ public abstract class Task implements Serializable {
         negativeViewRoles.add(roleId);
     }
 
-    public void addUserRef(String userRefId, Map<String, Boolean> permissions) {
-        userRefs.put(userRefId, permissions);
+    public void addActorRef(String actorFieldId, Map<String, Boolean> permissions) {
+        actorRefs.put(actorFieldId, permissions);
     }
 
-    public void addUsers(Set<String> userIds, Map<String, Boolean> permissions) {
-        userIds.forEach(userId -> {
-            if (users.containsKey(userId) && users.get(userId) != null) {
-                compareExistingUserPermissions(userId, new HashMap<>(permissions));
+    public void addActors(Set<String> actorIds, Map<String, Boolean> permissions) {
+        actorIds.forEach(actorId -> {
+            if (actors.containsKey(actorId) && actors.get(actorId) != null) {
+                compareExistingActorPermissions(actorId, new HashMap<>(permissions));
             } else {
-                users.put(userId, new HashMap<>(permissions));
+                actors.put(actorId, new HashMap<>(permissions));
             }
         });
     }
@@ -293,12 +293,12 @@ public abstract class Task implements Serializable {
 
     @JsonIgnore
     public String getUserId() {
-        return userId;
+        return assignee != null ? assignee.getId() : null;
     }
 
     @JsonIgnore
     public String getUserRealmId() {
-        return userRealmId;
+        return assignee != null ? assignee.getRealmId() : null;
     }
 
     public String getTranslatedEventTitle(EventType assign, Locale locale) {
@@ -317,30 +317,39 @@ public abstract class Task implements Serializable {
         });
     }
 
-    public void resolveViewUserRefs() {
-        getViewUserRefs();
-        this.viewUserRefs.clear();
-        this.userRefs.forEach((userRef, perms) -> {
+    public void resolveViewActorRefs() {
+        getViewActorRefs();
+        this.viewActorRefs.clear();
+        this.actorRefs.forEach((actorRef, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
-                viewUserRefs.add(userRef);
+                viewActorRefs.add(actorRef);
             }
         });
     }
 
-    public void resolveViewUsers() {
-        getViewUsers();
-        this.viewUsers.clear();
-        this.users.forEach((role, perms) -> {
+    /**
+     * Initializes {@link #viewUsers} collection. Any user defined in {@link #users} with permission {@link RolePermission#VIEW}
+     * of true value is added to the {@link #viewUsers} collection.
+     *
+     * @return true if the {@link #viewUsers} was modified, false otherwise
+     */
+    public boolean resolveViewActors() {
+        getViewActors();
+        AtomicBoolean isModified = new AtomicBoolean(!this.viewActors.isEmpty());
+        this.viewActors.clear();
+        this.actors.forEach((actorId, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
-                viewUsers.add(role);
+                isModified.set(viewActors.add(actorId));
             }
         });
+        return isModified.get();
     }
 
-    private void compareExistingUserPermissions(String userId, Map<String, Boolean> permissions) {
-        permissions.forEach((id, perm) -> {
-            if ((users.containsKey(userId) && !users.get(userId).containsKey(id)) || (users.containsKey(userId) && users.get(userId).containsKey(id) && users.get(userId).get(id))) {
-                users.get(userId).put(id, perm);
+    private void compareExistingActorPermissions(String actorId, Map<String, Boolean> permissions) {
+        permissions.forEach((permType, permValue) -> {
+            if ((actors.containsKey(actorId) && !actors.get(actorId).containsKey(permType))
+                    || (actors.containsKey(actorId) && actors.get(actorId).containsKey(permType) && actors.get(actorId).get(permType))) {
+                actors.get(actorId).put(permType, permValue);
             }
         });
     }

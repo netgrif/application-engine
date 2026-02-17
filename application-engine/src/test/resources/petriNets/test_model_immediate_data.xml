@@ -96,7 +96,7 @@
         <values>Value 3</values>
         <init>Value 3</init>
     </data>
-    <data type="user" immediate="true">
+    <data type="actor" immediate="true">
         <id>user_field</id>
         <title>User</title>
         <values>tester</values>
