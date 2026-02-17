@@ -26,11 +26,14 @@ public interface RealmRepository extends MongoRepository<Realm, String> {
 
     Optional<Realm> findByDefaultRealmTrue();
 
-    @Query(value = "{}", fields = "{ 'id': 1, 'name': 1, 'defaultRealm': 1, 'adminRealm': 1 }")
+    @Query(value = "{}", fields = "{ 'id': 1, 'name': 1, 'defaultRealm': 1, 'adminRealm': 1, 'tenantId': 1 }")
     Page<Realm> findAllSmall(Pageable pageable);
 
     @Query("{ 'adminRealm': true }")
     Optional<Realm> findAdminRealm();
+
+    @Query("{ 'defaultRealm': true, 'tenantId': ?0 }")
+    Optional<Realm> findByDefaultRealmTrueAndTenantId(String tenantId);
 
     default Page<Realm> searchRealms(RealmSearch realmSerach, Pageable pageable, MongoTemplate mongoTemplate) {
         Criteria searchCriteria = new Criteria();

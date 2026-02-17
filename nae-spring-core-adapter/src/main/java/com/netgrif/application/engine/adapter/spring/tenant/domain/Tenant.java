@@ -13,10 +13,6 @@ public class Tenant extends com.netgrif.application.engine.objects.tenant.Tenant
         super(id, tenantCode);
     }
 
-    public Tenant(String id, String tenantCode, List<String> workspaces, List<String> realms) {
-        super(id, tenantCode, workspaces, realms);
-    }
-
     @Id
     @Override
     public String getId() {

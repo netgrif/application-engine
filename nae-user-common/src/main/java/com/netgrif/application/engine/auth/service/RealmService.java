@@ -21,7 +21,10 @@ public interface RealmService {
 
     void disableAnonymUser(Realm realm);
 
+    @Deprecated(forRemoval = true)
     Optional<Realm> getDefaultRealm();
+
+    Optional<Realm> getDefaultRealm(String tenantId);
 
     Optional<Realm> getAdminRealm();
 

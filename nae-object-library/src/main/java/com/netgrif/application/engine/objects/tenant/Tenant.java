@@ -3,6 +3,7 @@ package com.netgrif.application.engine.objects.tenant;
 
 import com.netgrif.application.engine.objects.annotations.Indexed;
 import com.netgrif.application.engine.objects.auth.domain.ActorRef;
+import jdk.jfr.Unsigned;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,13 +38,6 @@ public abstract class Tenant implements Serializable {
     public Tenant(String id, String tenantCode) {
         this.id = id;
         this.tenantCode = tenantCode;
-    }
-
-    public Tenant(String id, String tenantCode, List<String> workspaces, List<String> realms) {
-        this.id = id;
-        this.tenantCode = tenantCode;
-        this.workspaces = workspaces;
-        this.realms = realms;
     }
 
     public String getOwnerRealmId() {

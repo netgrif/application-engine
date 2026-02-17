@@ -26,7 +26,12 @@ public abstract class Realm implements Serializable {
     private static final long serialVersionUID = -162168235241317688L;
 
     /**
-     * Indicates whether this realm is the default realm in the system.
+     * Tenant identifier. Realm can belong to only one tenant.
+     */
+    private String tenantId;
+
+    /**
+     * Indicates whether this realm is the default realm per Tenant.
      * Only one realm can be set as default.
      */
     @NotNull

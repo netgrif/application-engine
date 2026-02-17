@@ -1,8 +1,10 @@
 package com.netgrif.application.engine.auth.provider;
 
+import com.netgrif.application.engine.adapter.spring.tenant.service.TenantService;
 import com.netgrif.application.engine.adapter.spring.utils.PageableUtils;
 import com.netgrif.application.engine.auth.service.RealmService;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
+import com.netgrif.application.engine.objects.tenant.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 public class CollectionNameProvider {
 
     private RealmService realmService;
+    private TenantService tenantService;
 
     private static final String USER_MONGO_COLLECTION_PREFIX = "users_";
     private static final String NULL = "null";
@@ -25,9 +28,18 @@ public class CollectionNameProvider {
         this.realmService = realmService;
     }
 
+    @Autowired
+    public void setTenantService(TenantService tenantService) {
+        this.tenantService = tenantService;
+    }
+
     public String getCollectionNameForRealm(String realmId) {
         if (realmId == null || realmId.isEmpty() || realmId.equals(NULL)) {
-            return getDefaultRealmCollection();
+            Optional<Tenant> tenantOptional = tenantService.getByRealm(realmId);
+            if (tenantOptional.isEmpty()) {
+                throw new MissingResourceException("Tenant is not specified.", Tenant.class.getName(), "tenant");
+            }
+            return getDefaultRealmCollection(tenantOptional.get().getId());
         }
         return USER_MONGO_COLLECTION_PREFIX + realmId;
     }
@@ -51,8 +63,8 @@ public class CollectionNameProvider {
         return realmService.getAllRealm(PageableUtils.fullPageRequest()).getContent().stream().map(realm -> USER_MONGO_COLLECTION_PREFIX + realm.getName()).collect(Collectors.toSet());
     }
 
-    public String getDefaultRealmCollection() {
-        Optional<Realm> defaultRealmOptional = realmService.getDefaultRealm();
+    public String getDefaultRealmCollection(String tenantId) {
+        Optional<Realm> defaultRealmOptional = realmService.getDefaultRealm(tenantId);
         if (defaultRealmOptional.isEmpty()) {
             throw new MissingResourceException("Default realm is not specified.", Realm.class.getName(), "defaultRealm");
         }

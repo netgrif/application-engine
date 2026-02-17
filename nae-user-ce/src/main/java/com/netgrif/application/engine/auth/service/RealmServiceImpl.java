@@ -3,6 +3,8 @@ package com.netgrif.application.engine.auth.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netgrif.application.engine.adapter.spring.configuration.AbstractMongoCollectionConfigurator;
+import com.netgrif.application.engine.adapter.spring.tenant.domain.AdminTenant;
+import com.netgrif.application.engine.adapter.spring.tenant.service.TenantService;
 import com.netgrif.application.engine.auth.provider.AbstractAuthConfig;
 import com.netgrif.application.engine.auth.provider.AuthMethodProvider;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
@@ -44,6 +46,12 @@ public class RealmServiceImpl implements RealmService {
     @Autowired
     private AnonymousUserRefService anonymousUserRefService;
 
+    @Autowired
+    private TenantService tenantService;
+
+    @Autowired
+    private AdminTenant adminTenant;
+
     private AbstractMongoCollectionConfigurator mongoCollectionConfigurator;
 
     private CollectionNameProvider collectionNameProvider;
@@ -68,11 +76,14 @@ public class RealmServiceImpl implements RealmService {
         realm.setDescription(createRequest.getDescription());
         realm.setAdminRealm(createRequest.isAdminRealm());
 
-        if (createRequest.isDefaultRealm() && getDefaultRealm().isEmpty()) {
+        if (createRequest.isDefaultRealm() && getDefaultRealm(createRequest.getTenantId()).isEmpty()) {
             realm.setDefaultRealm(true);
         }
 
         realm = realmRepository.save(realm);
+
+        tenantService.addRealm(realm.getTenantId(), realm.getName());
+
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realm.getName());
 
         if (!mongoTemplate.collectionExists(collectionName)) {
@@ -110,7 +121,12 @@ public class RealmServiceImpl implements RealmService {
 
     @Override
     public Optional<Realm> getDefaultRealm() {
-        return realmRepository.findByDefaultRealmTrue().map(Realm.class::cast);
+        return realmRepository.findByDefaultRealmTrueAndTenantId(adminTenant.getId()).map(Realm.class::cast);
+    }
+
+    @Override
+    public Optional<Realm> getDefaultRealm(String tenantId) {
+        return realmRepository.findByDefaultRealmTrueAndTenantId(tenantId).map(Realm.class::cast);
     }
 
     @Override
@@ -181,7 +197,7 @@ public class RealmServiceImpl implements RealmService {
         realm.setMaxSessionsAllowed(update.getMaxSessionsAllowed());
 
         if (update.isDefaultRealm()) {
-            if (!realm.isDefaultRealm() && getDefaultRealm().isEmpty()) {
+            if (!realm.isDefaultRealm() && getDefaultRealm(realm.getTenantId()).isEmpty()) {
                 realm.setDefaultRealm(true);
             }
         } else {

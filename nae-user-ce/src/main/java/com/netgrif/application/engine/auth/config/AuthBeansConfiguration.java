@@ -1,6 +1,10 @@
 package com.netgrif.application.engine.auth.config;
 
+import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
+import com.netgrif.application.engine.adapter.spring.tenant.domain.AdminTenant;
+import com.netgrif.application.engine.adapter.spring.tenant.service.TenantService;
 import com.netgrif.application.engine.auth.service.*;
+import com.netgrif.application.engine.objects.auth.domain.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,4 +47,19 @@ public class AuthBeansConfiguration {
     public UserFactory userFactory() {
         return new UserFactoryImpl();
     }
+
+    @Bean
+    @ConditionalOnMissingBean(TenantService.class)
+    public TenantService tenantService() { return new TenantServiceImpl();}
+
+    @Bean
+    @ConditionalOnMissingBean(AdminTenant.class)
+    public AdminTenant adminTenant(UserService userService) {
+        AbstractUser system = userService.getSystem();
+        AdminTenant at = new AdminTenant();
+        ActorRef ownerRef = ActorTransformer.toActorRef(system);
+        at.setOwner(ownerRef);
+        return at;
+    }
+
 }

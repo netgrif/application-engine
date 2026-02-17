@@ -1,8 +1,6 @@
 package com.netgrif.application.engine.adapter.spring.tenant.service;
 
-
 import com.netgrif.application.engine.objects.auth.domain.Realm;
-import com.netgrif.application.engine.objects.importer.model.Option;
 import com.netgrif.application.engine.objects.tenant.Tenant;
 import com.netgrif.application.engine.objects.workspace.Workspace;
 
@@ -14,6 +12,10 @@ public interface TenantService {
     Tenant save(Tenant tenant);
 
     void delete(Tenant tenant);
+
+    void addRealm(String tenantId, String realmId);
+
+    void addWorkspace(String tenantId, String workspaceId);
 
     Optional<Tenant> getByCode(String tenantCode);
 
@@ -36,6 +38,8 @@ public interface TenantService {
     List<Tenant> getSuspendedTenants();
 
     List<Tenant> getDeletedTenants();
+
+    boolean isAdminTenant(Tenant tenant);
 
     boolean exists(String tenantId);
 
