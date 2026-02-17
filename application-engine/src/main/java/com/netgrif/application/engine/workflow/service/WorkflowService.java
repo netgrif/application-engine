@@ -1,38 +1,37 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
-import com.netgrif.application.engine.objects.workflow.domain.Case;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.event.evaluators.Evaluator;
+import com.netgrif.application.engine.event.services.EvaluationService;
+import com.netgrif.application.engine.importer.service.FieldFactory;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.event.events.workflow.CaseEvent;
 import com.netgrif.application.engine.objects.event.events.workflow.CreateCaseEvent;
 import com.netgrif.application.engine.objects.event.events.workflow.DeleteCaseEvent;
-import com.netgrif.application.engine.event.services.EvaluationService;
-import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.TaskField;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserListFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.objects.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-import com.netgrif.application.engine.security.service.EncryptionService;
-import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.objects.workflow.domain.*;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
+import com.netgrif.application.engine.objects.workflow.service.InitValueExpressionEvaluator;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.security.service.EncryptionService;
+import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
-import com.netgrif.application.engine.objects.workflow.service.InitValueExpressionEvaluator;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
@@ -204,6 +203,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale) {
+        if (user.isProcessAccessDeny()) {
+            return Page.empty();
+        }
         Predicate searchPredicate = searchService.buildQuery(request, user, locale);
         Page<Case> page;
         if (searchPredicate != null) {
@@ -218,6 +220,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public long count(Map<String, Object> request, LoggedUser user, Locale locale) {
+        if (user.isProcessAccessDeny()) {
+            return 0;
+        }
         Predicate searchPredicate = searchService.buildQuery(request, user, locale);
         if (searchPredicate != null) {
             return repository.count(searchPredicate);
@@ -320,9 +325,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user, Map<String, String> params) {
-        // TODO: impersonation
-//        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-        LoggedUser loggedOrImpersonated = user;
+        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
         PetriNet petriNet = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet((com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet) petriNetService.get(new ObjectId(netId)));
 //        int rulesExecuted;
         Case useCase = new com.netgrif.application.engine.adapter.spring.workflow.domain.Case(petriNet);

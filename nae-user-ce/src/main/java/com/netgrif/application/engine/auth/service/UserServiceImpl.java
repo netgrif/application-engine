@@ -396,9 +396,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<AbstractUser> searchAllCoMembers(String query, LoggedUser loggedUser, Pageable pageable) {
-//        AbstractUser user = this.findById(loggedUser.getSelfOrImpersonated().getId(), loggedUser.getSelfOrImpersonated().getRealmId());
-        // TODO: impersonation
-        AbstractUser user = this.findById(loggedUser.getStringId(), loggedUser.getRealmId());
+        AbstractUser user = this.findById(loggedUser.getSelfOrImpersonatedStringId(), loggedUser.getRealmId());
         BooleanExpression predicate = buildPredicate(user, query);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(loggedUser.getRealmId());
         Page<User> users = userRepository.findAllByQuery(predicate, pageable, mongoTemplate, collectionName);
@@ -411,9 +409,7 @@ public class UserServiceImpl implements UserService {
             return searchAllCoMembers(query, loggedUser, pageable);
         }
 
-//        AbstractUser user = this.findById(loggedUser.getSelfOrImpersonated().getId(), loggedUser.getSelfOrImpersonated().getRealmId());
-        // TODO: impersonation
-        AbstractUser user = this.findById(loggedUser.getStringId(), loggedUser.getRealmId());
+        AbstractUser user = this.findById(loggedUser.getSelfOrImpersonatedStringId(), loggedUser.getRealmId());
         BooleanExpression predicate = buildPredicate(user, query);
         if (roleIds != null && !roleIds.isEmpty()) {
             predicate = predicate.and(QUser.user.processRoles.any()._id.in(roleIds));
@@ -462,30 +458,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AbstractUser getLoggedOrSystem() {
+    public LoggedUser getLoggedOrSystem() {
         try {
             if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof String) {
-                return getSystem();
+                return ActorTransformer.toLoggedUser(getSystem());
             }
-            return getLoggedUser();
+            return getLoggedUserFromContext();
         } catch (NullPointerException e) {
-            return getSystem();
+            return ActorTransformer.toLoggedUser(getSystem());
         }
-    }
-
-    @Override
-    public AbstractUser getLoggedUser() {
-        LoggedUser loggedUser = getLoggedUserFromContext();
-        Optional<AbstractUser> userOptional = findUserByUsername(loggedUser.getUsername(), loggedUser.getRealmId());
-        AbstractUser user = userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] in realm [%s] is not present in the system.".formatted(loggedUser.getUsername(), loggedUser.getRealmId())));
-        // TODO: impersonation
-//        if (loggedUser.isImpersonating()) {
-//            IUser impersonated = transformToUser((LoggedUserImpl) loggedUser.getImpersonated());
-//            Collection<ProcessResourceId> resourceIds = loggedUser.getImpersonated().getProcessRoles().stream().map(ProcessRole::get_id).toList();
-//            impersonated.setProcessRoles(new HashSet<>(processRoleService.findAllByIds(resourceIds)));
-//            user.setImpersonated(impersonated);
-//        }
-        return user;
     }
 
     @Override
@@ -616,7 +597,7 @@ public class UserServiceImpl implements UserService {
     public Page<User> search(Predicate predicate, Pageable pageable, String realmId) {
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
         return userRepository.findAllByQuery(predicate, pageable, mongoTemplate, collectionName);
-    } 
+    }
 
     protected User initializeNewUser(String username, String email, String firstName, String lastName, String password, String realmId) {
         log.trace("Initializing new user [{}] in realm [{}]", username, realmId);

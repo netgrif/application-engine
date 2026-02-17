@@ -26,6 +26,8 @@ public class Task {
 
     private String transitionId;
 
+    private String processIdentifier;
+
     private TaskLayout layout;
 
     private String title;
@@ -80,6 +82,7 @@ public class Task {
         this._id = task.getObjectId();
         this.caseId = task.getCaseId();
         this.transitionId = task.getTransitionId();
+        this.processIdentifier = task.getProcessIdentifier();
         this.layout = task.getLayout();
         this.title = task.getTitle().getTranslation(locale);
         this.caseColor = task.getCaseColor();
@@ -111,6 +114,7 @@ public class Task {
         _id = new ProcessResourceId(entity.getId());
         caseId = entity.getCaseId();
         transitionId = entity.getTransitionId();
+        processIdentifier = entity.getProcessIdentifier();
         title = entity.getTitle().getDefaultValue();
         caseTitle = entity.getCaseTitle();
         priority = entity.getPriority();

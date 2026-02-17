@@ -144,7 +144,8 @@ public class WorkflowController {
     @Operation(summary = "Get count of the cases", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/count", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CountResponse count(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth, Locale locale) {
-        long count = elasticCaseService.count(searchBody.getList(), (LoggedUser) auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        long count = elasticCaseService.count(searchBody.getList(), loggedUser, locale, operation == MergeFilterOperation.AND);
         return CountResponse.caseCount(count);
     }
 

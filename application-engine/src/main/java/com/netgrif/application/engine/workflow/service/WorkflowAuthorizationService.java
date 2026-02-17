@@ -1,12 +1,10 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRolePermission;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAuthorizationService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,30 +22,24 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
     @Autowired
     private IPetriNetService petriNetService;
 
-    @Autowired
-    private UserService userService;
-
     @Override
     public boolean canCallDelete(LoggedUser user, String caseId) {
         Case requestedCase = workflowService.findOne(caseId);
-        // TODO: impersonation
-//        Boolean rolePerm = userHasAtLeastOneRolePermission(userService.transformToUser((LoggedUserImpl) user.getSelfOrImpersonated()), requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
-//        Boolean userPerm = userHasUserListPermission(userService.transformToUser((LoggedUserImpl) user.getSelfOrImpersonated()), requestedCase, ProcessRolePermission.DELETE);
-//        return user.getSelfOrImpersonated().isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
-        Boolean rolePerm = userHasAtLeastOneRolePermission(userService.transformToUser(user), requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
-        Boolean userPerm = userHasUserListPermission(userService.transformToUser(user), requestedCase, ProcessRolePermission.DELETE);
-        return user.isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
+        Boolean rolePerm = userHasAtLeastOneRolePermission(user.getSelfOrImpersonated(), requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
+        Boolean userPerm = userHasUserListPermission(user.getSelfOrImpersonated(), requestedCase, ProcessRolePermission.DELETE);
+        boolean processPerm = user.hasProcessAccess(requestedCase.getProcessIdentifier());
+        return user.isAdmin() || (processPerm && (userPerm == null ? (rolePerm != null && rolePerm) : userPerm));
     }
 
     @Override
     public boolean canCallCreate(LoggedUser user, String netId) {
         PetriNet net = petriNetService.getPetriNet(netId);
-        // TODO: impersonation
-        return user.isAdmin() || userHasAtLeastOneRolePermission(userService.transformToUser(user), net, ProcessRolePermission.CREATE);
+        boolean processPerm = user.hasProcessAccess(net.getIdentifier());
+        return user.isAdmin() || (processPerm && userHasAtLeastOneRolePermission(user, net, ProcessRolePermission.CREATE));
     }
 
     @Override
-    public Boolean userHasAtLeastOneRolePermission(AbstractUser user, PetriNet net, ProcessRolePermission... permissions) {
+    public Boolean userHasAtLeastOneRolePermission(LoggedUser user, PetriNet net, ProcessRolePermission... permissions) {
         Map<String, Boolean> aggregatePermissions = getAggregatePermissions(user, net.getPermissions());
 
         for (ProcessRolePermission permission : permissions) {
@@ -60,18 +52,15 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
     }
 
     @Override
-    public Boolean userHasUserListPermission(AbstractUser user, Case useCase, ProcessRolePermission... permissions) {
+    public Boolean userHasUserListPermission(LoggedUser user, Case useCase, ProcessRolePermission... permissions) {
         if (useCase.getUserRefs() == null || useCase.getUserRefs().isEmpty())
             return null;
 
-        // TODO: impersonation
-//        if (!useCase.getUsers().containsKey(user.getSelfOrImpersonated().getStringId())) {
-        if (!useCase.getUsers().containsKey(user.getStringId())) {
+        if (!useCase.getUsers().containsKey(user.getSelfOrImpersonatedStringId())) {
             return null;
         }
 
-        // TODO: impersonation
-        Map<String, Boolean> userPermissions = useCase.getUsers().get(user.getStringId());
+        Map<String, Boolean> userPermissions = useCase.getUsers().get(user.getSelfOrImpersonatedStringId());
 
         for (ProcessRolePermission permission : permissions) {
             Boolean perm = userPermissions.get(permission.toString());

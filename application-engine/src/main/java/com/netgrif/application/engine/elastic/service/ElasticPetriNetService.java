@@ -112,10 +112,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
             throw new IllegalArgumentException("Request can not be null!");
         }
         log.debug("Searching for PetriNet query with logged user [{}]", user.getId());
-        // TODO: impersonation
-//        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-        LoggedUser loggedOrImpersonated = user;
-        NativeQuery query = buildQuery(requests, loggedOrImpersonated, pageable, locale, isIntersection);
+        NativeQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
         List<PetriNet> netPage;
         long total;
         if (query != null) {
@@ -161,8 +158,9 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
         BoolQuery.Builder query = new BoolQuery.Builder();
 
         buildFullTextQuery(request, query);
-        boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
-        if (resultAlwaysEmpty) {
+        boolean impersonatedAccessDenied = buildImpersonatedProcessesQuery(user, query);
+        boolean resultAlwaysEmpty = buildGroupQuery(request, user.getSelfOrImpersonated(), locale, query);
+        if (resultAlwaysEmpty || impersonatedAccessDenied) {
             return null;
         }
         return query;
@@ -200,6 +198,30 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
                 .map(netIdentifier -> termQuery("identifier", netIdentifier))
                 .forEach(termQuery -> groupQuery.should(termQuery._toQuery()));
         query.filter(groupQuery.build()._toQuery());
+        return false;
+    }
+
+    protected boolean buildImpersonatedProcessesQuery(LoggedUser loggedUser, BoolQuery.Builder query) {
+        if (loggedUser.isAdmin() || !loggedUser.isImpersonating()) {
+            return false;
+        }
+        if (loggedUser.isProcessAccessDeny()) {
+            return true;
+        }
+        if (loggedUser.getImpersonatedProcesses() == null || loggedUser.getImpersonatedProcesses().isEmpty()) {
+            return false;
+        }
+        BoolQuery.Builder impersonatedProcessesQuery = new BoolQuery.Builder();
+        if (loggedUser.isImpersonatedProcessesListAllowing()) {
+            loggedUser.getImpersonatedProcesses().stream()
+                    .map(processIdentifier -> termQuery("identifier", processIdentifier))
+                    .forEach(termQuery -> impersonatedProcessesQuery.should(termQuery._toQuery()));
+        } else {
+            loggedUser.getImpersonatedProcesses().stream()
+                    .map(processIdentifier -> termQuery("identifier", processIdentifier))
+                    .forEach(termQuery -> impersonatedProcessesQuery.mustNot(termQuery._toQuery()));
+        }
+        query.filter(impersonatedProcessesQuery.build()._toQuery());
         return false;
     }
 }

@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,8 @@ import java.util.Map;
 @ExtendWith(SpringExtension.class)
 class AbstractAuthorizationServiceTest {
 
-    static class MockAuthorizationService extends AbstractAuthorizationService { }
+    static class MockAuthorizationService extends AbstractAuthorizationService {
+    }
 
     @Test
     public void hasPermission() {
@@ -57,7 +59,7 @@ class AbstractAuthorizationServiceTest {
         netPermissions.put(roles.get(2).getStringId(), getInitEntryValue());
 
         // situation 1
-        Map<String, Boolean> aggregatePermission = mockInstance.getAggregatePermissions(user, netPermissions);
+        Map<String, Boolean> aggregatePermission = mockInstance.getAggregatePermissions(ActorTransformer.toLoggedUser(user), netPermissions);
 
         assert aggregatePermission.get("create");
         assert aggregatePermission.get("view");
@@ -66,7 +68,7 @@ class AbstractAuthorizationServiceTest {
         // situation 2
         netPermissions.get(roles.get(0).getStringId()).put("create", false);
         netPermissions.get(roles.get(1).getStringId()).put("delete", false);
-        aggregatePermission = mockInstance.getAggregatePermissions(user, netPermissions);
+        aggregatePermission = mockInstance.getAggregatePermissions(ActorTransformer.toLoggedUser(user), netPermissions);
 
         assert !aggregatePermission.get("create");
         assert aggregatePermission.get("view");

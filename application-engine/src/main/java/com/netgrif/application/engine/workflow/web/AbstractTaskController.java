@@ -107,7 +107,7 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> assign(LoggedUser loggedUser, String taskId, Locale locale) {
         try {
-            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getName(),
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + (loggedUser.isImpersonating() ? loggedUser.getImpersonatedUser().getUsername() : loggedUser.getUsername()),
                     LocalisedEventOutcomeFactory.from(taskService.assignTask(loggedUser, taskId), locale));
         } catch (TransitionNotExecutableException e) {
             log.error("Assigning task [" + taskId + "] failed: ", e);
@@ -155,7 +155,7 @@ public abstract class AbstractTaskController {
     }
 
     public PagedModel<LocalisedTaskResource> getMy(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        Page<Task> page = taskService.findByUser(pageable, userService.transformToUser(((LoggedUserImpl) auth.getPrincipal())));
+        Page<Task> page = taskService.findByUser(pageable, ((LoggedUserImpl) auth.getPrincipal()));
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .getMy(auth, pageable, assembler, locale)).withRel("my");
         PagedModel<LocalisedTaskResource> resources = assembler.toModel(page, new TaskResourceAssembler(locale), selfLink);
@@ -164,7 +164,7 @@ public abstract class AbstractTaskController {
     }
 
     public PagedModel<LocalisedTaskResource> getMyFinished(Pageable pageable, Authentication auth, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        Page<Task> page = taskService.findByUser(pageable, userService.transformToUser(((LoggedUserImpl) auth.getPrincipal())));
+        Page<Task> page = taskService.findByUser(pageable, ((LoggedUserImpl) auth.getPrincipal()));
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .getMyFinished(pageable, auth, assembler, locale)).withRel("finished");
         PagedModel<LocalisedTaskResource> resources = assembler.toModel(page, new TaskResourceAssembler(locale), selfLink);

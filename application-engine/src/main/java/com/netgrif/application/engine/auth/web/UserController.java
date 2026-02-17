@@ -155,9 +155,7 @@ public class UserController {
     @GetMapping(value = "/{realmId}/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, Locale locale) {
         LoggedUser actualUser = userService.getLoggedUserFromContext();
-        // TODO: impersonation
-//        LoggedUser loggedUser = actualUser.getSelfOrImpersonated();
-        LoggedUser loggedUser = actualUser;
+        LoggedUser loggedUser = actualUser.getSelfOrImpersonated();
         if (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)) {
             log.info("User [{}] trying to get another user with ID [{}]", actualUser.getUsername(), userId);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -229,7 +227,7 @@ public class UserController {
         }
     }
 
-//
+    //
 //    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
 //    @Operation(summary = "Assign negative roles to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "X-Auth-Token")})
 //    @PutMapping(value = "/{realmId}/{id}/negativeRole", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

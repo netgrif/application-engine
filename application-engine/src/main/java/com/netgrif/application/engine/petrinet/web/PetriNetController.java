@@ -203,8 +203,12 @@ public class PetriNetController {
     PagedModel<PetriNetReferenceResource> searchElasticPetriNets(@RequestBody PetriNetSearch criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         // TODO: add Merge Filters and its operations
-
-        Page<PetriNetReference> nets = elasticService.search(criteria, user, pageable, locale, false);
+        Page<PetriNetReference> nets;
+        if (user.isProcessAccessDeny()) {
+            nets = Page.empty();
+        } else {
+            nets = elasticService.search(criteria, user, pageable, locale, false);
+        }
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
                 .searchElasticPetriNets(criteria, auth, pageable, assembler, locale)).withRel("search_elastic");
 
