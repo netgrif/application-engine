@@ -3,7 +3,6 @@ package com.netgrif.application.engine.adapter.spring.petrinet.service;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import org.springframework.data.domain.Page;
@@ -19,7 +18,7 @@ public interface ProcessRoleService {
     void delete(String id);
     void deleteAll(Collection<String> ids);
     void deleteAll();
-    void assignRolesToUser(AbstractUser user, Collection<ProcessResourceId> roleIds, LoggedUser loggedUser);
+    void assignRolesToUser(AbstractUser user, Collection<ProcessResourceId> roleIds);
     void assignRolesToGroup(Group group, Collection<ProcessResourceId> requestedRolesIds);
     ProcessRole getDefaultRole();
     ProcessRole getAnonymousRole();
@@ -34,7 +33,7 @@ public interface ProcessRoleService {
     ProcessRole findById(String id);
     List<ProcessRole> findByIds(Collection<String> ids);
     Page<ProcessRole> findAllGlobalRoles(Pageable pageable);
-    void deleteRolesOfNet(PetriNet net, LoggedUser loggedUser);
+    void deleteRolesOfNet(PetriNet net);
     void clearCache();
-    void deleteGlobalRole(String roleId, LoggedUser loggedUser);
+    void deleteGlobalRole(String roleId);
 }

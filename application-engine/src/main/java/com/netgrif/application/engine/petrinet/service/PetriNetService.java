@@ -831,7 +831,7 @@ public class PetriNetService implements IPetriNetService {
                 petriNet.getIdentifier(), petriNet.getVersion().toString());
 
         workflowService.deleteInstancesOfPetriNet(petriNet, force);
-        processRoleService.deleteRolesOfNet(petriNet, deletePetriNetParams.getLoggedUser());
+        processRoleService.deleteRolesOfNet(petriNet);
 
         log.info("[{}]: User [{}] is deleting process {} version {}", deletePetriNetParams.getPetriNetId(),
                 deletePetriNetParams.getLoggedUser().getStringId(), petriNet.getIdentifier(), petriNet.getVersion().toString());

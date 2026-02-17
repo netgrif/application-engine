@@ -152,8 +152,8 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
     }
 
     @Override
-    public void assignRolesToUser(AbstractUser user, Collection<ProcessResourceId> processResourceIds, LoggedUser loggedUser) {
-        // todo 2072 loggedUser as parameter! shouldn't be
+    public void assignRolesToUser(AbstractUser user, Collection<ProcessResourceId> processResourceIds) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
         assignRolesToActor(user.getProcessRoles(), processResourceIds, loggedUser);
         saveUserAndReloadContext(user, loggedUser);
     }
@@ -193,7 +193,7 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
         String userId = user.getStringId();
         securityContextService.saveToken(userId);
-        if (Objects.equals(userId, loggedUser.getStringId())) {
+        if (loggedUser != null && Objects.equals(userId, loggedUser.getStringId())) {
             loggedUser.getProcessRoles().clear();
             loggedUser.setProcessRoles(user.getProcessRoles());
             securityContextService.reloadSecurityContext(loggedUser);
@@ -462,7 +462,7 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
     }
 
     @Override
-    public void deleteRolesOfNet(PetriNet net, LoggedUser loggedUser) {
+    public void deleteRolesOfNet(PetriNet net) {
         log.info("[{}]: Initiating deletion of all roles of Petri net {} version {}", net.getStringId(), net.getIdentifier(),
                 net.getVersion().toString());
         List<ProcessResourceId> deletedRoleIds = this.findAllByNetStringId(net.getStringId()).stream()
@@ -494,7 +494,7 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
                                 .filter(role -> !deletedRoleStringIds.contains(role.getStringId()))
                                 .map(ProcessRole::get_id)
                                 .collect(Collectors.toSet());
-                        this.assignRolesToUser(user, newRoles, loggedUser);
+                        this.assignRolesToUser(user, newRoles);
                     }
 
                     usersPageable = usersPageable.next();
@@ -516,7 +516,7 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
     }
 
     @Override
-    public void deleteGlobalRole(String roleId, LoggedUser loggedUser) {
+    public void deleteGlobalRole(String roleId) {
         ProcessRole processRole = this.findById(roleId);
         if (processRole == null) {
             throw new RoleNotFoundException("Role with id [%s] not found.".formatted(roleId));
@@ -540,7 +540,7 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
             realms.forEach(realm -> {
                 Page<AbstractUser> users = userService.findAllByProcessRoles(Set.of(processRole.get_id()), realm.getName(), usersPageable);
                 while (users.hasContent()) {
-                    users.getContent().forEach(u -> removeRoleFromUser(u, processRole, loggedUser));
+                    users.getContent().forEach(u -> removeRoleFromUser(u, processRole));
                     users = userService.findAllByProcessRoles(Set.of(processRole.get_id()), realm.getName(), usersPageable);
                 }
             });
@@ -556,7 +556,7 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
         return petriNetPage.getTotalElements() > 0;
     }
 
-    private void removeRoleFromUser(AbstractUser user, ProcessRole processRole, LoggedUser loggedUser) {
+    private void removeRoleFromUser(AbstractUser user, ProcessRole processRole) {
         log.info("Removing global role with import ID [{}] and object ID [{}] from user [{}] with id [{}]",
                 processRole.getImportId(), processRole.getStringId(), user.getFullName(), user.getStringId());
         if (user.getProcessRoles().isEmpty()) {
@@ -566,7 +566,7 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
                 .filter(role -> !role.getStringId().equals(processRole.getStringId()))
                 .map(ProcessRole::get_id)
                 .collect(Collectors.toSet());
-        this.assignRolesToUser(user, newRoles, loggedUser);
+        this.assignRolesToUser(user, newRoles);
     }
 
     private ObjectId extractObjectId(String caseId) {
