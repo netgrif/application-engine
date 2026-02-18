@@ -21,6 +21,15 @@ import java.util.Optional;
 @Repository
 public interface GroupRepository extends MongoRepository<Group, String>, QuerydslPredicateExecutor<Group> {
 
+
+    /**
+     * Checks if a {@link Group} entity exists with the given identifier.
+     *
+     * @param identifier the unique identifier of the group
+     * @return {@code true} if a group with the specified identifier exists, otherwise {@code false}
+     */
+    boolean existsByIdentifier(String identifier);
+
     /**
      * Finds paginated list of all {@link Group} entities that have the given owner ID.
      *

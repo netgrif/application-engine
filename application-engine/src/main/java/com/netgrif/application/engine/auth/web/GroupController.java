@@ -105,8 +105,14 @@ public class GroupController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessage.createErrorMessage("User with id [%s] not found".formatted(newGroupRequest.ownerId())));
         }
-        groupService.create(newGroupRequest.identifier(), newGroupRequest.displayName(), user);
-        return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Group created successfully"));
+        try {
+            groupService.create(newGroupRequest.identifier(), newGroupRequest.displayName(), user);
+            return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Group created successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Group with identifier [%s] already exists".formatted(newGroupRequest.identifier())));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(ResponseMessage.createErrorMessage("Failed to create group with identifier [%s]".formatted(newGroupRequest.identifier())));
+        }
     }
 
     @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")

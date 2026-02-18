@@ -191,6 +191,12 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group create(String identifier, String title, AbstractUser groupOwner) {
+        if (identifier == null || identifier.isBlank()) {
+            throw new IllegalArgumentException("Group identifier cannot be null or blank.");
+        }
+        if (groupRepository.existsByIdentifier(identifier)) {
+            throw new IllegalArgumentException("Group with identifier [%s] already exists.".formatted(identifier));
+        }
         log.info("Creating default group for user: [{}]", groupOwner.getStringId());
         Group group = new Group(identifier, groupOwner.getRealmId());
         group.setOwnerId(groupOwner.getStringId());
