@@ -237,7 +237,7 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
     public List<ProcessRole> saveAll(Collection<ProcessRole> entities) {
         LoggedUser loggedUser = userService.getLoggedUserFromContext();
         return entities.stream().map(processRole -> {
-            if (!processRole.isGlobal() || findAllByImportId(processRole.getImportId(), Pageable.ofSize(1)).isEmpty()) {
+            if (!processRole.isGlobal() || findById(processRole.getStringId()) == null) {
                 if (processRole.getWorkspaceId() == null
                         || (loggedUser != null && !processRole.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin())) {
                     return null;

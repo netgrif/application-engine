@@ -1,0 +1,51 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>workspace_test</id>
+	<initials>WTT</initials>
+	<title>workspace_test</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<role>
+		<id>local_role</id>
+		<name>Local role</name>
+	</role>
+	<role global="true">
+		<id>global_role</id>
+		<name>Global role</name>
+	</role>
+	<transition>
+		<id>t1</id>
+		<x>496</x>
+		<y>112</y>
+		<label/>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>400</x>
+		<y>112</y>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>624</x>
+		<y>112</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t1</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

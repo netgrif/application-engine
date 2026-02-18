@@ -31,6 +31,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.policies.FinishPol
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.ArcFactory;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -100,6 +101,9 @@ public class Importer {
     protected ProcessRoleService processRoleService;
 
     @Autowired
+    protected ProcessRoleRepository processRoleRepository;
+
+    @Autowired
     protected ArcFactory arcFactory;
 
     @Autowired
@@ -132,22 +136,22 @@ public class Importer {
     @Autowired
     private ILogicValidator logicValidator;
 
-    public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
+    public Optional<PetriNet> importPetriNet(InputStream xml, String workspaceId) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
             initialize();
             unmarshallXml(xml);
-            return createPetriNet();
+            return createPetriNet(workspaceId);
         } catch (JAXBException e) {
-            log.error("Importing Petri net failed: ", e);
+            log.error("Importing Petri net failed in workspace [{}]: ", workspaceId, e);
         }
         return Optional.empty();
     }
 
-    public Optional<PetriNet> importPetriNet(File xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
+    public Optional<PetriNet> importPetriNet(File xml, String workspaceId) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
-            return importPetriNet(new FileInputStream(xml));
+            return importPetriNet(new FileInputStream(xml), workspaceId);
         } catch (FileNotFoundException e) {
-            log.error("Importing Petri net failed: ", e);
+            log.error("Importing Petri net failed in workspace [{}]: ", workspaceId, e);
         }
         return Optional.empty();
     }
@@ -158,7 +162,7 @@ public class Importer {
         this.places = new HashMap<>();
         this.fields = new HashMap<>();
         this.transactions = new HashMap<>();
-        this.defaultRole = processRoleService.getDefaultRole();
+        this.defaultRole = processRoleService.getDefaultRole(); // todo 2072 from which workspace?
         this.anonymousRole = processRoleService.getAnonymousRole();
         this.i18n = new HashMap<>();
         this.actions = new HashMap<>();
@@ -181,7 +185,7 @@ public class Importer {
         return savedFile.toPath();
     }
 
-    protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
+    protected Optional<PetriNet> createPetriNet(String workspaceId) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         net = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet();
         net.setVersion(null);
 
@@ -198,7 +202,7 @@ public class Importer {
             net.setVersion(stringToVersionConverter.convert(document.getVersion()));
         }
 
-        document.getRole().forEach(this::createRole);
+        document.getRole().forEach(role -> createRole(role, workspaceId));
         document.getData().forEach(this::createDataSet);
         document.getTransaction().forEach(this::createTransaction);
         document.getPlace().forEach(this::createPlace);
@@ -231,6 +235,8 @@ public class Importer {
         if (document.getTags() != null) {
             net.setTags(this.buildTagsMap(document.getTags().getTag()));
         }
+
+        net.setWorkspaceId(workspaceId);
 
         return Optional.of(net);
     }
@@ -1019,7 +1025,7 @@ public class Importer {
         places.put(importPlace.getId(), place);
     }
 
-    protected void createRole(Role importRole) {
+    protected void createRole(Role importRole, String workspaceId) {
         if (importRole.getId().equals(ProcessRole.DEFAULT_ROLE)) {
             throw new IllegalArgumentException("Role ID '" + ProcessRole.DEFAULT_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
         }
@@ -1029,26 +1035,29 @@ public class Importer {
         }
 
         ProcessRole role;
-        if (shouldInitializeRole(importRole)) {
-            role = initRole(importRole);
+        if (shouldInitializeRole(importRole, workspaceId)) {
+            role = initRole(importRole, workspaceId);
         } else {
-            role = processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId(), Pageable.ofSize(1)).getContent().getFirst();
+            role = processRoleRepository.findAllByImportIdAndWorkspaceId(ProcessRole.GLOBAL + importRole.getId(),
+                    workspaceId, Pageable.ofSize(1)).getContent().getFirst();
         }
 
         net.addRole(role);
         roles.put(importRole.getId(), role);
     }
 
-    protected boolean shouldInitializeRole(Role importRole) {
+    protected boolean shouldInitializeRole(Role importRole, String workspaceId) {
         return importRole.isGlobal() == null || !importRole.isGlobal() ||
-                (importRole.isGlobal() && processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId(), Pageable.ofSize(1)).getContent().isEmpty());
+                (importRole.isGlobal() && processRoleRepository.findAllByImportIdAndWorkspaceId(ProcessRole.GLOBAL + importRole.getId(),
+                        workspaceId, Pageable.ofSize(1)).getContent().isEmpty());
     }
 
-    protected ProcessRole initRole(Role importRole) {
+    protected ProcessRole initRole(Role importRole, String workspaceId) {
         ProcessRole role = new com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.ProcessRole();
         Map<EventType, com.netgrif.application.engine.objects.petrinet.domain.events.Event> events = createEventsMap(importRole.getEvent());
         role.setImportId(importRole.isGlobal() != null && importRole.isGlobal() ? ProcessRole.GLOBAL + importRole.getId() : importRole.getId());
         role.setEvents(events);
+        role.setWorkspaceId(workspaceId);
         if (importRole.getName() == null) {
             role.setName(toI18NString(importRole.getTitle()));
         } else {

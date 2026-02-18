@@ -187,20 +187,18 @@ public class PetriNetService implements IPetriNetService {
     @Transactional
     public ImportPetriNetEventOutcome importPetriNet(ImportPetriNetParams importPetriNetParams) throws IOException,
             MissingPetriNetMetaDataException, MissingIconKeyException {
-        validateAttributes(importPetriNetParams);
+        fillAndValidateAttributes(importPetriNetParams);
 
         ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
         ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
         IOUtils.copy(importPetriNetParams.getXmlFile(), xmlCopy);
-        Optional<PetriNet> importedProcess = getImporter().importPetriNet(new ByteArrayInputStream(xmlCopy.toByteArray()));
+        Optional<PetriNet> importedProcess = getImporter().importPetriNet(new ByteArrayInputStream(xmlCopy.toByteArray()),
+                importPetriNetParams.getWorkspaceId());
         if (importedProcess.isEmpty()) {
             return outcome;
         }
         PetriNet newProcess = importedProcess.get();
         PetriNet processToMakeNonDefault = checkAndHandleProcessVersion(newProcess, importPetriNetParams.getReleaseType());
-
-        String workspaceId = importPetriNetParams.getWorkspaceId() == null ? workspaceService.getDefault().getId() : importPetriNetParams.getWorkspaceId();
-        newProcess.setWorkspaceId(workspaceId);
 
         processRoleService.saveAll(newProcess.getRoles().values());
         newProcess.setAuthor(ActorTransformer.toActorRef(importPetriNetParams.getAuthor()));
@@ -875,7 +873,7 @@ public class PetriNetService implements IPetriNetService {
         return obj;
     }
 
-    protected void validateAttributes(ImportPetriNetParams importPetriNetParams) throws IllegalArgumentException {
+    protected void fillAndValidateAttributes(ImportPetriNetParams importPetriNetParams) throws IllegalArgumentException {
         if (importPetriNetParams.getXmlFile() == null) {
             throw new IllegalArgumentException("No Petriflow source file provided.");
         }
@@ -884,6 +882,9 @@ public class PetriNetService implements IPetriNetService {
         }
         if (importPetriNetParams.getReleaseType() == null) {
             throw new IllegalArgumentException("Version type is null.");
+        }
+        if (importPetriNetParams.getWorkspaceId() == null) {
+            importPetriNetParams.setWorkspaceId(workspaceService.getDefault().getId());
         }
     }
 
