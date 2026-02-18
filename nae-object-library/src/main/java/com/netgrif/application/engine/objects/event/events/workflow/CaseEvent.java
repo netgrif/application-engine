@@ -10,8 +10,8 @@ public abstract class CaseEvent extends Event {
 
     protected final CaseEventOutcome caseEventOutcome;
 
-    public CaseEvent(CaseEventOutcome caseEventOutcome, EventPhase eventPhase) {
-        super(caseEventOutcome, eventPhase);
+    protected CaseEvent(CaseEventOutcome caseEventOutcome, EventPhase eventPhase, String workspaceId) {
+        super(caseEventOutcome, eventPhase, workspaceId);
         this.caseEventOutcome = caseEventOutcome;
     }
 

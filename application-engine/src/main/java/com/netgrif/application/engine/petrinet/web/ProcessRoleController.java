@@ -5,7 +5,6 @@ import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleN
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleNotGlobalException;
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleReferencedException;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,13 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -47,10 +43,9 @@ public class ProcessRoleController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping(value = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseMessage> deleteGlobalRole(@PathVariable("id") String id, Authentication auth) {
+    public ResponseEntity<ResponseMessage> deleteGlobalRole(@PathVariable("id") String id) {
         try {
-            LoggedUser user = (LoggedUser) auth.getPrincipal();
-            processRoleService.deleteGlobalRole(id, user);
+            processRoleService.deleteGlobalRole(id);
         } catch (RoleNotFoundException e) {
             String message = "Error when deleting global role [%s]".formatted(id);
             log.error(message, e);

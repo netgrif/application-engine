@@ -45,7 +45,7 @@ public abstract class PetriNet extends PetriNetObject implements Workspaceable {
     private String uri;
 
     @Getter
-    @Setter // todo 2072 workspaceId regex validation
+    @Setter
     private String workspaceId;
 
     @Getter

@@ -21,7 +21,8 @@ public class FinishTaskEvent extends TaskEvent {
 
     @Override
     public String getMessage() {
-        return "FinishTaskEvent: Task [" + (taskEventOutcome.getTask() == null ? MISSING_IDENTIFIER : taskEventOutcome.getTask().getStringId()) + "] finished";
+        return "FinishTaskEvent: Task [%s] finished"
+                .formatted(taskEventOutcome.getTask() == null ? MISSING_IDENTIFIER : taskEventOutcome.getTask().getStringId());
     }
 
     @Override

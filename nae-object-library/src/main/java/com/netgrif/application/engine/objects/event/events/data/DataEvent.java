@@ -12,17 +12,16 @@ public abstract class DataEvent extends Event {
 
     private LoggedUser user;
 
-    public DataEvent(Object source) {
-        super(source);
+    protected DataEvent(Object source, String workspaceId) {
+        super(source, workspaceId);
     }
 
-    public DataEvent(Object source, AbstractUser user) {
-        super(source);
-        this.user = ActorTransformer.toLoggedUser(user);
+    protected DataEvent(Object source, AbstractUser user, String workspaceId) {
+        this(source, null, user, workspaceId);
     }
 
-    public DataEvent(Object source, EventPhase eventPhase, AbstractUser user) {
-        super(source, eventPhase);
+    protected DataEvent(Object source, EventPhase eventPhase, AbstractUser user, String workspaceId) {
+        super(source, eventPhase, workspaceId);
         this.user = ActorTransformer.toLoggedUser(user);
     }
 

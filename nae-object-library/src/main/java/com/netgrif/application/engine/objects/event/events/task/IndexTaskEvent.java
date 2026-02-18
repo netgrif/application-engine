@@ -10,11 +10,11 @@ public class IndexTaskEvent extends Event {
     protected final ElasticTask task;
 
     public IndexTaskEvent(ElasticTask task) {
-        super(task);
+        super(task, getWorkspaceIdFromResource(task));
         this.task = task;
     }
 
     public String getMessage() {
-        return "IndexTaskEvent: Task [" + task.getId() + "] indexed";
+        return "IndexTaskEvent: Task [%s] indexed".formatted(task.getId());
     }
 }

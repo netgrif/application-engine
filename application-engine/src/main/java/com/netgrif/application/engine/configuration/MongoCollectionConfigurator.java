@@ -2,6 +2,7 @@ package com.netgrif.application.engine.configuration;
 
 import com.netgrif.application.engine.adapter.spring.configuration.AbstractMongoCollectionConfigurator;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
+import com.netgrif.application.engine.objects.workspace.Workspace;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,6 @@ public class MongoCollectionConfigurator extends AbstractMongoCollectionConfigur
 
     @Override
     public List<Class<?>> getEntityIndexBlacklist() {
-        return List.of();
+        return List.of(Workspace.class);
     }
 }

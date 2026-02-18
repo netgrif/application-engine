@@ -216,10 +216,10 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<ResponseMessage> assignRolesToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
+    public ResponseEntity<ResponseMessage> assignRolesToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, @RequestBody Set<String> roleIds) {
         try {
             AbstractUser user = userService.findById(userId, realmId);
-            processRoleService.assignRolesToUser(user, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()), (LoggedUser) auth.getPrincipal());
+            processRoleService.assignRolesToUser(user, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()));
             log.info("Process roles {} assigned to user with id [{}]", roleIds, userId);
             return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Selected roles assigned to user " + userId));
         } catch (IllegalArgumentException e) {

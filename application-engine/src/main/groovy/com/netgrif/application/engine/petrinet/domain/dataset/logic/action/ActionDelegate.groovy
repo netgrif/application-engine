@@ -34,7 +34,6 @@ import com.netgrif.application.engine.menu.services.interfaces.DashboardItemServ
 import com.netgrif.application.engine.menu.services.interfaces.DashboardManagementService
 import com.netgrif.application.engine.menu.services.interfaces.IMenuItemService
 import com.netgrif.application.engine.objects.auth.domain.Group
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.Transition
@@ -973,7 +972,7 @@ class ActionDelegate {
                 .processIdentifier(identifier)
                 .title(title)
                 .color(color)
-                .author(ActorTransformer.toLoggedUser(author))
+                .author(author)
                 .locale(locale)
                 .params(params)
                 .build())
@@ -987,7 +986,7 @@ class ActionDelegate {
                 .process(net)
                 .title(title)
                 .color(color)
-                .author(ActorTransformer.toLoggedUser(author))
+                .author(author)
                 .locale(locale)
                 .params(params)
                 .build())
@@ -1536,22 +1535,20 @@ class ActionDelegate {
     }
 
     File exportCasesToFile(List<CaseSearchRequest> requests, String pathName, ExportDataConfig config = null,
-                           LoggedUser user = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
                            int pageSize = exportConfiguration.getMongoPageSize(),
                            Locale locale = LocaleContextHolder.getLocale(),
                            Boolean isIntersection = false) {
         File exportFile = new File(pathName)
-        OutputStream out = exportCases(requests, exportFile, config, user, pageSize, locale, isIntersection)
+        OutputStream out = exportCases(requests, exportFile, config, pageSize, locale, isIntersection)
         out.close()
         return exportFile
     }
 
     OutputStream exportCases(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config = null,
-                             LoggedUser user = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
                              int pageSize = exportConfiguration.getMongoPageSize(),
                              Locale locale = LocaleContextHolder.getLocale(),
                              Boolean isIntersection = false) {
-        return exportService.fillCsvCaseData(requests, outFile, config, user, pageSize, locale, isIntersection)
+        return exportService.fillCsvCaseData(requests, outFile, config, pageSize, locale, isIntersection)
     }
 
     File exportTasksToFile(Closure<Predicate> predicate, String pathName, ExportDataConfig config = null) {
@@ -1567,22 +1564,20 @@ class ActionDelegate {
     }
 
     File exportTasksToFile(List<ElasticTaskSearchRequest> requests, String pathName, ExportDataConfig config = null,
-                           LoggedUser user = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
                            int pageSize = exportConfiguration.getMongoPageSize(),
                            Locale locale = LocaleContextHolder.getLocale(),
                            Boolean isIntersection = false) {
         File exportFile = new File(pathName)
-        OutputStream out = exportTasks(requests, exportFile, config, user, pageSize, locale, isIntersection)
+        OutputStream out = exportTasks(requests, exportFile, config, pageSize, locale, isIntersection)
         out.close()
         return exportFile
     }
 
     OutputStream exportTasks(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config = null,
-                             LoggedUser user = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
                              int pageSize = exportConfiguration.getMongoPageSize(),
                              Locale locale = LocaleContextHolder.getLocale(),
                              Boolean isIntersection = false) {
-        return exportService.fillCsvTaskData(requests, outFile, config, user, pageSize, locale, isIntersection)
+        return exportService.fillCsvTaskData(requests, outFile, config, pageSize, locale, isIntersection)
     }
 
     FileFieldInputStream getFileFieldStream(Case useCase, Task task, FileField field, boolean forPreview = false) {
@@ -2832,7 +2827,7 @@ class ActionDelegate {
         if (!childrenIds.isEmpty()) {
             for (String id : childrenIds) {
                 Case childFolderCase = workflowService.findOne(id)
-                options.put(childFolderCase.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS.value].value as String, new I18nString(childFolderCase.dataSet[MenuItemConstants.FIELD_NODE_NAME.value].value as String))
+                options.put(childFolderCase.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value as String, new I18nString(childFolderCase.dataSet[MenuItemConstants.FIELD_NODE_NAME].value as String))
             }
         }
 
@@ -2840,7 +2835,7 @@ class ActionDelegate {
     }
 
     String getCorrectedUri(String uncheckedPath) {
-        String rootPath = MenuItemConstants.PATH_SEPARATOR.value
+        String rootPath = MenuItemConstants.PATH_SEPARATOR
         if (uncheckedPath == "") {
             return rootPath
         }

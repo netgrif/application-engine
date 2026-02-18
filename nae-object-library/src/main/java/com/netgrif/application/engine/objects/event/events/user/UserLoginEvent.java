@@ -6,12 +6,12 @@ import com.netgrif.application.engine.objects.utils.DateUtils;
 public class UserLoginEvent extends UserEvent {
 
     public UserLoginEvent(LoggedUser user) {
-        super(user);
+        super(user, null);
     }
 
     @Override
     public String getMessage() {
-        return "User " +  (user.getUsername() == null ? MISSING_IDENTIFIER : user.getUsername())  + " logged in on "
-                + DateUtils.toString(time);
+        return "User %s logged in on %s".formatted(user.getUsername() == null ? MISSING_IDENTIFIER : user.getUsername(),
+                DateUtils.toString(time));
     }
 }

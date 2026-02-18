@@ -6,13 +6,12 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.case
 public class DeleteCaseEvent extends CaseEvent {
 
     public DeleteCaseEvent(DeleteCaseEventOutcome caseEventOutcome, EventPhase eventPhase) {
-        super(caseEventOutcome, eventPhase);
+        super(caseEventOutcome, eventPhase, getWorkspaceIdFromResource(caseEventOutcome.getCase()));
     }
 
     @Override
     public String getMessage() {
-        return "DeleteCaseEvent: Case [" +
-                (caseEventOutcome.getCase() == null ? MISSING_IDENTIFIER : caseEventOutcome.getCase().getStringId())
-                + "] deleted";
+        return "DeleteCaseEvent: Case [%s] deleted"
+                .formatted(caseEventOutcome.getCase() == null ? MISSING_IDENTIFIER : caseEventOutcome.getCase().getStringId());
     }
 }

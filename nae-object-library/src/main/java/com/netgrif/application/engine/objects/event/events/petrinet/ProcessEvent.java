@@ -4,11 +4,11 @@ import com.netgrif.application.engine.objects.event.events.Event;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
 
 public abstract class ProcessEvent extends Event {
-    public ProcessEvent(Object source) {
-        super(source);
+    protected ProcessEvent(Object source, String workspaceId) {
+        super(source, workspaceId);
     }
 
-    public ProcessEvent(Object source, EventPhase eventPhase) {
-        super(source, eventPhase);
+    protected ProcessEvent(Object source, EventPhase eventPhase, String workspaceId) {
+        super(source, eventPhase, workspaceId);
     }
 }

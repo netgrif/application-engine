@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.action
 
-
+import com.netgrif.application.engine.concurrent.NaeThread
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -47,7 +47,7 @@ class ConcurrencyTest {
         def threads = []
         cases.each { it ->
             String caseId = it.stringId
-            threads << new Thread({
+            threads << new NaeThread({
                 log.info("Running case $caseId")
                 importHelper.assignTaskToSuper("task", caseId)
             })

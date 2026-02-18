@@ -16,13 +16,11 @@ public class DelegateTaskEvent extends TaskEvent {
     }
 
     public DelegateTaskEvent(DelegateTaskEventOutcome eventOutcome, EventPhase eventPhase, String delegate) {
-        super(eventOutcome, eventPhase);
-        this.delegate = delegate;
+        this(eventOutcome, eventPhase, null, delegate);
     }
 
     public DelegateTaskEvent(DelegateTaskEventOutcome eventOutcome, AbstractUser user, String delegate) {
-        super(eventOutcome, user);
-        this.delegate = delegate;
+        this(eventOutcome, null, user, delegate);
     }
 
     public DelegateTaskEvent(DelegateTaskEventOutcome eventOutcome, EventPhase eventPhase, AbstractUser user, String delegate) {
@@ -32,7 +30,8 @@ public class DelegateTaskEvent extends TaskEvent {
 
     @Override
     public String getMessage() {
-        return "DelegateTaskEvent: Task [" + (taskEventOutcome.getTask() == null ? MISSING_IDENTIFIER : taskEventOutcome.getTask().getStringId()) + "] delegated";
+        return "DelegateTaskEvent: Task [%s] delegated"
+                .formatted(taskEventOutcome.getTask() == null ? MISSING_IDENTIFIER : taskEventOutcome.getTask().getStringId());
     }
     @Override
     public EventType getEventType() {

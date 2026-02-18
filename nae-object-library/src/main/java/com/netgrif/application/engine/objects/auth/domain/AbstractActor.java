@@ -315,7 +315,6 @@ public abstract class AbstractActor implements Serializable {
         if (workspaceId == null || permission == null) {
             return;
         }
-        // todo 2072 workspaceId regex validation
         this.workspacePermissions.put(workspaceId, permission);
     }
 

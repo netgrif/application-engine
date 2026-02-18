@@ -336,6 +336,15 @@ public abstract class Case implements Serializable, Workspaceable {
         return isModified.get();
     }
 
+    // todo javadoc
+    public Optional<String> findTaskId(String transId) {
+        return this.tasks.stream()
+                .filter(taskPair -> taskPair.getTransition().equals(transId))
+                .map(TaskPair::getTask)
+                .filter(Objects::nonNull)
+                .findFirst();
+    }
+
     private void compareExistingActorPermissions(String actorId, Map<String, Boolean> permissions) {
         permissions.forEach((permType, permValue) -> {
             if ((actors.containsKey(actorId) && !actors.get(actorId).containsKey(permType))

@@ -142,7 +142,6 @@ public class PetriNetService implements IPetriNetService {
     }
 
     public void evictCache(PetriNet net) {
-        // todo 2072 check permission
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetById()), cacheProperties.getPetriNetById()).evict(net.getStringId());
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetDefault()), cacheProperties.getPetriNetDefault()).evict(net.getIdentifier());
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetLatest()), cacheProperties.getPetriNetLatest()).evict(net.getIdentifier());
@@ -497,7 +496,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public PetriNetImportReference getNetFromCase(String caseId) {
-        Case useCase = workflowService.findOne(caseId); // todo 2072 case resource
+        Case useCase = workflowService.findOne(caseId);
         PetriNetImportReference pn = new PetriNetImportReference();
         useCase.getPetriNet().getTransitions().forEach((key, value) -> pn.getTransitions().add(new TransitionImportReference(value)));
         useCase.getPetriNet().getPlaces().forEach((key, value) -> pn.getPlaces().add(new PlaceImportReference(value)));
@@ -832,7 +831,7 @@ public class PetriNetService implements IPetriNetService {
                 petriNet.getIdentifier(), petriNet.getVersion().toString());
 
         workflowService.deleteInstancesOfPetriNet(petriNet, force);
-        processRoleService.deleteRolesOfNet(petriNet, deletePetriNetParams.getLoggedUser());
+        processRoleService.deleteRolesOfNet(petriNet);
 
         log.info("[{}]: User [{}] is deleting process {} version {}", deletePetriNetParams.getPetriNetId(),
                 deletePetriNetParams.getLoggedUser().getStringId(), petriNet.getIdentifier(), petriNet.getVersion().toString());

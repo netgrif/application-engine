@@ -4,6 +4,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.utils.CopyConstructorUtil;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.TaskPair;
+import com.netgrif.application.engine.objects.workspace.Workspaceable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class ElasticCase implements Serializable {
+public abstract class ElasticCase implements Serializable, Workspaceable {
 
     @Serial
     private static final long serialVersionUID = 7536959921044863265L;

@@ -6,8 +6,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Workspace extends com.netgrif.application.engine.objects.workspace.Workspace {
 
-    // todo 2072 indexable
-
     public Workspace(String id) {
         super(id);
     }

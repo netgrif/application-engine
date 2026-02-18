@@ -47,21 +47,22 @@ abstract class FieldActionsRunner {
         return run(action, useCase, Optional.empty(), params, functions)
     }
 
-    List<EventOutcome> run(com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action action, Case useCase, Optional<Task> task, Map<String, String> params, List<Function> functions = []) {
+    List<EventOutcome> run(com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action action,
+                           Case useCase, Optional<Task> task, Map<String, String> params, List<Function> functions = []) {
         if (!actionsCache)
             actionsCache = new HashMap<>()
 
         log.debug("Action: $action")
         def code = getActionCode(action, functions)
-        final ActionStartEvent actionStart = new ActionStartEvent(action)
+        final ActionStartEvent actionStart = new ActionStartEvent(action, useCase.getWorkspaceId())
         try {
             publisher.publishEvent(actionStart)
             code.init(action, useCase, task, this, params)
             code()
-            publisher.publishEvent(new ActionStopEvent(action, actionStart, true))
+            publisher.publishEvent(new ActionStopEvent(action, actionStart, true, useCase.getWorkspaceId()))
         } catch (Exception e) {
             log.error("Action: $action.definition")
-            publisher.publishEvent(new ActionStopEvent(action, actionStart, false))
+            publisher.publishEvent(new ActionStopEvent(action, actionStart, false, useCase.getWorkspaceId()))
             throw e
         }
         return ((ActionDelegate) code.delegate).outcomes

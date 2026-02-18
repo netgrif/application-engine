@@ -13,8 +13,8 @@ public class ActionStopEvent extends ActionStartEvent {
     private final boolean success;
     private final long totalDuration;
 
-    public ActionStopEvent(Action action, ActionStartEvent startEvent, boolean success) {
-        super(action);
+    public ActionStopEvent(Action action, ActionStartEvent startEvent, boolean success, String workspaceId) {
+        super(action, workspaceId);
         setPhase(RunPhase.STOP);
         this.success = success;
         this.totalDuration = calculateExecutionDuration(startEvent.getTime());
