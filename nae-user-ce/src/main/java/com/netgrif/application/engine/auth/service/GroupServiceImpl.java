@@ -482,7 +482,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Page<Group> search(GroupSearchRequestDto searchDto, Pageable pageable) {
         List<Criteria> filters = new ArrayList<>();
-        if (searchDto != null && searchDto.ids() != null && !searchDto.ids().isEmpty()) {
+        if (searchDto != null && searchDto.ids() != null) {
             Criteria criteria = Criteria.where("_id").in(searchDto.ids());
             filters.add(criteria);
         }
