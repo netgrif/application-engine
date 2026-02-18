@@ -159,8 +159,11 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
 
         buildFullTextQuery(request, query);
         boolean impersonatedAccessDenied = buildImpersonatedProcessesQuery(user, query);
+        if (impersonatedAccessDenied) {
+            return null;
+        }
         boolean resultAlwaysEmpty = buildGroupQuery(request, user.getSelfOrImpersonated(), locale, query);
-        if (resultAlwaysEmpty || impersonatedAccessDenied) {
+        if (resultAlwaysEmpty) {
             return null;
         }
         return query;

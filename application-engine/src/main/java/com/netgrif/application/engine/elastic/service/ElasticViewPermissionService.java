@@ -112,4 +112,27 @@ public abstract class ElasticViewPermissionService {
                 .minimumShouldMatch(String.valueOf(1))
                 .build();
     }
+
+    protected BoolQuery.Builder buildAllowedProcessesQuery(LoggedUser loggedUser) {
+        if (loggedUser.isAdmin() || !loggedUser.isImpersonating()) {
+            return null;
+        }
+        if (loggedUser.isProcessAccessDeny()) {
+            return null;
+        }
+        if (loggedUser.getImpersonatedProcesses() == null || loggedUser.getImpersonatedProcesses().isEmpty()) {
+            return null;
+        }
+        TermsQueryField identifiers = new TermsQueryField.Builder()
+                .value(loggedUser.getImpersonatedProcesses().stream().map(FieldValue::of).collect(Collectors.toList()))
+                .build();
+
+        BoolQuery.Builder petriNetQuery = new BoolQuery.Builder();
+        if (loggedUser.isImpersonatedProcessesListAllowing()) {
+            petriNetQuery.should(QueryBuilders.terms(term -> term.field("processIdentifier").terms(identifiers)));
+        } else {
+            petriNetQuery.mustNot(QueryBuilders.terms(term -> term.field("processIdentifier").terms(identifiers)));
+        }
+        return petriNetQuery;
+    }
 }

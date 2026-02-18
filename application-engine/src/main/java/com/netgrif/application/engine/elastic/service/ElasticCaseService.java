@@ -131,7 +131,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
-        log.debug("Searching for query with logged user [{}]", user.getId());
+        log.debug("Searching for query with logged user [{}]", user.getSelfOrImpersonatedStringId());
 //        pageable = resolveUnmappedSortAttributes(pageable);
         if (user.isProcessAccessDeny()) {
             return new PageImpl<>(Collections.emptyList(), pageable, 0);
@@ -263,35 +263,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         }
 
         query.filter(petriNetQuery.build()._toQuery());
-    }
-
-    /**
-     *
-     *
-     * @param loggedUser
-     * @return Method return true if process access is denied (impersonated process list is empty and process allowing flag is set to true)
-     */
-    protected BoolQuery.Builder buildAllowedProcessesQuery(LoggedUser loggedUser) {
-        if (loggedUser.isAdmin() || !loggedUser.isImpersonating()) {
-            return null;
-        }
-        if (loggedUser.isProcessAccessDeny()) {
-            return null;
-        }
-        if (loggedUser.getImpersonatedProcesses() == null || loggedUser.getImpersonatedProcesses().isEmpty()) {
-            return null;
-        }
-        TermsQueryField identifiers = new TermsQueryField.Builder()
-                .value(loggedUser.getImpersonatedProcesses().stream().map(FieldValue::of).collect(Collectors.toList()))
-                .build();
-
-        BoolQuery.Builder petriNetQuery = new BoolQuery.Builder();
-        if (loggedUser.isImpersonatedProcessesListAllowing()) {
-            petriNetQuery.should(QueryBuilders.terms(term -> term.field("processIdentifier").terms(identifiers)));
-        } else {
-            petriNetQuery.mustNot(QueryBuilders.terms(term -> term.field("processIdentifier").terms(identifiers)));
-        }
-        return petriNetQuery;
     }
 
     /**
