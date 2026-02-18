@@ -2,6 +2,7 @@ name: Publish package to GitHub Packages
 on:
   release:
     types: [ published ]
+  workflow_dispatch:
 
 jobs:
   build:
