@@ -42,10 +42,6 @@ public abstract class PetriNet extends PetriNetObject implements Workspaceable {
 
     @Getter
     @Setter
-    private String uri;
-
-    @Getter
-    @Setter
     private String workspaceId;
 
     @Getter
@@ -188,7 +184,6 @@ public abstract class PetriNet extends PetriNetObject implements Workspaceable {
         this._id = petriNet.getObjectId();
         this.identifier = petriNet.getIdentifier();
         this.uriNodeId = petriNet.getUriNodeId();
-        this.uri = petriNet.getUri();
         this.workspaceId = petriNet.getWorkspaceId();
         this.title = petriNet.getTitle();
         this.importId = petriNet.getImportId();
