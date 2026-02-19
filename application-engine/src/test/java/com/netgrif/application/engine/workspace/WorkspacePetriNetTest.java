@@ -87,7 +87,6 @@ public class WorkspacePetriNetTest {
 
     @Test
     public void testImportPetriNet() throws IOException, MissingPetriNetMetaDataException {
-        // todo 2072 import same version with different workspaces -> should be ok
         ImportPetriNetParams params = ImportPetriNetParams.with()
                 .xmlFile(new FileInputStream("src/test/resources/petriNets/workspace_test.xml"))
                 .releaseType(VersionType.MAJOR)
@@ -119,6 +118,36 @@ public class WorkspacePetriNetTest {
 
         assertEquals(2, processRoleRepository.findAllByImportId("local_role", PageRequest.of(0, 3)).getContent().size());
         assertEquals(2, processRoleRepository.findAllByImportId("global_global_role", PageRequest.of(0, 3)).getContent().size());
+    }
+
+    @Test
+    public void testImportSamePetriNet() throws IOException, MissingPetriNetMetaDataException {
+        String netPath = "src/test/resources/petriNets/workspace_version_test.xml";
+        PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream(netPath))
+                .workspaceId("workspaceA")
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+        assertNotNull(petriNetRepository.findById(net.getStringId()));
+
+        assertThrows(IllegalArgumentException.class, () -> petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream(netPath))
+                .workspaceId("workspaceA")
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()));
+
+        net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream(netPath))
+                .workspaceId("workspaceB")
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+        assertNotNull(petriNetRepository.findById(net.getStringId()));
+
+        assertThrows(IllegalArgumentException.class, () -> petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream(netPath))
+                .workspaceId("workspaceB")
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()));
     }
 
     @Test

@@ -198,7 +198,8 @@ public class PetriNetService implements IPetriNetService {
             return outcome;
         }
         PetriNet newProcess = importedProcess.get();
-        PetriNet processToMakeNonDefault = checkAndHandleProcessVersion(newProcess, importPetriNetParams.getReleaseType());
+        PetriNet processToMakeNonDefault = checkAndHandleProcessVersion(newProcess, importPetriNetParams.getReleaseType(),
+                importPetriNetParams.getWorkspaceId());
 
         processRoleService.saveAll(newProcess.getRoles().values());
         newProcess.setAuthor(ActorTransformer.toActorRef(importPetriNetParams.getAuthor()));
@@ -259,19 +260,22 @@ public class PetriNetService implements IPetriNetService {
      * @return The process, which has been made non-default or null if no process updated
      * @throws IllegalArgumentException if the version already exists
      */
-    private PetriNet checkAndHandleProcessVersion(PetriNet newProcess, VersionType releaseType) {
+    private PetriNet checkAndHandleProcessVersion(PetriNet newProcess, VersionType releaseType, String workspaceId) {
         PetriNet processToMakeNonDefault = null;
 
-        if (newProcess.getVersion() != null && self.getPetriNet(newProcess.getIdentifier(), newProcess.getVersion()) != null) {
+        if (newProcess.getVersion() != null && repository.findByIdentifierAndVersionAndWorkspaceId(newProcess.getIdentifier(),
+                newProcess.getVersion(), workspaceId) != null) {
             throw new IllegalArgumentException("A process [%s] with such version [%s] already exists"
                     .formatted(newProcess.getIdentifier(), newProcess.getVersion()));
         }
-        PetriNet existingLatestProcess = self.getLatestVersionByIdentifier(newProcess.getIdentifier());
+        Page<PetriNet> existingLatestProcessAsPage = repository.findByIdentifierAndWorkspaceId(newProcess.getIdentifier(), workspaceId,
+                PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch"));
         boolean makeNonDefaultCurrentVersion = true;
-        if (existingLatestProcess == null && newProcess.getVersion() == null) {
+        if (existingLatestProcessAsPage.isEmpty() && newProcess.getVersion() == null) {
             newProcess.setVersion(new Version());
         } else {
-            if (newProcess.getVersion() == null) {
+            PetriNet existingLatestProcess = existingLatestProcessAsPage.isEmpty() ? null : existingLatestProcessAsPage.getContent().getFirst();
+            if (existingLatestProcess != null && newProcess.getVersion() == null) {
                 newProcess.setVersion(existingLatestProcess.getVersion().clone());
                 newProcess.incrementVersion(releaseType);
             } else if (existingLatestProcess != null && newProcess.getVersion().isLowerThan(existingLatestProcess.getVersion())) {
@@ -881,7 +885,7 @@ public class PetriNetService implements IPetriNetService {
             throw new IllegalArgumentException("No author of PetriNet provided.");
         }
         if (importPetriNetParams.getReleaseType() == null) {
-            throw new IllegalArgumentException("Version type is null.");
+            importPetriNetParams.setReleaseType(VersionType.MAJOR);
         }
         if (importPetriNetParams.getWorkspaceId() == null) {
             importPetriNetParams.setWorkspaceId(workspaceService.getDefault().getId());
