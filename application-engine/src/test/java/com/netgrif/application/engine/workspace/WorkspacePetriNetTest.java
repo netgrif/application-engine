@@ -6,6 +6,7 @@ import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
@@ -14,11 +15,13 @@ import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepos
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.workspace.service.WorkspaceService;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +35,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -70,9 +70,13 @@ public class WorkspacePetriNetTest {
     }
 
     private void loginCustomUser(String activeWorkspaceId, boolean isAdmin) {
+        loginCustomUser(activeWorkspaceId, isAdmin, null);}
+
+    private void loginCustomUser(String activeWorkspaceId, boolean isAdmin, Set<ProcessRole> processRoles) {
         LoggedUser loggedUser = new LoggedUserImpl();
         loggedUser.setUsername("username1");
         loggedUser.setActiveWorkspaceId(activeWorkspaceId);
+        loggedUser.setProcessRoles(processRoles);
         if (isAdmin) {
             Set<Authority> authorities = new HashSet<>();
             authorities.add(new AuthorityImpl(Authority.admin));
@@ -364,30 +368,265 @@ public class WorkspacePetriNetTest {
         assertNotNull(petriNetService.getLatestVersionByIdentifier(net.getIdentifier()));
         petriNetService.evictAllCaches();
     }
-//
-//    Page<PetriNet> getAll(Pageable pageable);
-//
-//    Page<PetriNet> getAllDefault(Pageable pageable);
-//
-//    FileSystemResource getFile(String netId, String title);
-//
-//    Page<PetriNetReference> getReferences(Locale locale, Pageable pageable);
-//
-//    Page<PetriNetReference> getReferencesByIdentifier(String identifier, Locale locale, Pageable pageable);
-//
-//    Page<PetriNetReference> getReferencesByVersion(Version version, Locale locale, Pageable pageable);
-//
-//    List<PetriNetReference> getReferencesByUsersProcessRoles(Locale locale);
-//
-//    PetriNetReference getReference(String identifier, Version version, Locale locale);
-//
-//    List<TransitionReference> getTransitionReferences(List<String> netsIds, Locale locale);
-//
-//    List<com.netgrif.application.engine.petrinet.web.responsebodies.DataFieldReference> getDataFieldReferences(List<TransitionReference> transitions, Locale locale);
-//
-//    Page<PetriNetReference> search(PetriNetSearch criteria, Pageable pageable, Locale locale);
-//
-//    Optional<PetriNet> findByImportId(String id);
+
+    @Test
+    public void testGetAll() {
+        String workspaceId1 = "default";
+        String workspaceId2 = "otherWorkspaceId";
+
+        PetriNet net = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet();
+        net.setWorkspaceId(workspaceId1);
+        petriNetRepository.save(net);
+
+        PetriNet net2 = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet();
+        net2.setWorkspaceId(workspaceId2);
+        petriNetRepository.save(net2);
+
+        logout();
+        Page<PetriNet> resultAsPage = petriNetService.getAll(PageRequest.of(0, 2));
+        assertEquals(2, resultAsPage.getContent().size());
+
+        loginCustomUser(workspaceId1, false);
+        resultAsPage = petriNetService.getAll(PageRequest.of(0, 2));
+        assertEquals(1, resultAsPage.getContent().size());
+
+        loginCustomUser(workspaceId1, true);
+        resultAsPage = petriNetService.getAll(PageRequest.of(0, 2));
+        assertEquals(2, resultAsPage.getContent().size());
+
+        loginCustomUser(workspaceId2, false);
+        resultAsPage = petriNetService.getAll(PageRequest.of(0, 2));
+        assertEquals(1, resultAsPage.getContent().size());
+
+        loginCustomUser("wrongWorkspace", false);
+        resultAsPage = petriNetService.getAll(PageRequest.of(0, 2));
+        assertEquals(0, resultAsPage.getContent().size());
+
+        loginCustomUser("wrongWorkspace", true);
+        resultAsPage = petriNetService.getAll(PageRequest.of(0, 2));
+        assertEquals(2, resultAsPage.getContent().size());
+    }
+
+    @Test
+    public void testGetAllDefault() {
+        String workspaceId1 = "default";
+        String workspaceId2 = "otherWorkspaceId";
+
+        PetriNet net = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet();
+        net.setWorkspaceId(workspaceId1);
+        net.setDefaultVersion(true);
+        petriNetRepository.save(net);
+
+        PetriNet net2 = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet();
+        net2.setWorkspaceId(workspaceId2);
+        net2.setDefaultVersion(true);
+        petriNetRepository.save(net2);
+
+        logout();
+        Page<PetriNet> resultAsPage = petriNetService.getAllDefault(PageRequest.of(0, 2));
+        assertEquals(2, resultAsPage.getContent().size());
+
+        loginCustomUser(workspaceId1, false);
+        resultAsPage = petriNetService.getAllDefault(PageRequest.of(0, 2));
+        assertEquals(1, resultAsPage.getContent().size());
+
+        loginCustomUser(workspaceId1, true);
+        resultAsPage = petriNetService.getAllDefault(PageRequest.of(0, 2));
+        assertEquals(2, resultAsPage.getContent().size());
+
+        loginCustomUser(workspaceId2, false);
+        resultAsPage = petriNetService.getAllDefault(PageRequest.of(0, 2));
+        assertEquals(1, resultAsPage.getContent().size());
+
+        loginCustomUser("wrongWorkspace", false);
+        resultAsPage = petriNetService.getAllDefault(PageRequest.of(0, 2));
+        assertEquals(0, resultAsPage.getContent().size());
+
+        loginCustomUser("wrongWorkspace", true);
+        resultAsPage = petriNetService.getAllDefault(PageRequest.of(0, 2));
+        assertEquals(2, resultAsPage.getContent().size());
+    }
+
+    @Test
+    public void testGetFile() throws IOException, MissingPetriNetMetaDataException {
+        String workspaceId1 = "default";
+        String workspaceId2 = "otherWorkspaceId";
+        PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/workspace_version_test.xml"))
+                .workspaceId(workspaceId1)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+
+        PetriNet net2 = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/workspace_version_test.xml"))
+                .workspaceId(workspaceId2)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+
+        logout();
+        assertNotNull(petriNetService.getFile(net.getStringId(), null));
+
+        loginCustomUser("wrongWorkspace", false);
+        assertNull(petriNetService.getFile(net.getStringId(), null));
+
+        loginCustomUser("wrongWorkspace", true);
+        assertNotNull(petriNetService.getFile(net.getStringId(), null));
+
+        loginCustomUser(workspaceId2, false);
+        assertNull(petriNetService.getFile(net.getStringId(), null));
+
+        loginCustomUser(workspaceId1, false);
+        assertNotNull(petriNetService.getFile(net.getStringId(), null));
+
+        loginCustomUser(workspaceId1, false);
+        assertNull(petriNetService.getFile(net2.getStringId(), null));
+
+        loginCustomUser(workspaceId2, false);
+        assertNotNull(petriNetService.getFile(net2.getStringId(), null));
+    }
+
+    @Test
+    public void testGetReferencesByNonNullVersion() throws IOException, MissingPetriNetMetaDataException {
+        String workspaceId1 = "default";
+        String workspaceId2 = "otherWorkspaceId";
+        PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/workspace_version_test.xml"))
+                .workspaceId(workspaceId1)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+
+        PetriNet net2 = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/workspace_version_test.xml"))
+                .workspaceId(workspaceId2)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+
+        assertEquals(net.getVersion(), net2.getVersion());
+        Version version = new Version();
+        assertEquals(version, net.getVersion());
+
+        logout();
+        Page<PetriNetReference> resultAsPage = petriNetService.getReferencesByVersion(version, Locale.getDefault(),
+                PageRequest.of(0, 2));
+        assertEquals(2, resultAsPage.getContent().size());
+
+        loginCustomUser("wrongWorkspaceId", false);
+        resultAsPage = petriNetService.getReferencesByVersion(version, Locale.getDefault(), PageRequest.of(0, 2));
+        assertEquals(0, resultAsPage.getContent().size());
+
+        loginCustomUser("wrongWorkspaceId", true);
+        resultAsPage = petriNetService.getReferencesByVersion(version, Locale.getDefault(), PageRequest.of(0, 2));
+        assertEquals(2, resultAsPage.getContent().size());
+
+        loginCustomUser(workspaceId1, false);
+        resultAsPage = petriNetService.getReferencesByVersion(version, Locale.getDefault(), PageRequest.of(0, 2));
+        assertEquals(1, resultAsPage.getContent().size());
+
+        loginCustomUser(workspaceId2, false);
+        resultAsPage = petriNetService.getReferencesByVersion(version, Locale.getDefault(), PageRequest.of(0, 2));
+        assertEquals(1, resultAsPage.getContent().size());
+
+        loginCustomUser(workspaceId2, true);
+        resultAsPage = petriNetService.getReferencesByVersion(version, Locale.getDefault(), PageRequest.of(0, 2));
+        assertEquals(2, resultAsPage.getContent().size());
+    }
+
+    @Test
+    @Disabled("Method getReferencesByUsersProcessRoles is broken (not workspace related)")
+    public void testGetReferencesByUsersProcessRoles() throws IOException, MissingPetriNetMetaDataException {
+        String workspaceId1 = "default";
+        PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/workspace_test.xml"))
+                .workspaceId(workspaceId1)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+
+        logout();
+        List<PetriNetReference> resultAsList = petriNetService.getReferencesByUsersProcessRoles(Locale.getDefault());
+        assertEquals(1, resultAsList.size());
+
+        loginCustomUser("wrongWorkspace", false, new HashSet<>(net.getRoles().values()));
+        resultAsList = petriNetService.getReferencesByUsersProcessRoles(Locale.getDefault());
+        assertTrue(resultAsList.isEmpty());
+
+        loginCustomUser("wrongWorkspace", true, new HashSet<>(net.getRoles().values()));
+        resultAsList = petriNetService.getReferencesByUsersProcessRoles(Locale.getDefault());
+        assertEquals(1, resultAsList.size());
+
+        loginCustomUser(workspaceId1, false, new HashSet<>(net.getRoles().values()));
+        resultAsList = petriNetService.getReferencesByUsersProcessRoles(Locale.getDefault());
+        assertEquals(1, resultAsList.size());
+    }
+
+    @Test
+    public void testFindByImportId() throws IOException, MissingPetriNetMetaDataException {
+        String workspaceId1 = "default";
+        PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/workspace_test.xml"))
+                .workspaceId(workspaceId1)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+
+        logout();
+        assertTrue(petriNetService.findByImportId(net.getIdentifier()).isPresent());
+
+        loginCustomUser("wrongWorkspace", false);
+        assertFalse(petriNetService.findByImportId(net.getIdentifier()).isPresent());
+
+        loginCustomUser("wrongWorkspace", true);
+        assertTrue(petriNetService.findByImportId(net.getIdentifier()).isPresent());
+
+        loginCustomUser(workspaceId1, false);
+        assertTrue(petriNetService.findByImportId(net.getIdentifier()).isPresent());
+    }
+
+    @Test
+    public void testSearch() throws IOException, MissingPetriNetMetaDataException {
+        String workspaceId1 = "default";
+        String workspaceId2 = "otherWorkspaceId";
+        PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/workspace_test.xml"))
+                .workspaceId(workspaceId1)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+
+        PetriNet net2 = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/workspace_test.xml"))
+                .workspaceId(workspaceId2)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+
+        PetriNetSearch searchBody = new PetriNetSearch();
+        searchBody.setIdentifier("workspace_test");
+
+        Set<ProcessRole> roles = new HashSet<>();
+        roles.addAll(net.getRoles().values());
+        roles.addAll(net2.getRoles().values());
+
+        logout();
+        Page<PetriNetReference> resultAsPage = petriNetService.search(searchBody, PageRequest.of(0, 2), Locale.getDefault());
+        assertEquals(2, resultAsPage.getContent().size());
+
+        loginCustomUser("wrongWorkspace", false, roles);
+        resultAsPage = petriNetService.search(searchBody, PageRequest.of(0, 2), Locale.getDefault());
+        assertEquals(0, resultAsPage.getContent().size());
+
+        loginCustomUser("wrongWorkspace", true, roles);
+        resultAsPage = petriNetService.search(searchBody, PageRequest.of(0, 2), Locale.getDefault());
+        assertEquals(2, resultAsPage.getContent().size());
+
+        loginCustomUser(workspaceId1, false, roles);
+        resultAsPage = petriNetService.search(searchBody, PageRequest.of(0, 2), Locale.getDefault());
+        assertEquals(1, resultAsPage.getContent().size());
+
+        loginCustomUser(workspaceId2, false, roles);
+        resultAsPage = petriNetService.search(searchBody, PageRequest.of(0, 2), Locale.getDefault());
+        assertEquals(1, resultAsPage.getContent().size());
+
+        loginCustomUser(workspaceId2, true, roles);
+        resultAsPage = petriNetService.search(searchBody, PageRequest.of(0, 2), Locale.getDefault());
+        assertEquals(2, resultAsPage.getContent().size());
+    }
 //
 //    PetriNet get(ObjectId petriNetId);
 //

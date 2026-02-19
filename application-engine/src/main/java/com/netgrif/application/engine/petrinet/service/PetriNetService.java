@@ -614,7 +614,6 @@ public class PetriNetService implements IPetriNetService {
             }
 
             if (loggedUser != null && !loggedUser.isAdmin()) {
-                // todo 2072 test
                 aggregation.getPipeline()
                         .add(Aggregation.match(Criteria.where("workspaceId").is(loggedUser.getActiveWorkspaceId())));
             }
@@ -855,7 +854,7 @@ public class PetriNetService implements IPetriNetService {
 
     protected Criteria getProcessRolesCriteria(LoggedUser user) {
         return new Criteria().orOperator(user.getProcessRoles().stream()
-                .map(role -> Criteria.where("permissions." + role).exists(true)).toArray(Criteria[]::new));
+                .map(role -> Criteria.where("permissions." + role.getStringId()).exists(true)).toArray(Criteria[]::new));
     }
 
     @Override
