@@ -23,16 +23,17 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException exception, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         try {
-            log.debug("Received HttpMessageNotWritableException: {}", exception.getMessage(), exception);
+            log.error("Received HttpMessageNotWritableException: {}", exception.getMessage(), exception);
             List<JsonMappingException.Reference> path = ((JsonMappingException) exception.getCause()).getPath();
-            JsonMappingException.Reference fieldReference = path.get(path.size() - 1);
-            JsonMappingException.Reference caseReference = path.get(path.size() - 3);
-            Field from = (Field) fieldReference.getFrom();
-            Case useCase = (Case) caseReference.getFrom();
-
-            log.error("[{}] Could not parse value of field [{}], value [{}]", useCase.getStringId(), from.getStringId(), from.getValue());
+            if (path.size() > 3) {
+                JsonMappingException.Reference fieldReference = path.getLast();
+                JsonMappingException.Reference caseReference = path.get(path.size() - 3);
+                Field from = (Field) fieldReference.getFrom();
+                Case useCase = (Case) caseReference.getFrom();
+                log.error("[{}] Could not parse value of field [{}], value [{}]", useCase.getStringId(), from.getStringId(), from.getValue());
+            }
         } catch (Exception e) {
-            log.warn("Unrecognized exception: ", e);
+            log.error("Unrecognized exception: ", e);
         }
         return super.handleHttpMessageNotWritable(exception, headers, status, request);
     }
