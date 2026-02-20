@@ -6,7 +6,7 @@ import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.FieldBehavior
-import com.netgrif.application.engine.petrinet.params.DeletePetriNetParams
+
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper

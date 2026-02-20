@@ -6,7 +6,6 @@ import com.netgrif.application.engine.configuration.cache.NaeCacheManager;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
-import com.netgrif.application.engine.petrinet.params.DeletePetriNetParams;
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.objects.event.events.petrinet.ProcessEvent;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
@@ -803,39 +802,41 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     @Transactional
-    public void deletePetriNet(DeletePetriNetParams deletePetriNetParams) {
-        doDeletePetriNet(deletePetriNetParams, false);
+    public void deletePetriNet(String petriNetId) {
+        doDeletePetriNet(petriNetId, false);
     }
 
     @Override
-    public void forceDeletePetriNet(DeletePetriNetParams deletePetriNetParams) {
-        doDeletePetriNet(deletePetriNetParams, true);
+    public void forceDeletePetriNet(String petriNetId) {
+        doDeletePetriNet(petriNetId, true);
     }
 
-    protected void doDeletePetriNet(DeletePetriNetParams deletePetriNetParams, boolean force) {
-        fillAndValidateAttributes(deletePetriNetParams);
+    protected void doDeletePetriNet(String petriNetId, boolean force) {
+        if (petriNetId == null) {
+            throw new IllegalArgumentException("No petriNet identifier was provided.");
+        }
+
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
 
         Optional<PetriNet> petriNetOptional;
-        if (deletePetriNetParams.getLoggedUser().isAdmin()) {
-            petriNetOptional = repository.findById(deletePetriNetParams.getPetriNetId());
+        if (loggedUser.isAdmin()) {
+            petriNetOptional = repository.findById(petriNetId);
         } else {
-            petriNetOptional = repository.findBy_idAndWorkspaceId(new ObjectId(deletePetriNetParams.getPetriNetId()),
-                    deletePetriNetParams.getLoggedUser().getActiveWorkspaceId());
+            petriNetOptional = repository.findBy_idAndWorkspaceId(new ObjectId(petriNetId), loggedUser.getActiveWorkspaceId());
         }
 
         if (petriNetOptional.isEmpty()) {
-            throw new IllegalArgumentException("Could not find process with id [" + deletePetriNetParams.getPetriNetId() + "]");
+            throw new IllegalArgumentException("Could not find process with id [" + petriNetId + "]");
         }
 
         PetriNet petriNet = petriNetOptional.get();
-        log.info("[{}]: Initiating deletion of process {} version {}", deletePetriNetParams.getPetriNetId(),
-                petriNet.getIdentifier(), petriNet.getVersion().toString());
+        log.info("[{}]: Initiating deletion of process {} version {}", petriNetId, petriNet.getIdentifier(), petriNet.getVersion().toString());
 
         workflowService.deleteInstancesOfPetriNet(petriNet, force);
         processRoleService.deleteRolesOfNet(petriNet);
 
-        log.info("[{}]: User [{}] is deleting process {} version {}", deletePetriNetParams.getPetriNetId(),
-                deletePetriNetParams.getLoggedUser().getStringId(), petriNet.getIdentifier(), petriNet.getVersion().toString());
+        log.info("[{}]: User [{}] is deleting process {} version {}", petriNetId, loggedUser.getStringId(),
+                petriNet.getIdentifier(), petriNet.getVersion().toString());
         publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.PRE));
         repository.deleteBy_id(petriNet.getObjectId());
         evictCache(petriNet);
@@ -888,15 +889,6 @@ public class PetriNetService implements IPetriNetService {
         }
         if (importPetriNetParams.getWorkspaceId() == null) {
             importPetriNetParams.setWorkspaceId(workspaceService.getDefault().getId());
-        }
-    }
-
-    protected void fillAndValidateAttributes(DeletePetriNetParams deletePetriNetParams) throws IllegalArgumentException {
-        if (deletePetriNetParams.getPetriNetId() == null) {
-            throw new IllegalArgumentException("No petriNet identifier was provided.");
-        }
-        if (deletePetriNetParams.getLoggedUser() == null) {
-            deletePetriNetParams.setLoggedUser(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()));
         }
     }
 

@@ -13,7 +13,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingI
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
-import com.netgrif.application.engine.petrinet.params.DeletePetriNetParams;
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
@@ -231,24 +230,17 @@ public class PetriNetController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements")
     })
     @DeleteMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource deletePetriNet(@PathVariable("id") String processId, @RequestParam(required = false) boolean force, Authentication auth) {
+    public MessageResource deletePetriNet(@PathVariable("id") String processId, @RequestParam(required = false) boolean force) {
         String decodedProcessId = decodeUrl(processId);
         if (Objects.equals(decodedProcessId, "")) {
             log.error("Deleting Petri net [{}] failed: could not decode process ID from URL", processId);
             return MessageResource.errorMessage("Deleting Petri net " + processId + " failed!");
         }
-        LoggedUser user = (LoggedUser) auth.getPrincipal();
         asyncRunner.execute(() -> {
             if (force) {
-                this.service.forceDeletePetriNet(DeletePetriNetParams.with()
-                        .petriNetId(decodedProcessId)
-                        .loggedUser(user)
-                        .build());
+                this.service.forceDeletePetriNet(decodedProcessId);
             } else {
-                this.service.deletePetriNet(DeletePetriNetParams.with()
-                        .petriNetId(decodedProcessId)
-                        .loggedUser(user)
-                        .build());
+                this.service.deletePetriNet(decodedProcessId);
             }
         });
         return MessageResource.successMessage("Petri net " + decodedProcessId + " is being deleted");

@@ -11,17 +11,20 @@ import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.objects.petrinet.domain.version.Version;
+import com.netgrif.application.engine.objects.workflow.domain.QCase;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
+import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workspace.service.WorkspaceService;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,10 +61,16 @@ public class WorkspacePetriNetTest {
     private PetriNetRepository petriNetRepository;
 
     @Autowired
+    private CaseRepository caseRepository;
+
+    @Autowired
     private ProcessRoleRepository processRoleRepository;
 
     @Autowired
     private WorkspaceService workspaceService;
+
+    @Autowired
+    private IWorkflowService workflowService;
 
     @BeforeEach
     protected void beforeEach() {
@@ -532,7 +541,6 @@ public class WorkspacePetriNetTest {
     }
 
     @Test
-    @Disabled("Method getReferencesByUsersProcessRoles is broken (not workspace related)")
     public void testGetReferencesByUsersProcessRoles() throws IOException, MissingPetriNetMetaDataException {
         String workspaceId1 = "default";
         PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
@@ -627,20 +635,110 @@ public class WorkspacePetriNetTest {
         resultAsPage = petriNetService.search(searchBody, PageRequest.of(0, 2), Locale.getDefault());
         assertEquals(2, resultAsPage.getContent().size());
     }
-//
-//    PetriNet get(ObjectId petriNetId);
-//
-//    List<PetriNet> get(Collection<ObjectId> petriNetId);
-//
-//    List<PetriNet> get(List<String> petriNetIds);
-//
-//    void deletePetriNet(DeletePetriNetParams deletePetriNetParams);
-//
-//    void forceDeletePetriNet(DeletePetriNetParams deletePetriNetParams);
-//
-//    List<String> getExistingPetriNetIdentifiersFromIdentifiersList(List<String> identifiers);
-//
-//    PetriNetImportReference getNetFromCase(String caseId);
-//
-//    Page<PetriNet> findAllByRoleId(String roleId, Pageable pageable);
+
+    @Test
+    public void testGet() throws IOException, MissingPetriNetMetaDataException {
+        String workspaceId1 = "default";
+        PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/workspace_test.xml"))
+                .workspaceId(workspaceId1)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+
+        logout();
+        PetriNet resultNet = petriNetService.get(net.getObjectId());
+        petriNetService.evictAllCaches();
+        assertNotNull(resultNet);
+
+        loginCustomUser("wrongWorkspace", false);
+        assertThrows(IllegalArgumentException.class, () -> petriNetService.get(net.getObjectId()));
+        petriNetService.evictAllCaches();
+
+        loginCustomUser("wrongWorkspace", true);
+        resultNet = petriNetService.get(net.getObjectId());
+        petriNetService.evictAllCaches();
+        assertNotNull(resultNet);
+
+        loginCustomUser(workspaceId1, false);
+        resultNet = petriNetService.get(net.getObjectId());
+        petriNetService.evictAllCaches();
+        assertNotNull(resultNet);
+    }
+
+    @Test
+    public void testDeletePetriNet() throws IOException, MissingPetriNetMetaDataException {
+        String workspaceId1 = "default";
+        PetriNet net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/workspace_test.xml"))
+                .workspaceId(workspaceId1)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+        workflowService.createCase(CreateCaseParams.with()
+                .process(net)
+                .author(superCreatorRunner.getSuperUser())
+                .build());
+
+        loginCustomUser("wrongWorkspace", false);
+        assertThrows(IllegalArgumentException.class, () -> petriNetService.deletePetriNet(net.getStringId()));
+        assertTrue(petriNetRepository.findById(net.getStringId()).isPresent());
+        assertTrue(caseRepository.exists(QCase.case$.processIdentifier.eq(net.getIdentifier())));
+
+        logout();
+        petriNetService.deletePetriNet(net.getStringId());
+        assertFalse(petriNetRepository.findById(net.getStringId()).isPresent());
+        assertFalse(caseRepository.exists(QCase.case$.processIdentifier.eq(net.getIdentifier())));
+
+        PetriNet net2 = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/workspace_test.xml"))
+                .workspaceId(workspaceId1)
+                .author(superCreatorRunner.getLoggedSuper())
+                .build()).getNet();
+        workflowService.createCase(CreateCaseParams.with()
+                .process(net2)
+                .author(superCreatorRunner.getSuperUser())
+                .build());
+
+        loginCustomUser(workspaceId1, false);
+        petriNetService.deletePetriNet(net2.getStringId());
+        assertFalse(petriNetRepository.findById(net2.getStringId()).isPresent());
+        assertFalse(caseRepository.exists(QCase.case$.processIdentifier.eq(net.getIdentifier())));
+    }
+
+    @Test
+    public void testGetExistingPetriNetIdentifiersFromIdentifiersList() {
+        String workspaceId1 = "default";
+        String workspaceId2 = "otherWorkspaceId";
+
+        PetriNet net = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet();
+        net.setWorkspaceId(workspaceId1);
+        net.setIdentifier("identifier1");
+        petriNetRepository.save(net);
+
+        PetriNet net2 = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet();
+        net2.setWorkspaceId(workspaceId2);
+        net2.setIdentifier("identifier2");
+        petriNetRepository.save(net2);
+
+        List<String> identifiers = List.of(net.getIdentifier(), net2.getIdentifier());
+
+        logout();
+        List<String> existingIdentifiers = petriNetService.getExistingPetriNetIdentifiersFromIdentifiersList(identifiers);
+        assertEquals(2, existingIdentifiers.size());
+
+        loginCustomUser("wrongWorkspace", false);
+        existingIdentifiers = petriNetService.getExistingPetriNetIdentifiersFromIdentifiersList(identifiers);
+        assertEquals(0, existingIdentifiers.size());
+
+        loginCustomUser("wrongWorkspace", true);
+        existingIdentifiers = petriNetService.getExistingPetriNetIdentifiersFromIdentifiersList(identifiers);
+        assertEquals(2, existingIdentifiers.size());
+
+        loginCustomUser(workspaceId1, false);
+        existingIdentifiers = petriNetService.getExistingPetriNetIdentifiersFromIdentifiersList(identifiers);
+        assertEquals(1, existingIdentifiers.size());
+
+        loginCustomUser(workspaceId2, false);
+        existingIdentifiers = petriNetService.getExistingPetriNetIdentifiersFromIdentifiersList(identifiers);
+        assertEquals(1, existingIdentifiers.size());
+    }
 }
