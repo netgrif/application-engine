@@ -23,7 +23,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException exception, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         try {
-            log.error("Received HttpMessageNotWritableException: {}", exception.getMessage(), exception);
+            log.debug("Received HttpMessageNotWritableException: {}", exception.getMessage(), exception);
             List<JsonMappingException.Reference> path = ((JsonMappingException) exception.getCause()).getPath();
             JsonMappingException.Reference fieldReference = path.get(path.size() - 1);
             JsonMappingException.Reference caseReference = path.get(path.size() - 3);
