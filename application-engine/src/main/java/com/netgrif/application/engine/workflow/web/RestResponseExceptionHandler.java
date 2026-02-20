@@ -21,18 +21,34 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     private static final Logger log = LoggerFactory.getLogger(RestResponseExceptionHandler.class);
 
     @Override
-    protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException exception, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+    protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException exception,
+                                                                  HttpHeaders headers,
+                                                                  HttpStatusCode status,
+                                                                  WebRequest request) {
         try {
-            List<JsonMappingException.Reference> path = ((JsonMappingException) exception.getCause()).getPath();
-            if (path.size() > 3) {
-                JsonMappingException.Reference fieldReference = path.getLast();
-                JsonMappingException.Reference caseReference = path.get(path.size() - 3);
-                Field from = (Field) fieldReference.getFrom();
-                Case useCase = (Case) caseReference.getFrom();
-                log.debug("[{}] Could not parse value of field [{}], value [{}]", useCase.getStringId(), from.getStringId(), from.getValue());
-            } else {
+            Throwable cause = exception.getCause();
+            if (!(cause instanceof JsonMappingException jme)) {
                 log.error("Received HttpMessageNotWritableException: {}", exception.getMessage(), exception);
+                return super.handleHttpMessageNotWritable(exception, headers, status, request);
             }
+
+            List<JsonMappingException.Reference> path = jme.getPath();
+            if (path.size() > 3) {
+                Object fieldFrom = path.getLast().getFrom();
+                Object caseFrom = path.get(path.size() - 3).getFrom();
+
+                if (fieldFrom instanceof Field field && caseFrom instanceof Case useCase) {
+                    log.debug("[{}] Could not parse value of field [{}], value [{}] | path={}",
+                            useCase.getStringId(), field.getStringId(), field.getValue(), jme.getPathReference());
+                } else {
+                    log.error("JSON write failed: {} | path={}",
+                            jme.getOriginalMessage(), jme.getPathReference(), jme);
+                }
+            } else {
+                log.error("JSON write failed: {} | path={}",
+                        jme.getOriginalMessage(), jme.getPathReference(), jme);
+            }
+
         } catch (Exception e) {
             log.error("Unrecognized exception: ", e);
         }
