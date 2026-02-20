@@ -29,7 +29,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
                 JsonMappingException.Reference caseReference = path.get(path.size() - 3);
                 Field from = (Field) fieldReference.getFrom();
                 Case useCase = (Case) caseReference.getFrom();
-                log.error("[{}] Could not parse value of field [{}], value [{}]", useCase.getStringId(), from.getStringId(), from.getValue());
+                log.debug("[{}] Could not parse value of field [{}], value [{}]", useCase.getStringId(), from.getStringId(), from.getValue());
             } else {
                 log.error("Received HttpMessageNotWritableException: {}", exception.getMessage(), exception);
             }
