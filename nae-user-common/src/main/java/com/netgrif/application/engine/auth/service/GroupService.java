@@ -206,7 +206,7 @@ public interface GroupService {
      * @param groupIdentifier the unique identifier of the group
      * @return the updated {@link Group}
      */
-    Group removeUser(String userId, String realmId, String groupIdentifier);
+    Group removeUser(String userId, String realmId, String groupId);
 
     /**
      * Removes a user from a group specified by its unique identifier.
@@ -215,7 +215,7 @@ public interface GroupService {
      * @param groupIdentifier the unique identifier of the target group
      * @return the updated {@link Group}
      */
-    Group removeUser(AbstractUser user, String groupIdentifier);
+    Group removeUser(AbstractUser user, String groupId);
 
     /**
      * Removes a user from a specific group.
