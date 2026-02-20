@@ -42,7 +42,6 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Slf4j
 @SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
@@ -79,7 +78,8 @@ public class WorkspacePetriNetTest {
     }
 
     private void loginCustomUser(String activeWorkspaceId, boolean isAdmin) {
-        loginCustomUser(activeWorkspaceId, isAdmin, null);}
+        loginCustomUser(activeWorkspaceId, isAdmin, null);
+    }
 
     private void loginCustomUser(String activeWorkspaceId, boolean isAdmin, Set<ProcessRole> processRoles) {
         LoggedUser loggedUser = new LoggedUserImpl();
