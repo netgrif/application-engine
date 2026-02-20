@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(callSuper = true)
 public abstract class MapField extends TextField {
 
-    public String[] keyValue;
-    public Map<String, I18nString> keyValueTranslations;
+    protected List<String> keyValue;
+    protected Map<String, I18nString> keyValueTranslations;
 
     public MapField(MapField field) {
         super(field);
-        this.keyValue = field.keyValue == null ? null : Arrays.copyOf(field.keyValue, field.keyValue.length);
+        this.keyValue = field.keyValue == null ? null : new ArrayList<>(field.keyValue);
         this.keyValueTranslations = field.keyValueTranslations == null ? null
                 : field.keyValueTranslations.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> new I18nString(entry.getValue())));
@@ -29,24 +29,26 @@ public abstract class MapField extends TextField {
     }
 
     public MapField(List<Map.Entry<String, I18nString>> valueTranslationPairs) {
-        super(new String[0]);
-        this.keyValue = new String[valueTranslationPairs.size()];
-        List<String> values = new ArrayList<>();
-        this.keyValueTranslations = new HashMap<>();
-        for (int i = 0; i < valueTranslationPairs.size(); i++) {
-            this.keyValue[i] = valueTranslationPairs.get(i).getKey();
-            values.addAll(I18nStringUtils.collectTranslations(valueTranslationPairs.get(i).getValue()));
-            this.keyValueTranslations.put(valueTranslationPairs.get(i).getKey(), valueTranslationPairs.get(i).getValue());
+        if (valueTranslationPairs == null || valueTranslationPairs.isEmpty()) {
+            return;
         }
-        this.textValue = values.toArray(new String[0]);
-        this.fulltextValue = values.toArray(new String[0]);
+        List<String> values = new ArrayList<>();
+        this.keyValue = new ArrayList<>();
+        this.keyValueTranslations = new HashMap<>();
+        for (Map.Entry<String, I18nString> valueTranslationPair : valueTranslationPairs) {
+            this.keyValue.add(valueTranslationPair.getKey());
+            values.addAll(I18nStringUtils.collectTranslations(valueTranslationPair.getValue()));
+            this.keyValueTranslations.put(valueTranslationPair.getKey(), valueTranslationPair.getValue());
+        }
+        this.textValue = values;
+        this.fulltextValue = values;
     }
 
     public Object getValue() {
-        if (keyValue != null && keyValue.length == 1) {
-            return keyValue[0];
-        } else if (keyValue != null && keyValue.length > 1) {
-            return new LinkedHashSet<>(Arrays.asList(keyValue));
+        if (this.keyValue != null && this.keyValue.size() == 1) {
+            return this.keyValue.getFirst();
+        } else if (this.keyValue != null && this.keyValue.size() > 1) {
+            return new LinkedHashSet<>(this.keyValue);
         }
         return null;
     }

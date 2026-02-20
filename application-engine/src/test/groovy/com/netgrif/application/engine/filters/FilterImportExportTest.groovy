@@ -332,8 +332,8 @@ class FilterImportExportTest {
                         "(processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.date.timestampValue:[1631138400000 TO 1631224800000}) AND " +
                         "(processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.date.timestampValue:[1631138400000 TO 1631311200000}) AND " +
                         "(processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.file.fileNameValue:*asdasd*) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) OR " +
-                        "((dataSet.fileList.fileNameValue:*asdasd*) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.user.userIdValue:<<me>>) AND " +
-                        "(processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.user.userIdValue:7) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) " +
+                        "((dataSet.fileList.fileNameValue:*asdasd*) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.user.actorIdValue:<<me>>) AND " +
+                        "(processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.user.actorIdValue:7) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) " +
                         "OR ((dataSet.datetime.timestampValue:[1631184300000 TO 1631184360000}) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) OR " +
                         "((dataSet.datetime.timestampValue:[1631184360000 TO 1631270820000}) AND (processIdentifier:6139e51308215f25b0a498c2_all_data))) AND (title:*asdasd*) AND " +
                         "((creationDateSortable:[1631138400000 TO 1631224800000}) OR (creationDateSortable:[1631138400000 TO 1631311200000})) AND " +

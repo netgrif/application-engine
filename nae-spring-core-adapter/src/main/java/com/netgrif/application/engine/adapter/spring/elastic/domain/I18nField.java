@@ -3,6 +3,7 @@ package com.netgrif.application.engine.adapter.spring.elastic.domain;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,12 +23,12 @@ public class I18nField extends com.netgrif.application.engine.objects.elastic.do
 
     @Override
     @Field(type = Text)
-    public String[] getFulltextValue() {
+    public List<String> getFulltextValue() {
         return super.getFulltextValue();
     }
 
     @Field(type = Text)
-    public String[] getKeyValue() {
+    public Set<String> getKeyValue() {
         return super.getKeyValue();
     }
 

@@ -794,10 +794,27 @@ class ActionDelegate {
             if (field instanceof NumberField) {
                 value = value as Double
             }
-            if (field instanceof UserListField && (value instanceof String[] || value instanceof List)) {
-                LinkedHashSet<UserFieldValue> users = new LinkedHashSet<>()
-                value.each { id -> users.add(new UserFieldValue(userService.findById(id as String, null))) }
-                value = new UserListFieldValue(users)
+            if (field instanceof ActorListField && (value instanceof String[] || value instanceof List)) {
+                LinkedHashSet<ActorFieldValue> actorFieldValues = new LinkedHashSet<>()
+                value.each { id ->
+                    AbstractUser user = userService.findById(id as String, null)
+                    if (user != null) {
+                        actorFieldValues.add(new UserFieldValue(user))
+                    } else {
+                        Group group = groupService.findById((String) id)
+                        actorFieldValues.add(new GroupFieldValue(group))
+                    }
+                }
+                value = new ActorListFieldValue(actorFieldValues)
+            }
+            if (field instanceof ActorField && value instanceof String) {
+                AbstractUser user = userService.findById(value, null)
+                if (user != null) {
+                    value = new UserFieldValue(user)
+                } else {
+                    Group group = groupService.findById(value)
+                    value = new GroupFieldValue(group)
+                }
             }
 //            if (field instanceof TaskField && targetTask.isPresent()) {
 //                dataService.validateTaskRefValue(value, targetTask.get().getStringId());

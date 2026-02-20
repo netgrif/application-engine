@@ -12,6 +12,7 @@ public class TransitionValidator implements ITransitionValidator {
     @Override
     public void checkDeprecatedAttributes(Transition transition) {
         validateAttribute(transition.getUsersRef(), "usersRef");
+        validateAttribute(transition.getUsersRef(), "userRef");
     }
 
     @Override

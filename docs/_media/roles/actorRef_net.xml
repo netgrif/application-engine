@@ -31,14 +31,14 @@
             <view>true</view>
         </caseLogic>
     </roleRef>
-    <usersRef>
-        <id>user_list_1</id>
+    <actorRef>
+        <id>actor_list_1</id>
         <caseLogic>
             <view>true</view>
         </caseLogic>
-    </usersRef>
+    </actorRef>
 
-    <!-- PROCESS USER REFS -->
+    <!-- PROCESS ACTOR REFS -->
     <!-- DATA -->
     <data type="button">
         <id>assign</id>
@@ -48,12 +48,12 @@
         <id>remove</id>
         <title>Remove from user ref</title>
     </data>
-    <data type="userList">
-        <id>user_list_1</id>
+    <data type="actorList">
+        <id>actor_list_1</id>
         <title>User list 1</title>
     </data>
-    <data type="userList">
-        <id>user_list_2</id>
+    <data type="actorList">
+        <id>actor_list_2</id>
         <title>User list 2</title>
     </data>
     <!-- I18NS -->
@@ -63,8 +63,8 @@
             <id>userAddition</id>
             <actions phase="post">
                 <action>
-                    userList: f.user_list_1;
-                    change userList value { [getDummyUser()] }
+                    actorList: f.actor_list_1;
+                    change actorList value { [getDummyUser()] }
                 </action>
             </actions>
         </event>
@@ -84,12 +84,12 @@
                 <view>true</view>
             </logic>
         </roleRef>
-        <usersRef>
-            <id>user_list_1</id>
+        <actorRef>
+            <id>actor_list_1</id>
             <logic>
                 <view>false</view>
             </logic>
-        </usersRef>
+        </actorRef>
         <dataRef>
             <id>assign</id>
             <logic>
@@ -99,8 +99,8 @@
                 <id>assign</id>
                 <actions phase="pre">
                     <action>
-                        userList: f.user_list_1;
-                        change userList value { [getDummyUser()] }
+                        actorList: f.actor_list_1;
+                        change actorList value { [getDummyUser()] }
                     </action>
                 </actions>
             </event>
@@ -114,8 +114,8 @@
                 <id>remove</id>
                 <actions phase="pre">
                     <action>
-                        userList: f.user_list_1;
-                        change userList value { [] }
+                        actorList: f.actor_list_1;
+                        change actorList value { [] }
                     </action>
                 </actions>
             </event>

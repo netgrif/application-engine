@@ -16,7 +16,7 @@ import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorListFieldValue
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.objects.workflow.domain.Task
@@ -315,7 +315,7 @@ class ImpersonationServiceTest {
         def owner = new UserFieldValue(user)
         caze.dataSet["impersonated"].value = owner
         caze.dataSet["impersonated_email"].value = owner.username
-        caze.dataSet["config_owner"].value = new UserListFieldValue([owner])
+        caze.dataSet["config_owner"].value = new ActorListFieldValue([owner])
         caze.dataSet["impersonators"].value = [impersonator]
         caze.dataSet["impersonated_roles"].value = roles ?: user.processRoles.stringId as List
         caze.dataSet["impersonated_authorities"].value = auths ?: user.authoritySet.stringId as List

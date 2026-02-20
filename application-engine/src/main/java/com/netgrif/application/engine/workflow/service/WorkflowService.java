@@ -1,7 +1,11 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
+import com.netgrif.application.engine.auth.service.GroupService;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.*;
+import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
@@ -15,10 +19,6 @@ import com.netgrif.application.engine.event.services.EvaluationService;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.TaskField;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.objects.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
@@ -98,6 +98,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     protected UserService userService;
+
+    @Autowired
+    protected GroupService groupService;
 
     @Autowired
     protected InitValueExpressionEvaluator initValueExpressionEvaluator;
@@ -230,19 +233,19 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public Case resolveUserRef(Case useCase, boolean canSaveUseCase) {
-        AtomicBoolean isUseCaseModified = new AtomicBoolean(!useCase.getUsers().isEmpty() || !useCase.getNegativeViewUsers().isEmpty());
-        useCase.getUsers().clear();
-        useCase.getNegativeViewUsers().clear();
-        useCase.getUserRefs().forEach((id, permission) -> {
-            if (resolveUserRefPermissions(useCase, id, permission)) {
+    public Case resolveActorRef(Case useCase, boolean canSaveUseCase) {
+        AtomicBoolean isUseCaseModified = new AtomicBoolean(!useCase.getActors().isEmpty() || !useCase.getNegativeViewActors().isEmpty());
+        useCase.getActors().clear();
+        useCase.getNegativeViewActors().clear();
+        useCase.getActorRefs().forEach((actorFieldId, permission) -> {
+            if (resolveActorRefPermissions(useCase, actorFieldId, permission)) {
                 isUseCaseModified.set(true);
             }
         });
-        if (useCase.resolveViewUsers()) {
+        if (useCase.resolveViewActors()) {
             isUseCaseModified.set(true);
         }
-        taskService.resolveUserRef(useCase);
+        taskService.resolveActorRef(useCase);
         if (isUseCaseModified.get() && canSaveUseCase) {
             return save(useCase);
         }
@@ -250,32 +253,44 @@ public class WorkflowService implements IWorkflowService {
     }
 
     /**
-     * Resolves user permissions for the useCase based on the user list data field.
+     * Resolves actor permissions for the useCase based on the actor list data field.
      *
-     * @param useCase useCase where to resolve user permissions
-     * @param userListId field id of the user list
-     * @param permission permission associated with the useCase and user list
+     * @param useCase useCase where to resolve actor permissions
+     * @param actorFieldId field id of the actor list
+     * @param permission permission associated with the useCase and actor list
      *
      * @return true if the useCase was modified, false otherwise
      */
-    private boolean resolveUserRefPermissions(Case useCase, String userListId, Map<String, Boolean> permission) {
-        List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(userListId).getValue());
-        if (userIds != null && !userIds.isEmpty()) {
-            if (permission.containsKey("view") && !permission.get("view")) {
-                return useCase.getNegativeViewUsers().addAll(userIds);
-            } else {
-                useCase.addUsers(new HashSet<>(userIds), permission);
-                return true;
+    private boolean resolveActorRefPermissions(Case useCase, String actorFieldId, Map<String, Boolean> permission) {
+        List<String> actorIds = getExistingActors((ActorListFieldValue) useCase.getDataSet().get(actorFieldId).getValue());
+        if (actorIds != null && !actorIds.isEmpty()) {
+            useCase.addActors(new HashSet<>(actorIds), permission);
+            if (permission.containsKey(ProcessRolePermission.VIEW.getValue()) && !permission.get(ProcessRolePermission.VIEW.getValue())) {
+                useCase.getNegativeViewActors().addAll(actorIds);
             }
+            return true;
         }
         return false;
     }
 
-    private List<String> getExistingUsers(UserListFieldValue userListValue) {
-        if (userListValue == null)
+    private List<String> getExistingActors(ActorListFieldValue actorListFieldValue) {
+        if (actorListFieldValue == null) {
             return null;
-        return userListValue.getUserValues().stream().map(UserFieldValue::getId)
-                .filter(id -> userService.findById(id, null) != null)
+        }
+        return actorListFieldValue.getActorValues().stream()
+                .map(ActorFieldValue::getId)
+                .filter(actorId -> {
+                    AbstractUser user = userService.findById(actorId, null);
+                    if (user != null) {
+                        return true;
+                    }
+                    try {
+                        groupService.findById(actorId);
+                        return true;
+                    } catch (IllegalArgumentException ignored) {
+                        return false;
+                    }
+                })
                 .collect(Collectors.toList());
     }
 

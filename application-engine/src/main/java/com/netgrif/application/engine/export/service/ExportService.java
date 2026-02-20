@@ -273,17 +273,25 @@ public class ExportService implements IExportService {
             case TASK_REF:
                 fieldValue = String.join(";", ((TaskField) fieldData).getValue());
                 break;
-            case USER:
-                fieldValue = ((UserFieldValue) fieldData).getUsername();
+            case ACTOR:
+                if (fieldData instanceof UserFieldValue) {
+                    fieldValue = ((UserFieldValue) fieldData).getUsername();
+                } else if (fieldData instanceof GroupFieldValue) {
+                    fieldValue = ((GroupFieldValue) fieldData).getName();
+                } else {
+                    fieldValue = "";
+                }
                 break;
             case DATE:
                 fieldValue = ((LocalDate) fieldData).toString();
                 break;
             case DATETIME:
-                fieldValue = ((Date) fieldData).toString();
+                fieldValue = fieldData.toString();
                 break;
-            case USERLIST:
-                fieldValue = ((UserListField) fieldData).getValue().getUserValues().stream().map(UserFieldValue::getId).collect(Collectors.joining(";"));
+            case ACTORLIST:
+                fieldValue = ((ActorListField) fieldData).getValue().getActorValues().stream()
+                        .map(ActorFieldValue::getId)
+                        .collect(Collectors.joining(";"));
                 break;
             case NUMBER:
                 fieldValue = fieldData.toString();

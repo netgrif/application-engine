@@ -107,7 +107,7 @@
         <placeholder>File field placeholder</placeholder>
     </data>
     <!-- USER -->
-    <data type="user">
+    <data type="actor">
         <id>user</id>
         <title>User</title>
         <!--<init></init>-->

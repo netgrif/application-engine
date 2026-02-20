@@ -17,18 +17,18 @@
             <view>false</view>
         </caseLogic>
     </roleRef>
-    <userRef>
+    <actorRef>
         <id>view_ul_pos</id>
         <caseLogic>
             <view>true</view>
         </caseLogic>
-    </userRef>
-    <userRef>
+    </actorRef>
+    <actorRef>
         <id>view_ul_neg</id>
         <caseLogic>
             <view>false</view>
         </caseLogic>
-    </userRef>
+    </actorRef>
     <role>
         <id>view_pos_role</id>
         <name>view role</name>
@@ -37,11 +37,11 @@
         <id>view_neg_role</id>
         <name>view role</name>
     </role>
-    <data type="userList">
+    <data type="actorList">
         <id>view_ul_pos</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>view_ul_neg</id>
         <title/>
     </data>
@@ -71,18 +71,18 @@
                 <view>false</view>
             </logic>
         </roleRef>
-        <userRef>
+        <actorRef>
             <id>view_ul_pos</id>
             <logic>
                 <view>true</view>
             </logic>
-        </userRef>
-        <userRef>
+        </actorRef>
+        <actorRef>
             <id>view_ul_neg</id>
             <logic>
                 <view>false</view>
             </logic>
-        </userRef>
+        </actorRef>
         <dataRef>
             <id>text</id>
             <logic>
