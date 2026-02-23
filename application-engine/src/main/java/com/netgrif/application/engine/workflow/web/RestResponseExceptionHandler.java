@@ -33,9 +33,16 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
             }
 
             List<JsonMappingException.Reference> path = jme.getPath();
+            if (log.isDebugEnabled()) {
+                for (int i = 0; i < path.size(); i++) {
+                    log.debug("Reference[{}]: {}", i, path.get(i));
+                }
+            }
             if (path.size() > 3) {
                 Object fieldFrom = path.getLast().getFrom();
+                log.debug("Field of class [{}] from: {}", fieldFrom.getClass(), fieldFrom);
                 Object caseFrom = path.get(path.size() - 3).getFrom();
+                log.debug("Case of class [{}] from: {}", caseFrom.getClass(), caseFrom);
 
                 if (fieldFrom instanceof Field field && caseFrom instanceof Case useCase) {
                     log.debug("[{}] Could not parse value of field [{}], value [{}] | path={}",

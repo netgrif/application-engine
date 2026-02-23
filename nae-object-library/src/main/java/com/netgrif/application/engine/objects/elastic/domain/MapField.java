@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(callSuper = true)
 public abstract class MapField extends TextField {
 
+    public static final String NONE_OPTION_KEY = "none";
+
     protected List<String> keyValue;
     protected Map<String, I18nString> keyValueTranslations;
 
@@ -21,7 +23,7 @@ public abstract class MapField extends TextField {
         this.keyValue = field.keyValue == null ? null : new ArrayList<>(field.keyValue);
         this.keyValueTranslations = field.keyValueTranslations == null ? null
                 : field.keyValueTranslations.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> new I18nString(entry.getValue())));
+                .collect(Collectors.toMap(entry -> resolveTranslationPairKey(entry.getKey()), entry -> new I18nString(entry.getValue())));
     }
 
     public MapField(Map.Entry<String, I18nString> valueTranslationPair) {
@@ -36,9 +38,9 @@ public abstract class MapField extends TextField {
         this.keyValue = new ArrayList<>();
         this.keyValueTranslations = new HashMap<>();
         for (Map.Entry<String, I18nString> valueTranslationPair : valueTranslationPairs) {
-            this.keyValue.add(valueTranslationPair.getKey());
+            this.keyValue.add(resolveTranslationPairKey(valueTranslationPair.getKey()));
             values.addAll(I18nStringUtils.collectTranslations(valueTranslationPair.getValue()));
-            this.keyValueTranslations.put(valueTranslationPair.getKey(), valueTranslationPair.getValue());
+            this.keyValueTranslations.put(resolveTranslationPairKey(valueTranslationPair.getKey()), valueTranslationPair.getValue());
         }
         this.textValue = values;
         this.fulltextValue = values;
@@ -51,5 +53,9 @@ public abstract class MapField extends TextField {
             return new LinkedHashSet<>(this.keyValue);
         }
         return null;
+    }
+
+    private String resolveTranslationPairKey(String key) {
+        return key == null || key.isBlank() ? NONE_OPTION_KEY : key;
     }
 }
