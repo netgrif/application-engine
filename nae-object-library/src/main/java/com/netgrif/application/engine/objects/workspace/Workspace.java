@@ -38,12 +38,11 @@ public abstract class Workspace implements Serializable {
     private boolean defaultWorkspace;
 
     public Workspace(String id) {
-        // todo 2072 implement test
         if (id == null) {
             throw new IllegalArgumentException("Workspace id cannot be null");
         }
         Matcher matcher = idPattern.matcher(id);
-        if (!matcher.matches()) {
+        if (!matcher.matches() || id.equals(FORBIDDEN_ID)) {
             throw new IllegalArgumentException("Workspace id is not valid");
         }
         this.id = id;
