@@ -40,9 +40,9 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
             }
             if (path.size() > 3) {
                 Object fieldFrom = path.getLast().getFrom();
-                log.debug("Field of class [{}] from: {}", fieldFrom.getClass(), fieldFrom);
+                log.debug("Field of class [{}] from: {}", fieldFrom == null ? "null" : fieldFrom.getClass(), fieldFrom);
                 Object caseFrom = path.get(path.size() - 3).getFrom();
-                log.debug("Case of class [{}] from: {}", caseFrom.getClass(), caseFrom);
+                log.debug("Case of class [{}] from: {}", caseFrom == null ? "null" : caseFrom.getClass(), caseFrom);
 
                 if (fieldFrom instanceof Field field && caseFrom instanceof Case useCase) {
                     log.debug("[{}] Could not parse value of field [{}], value [{}] | path={}",
