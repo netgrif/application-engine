@@ -6,7 +6,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.acti
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.objects.petrinet.domain.version.Version;
-import com.netgrif.application.engine.petrinet.params.DeletePetriNetParams;
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetImportReference;
@@ -281,24 +280,20 @@ public interface IPetriNetService {
     /**
      * Deletes a PetriNet instance by its process ID.
      *
-     * @param deletePetriNetParams parameters for petriNet removal
-     * <br>
-     * <b>Required parameters: petriNetId</b>
+     * @param petriNetId id of the process
      *
      * @throws IllegalArgumentException if the PetriNet doesn't exist
      */
-    void deletePetriNet(DeletePetriNetParams deletePetriNetParams);
+    void deletePetriNet(String petriNetId);
 
     /**
      * Forcefully deletes a PetriNet process by its ID.
      *
-     * @param deletePetriNetParams parameters for petriNet removal
-     * <br>
-     * <b>Required parameters: petriNetId</b>
+     * @param petriNetId id of the process
      *
      * @throws IllegalArgumentException if the PetriNet doesn't exist
      */
-    void forceDeletePetriNet(DeletePetriNetParams deletePetriNetParams);
+    void forceDeletePetriNet(String petriNetId);
 
     /**
      * Runs the specified set of actions on a PetriNet.

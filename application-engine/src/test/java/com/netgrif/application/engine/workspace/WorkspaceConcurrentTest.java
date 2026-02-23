@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
-public class WorkspaceAsyncTest {
+public class WorkspaceConcurrentTest {
 
     private static final String activeWorkspaceId = "default";
 
@@ -57,15 +57,14 @@ public class WorkspaceAsyncTest {
     @BeforeEach
     protected void beforeEach() {
         testHelper.truncateDbs();
-        loggedCustomUser();
+        loginCustomUser();
     }
 
-    private void loggedCustomUser() {
+    private void loginCustomUser() {
         LoggedUser loggedUser = new LoggedUserImpl();
         loggedUser.setUsername("username1");
         loggedUser.setActiveWorkspaceId(activeWorkspaceId);
         SecurityContextHolder.getContext().setAuthentication(UsernamePasswordAuthenticationToken.authenticated(loggedUser, "password", null));
-
     }
 
     @Test

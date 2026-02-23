@@ -16,7 +16,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.version.Version
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
-import com.netgrif.application.engine.petrinet.params.DeletePetriNetParams
+
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -234,18 +234,18 @@ class PetriNetServiceTest {
         assertFalse(petriNetService.get(processV2.getObjectId()).defaultVersion)
         assertTrue(petriNetService.get(processV3.getObjectId()).defaultVersion)
 
-        petriNetService.deletePetriNet(new DeletePetriNetParams(processV2.getStringId(), superCreator.loggedSuper))
+        petriNetService.deletePetriNet(processV2.getStringId())
 
         assertTrue(petriNetRepository.findById(processV2.getStringId()).isEmpty())
         assertFalse(petriNetService.get(processV1.getObjectId()).defaultVersion)
         assertTrue(petriNetService.get(processV3.getObjectId()).defaultVersion)
 
-        petriNetService.deletePetriNet(new DeletePetriNetParams(processV3.getStringId(), superCreator.loggedSuper))
+        petriNetService.deletePetriNet(processV3.getStringId())
 
         assertTrue(petriNetRepository.findById(processV3.getStringId()).isEmpty())
         assertTrue(petriNetService.get(processV1.getObjectId()).defaultVersion)
 
-        petriNetService.deletePetriNet(new DeletePetriNetParams(processV1.getStringId(), superCreator.loggedSuper))
+        petriNetService.deletePetriNet(processV1.getStringId())
 
         assertTrue(petriNetRepository.findById(processV1.getStringId()).isEmpty())
     }
@@ -263,41 +263,41 @@ class PetriNetServiceTest {
         assert petriNetRepository.count() == processCount + 2
 
         PetriNetSearch search = new PetriNetSearch();
-        assert petriNetService.search(search, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == processCount + 2;
+        assert petriNetService.search(search, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == processCount + 2;
 
         PetriNetSearch search1 = new PetriNetSearch();
         search1.setIdentifier("processSearchTest");
-        assert petriNetService.search(search1, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+        assert petriNetService.search(search1, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
 
         PetriNetSearch search2 = new PetriNetSearch();
         search2.setTitle("Process Search Test");
-        assert petriNetService.search(search2, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+        assert petriNetService.search(search2, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
 
         PetriNetSearch search3 = new PetriNetSearch();
         search3.setDefaultCaseName("Process Search Case Name");
-        assert petriNetService.search(search3, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+        assert petriNetService.search(search3, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
 
         PetriNetSearch search4 = new PetriNetSearch();
         search4.setInitials("PST");
-        assert petriNetService.search(search4, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+        assert petriNetService.search(search4, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
 
 
         PetriNetSearch search5 = new PetriNetSearch();
         ActorRef author = new ActorRef();
         author.setIdentifier(user.get().getUsername());
         search5.setAuthor(author);
-        assert petriNetService.search(search5, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+        assert petriNetService.search(search5, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
 
 
         PetriNetSearch search6 = new PetriNetSearch();
         search6.setVersion(new Version(1,0,0));
-        assert petriNetService.search(search6, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == processCount + 2;
+        assert petriNetService.search(search6, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == processCount + 2;
 
         PetriNetSearch search7 = new PetriNetSearch();
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("test", "test");
         search7.setTags(map);
-        assert petriNetService.search(search7, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+        assert petriNetService.search(search7, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
 
         PetriNetSearch search8 = new PetriNetSearch();
         HashMap<String, String> mapTags = new HashMap<String, String>();
@@ -308,7 +308,7 @@ class PetriNetServiceTest {
         search8.setDefaultCaseName("Process Search Case Name");
         search8.setInitials("PST");
         search8.setAuthor(author);
-        assert petriNetService.search(search8, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+        assert petriNetService.search(search8, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
     }
 
     private ImportPetriNetEventOutcome importProcess(String filePath, LoggedUser author) {

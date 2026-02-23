@@ -86,7 +86,7 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
         if (processRole.getWorkspaceId() == null
                 || (loggedUser != null && !processRole.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin())) {
             throw new IllegalArgumentException("Cannot save the role [%s] with different workspace. ProcessRole workspace: %s, LoggedUser workspace: %s"
-                    .formatted(processRole.getStringId(), processRole.getWorkspaceId(), loggedUser.getActiveWorkspaceId()));
+                    .formatted(processRole.getStringId(), processRole.getWorkspaceId(), loggedUser == null ? "" : loggedUser.getActiveWorkspaceId()));
         }
 
         return processRoleRepository.save(processRole);
@@ -128,13 +128,13 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
     }
 
     @Override
-    public void deleteAll(Collection<String> collection) {
+    public void deleteAll(Collection<String> ids) {
         LoggedUser loggedUser = userService.getLoggedUserFromContext();
         Set<ProcessRole> processRoles;
         if (loggedUser == null || loggedUser.isAdmin()) {
-            processRoles = processRoleRepository.findAllByIdsSet(collection);
+            processRoles = processRoleRepository.findAllByIdsSet(ids);
         } else {
-            processRoles = processRoleRepository.findAllByIdsSetAndWorkspaceId(collection, loggedUser.getActiveWorkspaceId());
+            processRoles = processRoleRepository.findAllByIdsSetAndWorkspaceId(ids, loggedUser.getActiveWorkspaceId());
         }
         if (!processRoles.isEmpty()) {
             processRoleRepository.deleteAll(processRoles);
@@ -160,7 +160,7 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public void assignRolesToGroup(Group group, Collection<ProcessResourceId> requestedRolesIds) {
-        assignRolesToActor(group.getProcessRoles(), requestedRolesIds, userService.getLoggedOrSystem());
+        assignRolesToActor(group.getProcessRoles(), requestedRolesIds, userService.getLoggedUserFromContext());
         groupService.save(group);
     }
 
@@ -237,7 +237,7 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
     public List<ProcessRole> saveAll(Collection<ProcessRole> entities) {
         LoggedUser loggedUser = userService.getLoggedUserFromContext();
         return entities.stream().map(processRole -> {
-            if (!processRole.isGlobal() || findAllByImportId(processRole.getImportId(), Pageable.ofSize(1)).isEmpty()) {
+            if (!processRole.isGlobal() || findById(processRole.getStringId()) == null) {
                 if (processRole.getWorkspaceId() == null
                         || (loggedUser != null && !processRole.getWorkspaceId().equals(loggedUser.getActiveWorkspaceId()) && !loggedUser.isAdmin())) {
                     return null;

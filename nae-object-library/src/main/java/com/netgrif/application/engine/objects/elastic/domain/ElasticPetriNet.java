@@ -29,8 +29,6 @@ public abstract class ElasticPetriNet implements Workspaceable {
 
     private String uriNodeId;
 
-    private String uri;
-
     private String workspaceId;
 
     private I18nField title;
@@ -47,7 +45,6 @@ public abstract class ElasticPetriNet implements Workspaceable {
         this.version = net.getVersion();
         this.defaultVersion = net.isDefaultVersion();
         this.uriNodeId = net.getUriNodeId();
-        this.uri = net.getUri();
         this.workspaceId = net.getWorkspaceId();
         this.title = this.transformToField(net.getTitle());
         this.initials = net.getInitials();
@@ -60,7 +57,6 @@ public abstract class ElasticPetriNet implements Workspaceable {
         if (net.getUriNodeId() != null) {
             this.uriNodeId = net.getUriNodeId();
         }
-        this.uri = net.getUri();
         this.workspaceId = net.getWorkspaceId();
         this.title = net.getTitle();
         this.initials = net.getInitials();
