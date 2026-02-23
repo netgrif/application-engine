@@ -23,7 +23,10 @@ public abstract class MapField extends TextField {
         this.keyValue = field.keyValue == null ? null : new ArrayList<>(field.keyValue);
         this.keyValueTranslations = field.keyValueTranslations == null ? null
                 : field.keyValueTranslations.entrySet().stream()
-                .collect(Collectors.toMap(entry -> resolveTranslationPairKey(entry.getKey()), entry -> new I18nString(entry.getValue())));
+                .collect(Collectors.toMap(entry ->
+                        resolveTranslationPairKey(entry.getKey()),
+                        entry -> new I18nString(entry.getValue()),
+                        (existing, replacement) -> replacement, LinkedHashMap::new));
     }
 
     public MapField(Map.Entry<String, I18nString> valueTranslationPair) {
