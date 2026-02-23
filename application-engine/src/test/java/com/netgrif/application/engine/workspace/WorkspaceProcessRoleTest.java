@@ -3,12 +3,14 @@ package com.netgrif.application.engine.workspace;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl;
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
+import com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
+import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,10 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -40,6 +39,9 @@ public class WorkspaceProcessRoleTest {
     
     @Autowired
     private ProcessRoleRepository processRoleRepository;
+
+    @Autowired
+    private PetriNetRepository petriNetRepository;
 
     @Autowired
     private UserService userService;
@@ -718,6 +720,53 @@ public class WorkspaceProcessRoleTest {
 
     @Test
     public void testDeleteRolesOfNet() {
-        // todo 2072
+        String workspaceId1 = "workspace1";
+        ProcessRole processRole = new com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.ProcessRole();
+        processRole.setWorkspaceId(workspaceId1);
+        processRoleRepository.save(processRole);
+
+        ProcessRole processRole2 = new com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.ProcessRole();
+        processRole2.setWorkspaceId(workspaceId1);
+        processRoleRepository.save(processRole2);
+
+        PetriNet net = new PetriNet();
+        net.setWorkspaceId(workspaceId1);
+        LinkedHashMap<String, ProcessRole> roleMap = new LinkedHashMap<>();
+        roleMap.put(processRole.getStringId(), processRole);
+        roleMap.put(processRole2.getStringId(), processRole2);
+        net.setRoles(roleMap);
+
+        net = petriNetRepository.save(net);
+
+        assertTrue(processRoleRepository.findByCompositeId(processRole.getStringId()).isPresent());
+        assertTrue(processRoleRepository.findByCompositeId(processRole2.getStringId()).isPresent());
+
+        logout();
+        processRoleService.deleteRolesOfNet(net);
+
+        assertFalse(processRoleRepository.findByCompositeId(processRole.getStringId()).isPresent());
+        assertFalse(processRoleRepository.findByCompositeId(processRole2.getStringId()).isPresent());
+
+        processRoleRepository.save(processRole);
+        processRoleRepository.save(processRole2);
+
+        loginCustomUser("wrongWorkspace", false);
+        PetriNet finalNet = net;
+        assertThrows(IllegalArgumentException.class, () -> processRoleService.deleteRolesOfNet(finalNet));
+        assertTrue(processRoleRepository.findByCompositeId(processRole.getStringId()).isPresent());
+        assertTrue(processRoleRepository.findByCompositeId(processRole2.getStringId()).isPresent());
+
+        loginCustomUser("wrongWorkspace", true);
+        processRoleService.deleteRolesOfNet(finalNet);
+        assertFalse(processRoleRepository.findByCompositeId(processRole.getStringId()).isPresent());
+        assertFalse(processRoleRepository.findByCompositeId(processRole2.getStringId()).isPresent());
+
+        processRoleRepository.save(processRole);
+        processRoleRepository.save(processRole2);
+
+        loginCustomUser(workspaceId1, false);
+        processRoleService.deleteRolesOfNet(finalNet);
+        assertFalse(processRoleRepository.findByCompositeId(processRole.getStringId()).isPresent());
+        assertFalse(processRoleRepository.findByCompositeId(processRole2.getStringId()).isPresent());
     }
 }
