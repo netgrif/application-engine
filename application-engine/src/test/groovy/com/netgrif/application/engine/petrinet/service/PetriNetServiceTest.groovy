@@ -108,7 +108,6 @@ class PetriNetServiceTest {
         long processCount = petriNetRepository.count()
         long taskCount = taskRepository.count()
 
-
         ImportPetriNetEventOutcome testNetOptional = importProcess(NET_FILE, superCreator.getLoggedSuper())
         assert testNetOptional.getNet() != null
         assert petriNetRepository.count() == processCount + 1
@@ -131,7 +130,7 @@ class PetriNetServiceTest {
         assert user.get().processRoles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
 
-        petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
+        petriNetService.deletePetriNet(testNet.stringId)
         assert petriNetRepository.count() == processCount
         Thread.sleep(5000)
         assert elasticPetriNetRepository.findById(testNet.stringId).isEmpty()

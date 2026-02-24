@@ -21,7 +21,9 @@ public interface ProcessRoleService {
     void assignRolesToUser(AbstractUser user, Collection<ProcessResourceId> roleIds);
     void assignRolesToGroup(Group group, Collection<ProcessResourceId> requestedRolesIds);
     ProcessRole getDefaultRole();
+    ProcessRole getDefaultRole(String workspaceId);
     ProcessRole getAnonymousRole();
+    ProcessRole getAnonymousRole(String workspaceId);
 
     Page<ProcessRole> findAll(Pageable pageable);
     List<ProcessRole> findAllByNetStringId(String netStringId);

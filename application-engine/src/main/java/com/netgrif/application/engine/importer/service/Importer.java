@@ -138,7 +138,7 @@ public class Importer {
 
     public Optional<PetriNet> importPetriNet(InputStream xml, String workspaceId) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
-            initialize();
+            initialize(workspaceId);
             unmarshallXml(xml);
             return createPetriNet(workspaceId);
         } catch (JAXBException e) {
@@ -156,14 +156,14 @@ public class Importer {
         return Optional.empty();
     }
 
-    protected void initialize() {
+    protected void initialize(String workspaceId) {
         this.roles = new HashMap<>();
         this.transitions = new HashMap<>();
         this.places = new HashMap<>();
         this.fields = new HashMap<>();
         this.transactions = new HashMap<>();
-        this.defaultRole = processRoleService.getDefaultRole(); // todo 2072 from which workspace?
-        this.anonymousRole = processRoleService.getAnonymousRole();
+        this.defaultRole = processRoleService.getDefaultRole(workspaceId);
+        this.anonymousRole = processRoleService.getAnonymousRole(workspaceId);
         this.i18n = new HashMap<>();
         this.actions = new HashMap<>();
         this.actionRefs = new HashMap<>();
@@ -424,9 +424,9 @@ public class Importer {
             if (ref.getLogic().getActionRef() != null) {
                 List<Action> fromActionRefs = buildActionRefs(ref.getLogic().getActionRef());
                 getActions.addAll(fromActionRefs.stream()
-                        .filter(action -> action.isTriggeredBy(DataEventType.GET)).collect(Collectors.toList()));
+                        .filter(action -> action.isTriggeredBy(DataEventType.GET)).toList());
                 setActions.addAll(fromActionRefs.stream()
-                        .filter(action -> action.isTriggeredBy(DataEventType.SET)).collect(Collectors.toList()));
+                        .filter(action -> action.isTriggeredBy(DataEventType.SET)).toList());
             }
 
             addActionsToDataEvent(getActions, dataEvents, DataEventType.GET);
@@ -622,7 +622,7 @@ public class Importer {
                 .filter(actions -> actions.getPhase().equals(phase))
                 .map(actions -> actions.getActionRef().stream().map(this::fromActionRef))
                 .flatMap(Function.identity())
-                .collect(Collectors.toList()));
+                .toList());
         return actionList;
     }
 
@@ -638,7 +638,7 @@ public class Importer {
         actionList.addAll(dataEvent.getActions().stream()
                 .filter(actions -> actions.getPhase().equals(phase))
                 .flatMap(actions -> actions.getActionRef().stream().map(this::fromActionRef))
-                .collect(Collectors.toList()));
+                .toList());
         return actionList;
     }
 
@@ -1238,8 +1238,8 @@ public class Importer {
         return role;
     }
 
-    public Field getField(String id) {
-        Field field = fields.get(id);
+    public Field<?> getField(String id) {
+        Field<?> field = fields.get(id);
         if (field == null) {
             throw new IllegalArgumentException("Field " + id + " not found");
         }
@@ -1309,9 +1309,7 @@ public class Importer {
     protected Map<String, String> buildTagsMap(List<Tag> tagsList) {
         Map<String, String> tags = new HashMap<>();
         if (tagsList != null) {
-            tagsList.forEach(tag -> {
-                tags.put(tag.getKey(), tag.getValue());
-            });
+            tagsList.forEach(tag -> tags.put(tag.getKey(), tag.getValue()));
         }
         return tags;
     }

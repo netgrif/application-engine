@@ -22,7 +22,9 @@ public abstract class DataEvent extends Event {
 
     protected DataEvent(Object source, EventPhase eventPhase, AbstractUser user, String workspaceId) {
         super(source, eventPhase, workspaceId);
-        this.user = ActorTransformer.toLoggedUser(user);
+        if (user != null) {
+            this.user = ActorTransformer.toLoggedUser(user);
+        }
     }
 
 }
