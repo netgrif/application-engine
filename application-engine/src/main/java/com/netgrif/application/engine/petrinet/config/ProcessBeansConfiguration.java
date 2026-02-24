@@ -5,7 +5,6 @@ import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.auth.service.RealmService;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.RoleActionsRunner;
-import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.petrinet.service.ProcessRoleServiceImpl;
@@ -14,6 +13,7 @@ import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.netgrif.application.engine.workspace.service.WorkspaceService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +26,6 @@ public class ProcessBeansConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ProcessRoleService processRoleService(ProcessRoleRepository processRoleRepository,
-                                                 PetriNetRepository petriNetRepository,
                                                  ApplicationEventPublisher publisher,
                                                  RoleActionsRunner roleActionsRunner,
                                                  @Lazy PetriNetService petriNetService,
@@ -34,6 +33,7 @@ public class ProcessBeansConfiguration {
                                                  ISecurityContextService securityContextService,
                                                  @Lazy GroupService groupService,
                                                  @Lazy RealmService realmService,
+                                                 WorkspaceService workspaceService,
                                                  @Lazy PaginationProperties paginationProperties,
                                                  @Lazy IWorkflowService workflowService,
                                                  @Lazy ITaskService taskService
@@ -47,6 +47,7 @@ public class ProcessBeansConfiguration {
                 securityContextService,
                 groupService,
                 realmService,
+                workspaceService,
                 paginationProperties,
                 workflowService,
                 taskService

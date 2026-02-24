@@ -28,7 +28,7 @@ public class UserFactoryImpl implements UserFactory {
         String defaultRoleId = processRoleService.getDefaultRole().getStringId();
         String anonymousRoleId = processRoleService.getAnonymousRole().getStringId();
         result.setProcessRoles(user.getProcessRoles().stream().map(processRole -> {
-            if (processRole.getStringId().equals(defaultRoleId)) {
+            if (processRole.getStringId().equals(defaultRoleId)) { // todo 2072 process roles in user should not be the same object as in cache
                 return new ProcessRole(processRole, locale);
             }
             if (processRole.getStringId().equals(anonymousRoleId)) {

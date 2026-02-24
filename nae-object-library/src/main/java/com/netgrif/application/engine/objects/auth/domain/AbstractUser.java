@@ -216,11 +216,8 @@ public abstract class AbstractUser extends AbstractActor {
 
     // todo javadoc
     public String getActiveWorkspaceId() {
-        if (isAdmin()) {
-            return "";
-        } else {
-            return this.activeWorkspaceId == null || this.activeWorkspaceId.isEmpty() ? Workspace.FORBIDDEN_ID : this.activeWorkspaceId;
-        }
+        String onEmptyWorkspaceId = isAdmin() ? "" : Workspace.FORBIDDEN_ID;
+        return this.activeWorkspaceId == null || this.activeWorkspaceId.isEmpty() ? onEmptyWorkspaceId : this.activeWorkspaceId;
     }
 
     /**

@@ -336,6 +336,11 @@ public abstract class AbstractActor implements Serializable {
         this.workspacePermissions = workspacePermissions == null ? new HashMap<>() : new HashMap<>(workspacePermissions);
     }
 
+    // todo javadoc
+    public boolean hasAuthority(String authorityName) {
+        return this.authoritySet.stream().anyMatch(userAuthority -> userAuthority.getName().equals(authorityName));
+    }
+
     /**
      * Checks if the actor has admin authority.
      * @return true if the actor has admin authority, false otherwise

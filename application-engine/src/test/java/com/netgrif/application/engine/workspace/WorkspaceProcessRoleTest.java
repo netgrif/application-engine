@@ -12,6 +12,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
+import com.netgrif.application.engine.workspace.service.WorkspaceService;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,9 @@ public class WorkspaceProcessRoleTest {
     
     @Autowired
     private ProcessRoleService processRoleService;
+
+    @Autowired
+    private WorkspaceService workspaceService;
     
     @Autowired
     private ProcessRoleRepository processRoleRepository;
@@ -385,12 +389,38 @@ public class WorkspaceProcessRoleTest {
 
     @Test
     public void testGetDefaultRole() {
-        // todo 2072
+        logout();
+        ProcessRole role = processRoleService.getDefaultRole();
+        assertEquals(workspaceService.getDefault().getId(), role.getWorkspaceId());
+
+        loginCustomUser("wrongWorkspace", false);
+        assertThrows(IllegalStateException.class, () -> processRoleService.getDefaultRole());
+
+        loginCustomUser("wrongWorkspace", true);
+        role = processRoleService.getDefaultRole();
+        assertEquals(workspaceService.getDefault().getId(), role.getWorkspaceId());
+
+        loginCustomUser(workspaceService.getDefault().getId(), false);
+        role = processRoleService.getDefaultRole();
+        assertEquals(workspaceService.getDefault().getId(), role.getWorkspaceId());
     }
 
     @Test
     public void testGetAnonymousRole() {
-        // todo 2072
+        logout();
+        ProcessRole role = processRoleService.getAnonymousRole();
+        assertEquals(workspaceService.getDefault().getId(), role.getWorkspaceId());
+
+        loginCustomUser("wrongWorkspace", false);
+        assertThrows(IllegalStateException.class, () -> processRoleService.getAnonymousRole());
+
+        loginCustomUser("wrongWorkspace", true);
+        role = processRoleService.getAnonymousRole();
+        assertEquals(workspaceService.getDefault().getId(), role.getWorkspaceId());
+
+        loginCustomUser(workspaceService.getDefault().getId(), false);
+        role = processRoleService.getAnonymousRole();
+        assertEquals(workspaceService.getDefault().getId(), role.getWorkspaceId());
     }
 
     @Test

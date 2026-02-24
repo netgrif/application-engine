@@ -26,6 +26,7 @@ import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.netgrif.application.engine.workspace.service.WorkspaceService;
 import lombok.Getter;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -52,6 +53,7 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
     private final ISecurityContextService securityContextService;
     private final GroupService groupService;
     private final RealmService realmService;
+    private final WorkspaceService workspaceService;
     @Getter
     private final PaginationProperties paginationProperties;
     @Getter
@@ -64,8 +66,9 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     public ProcessRoleServiceImpl(ProcessRoleRepository processRoleRepository,
                                   ApplicationEventPublisher publisher, RoleActionsRunner roleActionsRunner,
-                                  @Lazy IPetriNetService petriNetService, @Lazy UserService userService, ISecurityContextService securityContextService, @Lazy GroupService groupService,
-                                  @Lazy RealmService realmService, @Lazy PaginationProperties paginationProperties, @Lazy IWorkflowService workflowService, @Lazy ITaskService taskService) {
+                                  @Lazy IPetriNetService petriNetService, @Lazy UserService userService, ISecurityContextService securityContextService,
+                                  @Lazy GroupService groupService, @Lazy RealmService realmService, WorkspaceService workspaceService,
+                                  @Lazy PaginationProperties paginationProperties, @Lazy IWorkflowService workflowService, @Lazy ITaskService taskService) {
         this.processRoleRepository = processRoleRepository;
         this.publisher = publisher;
         this.roleActionsRunner = roleActionsRunner;
@@ -74,6 +77,7 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
         this.securityContextService = securityContextService;
         this.groupService = groupService;
         this.realmService = realmService;
+        this.workspaceService = workspaceService;
         this.paginationProperties = paginationProperties;
         this.workflowService = workflowService;
         this.taskService = taskService;
@@ -400,6 +404,11 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public ProcessRole getDefaultRole() {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        String defaultWorkspaceId = workspaceService.getDefault().getId();
+        if (loggedUser != null && !loggedUser.isAdmin() && !loggedUser.getActiveWorkspaceId().equals(defaultWorkspaceId)) {
+            throw new IllegalStateException("No default process role has been found!");
+        }
         if (defaultRole == null) {
             Page<ProcessRole> roles = processRoleRepository.findAllByImportId(ProcessRole.DEFAULT_ROLE, Pageable.ofSize(2));
             if (roles.isEmpty())
@@ -413,6 +422,11 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
 
     @Override
     public ProcessRole getAnonymousRole() {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        String defaultWorkspaceId = workspaceService.getDefault().getId();
+        if (loggedUser != null && !loggedUser.isAdmin() && !loggedUser.getActiveWorkspaceId().equals(defaultWorkspaceId)) {
+            throw new IllegalStateException("No default process role has been found!");
+        }
         if (anonymousRole == null) {
             Page<ProcessRole> roles = processRoleRepository.findAllByImportId(ProcessRole.ANONYMOUS_ROLE, Pageable.ofSize(2));
             if (roles.isEmpty())
