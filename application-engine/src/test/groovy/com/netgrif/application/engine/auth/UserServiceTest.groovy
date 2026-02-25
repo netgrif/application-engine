@@ -1,32 +1,32 @@
 package com.netgrif.application.engine.auth
 
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
-import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
-
 import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
+import com.netgrif.application.engine.objects.auth.domain.enums.WorkspacePermission
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.startup.ImportHelper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 import java.time.LocalDateTime
 
-import static org.junit.jupiter.api.Assertions.assertNull
-import static org.junit.jupiter.api.Assertions.assertThrows
+import static org.junit.jupiter.api.Assertions.*
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -129,6 +129,20 @@ class UserServiceTest {
         assert userPage.getContent().size() == 2
         assert userPage.getContent().stream().anyMatch(user -> user.getStringId() != null && !user.getStringId().isEmpty());
         assert userPage.content.any { it.stringId == user.stringId }
+    }
+
+    @Test
+    void findAllByWorkspace() {
+        user = createUser()
+        String workspaceId = "workspace1"
+        user.addWorkspacePermission(workspaceId, WorkspacePermission.READ)
+        userService.saveUser(user)
+
+        assertTrue(userService.findAllByWorkspace(null, user.getRealmId(), PageRequest.of(0, 2)).isEmpty())
+        assertTrue(userService.findAllByWorkspace(workspaceId, "wrongRealm", PageRequest.of(0, 2)).isEmpty())
+        Page<AbstractUser> resultAsPage = userService.findAllByWorkspace(workspaceId, user.getRealmId(), PageRequest.of(0, 2))
+        assertEquals(1, resultAsPage.getContent().size())
+        assertEquals(user.getId(), resultAsPage.getContent().first.getId())
     }
 
     private User createUser() {
