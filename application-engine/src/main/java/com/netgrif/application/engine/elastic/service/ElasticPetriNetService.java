@@ -2,10 +2,12 @@ package com.netgrif.application.engine.elastic.service;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
+import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.ElasticsearchConfiguration;
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticPetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
@@ -13,6 +15,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -34,8 +37,9 @@ import java.util.stream.Collectors;
 
 import static org.springframework.data.elasticsearch.client.elc.Queries.termQuery;
 
-@Service
 @Slf4j
+@Service
+@RequiredArgsConstructor
 public class ElasticPetriNetService implements IElasticPetriNetService {
 
     private final ElasticPetriNetRepository repository;
@@ -46,14 +50,9 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
 
     private final ElasticsearchTemplate template;
 
-    protected ElasticsearchConfiguration elasticsearchConfiguration;
+    private final UserService userService;
 
-    public ElasticPetriNetService(ElasticPetriNetRepository repository, Executor executors, ElasticsearchTemplate template, ElasticsearchConfiguration elasticsearchConfiguration) {
-        this.repository = repository;
-        this.executors = executors;
-        this.template = template;
-        this.elasticsearchConfiguration = elasticsearchConfiguration;
-    }
+    private final ElasticsearchConfiguration elasticsearchConfiguration;
 
     @Lazy
     @Autowired
@@ -100,22 +99,22 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
      * Method for search of PetriNets in Elastic
      *
      * @param requests       - search body, for now only title working
-     * @param user           - logged user
      * @param pageable       - pageable for paging
-     * @param locale         - internacionalization
+     * @param locale         - internationalization
      * @param isIntersection - property for merging filter, not implemented now, use false
      * @return Page<PetriNetReference> - page of PetriNetReferences
      */
     @Override
-    public Page<PetriNetReference> search(PetriNetSearch requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+    public Page<PetriNetReference> search(PetriNetSearch requests, Pageable pageable, Locale locale, Boolean isIntersection) {
         if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
-        log.debug("Searching for PetriNet query with logged user [{}]", user.getId());
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
+        log.debug("Searching for PetriNet query with logged user [{}]", loggedUser.getId());
         // TODO: impersonation
 //        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-        LoggedUser loggedOrImpersonated = user;
-        NativeQuery query = buildQuery(requests, pageable, locale, isIntersection);
+        LoggedUser loggedOrImpersonated = loggedUser;
+        NativeQuery query = buildQuery(requests, loggedOrImpersonated, pageable, locale, isIntersection);
         List<PetriNet> netPage;
         long total;
         if (query != null) {
@@ -132,9 +131,10 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
         return new PageImpl<>(netPage.stream().map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()), pageable, total);
     }
 
-    protected NativeQuery buildQuery(PetriNetSearch request, Pageable pageable, Locale locale, Boolean isIntersection) {
+    protected NativeQuery buildQuery(PetriNetSearch request, LoggedUser loggedUser, Pageable pageable, Locale locale,
+                                     Boolean isIntersection) {
         List<BoolQuery.Builder> singleQueries = new LinkedList<>();
-        singleQueries.add(buildSingleQuery(request, locale));
+        singleQueries.add(buildSingleQuery(request, loggedUser, locale));
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
             // one of the queries evaluates to empty set => the entire result is an empty set
@@ -157,7 +157,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
                 .build();
     }
 
-    protected BoolQuery.Builder buildSingleQuery(PetriNetSearch request, Locale locale) {
+    protected BoolQuery.Builder buildSingleQuery(PetriNetSearch request, LoggedUser loggedUser, Locale locale) {
         BoolQuery.Builder query = new BoolQuery.Builder();
 
         buildFullTextQuery(request, query);
@@ -165,7 +165,17 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
         if (resultAlwaysEmpty) {
             return null;
         }
+
+        if (!loggedUser.isAdmin()) {
+            query.filter(buildWorkspace(loggedUser)._toQuery());
+        }
         return query;
+    }
+
+    protected BoolQuery buildWorkspace(LoggedUser loggedUser) {
+        return new BoolQuery.Builder()
+                .must(termQuery("workspaceId", loggedUser.getActiveWorkspaceId()))
+                .build();
     }
 
     protected void buildFullTextQuery(PetriNetSearch request, BoolQuery.Builder query) {

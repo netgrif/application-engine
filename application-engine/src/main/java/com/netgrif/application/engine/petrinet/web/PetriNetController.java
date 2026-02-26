@@ -207,15 +207,14 @@ public class PetriNetController {
     @Operation(summary = "Search elastic processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search_elastic", produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
-    PagedModel<PetriNetReferenceResource> searchElasticPetriNets(@RequestBody PetriNetSearch criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
-        LoggedUser user = (LoggedUser) auth.getPrincipal();
+    PagedModel<PetriNetReferenceResource> searchElasticPetriNets(@RequestBody PetriNetSearch criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
         // TODO: add Merge Filters and its operations
 
-        Page<PetriNetReference> nets = elasticService.search(criteria, user, pageable, locale, false);
+        Page<PetriNetReference> nets = elasticService.search(criteria, pageable, locale, false);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
-                .searchElasticPetriNets(criteria, auth, pageable, assembler, locale)).withRel("search_elastic");
+                .searchElasticPetriNets(criteria, pageable, assembler, locale)).withRel("search_elastic");
 
-//        TODO doriesit linky pista ich zakomentoval
+//        TODO resolve links, they have been commented out
         PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);
         PetriNetReferenceResourceAssembler.buildLinks(resources);
         return resources;
