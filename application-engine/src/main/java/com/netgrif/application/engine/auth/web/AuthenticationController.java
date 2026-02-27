@@ -7,6 +7,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IRegistrationServi
 import com.netgrif.application.engine.auth.web.requestbodies.ChangePasswordRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
+import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
@@ -148,7 +149,11 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         LoggedUser loggedUser = (LoggedUser) authentication.getPrincipal();
-        return ResponseEntity.ok(userResponseFactory.getUser(userService.findById(loggedUser.getStringId(), null), locale));
+        User userResponse = userResponseFactory.getUser(userService.findById(loggedUser.getStringId(), null), locale);
+        if (loggedUser.isImpersonating()) {
+            userResponse.setImpersonated(userResponseFactory.getUser(loggedUser.getImpersonatedUser(), locale));
+        }
+        return ResponseEntity.ok(userResponse);
     }
 
     @Operation(summary = "Reset password")

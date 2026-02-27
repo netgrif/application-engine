@@ -4,17 +4,19 @@ import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.querydsl.core.annotations.QueryEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 @Data
 @QueryEntity
+@NoArgsConstructor
 @AllArgsConstructor
 public class Impersonation implements Serializable {
 
@@ -34,11 +36,30 @@ public class Impersonation implements Serializable {
     private LocalDateTime impersonatedFrom;
     private LocalDateTime impersonatedTo;
 
-    private Map<String, ProcessRole> impersonatedRoles;
-    private Map<String, Authority> impersonatedAuthorities;
+    private Set<String> impersonatedRoles;
+    private Set<String> impersonatedAuthorities;
 
     private boolean impersonatedProcessesListAllowing;
     private List<String> impersonatedProcesses;
+
+    public Impersonation(String realmId, String impersonatedId, String impersonatedUsername, List<String> impersonatorUsersIds,
+                         List<String> impersonatorUsersNames, List<String> impersonatorGroupsIds, List<String> impersonatorGroupsNames,
+                         LocalDateTime impersonatedFrom, LocalDateTime impersonatedTo, Set<String> impersonatedRoles,
+                         Set<String> impersonatedAuthorities, boolean impersonatedProcessesListAllowing, List<String> impersonatedProcesses) {
+        this.realmId = realmId;
+        this.impersonatedId = impersonatedId;
+        this.impersonatedUsername = impersonatedUsername;
+        this.impersonatorUsersIds = impersonatorUsersIds;
+        this.impersonatorUsersNames = impersonatorUsersNames;
+        this.impersonatorGroupsIds = impersonatorGroupsIds;
+        this.impersonatorGroupsNames = impersonatorGroupsNames;
+        this.impersonatedFrom = impersonatedFrom;
+        this.impersonatedTo = impersonatedTo;
+        this.impersonatedRoles = impersonatedRoles;
+        this.impersonatedAuthorities = impersonatedAuthorities;
+        this.impersonatedProcessesListAllowing = impersonatedProcessesListAllowing;
+        this.impersonatedProcesses = impersonatedProcesses;
+    }
 
     public Impersonation(String realmId, String impersonatedId, String impersonatedUsername, LocalDateTime impersonatedFrom, LocalDateTime impersonatedTo) {
         this.realmId = realmId;
@@ -50,8 +71,8 @@ public class Impersonation implements Serializable {
         this.impersonatorUsersNames = new ArrayList<>();
         this.impersonatorGroupsIds = new ArrayList<>();
         this.impersonatorGroupsNames = new ArrayList<>();
-        this.impersonatedRoles = new HashMap<>();
-        this.impersonatedAuthorities = new HashMap<>();
+        this.impersonatedRoles = new HashSet<>();
+        this.impersonatedAuthorities = new HashSet<>();
         this.impersonatedProcesses = new ArrayList<>();
     }
 
@@ -83,18 +104,18 @@ public class Impersonation implements Serializable {
         this.impersonatorGroupsNames.add(impersonatorGroupName);
     }
 
-    public void addImpersonatedRole(String roleId, ProcessRole role) {
+    public void addImpersonatedRole(ProcessRole role) {
         if (this.impersonatedRoles == null) {
-            this.impersonatedRoles = new HashMap<>();
+            this.impersonatedRoles = new HashSet<>();
         }
-        this.impersonatedRoles.put(roleId, role);
+        this.impersonatedRoles.add(role.getStringId());
     }
 
-    public void addImpersonatedAuthority(String authorityId, Authority authority) {
+    public void addImpersonatedAuthority(Authority authority) {
         if (this.impersonatedAuthorities == null) {
-            this.impersonatedAuthorities = new HashMap<>();
+            this.impersonatedAuthorities = new HashSet<>();
         }
-        this.impersonatedAuthorities.put(authorityId, authority);
+        this.impersonatedAuthorities.add(authority.getStringId());
     }
 
     public void addImpersonatedProcess(String processId) {

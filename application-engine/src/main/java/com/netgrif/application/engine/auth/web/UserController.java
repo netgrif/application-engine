@@ -124,8 +124,12 @@ public class UserController {
             log.error("Could not find user with id [{}]", loggedUser.getId(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+        User userResponse = userFactory.getUser(user, locale);
+        if (loggedUser.isImpersonating()) {
+            userResponse.setImpersonated(userFactory.getUser(loggedUser.getImpersonatedUser(), locale));
+        }
 
-        return ResponseEntity.ok(userFactory.getUser(user, locale));
+        return ResponseEntity.ok(userResponse);
     }
 
     @ApiResponses(value = {

@@ -68,14 +68,14 @@ public class ImpersonationServiceImpl implements ImpersonationService {
     }
 
     @Override
-    public LoggedUser startImpersonation(Impersonation impersonation) throws IllegalArgumentException, AccessDeniedException {
-        log.error("Trying to call startImpersonation(Impersonation impersonation) in community edition.");
+    public LoggedUser startImpersonation(String impersonationId) throws IllegalArgumentException, AccessDeniedException {
+        log.error("Trying to call startImpersonation(String impersonationId) in community edition.");
         throw new NotImplementedException("Impersonation not implemented in community edition.");
     }
 
     @Override
-    public LoggedUser startImpersonation(Impersonation impersonation, LoggedUser impersonator) throws IllegalArgumentException, AccessDeniedException {
-        log.error("Trying to call startImpersonation(Impersonation impersonation, LoggedUser impersonator) in community edition.");
+    public LoggedUser startImpersonation(String impersonationId, LoggedUser impersonator) throws IllegalArgumentException, AccessDeniedException {
+        log.error("Trying to call startImpersonation(String impersonationId, LoggedUser impersonator) in community edition.");
         throw new NotImplementedException("Impersonation not implemented in community edition.");
     }
 

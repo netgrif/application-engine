@@ -137,10 +137,15 @@ public abstract class LoggedUser extends AbstractUser implements Serializable {
         return this.impersonatedUser.getProcessRoles();
     }
 
+    public void setProcessRolesToLoggedUser(Set<ProcessRole> processRoleSet) {
+        super.setProcessRoles(processRoleSet);
+    }
+
     @Override
     public void setProcessRoles(Set<ProcessRole> processRoleSet) {
         if (!this.isImpersonating()) {
             super.setProcessRoles(processRoleSet);
+            return;
         }
         this.impersonatedUser.setProcessRoles(processRoleSet);
     }
@@ -157,6 +162,7 @@ public abstract class LoggedUser extends AbstractUser implements Serializable {
     public void setAuthoritySet(Set<Authority> authoritySet) {
         if (!this.isImpersonating()) {
             super.setAuthoritySet(authoritySet);
+            return;
         }
         this.impersonatedUser.setAuthoritySet(authoritySet);
     }

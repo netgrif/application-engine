@@ -154,7 +154,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         securityContextService.saveToken(userId);
         if (Objects.equals(userId, loggedUser.getSelfOrImpersonatedStringId())) {
             loggedUser.getProcessRoles().clear();
-            loggedUser.setProcessRoles(user.getProcessRoles());
+            loggedUser.setProcessRolesToLoggedUser(user.getProcessRoles());
             securityContextService.reloadSecurityContext(loggedUser);
         }
     }

@@ -28,9 +28,9 @@ public interface ImpersonationService {
 
     Page<Impersonation> getPagedCurrentImpersonationsAsImpersonator(String userId, List<String> groupsIds, String realmId, Pageable pageable, LoggedUser loggedUser) throws IllegalArgumentException;
 
-    LoggedUser startImpersonation(Impersonation impersonation) throws IllegalArgumentException, AccessDeniedException;
+    LoggedUser startImpersonation(String impersonationId) throws IllegalArgumentException, AccessDeniedException;
 
-    LoggedUser startImpersonation(Impersonation impersonation, LoggedUser loggedUser) throws IllegalArgumentException, AccessDeniedException;
+    LoggedUser startImpersonation(String impersonationId, LoggedUser loggedUser) throws IllegalArgumentException, AccessDeniedException;
 
     LoggedUser endImpersonation() throws IllegalArgumentException;
 
