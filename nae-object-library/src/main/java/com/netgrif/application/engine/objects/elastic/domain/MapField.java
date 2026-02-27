@@ -39,7 +39,7 @@ public abstract class MapField extends TextField {
         }
         List<String> values = new ArrayList<>();
         this.keyValue = new ArrayList<>();
-        this.keyValueTranslations = new HashMap<>();
+        this.keyValueTranslations = new LinkedHashMap<>();
         for (Map.Entry<String, I18nString> valueTranslationPair : valueTranslationPairs) {
             this.keyValue.add(resolveTranslationPairKey(valueTranslationPair.getKey()));
             values.addAll(I18nStringUtils.collectTranslations(valueTranslationPair.getValue()));
