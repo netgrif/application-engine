@@ -44,7 +44,10 @@ public abstract class MapField extends TextField {
             String key = resolveTranslationPairKey(valueTranslationPair.getKey());
             this.keyValue.add(key);
             values.addAll(I18nStringUtils.collectTranslations(valueTranslationPair.getValue()));
-            this.keyValueTranslations.put(key, valueTranslationPair.getValue());
+            this.keyValueTranslations.put(
+                    key,
+                    valueTranslationPair.getValue() == null ? null : new I18nString(valueTranslationPair.getValue())
+            );
         }
         this.textValue = values;
         this.fulltextValue = values;
