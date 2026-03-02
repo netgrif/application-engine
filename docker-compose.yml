@@ -15,7 +15,7 @@ services:
           memory: "512M"
 
   docker-elastic:
-    image: elasticsearch:7.17.4
+    image: elasticsearch:7.17.28
     environment:
       - cluster.name=elasticsearch
       - discovery.type=single-node
