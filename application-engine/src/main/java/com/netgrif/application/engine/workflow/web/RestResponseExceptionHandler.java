@@ -60,7 +60,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
                             jme.getOriginalMessage(), jme.getPathReference(), describePath(path), jme);
                 }
             } else {
-                log.error("JSON write failed: {} | path={} | details={}",
+                log.error("JSON write failed because of path is smaller than 3: {} | path={} | details={}",
                         jme.getOriginalMessage(), jme.getPathReference(), describePath(path), jme);
             }
 
