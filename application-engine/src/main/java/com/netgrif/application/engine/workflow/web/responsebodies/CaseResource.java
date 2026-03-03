@@ -17,7 +17,7 @@ public class CaseResource extends EntityModel<Case> {
 
     public CaseResource(Case content) {
         super(content, new ArrayList<>());
-        log.debug("Creating CaseResource, id={}, locale={}, caseClass={}", content.get_id(), LocaleContextHolder.getLocale(), content.getClass().getName());
+        log.trace("Creating CaseResource, id={}, locale={}, caseClass={}", content.get_id(), LocaleContextHolder.getLocale(), content.getClass().getName());
         buildLinks();
     }
 

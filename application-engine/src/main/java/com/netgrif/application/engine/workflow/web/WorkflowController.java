@@ -129,16 +129,22 @@ public class WorkflowController {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
 
         Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, locale, operation == MergeFilterOperation.AND);
-        if (log.isDebugEnabled()) {
-            log.debug("Found {} cases with id {}.", cases.getNumberOfElements(), cases.map(Case::getStringId));
+        if (log.isTraceEnabled()) {
+            log.trace("Found {} cases with id {}.", cases.getNumberOfElements(), cases.map(Case::getStringId));
         }
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                 .search(searchBody, operation, pageable, assembler, auth, locale)).withRel("search");
 
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
+
+        if (log.isTraceEnabled()) {
+            log.trace("Paged model of {}", resources);
+        }
+
         ResourceLinkAssembler.addLinks(resources, ElasticCase.class, selfLink.getRel().toString());
-        if (log.isDebugEnabled()) {
-            log.debug("Returning paged model of {}", resources);
+
+        if (log.isTraceEnabled()) {
+            log.trace("Returning paged model with link: {}", resources);
         }
         return resources;
     }
