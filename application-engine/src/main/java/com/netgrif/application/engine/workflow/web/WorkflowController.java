@@ -109,7 +109,7 @@ public class WorkflowController {
                 .getAll(pageable, assembler)).withRel("all");
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
+        return resources;
     }
 
     @Operation(summary = "Generic case search with QueryDSL predicate, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -120,7 +120,7 @@ public class WorkflowController {
                 .search2(predicate, pageable, assembler)).withRel("search2");
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
+        return resources;
     }
 
     @Operation(summary = "Generic case search on Elasticsearch database, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -129,12 +129,24 @@ public class WorkflowController {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
 
         Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, locale, operation == MergeFilterOperation.AND);
+        if (log.isTraceEnabled()) {
+            log.trace("Found {} cases with id {}.", cases.getNumberOfElements(), cases.map(Case::getStringId));
+        }
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                 .search(searchBody, operation, pageable, assembler, auth, locale)).withRel("search");
 
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
+
+        if (log.isTraceEnabled()) {
+            log.trace("Paged model of {}", resources);
+        }
+
         ResourceLinkAssembler.addLinks(resources, ElasticCase.class, selfLink.getRel().toString());
-        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
+
+        if (log.isTraceEnabled()) {
+            log.trace("Returning paged model with link: {}", resources);
+        }
+        return resources;
     }
 
     @Operation(summary = "Generic case search on Mongo database, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -145,7 +157,7 @@ public class WorkflowController {
                 .searchMongo(searchBody, pageable, auth, assembler, locale)).withRel("search");
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
+        return resources;
     }
 
 
@@ -173,7 +185,7 @@ public class WorkflowController {
                 .findAllByAuthor(authorId, petriNet, assembler, pageable)).withRel("author");
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
+        return resources;
     }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
