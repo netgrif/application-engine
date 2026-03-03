@@ -6,13 +6,11 @@ import com.netgrif.application.engine.workflow.web.requestbodies.CreateCaseBody;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.core.Relation;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 import java.util.ArrayList;
 
 @Slf4j
-@Relation(collectionRelation = "cases", itemRelation = "cases")
 public class CaseResource extends EntityModel<Case> {
 
     public CaseResource(Case content) {
