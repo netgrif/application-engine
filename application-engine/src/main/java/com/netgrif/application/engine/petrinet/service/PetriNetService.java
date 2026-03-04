@@ -6,6 +6,7 @@ import com.netgrif.application.engine.configuration.cache.NaeCacheManager;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
+import com.netgrif.application.engine.objects.auth.domain.enums.WorkspacePermission;
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
 import com.netgrif.application.engine.objects.event.events.petrinet.ProcessEvent;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
@@ -284,10 +285,12 @@ public class PetriNetService implements IPetriNetService {
                 existingLatestProcess.makeNonDefault();
                 processToMakeNonDefault = existingLatestProcess;
             } else if (makeNonDefaultCurrentVersion) {
-                PetriNet existingActiveProcess = self.getDefaultVersionByIdentifier(newProcess.getIdentifier());
-                if (existingActiveProcess != null) {
-                    existingActiveProcess.makeNonDefault();
-                    processToMakeNonDefault = existingActiveProcess;
+                Page<PetriNet> pageOfExistingPetriNet = repository.findByIdentifierAndDefaultVersionAndWorkspaceId(newProcess.getIdentifier(),
+                        true, workspaceId, PageRequest.of(0, 1));
+                if (!pageOfExistingPetriNet.getContent().isEmpty()) {
+                    PetriNet existingDefaultProcess = pageOfExistingPetriNet.getContent().getFirst();
+                    existingDefaultProcess.makeNonDefault();
+                    processToMakeNonDefault = existingDefaultProcess;
                 }
             }
         }
@@ -884,11 +887,16 @@ public class PetriNetService implements IPetriNetService {
         if (importPetriNetParams.getAuthor() == null) {
             throw new IllegalArgumentException("No author of PetriNet provided.");
         }
+        if (importPetriNetParams.getWorkspaceId() == null || importPetriNetParams.getWorkspaceId().isEmpty()) {
+            importPetriNetParams.setWorkspaceId(workspaceService.getDefault().getId());
+        }
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        boolean isAdmin = loggedUser == null || loggedUser.isAdmin();
+        if (!isAdmin && !loggedUser.hasWorkspacePermission(importPetriNetParams.getWorkspaceId(), WorkspacePermission.READ_WRITE)) {
+            throw new IllegalArgumentException("No permission for workspace: %s".formatted(importPetriNetParams.getWorkspaceId()));
+        }
         if (importPetriNetParams.getReleaseType() == null) {
             importPetriNetParams.setReleaseType(VersionType.MAJOR);
-        }
-        if (importPetriNetParams.getWorkspaceId() == null) {
-            importPetriNetParams.setWorkspaceId(workspaceService.getDefault().getId());
         }
     }
 

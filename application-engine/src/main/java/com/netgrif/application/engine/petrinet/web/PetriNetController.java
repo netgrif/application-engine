@@ -94,7 +94,7 @@ public class PetriNetController {
         }
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN') and @workspacePermissionService.checkPermissionAndSelectWorkspace(#workspaceId, #auth.getPrincipal())")
     @Operation(summary = "Import new process",
             description = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -229,7 +229,8 @@ public class PetriNetController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements")
     })
     @DeleteMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource deletePetriNet(@PathVariable("id") String processId, @RequestParam(required = false) boolean force) {
+    public MessageResource deletePetriNet(@PathVariable("id") String processId, @RequestParam(required = false) boolean force,
+                                          Authentication auth) {
         String decodedProcessId = decodeUrl(processId);
         if (Objects.equals(decodedProcessId, "")) {
             log.error("Deleting Petri net [{}] failed: could not decode process ID from URL", processId);
