@@ -109,6 +109,7 @@ public class PetriNetController {
             @RequestParam(value = "meta", required = false) String releaseType,
             @RequestParam(value = "workspaceId", required = false) String workspaceId,
             Authentication auth, Locale locale) throws MissingPetriNetMetaDataException, MissingIconKeyException {
+        // todo 2072 test in CE and EE
         try {
             VersionType release = releaseType == null ? VersionType.MAJOR : VersionType.valueOf(releaseType.trim().toUpperCase());
             ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(ImportPetriNetParams.with()
