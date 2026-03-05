@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.auth.provider;
 
-import com.netgrif.application.engine.adapter.spring.tenant.service.TenantService;
+import com.netgrif.application.engine.auth.service.TenantService;
 import com.netgrif.application.engine.adapter.spring.utils.PageableUtils;
 import com.netgrif.application.engine.auth.service.RealmService;
 import com.netgrif.application.engine.objects.auth.domain.Realm;

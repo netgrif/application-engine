@@ -10,7 +10,7 @@ public class IndexCaseEvent extends Event {
     protected final ElasticCase elasticCase;
 
     public IndexCaseEvent(ElasticCase elasticCase) {
-        super(elasticCase, getWorkspaceIdFromResource(elasticCase));
+        super(elasticCase, null, getWorkspaceIdFromResource(elasticCase));
         this.elasticCase = elasticCase;
     }
 

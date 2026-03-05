@@ -208,7 +208,7 @@ public class PetriNetService implements IPetriNetService {
                 newProcess.getInitials(), newProcess.getVersion(), savedPath);
         functionCacheService.cacheAllPetriNetFunctions();
         runActionAndPublishEvent(outcome, null, newProcess.getPreUploadActions(), importPetriNetParams.getParams(),
-                new ProcessDeployEvent(outcome, EventPhase.PRE));
+                new ProcessDeployEvent(outcome, EventPhase.PRE, userService.getLoggedOrSystem()));
 
         if (processToMakeNonDefault != null) {
             doSaveInternal(processToMakeNonDefault);
@@ -217,7 +217,7 @@ public class PetriNetService implements IPetriNetService {
         functionCacheService.cachePetriNetFunctions(newProcess);
 
         runActionAndPublishEvent(outcome, saveProcessOpt.orElseThrow(), newProcess.getPostUploadActions(),
-                importPetriNetParams.getParams(), new ProcessDeployEvent(outcome, EventPhase.POST));
+                importPetriNetParams.getParams(), new ProcessDeployEvent(outcome, EventPhase.POST, userService.getLoggedOrSystem()));
 
         return outcome;
     }
@@ -837,7 +837,7 @@ public class PetriNetService implements IPetriNetService {
 
         log.info("[{}]: User [{}] is deleting process {} version {}", petriNetId, loggedUser.getStringId(),
                 petriNet.getIdentifier(), petriNet.getVersion().toString());
-        publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.PRE));
+        publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.PRE, userService.getLoggedOrSystem()));
         repository.deleteBy_id(petriNet.getObjectId());
         evictCache(petriNet);
         functionCacheService.removeCachedPetriNetFunctions(petriNet.getIdentifier());
@@ -850,7 +850,7 @@ public class PetriNetService implements IPetriNetService {
                 save(processToMakeDefault);
             }
         }
-        publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.POST));
+        publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.POST, userService.getLoggedOrSystem()));
     }
 
     protected Criteria getProcessRolesCriteria(LoggedUser user) {

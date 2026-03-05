@@ -1,12 +1,18 @@
 package com.netgrif.application.engine.objects.event.listeners;
 
 import com.netgrif.application.engine.objects.event.dispatchers.common.AbstractDispatcher;
+import com.netgrif.application.engine.objects.event.dispatchers.common.DispatcherRegistry;
 
 import java.util.EventObject;
 
 public abstract class ContextEditingListener<T> extends Listener {
 
+    public ContextEditingListener(DispatcherRegistry dispatcherRegistry) {
+        super(dispatcherRegistry);
+    }
+
     public ContextEditingListener() {
+        super();
     }
 
     /**

@@ -10,7 +10,7 @@ public class IndexTaskEvent extends Event {
     protected final ElasticTask task;
 
     public IndexTaskEvent(ElasticTask task) {
-        super(task, getWorkspaceIdFromResource(task));
+        super(task,null, getWorkspaceIdFromResource(task));
         this.task = task;
     }
 

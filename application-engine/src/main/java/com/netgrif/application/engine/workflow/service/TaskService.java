@@ -149,14 +149,12 @@ public class TaskService implements ITaskService {
             task = findOne(task.getStringId());
         }
         AssignTaskEventOutcome outcome = new AssignTaskEventOutcome(useCase, task, outcomes);
-        useCase = evaluateRules(new AssignTaskEvent(outcome, EventPhase.PRE));
+        useCase = evaluateRules(new AssignTaskEvent(outcome, EventPhase.PRE, taskParams.getUser()));
 
         useCase = assignTaskToUser(taskParams.getUser(), task, useCase, transition);
-        publisher.publishEvent(new AssignTaskEvent(outcome, EventPhase.PRE, taskParams.getUser()));
         outcomes.addAll((eventService.runActions(transition.getPostAssignActions(), useCase, task, transition, taskParams.getParams())));
-        useCase = evaluateRules(new AssignTaskEvent(outcome, EventPhase.POST));
+        useCase = evaluateRules(new AssignTaskEvent(outcome, EventPhase.POST, taskParams.getUser()));
 
-        publisher.publishEvent(new AssignTaskEvent(outcome, EventPhase.POST, taskParams.getUser()));
         addMessageToOutcome(transition, EventType.ASSIGN, outcome);
         // TODO: impersonation user.getSelfOrImpersonated().getEmail()
         log.info("[{}]: Task [{}] in case [{}] assigned to [{}]", useCase.getStringId(), task.getTitle(),
@@ -232,7 +230,7 @@ public class TaskService implements ITaskService {
             task = findOne(task.getStringId());
         }
         FinishTaskEventOutcome outcome = new FinishTaskEventOutcome(useCase, task, outcomes);
-        useCase = evaluateRules(new FinishTaskEvent(outcome, EventPhase.PRE));
+        useCase = evaluateRules(new FinishTaskEvent(outcome, EventPhase.PRE, user));
 
         useCase = finishExecution(transition, task, useCase);
         ReloadTaskOutcome reloadTaskOutcome = reloadTasks(useCase, false);
@@ -242,7 +240,7 @@ public class TaskService implements ITaskService {
 
         publisher.publishEvent(new FinishTaskEvent(outcome, EventPhase.PRE, user));
         outcomes.addAll(eventService.runActions(transition.getPostFinishActions(), useCase, task, transition, taskParams.getParams()));
-        useCase = evaluateRules(new FinishTaskEvent(outcome, EventPhase.POST));
+        useCase = evaluateRules(new FinishTaskEvent(outcome, EventPhase.POST, user));
 
         outcome = new FinishTaskEventOutcome(useCase, task, outcomes);
         addMessageToOutcome(transition, EventType.FINISH, outcome);
@@ -438,8 +436,7 @@ public class TaskService implements ITaskService {
         }
 
         DelegateTaskEventOutcome outcome = new DelegateTaskEventOutcome(useCase, task, outcomes);
-        useCase = evaluateRules(new DelegateTaskEvent(outcome, EventPhase.PRE));
-        publisher.publishEvent(new DelegateTaskEvent(outcome, EventPhase.PRE, delegator, newAssignee.getStringId()));
+        useCase = evaluateRules(new DelegateTaskEvent(outcome, EventPhase.PRE, delegator, newAssignee.getStringId()));
 
         useCase = delegate(newAssignee, task, useCase, transition);
 
@@ -491,10 +488,9 @@ public class TaskService implements ITaskService {
      * </tr>
      * </table>
      *
-     * @param useCase useCase for which to reload tasks
+     * @param useCase      useCase for which to reload tasks
      * @param lazyCaseSave if set to true, the useCase is saved only if any task is about to be executed. If set to false
      *                     the useCase is saved every time this method is called.
-     *
      * @return {@link ReloadTaskOutcome}, which holds the information if any task was executed and if the useCase was saved
      */
     @SuppressWarnings("StatementWithEmptyBody")

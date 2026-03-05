@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.startup.runner;
 
+import com.netgrif.application.engine.adapter.spring.tenant.domain.AdminTenant;
 import com.netgrif.application.engine.auth.service.RealmService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
@@ -18,14 +19,16 @@ import org.springframework.stereotype.Component;
 public class DefaultRealmRunner implements ApplicationEngineStartupRunner {
 
     private final RealmService realmService;
+    private final AdminTenant adminTenant;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        if (realmService.getDefaultRealm().isPresent()) {
+        if (realmService.getDefaultRealm(adminTenant.getId()).isPresent()) {
             return;
         }
 
         Realm createRequest = new com.netgrif.application.engine.adapter.spring.auth.domain.Realm("Default");
+        createRequest.setTenantId(adminTenant.getId());
         createRequest.setDescription("Default realm");
         createRequest.setAdminRealm(true);
         createRequest.setDefaultRealm(true);

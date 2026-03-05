@@ -1,17 +1,18 @@
 package com.netgrif.application.engine.objects.event.events.event;
 
+import com.netgrif.application.engine.objects.auth.domain.ActorRef;
 import com.netgrif.application.engine.objects.event.RunPhase;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.objects.petrinet.domain.events.DataEventType;
 import lombok.Getter;
 
 @Getter
-public class ActionStartEvent  extends ActionEvent {
+public class ActionStartEvent extends ActionEvent {
 
     private final DataEventType trigger;
 
-    public ActionStartEvent(Action action, String workspaceId) {
-        super(action, workspaceId);
+    public ActionStartEvent(Action action, ActorRef actor, String workspaceId) {
+        super(action, actor, workspaceId);
         this.trigger = action.getTrigger();
         setPhase(RunPhase.START);
     }

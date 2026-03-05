@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.auth.domain;
 
 
-import com.netgrif.application.engine.auth.tenant.TenantClaim;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
 import com.netgrif.application.engine.objects.workspace.Workspace;
 import lombok.Getter;
@@ -15,8 +14,6 @@ public class NetgrifAuthenticationToken extends UsernamePasswordAuthenticationTo
     private final Realm realm;
     @Setter
     private Workspace workspace;
-    @Setter
-    private TenantClaim tenantClaim;
 
     public NetgrifAuthenticationToken(Object principal, Object credentials, String realmName) {
         super(principal, credentials);

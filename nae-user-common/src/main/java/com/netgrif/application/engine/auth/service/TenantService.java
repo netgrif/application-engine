@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.adapter.spring.tenant.service;
+package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.objects.auth.domain.Realm;
 import com.netgrif.application.engine.objects.tenant.Tenant;
@@ -9,19 +9,27 @@ import java.util.Optional;
 
 public interface TenantService {
 
+    String TENANT_ID = "tenantId";
+
+    String TENANT_EMPTY = "empty";
+
     Tenant save(Tenant tenant);
 
     void delete(Tenant tenant);
 
-    void addRealm(String tenantId, String realmId);
+    void addRealm(String tenantId, Realm realm);
 
-    void addWorkspace(String tenantId, String workspaceId);
+    void removeRealm(String tenantId, String realmId);
+
+    void addWorkspace(String tenantId, Workspace workspace);
+
+    void removeWorkspace(String tenantId, String workspaceId);
 
     Optional<Tenant> getByCode(String tenantCode);
 
     Optional<Tenant> getById(String tenantId);
 
-    Optional<Tenant> getByOwner(String ownerId);
+    Optional<Tenant> getByOwner(String owner);
 
     Optional<Tenant> getByWorkspace(String workspaceId);
 

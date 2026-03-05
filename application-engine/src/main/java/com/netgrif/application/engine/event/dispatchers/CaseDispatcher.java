@@ -28,7 +28,7 @@ public class CaseDispatcher extends AbstractDispatcher {
 
     @EventListener
     public void handleDeleteCaseEvent(DeleteCaseEvent event) {
-        dispatchAsync(event);
+        dispatch(event);
     }
 
     @EventListener

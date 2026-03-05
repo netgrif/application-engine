@@ -1,11 +1,13 @@
 package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.adapter.spring.tenant.domain.AdminTenant;
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.adapter.spring.workflow.service.FilterImportExportService;
 import com.netgrif.application.engine.auth.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
 import com.netgrif.application.engine.auth.repository.UserRepository;
+import com.netgrif.application.engine.auth.tenant.TenantSupport;
 import com.netgrif.application.engine.objects.auth.constants.UserConstants;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
@@ -58,6 +60,8 @@ public class UserServiceImpl implements UserService {
     private AbstractUser systemUser;
 
     private RealmService realmService;
+
+    private AdminTenant adminTenant;
 
     @Getter
     private PaginationProperties paginationProperties;
@@ -118,6 +122,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public void setRealmService(RealmService realmService) {
         this.realmService = realmService;
+    }
+
+    @Autowired
+    public void setAdminTenant(AdminTenant adminTenant) {
+        this.adminTenant = adminTenant;
     }
 
     @Override
@@ -184,6 +193,7 @@ public class UserServiceImpl implements UserService {
     public AbstractUser createUser(AbstractUser user, String realmId) {
         log.info("Creating user [{}] in realm [{}]", user.getUsername(), realmId);
         addDefaultAuthorities(user);
+        addDefaultAttributes(user);
         addDefaultRole(user);
         setPassword(user, user.getPassword());
 
@@ -210,6 +220,7 @@ public class UserServiceImpl implements UserService {
         log.info("Creating user [{}] from third-party auth [{}] in realm [{}] without password", username, authMethod, realmId);
         User user = initializeNewUser(username, email, firstName, lastName, "N/A", realmId);
         addDefaultAuthorities(user);
+        addDefaultAttributes(user);
         addDefaultRole(user);
         setDisablePassword(user);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
@@ -299,6 +310,13 @@ public class UserServiceImpl implements UserService {
         log.trace("Assigning default role to user [{}]", user.getUsername());
         user.addProcessRole(processRoleService.getDefaultRole());
         saveUser(user);
+    }
+
+    @Override
+    public void addDefaultAttributes(AbstractUser user) {
+        log.trace("Assigning default attributes to user [{}]", user.getUsername());
+        Optional<Realm> realm = realmService.getRealmById(user.getRealmId());
+        realm.ifPresent(r -> TenantSupport.decorateUserWithTenant(user, r.getName()));
     }
 
     @Override
@@ -583,7 +601,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AbstractUser createSystemUser() {
-        User system = (User) findByEmail(UserConstants.SYSTEM_USER_EMAIL, null);
+        if(adminTenant.getDefaultRealmId().isEmpty()) {
+            throw new IllegalStateException("Admin tenant does not have default realm.");
+        }
+        User system = (User) findByEmail(UserConstants.SYSTEM_USER_EMAIL, adminTenant.getDefaultRealmId().get());
         if (system == null) {
             Authority adminAuthority = authorityService.getOrCreate(Authority.admin);
             Authority systemAuthority = authorityService.getOrCreate(Authority.systemAdmin);
@@ -599,6 +620,8 @@ public class UserServiceImpl implements UserService {
             system.setLastName(UserConstants.SYSTEM_USER_SURNAME);
             system.setState(UserState.ACTIVE);
             system.setAuthoritySet(authorities);
+            system.setRealmId(adminTenant.getDefaultRealmId().get());
+            system.setAttribute(TenantService.TENANT_ID, adminTenant.getId(), false);
             saveUser(system);
         }
         return system;

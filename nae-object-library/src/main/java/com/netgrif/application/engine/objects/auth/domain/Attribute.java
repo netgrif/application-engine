@@ -38,9 +38,32 @@ public class Attribute<T> implements Serializable {
     private LocalDateTime lastUpdated = LocalDateTime.now();
 
     /**
+     * Creates an Attribute instance with the specified value.
+     * The created attribute will have the `required` flag set to false by default.
+     *
+     * @param <T>   The type of the value to be stored in the attribute
+     * @param value The initial value of the attribute
+     * @return A new Attribute instance containing the specified value
+     */
+    public static <T> Attribute<T> of(T value) {
+        return new Attribute<>(value);
+    }
+
+    /**
+     * Creates an Attribute instance with the specified value and required status.
+     *
+     * @param <T>   The type of the value to be stored in the attribute
+     * @param value The initial value of the attribute
+     * @return A new Attribute instance containing the specified value
+     */
+    public static <T> Attribute<T> required(T value) {
+        return new Attribute<>(value, true);
+    }
+
+    /**
      * Creates a new attribute with the specified value and required status.
      *
-     * @param value The initial value of the attribute
+     * @param value    The initial value of the attribute
      * @param required Whether the attribute must have a non-null value
      * @throws IllegalArgumentException if required is true and value is null
      */
@@ -78,5 +101,14 @@ public class Attribute<T> implements Serializable {
         }
         this.value = value;
         this.lastUpdated = LocalDateTime.now();
+    }
+
+    /**
+     * Checks if the attribute has a null value.
+     *
+     * @return true if the attribute is empty (null), false otherwise
+     */
+    public boolean hasNullValue() {
+        return value == null;
     }
 }

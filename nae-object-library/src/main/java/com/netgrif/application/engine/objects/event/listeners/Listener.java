@@ -2,6 +2,7 @@ package com.netgrif.application.engine.objects.event.listeners;
 
 
 import com.netgrif.application.engine.objects.event.dispatchers.common.AbstractDispatcher;
+import com.netgrif.application.engine.objects.event.dispatchers.common.DispatcherRegistry;
 import lombok.Getter;
 
 import java.util.EventListener;
@@ -11,9 +12,32 @@ import java.util.Set;
 @Getter
 public abstract class Listener implements EventListener {
 
+    protected DispatcherRegistry registry;
+
     public Listener() {
+        this(null);
     }
-    //todo: register global
+
+
+    public Listener(DispatcherRegistry registry) {
+        this.registry = registry;
+    }
+
+
+    public void register(Class<? extends EventObject> event, AbstractDispatcher.DispatchMethod dispatchMethod) {
+        if (registry == null) {
+            throw new IllegalStateException("DispatcherRegistry is not set");
+        }
+        registry.getDispatcher(event).registerListener(this, event, dispatchMethod);
+    }
+
+    public void registerAll(Set<Class<? extends EventObject>> events, AbstractDispatcher.DispatchMethod dispatchMethod) {
+        if (registry == null) {
+            throw new IllegalStateException("DispatcherRegistry is not set");
+        }
+        events.forEach(event -> registry.getDispatcher(event).registerListener(this, event, dispatchMethod));
+    }
+
 
     /**
      * Register this listener to dispatcher.

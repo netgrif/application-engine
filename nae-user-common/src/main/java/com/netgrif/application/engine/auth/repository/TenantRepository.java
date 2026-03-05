@@ -20,7 +20,7 @@ import static org.springframework.data.domain.Sort.by;
 
 public interface TenantRepository extends MongoRepository<Tenant, String> {
 
-    Optional<Tenant> findByOwner_Id(String ownerId);
+    Optional<Tenant> findByOwner(String owner);
 
     Optional<Tenant> findTenantByWorkspacesContaining(String workspaceId);
 

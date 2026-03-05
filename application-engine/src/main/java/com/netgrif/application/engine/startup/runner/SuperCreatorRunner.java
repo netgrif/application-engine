@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.startup.runner;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.adapter.spring.tenant.domain.AdminTenant;
+import com.netgrif.application.engine.auth.service.TenantService;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.auth.service.UserService;
@@ -36,6 +38,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     private final UserService userService;
     private final GroupService groupService;
     private final ProcessRoleService processRoleService;
+    private final AdminTenant adminTenant;
 
     @Getter
     private AbstractUser superUser;
@@ -52,8 +55,11 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
         Set<Authority> authorities = new HashSet<>();
         authorities.add(adminAuthority);
         authorities.add(systemAuthority);
-
-        Optional<AbstractUser> superUser = userService.findUserByUsername(UserConstants.ADMIN_USER_USERNAME, null);
+        Optional<String> defaultRealmId = adminTenant.getDefaultRealmId();
+        if (defaultRealmId.isEmpty()) {
+            throw new IllegalStateException("Default realm not found");
+        }
+        Optional<AbstractUser> superUser = userService.findUserByUsername(UserConstants.ADMIN_USER_USERNAME, defaultRealmId.get());
         if (superUser.isEmpty()) {
             User user = new User();
             user.setFirstName(UserConstants.ADMIN_USER_FIRST_NAME);
@@ -65,7 +71,9 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
             user.setState(UserState.ACTIVE);
             user.setAuthoritySet(authorities);
             user.setProcessRoles(new HashSet<>(processRoleService.findAll(Pageable.unpaged()).getContent()));
-            this.superUser = userService.createUser(user, null);
+            user.setRealmId(defaultRealmId.get());
+            user.setAttribute(TenantService.TENANT_ID, adminTenant.getId(), false);
+            this.superUser = userService.createUser(user, defaultRealmId.get());
             log.info("Super user created");
         } else {
             log.info("Super user detected");
@@ -88,12 +96,12 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
 
     public void setAllProcessRoles() {
         superUser.setProcessRoles(new HashSet<>(processRoleService.findAll(Pageable.unpaged()).getContent()));
-        superUser = userService.saveUser(superUser, null);
+        superUser = userService.saveUser(superUser, superUser.getRealmId());
     }
 
     public void setAllAuthorities() {
         superUser.setAuthoritySet(new HashSet<>(authorityService.findAll(Pageable.unpaged()).stream().toList()));
-        superUser = userService.saveUser(superUser, null);
+        superUser = userService.saveUser(superUser, superUser.getRealmId());
     }
 
     public LoggedUser getLoggedSuper() {

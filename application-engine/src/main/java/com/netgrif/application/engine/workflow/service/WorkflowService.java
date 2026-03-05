@@ -328,7 +328,7 @@ public class WorkflowService implements IWorkflowService {
         outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty(),
                 createCaseParams.getParams()));
 
-        publisher.publishEvent(new CreateCaseEvent(outcome, EventPhase.PRE));
+        publisher.publishEvent(new CreateCaseEvent(outcome, EventPhase.PRE, userService.getLoggedOrSystem()));
 
         Case useCase = createCaseObject(createCaseParams);
         log.info("[{}]: Case {} created", useCase.getStringId(), useCase.getTitle());
@@ -347,7 +347,7 @@ public class WorkflowService implements IWorkflowService {
 
         CreateCaseEventOutcome eventOutcome = new CreateCaseEventOutcome(useCase, outcome.getOutcomes());
         eventOutcome.setMessage(outcome.getMessage());
-        useCase = evaluateRules(new CreateCaseEvent(eventOutcome, EventPhase.POST));
+        useCase = evaluateRules(new CreateCaseEvent(eventOutcome, EventPhase.POST, userService.getLoggedOrSystem()));
 
         outcome.setCase(setImmediateDataFields(useCase));
         addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
@@ -437,11 +437,12 @@ public class WorkflowService implements IWorkflowService {
         Case useCase = deleteCaseParams.getUseCase();
         DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, new ArrayList<>());
 
+        publisher.publishEvent(new DeleteCaseEvent(outcome, EventPhase.PRE, userService.getLoggedOrSystem()));
+
         if (!deleteCaseParams.isForce()) {
             outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(),
                     useCase, Optional.empty(), deleteCaseParams.getParams()));
-            publisher.publishEvent(new DeleteCaseEvent(outcome, EventPhase.PRE));
-            useCase = ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("default")).apply(new DeleteCaseEvent(outcome, EventPhase.PRE));
+            useCase = ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("default")).apply(new DeleteCaseEvent(outcome, EventPhase.PRE, userService.getLoggedOrSystem()));
         }
         log.info("[{}]: User [{}] is deleting case {}", useCase.getStringId(), userService.getLoggedOrSystem().getStringId(),
                 useCase.getTitle());
@@ -453,9 +454,9 @@ public class WorkflowService implements IWorkflowService {
             outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null,
                     Optional.empty(), deleteCaseParams.getParams()));
             addMessageToOutcome(useCase.getPetriNet(), CaseEventType.DELETE, outcome);
-            ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("noContext")).apply(new DeleteCaseEvent(outcome, EventPhase.POST));
-            publisher.publishEvent(new DeleteCaseEvent(outcome, EventPhase.POST));
+            ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("noContext")).apply(new DeleteCaseEvent(outcome, EventPhase.POST, userService.getLoggedOrSystem()));
         }
+        publisher.publishEvent(new DeleteCaseEvent(outcome, EventPhase.POST, userService.getLoggedOrSystem()));
 
         return outcome;
     }

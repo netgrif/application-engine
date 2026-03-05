@@ -17,6 +17,6 @@ public class AdminActionEvent extends UserEvent {
 
     @Override
     public String getMessage() {
-        return "User %s ran following script: %s".formatted(user.getUsername() == null ? MISSING_IDENTIFIER : user.getUsername(), code);
+        return "User %s ran following script: %s".formatted(getActor().getUsername() == null ? MISSING_IDENTIFIER : getActor().getUsername(), code);
     }
 }

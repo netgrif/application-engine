@@ -2,7 +2,7 @@ package com.netgrif.application.engine.startup.runner;
 
 
 import com.netgrif.application.engine.adapter.spring.tenant.domain.AdminTenant;
-import com.netgrif.application.engine.adapter.spring.tenant.service.TenantService;
+import com.netgrif.application.engine.auth.service.TenantService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import com.netgrif.application.engine.workspace.service.WorkspaceService;
@@ -15,13 +15,13 @@ import org.springframework.stereotype.Component;
 @Component
 @RunnerOrder(51)
 @RequiredArgsConstructor
-public class TenantRunner implements ApplicationEngineStartupRunner {
+public class AdminTenantRunner implements ApplicationEngineStartupRunner {
     private final TenantService tenantService;
     private final WorkspaceService workspaceService;
     private final AdminTenant adminTenant;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        tenantService.addWorkspace(adminTenant.getId(), workspaceService.getDefault().getId());
+        tenantService.addWorkspace(adminTenant.getId(), workspaceService.getDefault());
     }
 }

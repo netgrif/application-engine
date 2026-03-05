@@ -6,6 +6,7 @@ import com.netgrif.application.engine.objects.event.listeners.Listener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -16,18 +17,20 @@ import java.util.function.Function;
 @Slf4j
 public abstract class AbstractDispatcher {
 
-    //TODO: Configure custom executor
-    //TODO: Register event
-
     private final Set<RegisteredListener> registeredListeners;
     @Getter
     private final Set<Class<? extends EventObject>> allowedEvents;
 
-    private final Executor DEFAULT_EXECUTOR = Executors.newCachedThreadPool();
+    private final Executor executor;
 
     protected AbstractDispatcher(Set<Class<? extends EventObject>> allowedEvents) {
+        this(allowedEvents, Executors.newVirtualThreadPerTaskExecutor());
+    }
+
+    protected AbstractDispatcher(Set<Class<? extends EventObject>> allowedEvents, Executor executor) {
         this.allowedEvents = allowedEvents;
         this.registeredListeners = new HashSet<>();
+        this.executor = executor;
     }
 
     public enum DispatchMethod {
@@ -113,20 +116,22 @@ public abstract class AbstractDispatcher {
     }
 
     /**
-     * <p>Send event object to registered {@link Listener}. This function sends events asynchronously,
-     * but wait until all listeners have finished executing the onEvent method. This is wrapper method,
-     * where decision function foo as input is omitted. Decision is made by lambda function,
-     * which checks if registerListener contains provided event with sync dispatching method </p>
+     * <p>Sends an event object to registered {@link Listener}s synchronously.
+     * This method dispatches the event asynchronously but waits until all listeners
+     * have finished executing their {@link Listener#onEvent} methods.</p>
      *
-     * @param event Event that the listener is subscribed to
-     * @param <E>   Type of event, must be child of {@link EventObject}
+     * <p>Only listeners registered with {@link DispatchMethod#SYNC} for this event type
+     * will receive the event.</p>
+     *
+     * @param event Event to be dispatched to listeners
+     * @param <E>   Type of event, must extend {@link EventObject}
      * @see AbstractDispatcher#dispatch(EventObject, Function, Executor)
      * @see RegisteredListener
      */
     protected <E extends EventObject> void dispatch(E event) {
         dispatch(event, (RegisteredListener registeredListener) ->
                 registeredListener.contains(event)
-                        && registeredListener.contains(DispatchMethod.SYNC), DEFAULT_EXECUTOR);
+                        && registeredListener.contains(DispatchMethod.SYNC), executor);
     }
 
     /**
@@ -143,7 +148,7 @@ public abstract class AbstractDispatcher {
     protected <E extends EventObject> void dispatchAsync(E event) {
         dispatchAsync(event, (RegisteredListener registeredListener) ->
                 registeredListener.contains(event)
-                        && registeredListener.contains(DispatchMethod.ASYNC), DEFAULT_EXECUTOR);
+                        && registeredListener.contains(DispatchMethod.ASYNC), executor);
     }
 
     /**
@@ -200,7 +205,7 @@ public abstract class AbstractDispatcher {
         }
     }
 
-    protected String getName() {
+    public String getName() {
         return this.getClass().getSimpleName();
     }
 

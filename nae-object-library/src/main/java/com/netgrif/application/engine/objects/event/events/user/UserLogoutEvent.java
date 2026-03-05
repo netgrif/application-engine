@@ -11,7 +11,7 @@ public class UserLogoutEvent extends UserEvent {
 
     @Override
     public String getMessage() {
-        return "User %s logged out on %s".formatted(user.getUsername() == null ? MISSING_IDENTIFIER : user.getUsername(),
+        return "User %s logged out on %s".formatted(getActor().getUsername() == null ? MISSING_IDENTIFIER : getActor().getUsername(),
                 DateUtils.toString(time));
     }
 }

@@ -3,18 +3,25 @@ package com.netgrif.application.engine.objects.tenant;
 
 import com.netgrif.application.engine.objects.annotations.Indexed;
 import com.netgrif.application.engine.objects.auth.domain.ActorRef;
-import jdk.jfr.Unsigned;
+import com.netgrif.application.engine.objects.auth.domain.Realm;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 public abstract class Tenant implements Serializable {
+
+    private record RealmRef(String name, boolean defaultRealm) {
+
+    }
+
     @Serial
-    private static final long serialVersionUID = 26983148877935L ;
+    private static final long serialVersionUID = 26983148877935L;
 
     private final String id;
 
@@ -24,13 +31,13 @@ public abstract class Tenant implements Serializable {
     private TenantStatus status = TenantStatus.INACTIVE;
 
     @Setter
-    private ActorRef owner;
+    private String owner;
 
     @Setter
     private List<String> workspaces;
 
     @Setter
-    private List<String> realms;
+    private List<RealmRef> realms;
 
     @Setter
     private String name;
@@ -38,10 +45,8 @@ public abstract class Tenant implements Serializable {
     public Tenant(String id, String tenantCode) {
         this.id = id;
         this.tenantCode = tenantCode;
-    }
-
-    public String getOwnerRealmId() {
-        return owner.getRealmId();
+        this.workspaces = new ArrayList<>();
+        this.realms = new ArrayList<>();
     }
 
     public void setActive() {
@@ -76,16 +81,28 @@ public abstract class Tenant implements Serializable {
         return TenantStatus.DELETED.equals(status);
     }
 
+    public void addRealm(Realm realm) {
+        realms.add(new RealmRef(realm.getName(), realm.isDefaultRealm()));
+    }
+
     public void addWorkspace(String workspaceId) {
         workspaces.add(workspaceId);
     }
 
-    public void addRealm(String realmId) {
-        realms.add(realmId);
+    public void removeWorkspace(String workspaceId) {
+        workspaces.remove(workspaceId);
+    }
+
+    public void removeRealm(String realmId) {
+        realms.stream().filter(realmRef -> realmRef.name.equals(realmId)).findFirst().ifPresent(realmRef -> realms.remove(realmRef));
+    }
+
+    public Optional<String> getDefaultRealmId() {
+        return realms.stream().filter(realmRef -> realmRef.defaultRealm).findFirst().map(realmRef -> realmRef.name);
     }
 
     public enum TenantStatus {
-        ACTIVE,INACTIVE, SUSPENDED, DELETED
+        ACTIVE, INACTIVE, SUSPENDED, DELETED
     }
 
 

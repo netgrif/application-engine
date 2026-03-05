@@ -4,8 +4,6 @@ package com.netgrif.application.engine.adapter.spring.tenant.domain;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
-
 @Document
 public class Tenant extends com.netgrif.application.engine.objects.tenant.Tenant {
 

@@ -3,7 +3,6 @@ package com.netgrif.application.engine.auth.service;
 import com.netgrif.application.engine.adapter.spring.tenant.domain.AdminTenant;
 import com.netgrif.application.engine.adapter.spring.tenant.exception.TenantConflictException;
 import com.netgrif.application.engine.adapter.spring.tenant.exception.TenantNotFoundException;
-import com.netgrif.application.engine.adapter.spring.tenant.service.TenantService;
 import com.netgrif.application.engine.auth.repository.TenantRepository;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
 import com.netgrif.application.engine.objects.tenant.Tenant;
@@ -21,6 +20,8 @@ public class TenantServiceImpl implements TenantService {
     @Autowired
     private AdminTenant adminTenant;
 
+    //todo admin tenant
+
     @Override
     public Tenant save(Tenant tenant) {
         if (isAdminTenant(tenant)) return adminTenant;
@@ -29,14 +30,19 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public void delete(Tenant tenant) {
+
         if (isAdminTenant(tenant)) throw new TenantConflictException("Cannot delete admin tenant");
         repository.delete(tenant);
     }
 
     @Override
-    public void addRealm(String tenantId, String realmId) {
+    public void addRealm(String tenantId, Realm realm) {
         getById(tenantId).ifPresentOrElse((tenant) -> {
-                    tenant.addRealm(realmId);
+                    if (tenant.getDefaultRealmId().isEmpty() && realm.isDefaultRealm()) {
+                        tenant.addRealm(realm);
+                    } else {
+                        throw new TenantConflictException("Cannot set more than one default realm per tenant");
+                    }
                     save(tenant);
                 },
                 () -> {
@@ -45,9 +51,31 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public void addWorkspace(String tenantId, String workspaceId) {
+    public void removeRealm(String tenantId, String realmId) {
         getById(tenantId).ifPresentOrElse((tenant) -> {
-                    tenant.addWorkspace(workspaceId);
+                    tenant.removeRealm(realmId);
+                    save(tenant);
+                },
+                () -> {
+                    throw new TenantNotFoundException("Tenant not found");
+                });
+    }
+
+    @Override
+    public void addWorkspace(String tenantId, Workspace workspace) {
+        getById(tenantId).ifPresentOrElse((tenant) -> {
+                    tenant.addWorkspace(workspace.getId());
+                    save(tenant);
+                },
+                () -> {
+                    throw new TenantNotFoundException("Tenant not found");
+                });
+    }
+
+    @Override
+    public void removeWorkspace(String tenantId, String workspaceId) {
+        getById(tenantId).ifPresentOrElse((tenant) -> {
+                    tenant.removeWorkspace(workspaceId);
                     save(tenant);
                 },
                 () -> {
@@ -68,9 +96,9 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public Optional<Tenant> getByOwner(String ownerId) {
-        if (adminTenant.getOwner().getId().equals(ownerId)) return Optional.of(adminTenant);
-        return repository.findByOwner_Id(ownerId);
+    public Optional<Tenant> getByOwner(String owner) {
+        if (adminTenant.getOwner().equals(owner)) return Optional.of(adminTenant);
+        return repository.findByOwner(owner);
 
     }
 
@@ -98,7 +126,6 @@ public class TenantServiceImpl implements TenantService {
     public List<Tenant> getAll() {
         return repository.findAll();
     }
-
 
     @Override
     public List<Tenant> getActiveTenants() {

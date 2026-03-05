@@ -30,7 +30,7 @@ public class UserRoleChangeEvent extends UserEvent {
             sb.append(",");
         });
         sb.append(" assigned to user ");
-        sb.append(user.getUsername());
+        sb.append(getActor().getUsername());
         return sb.toString();
     }
 }

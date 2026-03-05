@@ -275,6 +275,7 @@ public class DataService implements IDataService {
             task.setUser(userService.findById(task.getUserId(), task.getUserRealmId()));
         }
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
+        publisher.publishEvent(new SetDataEvent(outcome, EventPhase.PRE, user));
         values.fields().forEachRemaining(entry -> {
             String fieldId = entry.getKey();
             DataField dataField = useCase.getDataSet().get(fieldId);
@@ -356,13 +357,12 @@ public class DataService implements IDataService {
             }
             outcome.addChangedField(fieldId, changedField);
             workflowService.save(useCase);
-            publisher.publishEvent(new SetDataEvent(outcome, EventPhase.PRE, user));
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, params));
             applyFieldConnectedChanges(useCase, field);
         });
         updateDataset(useCase);
         outcome.setCase(workflowService.save(useCase));
-        publisher.publishEvent(new SetDataEvent(outcome));
+        publisher.publishEvent(new SetDataEvent(outcome, EventPhase.POST, user));
         return outcome;
     }
 

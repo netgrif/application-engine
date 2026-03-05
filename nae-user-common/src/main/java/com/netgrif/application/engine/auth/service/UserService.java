@@ -126,6 +126,13 @@ public interface UserService {
     void addDefaultRole(AbstractUser user);
 
     /**
+     * Adds default attributes to a user.
+     *
+     * @param user the user to update
+     */
+    void addDefaultAttributes(AbstractUser user);
+
+    /**
      * Adds anonymous authorities to a user.
      *
      * @param user the user to update

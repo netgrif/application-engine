@@ -11,7 +11,7 @@ public class UserRegistrationEvent extends UserEvent {
 
     @Override
     public String getMessage() {
-        return "New user %s registered on %s".formatted(user.getUsername() == null ? MISSING_IDENTIFIER : user.getUsername(),
+        return "New user %s registered on %s".formatted(getActor().getUsername() == null ? MISSING_IDENTIFIER : getActor().getUsername(),
                 DateUtils.toString(time));
     }
 }

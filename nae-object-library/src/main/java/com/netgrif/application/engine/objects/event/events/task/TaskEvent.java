@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.objects.event.events.task;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.event.events.Event;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
@@ -13,8 +14,6 @@ public abstract class TaskEvent extends Event {
 
     protected final TaskEventOutcome taskEventOutcome;
 
-    private final AbstractUser user;
-
     protected TaskEvent(TaskEventOutcome eventOutcome, EventPhase phase) {
         this(eventOutcome, phase, null);
     }
@@ -24,9 +23,8 @@ public abstract class TaskEvent extends Event {
     }
 
     protected TaskEvent(TaskEventOutcome eventOutcome, EventPhase phase, AbstractUser user) {
-        super(eventOutcome, phase, getWorkspaceIdFromResource(eventOutcome.getCase()));
+        super(eventOutcome, phase, ActorTransformer.toActorRef(user), getWorkspaceIdFromResource(eventOutcome.getCase()));
         this.taskEventOutcome = eventOutcome;
-        this.user = user;
     }
 
     public abstract EventType getEventType();

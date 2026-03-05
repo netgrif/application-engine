@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netgrif.application.engine.adapter.spring.configuration.AbstractMongoCollectionConfigurator;
 import com.netgrif.application.engine.adapter.spring.tenant.domain.AdminTenant;
-import com.netgrif.application.engine.adapter.spring.tenant.service.TenantService;
 import com.netgrif.application.engine.auth.provider.AbstractAuthConfig;
 import com.netgrif.application.engine.auth.provider.AuthMethodProvider;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
@@ -75,6 +74,7 @@ public class RealmServiceImpl implements RealmService {
         com.netgrif.application.engine.adapter.spring.auth.domain.Realm realm = new com.netgrif.application.engine.adapter.spring.auth.domain.Realm(createRequest.getName());
         realm.setDescription(createRequest.getDescription());
         realm.setAdminRealm(createRequest.isAdminRealm());
+        realm.setTenantId(createRequest.getTenantId());
 
         if (createRequest.isDefaultRealm() && getDefaultRealm(createRequest.getTenantId()).isEmpty()) {
             realm.setDefaultRealm(true);
@@ -82,7 +82,7 @@ public class RealmServiceImpl implements RealmService {
 
         realm = realmRepository.save(realm);
 
-        tenantService.addRealm(realm.getTenantId(), realm.getName());
+        tenantService.addRealm(realm.getTenantId(), realm);
 
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realm.getName());
 
@@ -93,6 +93,7 @@ public class RealmServiceImpl implements RealmService {
             } catch (Exception e) {
                 log.error("Error occurred while creating collection for realm {}", realm.getName(), e);
                 realmRepository.delete(realm);
+                tenantService.removeRealm(realm.getTenantId(), realm.getName());
                 throw new RuntimeException("Error occurred while creating collection for realm " + realm.getName(), e);
             }
         }
@@ -293,6 +294,7 @@ public class RealmServiceImpl implements RealmService {
         if (!realmRepository.existsById(realmId)) {
             throw new IllegalArgumentException("Realm with id " + realmId + " not found");
         }
+        tenantService.getByRealm(realmId).ifPresent(t -> tenantService.removeRealm(t.getId(), realmId));
         realmRepository.deleteById(realmId);
     }
 }
