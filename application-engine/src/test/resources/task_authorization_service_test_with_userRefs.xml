@@ -155,7 +155,7 @@
         <actorRef>
             <id>view_pos_ul</id>
             <logic>
-                <view>false</view>
+                <view>true</view>
             </logic>
         </actorRef>
         <dataRef>
