@@ -333,8 +333,8 @@ class WorkflowAuthorizationServiceTest {
 
     @Test
     void testCanCallDeleteWithRoleDeleteUndefinedAndActorRefDeleteTrue() {
-        ProcessRole positiveDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "view_pos_role")
-        userService.addRole(testUser, positiveDeleteRole.getStringId())
+        ProcessRole positiveViewRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "view_pos_role")
+        userService.addRole(testUser, positiveViewRole.getStringId())
         Case case_ = workflowService.createCase(CreateCaseParams.with()
                 .process(netWithUserRefs)
                 .title("Test delete")
