@@ -63,8 +63,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
             }
         }
 
-        return Arrays.stream(permissions)
-                .anyMatch(permission -> hasPermission(aggregatePermissions.get(permission.toString())));
+        return checkPermissions(aggregatePermissions, Arrays.stream(permissions).map(ProcessRolePermission::toString).toList());
     }
 
     @Override
@@ -84,8 +83,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
                 return false;
             }
         }
-        return Arrays.stream(permissions)
-                .anyMatch(permission -> hasPermission(userPermissions.get(permission.toString())));
+        return checkPermissions(userPermissions, Arrays.stream(permissions).map(ProcessRolePermission::toString).toList());
     }
 
     private Map<String, Boolean> findUserPermissions(Case useCase, AbstractUser user) {

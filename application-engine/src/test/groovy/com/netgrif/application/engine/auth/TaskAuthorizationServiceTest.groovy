@@ -590,4 +590,45 @@ class TaskAuthorizationServiceTest {
         workflowService.deleteCase(new DeleteCaseParams(case_.stringId))
     }
 
+    @Test
+    void testCanAssignWithRoleAssignTrueAndWithActorRefAssignUndefined() {
+        ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "assign_pos_role")
+        userService.addRole(testUser, positiveRole.get_id())
+        Case case_ = workflowService.createCase(CreateCaseParams.with()
+                .process(netWithUserRefs)
+                .title("Test assign")
+                .color("")
+                .author(ActorTransformer.toLoggedUser(testUser))
+                .build()).getCase()
+
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_pos_ul": [
+                        "value": [testUser.stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        assert taskAuthorizationService.canCallAssign(ActorTransformer.toLoggedUser(testUser), (new ArrayList<>(case_.getTasks())).get(0).task)
+    }
+
+    @Test
+    void testCanAssignWithRoleAssignUndefinedAndWithActorRefAssignTrue() {
+        ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "view_pos_role")
+        userService.addRole(testUser, positiveRole.get_id())
+        Case case_ = workflowService.createCase(CreateCaseParams.with()
+                .process(netWithUserRefs)
+                .title("Test assign")
+                .color("")
+                .author(ActorTransformer.toLoggedUser(testUser))
+                .build()).getCase()
+
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "assign_pos_ul": [
+                        "value": [testUser.stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        assert taskAuthorizationService.canCallAssign(ActorTransformer.toLoggedUser(testUser), (new ArrayList<>(case_.getTasks())).get(0).task)
+    }
 }

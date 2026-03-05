@@ -311,6 +311,46 @@ class WorkflowAuthorizationServiceTest {
         userService.removeRole(testUser, negDeleteRole.getStringId())
     }
 
+    @Test
+    void testCanCallDeleteWithRoleDeleteTrueAndActorRefDeleteUndefined() {
+        ProcessRole positiveDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
+        userService.addRole(testUser, positiveDeleteRole.getStringId())
+        Case case_ = workflowService.createCase(CreateCaseParams.with()
+                .process(netWithUserRefs)
+                .title("Test delete")
+                .color("")
+                .author(ActorTransformer.toLoggedUser(testUser))
+                .build()).getCase()
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_actor_list": [
+                        "value": [testUser.stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        assert workflowAuthorizationService.canCallDelete(ActorTransformer.toLoggedUser(testUser), case_.getStringId())
+    }
+
+    @Test
+    void testCanCallDeleteWithRoleDeleteUndefinedAndActorRefDeleteTrue() {
+        ProcessRole positiveViewRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "view_pos_role")
+        userService.addRole(testUser, positiveViewRole.getStringId())
+        Case case_ = workflowService.createCase(CreateCaseParams.with()
+                .process(netWithUserRefs)
+                .title("Test delete")
+                .color("")
+                .author(ActorTransformer.toLoggedUser(testUser))
+                .build()).getCase()
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "pos_user_list": [
+                        "value": [testUser.stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        assert workflowAuthorizationService.canCallDelete(ActorTransformer.toLoggedUser(testUser), case_.getStringId())
+    }
+
     @SuppressWarnings("GrMethodMayBeStatic")
     private def parseResult(MvcResult result) {
         return (new JsonSlurper()).parseText(result.response.contentAsString)
