@@ -9,10 +9,6 @@ import java.util.Optional;
 
 public interface TenantService {
 
-    String TENANT_ID = "tenantId";
-
-    String TENANT_EMPTY = "empty";
-
     Tenant save(Tenant tenant);
 
     void delete(Tenant tenant);
@@ -46,8 +42,6 @@ public interface TenantService {
     List<Tenant> getSuspendedTenants();
 
     List<Tenant> getDeletedTenants();
-
-    boolean isAdminTenant(Tenant tenant);
 
     boolean exists(String tenantId);
 

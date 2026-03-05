@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.startup.runner;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-import com.netgrif.application.engine.adapter.spring.tenant.domain.AdminTenant;
 import com.netgrif.application.engine.auth.service.TenantService;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.GroupService;
@@ -10,6 +9,7 @@ import com.netgrif.application.engine.configuration.properties.SecurityConfigura
 import com.netgrif.application.engine.objects.auth.constants.UserConstants;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
+import com.netgrif.application.engine.objects.tenant.Tenant;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.Getter;
@@ -23,6 +23,9 @@ import org.springframework.stereotype.Component;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+
+import static com.netgrif.application.engine.objects.tenant.TenantConstants.ADMIN_TENANT_ID;
+import static com.netgrif.application.engine.objects.tenant.TenantConstants.TENANT_ID;
 
 
 @Slf4j
@@ -38,7 +41,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     private final UserService userService;
     private final GroupService groupService;
     private final ProcessRoleService processRoleService;
-    private final AdminTenant adminTenant;
+    private final TenantService tenantService;
 
     @Getter
     private AbstractUser superUser;
@@ -55,7 +58,11 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
         Set<Authority> authorities = new HashSet<>();
         authorities.add(adminAuthority);
         authorities.add(systemAuthority);
-        Optional<String> defaultRealmId = adminTenant.getDefaultRealmId();
+        Optional<Tenant> adminTenant = tenantService.getById(ADMIN_TENANT_ID);
+        if (adminTenant.isEmpty()) {
+            throw new IllegalStateException("Admin tenant not found");
+        }
+        Optional<String> defaultRealmId = adminTenant.get().getDefaultRealmId();
         if (defaultRealmId.isEmpty()) {
             throw new IllegalStateException("Default realm not found");
         }
@@ -72,7 +79,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
             user.setAuthoritySet(authorities);
             user.setProcessRoles(new HashSet<>(processRoleService.findAll(Pageable.unpaged()).getContent()));
             user.setRealmId(defaultRealmId.get());
-            user.setAttribute(TenantService.TENANT_ID, adminTenant.getId(), false);
+            user.setAttribute(TENANT_ID, ADMIN_TENANT_ID, false);
             this.superUser = userService.createUser(user, defaultRealmId.get());
             log.info("Super user created");
         } else {

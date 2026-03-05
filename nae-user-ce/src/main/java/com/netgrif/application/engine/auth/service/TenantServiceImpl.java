@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.adapter.spring.tenant.domain.AdminTenant;
 import com.netgrif.application.engine.adapter.spring.tenant.exception.TenantConflictException;
 import com.netgrif.application.engine.adapter.spring.tenant.exception.TenantNotFoundException;
 import com.netgrif.application.engine.auth.repository.TenantRepository;
@@ -17,21 +16,14 @@ public class TenantServiceImpl implements TenantService {
     @Autowired
     private TenantRepository repository;
 
-    @Autowired
-    private AdminTenant adminTenant;
-
-    //todo admin tenant
 
     @Override
     public Tenant save(Tenant tenant) {
-        if (isAdminTenant(tenant)) return adminTenant;
         return repository.save(tenant);
     }
 
     @Override
     public void delete(Tenant tenant) {
-
-        if (isAdminTenant(tenant)) throw new TenantConflictException("Cannot delete admin tenant");
         repository.delete(tenant);
     }
 
@@ -85,21 +77,17 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public Optional<Tenant> getByCode(String tenantCode) {
-        if (AdminTenant.ADMIN_TENANT_CODE.equals(tenantCode)) return Optional.of(adminTenant);
         return repository.findTenantByTenantCode(tenantCode);
     }
 
     @Override
     public Optional<Tenant> getById(String tenantId) {
-        if (AdminTenant.ADMIN_TENANT_ID.equals(tenantId)) return Optional.of(adminTenant);
         return repository.findById(tenantId);
     }
 
     @Override
     public Optional<Tenant> getByOwner(String owner) {
-        if (adminTenant.getOwner().equals(owner)) return Optional.of(adminTenant);
         return repository.findByOwner(owner);
-
     }
 
     @Override
@@ -140,11 +128,6 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public List<Tenant> getDeletedTenants() {
         return repository.findTenantsByDeletedIsTrue();
-    }
-
-    @Override
-    public boolean isAdminTenant(Tenant tenant) {
-        return adminTenant.equals(tenant);
     }
 
     @Override

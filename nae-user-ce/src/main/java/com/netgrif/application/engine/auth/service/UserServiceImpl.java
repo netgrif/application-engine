@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-import com.netgrif.application.engine.adapter.spring.tenant.domain.AdminTenant;
+
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.adapter.spring.workflow.service.FilterImportExportService;
 import com.netgrif.application.engine.auth.config.GroupConfigurationProperties;
@@ -13,6 +13,7 @@ import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.objects.tenant.Tenant;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -34,6 +35,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.netgrif.application.engine.objects.tenant.TenantConstants.TENANT_ID;
 
 @Slf4j
 @Getter
@@ -61,7 +64,7 @@ public class UserServiceImpl implements UserService {
 
     private RealmService realmService;
 
-    private AdminTenant adminTenant;
+    private Tenant adminTenant;
 
     @Getter
     private PaginationProperties paginationProperties;
@@ -125,7 +128,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Autowired
-    public void setAdminTenant(AdminTenant adminTenant) {
+    public void setAdminTenant(Tenant adminTenant) {
         this.adminTenant = adminTenant;
     }
 
@@ -621,7 +624,7 @@ public class UserServiceImpl implements UserService {
             system.setState(UserState.ACTIVE);
             system.setAuthoritySet(authorities);
             system.setRealmId(adminTenant.getDefaultRealmId().get());
-            system.setAttribute(TenantService.TENANT_ID, adminTenant.getId(), false);
+            system.setAttribute(TENANT_ID, adminTenant.getId(), false);
             saveUser(system);
         }
         return system;

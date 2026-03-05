@@ -3,7 +3,6 @@ package com.netgrif.application.engine.auth.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netgrif.application.engine.adapter.spring.configuration.AbstractMongoCollectionConfigurator;
-import com.netgrif.application.engine.adapter.spring.tenant.domain.AdminTenant;
 import com.netgrif.application.engine.auth.provider.AbstractAuthConfig;
 import com.netgrif.application.engine.auth.provider.AuthMethodProvider;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
@@ -27,6 +26,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.netgrif.application.engine.objects.tenant.TenantConstants.ADMIN_TENANT_ID;
+
 @Slf4j
 public class RealmServiceImpl implements RealmService {
 
@@ -47,9 +48,6 @@ public class RealmServiceImpl implements RealmService {
 
     @Autowired
     private TenantService tenantService;
-
-    @Autowired
-    private AdminTenant adminTenant;
 
     private AbstractMongoCollectionConfigurator mongoCollectionConfigurator;
 
@@ -122,7 +120,7 @@ public class RealmServiceImpl implements RealmService {
 
     @Override
     public Optional<Realm> getDefaultRealm() {
-        return realmRepository.findByDefaultRealmTrueAndTenantId(adminTenant.getId()).map(Realm.class::cast);
+        return realmRepository.findByDefaultRealmTrueAndTenantId(ADMIN_TENANT_ID).map(Realm.class::cast);
     }
 
     @Override

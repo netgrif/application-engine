@@ -11,6 +11,9 @@ import com.netgrif.application.engine.objects.tenant.Tenant;
 
 import java.util.Optional;
 
+import static com.netgrif.application.engine.objects.tenant.TenantConstants.TENANT_EMPTY;
+import static com.netgrif.application.engine.objects.tenant.TenantConstants.TENANT_ID;
+
 public class TenantEventEnricher implements EventEnricher {
 
     private final UserService userService;
@@ -31,7 +34,7 @@ public class TenantEventEnricher implements EventEnricher {
             } else {
                 tenantAtt = getTenantIdFromLoggedUser();
             }
-            e.addAttribute(TenantService.TENANT_ID, tenantAtt);
+            e.addAttribute(TENANT_ID, tenantAtt);
         }
         return event;
     }
@@ -47,12 +50,12 @@ public class TenantEventEnricher implements EventEnricher {
     private Attribute<?> getTenantIdFromLoggedUser() {
         AbstractUser loggedUser = userService.getLoggedOrSystem();
         if (loggedUser == null) {
-            return Attribute.of(TenantService.TENANT_EMPTY);
+            return Attribute.of(TENANT_EMPTY);
         }
-        Attribute<?> tenantAtt = loggedUser.getAttribute(TenantService.TENANT_ID);
+        Attribute<?> tenantAtt = loggedUser.getAttribute(TENANT_ID);
         if (tenantAtt == null || tenantAtt.hasNullValue()) {
-            return Attribute.of(TenantService.TENANT_EMPTY);
+            return Attribute.of(TENANT_EMPTY);
         }
-        return loggedUser.getAttribute(TenantService.TENANT_ID);
+        return loggedUser.getAttribute(TENANT_ID);
     }
 }

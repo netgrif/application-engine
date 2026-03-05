@@ -12,6 +12,9 @@ import org.springframework.context.ApplicationContextAware;
 
 import java.util.Optional;
 
+import static com.netgrif.application.engine.objects.tenant.TenantConstants.TENANT_EMPTY;
+import static com.netgrif.application.engine.objects.tenant.TenantConstants.TENANT_ID;
+
 
 public class TenantSupport implements ApplicationContextAware {
 
@@ -36,7 +39,7 @@ public class TenantSupport implements ApplicationContextAware {
 
     public static String getLoggedUserTenantId() {
         AbstractUser user = getUserService().getLoggedUser();
-        Attribute<?> tenantAtt = user.getAttribute(TenantService.TENANT_ID);
+        Attribute<?> tenantAtt = user.getAttribute(TENANT_ID);
         if (tenantAtt == null || tenantAtt.hasNullValue()) {
             return null;
         }
@@ -45,6 +48,11 @@ public class TenantSupport implements ApplicationContextAware {
 
     public static String getAndUpdateLoggedUserWithTenantId() {
         AbstractUser user = getUserService().getLoggedUser();
+        return getAndUpdateUserWithTenantId(user);
+
+    }
+
+    public static String getAndUpdateUserWithTenantId(AbstractUser user) {
         return getRealmService()
                 .getRealmById(user.getRealmId())
                 .flatMap(realm -> getTenantService().getByRealm(user.getRealmId()))
@@ -57,12 +65,12 @@ public class TenantSupport implements ApplicationContextAware {
 
     public static void decorateUserWithTenant(AbstractUser user) {
         Optional<Tenant> tenant = getTenantService().getByRealm(user.getRealmId());
-        String tenantId = tenant.map(Tenant::getId).orElse(TenantService.TENANT_EMPTY);
+        String tenantId = tenant.map(Tenant::getId).orElse(TENANT_EMPTY);
         decorateUserWithTenant(user, tenantId);
     }
 
     public static void decorateUserWithTenant(AbstractUser user, String tenantId) {
-        user.setAttribute(TenantService.TENANT_ID, tenantId, false);
+        user.setAttribute(TENANT_ID, tenantId, false);
     }
 
     public static void decorateAndUpdateUserWithTenant(AbstractUser user) {
