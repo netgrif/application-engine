@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.elastic.web;
 
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
+import com.netgrif.application.engine.elastic.service.ReindexingTask;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import com.netgrif.application.engine.elastic.web.requestbodies.IndexParams;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.elastic.service.ReindexingTask;
 import com.netgrif.application.engine.workflow.service.CaseSearchService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
@@ -102,8 +101,10 @@ public class ElasticController {
 
                 for (int page = 0; page < numOfPages; page++) {
                     log.info("Indexing page {}", page + 1);
-                    Predicate predicate = searchService.buildQuery(searchBody, user, locale);
-                    reindexingTask.forceReindexPage(predicate, page, numOfPages);
+                    if (!user.isProcessAccessDeny()) {
+                        Predicate predicate = searchService.buildQuery(searchBody, user, locale);
+                        reindexingTask.forceReindexPage(predicate, page, numOfPages);
+                    }
                 }
             }
 

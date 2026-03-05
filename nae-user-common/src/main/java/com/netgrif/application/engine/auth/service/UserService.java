@@ -10,8 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.core.Authentication;
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.objects.auth.domain.ActorRef;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -29,7 +27,7 @@ public interface UserService {
     /**
      * Saves a user in the specified realm.
      *
-     * @param user the user to be saved
+     * @param user    the user to be saved
      * @param realmId the identifier of the realm
      * @return the saved user
      */
@@ -66,7 +64,7 @@ public interface UserService {
     /**
      * Finds a user by username within a specific realm.
      *
-     * @param username the username to search for
+     * @param username  the username to search for
      * @param realmName the name of the realm
      * @return an Optional containing the user if found
      */
@@ -78,7 +76,7 @@ public interface UserService {
      * Retrieves a paginated list of all users in a specific realm.
      *
      * @param realmName the name of the realm
-     * @param pageable pagination information
+     * @param pageable  pagination information
      * @return page of users
      */
     Page<AbstractUser> findAllUsers(String realmName, Pageable pageable);
@@ -86,11 +84,11 @@ public interface UserService {
     /**
      * Creates a new user with basic information.
      *
-     * @param username the username
-     * @param email the email address
+     * @param username  the username
+     * @param email     the email address
      * @param firstName the first name
-     * @param lastName the last name
-     * @param password the password
+     * @param lastName  the last name
+     * @param password  the password
      * @param realmName the realm name
      * @return the created user
      */
@@ -99,7 +97,7 @@ public interface UserService {
     /**
      * Creates a new user from an existing user object in a specific realm.
      *
-     * @param user the user to create
+     * @param user    the user to create
      * @param realmId the realm identifier
      * @return the created user
      */
@@ -108,11 +106,11 @@ public interface UserService {
     /**
      * Creates a user from third-party authentication.
      *
-     * @param username the username
-     * @param email the email address
-     * @param firstName the first name
-     * @param lastName the last name
-     * @param realmId the realm identifier
+     * @param username   the username
+     * @param email      the email address
+     * @param firstName  the first name
+     * @param lastName   the last name
+     * @param realmId    the realm identifier
      * @param authMethod the authentication method used
      * @return the created user
      */
@@ -149,7 +147,7 @@ public interface UserService {
     /**
      * Finds a user by ID in a specific realm.
      *
-     * @param id the user identifier
+     * @param id      the user identifier
      * @param realmId the realm identifier
      * @return the found user
      */
@@ -165,7 +163,7 @@ public interface UserService {
     /**
      * Finds a user by authentication in a specific realm.
      *
-     * @param auth the authentication object
+     * @param auth    the authentication object
      * @param realmId the realm identifier
      * @return the found user
      */
@@ -174,7 +172,7 @@ public interface UserService {
     /**
      * Updates a user with new information.
      *
-     * @param user the current user
+     * @param user        the current user
      * @param updatedUser the user with updated information
      * @return the updated user
      */
@@ -183,7 +181,7 @@ public interface UserService {
     /**
      * Finds a user by email in a specific realm.
      *
-     * @param email the email address
+     * @param email   the email address
      * @param realmId the realm identifier
      * @return the found user
      */
@@ -192,7 +190,7 @@ public interface UserService {
     /**
      * Finds all users by their IDs in a specific realm.
      *
-     * @param ids collection of user identifiers
+     * @param ids     collection of user identifiers
      * @param realmId the realm identifier
      * @return list of found users
      */
@@ -201,7 +199,7 @@ public interface UserService {
     /**
      * Finds all active users with specific process roles.
      *
-     * @param roleIds collection of process role identifiers
+     * @param roleIds  collection of process role identifiers
      * @param pageable pagination information
      * @return page of users
      */
@@ -226,8 +224,8 @@ public interface UserService {
     /**
      * Assigns an authority to a user.
      *
-     * @param userId the user identifier
-     * @param realmId the realm identifier
+     * @param userId      the user identifier
+     * @param realmId     the realm identifier
      * @param authorityId the authority identifier
      * @return the updated user
      */
@@ -238,14 +236,7 @@ public interface UserService {
      *
      * @return the logged user or system user
      */
-    AbstractUser getLoggedOrSystem();
-
-    /**
-     * Gets the currently logged user.
-     *
-     * @return the logged user
-     */
-    AbstractUser getLoggedUser();
+    LoggedUser getLoggedOrSystem();
 
     /**
      * Gets the system user.
@@ -265,7 +256,7 @@ public interface UserService {
      * Adds a process role to a user by ID.
      *
      * @param user the user to update
-     * @param id the process role identifier
+     * @param id   the process role identifier
      * @return the updated user
      */
     AbstractUser addRole(AbstractUser user, ProcessResourceId id);
@@ -273,7 +264,7 @@ public interface UserService {
     /**
      * Adds a role to a user by string identifier.
      *
-     * @param user the user to update
+     * @param user         the user to update
      * @param roleStringId the role string identifier
      * @return the updated user
      */
@@ -284,9 +275,9 @@ public interface UserService {
     /**
      * Searches for co-members of a principal user.
      *
-     * @param query the search query
+     * @param query     the search query
      * @param principal the principal user
-     * @param pageable pagination information
+     * @param pageable  pagination information
      * @return page of matching co-members
      */
     Page<AbstractUser> searchAllCoMembers(String query, LoggedUser principal, Pageable pageable);
@@ -294,20 +285,20 @@ public interface UserService {
     /**
      * Advanced search for co-members with role filtering.
      *
-     * @param query the search query
-     * @param roleIds required role identifiers
+     * @param query         the search query
+     * @param roleIds       required role identifiers
      * @param negateRoleIds excluded role identifiers
-     * @param loggedUser the logged user
-     * @param pageable pagination information
+     * @param loggedUser    the logged user
+     * @param pageable      pagination information
      * @return page of matching co-members
      */
     Page<AbstractUser> searchAllCoMembers(String query, Collection<ProcessResourceId> roleIds,
-            Collection<ProcessResourceId> negateRoleIds, LoggedUser loggedUser, Pageable pageable);
+                                          Collection<ProcessResourceId> negateRoleIds, LoggedUser loggedUser, Pageable pageable);
 
     /**
      * Removes specified process roles from a user.
      *
-     * @param user the user to update
+     * @param user            the user to update
      * @param processRolesIds collection of process role identifiers to remove
      * @return the updated user
      */
@@ -316,7 +307,7 @@ public interface UserService {
     /**
      * Removes specified process roles from a user.
      *
-     * @param user the user to update
+     * @param user         the user to update
      * @param processRoles collection of process roles to remove
      * @return the updated user
      */
@@ -334,7 +325,7 @@ public interface UserService {
     /**
      * Removes a process role from a user by role ID.
      *
-     * @param user the user to update
+     * @param user   the user to update
      * @param roleId the process role identifier
      * @return the updated user
      */
@@ -343,7 +334,7 @@ public interface UserService {
     /**
      * Removes a role from a user by string identifier.
      *
-     * @param user the user to update
+     * @param user   the user to update
      * @param roleId the role string identifier
      * @return the updated user
      */
@@ -389,9 +380,9 @@ public interface UserService {
     /**
      * Removes all users with specified state and expiration date before given date in specified realms.
      *
-     * @param state the user state
+     * @param state          the user state
      * @param expirationDate the expiration date
-     * @param realmIds collection of realm identifiers
+     * @param realmIds       collection of realm identifiers
      */
     void removeAllByStateAndExpirationDateBeforeForRealms(UserState state, LocalDateTime expirationDate, Collection<String> realmIds);
 
@@ -419,7 +410,7 @@ public interface UserService {
     /**
      * Resets password for user.
      *
-     * @param user user
+     * @param user        user
      * @param newPassword new password
      * @param oldPassword old password
      * @return the updated user

@@ -1,41 +1,43 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.auth.service.GroupService;
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.*;
-import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRolePermission;
-import com.netgrif.application.engine.objects.workflow.domain.Case;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.event.evaluators.Evaluator;
+import com.netgrif.application.engine.event.services.EvaluationService;
+import com.netgrif.application.engine.importer.service.FieldFactory;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.event.events.workflow.CaseEvent;
 import com.netgrif.application.engine.objects.event.events.workflow.CreateCaseEvent;
 import com.netgrif.application.engine.objects.event.events.workflow.DeleteCaseEvent;
-import com.netgrif.application.engine.event.services.EvaluationService;
-import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorFieldValue;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorListFieldValue;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.TaskField;
 import com.netgrif.application.engine.objects.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-import com.netgrif.application.engine.security.service.EncryptionService;
-import com.netgrif.application.engine.utils.FullPageRequest;
+import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.objects.workflow.domain.*;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
+import com.netgrif.application.engine.objects.workflow.service.InitValueExpressionEvaluator;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.security.service.EncryptionService;
+import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.outcomes.ReloadTaskOutcome;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.params.DeleteCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
-import com.netgrif.application.engine.objects.workflow.service.InitValueExpressionEvaluator;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
@@ -210,6 +212,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale) {
+        if (user.isProcessAccessDeny()) {
+            return Page.empty();
+        }
         Predicate searchPredicate = searchService.buildQuery(request, user, locale);
         Page<Case> page;
         if (searchPredicate != null) {
@@ -224,6 +229,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public long count(Map<String, Object> request, LoggedUser user, Locale locale) {
+        if (user.isProcessAccessDeny()) {
+            return 0;
+        }
         Predicate searchPredicate = searchService.buildQuery(request, user, locale);
         if (searchPredicate != null) {
             return repository.count(searchPredicate);
@@ -255,10 +263,9 @@ public class WorkflowService implements IWorkflowService {
     /**
      * Resolves actor permissions for the useCase based on the actor list data field.
      *
-     * @param useCase useCase where to resolve actor permissions
+     * @param useCase      useCase where to resolve actor permissions
      * @param actorFieldId field id of the actor list
-     * @param permission permission associated with the useCase and actor list
-     *
+     * @param permission   permission associated with the useCase and actor list
      * @return true if the useCase was modified, false otherwise
      */
     private boolean resolveActorRefPermissions(Case useCase, String actorFieldId, Map<String, Boolean> permission) {
@@ -332,15 +339,15 @@ public class WorkflowService implements IWorkflowService {
      * Creates pure {@link Case} object without any {@link Task} object initialized.
      *
      * @param createCaseParams parameters for object creation
-     *
      * @return created {@link Case} object
-     * */
+     *
+     */
     private Case createCaseObject(CreateCaseParams createCaseParams) {
         PetriNet petriNet = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet((com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet) createCaseParams.getProcess());
         Case useCase = new com.netgrif.application.engine.adapter.spring.workflow.domain.Case(petriNet);
         useCase.populateDataSet(initValueExpressionEvaluator, createCaseParams.getParams());
         useCase.setColor(createCaseParams.getColor());
-        useCase.setAuthor(ActorTransformer.toActorRef(createCaseParams.getAuthor())); // TODO: impersonation
+        useCase.setAuthor(ActorTransformer.toActorRef(createCaseParams.getAuthor().getSelfOrImpersonated()));
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(createCaseParams.getMakeTitle().apply(useCase));
 
@@ -529,7 +536,6 @@ public class WorkflowService implements IWorkflowService {
      * Initializes task ref data fields with the task ids based on field definition in petriNet
      *
      * @param useCase useCase where to initialize task ref data fields
-     *
      * @return true if useCase was modified, false otherwise
      */
     protected boolean resolveTaskRefs(Case useCase) {

@@ -3,7 +3,6 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.startup.runner.FilterRunner;
 import com.netgrif.application.engine.workflow.service.interfaces.IUserFilterSearchService;
@@ -33,12 +32,12 @@ public class UserFilterSearchService implements IUserFilterSearchService {
                                 .query(
                                         String.format("(title:%s*) AND ((dataSet.visibility.keyValue:private AND authorEmail:%s) OR (dataSet.visibility.keyValue:public))",
                                                 userInput,
-                                                userService.getLoggedUser().getEmail())
+                                                userService.getLoggedUserFromContext().getEmail())
                                 )
                                 .transition(Collections.singletonList("view_filter"))
                                 .build()
                 ),
-                ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
+                userService.getLoggedOrSystem(),
                 PageRequest.of(0, 100),
                 LocaleContextHolder.getLocale(),
                 true);

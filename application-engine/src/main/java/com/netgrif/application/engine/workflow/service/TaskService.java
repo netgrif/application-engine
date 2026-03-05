@@ -1,38 +1,38 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.auth.service.GroupService;
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorFieldValue;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorListFieldValue;
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.event.events.task.*;
 import com.netgrif.application.engine.objects.petrinet.domain.*;
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.ArcOrderComparator;
 import com.netgrif.application.engine.objects.petrinet.domain.arcs.ResetArc;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorFieldValue;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorListFieldValue;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-import com.netgrif.application.engine.utils.DateUtils;
-import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.application.engine.objects.workflow.domain.*;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.*;
-import com.netgrif.application.engine.workflow.domain.outcomes.ReloadTaskOutcome;
-import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.objects.workflow.domain.triggers.TimeTrigger;
 import com.netgrif.application.engine.objects.workflow.domain.triggers.Trigger;
+import com.netgrif.application.engine.utils.DateUtils;
+import com.netgrif.application.engine.utils.FullPageRequest;
+import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
+import com.netgrif.application.engine.workflow.domain.outcomes.ReloadTaskOutcome;
+import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.params.DelegateTaskParams;
 import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -123,11 +123,12 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, AbstractUser user, Map<String, String> params) throws TransitionNotExecutableException {
+        LoggedUser loggedUser = user instanceof LoggedUser ? (LoggedUser) user : ActorTransformer.toLoggedUser(user);
         List<AssignTaskEventOutcome> outcomes = new ArrayList<>();
         for (Task task : tasks) {
             outcomes.add(assignTask(TaskParams.with()
                     .task(task)
-                    .user(user)
+                    .user(loggedUser)
                     .params(params)
                     .build()));
         }
@@ -141,6 +142,7 @@ public class TaskService implements ITaskService {
         Case useCase = taskParams.getUseCase();
         Task task = taskParams.getTask();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+        LoggedUser loggedUser = taskParams.getUser();
 
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreAssignActions(), useCase,
                 task, transition, taskParams.getParams()));
@@ -157,9 +159,10 @@ public class TaskService implements ITaskService {
 
         publisher.publishEvent(new AssignTaskEvent(outcome, EventPhase.POST, taskParams.getUser()));
         addMessageToOutcome(transition, EventType.ASSIGN, outcome);
-        // TODO: impersonation user.getSelfOrImpersonated().getEmail()
-        log.info("[{}]: Task [{}] in case [{}] assigned to [{}]", useCase.getStringId(), task.getTitle(),
-                useCase.getTitle(), taskParams.getUser().getEmail());
+        String userMessage = loggedUser.isImpersonating()
+                ? "[" + loggedUser.getUsername() + "] in realm [" + loggedUser.getRealmId() + "]. Impersonation for user [" + loggedUser.getImpersonatedUser().getUsername() + "]"
+                : "[" + loggedUser.getUsername() + "] in realm [" + loggedUser.getRealmId() + "]";
+        log.info("[{}]: Task [{}] in case [{}] assigned to {}", useCase.getStringId(), task.getTitle(), useCase.getTitle(), userMessage);
 
         return outcome;
     }
@@ -167,15 +170,19 @@ public class TaskService implements ITaskService {
     protected Case assignTaskToUser(AbstractUser user, Task task, Case useCase, Transition transition) throws TransitionNotExecutableException {
         useCase.getPetriNet().initializeArcs();
 
-        // TODO: impersonation user.getSelfOrImpersonated().getEmail()
-        log.info("[{}]: Assigning task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), user.getEmail());
-
         startExecution(transition, useCase);
-        // TODO: impersonation
-        task.setAssignee(ActorTransformer.toActorRef(user));
         task.setStartDate(LocalDateTime.now());
-        // TODO: impersonation
-        task.setUser(user);
+        String userMessage;
+        if (user instanceof LoggedUser loggedUser && loggedUser.isImpersonating()) {
+            task.setImpersonatorUserId(loggedUser.getStringId());
+            task.setImpersonatorUsername(loggedUser.getUsername());
+            task.setAssignee(ActorTransformer.toActorRef(loggedUser.getSelfOrImpersonated()));
+            userMessage = "[" + loggedUser.getUsername() + "] in realm [" + loggedUser.getRealmId() + "]. Impersonation for user [" + loggedUser.getImpersonatedUser().getUsername() + "]";
+        } else {
+            task.setAssignee(ActorTransformer.toActorRef(user));
+            userMessage = "[" + user.getUsername() + "] in realm [" + user.getRealmId() + "]";
+        }
+        log.info("[{}]: Assigning task [{}] to user {}", useCase.getStringId(), task.getTitle(), userMessage);
 
         useCase = workflowService.save(useCase);
         save(task);
@@ -193,11 +200,12 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, AbstractUser user, Map<String, String> params) throws TransitionNotExecutableException {
+        LoggedUser loggedUser = user instanceof LoggedUser ? (LoggedUser) user : ActorTransformer.toLoggedUser(user);
         List<FinishTaskEventOutcome> outcomes = new ArrayList<>();
         for (Task task : tasks) {
             outcomes.add(finishTask(TaskParams.with()
                     .task(task)
-                    .user(user)
+                    .user(loggedUser)
                     .params(params)
                     .build()));
         }
@@ -210,19 +218,20 @@ public class TaskService implements ITaskService {
 
         Task task = taskParams.getTask();
         Case useCase = taskParams.getUseCase();
-        AbstractUser user = taskParams.getUser();
+        LoggedUser user = taskParams.getUser();
 
         if (task.getUserId() == null) {
             throw new IllegalArgumentException("Task with id=%s is not assigned to any user.".formatted(task.getStringId()));
         }
-        // TODO: impersonation
-        if (!task.getUserId().equals(user.getStringId()) && !((Boolean) user.getAttributes().containsKey("anonymous"))) {
+        if (!task.getUserId().equals(user.getSelfOrImpersonatedStringId()) && !((Boolean) user.getAttributes().containsKey("anonymous"))) {
             throw new IllegalArgumentException("User that is not assigned tried to finish task");
         }
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
-        // TODO: impersonation
-        log.info("[{}]: Finishing task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), user.getEmail());
+        String userMessage = user.isImpersonating()
+                ? "[" + user.getUsername() + "] in realm [" + user.getRealmId() + "]. Impersonation for user [" + user.getImpersonatedUser().getUsername() + "]"
+                : "[" + user.getUsername() + "] in realm [" + user.getRealmId() + "]";
+        log.info("[{}]: Finishing task [{}] to user {}", useCase.getStringId(), task.getTitle(), userMessage);
 
         validateData(transition, useCase);
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreFinishActions(), useCase,
@@ -260,11 +269,12 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, AbstractUser user, Map<String, String> params) {
+        LoggedUser loggedUser = user instanceof LoggedUser ? (LoggedUser) user : ActorTransformer.toLoggedUser(user);
         List<CancelTaskEventOutcome> outcomes = new ArrayList<>();
         for (Task task : tasks) {
             outcomes.add(cancelTask(TaskParams.with()
                     .task(task)
-                    .user(user)
+                    .user(loggedUser)
                     .params(params)
                     .build()));
         }
@@ -277,11 +287,13 @@ public class TaskService implements ITaskService {
 
         Task task = taskParams.getTask();
         Case useCase = taskParams.getUseCase();
-        AbstractUser user = taskParams.getUser();
+        LoggedUser user = taskParams.getUser();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
-        // TODO: impersonation
-        log.info("[{}]: Canceling task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), user.getEmail());
+        String userMessage = user.isImpersonating()
+                ? "[" + user.getUsername() + "] in realm [" + user.getRealmId() + "]. Impersonation for user [" + user.getImpersonatedUser().getUsername() + "]"
+                : "[" + user.getUsername() + "] in realm [" + user.getRealmId() + "]";
+        log.info("[{}]: Canceling task [{}] to user {}", useCase.getStringId(), task.getTitle(), userMessage);
 
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreCancelActions(), useCase,
                 task, transition, taskParams.getParams()));
@@ -305,9 +317,7 @@ public class TaskService implements ITaskService {
         outcome.setOutcomes(outcomes);
         addMessageToOutcome(transition, EventType.CANCEL, outcome);
         publisher.publishEvent(new CancelTaskEvent(outcome, EventPhase.POST, user));
-        // TODO: impersonation
-        log.info("[{}]: Task [{}] in case [{}] assigned to [{}] was cancelled", useCase.getStringId(), task.getTitle(),
-                useCase.getTitle(), user.getEmail());
+        log.info("[{}]: Task [{}] in case [{}] assigned to {} was cancelled", useCase.getStringId(), task.getTitle(), useCase.getTitle(), userMessage);
 
         return outcome;
     }
@@ -356,7 +366,7 @@ public class TaskService implements ITaskService {
             taskParams.setUseCase(useCase);
         }
         if (taskParams.getUser() == null) {
-            AbstractUser user = userService.getLoggedOrSystem();
+            LoggedUser user = userService.getLoggedOrSystem();
             taskParams.setUser(user);
         }
     }
@@ -378,7 +388,7 @@ public class TaskService implements ITaskService {
             if (delegator == null) {
                 delegator = userService.getLoggedOrSystem();
             }
-            taskParams.setDelegator(delegator);
+            taskParams.setDelegator(delegator instanceof LoggedUser loggedUser ? loggedUser : ActorTransformer.toLoggedUser(delegator));
         }
         if (taskParams.getNewAssignee() == null) {
             if (taskParams.getNewAssigneeId() == null) {
@@ -405,6 +415,8 @@ public class TaskService implements ITaskService {
 
         task.setAssignee(null);
         task.setStartDate(null);
+        task.setImpersonatorUserId(null);
+        task.setImpersonatorUsername(null);
 
         useCase = workflowService.save(useCase);
         save(task);
@@ -417,12 +429,15 @@ public class TaskService implements ITaskService {
         fillAndValidateAttributes(delegateTaskParams);
 
         AbstractUser newAssignee = delegateTaskParams.getNewAssignee();
-        AbstractUser delegator = delegateTaskParams.getDelegator();
+        LoggedUser delegator = delegateTaskParams.getDelegator();
         Task task = delegateTaskParams.getTask();
         Case useCase = delegateTaskParams.getUseCase();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
-        log.info("[{}]: Delegating task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), newAssignee.getEmail());
+        String userMessage = delegator.isImpersonating()
+                ? "[" + delegator.getUsername() + "] in realm [" + delegator.getRealmId() + "]. Impersonation for user [" + delegator.getImpersonatedUser().getUsername() + "]"
+                : "[" + delegator.getUsername() + "] in realm [" + delegator.getRealmId() + "]";
+        log.info("[{}]: Delegating task [{}] to user [{}] from user {}", useCase.getStringId(), task.getTitle(), newAssignee.getEmail(), userMessage);
 
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreDelegateActions(), useCase,
                 task, transition, delegateTaskParams.getParams()));
@@ -447,9 +462,7 @@ public class TaskService implements ITaskService {
 
         addMessageToOutcome(transition, EventType.DELEGATE, outcome);
         publisher.publishEvent(new DelegateTaskEvent(outcome, EventPhase.POST, delegator, newAssignee.getStringId()));
-        // TODO: impersonation
-        log.info("Task [{}] in case [{}] assigned to [{}] was delegated to [{}]", task.getTitle(), useCase.getTitle(),
-                newAssignee.getEmail(), newAssignee.getEmail());
+        log.info("Task [{}] in case [{}] assigned to {} was delegated to [{}]", task.getTitle(), useCase.getTitle(), userMessage, newAssignee.getEmail());
 
         return outcome;
     }
@@ -458,6 +471,8 @@ public class TaskService implements ITaskService {
         if (task.getUserId() != null) {
             task.setAssignee(ActorTransformer.toActorRef(delegated));
             task.setUser(delegated);
+            task.setImpersonatorUsername(null);
+            task.setImpersonatorUserId(null);
             save(task);
             return useCase;
         } else {
@@ -484,10 +499,9 @@ public class TaskService implements ITaskService {
      * </tr>
      * </table>
      *
-     * @param useCase useCase for which to reload tasks
+     * @param useCase      useCase for which to reload tasks
      * @param lazyCaseSave if set to true, the useCase is saved only if any task is about to be executed. If set to false
      *                     the useCase is saved every time this method is called.
-     *
      * @return {@link ReloadTaskOutcome}, which holds the information if any task was executed and if the useCase was saved
      */
     @SuppressWarnings("StatementWithEmptyBody")
@@ -576,6 +590,8 @@ public class TaskService implements ITaskService {
         task.setFinishDate(LocalDateTime.now());
         task.setFinishedBy(task.getUserId());
         task.setAssignee(null);
+        task.setImpersonatorUsername(null);
+        task.setImpersonatorUserId(null);
 
         save(task);
         return workflowService.save(useCase);
@@ -673,26 +689,30 @@ public class TaskService implements ITaskService {
     @Override
     public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable, Locale locale) {
         List<Task> tasks;
-        // TODO: impersonation
-//        LoggedUser loggedOrImpersonated = loggedUser.getSelfOrImpersonated();
-        LoggedUser loggedOrImpersonated = loggedUser;
 
-        if (loggedOrImpersonated.getProcessRoles().isEmpty()) {
+        if (loggedUser.getProcessRoles().isEmpty() || loggedUser.isProcessAccessDeny()) {
             tasks = new ArrayList<>();
             return new PageImpl<>(tasks, pageable, 0L);
         } else {
             StringBuilder queryBuilder = new StringBuilder();
             queryBuilder.append("{$or:[");
-            loggedOrImpersonated.getProcessRoles().forEach(role -> {
+            loggedUser.getProcessRoles().forEach(role -> {
                 queryBuilder.append("{\"roles.");
                 queryBuilder.append(role);
                 queryBuilder.append("\":{$exists:true}},");
             });
-            if (!loggedOrImpersonated.getProcessRoles().isEmpty())
-                queryBuilder.deleteCharAt(queryBuilder.length() - 1);
-            else
-                queryBuilder.append("{}");
+            queryBuilder.deleteCharAt(queryBuilder.length() - 1);
             queryBuilder.append("]}");
+            if (loggedUser.isImpersonating() && loggedUser.getImpersonatedProcesses() != null && !loggedUser.getImpersonatedProcesses().isEmpty()) {
+                String processList = loggedUser.getImpersonatedProcesses().stream()
+                        .map(p -> "\"" + p + "\"")
+                        .collect(Collectors.joining(","));
+                if (loggedUser.isImpersonatedProcessesListAllowing()) {
+                    queryBuilder.append(",\"processIdentifier\":{$in:[").append(processList).append("]}");
+                } else {
+                    queryBuilder.append(",\"processIdentifier\":{$nin:[").append(processList).append("]}");
+                }
+            }
             BasicQuery query = new BasicQuery(queryBuilder.toString());
             query = (BasicQuery) query.with(pageable);
             tasks = mongoTemplate.find(query, Task.class);
@@ -703,6 +723,9 @@ public class TaskService implements ITaskService {
 
     @Override
     public Page<Task> search(List<TaskSearchRequest> requests, Pageable pageable, LoggedUser user, Locale locale, Boolean isIntersection) {
+        if (user.isProcessAccessDeny()) {
+            return Page.empty();
+        }
         com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
         if (searchPredicate != null) {
             Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
@@ -716,6 +739,9 @@ public class TaskService implements ITaskService {
 
     @Override
     public long count(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
+        if (user.isProcessAccessDeny()) {
+            return 0;
+        }
         com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
         if (searchPredicate != null) {
             return taskRepository.count(searchPredicate);
@@ -762,9 +788,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public Page<Task> findByUser(Pageable pageable, AbstractUser user) {
-        // TODO: impersonation
-//        return loadUsers(taskRepository.findByUserId(pageable, user.getSelfOrImpersonated().getStringId()));
-        return loadUsers(taskRepository.findByAssignee_Id(pageable, user.getStringId()));
+        return loadUsers(taskRepository.findByAssignee_Id(pageable, user.getSelfOrImpersonatedStringId()));
     }
 
     @Override
@@ -879,6 +903,7 @@ public class TaskService implements ITaskService {
         final Task task = com.netgrif.application.engine.adapter.spring.workflow.domain.Task.with()
                 .title(transition.getTitle())
                 .processId(useCase.getPetriNetId())
+                .processIdentifier(useCase.getProcessIdentifier())
                 .caseId(useCase.get_id().toString())
                 .transitionId(transition.getImportId())
                 .layout(transition.getLayout())

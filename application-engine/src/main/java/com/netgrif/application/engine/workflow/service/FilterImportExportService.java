@@ -6,35 +6,33 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.google.common.collect.Lists;
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
-import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
-import com.netgrif.application.engine.objects.common.ResourceNotFoundException;
-import com.netgrif.application.engine.objects.common.ResourceNotFoundExceptionCode;
-import com.netgrif.application.engine.workflow.domain.FilterDeserializer;
-import com.netgrif.application.engine.objects.workflow.domain.IllegalFilterFileException;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.FilterConfigurationProperties;
-import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.application.engine.objects.workflow.domain.filter.FilterImportExport;
-import com.netgrif.application.engine.objects.workflow.domain.filter.FilterImportExportList;
+import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
+import com.netgrif.application.engine.objects.common.ResourceNotFoundException;
+import com.netgrif.application.engine.objects.common.ResourceNotFoundExceptionCode;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.application.engine.objects.workflow.domain.*;
+import com.netgrif.application.engine.objects.workflow.domain.filter.FilterImportExport;
+import com.netgrif.application.engine.objects.workflow.domain.filter.FilterImportExportList;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
+import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner;
 import com.netgrif.application.engine.utils.InputStreamToString;
+import com.netgrif.application.engine.workflow.domain.FilterDeserializer;
 import com.netgrif.application.engine.objects.workflow.domain.*;
 import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import com.netgrif.application.engine.objects.workflow.domain.Case;
-import com.netgrif.application.engine.objects.workflow.domain.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -263,7 +261,7 @@ public class FilterImportExportService implements IFilterImportExportService {
             filterCase.get().getDataSet().get(FIELD_FILTER).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.VISIBLE));
             workflowService.save(filterCase.get());
         });
-        taskService.assignTasks(taskService.findAllById(new ArrayList<>(importedFilterTaskIds.values())), userService.getLoggedUser());
+        taskService.assignTasks(taskService.findAllById(new ArrayList<>(importedFilterTaskIds.values())), userService.getLoggedUserFromContext());
         changeFilterField(importedFilterTaskIds.values());
         return importedFilterTaskIds;
     }
@@ -319,7 +317,7 @@ public class FilterImportExportService implements IFilterImportExportService {
     protected FilterImportExportList loadFromXML() throws IOException, IllegalFilterFileException {
         Case exportCase = workflowService.searchOne(
                 QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER)
-                        .and(QCase.case$.author.id.eq(userService.getLoggedUser().getStringId()))
+                        .and(QCase.case$.author.id.eq(userService.getLoggedUserFromContext().getStringId()))
         );
 
         FileFieldValue ffv = (FileFieldValue) exportCase.getDataSet().get(UPLOAD_FILE_FIELD).getValue();
@@ -337,7 +335,7 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Transactional
     protected FileFieldValue createXML(FilterImportExportList filters) throws IOException {
-        String filePath = fileStorageConfiguration.getPath() + "/filterExport/" + userService.getLoggedUser().getStringId() + "/" + filterProperties.getExport().getFileName();
+        String filePath = fileStorageConfiguration.getPath() + "/filterExport/" + userService.getLoggedUserFromContext().getStringId() + "/" + filterProperties.getExport().getFileName();
         File f = new File(filePath);
         f.getParentFile().mkdirs();
 

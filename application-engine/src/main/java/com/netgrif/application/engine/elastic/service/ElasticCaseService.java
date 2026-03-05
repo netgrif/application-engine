@@ -4,26 +4,26 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.mapping.FieldType;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.domain.BulkOperationWrapper;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.objects.event.events.workflow.IndexCaseEvent;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
+import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.SearchHitSupport;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.core.query.*;
+import org.springframework.data.elasticsearch.core.query.Order;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -131,12 +131,12 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
-        log.debug("Searching for query with logged user [{}]", user.getId());
-        // TODO: impersonation
-//        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-        LoggedUser loggedOrImpersonated = user;
+        log.debug("Searching for query with logged user [{}]", user.getSelfOrImpersonatedStringId());
 //        pageable = resolveUnmappedSortAttributes(pageable);
-        NativeQuery query = buildQuery(requests, loggedOrImpersonated, pageable, locale, isIntersection);
+        if (user.isProcessAccessDeny()) {
+            return new PageImpl<>(Collections.emptyList(), pageable, 0);
+        }
+        NativeQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
         List<Case> casePage;
         long total;
         if (query != null) {
@@ -158,11 +158,11 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
+        if (user.isProcessAccessDeny()) {
+            return 0;
+        }
 
-        // TODO: impersonation
-//        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-        LoggedUser loggedOrImpersonated = user;
-        NativeQuery query = buildQuery(requests, loggedOrImpersonated, new FullPageRequest(), locale, isIntersection);
+        NativeQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase.class);
         } else {
@@ -171,7 +171,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     protected NativeQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
-        List<BoolQuery.Builder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
+        List<BoolQuery.Builder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user.getSelfOrImpersonated(), locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
             // one of the queries evaluates to empty set => the entire result is an empty set
@@ -186,6 +186,10 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
         BinaryOperator<BoolQuery.Builder> reductionOperation = isIntersection ? (a, b) -> a.must(b.build()._toQuery()) : (a, b) -> a.should(b.build()._toQuery());
         BoolQuery.Builder query = singleQueries.stream().reduce(new BoolQuery.Builder(), reductionOperation);
+        BoolQuery.Builder impersonatedProcessesQuery = buildAllowedProcessesQuery(user);
+        if (impersonatedProcessesQuery != null) {
+            query.filter(impersonatedProcessesQuery.build()._toQuery());
+        }
 
         NativeQueryBuilder builder = new NativeQueryBuilder()
                 .withQuery(query.build()._toQuery())

@@ -8,12 +8,6 @@ import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.files.StorageResolverService;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
-import com.netgrif.application.engine.workflow.domain.FilterDeserializer;
-import com.netgrif.application.engine.workflow.domain.IllegalMenuFileException;
-import com.netgrif.application.engine.workflow.params.CreateCaseParams;
-import com.netgrif.application.engine.workflow.params.TaskParams;
-import com.netgrif.application.engine.workflow.service.interfaces.IMenuImportExportService;
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.EnumerationMapField;
@@ -22,14 +16,21 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldV
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.MultichoiceMapField;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.startup.ImportHelper;
-import com.netgrif.application.engine.utils.InputStreamToString;
-import com.netgrif.application.engine.objects.workflow.domain.*;
+import com.netgrif.application.engine.objects.workflow.domain.AuthorizationType;
+import com.netgrif.application.engine.objects.workflow.domain.Case;
+import com.netgrif.application.engine.objects.workflow.domain.QTask;
+import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.objects.workflow.domain.menu.Menu;
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuAndFilters;
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuEntry;
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuEntryRole;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.startup.ImportHelper;
+import com.netgrif.application.engine.utils.InputStreamToString;
+import com.netgrif.application.engine.workflow.domain.FilterDeserializer;
+import com.netgrif.application.engine.workflow.domain.IllegalMenuFileException;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -274,7 +275,7 @@ public class MenuImportExportService implements IMenuImportExportService {
         try {
             taskService.assignTask(TaskParams.with()
                     .task(task)
-                    .user(userService.getLoggedUser())
+                    .user(userService.getLoggedUserFromContext())
                     .build());
             menuItemCase.getDataSet().get(MENU_IDENTIFIER).setValue(menuIdentifier);
             menuItemCase.getDataSet().get(PARENT_ID).setValue(parentId);
@@ -305,7 +306,7 @@ public class MenuImportExportService implements IMenuImportExportService {
     protected FileFieldValue createXML(MenuAndFilters menuAndFilters, String parentId, FileField fileField) throws IOException {
         FileFieldValue ffv = new FileFieldValue();
         try {
-            ffv.setName("menu_" + userService.getLoggedUser().getName().replaceAll("\\s+", "") + ".xml");
+            ffv.setName("menu_" + userService.getLoggedUserFromContext().getName().replaceAll("\\s+", "") + ".xml");
             ffv.setPath(storageResolverService.resolve(fileField.getStorageType()).getPath(parentId, fileField.getImportId(), ffv.getName()));
             File f = new File(ffv.getPath());
             XmlMapper xmlMapper = new XmlMapper();

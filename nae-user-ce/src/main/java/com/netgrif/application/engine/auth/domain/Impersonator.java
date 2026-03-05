@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.impersonation.domain;
+package com.netgrif.application.engine.auth.domain;
 
 
 import lombok.AllArgsConstructor;
@@ -10,8 +10,6 @@ import org.springframework.data.redis.core.index.Indexed;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -24,9 +22,6 @@ public class Impersonator implements Serializable {
 
     @Indexed
     protected String impersonatedId;
-
-    @Indexed
-    protected List<String> configIds = new ArrayList<>();
 
     protected LocalDateTime impersonatingSince;
     protected LocalDateTime impersonatingUntil;

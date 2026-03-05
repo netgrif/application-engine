@@ -1,18 +1,18 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase;
 import com.netgrif.application.engine.importer.service.FieldFactory;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorFieldValue;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldType;
+import com.netgrif.application.engine.objects.workflow.domain.Case;
+import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.objects.workflow.domain.Case;
-import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
-import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Ops;
@@ -61,7 +61,6 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     public Predicate buildQuery(Map<String, Object> requestQuery, LoggedUser user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
-//        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
 
         if (requestQuery.containsKey(PETRINET)) {
             builder.and(petriNet(requestQuery.get(PETRINET), user, locale));
@@ -95,11 +94,16 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 return null;
             }
         }
-        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(user));
-        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(user));
-        permissionConstraints.or(buildViewActorQueryConstraint(user));
-        permissionConstraints.andNot(buildNegativeViewActorsQueryConstraint(user));
+        LoggedUser impersonationUser = user.getSelfOrImpersonated();
+        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(impersonationUser));
+        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(impersonationUser));
+        permissionConstraints.or(buildViewActorQueryConstraint(impersonationUser));
+        permissionConstraints.andNot(buildNegativeViewActorsQueryConstraint(impersonationUser));
         builder.and(permissionConstraints);
+        BooleanExpression impersonatedProcessesConstraints = buildImpersonatedProcessesConstraint(user);
+        if (impersonatedProcessesConstraints != null) {
+            builder.and(impersonatedProcessesConstraints);
+        }
         return builder;
     }
 
@@ -154,6 +158,22 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (query.containsKey(PETRINET_IDENTIFIER) && allowedNets.stream().anyMatch(net -> net.getIdentifier().equalsIgnoreCase(query.get(PETRINET_IDENTIFIER))))
             return QCase.case$.processIdentifier.equalsIgnoreCase(query.get(PETRINET_IDENTIFIER));
         return null;
+    }
+
+    private static BooleanExpression buildImpersonatedProcessesConstraint(LoggedUser loggedUser) {
+        if (loggedUser.isAdmin() || !loggedUser.isImpersonating()) {
+            return null;
+        }
+        if (loggedUser.isProcessAccessDeny()) {
+            return null;
+        }
+        if (loggedUser.getImpersonatedProcesses() == null || loggedUser.getImpersonatedProcesses().isEmpty()) {
+            return null;
+        }
+        if (loggedUser.isImpersonatedProcessesListAllowing()) {
+            return QCase.case$.processIdentifier.in(loggedUser.getImpersonatedProcesses());
+        }
+        return QCase.case$.processIdentifier.notIn(loggedUser.getImpersonatedProcesses());
     }
 
     public Predicate author(Object query) {

@@ -1,19 +1,18 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.configuration.properties.FilterConfigurationProperties;
+import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase;
+import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask;
 import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
+import com.netgrif.application.engine.configuration.properties.FilterConfigurationProperties;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.objects.workflow.domain.Case;
+import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
-import com.netgrif.application.engine.objects.workflow.domain.Case;
-import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase;
-import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask;
-import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -429,7 +428,7 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
             return Optional.empty();
         }
 
-        AbstractUser loggedUser = this.userService.getLoggedOrSystem();
+        LoggedUser loggedUser = this.userService.getLoggedOrSystem();
         if (loggedUser.getStringId().equals(this.userService.getSystem().getStringId())) {
             Case filterCase = this.workflowService.searchOne(QCase.case$.processIdentifier.eq("filter").and(QCase.case$.title.eq(title)).and(QCase.case$.author.id.eq(userService.getSystem().getStringId())));
             if (filterCase != null) {
@@ -442,7 +441,7 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
                     .process(filterNet)
                     .title(title)
                     .color(null)
-                    .author(ActorTransformer.toLoggedUser(loggedUser))
+                    .author(loggedUser)
                     .build()).getCase();
             filterCase.setIcon(icon);
             filterCase = this.workflowService.save(filterCase);

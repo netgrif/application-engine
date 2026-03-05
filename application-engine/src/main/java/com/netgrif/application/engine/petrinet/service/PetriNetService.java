@@ -2,37 +2,36 @@ package com.netgrif.application.engine.petrinet.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.auth.service.GroupService;
+import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
-import com.netgrif.application.engine.petrinet.params.DeletePetriNetParams;
-import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
+import com.netgrif.application.engine.importer.service.Importer;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.event.events.petrinet.ProcessDeleteEvent;
+import com.netgrif.application.engine.objects.event.events.petrinet.ProcessDeployEvent;
 import com.netgrif.application.engine.objects.event.events.petrinet.ProcessEvent;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.objects.petrinet.domain.Transition;
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.ArcImportReference;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
-import com.netgrif.application.engine.objects.event.events.petrinet.ProcessDeleteEvent;
-import com.netgrif.application.engine.objects.event.events.petrinet.ProcessDeployEvent;
-import com.netgrif.application.engine.importer.service.Importer;
-import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventPhase;
-import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.objects.petrinet.domain.version.Version;
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
+import com.netgrif.application.engine.petrinet.params.DeletePetriNetParams;
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -186,7 +185,7 @@ public class PetriNetService implements IPetriNetService {
         PetriNet processToMakeNonDefault = checkAndHandleProcessVersion(newProcess, importPetriNetParams.getReleaseType());
 
         processRoleService.saveAll(newProcess.getRoles().values());
-        newProcess.setAuthor(ActorTransformer.toActorRef(importPetriNetParams.getAuthor()));
+        newProcess.setAuthor(ActorTransformer.toActorRef(importPetriNetParams.getAuthor().getSelfOrImpersonated()));
         Path savedPath = getImporter().saveNetFile(newProcess, new ByteArrayInputStream(xmlCopy.toByteArray()));
         xmlCopy.close();
         log.info("Petri net {} ({} v{}) imported successfully and saved in a folder: {}", newProcess.getTitle(),
@@ -496,7 +495,14 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public List<PetriNetReference> getReferencesByUsersProcessRoles(LoggedUser user, Locale locale) {
-        Query query = Query.query(getProcessRolesCriteria(user));
+        if (user.isProcessAccessDeny()) {
+            return new ArrayList<>();
+        }
+        Criteria processRolesCriteria = getProcessRolesCriteria(user);
+        Criteria impersonatedProcessesCriteria = getImpersonatedProcessesCriteria(user);
+        Query query = impersonatedProcessesCriteria == null
+                ? Query.query(processRolesCriteria)
+                : Query.query(processRolesCriteria.andOperator(impersonatedProcessesCriteria));
         return mongoTemplate.find(query, com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class).stream()
                 .map(net -> transformToReference(net, locale))
                 .collect(Collectors.toList());
@@ -549,13 +555,16 @@ public class PetriNetService implements IPetriNetService {
         Query query = new Query();
         Query queryTotal = new Query();
 
-        // TODO: resolve impersonation
         if (!user.isAdmin()) {
+            if (user.isProcessAccessDeny()) {
+                return Page.empty();
+            }
             query.addCriteria(getProcessRolesCriteria(user));
+            Criteria impersonatedProcessesCriteria = getImpersonatedProcessesCriteria(user);
+            if (impersonatedProcessesCriteria != null) {
+                query.addCriteria(impersonatedProcessesCriteria);
+            }
         }
-//        if (!user.getSelfOrImpersonated().isAdmin())
-//            query.addCriteria(getProcessRolesCriteria(user.getSelfOrImpersonated()));
-
         if (criteriaClass.getIdentifier() != null) {
             this.addValueCriteria(query, queryTotal, Criteria.where("identifier").regex(criteriaClass.getIdentifier(), "i"));
         }
@@ -640,7 +649,7 @@ public class PetriNetService implements IPetriNetService {
         processRoleService.deleteRolesOfNet(petriNet, deletePetriNetParams.getLoggedUser());
 
         log.info("[{}]: User [{}] is deleting Petri net {} version {}", deletePetriNetParams.getPetriNetId(),
-                deletePetriNetParams.getLoggedUser().getStringId(), petriNet.getIdentifier(), petriNet.getVersion().toString());
+                deletePetriNetParams.getLoggedUser().getSelfOrImpersonatedStringId(), petriNet.getIdentifier(), petriNet.getVersion().toString());
         publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.PRE));
         repository.deleteBy_id(petriNet.getObjectId());
         evictCache(petriNet);
@@ -660,6 +669,16 @@ public class PetriNetService implements IPetriNetService {
     protected Criteria getProcessRolesCriteria(LoggedUser user) {
         return new Criteria().orOperator(user.getProcessRoles().stream()
                 .map(role -> Criteria.where("permissions." + role).exists(true)).toArray(Criteria[]::new));
+    }
+
+    private Criteria getImpersonatedProcessesCriteria(LoggedUser user) {
+        if (user.isAdmin() || !user.isImpersonating() || user.getImpersonatedProcesses() == null || user.getImpersonatedProcesses().isEmpty()) {
+            return null;
+        }
+        if (user.isImpersonatedProcessesListAllowing()) {
+            return Criteria.where("identifier").in(user.getImpersonatedProcesses());
+        }
+        return Criteria.where("identifier").nin(user.getImpersonatedProcesses());
     }
 
     @Override
@@ -698,7 +717,7 @@ public class PetriNetService implements IPetriNetService {
             throw new IllegalArgumentException("No petriNet identifier was provided.");
         }
         if (deletePetriNetParams.getLoggedUser() == null) {
-            deletePetriNetParams.setLoggedUser(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()));
+            deletePetriNetParams.setLoggedUser(userService.getLoggedOrSystem());
         }
     }
 

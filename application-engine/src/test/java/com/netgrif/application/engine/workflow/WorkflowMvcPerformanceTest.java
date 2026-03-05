@@ -181,7 +181,7 @@ public class WorkflowMvcPerformanceTest {
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
             taskService.assignTask(TaskParams.with()
                     .taskId(taskId)
-                    .user(this.user1)
+                    .user(ActorTransformer.toLoggedUser(this.user1))
                     .build());
             long start = System.currentTimeMillis();
             mvc.perform(get(CANCEL_TASK_URL + taskId)
@@ -233,7 +233,7 @@ public class WorkflowMvcPerformanceTest {
             String taskId = useCase.getTasks().stream().findFirst().get().getTask();
             taskService.assignTask(TaskParams.with()
                     .taskId(taskId)
-                    .user(this.user1)
+                    .user(ActorTransformer.toLoggedUser(this.user1))
                     .build());
             long start = System.currentTimeMillis();
             mvc.perform(get(FINISH_TASK_URL + taskId)

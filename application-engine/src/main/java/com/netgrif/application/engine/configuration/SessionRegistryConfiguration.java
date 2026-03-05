@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.configuration.properties.ImpersonationConfigurationProperties;
+import com.netgrif.application.engine.adapter.spring.configuration.ImpersonationConfigurationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

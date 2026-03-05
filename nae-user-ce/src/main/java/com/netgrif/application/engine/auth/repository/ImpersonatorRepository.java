@@ -1,6 +1,6 @@
-package com.netgrif.application.engine.impersonation.domain.repository;
+package com.netgrif.application.engine.auth.repository;
 
-import com.netgrif.application.engine.impersonation.domain.Impersonator;
+import com.netgrif.application.engine.auth.domain.Impersonator;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

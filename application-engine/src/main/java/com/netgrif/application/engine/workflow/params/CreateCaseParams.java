@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.params;
 
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.WorkflowService;
@@ -39,7 +39,7 @@ public class CreateCaseParams {
     private String color;
 
     /// Author of the Case
-    private AbstractUser author;
+    private LoggedUser author;
 
     @Builder.Default
     private Locale locale = LocaleContextHolder.getLocale();

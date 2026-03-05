@@ -127,7 +127,7 @@ public class ActionApiImpl implements ActionApi {
                 .processIdentifier(identifier)
                 .title(title)
                 .color(color)
-                .author(resolveAbstractUser(authPrincipalDto))
+                .author(ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto)))
                 .locale(locale)
                 .params(params)
                 .build());
@@ -158,7 +158,7 @@ public class ActionApiImpl implements ActionApi {
     @Override
     public AssignTaskEventOutcome assignTask(String taskId, AuthPrincipalDto authPrincipalDto, Map<String, String> params) throws TransitionNotExecutableException {
         Task task = taskService.findOne(taskId);
-        AbstractUser user = resolveAbstractUser(authPrincipalDto);
+        LoggedUser user = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
         return taskService.assignTask(TaskParams.with()
                 .task(task)
                 .user(user)
@@ -169,7 +169,7 @@ public class ActionApiImpl implements ActionApi {
     @Override
     public CancelTaskEventOutcome cancelTask(String taskId, AuthPrincipalDto authPrincipalDto, Map<String, String> params) {
         Task task = taskService.findOne(taskId);
-        AbstractUser user = resolveAbstractUser(authPrincipalDto);
+        LoggedUser user = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
         return taskService.cancelTask(TaskParams.with()
                 .task(task)
                 .user(user)
@@ -180,7 +180,7 @@ public class ActionApiImpl implements ActionApi {
     @Override
     public FinishTaskEventOutcome finishTask(String taskId, AuthPrincipalDto authPrincipalDto, Map<String, String> params) throws TransitionNotExecutableException {
         Task task = taskService.findOne(taskId);
-        AbstractUser user = resolveAbstractUser(authPrincipalDto);
+        LoggedUser user = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
         return taskService.finishTask(TaskParams.with()
                 .task(task)
                 .user(user)

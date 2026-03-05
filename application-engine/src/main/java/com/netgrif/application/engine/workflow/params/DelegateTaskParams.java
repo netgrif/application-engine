@@ -1,9 +1,10 @@
 package com.netgrif.application.engine.workflow.params;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.service.TaskService;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
+import com.netgrif.application.engine.workflow.service.TaskService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,7 +36,7 @@ public class DelegateTaskParams {
     private String newAssigneeId;
 
     /// The user, who is performing the delegation
-    private AbstractUser delegator;
+    private LoggedUser delegator;
 
     /// The user's string id, who is performing the delegation
     private String delegatorId;
@@ -63,7 +64,7 @@ public class DelegateTaskParams {
         }
 
         /// Sets the {@link #delegator} and {@link #delegatorId}
-        public DelegateTaskParamsBuilder delegator(AbstractUser delegator) {
+        public DelegateTaskParamsBuilder delegator(LoggedUser delegator) {
             this.delegator = delegator;
             if (delegator != null) {
                 this.delegatorId = delegator.getStringId();

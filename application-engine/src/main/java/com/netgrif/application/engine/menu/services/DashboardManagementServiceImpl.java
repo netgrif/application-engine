@@ -5,13 +5,8 @@ import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.menu.services.interfaces.DashboardManagementService;
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.objects.common.ResourceNotFoundException;
-import com.netgrif.application.engine.objects.common.ResourceNotFoundExceptionCode;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
-import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.objects.utils.MenuItemUtils;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
@@ -68,7 +63,7 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
             return managementCase;
         }
         addReferencedMenuItems(body);
-        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
+        LoggedUser loggedUser = userService.getLoggedOrSystem();
         managementCase = workflowService.createCase(CreateCaseParams.with()
                 .processIdentifier(DashboardManagementConstants.PROCESS_IDENTIFIER)
                 .title(body.getName().getDefaultValue())
@@ -115,7 +110,7 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected Case setDataWithExecute(Case useCase, String transId, Map<String, Map<String, Object>> dataSet) throws TransitionNotExecutableException {
-        AbstractUser loggedUser = userService.getLoggedOrSystem();
+        LoggedUser loggedUser = userService.getLoggedOrSystem();
         String taskId = MenuItemUtils.findTaskIdInCase(useCase, transId);
         Task task = taskService.findOne(taskId);
         task = taskService.assignTask(TaskParams.with()
@@ -134,7 +129,7 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
                 .process(Collections.singletonList(new CaseSearchRequest.PetriNet(processIdentifier)))
                 .query(query)
                 .build();
-        Page<Case> resultPage = elasticCaseService.search(java.util.List.of(request), ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()),
+        Page<Case> resultPage = elasticCaseService.search(java.util.List.of(request), userService.getLoggedOrSystem(),
                 PageRequest.of(0, 1), Locale.getDefault(), false);
 
         return resultPage.hasContent() ? resultPage.getContent().get(0) : null;
