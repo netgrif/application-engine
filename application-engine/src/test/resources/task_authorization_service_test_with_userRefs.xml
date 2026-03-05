@@ -20,6 +20,10 @@
         <id>finish_neg_role</id>
         <name>finish neg role</name>
     </role>
+    <role>
+        <id>view_pos_role</id>
+        <name>view pos role</name>
+    </role>
     <data type="actorList">
         <id>assign_pos_ul</id>
         <title/>
@@ -50,6 +54,10 @@
     </data>
     <data type="actorList">
         <id>finish_neg_ul</id>
+        <title/>
+    </data>
+    <data type="actorList">
+        <id>view_pos_ul</id>
         <title/>
     </data>
     <data type="text">
@@ -88,6 +96,12 @@
             <id>finish_neg_role</id>
             <logic>
                 <finish>false</finish>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>view_pos_role</id>
+            <logic>
+                <view>true</view>
             </logic>
         </roleRef>
         <actorRef>
@@ -136,6 +150,12 @@
             <id>finish_neg_ul</id>
             <logic>
                 <finish>false</finish>
+            </logic>
+        </actorRef>
+        <actorRef>
+            <id>view_pos_ul</id>
+            <logic>
+                <view>false</view>
             </logic>
         </actorRef>
         <dataRef>
