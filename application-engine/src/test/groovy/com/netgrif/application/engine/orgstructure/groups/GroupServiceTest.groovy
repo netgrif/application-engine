@@ -92,7 +92,7 @@ class GroupServiceTest {
     @Test
     void addAndRemoveUser() {
         QGroup qGroup = new QGroup("group")
-        Group group = groupService.findByPredicate(qGroup.identifier.eq("CUSTOM_GROUP_1"), new FullPageRequest()).getContent().get(0)
+        Group group = groupService.findByPredicate(qGroup.identifier.eq(DUMMY_USER_MAIL), new FullPageRequest()).getContent().get(0)
         group = groupService.addUser(userService.findUserByUsername(CUSTOMER_USER_MAIL, null).get(), group)
         assert group.getMemberIds().size() == 2
         group = groupService.removeUser(userService.findUserByUsername(CUSTOMER_USER_MAIL, null).get(), group)
@@ -106,7 +106,7 @@ class GroupServiceTest {
                 .releaseType(VersionType.MAJOR)
                 .author(userService.getSystem())
                 .build())
-        ProcessRole role = netWithRoleOutcome.getNet().getRoles().get("simple_role")
+        ProcessRole role = netWithRoleOutcome.getNet().getRoles().values().find { it.importId == "simple_role"}
         Group group = groupService.create("addAndRemoveRole", "Add and remove role test group", dummy)
         group = groupService.addRole(group.getStringId(), role.getStringId())
         assert group.getProcessRoles().any {it.getStringId() == role.getStringId()}

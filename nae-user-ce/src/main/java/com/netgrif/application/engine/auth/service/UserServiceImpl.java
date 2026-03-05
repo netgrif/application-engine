@@ -570,18 +570,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AbstractUser createSystemUser() {
-        User system = (User) findByEmail(UserConstants.SYSTEM_USER_EMAIL, null);
-        if (system == null) {
-            system = new User();
-            system.setUsername(UserConstants.SYSTEM_USER_EMAIL);
-            system.setEmail(UserConstants.SYSTEM_USER_EMAIL);
-            system.setPassword("n/a");
-            system.setFirstName(UserConstants.SYSTEM_USER_NAME);
-            system.setLastName(UserConstants.SYSTEM_USER_SURNAME);
-            system.setState(UserState.ACTIVE);
-            saveUser(system);
+        if (systemUser == null) {
+            systemUser = new User();
+            systemUser.setUsername(UserConstants.SYSTEM_USER_EMAIL);
+            systemUser.setEmail(UserConstants.SYSTEM_USER_EMAIL);
+            systemUser.setPassword("n/a");
+            systemUser.setFirstName(UserConstants.SYSTEM_USER_NAME);
+            systemUser.setLastName(UserConstants.SYSTEM_USER_SURNAME);
+            ((User) systemUser).setState(UserState.ACTIVE);
         }
-        return system;
+        return systemUser;
     }
 
     @Override

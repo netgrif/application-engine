@@ -135,10 +135,7 @@ class FileFieldTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
-        def adminUser = importHelper.createUser(new User(firstName: "Admin", lastName: "User", username: UserConstants.ADMIN_USER_USERNAME, email: UserConstants.ADMIN_USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("admin")] as Authority[],
-//                [] as Group[],
-                [] as ProcessRole[])
+        def adminUser = userService.findUserByUsername(UserConstants.ADMIN_USER_USERNAME, null).get()
 
         auth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(adminUser), "password", [auths.get("admin")] as List<AuthorityImpl>)
         auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
