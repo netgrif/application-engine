@@ -11,6 +11,10 @@ public interface TenantService {
 
     Tenant save(Tenant tenant);
 
+    Tenant getAdminTenant();
+
+    String getAdminTenantId();
+
     void delete(Tenant tenant);
 
     void addRealm(String tenantId, Realm realm);

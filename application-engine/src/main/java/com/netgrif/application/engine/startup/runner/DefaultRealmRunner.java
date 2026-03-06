@@ -2,6 +2,7 @@ package com.netgrif.application.engine.startup.runner;
 
 import com.netgrif.application.engine.auth.service.RealmService;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
+import com.netgrif.application.engine.objects.tenant.TenantConstants;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +10,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import static com.netgrif.application.engine.objects.tenant.TenantConstants.ADMIN_TENANT_ID;
 
 @Slf4j
 @Component
@@ -25,12 +25,12 @@ public class DefaultRealmRunner implements ApplicationEngineStartupRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        if (realmService.getDefaultRealm(ADMIN_TENANT_ID).isPresent()) {
+        if (realmService.getDefaultRealm(TenantConstants.AdminTenant.ID).isPresent()) {
             return;
         }
 
         Realm createRequest = new com.netgrif.application.engine.adapter.spring.auth.domain.Realm("Default");
-        createRequest.setTenantId(ADMIN_TENANT_ID);
+        createRequest.setTenantId(TenantConstants.AdminTenant.ID);
         createRequest.setDescription("Default realm");
         createRequest.setAdminRealm(true);
         createRequest.setDefaultRealm(true);

@@ -5,11 +5,13 @@ import com.netgrif.application.engine.auth.service.TenantService;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.auth.service.TenantUserService;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.constants.UserConstants;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.objects.tenant.Tenant;
+import com.netgrif.application.engine.objects.tenant.TenantConstants;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.Getter;
@@ -24,8 +26,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.netgrif.application.engine.objects.tenant.TenantConstants.ADMIN_TENANT_ID;
-import static com.netgrif.application.engine.objects.tenant.TenantConstants.TENANT_ID;
 
 
 @Slf4j
@@ -58,7 +58,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
         Set<Authority> authorities = new HashSet<>();
         authorities.add(adminAuthority);
         authorities.add(systemAuthority);
-        Optional<Tenant> adminTenant = tenantService.getById(ADMIN_TENANT_ID);
+        Optional<Tenant> adminTenant = tenantService.getById(TenantConstants.AdminTenant.ID);
         if (adminTenant.isEmpty()) {
             throw new IllegalStateException("Admin tenant not found");
         }
@@ -79,7 +79,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
             user.setAuthoritySet(authorities);
             user.setProcessRoles(new HashSet<>(processRoleService.findAll(Pageable.unpaged()).getContent()));
             user.setRealmId(defaultRealmId.get());
-            user.setAttribute(TENANT_ID, ADMIN_TENANT_ID, false);
+            TenantUserService.addTenantsToUser(user, TenantConstants.AdminTenant.ID);
             this.superUser = userService.createUser(user, defaultRealmId.get());
             log.info("Super user created");
         } else {

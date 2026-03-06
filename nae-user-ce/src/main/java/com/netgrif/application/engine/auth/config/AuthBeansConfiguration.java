@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.auth.config;
 
-import com.netgrif.application.engine.auth.service.TenantService;
 import com.netgrif.application.engine.auth.service.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -47,6 +46,14 @@ public class AuthBeansConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(TenantService.class)
-    public TenantService tenantService() { return new TenantServiceImpl();}
+    public TenantService tenantService() {
+        return new TenantServiceImpl();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(TenantUserService.class)
+    public TenantUserService tenantUserService(TenantService tenantService, UserService userService, RealmService realmService) {
+        return new TenantUserServiceImpl(tenantService, userService, realmService);
+    }
 
 }

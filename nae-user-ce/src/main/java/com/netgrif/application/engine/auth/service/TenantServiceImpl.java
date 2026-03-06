@@ -5,6 +5,7 @@ import com.netgrif.application.engine.adapter.spring.tenant.exception.TenantNotF
 import com.netgrif.application.engine.auth.repository.TenantRepository;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
 import com.netgrif.application.engine.objects.tenant.Tenant;
+import com.netgrif.application.engine.objects.tenant.TenantConstants;
 import com.netgrif.application.engine.objects.workspace.Workspace;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,6 +21,16 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public Tenant save(Tenant tenant) {
         return repository.save(tenant);
+    }
+
+    @Override
+    public Tenant getAdminTenant() {
+        return getById(getAdminTenantId()).orElseThrow(() -> new TenantNotFoundException("Tenant not found"));
+    }
+
+    @Override
+    public String getAdminTenantId() {
+        return TenantConstants.AdminTenant.ID;
     }
 
     @Override

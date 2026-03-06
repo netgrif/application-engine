@@ -16,8 +16,12 @@ import java.util.Optional;
 @Getter
 public abstract class Tenant implements Serializable {
 
-    private record RealmRef(String name, boolean defaultRealm) {
+    public record RealmRef(String name, boolean defaultRealm) {
 
+    }
+
+    public enum TenantStatus {
+        ACTIVE, INACTIVE, SUSPENDED, DELETED
     }
 
     @Serial
@@ -100,10 +104,5 @@ public abstract class Tenant implements Serializable {
     public Optional<String> getDefaultRealmId() {
         return realms.stream().filter(realmRef -> realmRef.defaultRealm).findFirst().map(realmRef -> realmRef.name);
     }
-
-    public enum TenantStatus {
-        ACTIVE, INACTIVE, SUSPENDED, DELETED
-    }
-
 
 }

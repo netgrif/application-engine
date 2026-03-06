@@ -12,7 +12,7 @@ import com.netgrif.application.engine.objects.tenant.Tenant;
 import java.util.Optional;
 
 import static com.netgrif.application.engine.objects.tenant.TenantConstants.TENANT_EMPTY;
-import static com.netgrif.application.engine.objects.tenant.TenantConstants.TENANT_ID;
+import static com.netgrif.application.engine.objects.tenant.TenantConstants.ACTIVE_TENANT_ID;
 
 public class TenantEventEnricher implements EventEnricher {
 
@@ -34,7 +34,7 @@ public class TenantEventEnricher implements EventEnricher {
             } else {
                 tenantAtt = getTenantIdFromLoggedUser();
             }
-            e.addAttribute(TENANT_ID, tenantAtt);
+            e.addAttribute(ACTIVE_TENANT_ID, tenantAtt);
         }
         return event;
     }
@@ -52,10 +52,10 @@ public class TenantEventEnricher implements EventEnricher {
         if (loggedUser == null) {
             return Attribute.of(TENANT_EMPTY);
         }
-        Attribute<?> tenantAtt = loggedUser.getAttribute(TENANT_ID);
+        Attribute<?> tenantAtt = loggedUser.getAttribute(ACTIVE_TENANT_ID);
         if (tenantAtt == null || tenantAtt.hasNullValue()) {
             return Attribute.of(TENANT_EMPTY);
         }
-        return loggedUser.getAttribute(TENANT_ID);
+        return loggedUser.getAttribute(ACTIVE_TENANT_ID);
     }
 }

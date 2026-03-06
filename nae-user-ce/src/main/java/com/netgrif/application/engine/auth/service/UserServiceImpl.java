@@ -1,13 +1,11 @@
 package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.adapter.spring.workflow.service.FilterImportExportService;
 import com.netgrif.application.engine.auth.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
 import com.netgrif.application.engine.auth.repository.UserRepository;
-import com.netgrif.application.engine.auth.tenant.TenantSupport;
 import com.netgrif.application.engine.objects.auth.constants.UserConstants;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
@@ -36,8 +34,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.netgrif.application.engine.objects.tenant.TenantConstants.TENANT_ID;
-
 @Slf4j
 @Getter
 public class UserServiceImpl implements UserService {
@@ -64,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
     private RealmService realmService;
 
-    private Tenant adminTenant;
+    private TenantService tenantService;
 
     @Getter
     private PaginationProperties paginationProperties;
@@ -128,8 +124,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Autowired
-    public void setAdminTenant(Tenant adminTenant) {
-        this.adminTenant = adminTenant;
+    public void setTenantService(TenantService tenantService) {
+        this.tenantService = tenantService;
     }
 
     @Override
@@ -145,6 +141,10 @@ public class UserServiceImpl implements UserService {
             u.setModifiedAt(LocalDateTime.now());
         }
         String collectionName = collectionNameProvider.getCollectionNameForRealm(user.getRealmId());
+        Tenant tenant = tenantService.getByRealm(user.getRealmId()).orElse(null);
+        if (tenant != null) {
+            TenantUserService.addTenantsToUser(user, tenant.getId());
+        }
         user = userRepository.saveUser((User) user, mongoTemplate, collectionName);
         log.trace("User [{}] saved in collection [{}]", user.getUsername(), collectionName);
         return user;
@@ -319,7 +319,7 @@ public class UserServiceImpl implements UserService {
     public void addDefaultAttributes(AbstractUser user) {
         log.trace("Assigning default attributes to user [{}]", user.getUsername());
         Optional<Realm> realm = realmService.getRealmById(user.getRealmId());
-        realm.ifPresent(r -> TenantSupport.decorateUserWithTenant(user, r.getName()));
+        realm.ifPresent(r -> TenantUserService.addTenantsToUser(user, r.getTenantId()));
     }
 
     @Override
@@ -604,7 +604,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AbstractUser createSystemUser() {
-        if(adminTenant.getDefaultRealmId().isEmpty()) {
+        Tenant adminTenant = tenantService.getAdminTenant();
+        if (adminTenant.getDefaultRealmId().isEmpty()) {
             throw new IllegalStateException("Admin tenant does not have default realm.");
         }
         User system = (User) findByEmail(UserConstants.SYSTEM_USER_EMAIL, adminTenant.getDefaultRealmId().get());
@@ -623,8 +624,8 @@ public class UserServiceImpl implements UserService {
             system.setLastName(UserConstants.SYSTEM_USER_SURNAME);
             system.setState(UserState.ACTIVE);
             system.setAuthoritySet(authorities);
-            system.setRealmId(adminTenant.getDefaultRealmId().get());
-            system.setAttribute(TENANT_ID, adminTenant.getId(), false);
+            TenantUserService.addActiveTenantIdToUser(system, adminTenant.getId());
+            TenantUserService.addTenantsToUser(system, adminTenant.getId());
             saveUser(system);
         }
         return system;
@@ -662,7 +663,7 @@ public class UserServiceImpl implements UserService {
     public Page<User> search(Predicate predicate, Pageable pageable, String realmId) {
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
         return userRepository.findAllByQuery(predicate, pageable, mongoTemplate, collectionName);
-    } 
+    }
 
     protected User initializeNewUser(String username, String email, String firstName, String lastName, String password, String realmId) {
         log.trace("Initializing new user [{}] in realm [{}]", username, realmId);

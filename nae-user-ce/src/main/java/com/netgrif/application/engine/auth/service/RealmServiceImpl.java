@@ -13,6 +13,7 @@ import com.netgrif.application.engine.objects.auth.domain.Realm;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.provider.AuthMethodConfig;
 import com.netgrif.application.engine.objects.auth.provider.RealmUpdate;
+import com.netgrif.application.engine.objects.tenant.TenantConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -26,7 +27,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.netgrif.application.engine.objects.tenant.TenantConstants.ADMIN_TENANT_ID;
 
 @Slf4j
 public class RealmServiceImpl implements RealmService {
@@ -120,7 +120,7 @@ public class RealmServiceImpl implements RealmService {
 
     @Override
     public Optional<Realm> getDefaultRealm() {
-        return realmRepository.findByDefaultRealmTrueAndTenantId(ADMIN_TENANT_ID).map(Realm.class::cast);
+        return realmRepository.findByDefaultRealmTrueAndTenantId(TenantConstants.AdminTenant.ID).map(Realm.class::cast);
     }
 
     @Override
