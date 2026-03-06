@@ -36,17 +36,7 @@ public class GroupRunner implements ApplicationEngineStartupRunner {
         Optional<Group> systemGroupOpt = groupService.findByIdentifier(userService.getSystem().getUsername());
         if (systemGroupOpt.isEmpty()) {
             groupService.create(userService.getSystem());
-            log.info("System group created.");
-        } else {
-            log.info("System group already exists. Updating.");
-            Group systemGroup = systemGroupOpt.get();
-            systemGroup.setOwnerUsername(userService.getSystem().getUsername());
-            systemGroup.setOwnerId(userService.getSystem().getStringId());
-            systemGroup.getMemberIds().clear();
-            systemGroup.addMemberId(userService.getSystem().getStringId());
-            userService.getSystem().addGroupId(systemGroup.getStringId());
-            groupService.save(systemGroup);
-            log.info("System group updated.");
+            log.info("Default system group created.");
         }
     }
 
