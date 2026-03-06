@@ -220,7 +220,7 @@ public class PetriNetController {
         return resources;
     }
 
-    @PreAuthorize("@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId)")
+    @PreAuthorize("@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId) and @workspacePermissionService.checkPermissionAndSelectWorkspace(#workspaceId, #auth.getPrincipal())")
     @Operation(summary = "Delete process",
             description = "Caller must have the ADMIN role. Removes the specified process, along with it's cases, tasks and process roles.",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -230,6 +230,7 @@ public class PetriNetController {
     })
     @DeleteMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource deletePetriNet(@PathVariable("id") String processId, @RequestParam(required = false) boolean force,
+                                          @RequestParam(value = "workspaceId", required = false) String workspaceId,
                                           Authentication auth) {
         String decodedProcessId = decodeUrl(processId);
         if (Objects.equals(decodedProcessId, "")) {
