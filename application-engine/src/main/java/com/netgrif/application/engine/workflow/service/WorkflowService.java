@@ -255,10 +255,9 @@ public class WorkflowService implements IWorkflowService {
     /**
      * Resolves actor permissions for the useCase based on the actor list data field.
      *
-     * @param useCase useCase where to resolve actor permissions
+     * @param useCase      useCase where to resolve actor permissions
      * @param actorFieldId field id of the actor list
-     * @param permission permission associated with the useCase and actor list
-     *
+     * @param permission   permission associated with the useCase and actor list
      * @return true if the useCase was modified, false otherwise
      */
     private boolean resolveActorRefPermissions(Case useCase, String actorFieldId, Map<String, Boolean> permission) {
@@ -278,20 +277,22 @@ public class WorkflowService implements IWorkflowService {
             return null;
         }
         return actorListFieldValue.getActorValues().stream()
+                .filter(this::actorExists)
                 .map(ActorFieldValue::getId)
-                .filter(actorId -> {
-                    AbstractUser user = userService.findById(actorId, null);
-                    if (user != null) {
-                        return true;
-                    }
-                    try {
-                        groupService.findById(actorId);
-                        return true;
-                    } catch (IllegalArgumentException ignored) {
-                        return false;
-                    }
-                })
                 .collect(Collectors.toList());
+    }
+
+    private boolean actorExists(ActorFieldValue actorFieldValue) {
+        AbstractUser user = userService.findById(actorFieldValue.getId(), actorFieldValue.getRealmId());
+        if (user != null) {
+            return true;
+        }
+        try {
+            groupService.findById(actorFieldValue.getId());
+            return true;
+        } catch (IllegalArgumentException ignored) {
+            return false;
+        }
     }
 
     public CreateCaseEventOutcome createCase(CreateCaseParams createCaseParams) {
