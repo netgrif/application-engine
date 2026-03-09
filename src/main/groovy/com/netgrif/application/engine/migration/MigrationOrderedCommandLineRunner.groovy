@@ -49,18 +49,21 @@ abstract class MigrationOrderedCommandLineRunner extends AbstractOrderedCommandL
         }
         log.info("Migration ${title} applied")
         if (shutdownAfterFinish || migrationProperties.isShutdownAfterMigration()) {
-            sleep(100)
+            // sleep is for elastic executor and other things to flush their work after migration.
+            // the number was chosen arbitrary by feeling 😅
+            sleep(333)
             shutdownProvider.shutdown(this.class)
         }
     }
 
-    protected enableShutdownAfterFinish() {
+    protected void enableShutdownAfterFinish() {
         this.shutdownAfterFinish = true;
     }
 
-    protected disableShutdownAfterFinish() {
+    protected void disableShutdownAfterFinish() {
         this.shutdownAfterFinish = false;
     }
 
     abstract void migrate()
+
 }
