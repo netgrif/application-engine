@@ -772,12 +772,9 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void resolveUserRef(Case useCase) {
-        useCase.getTasks().forEach(taskPair -> {
-            Optional<Task> taskOptional = taskRepository.findById(taskPair.getTask());
-            taskOptional.ifPresent(task -> resolveUserRef(task, useCase));
-        });
-
+    public List<Task> resolveUserRef(Case useCase) {
+        List<Task> tasks = taskRepository.findAllBy_idIn(useCase.getTasks().stream().map(TaskPair::getTask).collect(Collectors.toList()));
+        return tasks.stream().map(task -> resolveUserRef(task, useCase)).collect(Collectors.toList());
     }
 
     @Override
@@ -786,9 +783,9 @@ public class TaskService implements ITaskService {
         task.getNegativeViewUsers().clear();
         task.getUserRefs().forEach((id, permission) -> {
             List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(id).getValue());
-            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
+            if (userIds != null && !userIds.isEmpty() && permission.containsKey("view") && !permission.get("view")) {
                 task.getNegativeViewUsers().addAll(userIds);
-            } else if (userIds != null && userIds.size() != 0) {
+            } else if (userIds != null && !userIds.isEmpty()) {
                 task.addUsers(new HashSet<>(userIds), permission);
             }
         });

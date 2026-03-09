@@ -54,6 +54,11 @@ public abstract class AbstractUserService implements IUserService {
     }
 
     @Override
+    public boolean existsById(String id) {
+        return repository.existsById(id);
+    }
+
+    @Override
     public IUser assignAuthority(String userId, String authorityId) {
         IUser user = resolveById(userId, true);
         Authority authority = authorityService.getOne(authorityId);
