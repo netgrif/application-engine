@@ -19,9 +19,6 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Temporary remove corrupted jars
-        run: rm -rf ~/.m2/repository/xml-apis
-
       - name: Build
         run: mvn clean verify -DskipTests=true
 
