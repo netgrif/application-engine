@@ -72,6 +72,13 @@ public class RealmServiceImpl implements RealmService {
         com.netgrif.application.engine.adapter.spring.auth.domain.Realm realm = new com.netgrif.application.engine.adapter.spring.auth.domain.Realm(createRequest.getName());
         realm.setDescription(createRequest.getDescription());
         realm.setAdminRealm(createRequest.isAdminRealm());
+
+        boolean tenantExists = tenantService.exists(createRequest.getTenantId());
+
+        if (tenantExists) {
+            throw new IllegalArgumentException("Tenant with id [%s] does not exist.".formatted(createRequest.getTenantId()));
+        }
+
         realm.setTenantId(createRequest.getTenantId());
 
         if (createRequest.isDefaultRealm() && getDefaultRealm(createRequest.getTenantId()).isEmpty()) {
