@@ -228,7 +228,7 @@ public class WorkflowService implements IWorkflowService {
 
     private void resolveUserRefPermissions(Case useCase, String userListId, Map<String, Boolean> permission) {
         List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(userListId).getValue());
-        if (userIds != null && userIds.size() != 0) {
+        if (userIds != null && !userIds.isEmpty()) {
             if (permission.containsKey("view") && !permission.get("view")) {
                 useCase.getNegativeViewUsers().addAll(userIds);
             } else {
@@ -241,7 +241,7 @@ public class WorkflowService implements IWorkflowService {
         if (userListValue == null)
             return null;
         return userListValue.getUserValues().stream().map(UserFieldValue::getId)
-                .filter(id -> userService.resolveById(id, false) != null)
+                .filter(id -> userService.existsById(id))
                 .collect(Collectors.toList());
     }
 

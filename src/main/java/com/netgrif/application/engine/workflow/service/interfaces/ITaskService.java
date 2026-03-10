@@ -15,7 +15,6 @@ import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchReque
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
@@ -106,7 +105,7 @@ public interface ITaskService {
 
     DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId, Map<String, String> params) throws TransitionNotExecutableException;
 
-    void resolveUserRef(Case useCase);
+    List<Task> resolveUserRef(Case useCase);
 
     Task resolveUserRef(Task task, Case useCase);
 
