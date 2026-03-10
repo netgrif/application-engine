@@ -8,22 +8,19 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Set up JDK 11
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v5
         with:
           java-version: 11
-          distribution: 'adopt'
+          distribution: 'temurin'
+          cache: maven
 
-      - name: Cache Maven packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+      - name: Temporary remove corrupted jars
+        run: rm -rf ~/.m2/repository/xml-apis
 
       - name: Build
         run: mvn clean verify -DskipTests=true
@@ -35,7 +32,7 @@ jobs:
     timeout-minutes: 200
     services:
       mongo:
-        image: mongo:4.4
+        image: mongo:6
         ports:
           - 27017:27017
 
@@ -45,7 +42,7 @@ jobs:
           - 6379:6379
 
       elasticsearch:
-        image: elasticsearch:7.17.3
+        image: elasticsearch:7.17.28
         ports:
           - 9200:9200
           - 9300:9300
@@ -66,15 +63,16 @@ jobs:
           echo $ELASTIC_SEARCH_URL
           curl -fsSL "$ELASTIC_SEARCH_URL/_cat/health?h=status"
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Set up JDK 11
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v5
         with:
           java-version: 11
-          distribution: 'adopt'
+          distribution: 'temurin'
+          cache: maven
 
 #      - name: Cache SonarCloud packages
 #        uses: actions/cache@v3
@@ -82,13 +80,6 @@ jobs:
 #          path: ~/.sonar/cache
 #          key: ${{ runner.os }}-sonar
 #          restore-keys: ${{ runner.os }}-sonar
-
-      - name: Cache Maven packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
 
       - name: Generate certificates
         run: cd src/main/resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../../../..
