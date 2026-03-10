@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -12,10 +14,16 @@ import org.springframework.stereotype.Component;
 public class ApplicationShutdownProvider {
 
     private final ApplicationContext applicationContext;
+    private final TaskExecutor taskExecutor;
 
     public void shutdown(Class<?> calledBy, int exitCode) {
         String className = calledBy == null ? "unknown" : calledBy.getSimpleName();
         log.info("Application was signalled by {} to shutdown; exit code: {}", className, exitCode);
+        if (taskExecutor != null && taskExecutor instanceof ThreadPoolTaskExecutor) {
+            log.info("Shutting down thread pool executor");
+            ThreadPoolTaskExecutor executor = (ThreadPoolTaskExecutor) taskExecutor;
+            executor.shutdown();
+        }
         int ec = SpringApplication.exit(applicationContext, () -> exitCode);
         System.exit(ec);
     }
