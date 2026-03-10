@@ -3,7 +3,9 @@ package com.netgrif.application.engine.workspace.service;
 import com.netgrif.application.engine.objects.workspace.Workspace;
 import org.springframework.stereotype.Service;
 
-import static com.netgrif.application.engine.objects.workspace.DefaultWorkspaceConstants.*;
+import java.util.Optional;
+
+import static com.netgrif.application.engine.objects.workspace.WorkspaceConstants.*;
 
 // todo javadoc
 @Service
@@ -24,15 +26,15 @@ public class MockWorkspaceService implements WorkspaceService {
     }
 
     @Override
-    public Workspace findOne(String workspaceId) {
+    public Optional<Workspace> findOne(String workspaceId) {
         if (workspaceId == null) {
-            return null;
+            return Optional.empty();
         }
 
         if (workspaceId.equals(DEFAULT_WORKSPACE_ID)) {
-            return this.defaultWorkspace;
+            return Optional.of(this.defaultWorkspace);
         }
 
-        return null;
+        return Optional.empty();
     }
 }

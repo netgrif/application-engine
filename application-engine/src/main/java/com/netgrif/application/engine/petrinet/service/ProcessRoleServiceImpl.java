@@ -11,6 +11,7 @@ import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
+import com.netgrif.application.engine.objects.auth.domain.enums.WorkspacePermission;
 import com.netgrif.application.engine.objects.event.events.user.UserRoleChangeEvent;
 import com.netgrif.application.engine.objects.importer.model.EventPhaseType;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
@@ -421,6 +422,16 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
     }
 
     @Override
+    public ProcessRole getDefaultRole(String workspaceId) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser != null && !loggedUser.isAdmin() && !loggedUser.hasWorkspacePermission(workspaceId, WorkspacePermission.READ)) {
+            throw new IllegalArgumentException("User [%s] is missing workspace permission for workspace: %s"
+                    .formatted(loggedUser.getUsername(), workspaceId));
+        }
+        return processRoleRepository.findByImportIdAndWorkspaceId(ProcessRole.DEFAULT_ROLE, workspaceId).orElse(null);
+    }
+
+    @Override
     public ProcessRole getAnonymousRole() {
         LoggedUser loggedUser = userService.getLoggedUserFromContext();
         String defaultWorkspaceId = workspaceService.getDefault().getId();
@@ -436,6 +447,16 @@ public class ProcessRoleServiceImpl implements com.netgrif.application.engine.ad
             anonymousRole = roles.stream().findFirst().orElse(null);
         }
         return anonymousRole;
+    }
+
+    @Override
+    public ProcessRole getAnonymousRole(String workspaceId) {
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
+        if (loggedUser != null && !loggedUser.isAdmin() && !loggedUser.hasWorkspacePermission(workspaceId, WorkspacePermission.READ)) {
+            throw new IllegalArgumentException("User [%s] is missing workspace permission for workspace: %s"
+                    .formatted(loggedUser.getUsername(), workspaceId));
+        }
+        return processRoleRepository.findByImportIdAndWorkspaceId(ProcessRole.ANONYMOUS_ROLE, workspaceId).orElse(null);
     }
 
     /**

@@ -25,8 +25,10 @@ public class UserFactoryImpl implements UserFactory {
             return result;
         }
 
-        String defaultRoleId = processRoleService.getDefaultRole().getStringId();
-        String anonymousRoleId = processRoleService.getAnonymousRole().getStringId();
+        com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole defaultRole = processRoleService.getDefaultRole();
+        String defaultRoleId = defaultRole == null ? null : defaultRole.getStringId();
+        com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole anonymousRole = processRoleService.getAnonymousRole();
+        String anonymousRoleId = anonymousRole == null ? null : anonymousRole.getStringId();
         result.setProcessRoles(user.getProcessRoles().stream().map(processRole -> {
             if (processRole.getStringId().equals(defaultRoleId)) { // todo 2072 process roles in user should not be the same object as in cache
                 return new ProcessRole(processRole, locale);

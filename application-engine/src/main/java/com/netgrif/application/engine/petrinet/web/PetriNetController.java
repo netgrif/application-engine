@@ -94,7 +94,7 @@ public class PetriNetController {
         }
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN') and @workspacePermissionService.checkPermissionAndSelectWorkspace(#workspaceId, #auth.getPrincipal())")
     @Operation(summary = "Import new process",
             description = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -207,21 +207,20 @@ public class PetriNetController {
     @Operation(summary = "Search elastic processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search_elastic", produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
-    PagedModel<PetriNetReferenceResource> searchElasticPetriNets(@RequestBody PetriNetSearch criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
-        LoggedUser user = (LoggedUser) auth.getPrincipal();
+    PagedModel<PetriNetReferenceResource> searchElasticPetriNets(@RequestBody PetriNetSearch criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
         // TODO: add Merge Filters and its operations
 
-        Page<PetriNetReference> nets = elasticService.search(criteria, user, pageable, locale, false);
+        Page<PetriNetReference> nets = elasticService.search(criteria, pageable, locale, false);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
-                .searchElasticPetriNets(criteria, auth, pageable, assembler, locale)).withRel("search_elastic");
+                .searchElasticPetriNets(criteria, pageable, assembler, locale)).withRel("search_elastic");
 
-//        TODO doriesit linky pista ich zakomentoval
+//        TODO resolve links, they have been commented out
         PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);
         PetriNetReferenceResourceAssembler.buildLinks(resources);
         return resources;
     }
 
-    @PreAuthorize("@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId)")
+    @PreAuthorize("@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId) and @workspacePermissionService.checkPermissionAndSelectWorkspace(#workspaceId, #auth.getPrincipal())")
     @Operation(summary = "Delete process",
             description = "Caller must have the ADMIN role. Removes the specified process, along with it's cases, tasks and process roles.",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -230,7 +229,9 @@ public class PetriNetController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements")
     })
     @DeleteMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource deletePetriNet(@PathVariable("id") String processId, @RequestParam(required = false) boolean force) {
+    public MessageResource deletePetriNet(@PathVariable("id") String processId, @RequestParam(required = false) boolean force,
+                                          @RequestParam(value = "workspaceId", required = false) String workspaceId,
+                                          Authentication auth) {
         String decodedProcessId = decodeUrl(processId);
         if (Objects.equals(decodedProcessId, "")) {
             log.error("Deleting Petri net [{}] failed: could not decode process ID from URL", processId);

@@ -442,4 +442,7 @@ public interface UserService {
      * @return a paginated list of users matching the predicate within the specified realm
      */
     Page<User> search(Predicate predicate, Pageable pageable, String realmId);
+
+    // todo javadoc
+    Page<AbstractUser> findAllByWorkspace(String workspaceId, String realmId, Pageable pageable);
 }

@@ -318,6 +318,14 @@ public abstract class AbstractActor implements Serializable {
         this.workspacePermissions.put(workspaceId, permission);
     }
 
+    // todo javadoc
+    public boolean hasWorkspacePermission(String workspaceId, WorkspacePermission permission) {
+        if (this.workspacePermissions == null) {
+            this.workspacePermissions = new HashMap<>();
+        }
+        return this.workspacePermissions.containsKey(workspaceId);
+    }
+
     /**
      * todo javadoc
      */

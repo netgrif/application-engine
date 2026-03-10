@@ -282,4 +282,11 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
         long total = mongoTemplate.count(query.limit(-1).skip(-1), User.class, collection);
         return new PageImpl<>(resultUserList, pageable, total);
     }
+
+    // todo javadoc
+    default Page<User> findAllByWorkspacePermission(String workspaceId, Pageable pageable, MongoTemplate mongoTemplate,
+                                                    String collectionName) {
+        Query query = Query.query(Criteria.where("workspacePermissions.%s".formatted(workspaceId)).exists(true));
+        return resolveUserPage(pageable, mongoTemplate, collectionName, query);
+    }
 }

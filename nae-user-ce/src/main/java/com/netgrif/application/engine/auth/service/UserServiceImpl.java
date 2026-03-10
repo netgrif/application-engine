@@ -663,6 +663,13 @@ public class UserServiceImpl implements UserService {
     public Page<User> search(Predicate predicate, Pageable pageable, String realmId) {
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
         return userRepository.findAllByQuery(predicate, pageable, mongoTemplate, collectionName);
+    } 
+
+    @Override
+    public Page<AbstractUser> findAllByWorkspace(String workspaceId, String realmId, Pageable pageable) {
+        String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
+        Page<User> usersPage = userRepository.findAllByWorkspacePermission(workspaceId, pageable, mongoTemplate, collectionName);
+        return changeType(usersPage, usersPage.getPageable());
     }
 
     protected User initializeNewUser(String username, String email, String firstName, String lastName, String password, String realmId) {

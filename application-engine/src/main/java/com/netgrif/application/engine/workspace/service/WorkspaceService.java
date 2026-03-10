@@ -2,7 +2,9 @@ package com.netgrif.application.engine.workspace.service;
 
 import com.netgrif.application.engine.objects.workspace.Workspace;
 
+import java.util.Optional;
+
 public interface WorkspaceService {
     Workspace getDefault();
-    Workspace findOne(String workspaceId);
+    Optional<Workspace> findOne(String workspaceId);
 }
