@@ -25,7 +25,7 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public Tenant getAdminTenant() {
-        return getById(getAdminTenantId()).orElseThrow(() -> new TenantNotFoundException("Tenant not found"));
+        return getById(getAdminTenantId()).orElseThrow(() -> new TenantNotFoundException("Admin Tenant not found"));
     }
 
     @Override
@@ -43,6 +43,7 @@ public class TenantServiceImpl implements TenantService {
         getById(tenantId).ifPresentOrElse((tenant) -> {
                     if (tenant.getDefaultRealmId().isEmpty() && realm.isDefaultRealm()) {
                         tenant.addRealm(realm);
+                        tenant.setActive();
                     } else {
                         throw new TenantConflictException("Cannot set more than one default realm per tenant");
                     }
@@ -68,6 +69,7 @@ public class TenantServiceImpl implements TenantService {
     public void addWorkspace(String tenantId, Workspace workspace) {
         getById(tenantId).ifPresentOrElse((tenant) -> {
                     tenant.addWorkspace(workspace.getId());
+                    tenant.setActive();
                     save(tenant);
                 },
                 () -> {

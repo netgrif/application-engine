@@ -31,7 +31,7 @@ public interface TenantUserService {
 
     static void addTenantsToUser(AbstractUser user, String... tenantIds) {
         Attribute<?> tenantAtt = user.getAttribute(TENANTS);
-        if (tenantAtt.hasNullValue()) {
+        if (tenantAtt == null || tenantAtt.hasNullValue()) {
             setTenantsToUser(user, tenantIds);
             return;
         }

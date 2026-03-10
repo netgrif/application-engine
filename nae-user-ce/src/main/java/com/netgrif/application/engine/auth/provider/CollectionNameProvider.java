@@ -35,11 +35,7 @@ public class CollectionNameProvider {
 
     public String getCollectionNameForRealm(String realmId) {
         if (realmId == null || realmId.isEmpty() || realmId.equals(NULL)) {
-            Optional<Tenant> tenantOptional = tenantService.getByRealm(realmId);
-            if (tenantOptional.isEmpty()) {
-                throw new MissingResourceException("Tenant is not specified.", Tenant.class.getName(), "tenant");
-            }
-            return getDefaultRealmCollection(tenantOptional.get().getId());
+            return getDefaultRealmCollection(tenantService.getAdminTenantId());
         }
         return USER_MONGO_COLLECTION_PREFIX + realmId;
     }
@@ -64,6 +60,10 @@ public class CollectionNameProvider {
     }
 
     public String getDefaultRealmCollection(String tenantId) {
+        if (tenantId == null || tenantId.isEmpty()) {
+            throw new MissingResourceException("Tenant id is not specified.", Tenant.class.getName(), tenantService.getAdminTenantId());
+        }
+
         Optional<Realm> defaultRealmOptional = realmService.getDefaultRealm(tenantId);
         if (defaultRealmOptional.isEmpty()) {
             throw new MissingResourceException("Default realm is not specified.", Realm.class.getName(), "defaultRealm");
