@@ -2,7 +2,7 @@ package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.adapter.spring.petrinet.web.responsebodies.ProcessRole;
-import com.netgrif.application.engine.auth.web.responsebodies.User;
+import com.netgrif.application.engine.auth.web.responsebodies.UserDto;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -18,8 +18,8 @@ public class UserFactoryImpl implements UserFactory {
     private ProcessRoleFactory processRoleFactory;
 
     @Override
-    public User getUser(AbstractUser user, Locale locale) {
-        User result = getUser(user);
+    public UserDto getUser(AbstractUser user, Locale locale) {
+        UserDto result = getUser(user);
 
         String defaultRoleId = processRoleService.getDefaultRole().getStringId();
         String anonymousRoleId = processRoleService.getAnonymousRole().getStringId();
@@ -36,7 +36,7 @@ public class UserFactoryImpl implements UserFactory {
         return result;
     }
 
-    protected User getUser(AbstractUser user) {
-        return User.createUser(user);
+    protected UserDto getUser(AbstractUser user) {
+        return UserDto.createUser(user);
     }
 }

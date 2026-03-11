@@ -6,15 +6,18 @@ import com.netgrif.application.engine.objects.auth.domain.Attribute;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.Credential;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
+import com.netgrif.application.engine.objects.dto.response.group.GroupDto;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
-public class User {
+public class UserDto {
     public static final String ATTR_ENABLED_CREDENTIALS = "enabledCredentials";
 
     private String id;
@@ -29,14 +32,15 @@ public class User {
     private Set<ProcessRole> processRoles;
     private Set<ProcessRole> negativeProcessRoles;
     private Set<String> groupIds;
-    private User impersonated;
+    private Set<GroupDto> groups;
+    private UserDto impersonated;
     private LocalDateTime createdAt;
     private Map<String, Attribute<?>> attributes;
     private boolean enabled;
     private boolean emailVerified;
     protected UserState state;
 
-    public User(AbstractUser user) {
+    public UserDto(AbstractUser user) {
         Attribute<Set<String>> enabledCredentialsAttribute = new Attribute<>();
         if (user instanceof com.netgrif.application.engine.objects.auth.domain.User domainUser) {
             Map<String, Credential<?>> credentials = domainUser.getCredentials();
@@ -73,10 +77,16 @@ public class User {
         }
     }
 
-    public static User createUser(AbstractUser user) {
-        User result = new User(user);
+    public static UserDto createUser(AbstractUser user) {
+        UserDto result = new UserDto(user);
         result.setAuthorities(user.getAuthoritySet());
         result.setGroupIds(user.getGroupIds());
+        return result;
+    }
+
+    public static UserDto createUser(AbstractUser user, List<GroupDto> groups) {
+        UserDto result = createUser(user);
+        result.setGroups(new HashSet<>(groups));
         return result;
     }
 }
