@@ -232,7 +232,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void addUserToDefaultSystemGroup(AbstractUser user) {
         log.info("Adding user [{}] to default group", user.getStringId());
-        addUser(user, getDefaultSystemGroup());
+        addUser(getDefaultSystemGroup(), user);
     }
 
     @Override
@@ -246,30 +246,30 @@ public class GroupServiceImpl implements GroupService {
         Set<String> newMemberIds = new HashSet<>(userIds);
         newMemberIds.removeAll(currentGroupMemberIds);
 
-        removableMemberIds.forEach(toBeRemovedId -> removeUser(userService.findById(toBeRemovedId, group.getRealmId()), group));
-        newMemberIds.forEach(toBeAddedId -> addUser(userService.findById(toBeAddedId, group.getRealmId()), group));
+        removableMemberIds.forEach(toBeRemovedId -> removeUser(group, userService.findById(toBeRemovedId, group.getRealmId())));
+        newMemberIds.forEach(toBeAddedId -> addUser(group, userService.findById(toBeAddedId, group.getRealmId())));
         return group;
     }
 
     @Override
-    public Group addUser(String userId, String groupId, String realmId) {
-        return addUser(userService.findById(userId, realmId), groupId);
+    public Group addUser(String groupId, String userId, String realmId) {
+        return addUser(groupId, userService.findById(userId, realmId));
     }
 
     @Override
-    public Group addUser(String userId, Group group, String realmId) {
+    public Group addUser(Group group, String userId, String realmId) {
         AbstractUser user = userService.findById(userId, realmId);
-        return addUser(user, group);
+        return addUser(group, user);
     }
 
     @Override
-    public Group addUser(AbstractUser user, String groupId) {
+    public Group addUser(String groupId, AbstractUser user) {
         Group group = findById(groupId);
-        return addUser(user, group);
+        return addUser(group, user);
     }
 
     @Override
-    public Group addUser(AbstractUser user, Group group) {
+    public Group addUser(Group group, AbstractUser user) {
         Assert.notNull(user, "User cannot be null");
         Assert.notNull(group, "Group cannot be null");
 
@@ -281,18 +281,18 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group removeUser(String userId, String realmId, String groupId) {
-        return removeUser(userService.findById(userId, realmId), groupId);
+    public Group removeUser(String userId, String groupId, String realmId) {
+        return removeUser(groupId, userService.findById(userId, realmId));
     }
 
     @Override
-    public Group removeUser(AbstractUser user, String groupId) {
+    public Group removeUser(String groupId, AbstractUser user) {
         Group group = findById(groupId);
-        return removeUser(user, group);
+        return removeUser(group, user);
     }
 
     @Override
-    public Group removeUser(AbstractUser user, Group group) {
+    public Group removeUser(Group group, AbstractUser user) {
         Assert.notNull(user, "User cannot be null");
         Assert.notNull(group, "Group cannot be null");
 

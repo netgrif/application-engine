@@ -206,7 +206,7 @@ public class GroupController {
         try {
             Group group = groupService.findById(groupId);
             AbstractUser user = userService.findById(userId, group.getRealmId());
-            groupService.addUser(user, group);
+            groupService.addUser(group, user);
             return ResponseEntity.ok("Added user [" + userId + "] to group [" + groupId + "]");
         } catch (IllegalArgumentException e) {
             String message = "Failed to add member [%s] to group [%s]".formatted(userId, groupId);
@@ -230,7 +230,7 @@ public class GroupController {
         try {
             Group group = groupService.findById(groupId);
             AbstractUser user = userService.findById(userId, group.getRealmId());
-            groupService.removeUser(user, group);
+            groupService.removeUser(group, user);
             return ResponseEntity.ok("User [" + userId + "] removed from group [" + groupId + "]");
         } catch (IllegalArgumentException e) {
             String message = "Failed to remove member [%s] from group [%s]".formatted(userId, groupId);

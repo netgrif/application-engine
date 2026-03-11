@@ -162,13 +162,12 @@ public interface GroupService {
 
     /**
      * Adds a user to a group within a specific realm.
-     *
+     * @param groupId id of the group
      * @param userId ID of the user to add
-     * @param groupIdentifier identifier of the group
      * @param realmId ID of the realm
      * @return the updated {@link Group}
      */
-    Group addUser(String userId, String groupIdentifier, String realmId);
+    Group addUser(String groupId, String userId, String realmId);
 
     /**
      * Adds a user to a group within a specific realm.
@@ -178,16 +177,15 @@ public interface GroupService {
      * @param realmId ID of the realm
      * @return the updated {@link Group}
      */
-    Group addUser(String userId, Group group, String realmId);
+    Group addUser(Group group, String userId, String realmId);
 
     /**
      * Adds a user to a group specified by identifier.
-     *
+     * @param groupId id of the target group
      * @param user the user to add
-     * @param groupIdentifier identifier of the target group
      * @return the updated {@link Group}
      */
-    Group addUser(AbstractUser user, String groupIdentifier);
+    Group addUser(String groupId, AbstractUser user);
 
     /**
      * Adds a user to a specific group.
@@ -196,18 +194,16 @@ public interface GroupService {
      * @param group the group to add the user to
      * @return the updated {@link Group}
      */
-    Group addUser(AbstractUser user, Group group);
-
+    Group addUser(Group group, AbstractUser user);
 
     /**
      * Removes a user from a group within a specific realm.
-     *
-     * @param userId          the ID of the user to remove
-     * @param realmId         the ID of the realm where the group exists
-     * @param groupIdentifier the unique identifier of the group
+    * @param groupId   the unique identifier of the group
+    * @param userId    the ID of the user to remove
+     * @param realmId  the ID of the realm where the group exists
      * @return the updated {@link Group}
      */
-    Group removeUser(String userId, String realmId, String groupId);
+    Group removeUser(String groupId, String userId, String realmId);
 
     /**
      * Removes a user from a group specified by its unique identifier.
@@ -216,7 +212,7 @@ public interface GroupService {
      * @param groupIdentifier the unique identifier of the target group
      * @return the updated {@link Group}
      */
-    Group removeUser(AbstractUser user, String groupId);
+    Group removeUser(String groupId, AbstractUser user);
 
     /**
      * Removes a user from a specific group.
@@ -225,7 +221,7 @@ public interface GroupService {
      * @param group the group from which the user will be removed
      * @return the updated {@link Group}
      */
-    Group removeUser(AbstractUser user, Group group);
+    Group removeUser(Group group, AbstractUser user);
 
     /**
      * Finds groups matching a given predicate with pagination.

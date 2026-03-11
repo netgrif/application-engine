@@ -2902,12 +2902,12 @@ class ActionDelegate {
         return groupService.save(group)
     }
 
-    Group addUserToGroup(String userId, String groupId, String realmId) {
-        return groupService.addUser(userId, groupId, realmId)
+    Group addUserToGroup(String groupId, String userId, String realmId) {
+        return groupService.addUser(groupId, userId, realmId)
     }
 
-    Group removeUserFromGroup(String userId, String realmId, String groupId) {
-        return groupService.removeUser(userId, realmId, groupId)
+    Group removeUserFromGroup(String groupId, String userId, String realmId) {
+        return groupService.removeUser(groupId, userId, realmId)
     }
 
     Group addAuthorityToGroup(String groupId, String authorityId) {
