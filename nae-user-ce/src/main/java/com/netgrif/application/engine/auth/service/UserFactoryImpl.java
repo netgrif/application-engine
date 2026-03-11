@@ -4,7 +4,9 @@ import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRol
 import com.netgrif.application.engine.adapter.spring.petrinet.web.responsebodies.ProcessRole;
 import com.netgrif.application.engine.auth.web.responsebodies.UserDto;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.dto.response.group.GroupDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -17,9 +19,12 @@ public class UserFactoryImpl implements UserFactory {
     @Autowired
     private ProcessRoleFactory processRoleFactory;
 
+    @Autowired
+    private GroupService groupService;
+
     @Override
     public UserDto getUser(AbstractUser user, Locale locale) {
-        UserDto result = getUser(user);
+        UserDto result = UserDto.createUser(user, groupService.findAllByIds(user.getGroupIds(), Pageable.unpaged()).stream().map(group -> GroupDto.fromGroup(group, locale)).collect(Collectors.toList()));
 
         String defaultRoleId = processRoleService.getDefaultRole().getStringId();
         String anonymousRoleId = processRoleService.getAnonymousRole().getStringId();
@@ -36,7 +41,4 @@ public class UserFactoryImpl implements UserFactory {
         return result;
     }
 
-    protected UserDto getUser(AbstractUser user) {
-        return UserDto.createUser(user);
-    }
 }

@@ -86,7 +86,9 @@ public class UserDto {
 
     public static UserDto createUser(AbstractUser user, List<GroupDto> groups) {
         UserDto result = createUser(user);
-        result.setGroups(new HashSet<>(groups));
+        if (groups != null) {
+            result.setGroups(new HashSet<>(groups));
+        }
         return result;
     }
 }
