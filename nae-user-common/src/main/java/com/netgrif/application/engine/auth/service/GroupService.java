@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.dto.request.group.GroupSearchRequestDto;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
@@ -254,6 +255,8 @@ public interface GroupService {
     Group addAuthority(String groupId, String authorityId);
 
 
+    Group addAuthority(Group group, Authority authority);
+
     /**
      * Removes a specific authority from a group.
      *
@@ -263,6 +266,8 @@ public interface GroupService {
      */
     Group removeAuthority(String groupId, String authorityId);
 
+
+    Group removeAuthority(Group group, Authority authority);
 
     /**
      * Assigns multiple subgroups to a parent group.

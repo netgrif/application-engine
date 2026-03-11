@@ -6,6 +6,7 @@ import com.netgrif.application.engine.auth.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
 import com.netgrif.application.engine.auth.repository.GroupRepository;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundException;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundExceptionCode;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.util.Pair;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -268,6 +270,9 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group addUser(AbstractUser user, Group group) {
+        Assert.notNull(user, "User cannot be null");
+        Assert.notNull(group, "Group cannot be null");
+
         log.info("Adding user [{}] to group [{}]", user.getStringId(), group.getStringId());
         user.addGroupId(group.getStringId());
         group.addMemberId(user.getStringId());
@@ -288,6 +293,9 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group removeUser(AbstractUser user, Group group) {
+        Assert.notNull(user, "User cannot be null");
+        Assert.notNull(group, "Group cannot be null");
+
         log.info("Removing user [{}] from group [{}]", user.getStringId(), group.getStringId());
         user.removeGroupId(group.getStringId());
         group.removeMemberId(user.getStringId());
@@ -328,14 +336,30 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group addAuthority(String groupId, String authorityId) {
         Group group = findById(groupId);
-        group.addAuthority(authorityService.getOne(authorityId));
+        Authority authority = authorityService.getOne(authorityId);
+        return addAuthority(group, authority);
+    }
+
+    @Override
+    public Group addAuthority(Group group, Authority authority) {
+        Assert.notNull(group, "Group cannot be null");
+        Assert.notNull(authority, "Authority cannot be null");
+        group.addAuthority(authority);
         return save(group);
     }
 
     @Override
     public Group removeAuthority(String groupId, String authorityId) {
         Group group = findById(groupId);
-        group.removeAuthority(authorityService.getOne(authorityId));
+        Authority authority = authorityService.getOne(authorityId);
+        return removeAuthority(group, authority);
+    }
+
+    @Override
+    public Group removeAuthority(Group group, Authority authority) {
+        Assert.notNull(group, "Group cannot be null");
+        Assert.notNull(authority, "Authority cannot be null");
+        group.removeAuthority(authority);
         return save(group);
     }
 
@@ -385,6 +409,9 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Pair<Group, Group> addSubgroup(Group parentGroup, Group childGroup) {
+        Assert.notNull(parentGroup, "Parent group cannot be null");
+        Assert.notNull(childGroup, "Child group cannot be null");
+
         // TODO: maybe handle groups cycles here?
         if (parentGroup.getStringId().equals(childGroup.getStringId())) {
             throw new IllegalArgumentException("Trying to add group to itself [%s]!".formatted(parentGroup.getStringId()));
@@ -427,6 +454,9 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Pair<Group, Group> removeSubgroup(Group parentGroup, Group childGroup) {
+        Assert.notNull(parentGroup, "Parent group cannot be null");
+        Assert.notNull(childGroup, "Child group cannot be null");
+
         if (parentGroup.getStringId().equals(childGroup.getStringId())) {
             throw new IllegalArgumentException("Trying to remove group from itself [%s]!".formatted(parentGroup.getStringId()));
         }
@@ -512,6 +542,8 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group addRole(Group group, ProcessRole processRole) {
+        Assert.notNull(group, "Group cannot be null");
+        Assert.notNull(processRole, "Process role cannot be null");
         group.addProcessRole(processRole);
         return save(group);
     }
@@ -525,6 +557,9 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group removeRole(Group group, ProcessRole processRole) {
+        Assert.notNull(group, "Group cannot be null");
+        Assert.notNull(processRole, "Process role cannot be null");
+
         group.removeProcessRole(processRole);
         return save(group);
     }
