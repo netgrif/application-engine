@@ -148,7 +148,6 @@ public interface GroupService {
      */
     Group getDefaultSystemGroup();
 
-
     /**
      * Assigns a set of users to a group based on its ID.
      * <p>
