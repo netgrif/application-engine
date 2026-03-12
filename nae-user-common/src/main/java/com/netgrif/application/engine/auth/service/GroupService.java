@@ -263,6 +263,15 @@ public interface GroupService {
     Group removeAuthority(String groupId, String authorityId);
 
 
+    /**
+     * Removes a specific authority from the provided group.
+     * <p>
+     * This method updates the group by removing the specified authority.
+     *
+     * @param group     the {@link Group} object from which the authority will be removed
+     * @param authority the {@link Authority} to be removed from the group
+     * @return the updated {@link Group} object without the specified authority
+     */
     Group removeAuthority(Group group, Authority authority);
 
     /**
