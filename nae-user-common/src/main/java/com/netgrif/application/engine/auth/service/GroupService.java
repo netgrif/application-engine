@@ -251,6 +251,15 @@ public interface GroupService {
     Group addAuthority(String groupId, String authorityId);
 
 
+    /**
+     * Assigns a specific authority to the provided group.
+     * <p>
+     * This method updates the group by adding the specified authority to its list of associated authorities.
+     *
+     * @param group     the {@link Group} object to which the authority will be added
+     * @param authority the {@link Authority} to be assigned to the group
+     * @return the updated {@link Group} object with the newly assigned authority
+     */
     Group addAuthority(Group group, Authority authority);
 
     /**
