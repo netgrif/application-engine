@@ -1,10 +1,13 @@
 package com.netgrif.application.engine.auth.repository;
 
 import com.netgrif.application.engine.objects.auth.domain.Group;
+import com.netgrif.application.engine.objects.auth.domain.User;
+import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -66,6 +69,8 @@ public interface GroupRepository extends MongoRepository<Group, String>, Queryds
     Page<Group> findAllByRealmId(String realmId, Pageable pageable);
 
     Page<Group> findAllByRealmIdIn(Collection<String> realmIds, Pageable pageable);
+
+    Page<Group> findAllByProcessRoles__idIn(Collection<ProcessResourceId> rolesId, Pageable pageable);
 
     void removeAllByRealmIdIn(Collection<String> realmIds);
 

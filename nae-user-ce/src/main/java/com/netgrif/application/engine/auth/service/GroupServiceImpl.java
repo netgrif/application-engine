@@ -565,6 +565,11 @@ public class GroupServiceImpl implements GroupService {
         return save(group);
     }
 
+    @Override
+    public Page<Group> findAllByProcessRoles(Collection<ProcessResourceId> roleIds, Pageable pageable) {
+        return groupRepository.findAllByProcessRoles__idIn(roleIds, pageable);
+    }
+
     protected String getGroupOwnerEmail(Group groupCase) {
         return userService.findById(groupCase.getOwnerId(), groupCase.getRealmId()).getEmail();
     }

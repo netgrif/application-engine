@@ -5,6 +5,7 @@ import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.dto.request.group.GroupSearchRequestDto;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import org.springframework.data.mongodb.core.query.Query;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
@@ -462,4 +463,6 @@ public interface GroupService {
      * @return the updated {@link Group} object without the specified role
      */
     Group removeRole(Group group, ProcessRole processRole);
+
+    Page<Group> findAllByProcessRoles(Collection<ProcessResourceId> roleIds, Pageable pageable);
 }
