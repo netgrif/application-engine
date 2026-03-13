@@ -176,4 +176,18 @@ public class Group extends AbstractActor implements Serializable {
     public void setSubgroupIds(Set<String> subgroupIds) {
         this.subgroupIds = subgroupIds == null ? new HashSet<>() : new HashSet<>(subgroupIds);
     }
+
+    public Set<String> getMemberIds() {
+        if (memberIds == null) {
+            memberIds = new HashSet<>();
+        }
+        return memberIds;
+    }
+
+    public Set<String> getSubgroupIds() {
+        if (subgroupIds == null) {
+            subgroupIds = new HashSet<>();
+        }
+        return subgroupIds;
+    }
 }

@@ -237,6 +237,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group assignUsersToGroup(String groupId, Set<String> userIds) {
+        userIds = userIds == null ? new HashSet<>() : userIds;
         Group group = this.findById(groupId);
         Set<String> currentGroupMemberIds = group.getMemberIds();
 
@@ -281,7 +282,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group removeUser(String userId, String groupId, String realmId) {
+    public Group removeUser(String groupId, String userId, String realmId) {
         return removeUser(groupId, userService.findById(userId, realmId));
     }
 
