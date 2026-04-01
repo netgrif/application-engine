@@ -150,7 +150,7 @@ public class PetriNetService implements IPetriNetService {
      * Get read only Petri net.
      */
     @Override
-    @Cacheable(value = "petriNetCache")
+    @Cacheable(value = "petriNetCache", unless = "#result == null")
     public PetriNet get(ObjectId petriNetId) {
         Optional<PetriNet> optional = repository.findById(petriNetId.toString());
         if (optional.isEmpty()) {
@@ -301,7 +301,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Cacheable(value = "petriNetById")
+    @Cacheable(value = "petriNetById", unless = "#result == null")
     public PetriNet getPetriNet(String id) {
         Optional<PetriNet> net = repository.findById(id);
         if (net.isEmpty()) {
