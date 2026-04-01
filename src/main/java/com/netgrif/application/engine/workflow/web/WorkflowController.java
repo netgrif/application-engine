@@ -31,6 +31,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -188,6 +189,37 @@ public class WorkflowController {
         } catch (Exception e) {
             log.error("Reloading tasks of case [" + caseId + "] failed:", e);
             return MessageResource.errorMessage("Reloading tasks in case " + caseId + " has failed!");
+        }
+    }
+
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Operation(summary = "Reload tasks of all cases",
+            description = "Caller must have the ADMIN role",
+            security = {@SecurityRequirement(name = "BasicAuth")})
+    @GetMapping(value = "/case/reload_all", produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
+    })
+    public MessageResource reloadTasksOfAllCases(Authentication auth, Locale locale) {
+        log.info("Starting reload tasks of all cases to repair database integrity.");
+        try {
+            long caseCount = workflowService.count(Map.of(), (LoggedUser) auth.getPrincipal(), locale);
+            log.info("Number of cases: {}", caseCount);
+            long pageCount = Double.valueOf(Math.ceil((double) caseCount / 1000)).longValue();
+            log.info("Calculated number of pages: {}", pageCount);
+
+            for (int i = 0; i < pageCount; i++) {
+                PageRequest pageRequest = PageRequest.of(i, 1000);
+                Page<Case> cases = workflowService.getAll(pageRequest);
+                log.info("Processing page {} of {}", i + 1, pageCount);
+                cases.forEach(aCase -> taskService.reloadTasks(aCase));
+            }
+
+            return MessageResource.successMessage("Task reloaded for " + caseCount + " cases");
+        } catch (Exception e) {
+            log.error("Reloading tasks of cases has failed:", e);
+            return MessageResource.errorMessage("Reloading tasks in cases has failed!");
         }
     }
 
