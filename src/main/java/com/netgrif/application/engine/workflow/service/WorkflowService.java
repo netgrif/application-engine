@@ -604,11 +604,15 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private void checkChangedDataSet(Case useCase) {
+        boolean anyChanged = false;
         for (DataField data : useCase.getDataSet().values()) {
             if (data.isChanged()) {
-                useCase.setLastModifiedDataSet(LocalDateTime.now());
-                return;
+                anyChanged = true;
             }
-        };
-    };
+            data.setChanged(false);
+        }
+        if (anyChanged) {
+            useCase.setLastModifiedDataSet(LocalDateTime.now());
+        }
+    }
 }
