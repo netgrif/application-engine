@@ -87,15 +87,27 @@ public class DataField implements Referencable, Serializable {
     }
 
     public void setValue(Object value) {
+        setValue(value, true);
+    }
+
+    public void setValue(Object value, boolean trackChange) {
         this.value = value;
         update();
-        changed();
+        if (trackChange) {
+            changed();
+        }
     }
 
     public void setChoices(Set<I18nString> choices) {
+        setChoices(choices, true);
+    }
+
+    public void setChoices(Set<I18nString> choices, boolean trackChange) {
         this.choices = choices;
         update();
-        changed();
+        if (trackChange) {
+            changed();
+        }
     }
 
     public void setAllowedNets(List<String> allowedNets) {
@@ -109,9 +121,15 @@ public class DataField implements Referencable, Serializable {
     }
 
     public void setOptions(Map<String, I18nString> options) {
+        setOptions(options, true);
+    }
+
+    public void setOptions(Map<String, I18nString> options, boolean trackChange) {
         this.options = options;
         update();
-        changed();
+        if (trackChange) {
+            changed();
+        }
     }
 
     public void setValidations(List<Validation> validations) {

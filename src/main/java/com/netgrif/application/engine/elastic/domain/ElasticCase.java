@@ -114,7 +114,9 @@ public class ElasticCase {
         uriNodeId = useCase.getUriNodeId();
         mongoId = useCase.getStringId();   //TODO: Duplication
         lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
-        lastModifiedDataSet = Timestamp.valueOf(useCase.getLastModifiedDataSet()).getTime();
+        if (useCase.getLastModifiedDataSet() != null) {
+            lastModifiedDataSet = Timestamp.valueOf(useCase.getLastModifiedDataSet()).getTime();
+        }
         processIdentifier = useCase.getProcessIdentifier();
         processId = useCase.getPetriNetId();
         visualId = useCase.getVisualId();
