@@ -43,6 +43,10 @@ public class Case implements Serializable {
     private LocalDateTime lastModified;
 
     @Getter
+    @Setter
+    private LocalDateTime lastModifiedDataSet;
+
+    @Getter
     private String visualId;
 
     @NotNull

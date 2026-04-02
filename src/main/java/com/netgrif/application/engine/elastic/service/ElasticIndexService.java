@@ -486,6 +486,9 @@ public class ElasticIndexService implements IElasticIndexService {
         if (useCase.getLastModified() == null) {
             useCase.setLastModified(LocalDateTime.now());
         }
+        if (useCase.getLastModifiedDataSet() == null) {
+            useCase.setLastModifiedDataSet(LocalDateTime.now());
+        }
     }
 
     /**

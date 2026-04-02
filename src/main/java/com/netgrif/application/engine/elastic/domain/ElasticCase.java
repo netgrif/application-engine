@@ -40,6 +40,8 @@ public class ElasticCase {
 
     private Long lastModified;
 
+    private Long lastModifiedDataSet;
+
     @Field(type = Keyword)
     private String stringId;
 
@@ -112,6 +114,7 @@ public class ElasticCase {
         uriNodeId = useCase.getUriNodeId();
         mongoId = useCase.getStringId();   //TODO: Duplication
         lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
+        lastModifiedDataSet = Timestamp.valueOf(useCase.getLastModifiedDataSet()).getTime();
         processIdentifier = useCase.getProcessIdentifier();
         processId = useCase.getPetriNetId();
         visualId = useCase.getVisualId();
@@ -137,6 +140,7 @@ public class ElasticCase {
     public void update(ElasticCase useCase) {
         version++;
         lastModified = useCase.getLastModified();
+        lastModifiedDataSet = useCase.getLastModifiedDataSet();
         if (useCase.getUriNodeId() != null) {
             uriNodeId = useCase.getUriNodeId();
         }

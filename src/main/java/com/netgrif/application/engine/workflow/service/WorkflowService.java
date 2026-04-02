@@ -122,10 +122,14 @@ public class WorkflowService implements IWorkflowService {
         if (useCase.getPetriNet() == null) {
             setPetriNet(useCase);
         }
+        checkChangedDataSet(useCase);
         encryptDataSet(useCase);
         useCase = repository.save(useCase);
         try {
             setImmediateDataFields(useCase);
+            if (useCase.getLastModifiedDataSet() == null) {
+                useCase.setLastModifiedDataSet(LocalDateTime.now());
+            }
             elasticCaseService.indexNow(this.caseMappingService.transform(useCase));
         } catch (Exception e) {
             log.error("Indexing failed [" + useCase.getStringId() + "]", e);
@@ -598,4 +602,13 @@ public class WorkflowService implements IWorkflowService {
         }
         return outcome;
     }
+
+    private void checkChangedDataSet(Case useCase) {
+        for (DataField data : useCase.getDataSet().values()) {
+            if (data.isChanged()) {
+                useCase.setLastModifiedDataSet(LocalDateTime.now());
+                return;
+            }
+        };
+    };
 }

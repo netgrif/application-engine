@@ -14,6 +14,7 @@ import com.querydsl.core.annotations.QueryType;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Transient;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -65,6 +66,11 @@ public class DataField implements Referencable, Serializable {
     @Setter
     private Component component;
 
+    @Transient
+    @Getter
+    @Setter
+    private boolean changed = false;
+
     public DataField() {
         behavior = new HashMap<>();
         dataRefComponents = new HashMap<>();
@@ -83,11 +89,13 @@ public class DataField implements Referencable, Serializable {
     public void setValue(Object value) {
         this.value = value;
         update();
+        changed();
     }
 
     public void setChoices(Set<I18nString> choices) {
         this.choices = choices;
         update();
+        changed();
     }
 
     public void setAllowedNets(List<String> allowedNets) {
@@ -103,6 +111,7 @@ public class DataField implements Referencable, Serializable {
     public void setOptions(Map<String, I18nString> options) {
         this.options = options;
         update();
+        changed();
     }
 
     public void setValidations(List<Validation> validations) {
@@ -208,6 +217,10 @@ public class DataField implements Referencable, Serializable {
 
     private void update() {
         version++;
+    }
+
+    private void changed() {
+        changed = true;
     }
 
     public boolean isNewerThen(DataField other) {
