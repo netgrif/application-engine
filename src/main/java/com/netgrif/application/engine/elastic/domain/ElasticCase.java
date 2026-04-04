@@ -142,7 +142,9 @@ public class ElasticCase {
     public void update(ElasticCase useCase) {
         version++;
         lastModified = useCase.getLastModified();
-        lastModifiedDataSet = useCase.getLastModifiedDataSet();
+        if (useCase.getLastModifiedDataSet() != null) {
+            lastModifiedDataSet = useCase.getLastModifiedDataSet();
+        }
         if (useCase.getUriNodeId() != null) {
             uriNodeId = useCase.getUriNodeId();
         }
