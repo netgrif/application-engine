@@ -478,7 +478,7 @@
         <dependency>
             <groupId>com.netgrif</groupId>
             <artifactId>quartz-mongodb-connector</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
 
         <!-- OpenAPI 3 / Swagger Docs -->

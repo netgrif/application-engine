@@ -235,6 +235,13 @@ public class XlsExportService implements IXlsExportService {
     }
 
     private String getProcessIdentifierFromFilteredRequest(FilteredCasesRequest request) {
+        if (request.getQuery() == null ||
+                request.getQuery().isEmpty() ||
+                request.getQuery().get(0) == null ||
+                request.getQuery().get(0).query == null ||
+                request.getQuery().get(0).query.isBlank()) {
+            return "";
+        }
         return Arrays.stream(request.getQuery().get(0).query.split("\\s+"))
                 .filter(part -> part.startsWith("processIdentifier:"))
                 .map(part -> part.split(":", 2)[1])
