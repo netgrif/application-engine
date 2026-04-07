@@ -25,6 +25,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.4.2](h
 - [NAE-2303] TaskRef Security Improvements
 - [NAE-2310] Elasticsearch fulltext query input sanitation
 - [NAE-2246] - Enable Redis TLS & Configure Redis Sentinel
+- [NAE-2401] Timestamp of case dataSet change
 
 ## [6.4.1](https://github.com/netgrif/application-engine/releases/tag/v6.4.1) (2025-03-19)
 

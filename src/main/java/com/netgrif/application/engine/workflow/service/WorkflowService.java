@@ -122,6 +122,7 @@ public class WorkflowService implements IWorkflowService {
         if (useCase.getPetriNet() == null) {
             setPetriNet(useCase);
         }
+        checkChangedDataSet(useCase);
         encryptDataSet(useCase);
         useCase = repository.save(useCase);
         try {
@@ -476,7 +477,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.getPetriNet().getDataSet().values().stream().filter(f -> f instanceof TaskField).map(TaskField.class::cast).forEach(field -> {
             if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty() && useCase.getDataField(field.getStringId()).getValue() != null &&
                     useCase.getDataField(field.getStringId()).getValue().equals(field.getDefaultValue())) {
-                useCase.getDataField(field.getStringId()).setValue(new ArrayList<>());
+                useCase.getDataField(field.getStringId()).setValue(new ArrayList<>(), false);
                 List<TaskPair> taskPairList = useCase.getTasks().stream().filter(t ->
                         (field.getDefaultValue().contains(t.getTransition()))).collect(Collectors.toList());
                 if (!taskPairList.isEmpty()) {
@@ -564,7 +565,7 @@ public class WorkflowService implements IWorkflowService {
             if (value == null)
                 continue;
 
-            dataField.setValue(method.apply(Pair.of(value, encryption)));
+            dataField.setValue(method.apply(Pair.of(value, encryption)), false);
         }
     }
 
@@ -598,4 +599,17 @@ public class WorkflowService implements IWorkflowService {
         }
         return outcome;
     }
+
+    private void checkChangedDataSet(Case useCase) {
+        boolean changed = false;
+        for (DataField data : useCase.getDataSet().values()) {
+            if (data.isChanged()) {
+                changed = true;
+                data.setChanged(false);
+            }
+        };
+        if (changed) {
+            useCase.setLastModifiedDataSet(LocalDateTime.now());
+        }
+    };
 }
