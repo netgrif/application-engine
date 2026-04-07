@@ -3,6 +3,7 @@ package com.netgrif.application.engine.elastic.service;
 
 import com.netgrif.application.engine.elastic.domain.BooleanField;
 import com.netgrif.application.engine.elastic.domain.ButtonField;
+import com.netgrif.application.engine.elastic.domain.CaseField;
 import com.netgrif.application.engine.elastic.domain.DateField;
 import com.netgrif.application.engine.elastic.domain.FileField;
 import com.netgrif.application.engine.elastic.domain.I18nField;
@@ -77,6 +78,8 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return this.transformFileListField(caseField);
         } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.UserListField) {
             return this.transformUserListField(caseField);
+        } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.CaseField) {
+            return this.transformCaseField(caseField);
         } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.I18nField) {
             return this.transformI18nField(caseField, (com.netgrif.application.engine.petrinet.domain.dataset.I18nField) netField);
         } else {
@@ -227,11 +230,11 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     protected Optional<DataField> transformDateField(com.netgrif.application.engine.workflow.domain.DataField dateField, com.netgrif.application.engine.petrinet.domain.dataset.DateField netField) {
         if (dateField.getValue() instanceof LocalDate) {
             LocalDate date = (LocalDate) dateField.getValue();
-            return formatDateField(LocalDateTime.of(date, LocalTime.NOON));
+            return formatDateField(LocalDateTime.of(date, LocalTime.MIDNIGHT));
         } else if (dateField.getValue() instanceof Date) {
 //            log.warn(String.format("DateFields should have LocalDate values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
             LocalDateTime transformed = this.transformDateValueField(dateField);
-            return formatDateField(LocalDateTime.of(transformed.toLocalDate(), LocalTime.NOON));
+            return formatDateField(LocalDateTime.of(transformed.toLocalDate(), LocalTime.MIDNIGHT));
         } else {
             // TODO throw error?
             log.error(String.format("Unsupported DateField value type (%s)! Skipping indexation...", dateField.getValue().getClass().getCanonicalName()));
@@ -281,6 +284,10 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
     protected Optional<DataField> transformFileListField(com.netgrif.application.engine.workflow.domain.DataField fileListField) {
         return Optional.of(new FileField(((FileListFieldValue) fileListField.getValue()).getNamesPaths().toArray(new FileFieldValue[0])));
+    }
+
+    protected Optional<DataField> transformCaseField(com.netgrif.application.engine.workflow.domain.DataField caseField) {
+        return Optional.of(new CaseField((List<String>) caseField.getValue()));
     }
 
     protected Optional<DataField> transformOtherFields(com.netgrif.application.engine.workflow.domain.DataField otherField, Field netField) {

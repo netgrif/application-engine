@@ -4,7 +4,7 @@ To use a shared role in Petri nets first we must declare it. We can declare it a
 attribute set to ``true``:
 ```xml
 <document xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-          xsi:noNamespaceSchemaLocation='https://petriflow.com/petriflow.schema.xsd'>
+          xsi:noNamespaceSchemaLocation='https://petriflow.org/petriflow.schema.xsd'>
 	<id>nae_1927</id>
 	...
 	<role global="true">

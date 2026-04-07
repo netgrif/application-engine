@@ -43,6 +43,7 @@ public enum MenuItemConstants {
     PREFERENCE_ITEM_FIELD_CASE_HEADERS_DEFAULT_MODE("case_headers_default_mode"),
     PREFERENCE_ITEM_FIELD_CASE_IS_HEADER_MODE_CHANGEABLE("case_is_header_mode_changeable"),
     PREFERENCE_ITEM_FIELD_USE_CASE_DEFAULT_HEADERS("case_is_header_mode_changeable"),
+    PREFERENCE_ITEM_FIELD_CASE_ALLOW_EXPORT("case_allow_export"),
     PREFERENCE_ITEM_FIELD_ADDITIONAL_FILTER_CASE("additional_filter_case"),
     PREFERENCE_ITEM_FIELD_MERGE_FILTERS("merge_filters"),
     PREFERENCE_ITEM_FIELD_TASK_VIEW_SEARCH_TYPE("task_view_search_type"),

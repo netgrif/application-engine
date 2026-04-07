@@ -2,20 +2,36 @@ package com.netgrif.application.engine.elastic.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
+import com.netgrif.application.engine.elastic.domain.ElasticCase;
+import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
+import com.netgrif.application.engine.elastic.domain.ElasticTask;
+import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository;
+import com.netgrif.application.engine.elastic.serializer.LocalDateTimeJsonDeserializer;
+import com.netgrif.application.engine.elastic.serializer.LocalDateTimeJsonSerializer;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
+import com.netgrif.application.engine.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.Task;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.open.OpenIndexResponse;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
+import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CloseIndexRequest;
 import org.elasticsearch.client.indices.CloseIndexResponse;
 import org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.elasticsearch.xcontent.XContentType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Setting;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -24,14 +40,17 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.SearchScrollHits;
 import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.Query;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.util.CloseableIterator;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -40,17 +59,55 @@ public class ElasticIndexService implements IElasticIndexService {
 
     private static final String PLACEHOLDERS = "petriNetIndex, caseIndex, taskIndex";
 
-    @Autowired
-    private ApplicationContext context;
+    private final ApplicationContext context;
 
-    @Autowired
-    private ElasticsearchRestTemplate elasticsearchTemplate;
+    private final ElasticsearchRestTemplate elasticsearchTemplate;
 
-    @Autowired
-    private ElasticsearchOperations operations;
+    private final RestHighLevelClient elasticsearchClient;
 
-    @Autowired
-    private ElasticsearchProperties elasticsearchProperties;
+    private final ElasticsearchOperations operations;
+
+    private final ElasticsearchProperties elasticsearchProperties;
+
+    private final ElasticCaseRepository elasticCaseRepository;
+
+    private final ElasticTaskRepository elasticTaskRepository;
+
+    private final PetriNetService petriNetService;
+
+    private final MongoTemplate mongoTemplate;
+
+    private final ElasticCaseMappingService caseMappingService;
+
+    private final ElasticTaskMappingService taskMappingService;
+
+    private final ObjectMapper objectMapper;
+
+    public ElasticIndexService(ApplicationContext context,
+                               ElasticsearchRestTemplate elasticsearchTemplate,
+                               RestHighLevelClient elasticsearchClient,
+                               ElasticsearchOperations operations,
+                               ElasticsearchProperties elasticsearchProperties,
+                               ElasticCaseRepository elasticCaseRepository,
+                               ElasticTaskRepository elasticTaskRepository,
+                               PetriNetService petriNetService,
+                               MongoTemplate mongoTemplate,
+                               ElasticCaseMappingService caseMappingService,
+                               ElasticTaskMappingService taskMappingService) {
+        this.context = context;
+        this.elasticsearchTemplate = elasticsearchTemplate;
+        this.elasticsearchClient = elasticsearchClient;
+        this.operations = operations;
+        this.elasticsearchProperties = elasticsearchProperties;
+        this.elasticCaseRepository = elasticCaseRepository;
+        this.elasticTaskRepository = elasticTaskRepository;
+        this.petriNetService = petriNetService;
+        this.mongoTemplate = mongoTemplate;
+        this.caseMappingService = caseMappingService;
+        this.taskMappingService = taskMappingService;
+        this.objectMapper = new ObjectMapper();
+        configureMapper();
+    }
 
     @Override
     public boolean indexExists(String indexName) {
@@ -67,24 +124,6 @@ public class ElasticIndexService implements IElasticIndexService {
         String indexName = getIndexName(clazz, placeholders);
         return elasticsearchTemplate.index(new IndexQueryBuilder().withId(getIdFromSource(source))
                 .withObject(source).build(), IndexCoordinates.of(indexName));
-    }
-
-
-    @Override
-    public boolean bulkIndex(List<?> list, Class<?> clazz, String... placeholders) {
-        String indexName = getIndexName(clazz, placeholders);
-        try {
-            if (list != null && !list.isEmpty()) {
-                List<IndexQuery> indexQueries = new ArrayList<>();
-                list.forEach(source ->
-                        indexQueries.add(new IndexQueryBuilder().withId(getIdFromSource(source)).withObject(source).build()));
-                elasticsearchTemplate.bulkIndex(indexQueries, IndexCoordinates.of(indexName));
-            }
-        } catch (Exception e) {
-            log.error("bulkIndex:", e);
-            return false;
-        }
-        return true;
     }
 
     @Override
@@ -304,6 +343,248 @@ public class ElasticIndexService implements IElasticIndexService {
         }
     }
 
+
+    /**
+     * Performs bulk indexing of cases and tasks into Elasticsearch.
+     *
+     * @param indexAll      if true, indexes all cases and tasks, regardless of modification time
+     * @param after         the time after which cases and tasks should be considered for reindexing
+     * @param caseBatchSize number of cases to process per batch. If null, defaults from Elasticsearch properties
+     * @param taskBatchSize number of tasks to process per batch. If null, defaults from Elasticsearch properties
+     */
+    @Override
+    public void bulkIndex(boolean indexAll, LocalDateTime after, Integer caseBatchSize, Integer taskBatchSize) {
+        log.info("Reindexing stale cases: started reindexing after {}", after);
+        LocalDateTime now = LocalDateTime.now();
+
+        if (caseBatchSize == null) {
+            caseBatchSize = elasticsearchProperties.getBatch().getCaseBatchSize();
+        }
+        if (taskBatchSize == null) {
+            taskBatchSize = elasticsearchProperties.getBatch().getTaskBatchSize();
+        }
+
+        org.springframework.data.mongodb.core.query.Query query;
+        if (indexAll || after == null) {
+            query = org.springframework.data.mongodb.core.query.Query.query(Criteria.where("lastModified").lt(now));
+            log.info("Reindexing stale cases: force all");
+        } else {
+            query = org.springframework.data.mongodb.core.query.Query.query(Criteria.where("lastModified").lt(now).gt(after.minusMinutes(2)));
+        }
+
+        long count = mongoTemplate.count(query, Case.class);
+        if (count > 0) {
+            reindexQueried(query, count, caseBatchSize, taskBatchSize);
+        }
+        log.info("Reindexing stale cases: end");
+    }
+
+    /**
+     * Reindexes queried cases and tasks into Elasticsearch in batches.
+     *
+     * @param count         total number of cases to reindex
+     * @param caseBatchSize batch size for cases
+     * @param taskBatchSize batch size for tasks
+     */
+    private void reindexQueried(org.springframework.data.mongodb.core.query.Query query, long count, int caseBatchSize, int taskBatchSize) {
+        long numOfPages = ((count / caseBatchSize) + 1);
+        log.info("Reindexing {} pages", numOfPages);
+
+        query.cursorBatchSize(caseBatchSize);
+        long page = 1, currentBatchSize = 0;
+        List<UpdateRequest> caseOperations = new ArrayList<>();
+        List<String> caseIds = new ArrayList<>();
+
+        try (CloseableIterator<Case> cursor = mongoTemplate.stream(query, Case.class)) {
+            while (cursor.hasNext()) {
+                Case aCase = cursor.next();
+                prepareCase(aCase);
+                ElasticCase elasticCase = caseMappingService.transform(aCase);
+                ElasticCase existingCase = null;
+                try {
+                    existingCase = elasticCaseRepository.findByStringId(aCase.getStringId());
+                } catch (InvalidDataAccessApiUsageException ignored) {
+                    log.debug("[{}]: Case \"{}\" has duplicates, will reindex.", aCase.getStringId(), aCase.getTitle());
+                    elasticCaseRepository.deleteAllByStringId(aCase.getStringId());
+                }
+                if (existingCase == null) {
+                    existingCase = elasticCase;
+                } else {
+                    existingCase.update(elasticCase);
+                }
+                prepareCaseBulkOperation(existingCase, caseOperations);
+                caseIds.add(aCase.getStringId());
+
+                if (++currentBatchSize == caseBatchSize || !cursor.hasNext()) {
+                    log.info("Reindexing case page {} / {}", page, numOfPages);
+                    executeAndValidate(caseOperations);
+                    bulkIndexTasks(caseIds, taskBatchSize);
+                    caseOperations.clear();
+                    caseIds.clear();
+                    currentBatchSize = 0;
+                    page++;
+                }
+            }
+        }
+    }
+
+    /**
+     * Reindexes tasks into Elasticsearch in batches corresponding to the provided case IDs.
+     *
+     * @param caseIds       list of case IDs whose tasks need to be reindexed
+     * @param taskBatchSize size of the batch for tasks
+     */
+    private void bulkIndexTasks(List<String> caseIds, int taskBatchSize) {
+        if (caseIds == null || caseIds.isEmpty()) {
+            return;
+        }
+        org.springframework.data.mongodb.core.query.Query query = org.springframework.data.mongodb.core.query.Query.query(Criteria.where("caseId").in(caseIds)).cursorBatchSize(taskBatchSize);
+        long totalSize = mongoTemplate.count(query, Task.class);
+        long numOfPages = ((totalSize / taskBatchSize) + 1);
+
+        long page = 1, currentBatchSize = 0;
+        List<UpdateRequest> taskOperations = new ArrayList<>();
+
+        try (CloseableIterator<Task> cursor = mongoTemplate.stream(query, Task.class)) {
+            while (cursor.hasNext()) {
+                Task task = cursor.next();
+                ElasticTask elasticTask = taskMappingService.transform(task);
+                ElasticTask existingTask = null;
+                try {
+                    existingTask = elasticTaskRepository.findByStringId(task.getStringId());
+                } catch (InvalidDataAccessApiUsageException ignored) {
+                    log.debug("[{}]: Task \"{}\" has duplicates, will reindex.", task.getStringId(), task.getTitle());
+                    elasticTaskRepository.deleteAllByStringId(task.getStringId());
+                }
+                if (existingTask == null) {
+                    existingTask = elasticTask;
+                } else {
+                    existingTask.update(elasticTask);
+                }
+                prepareTaskBulkOperation(existingTask, taskOperations);
+
+                if (++currentBatchSize == taskBatchSize || !cursor.hasNext()) {
+                    log.info("Reindexing task page {} / {}", page, numOfPages);
+                    executeAndValidate(taskOperations);
+                    taskOperations.clear();
+                    currentBatchSize = 0;
+                    page++;
+                }
+            }
+        }
+    }
+
+    /**
+     * Prepares the case object by ensuring necessary dependencies and last modified timestamp are set.
+     *
+     * @param useCase case object to prepare
+     */
+    private void prepareCase(Case useCase) {
+        if (useCase.getPetriNet() == null) {
+            useCase.setPetriNet(petriNetService.get(useCase.getPetriNetObjectId()));
+        }
+        if (useCase.getLastModified() == null) {
+            useCase.setLastModified(LocalDateTime.now());
+        }
+    }
+
+    /**
+     * Prepares a bulk operation for indexing or updating a case in Elasticsearch.
+     *
+     * @param doc        transformed ElasticCase object
+     * @param operations collection of BulkOperations to add this operation to
+     */
+    private void prepareCaseBulkOperation(ElasticCase doc, List<UpdateRequest> operations) {
+        try {
+            String json = objectMapper.writeValueAsString(doc);
+            UpdateRequest updateRequest = new UpdateRequest()
+                    .id(doc.getId() == null ? doc.getStringId() : doc.getId())
+                    .doc(json, XContentType.JSON)
+                    .upsert(json, XContentType.JSON)
+                    .index(elasticsearchProperties.getIndex().get("case"));
+            operations.add(updateRequest);
+        } catch (Exception e) {
+            log.error("Failed to prepare bulk operation for case [{}]: {}", doc.getStringId(), e.getMessage());
+        }
+    }
+
+    /**
+     * Prepares a bulk operation for indexing or updating a task in Elasticsearch.
+     *
+     * @param doc        transformed ElasticTask object
+     * @param operations collection of BulkOperations to add this operation to
+     */
+    private void prepareTaskBulkOperation(ElasticTask doc, List<UpdateRequest> operations) {
+        try {
+            String json = objectMapper.writeValueAsString(doc);
+            UpdateRequest updateRequest = new UpdateRequest()
+                    .id(doc.getId() == null ? doc.getStringId() : doc.getId())
+                    .doc(json, XContentType.JSON)
+                    .upsert(json, XContentType.JSON)
+                    .index(elasticsearchProperties.getIndex().get("task"));
+            operations.add(updateRequest);
+        } catch (Exception e) {
+            log.error("Failed to prepare bulk operation for task [{}]: {}", doc.getStringId(), e.getMessage());
+        }
+    }
+
+    /**
+     * Executes the bulk operations and validates the results, retrying on partial failures.
+     *
+     * @param operations list of bulk operations to execute
+     */
+    private void executeAndValidate(List<UpdateRequest> operations) {
+        if (operations.isEmpty()) {
+            return;
+        }
+
+        BulkRequest request = new BulkRequest();
+        operations.forEach(request::add);
+
+        try {
+            BulkResponse response = elasticsearchClient.bulk(request, RequestOptions.DEFAULT);
+            checkForBulkUpdateFailure(response);
+            log.info("Batch indexed successfully with {} ops", operations.size());
+        } catch (ElasticsearchException e) {
+            log.warn("Failed for {} ops to index bulk {}", operations.size(), e.getMessage(), e);
+
+            if (operations.size() == 1) {
+                log.error("Single operation failed. Skipping. {}", operations.get(0), e);
+                return;
+            }
+
+            log.warn("Dividing the requirement.");
+
+            int mid = operations.size() / 2;
+            List<UpdateRequest> left = operations.subList(0, mid);
+            List<UpdateRequest> right = operations.subList(mid, operations.size());
+
+            executeAndValidate(new ArrayList<>(left));
+            executeAndValidate(new ArrayList<>(right));
+        } catch (Exception e) {
+            log.error("Failed to index bulk: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Checks the results of a bulk indexing operation for failures.
+     *
+     * @param response the BulkResponse from Elasticsearch
+     * @throws ElasticsearchException if there are failures in the bulk response
+     */
+    private void checkForBulkUpdateFailure(BulkResponse response) {
+        Map<String, String> failedDocuments = new HashMap<>();
+        Arrays.stream(response.getItems()).forEach(item -> {
+            if (item.getFailure() != null) {
+                failedDocuments.put(item.getId(), item.getFailure().getMessage());
+            }
+        });
+
+        if (!failedDocuments.isEmpty()) {
+            throw new ElasticsearchException("Bulk indexing has failures. Use ElasticsearchException.getFailedDocuments() for details [{}]", failedDocuments);
+        }
+    }
+
     private String getIdFromSource(Object source) {
         if (source == null) {
             return null;
@@ -377,4 +658,11 @@ public class ElasticIndexService implements IElasticIndexService {
         return indexName;
     }
 
+    private void configureMapper() {
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeJsonSerializer());
+        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeJsonDeserializer());
+        objectMapper.registerModule(javaTimeModule);
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
 }

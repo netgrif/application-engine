@@ -5,7 +5,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
-    <version>6.4.1</version>
+    <version>6.4.2</version>
     <packaging>jar</packaging>
 
     <name>NETGRIF Application Engine</name>
@@ -64,13 +64,47 @@
         <drools.version>7.70.0.Final</drools.version>
         <sonar.organization>netgrif-oss</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <jackson.version>2.15.0-rc1</jackson.version>
     </properties>
 
     <repositories>
+<!--        <repository>-->
+<!--            <id>oss.snapshots</id>-->
+<!--            <name>OSSRH SNAPSHOT</name>-->
+<!--            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>-->
+<!--            <releases>-->
+<!--                <enabled>false</enabled>-->
+<!--            </releases>-->
+<!--            <snapshots>-->
+<!--                <enabled>true</enabled>-->
+<!--            </snapshots>-->
+<!--        </repository>-->
+<!--        <repository>-->
+<!--            <id>mvnrepository1</id>-->
+<!--            <url>https://maven.imagej.net/content/repositories/public/</url>-->
+<!--        </repository>-->
+<!--        <repository>-->
+<!--            <id>mvnrepository2</id>-->
+<!--            <url>https://repo.spring.io/plugins-release/</url>-->
+<!--        </repository>-->
+<!--        <repository>-->
+<!--            <id>mulesoft</id>-->
+<!--            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>-->
+<!--        </repository>-->
         <repository>
-            <id>oss.snapshots</id>
-            <name>OSSRH SNAPSHOT</name>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <name>Central Portal Snapshots</name>
+            <id>central-portal-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
@@ -79,16 +113,14 @@
             </snapshots>
         </repository>
         <repository>
-            <id>mvnrepository1</id>
-            <url>https://maven.imagej.net/content/repositories/public/</url>
-        </repository>
-        <repository>
-            <id>mvnrepository2</id>
-            <url>https://repo.spring.io/plugins-release/</url>
-        </repository>
-        <repository>
-            <id>mulesoft</id>
-            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
@@ -305,9 +337,14 @@
             <version>1.17</version>
         </dependency>
         <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis-ext</artifactId>
+            <version>1.3.04</version>
+        </dependency>
+        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.7</version>
+            <version>2.14.0</version>
         </dependency>
         <dependency>
             <groupId>de.rototor.pdfbox</groupId>
@@ -352,12 +389,11 @@
             <version>${querydsl.version}</version>
         </dependency>
 
-
         <!-- QR code -->
         <dependency>
-            <groupId>com.github.kenglxn.qrgen</groupId>
-            <artifactId>javase</artifactId>
-            <version>2.6.0</version>
+            <groupId>com.github.kenglxn</groupId>
+            <artifactId>QRGen</artifactId>
+            <version>3.0.1</version>
         </dependency>
 
         <!-- ElasticSearch -->
@@ -365,6 +401,20 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
         </dependency>
+
+        <!-- Java 8 Date/time -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.json</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+
 
         <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
         <dependency>
@@ -393,13 +443,6 @@
             <groupId>org.drools</groupId>
             <artifactId>drools-canonical-model</artifactId>
             <version>${drools.version}</version>
-        </dependency>
-
-        <!-- QRGen -->
-        <dependency>
-            <groupId>net.glxn.qrgen</groupId>
-            <artifactId>core</artifactId>
-            <version>2.0</version>
         </dependency>
 
         <dependency>
@@ -435,7 +478,7 @@
         <dependency>
             <groupId>com.netgrif</groupId>
             <artifactId>quartz-mongodb-connector</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.1</version>
         </dependency>
 
         <!-- OpenAPI 3 / Swagger Docs -->
@@ -492,38 +535,38 @@
         <dependency>
             <groupId>com.fasterxml.jackson</groupId>
             <artifactId>jackson-base</artifactId>
-            <version>2.15.0-rc1</version>
+            <version>${jackson.version}</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.15.0-rc1</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.15.0-rc1</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
-            <version>2.15.0-rc1</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.15.0-rc1</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
-            <version>2.15.0-rc1</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-jsonSchema</artifactId>
-            <version>2.15.0-rc1</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>io.minio</groupId>
@@ -860,14 +903,14 @@
             <id>ossrh-publish</id>
             <distributionManagement>
                 <repository>
-                    <id>ossrh</id>
+                    <id>central</id>
                     <name>Central Repository OSSRH</name>
-                    <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                    <url>https://central.sonatype.com/</url>
                 </repository>
                 <snapshotRepository>
-                    <id>ossrh</id>
+                    <id>central</id>
                     <name>Central Repository OSSRG Snapshots</name>
-                    <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+                    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
                 </snapshotRepository>
             </distributionManagement>
             <build>
@@ -906,6 +949,16 @@
                                 </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.9.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <checksums>required</checksums>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>

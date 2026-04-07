@@ -15,7 +15,7 @@ services:
           memory: "512M"
 
   docker-elastic:
-    image: elasticsearch:7.17.4
+    image: elasticsearch:7.17.28
     environment:
       - cluster.name=elasticsearch
       - discovery.type=single-node
@@ -38,8 +38,9 @@ services:
     image: redis:6
     ports:
       - "6379:6379"
+
   minio:
-    image: docker.io/bitnami/minio:2022
+    image: docker.io/bitnamilegacy/minio:2025.7.23
     ports:
       - '9000:9000'
       - '9001:9001'
@@ -51,13 +52,6 @@ services:
       - MINIO_ROOT_USER=root
       - MINIO_ROOT_PASSWORD=password
       - MINIO_DEFAULT_BUCKETS=default
-networks:
-  minionetwork:
-    driver: bridge
-
-volumes:
-  minio_data:
-    driver: local
 
 #  kibana:
 #    image: docker.elastic.co/kibana/kibana:7.17.4
@@ -67,3 +61,12 @@ volumes:
 #      - docker-elastic
 #    ports:
 #      - "5601:5601"
+
+networks:
+  minionetwork:
+    driver: bridge
+
+volumes:
+  minio_data:
+    driver: local
+

@@ -1,4 +1,4 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
 	<id>preference_item</id>
 	<initials>PRI</initials>
 	<title>Preference Item</title>
@@ -1019,6 +1019,10 @@
 			])
 		</action>
 	</data>
+	<data type="boolean" immediate="true">
+		<id>case_allow_export</id>
+		<title name="case_allow_export">Allow export?</title>
+	</data>
 
 	<!-- I18NS -->
 	<i18n locale="sk">
@@ -1098,6 +1102,7 @@
 		<i18nString name="move_dest_uri_new_node_desc">Uveďte názov uzlu, ktorý chcete pridať</i18nString>
 		<i18nString name="move_dest_uri_desc">Zoznam uzlov reprezentujúce cieľovú URI</i18nString>
 		<i18nString name="move_add_node">Pridať</i18nString>
+		<i18nString name="case_allow_export">Povoliť export?</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="icon_preview">Ikonevorschau</i18nString>
@@ -1176,6 +1181,7 @@
 		<i18nString name="roles_banned_desc">Rollen, für die wird den Menüeintrag ausgeblendet</i18nString>
 		<i18nString name="move_dest_uri_new_node_desc">Nächste URI-Teil angeben</i18nString>
 		<i18nString name="move_dest_uri_desc">Teile der Ziel URI</i18nString>
+		<i18nString name="case_allow_export">Erlaube Export?</i18nString>
 	</i18n>
 
 	<!-- TRANSITIONS -->
@@ -1952,7 +1958,22 @@
 					<x>0</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>2</cols>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>case_allow_export</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>

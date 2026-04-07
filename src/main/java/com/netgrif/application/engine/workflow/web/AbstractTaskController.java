@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
+import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.IllegalArgumentWithChangedFieldsException;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
@@ -16,6 +17,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.Eve
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.web.responsebodies.*;
@@ -38,10 +40,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class AbstractTaskController {
 
@@ -51,11 +51,15 @@ public abstract class AbstractTaskController {
 
     private final IDataService dataService;
 
+    private final IWorkflowService workflowService;
+
     private final IElasticTaskService searchService;
 
-    public AbstractTaskController(ITaskService taskService, IDataService dataService, IElasticTaskService searchService) {
+    public AbstractTaskController(ITaskService taskService, IDataService dataService, IWorkflowService workflowService,
+                                  IElasticTaskService searchService) {
         this.taskService = taskService;
         this.dataService = dataService;
+        this.workflowService = workflowService;
         this.searchService = searchService;
     }
 
@@ -210,9 +214,31 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> setData(String taskId, ObjectNode dataBody, Locale locale) {
         try {
+            List<com.netgrif.application.engine.petrinet.domain.DataGroup> dataGroups = dataService.getDataGroups(taskId, locale).getData();
+            Set<String> referencedTaskIds = new HashSet<>();
+            referencedTaskIds.add(taskId);
+            for (com.netgrif.application.engine.petrinet.domain.DataGroup dataGroup : dataGroups) {
+                Set<String> referencedTaskIdsByDataGroup = dataGroup.getFields().getContent().stream()
+                        .filter(localisedField -> localisedField.getType() == FieldType.TASK_REF
+                                && localisedField.getValue() instanceof List
+                                && !((List<?>) localisedField.getValue()).isEmpty())
+                        .map(localisedField -> (List<String>) localisedField.getValue())
+                        .flatMap(List::stream)
+                        .collect(Collectors.toSet());
+                referencedTaskIds.addAll(referencedTaskIdsByDataGroup);
+            }
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
-            dataBody.fields().forEachRemaining(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue().deepCopy())));
+            dataBody.fields().forEachRemaining(fieldChangesEntry -> {
+                String taskIdToChangeWith = fieldChangesEntry.getKey();
+                if (!referencedTaskIds.contains(taskIdToChangeWith)) {
+                    return;
+                }
+                Task taskToChangeWith = taskService.findOne(taskIdToChangeWith);
+                outcomes.put(taskIdToChangeWith, dataService.setData(taskToChangeWith,
+                        fieldChangesEntry.getValue().deepCopy(), new HashMap<>(), true));
+            });
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
+            mainOutcome = handleMainSetDataEventOutcome(mainOutcome, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set",
                     LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
         } catch (IllegalArgumentWithChangedFieldsException e) {
@@ -230,6 +256,7 @@ public abstract class AbstractTaskController {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
             outcomes.put(dataBody.getParentTaskId(), dataService.saveFile(dataBody.getParentTaskId(), dataBody.getFieldId(), multipartFile));
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
+            mainOutcome = handleMainSetDataEventOutcome(mainOutcome, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set",
                     LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
         } catch (IllegalArgumentWithChangedFieldsException e) {
@@ -262,7 +289,8 @@ public abstract class AbstractTaskController {
         Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
         outcomes.put(taskId, dataService.deleteFile(taskId, fieldId));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
-        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+        mainOutcome = handleMainSetDataEventOutcome(mainOutcome, taskId);
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set",
                 LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
@@ -270,7 +298,8 @@ public abstract class AbstractTaskController {
         Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
         outcomes.put(requestBody.getParentTaskId(), dataService.saveFiles(requestBody.getParentTaskId(), requestBody.getFieldId(), multipartFiles));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
-        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+        mainOutcome = handleMainSetDataEventOutcome(mainOutcome, taskId);
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set",
                 LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
@@ -294,7 +323,8 @@ public abstract class AbstractTaskController {
         Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
         outcomes.put(taskId, dataService.deleteFileByName(taskId, fieldId, name));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
-        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+        mainOutcome = handleMainSetDataEventOutcome(mainOutcome, taskId);
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set",
                 LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
@@ -309,5 +339,14 @@ public abstract class AbstractTaskController {
                 .ok()
                 .headers(headers)
                 .body(fileFieldInputStream != null ? new InputStreamResource(fileFieldInputStream.getInputStream()) : null);
+    }
+    
+    protected SetDataEventOutcome handleMainSetDataEventOutcome(SetDataEventOutcome mainOutcome, String taskId) {
+        if (mainOutcome == null) {
+            Task task = taskService.findOne(taskId);
+            return new SetDataEventOutcome(workflowService.findOne(task.getCaseId()), task);
+        } else {
+            return mainOutcome;
+        }
     }
 }

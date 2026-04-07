@@ -4,8 +4,11 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
@@ -27,4 +30,6 @@ public interface IElasticCaseService {
     void removeByPetriNetId(String processId);
 
     String findUriNodeId(Case aCase);
+
+    NativeSearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection);
 }

@@ -7,6 +7,7 @@ import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
@@ -49,8 +50,9 @@ public class PublicTaskController extends AbstractTaskController {
     private final ITaskService taskService;
     private final IDataService dataService;
 
-    public PublicTaskController(ITaskService taskService, IDataService dataService, IUserService userService) {
-        super(taskService, dataService, null);
+    public PublicTaskController(ITaskService taskService, IDataService dataService, IUserService userService,
+                                IWorkflowService workflowService) {
+        super(taskService, dataService, workflowService, null);
         this.taskService = taskService;
         this.dataService = dataService;
         this.userService = userService;

@@ -173,7 +173,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         return elasticCase.getUriNodeId();
     }
 
-    protected NativeSearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+    public NativeSearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
         List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {

@@ -5,7 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.4.1](https://github.com/netgrif/application-engine/commits/v6.4.1)
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.4.2](https://github.com/netgrif/application-engine/commits/v6.4.2)
+
+## [6.4.2](https://github.com/netgrif/application-engine/releases/tag/v6.4.2) (2025-05-16)
+
+### Fixed
+
+- [NAE-2225] Not possible to set empty options using setData
+- [NAE-2231] Unable to change behavior of taskRef on finish event without error message
+- Refactor ObjectMapper configuration for Elasticsearch
+- Remove custom serializers for startDate in ElasticTask
+- [NAE-2342] Improve Quartz configuration
+- Minor improvements to manage migrations
+
+### Added
+
+- [NAE-2100] Case view export button as NAE feature
+- [NAE-2136] Speed up Elasticsearch reindex
+- [NAE-2303] TaskRef Security Improvements
+- [NAE-2310] Elasticsearch fulltext query input sanitation
+- [NAE-2246] - Enable Redis TLS & Configure Redis Sentinel
+- [NAE-2401] Timestamp of case dataSet change
 
 ## [6.4.1](https://github.com/netgrif/application-engine/releases/tag/v6.4.1) (2025-03-19)
 

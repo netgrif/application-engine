@@ -9,6 +9,7 @@ import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.web.responsebodies.CountResponse;
@@ -51,8 +52,9 @@ public class TaskController extends AbstractTaskController {
 
     public static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
-    public TaskController(ITaskService taskService, IDataService dataService, IElasticTaskService searchService) {
-        super(taskService, dataService, searchService);
+    public TaskController(ITaskService taskService, IDataService dataService, IWorkflowService workflowService,
+                          IElasticTaskService searchService) {
+        super(taskService, dataService, workflowService, searchService);
     }
 
     @Override
