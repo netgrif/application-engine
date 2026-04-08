@@ -98,6 +98,9 @@ public class QrService implements IQrService {
 
         try (OutputStream outputStream = Files.newOutputStream(outputPath)) {
             MatrixToImageWriter.writeToStream(bitMatrix, resolveImageFormat(code), outputStream, config);
+        } catch (IOException e) {
+            log.error("Failed to write QR code to file [file={}, path={}]", code.getFileName(), outputPath.toAbsolutePath(), e);
+            throw e;
         }
 
         return outputPath.toFile();
@@ -216,6 +219,7 @@ public class QrService implements IQrService {
         try (OutputStream outputStream = Files.newOutputStream(outputPath)) {
             boolean written = ImageIO.write(image, format, outputStream);
             if (!written) {
+                log.error("Failed to write image to disk [file={}, format={}, path={}]", code.getFileName(), format, outputPath.toAbsolutePath());
                 throw new IOException("No ImageIO writer found for format: " + format);
             }
         }
