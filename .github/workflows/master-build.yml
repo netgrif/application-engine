@@ -1,15 +1,18 @@
 name: Build
+
 on:
   push:
     branches:
       - master
+    paths-ignore:
+      - 'docs/**'
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -50,21 +53,30 @@ jobs:
         ports:
           - 9200:9200
           - 9300:9300
-        options: -e="discovery.type=single-node" -e="xpack.security.enabled=false" --health-cmd="curl http://localhost:9200/_cluster/health" --health-interval=10s --health-timeout=5s --health-retries=10
+        options: >-
+          -e="discovery.type=single-node"
+          -e="xpack.security.enabled=false"
+          --health-cmd="curl http://localhost:9200/_cluster/health"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
 
       minio:
         image: docker.io/bawix/minio:2022
         ports:
           - 9000:9000
           - 9001:9001
-        options: -e="MINIO_ROOT_USER=root" -e="MINIO_ROOT_PASSWORD=password" -e="MINIO_DEFAULT_BUCKETS=default"
+        options: >-
+          -e="MINIO_ROOT_USER=root"
+          -e="MINIO_ROOT_PASSWORD=password"
+          -e="MINIO_DEFAULT_BUCKETS=default"
 
     steps:
-      - name: Test Database
+      - name: Test Elasticsearch health
         env:
           ELASTIC_SEARCH_URL: http://localhost:${{ job.services.elasticsearch.ports[9200] }}
         run: |
-          echo $ELASTIC_SEARCH_URL
+          echo "Elasticsearch URL: $ELASTIC_SEARCH_URL"
           curl -fsSL "$ELASTIC_SEARCH_URL/_cat/health?h=status"
 
       - uses: actions/checkout@v4
@@ -92,7 +104,12 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Generate certificates
-        run: cd application-engine/src/main/resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../../../../..
+        run: |
+          cd application-engine/src/main/resources/certificates
+          openssl genrsa -out keypair.pem 4096
+          openssl rsa -in keypair.pem -pubout -out public.crt
+          openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der
+          cd ../../../../..
 
       - name: Build
         run: mvn clean package install -DskipTests=true
@@ -103,7 +120,7 @@ jobs:
 #          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 #        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=netgrif_application-engine
 
-      - name: Build, test
+      - name: Test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn -B verify
@@ -139,8 +156,10 @@ jobs:
           mvn javadoc:javadoc
           cp -r ./application-engine/target/reports/apidocs/* ./docs/javadoc/
 
-      - uses: EndBug/add-and-commit@v9
-        with:
-          add: docs
-          pathspec_error_handling: exitImmediately
-          message: 'CI - Update documentation'
+      - name: Commit docs if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs
+          git diff --staged --quiet || git commit -m "CI - Update documentation"
+          git push
