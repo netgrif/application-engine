@@ -98,8 +98,6 @@ public class QrService implements IQrService {
 
         try (OutputStream outputStream = Files.newOutputStream(outputPath)) {
             MatrixToImageWriter.writeToStream(bitMatrix, resolveImageFormat(code), outputStream, config);
-        } catch (IOException e) {
-            log.error("Failed to write QR code to file [file={}]", code.getFileName(), e);
         }
 
         return outputPath.toFile();

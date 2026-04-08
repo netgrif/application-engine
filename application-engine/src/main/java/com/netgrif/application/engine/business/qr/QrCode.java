@@ -22,11 +22,11 @@ public class QrCode {
 
     private int height = 250;
 
-    private ErrorCorrectionLevel errorCorrectionLevel = ErrorCorrectionLevel.L;
+    private ErrorCorrectionLevel errorCorrectionLevel = ErrorCorrectionLevel.H;
 
     private int onColor = 0xFF000000;
 
-    private int offColor = 0xFFFF99FF;
+    private int offColor = 0xFFFFFFFF;
 
     private String charset = "ISO-8859-1";
 
