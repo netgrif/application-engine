@@ -283,7 +283,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private boolean actorExists(ActorFieldValue actorFieldValue) {
-        if (actorFieldValue == null || actorFieldValue.getId() == null) {
+        if (actorFieldValue == null || actorFieldValue.getId() == null || actorFieldValue.getId().isBlank() || !ObjectId.isValid(actorFieldValue.getId())) {
             return false;
         }
         AbstractUser user = userService.findById(actorFieldValue.getId(), actorFieldValue.getRealmId());
