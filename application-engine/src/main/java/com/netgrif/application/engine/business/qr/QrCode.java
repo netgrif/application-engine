@@ -7,11 +7,13 @@ import net.glxn.qrgen.core.image.ImageType;
 @Data
 public class QrCode {
 
+    private static final double DEFAULT_LOGO_RATIO = 0.22;
+
     private String content;
 
     private String fileName;
 
-    private ImageType imageType = ImageType.JPG;
+    private QrImageType imageType = QrImageType.PNG;
 
     private int width = 250;
 
