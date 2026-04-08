@@ -31,8 +31,7 @@ public class QrService implements IQrService {
 
     @Override
     public Optional<InputStream> generateToStream(QrCode code) {
-        log.debug("Generating QR code to stream [file={}, size={}x{}, errorCorrection={}]",
-                code.getFileName(), code.getWidth(), code.getHeight(), code.getErrorCorrectionLevel());
+        log.debug("Generating QR code to stream [file={}, size={}x{}, errorCorrection={}]", code.getFileName(), code.getWidth(), code.getHeight(), code.getErrorCorrectionLevel());
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             BitMatrix bitMatrix = createBitMatrix(code);
             MatrixToImageConfig config = new MatrixToImageConfig(code.getOnColor(), code.getOffColor());
@@ -40,8 +39,7 @@ public class QrService implements IQrService {
 
             MatrixToImageWriter.writeToStream(bitMatrix, format, os, config);
 
-            log.trace("QR code stream generated successfully [file={}, bytes={}]",
-                    code.getFileName(), os.size());
+            log.trace("QR code stream generated successfully [file={}, bytes={}]", code.getFileName(), os.size());
             return Optional.of(new ByteArrayInputStream(os.toByteArray()));
         } catch (WriterException | IOException e) {
             log.error("Failed to generate QR code to stream [file={}]", code.getFileName(), e);
@@ -51,12 +49,10 @@ public class QrService implements IQrService {
 
     @Override
     public Optional<File> generateToFile(QrCode code) {
-        log.debug("Generating QR code to file [file={}, size={}x{}, errorCorrection={}]",
-                code.getFileName(), code.getWidth(), code.getHeight(), code.getErrorCorrectionLevel());
+        log.debug("Generating QR code to file [file={}, size={}x{}, errorCorrection={}]", code.getFileName(), code.getWidth(), code.getHeight(), code.getErrorCorrectionLevel());
         try {
             File result = generateFile(code);
-            log.trace("QR code file generated successfully [file={}, sizeBytes={}]",
-                    result.getAbsolutePath(), result.length());
+            log.trace("QR code file generated successfully [file={}, sizeBytes={}]", result.getAbsolutePath(), result.length());
             return Optional.of(result);
         } catch (WriterException | IOException e) {
             log.error("Failed to generate QR code to file [file={}]", code.getFileName(), e);
@@ -66,9 +62,7 @@ public class QrService implements IQrService {
 
     @Override
     public Optional<File> generateWithLogo(QrCode code, InputStream imageStream) {
-        log.debug("Generating QR code with logo [file={}, size={}x{}, errorCorrection={}, logoRatio={}]",
-                code.getFileName(), code.getWidth(), code.getHeight(),
-                code.getErrorCorrectionLevel(), code.getLogoRatio());
+        log.debug("Generating QR code with logo [file={}, size={}x{}, errorCorrection={}, logoRatio={}]", code.getFileName(), code.getWidth(), code.getHeight(), code.getErrorCorrectionLevel(), code.getLogoRatio());
 
         validateLogoErrorCorrection(code);
 
@@ -82,16 +76,14 @@ public class QrService implements IQrService {
             MatrixToImageConfig config = new MatrixToImageConfig(code.getOnColor(), code.getOffColor());
             BufferedImage qrImage = MatrixToImageWriter.toBufferedImage(bitMatrix, config);
 
-            log.trace("QR BitMatrix created [file={}, qrSize={}x{}]",
-                    code.getFileName(), qrImage.getWidth(), qrImage.getHeight());
+            log.trace("QR BitMatrix created [file={}, qrSize={}x{}]", code.getFileName(), qrImage.getWidth(), qrImage.getHeight());
 
             BufferedImage scaledLogo = scaleLogo(overlay, qrImage.getWidth(), qrImage.getHeight(), code.getLogoRatio());
             BufferedImage combined = compositeLogoOnQr(qrImage, scaledLogo, code);
             writeImageToFile(combined, code);
 
             File result = new File(code.getFileName());
-            log.trace("QR code with logo written to disk [file={}, sizeBytes={}]",
-                    result.getAbsolutePath(), result.length());
+            log.trace("QR code with logo written to disk [file={}, sizeBytes={}]", result.getAbsolutePath(), result.length());
             return Optional.of(result);
         } catch (WriterException | IOException e) {
             log.error("Failed to generate QR code with logo [file={}]", code.getFileName(), e);
@@ -119,8 +111,7 @@ public class QrService implements IQrService {
         hints.put(EncodeHintType.ERROR_CORRECTION, code.getErrorCorrectionLevel());
         hints.put(EncodeHintType.MARGIN, 1);
 
-        log.trace("Encoding BitMatrix [file={}, charset={}, errorCorrection={}, margin=1]",
-                code.getFileName(), code.getCharset(), code.getErrorCorrectionLevel());
+        log.trace("Encoding BitMatrix [file={}, charset={}, errorCorrection={}, margin=1]", code.getFileName(), code.getCharset(), code.getErrorCorrectionLevel());
 
         return new QRCodeWriter().encode(
                 code.getContent(),
@@ -135,8 +126,7 @@ public class QrService implements IQrService {
         try {
             BufferedImage image = ImageIO.read(imageStream);
             if (image == null) {
-                log.error("Logo image stream produced a null image — unsupported format or empty stream [file={}]",
-                        fileName);
+                log.error("Logo image stream produced a null image — unsupported format or empty stream [file={}]", fileName);
                 return null;
             }
             log.trace("Logo image read successfully [file={}, logoSize={}x{}]",
@@ -153,12 +143,10 @@ public class QrService implements IQrService {
         int logoWidth = logo.getWidth();
         int logoHeight = logo.getHeight();
 
-        log.trace("Logo scale check [original={}x{}, maxAllowed={}px, ratio={}]",
-                logoWidth, logoHeight, maxSize, logoRatio);
+        log.trace("Logo scale check [original={}x{}, maxAllowed={}px, ratio={}]", logoWidth, logoHeight, maxSize, logoRatio);
 
         if (logoWidth <= maxSize && logoHeight <= maxSize) {
-            log.debug("Logo fits within ratio, no scaling needed [logo={}x{}, max={}px]",
-                    logoWidth, logoHeight, maxSize);
+            log.debug("Logo fits within ratio, no scaling needed [logo={}x{}, max={}px]", logoWidth, logoHeight, maxSize);
             return logo;
         }
 
@@ -189,9 +177,7 @@ public class QrService implements IQrService {
         int padding = code.getLogoBackgroundPadding();
         int arc = code.getLogoBackgroundArc();
 
-        log.trace("Compositing logo onto QR [qr={}x{}, logo={}x{}, offset=({},{}), padding={}, arc={}]",
-                qrImage.getWidth(), qrImage.getHeight(),
-                logo.getWidth(), logo.getHeight(), x, y, padding, arc);
+        log.trace("Compositing logo onto QR [qr={}x{}, logo={}x{}, offset=({},{}), padding={}, arc={}]", qrImage.getWidth(), qrImage.getHeight(), logo.getWidth(), logo.getHeight(), x, y, padding, arc);
 
         BufferedImage combined = new BufferedImage(
                 qrImage.getWidth(),
@@ -240,12 +226,7 @@ public class QrService implements IQrService {
 
     private void validateLogoErrorCorrection(QrCode code) {
         if (code.getErrorCorrectionLevel() != ErrorCorrectionLevel.H) {
-            log.warn(
-                    "QR code '{}' uses ErrorCorrectionLevel.{} — ErrorCorrectionLevel.H is strongly " +
-                            "recommended when embedding a logo to ensure reliable scanning.",
-                    code.getFileName(),
-                    code.getErrorCorrectionLevel()
-            );
+            log.warn("QR code '{}' uses ErrorCorrectionLevel.{} — ErrorCorrectionLevel.H is strongly recommended when embedding a logo to ensure reliable scanning.", code.getFileName(), code.getErrorCorrectionLevel());
         }
     }
 
