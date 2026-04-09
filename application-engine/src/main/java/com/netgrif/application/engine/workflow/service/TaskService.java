@@ -859,20 +859,25 @@ public class TaskService implements ITaskService {
             return null;
         }
         return actorListFieldValue.getActorValues().stream()
+                .filter(this::actorExists)
                 .map(ActorFieldValue::getId)
-                .filter(actorId -> {
-                    AbstractUser user = userService.findById(actorId, null);
-                    if (user != null) {
-                        return true;
-                    }
-                    try {
-                        groupService.findById(actorId);
-                        return true;
-                    } catch (IllegalArgumentException ignored) {
-                        return false;
-                    }
-                })
                 .collect(Collectors.toList());
+    }
+
+    private boolean actorExists(ActorFieldValue actorFieldValue) {
+        if (actorFieldValue == null || actorFieldValue.getId() == null || actorFieldValue.getId().isBlank() || !ObjectId.isValid(actorFieldValue.getId())) {
+            return false;
+        }
+        AbstractUser user = userService.findById(actorFieldValue.getId(), actorFieldValue.getRealmId());
+        if (user != null) {
+            return true;
+        }
+        try {
+            groupService.findById(actorFieldValue.getId());
+            return true;
+        } catch (IllegalArgumentException ignored) {
+            return false;
+        }
     }
 
     private Task createFromTransition(Transition transition, Case useCase) {
