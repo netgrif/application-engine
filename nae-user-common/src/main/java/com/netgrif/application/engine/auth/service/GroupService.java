@@ -1,8 +1,11 @@
 package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.Group;
-import com.netgrif.application.engine.objects.auth.dto.GroupSearchDto;
+import com.netgrif.application.engine.objects.dto.request.group.GroupSearchRequestDto;
+import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import org.springframework.data.mongodb.core.query.Query;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
@@ -12,6 +15,7 @@ import org.springframework.data.util.Pair;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Service interface for managing user groups in the application.
@@ -83,7 +87,14 @@ public interface GroupService {
      * @return the {@link Group} with the specified ID
      */
     Group findById(String id);
-
+    
+    /**
+     * Finds all groups matching the specified collection of IDs with pagination support.
+     *
+     * @param ids      collection of group IDs to search for
+     * @param pageable pagination information
+     * @return a page of {@link Group}s that match the provided IDs
+     */
     Page<Group> findAllByIds(Collection<String> ids, Pageable pageable);
 
     /**
@@ -139,14 +150,24 @@ public interface GroupService {
     Group getDefaultSystemGroup();
 
     /**
-     * Adds a user to a group within a specific realm.
+     * Assigns a set of users to a group based on its ID.
+     * <p>
+     * This method updates the membership of the specified group by adding the provided user IDs.
      *
+     * @param groupId the ID of the group to which the users will be assigned
+     * @param userIds a set of user IDs to assign to the group
+     * @return the updated {@link Group} object including the newly assigned users
+     */
+    Group assignUsersToGroup(String groupId, Set<String> userIds);
+
+    /**
+     * Adds a user to a group within a specific realm.
+     * @param groupId id of the group
      * @param userId ID of the user to add
-     * @param groupId ID of the group
      * @param realmId ID of the realm
      * @return the updated {@link Group}
      */
-    Group addUser(String userId, String groupId, String realmId);
+    Group addUser(String groupId, String userId, String realmId);
 
     /**
      * Adds a user to a group within a specific realm.
@@ -156,16 +177,15 @@ public interface GroupService {
      * @param realmId ID of the realm
      * @return the updated {@link Group}
      */
-    Group addUser(String userId, Group group, String realmId);
+    Group addUser(Group group, String userId, String realmId);
 
     /**
      * Adds a user to a group specified by identifier.
-     *
+     * @param groupId id of the target group
      * @param user the user to add
-     * @param groupIdentifier identifier of the target group
      * @return the updated {@link Group}
      */
-    Group addUser(AbstractUser user, String groupIdentifier);
+    Group addUser(String groupId, AbstractUser user);
 
     /**
      * Adds a user to a specific group.
@@ -174,25 +194,34 @@ public interface GroupService {
      * @param group the group to add the user to
      * @return the updated {@link Group}
      */
-    Group addUser(AbstractUser user, Group group);
+    Group addUser(Group group, AbstractUser user);
 
     /**
-     * Removes a user from a group specified by identifier.
-     *
-     * @param user the user to remove
-     * @param groupIdentifier identifier of the target group
+     * Removes a user from a group within a specific realm.
+    * @param groupId   the unique identifier of the group
+    * @param userId    the ID of the user to remove
+     * @param realmId  the ID of the realm where the group exists
      * @return the updated {@link Group}
      */
-    Group removeUser(AbstractUser user, String groupIdentifier);
+    Group removeUser(String groupId, String userId, String realmId);
+
+    /**
+     * Removes a user from a group specified by its unique identifier.
+     *
+     * @param user            the user to be removed
+     * @param groupIdentifier the unique identifier of the target group
+     * @return the updated {@link Group}
+     */
+    Group removeUser(String groupId, AbstractUser user);
 
     /**
      * Removes a user from a specific group.
      *
-     * @param user the user to remove
-     * @param group the group to remove the user from
+     * @param user  the user to be removed
+     * @param group the group from which the user will be removed
      * @return the updated {@link Group}
      */
-    Group removeUser(AbstractUser user, Group group);
+    Group removeUser(Group group, AbstractUser user);
 
     /**
      * Finds groups matching a given predicate with pagination.
@@ -203,6 +232,13 @@ public interface GroupService {
      */
     Page<Group> findByPredicate(Predicate predicate, Pageable pageable);
 
+    /**
+     * Finds groups matching the specified MongoDB query with pagination support.
+     *
+     * @param query    the MongoDB query defining the criteria for searching groups
+     * @param pageable pagination information
+     * @return a page of {@link Group}s that match the query criteria
+     */
     Page<Group> findByQuery(Query query, Pageable pageable);
 
     /**
@@ -212,7 +248,52 @@ public interface GroupService {
      * @param authorityId ID of the authority to assign
      * @return the updated {@link Group}
      */
-    Group assignAuthority(String groupId, String authorityId);
+    Group addAuthority(String groupId, String authorityId);
+
+
+    /**
+     * Assigns a specific authority to the provided group.
+     * <p>
+     * This method updates the group by adding the specified authority to its list of associated authorities.
+     *
+     * @param group     the {@link Group} object to which the authority will be added
+     * @param authority the {@link Authority} to be assigned to the group
+     * @return the updated {@link Group} object with the newly assigned authority
+     */
+    Group addAuthority(Group group, Authority authority);
+
+    /**
+     * Removes a specific authority from a group.
+     *
+     * @param groupId     the ID of the group from which the authority will be removed
+     * @param authorityId the ID of the authority to remove
+     * @return the updated {@link Group} object without the specified authority
+     */
+    Group removeAuthority(String groupId, String authorityId);
+
+
+    /**
+     * Removes a specific authority from the provided group.
+     * <p>
+     * This method updates the group by removing the specified authority.
+     *
+     * @param group     the {@link Group} object from which the authority will be removed
+     * @param authority the {@link Authority} to be removed from the group
+     * @return the updated {@link Group} object without the specified authority
+     */
+    Group removeAuthority(Group group, Authority authority);
+
+    /**
+     * Assigns multiple subgroups to a parent group.
+     * <p>
+     * This method establishes relationships between the specified child groups
+     * and the parent group identified by its ID.
+     *
+     * @param parentGroupId the ID of the parent group to which subgroups will be assigned
+     * @param childGroupIds the list of IDs of the subgroups to be assigned to the parent group
+     * @return the updated {@link Group} representing the parent group with its new subgroup assignments
+     */
+    Group assignSubgroups(String parentGroupId, Set<String> childGroupIds);
 
     /**
      * Adds a subgroup relationship between two groups.
@@ -249,6 +330,43 @@ public interface GroupService {
      * @return a {@link Pair} containing both the updated parent and child {@link Group}s
      */
     Pair<Group, Group> addSubgroup(Group parentGroup, Group childGroup);
+
+
+    /**
+     * Removes a subgroup relationship between two groups by their IDs.
+     *
+     * @param parentGroupId the ID of the parent group
+     * @param childGroupId  the ID of the child group
+     * @return a {@link Pair} containing both the updated parent and child {@link Group}s
+     */
+    Pair<Group, Group> removeSubgroup(String parentGroupId, String childGroupId);
+
+    /**
+     * Removes a subgroup relationship between a parent group object and a child group by its ID.
+     *
+     * @param parentGroup  the parent group object
+     * @param childGroupId the ID of the child group
+     * @return a {@link Pair} containing both the updated parent and child {@link Group}s
+     */
+    Pair<Group, Group> removeSubgroup(Group parentGroup, String childGroupId);
+
+    /**
+     * Removes a subgroup relationship between a parent group by its ID and a child group object.
+     *
+     * @param parentGroupId the ID of the parent group
+     * @param childGroup    the child group object
+     * @return a {@link Pair} containing both the updated parent and child {@link Group}s
+     */
+    Pair<Group, Group> removeSubgroup(String parentGroupId, Group childGroup);
+
+    /**
+     * Removes a subgroup relationship between two group objects.
+     *
+     * @param parentGroup the parent group object
+     * @param childGroup  the child group object
+     * @return a {@link Pair} containing both the updated parent and child {@link Group}s
+     */
+    Pair<Group, Group> removeSubgroup(Group parentGroup, Group childGroup);
 
     /**
      * Retrieves all parent groups of a specified group.
@@ -302,9 +420,49 @@ public interface GroupService {
     /**
      * Searches for groups based on the provided search criteria and pageable details.
      *
-     * @param searchDto the search criteria encapsulated in a {@link GroupSearchDto}
+     * @param searchDto the search criteria encapsulated in a {@link GroupSearchRequestDto}
      * @param pageable pagination information for the results
      * @return a page of {@link Group} objects that match the search criteria
      */
-    Page<Group> search(GroupSearchDto searchDto, Pageable pageable);
+    Page<Group> search(GroupSearchRequestDto searchDto, Pageable pageable);
+
+    /**
+     * Adds a role to a specified group.
+     *
+     * @param groupId the ID of the group to which the role will be added
+     * @param roleId  the ID of the role to add to the group
+     * @return the updated {@link Group} object with the new role assigned
+     */
+    Group addRole(String groupId, String roleId);
+
+    
+    /**
+     * Assigns a specific process role to a group.
+     *
+     * @param group       the {@link Group} to which the role will be added
+     * @param processRole the {@link ProcessRole} to assign to the group
+     * @return the updated {@link Group} object with the assigned role
+     */
+    Group addRole(Group group, ProcessRole processRole);
+
+    /**
+     * Removes a role from a specified group.
+     *
+     * @param groupId the ID of the group from which the role will be removed
+     * @param roleId  the ID of the role to remove from the group
+     * @return the updated {@link Group} object without the specified role
+     */
+    Group removeRole(String groupId, String roleId);
+
+
+    /**
+     * Removes a specified process role from a group.
+     *
+     * @param group       the {@link Group} from which the role will be removed
+     * @param processRole the {@link ProcessRole} to remove from the group
+     * @return the updated {@link Group} object without the specified role
+     */
+    Group removeRole(Group group, ProcessRole processRole);
+
+    Page<Group> findAllByProcessRoles(Collection<ProcessResourceId> roleIds, Pageable pageable);
 }

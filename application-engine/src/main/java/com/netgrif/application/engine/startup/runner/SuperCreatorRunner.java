@@ -83,7 +83,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     }
 
     public void setAllGroups() {
-        groupService.findAll(Pageable.unpaged()).forEach(g -> groupService.addUser(getSuperUser(), g));
+        groupService.findAll(Pageable.unpaged()).forEach(g -> groupService.addUser(g, getSuperUser()));
     }
 
     public void setAllProcessRoles() {

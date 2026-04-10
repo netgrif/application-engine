@@ -151,7 +151,7 @@ public class RegistrationService implements IRegistrationService {
 
         if (newUser.groups != null && !newUser.groups.isEmpty()) {
             for (String group : newUser.groups) {
-                groupService.addUser(user, group);
+                groupService.addUser(group, user);
             }
         }
 

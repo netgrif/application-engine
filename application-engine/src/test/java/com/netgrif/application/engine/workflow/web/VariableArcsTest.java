@@ -130,6 +130,7 @@ public class VariableArcsTest {
         user.setCredential("password", passwordCredential);
         user.setState(UserState.ACTIVE);
         user.setEmail("VariableArcsTest@test.com");
+        user.setUsername("VariableArcsTest@test.com");
         testUser = importHelper.createUser(user,
                 new Authority[]{authorityService.getOrCreate(Authority.user)},
                 new ProcessRole[]{});

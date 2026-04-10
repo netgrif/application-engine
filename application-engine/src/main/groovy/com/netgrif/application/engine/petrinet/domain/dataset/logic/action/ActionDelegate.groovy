@@ -35,6 +35,7 @@ import com.netgrif.application.engine.menu.services.interfaces.DashboardManageme
 import com.netgrif.application.engine.menu.services.interfaces.IMenuItemService
 import com.netgrif.application.engine.objects.auth.domain.Group
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser
+import com.netgrif.application.engine.objects.auth.domain.QGroup
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.Transition
@@ -99,6 +100,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import com.netgrif.application.engine.objects.utils.Nullable
+import org.springframework.data.util.Pair
 
 import java.time.ZoneId
 import java.util.stream.Collectors
@@ -2873,5 +2875,62 @@ class ActionDelegate {
         StorageField<?> storageField = (StorageField<?>) field
         IStorageService storageService = storageResolverService.resolve(storageField.storageType)
         return storageService.getPath(aCase.stringId, fileFieldId, fileName)
+    }
+
+    Group findGroupByIdentifier(String identifier) {
+        return groupService.findByIdentifier(identifier).orElse(null)
+    }
+
+    Group findGroupById(String groupId) {
+        return groupService.findById(groupId)
+    }
+
+    Page<Group> findGroups(Closure<Predicate> predicate = {it.identifier.isNotNull()}, Pageable pageable = Pageable.unpaged()) {
+        QGroup qGroup = new QGroup("group")
+        return groupService.findByPredicate(predicate(qGroup), pageable)
+    }
+
+    Group createGroup(String identifier, String title = "", AbstractUser owner = userService.getLoggedOrSystem()) {
+        return groupService.create(identifier, title, owner)
+    }
+
+    void deleteGroup(Group group) {
+        groupService.delete(group)
+    }
+
+    Group saveGroup(Group group) {
+        return groupService.save(group)
+    }
+
+    Group addUserToGroup(String groupId, String userId, String realmId) {
+        return groupService.addUser(groupId, userId, realmId)
+    }
+
+    Group removeUserFromGroup(String groupId, String userId, String realmId) {
+        return groupService.removeUser(groupId, userId, realmId)
+    }
+
+    Group addAuthorityToGroup(String groupId, String authorityId) {
+        return groupService.addAuthority(groupId, authorityId)
+    }
+
+    Group removeAuthorityFromGroup(String groupId, String authorityId) {
+        return groupService.removeAuthority(groupId, authorityId)
+    }
+
+    Group addRoleToGroup(String groupId, String roleId) {
+        return groupService.addRole(groupId, roleId)
+    }
+
+    Group removeRoleFromGroup(String groupId, String roleId) {
+        return groupService.removeRole(groupId, roleId)
+    }
+
+    Pair<Group, Group> addSubGroup(String groupId, String subGroupId) {
+        return groupService.addSubgroup(groupId, subGroupId)
+    }
+
+    Pair<Group, Group> removeSubGroup(String groupId, String subGroupId) {
+        return groupService.removeSubgroup(groupId, subGroupId)
     }
 }

@@ -7,7 +7,7 @@ import com.netgrif.application.engine.auth.web.requestbodies.PreferencesRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserCreateRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.application.engine.auth.web.responsebodies.PreferencesResource;
-import com.netgrif.application.engine.auth.web.responsebodies.User;
+import com.netgrif.application.engine.auth.web.responsebodies.UserDto;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
@@ -62,7 +62,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/{realmId}")
-    public ResponseEntity<User> createUser(@PathVariable String realmId, @RequestBody UserCreateRequest request, Locale locale) {
+    public ResponseEntity<UserDto> createUser(@PathVariable String realmId, @RequestBody UserCreateRequest request, Locale locale) {
         try {
             if (!realmExists(realmId)) {
                 log.error("Realm with id [{}] not found", realmId);
@@ -95,7 +95,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{realmId}/all")
-    public ResponseEntity<Page<User>> getAllUsers(@PathVariable String realmId, Pageable pageable, Locale locale) {
+    public ResponseEntity<Page<UserDto>> getAllUsers(@PathVariable String realmId, Pageable pageable, Locale locale) {
         if (!realmExists(realmId)) {
             log.error("Realm with id [{}] not found", realmId);
             return ResponseEntity.badRequest().build();
@@ -111,7 +111,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> getLoggedUser(Authentication auth, Locale locale) {
+    public ResponseEntity<UserDto> getLoggedUser(Authentication auth, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         AbstractUser user;
         try {
@@ -135,7 +135,7 @@ public class UserController {
     })
     @Operation(summary = "Generic user search", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<User>> search(@RequestBody UserSearchRequestBody query, Pageable pageable, Authentication auth, Locale locale) {
+    public ResponseEntity<Page<UserDto>> search(@RequestBody UserSearchRequestBody query, Pageable pageable, Authentication auth, Locale locale) {
         List<ProcessResourceId> roles = query.getRoles() == null ? null : query.getRoles().stream().map(ProcessResourceId::new).toList();
         List<ProcessResourceId> negativeRoles = query.getNegativeRoles() == null ? null : query.getNegativeRoles().stream().map(ProcessResourceId::new).toList();
         Page<AbstractUser> users = userService.searchAllCoMembers(query.getFulltext(),
@@ -153,7 +153,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping(value = "/{realmId}/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> getUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, Locale locale) {
+    public ResponseEntity<UserDto> getUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, Locale locale) {
         LoggedUser actualUser = userService.getLoggedUserFromContext();
         // TODO: impersonation
 //        LoggedUser loggedUser = actualUser.getSelfOrImpersonated();
@@ -251,7 +251,7 @@ public class UserController {
 //        }
 //    }
 //
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @Operation(summary = "Get all authorities of the system",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "X-Auth-Token")})
@@ -265,7 +265,7 @@ public class UserController {
         return ResponseEntity.ok(authorityService.findAll(Pageable.unpaged()).stream().toList());
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @Operation(summary = "Assign authority to the user",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "X-Auth-Token")})
@@ -325,11 +325,11 @@ public class UserController {
         }
     }
 
-    private Page<User> changeToResponse(Page<AbstractUser> users, Pageable pageable, Locale locale) {
+    private Page<UserDto> changeToResponse(Page<AbstractUser> users, Pageable pageable, Locale locale) {
         return new PageImpl<>(changeType(users.getContent(), locale), pageable, users.getTotalElements());
     }
 
-    public List<User> changeType(List<AbstractUser> users, Locale locale) {
+    public List<UserDto> changeType(List<AbstractUser> users, Locale locale) {
         return users.stream().map(u -> userFactory.getUser(u, locale)).toList();
     }
 

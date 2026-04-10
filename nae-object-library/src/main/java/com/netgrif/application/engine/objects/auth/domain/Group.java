@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
+import com.netgrif.application.engine.objects.annotations.EnsureCollection;
+import com.netgrif.application.engine.objects.annotations.Indexed;
 import com.querydsl.core.annotations.QueryEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,30 +18,35 @@ import java.util.Set;
  */
 @Getter
 @QueryEntity
+@EnsureCollection
 public class Group extends AbstractActor implements Serializable {
 
     /**
      * The unique identifier of the group.
      */
     @Setter
+    @Indexed
     private String identifier;
 
     /**
      * The display name of the group shown in the user interface.
      */
     @Setter
+    @Indexed
     private String displayName;
 
     /**
      * The unique identifier of the group owner.
      */
     @Setter
+    @Indexed
     private String ownerId;
 
     /**
      * The username of the group owner.
      */
     @Setter
+    @Indexed
     private String ownerUsername;
 
     /**
@@ -168,5 +175,19 @@ public class Group extends AbstractActor implements Serializable {
      */
     public void setSubgroupIds(Set<String> subgroupIds) {
         this.subgroupIds = subgroupIds == null ? new HashSet<>() : new HashSet<>(subgroupIds);
+    }
+
+    public Set<String> getMemberIds() {
+        if (memberIds == null) {
+            memberIds = new HashSet<>();
+        }
+        return memberIds;
+    }
+
+    public Set<String> getSubgroupIds() {
+        if (subgroupIds == null) {
+            subgroupIds = new HashSet<>();
+        }
+        return subgroupIds;
     }
 }
