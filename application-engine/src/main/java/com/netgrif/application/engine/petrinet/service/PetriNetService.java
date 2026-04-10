@@ -138,6 +138,15 @@ public class PetriNetService implements IPetriNetService {
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetByIdentifier()), cacheProperties.getPetriNetByIdentifier()).clear();
     }
 
+    @Override
+    public void evictCache(String id, String identifier, String version) {
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetById()), cacheProperties.getPetriNetById()).evict(id);
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetDefault()), cacheProperties.getPetriNetDefault()).evict(identifier);
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetLatest()), cacheProperties.getPetriNetLatest()).evict(identifier);
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetCache()), cacheProperties.getPetriNetCache()).evict(new ObjectId(id));
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetByIdentifier()), cacheProperties.getPetriNetByIdentifier()).evict(identifier + version);
+    }
+
     public void evictCache(PetriNet net) {
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetById()), cacheProperties.getPetriNetById()).evict(net.getStringId());
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetDefault()), cacheProperties.getPetriNetDefault()).evict(net.getIdentifier());
@@ -150,7 +159,7 @@ public class PetriNetService implements IPetriNetService {
      * Get read only Petri net.
      */
     @Override
-    @Cacheable(value = "petriNetCache")
+    @Cacheable(value = "petriNetCache", unless = "#result == null")
     public PetriNet get(ObjectId petriNetId) {
         Optional<PetriNet> optional = repository.findById(petriNetId.toString());
         if (optional.isEmpty()) {
@@ -301,7 +310,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Cacheable(value = "petriNetById")
+    @Cacheable(value = "petriNetById", unless = "#result == null")
     public PetriNet getPetriNet(String id) {
         Optional<PetriNet> net = repository.findById(id);
         if (net.isEmpty()) {
