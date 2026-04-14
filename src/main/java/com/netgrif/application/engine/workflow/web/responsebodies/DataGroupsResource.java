@@ -18,11 +18,16 @@ public class DataGroupsResource extends CollectionModel<DataGroup> {
                     return dataGroup;
                 })
                 .collect(Collectors.toList()));
-        buildLinks();
+        String taskId = content.stream()
+                .map(com.netgrif.application.engine.petrinet.domain.DataGroup::getParentTaskId)
+                .filter(id -> id != null && !id.isBlank())
+                .findFirst()
+                .orElse(null);
+        buildLinks(taskId);
     }
 
-    private void buildLinks() {
+    private void buildLinks(String taskId) {
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .getData("", null, null)).withSelfRel());
+                .getData(taskId, null, null)).withSelfRel());
     }
 }
