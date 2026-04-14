@@ -31,6 +31,8 @@ public interface ITaskAuthorizationService {
 
     boolean canCallSaveData(LoggedUser loggedUser, String taskId);
 
+    boolean canCallGetData(LoggedUser loggedUser, String taskId);
+
     boolean canCallSaveFile(LoggedUser loggedUser, String taskId);
 
 }

@@ -23,6 +23,6 @@ public class DataGroupsResource extends CollectionModel<DataGroup> {
 
     private void buildLinks() {
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .getData("", null)).withSelfRel());
+                .getData("", null, null)).withSelfRel());
     }
 }

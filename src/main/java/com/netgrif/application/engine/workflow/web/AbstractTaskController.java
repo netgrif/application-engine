@@ -198,7 +198,7 @@ public abstract class AbstractTaskController {
     }
 
 
-    public EntityModel<EventOutcomeWithMessage> getData(String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> getData(String taskId, Authentication authentication, Locale locale) {
         try {
             GetDataGroupsEventOutcome outcome = dataService.getDataGroups(taskId, locale);
             return EventOutcomeWithMessageResource.successMessage("Get data groups successful",
