@@ -503,13 +503,12 @@ class TaskAuthorizationServiceTest {
     void testCanGetDataWithPosViewUserRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test get data", "", testUser.transformToLoggedUser()).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
-        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+        dataService.setData(taskId, ImportHelper.populateDataset([
                 "view_pos_ul": [
                         "value": [testUser.stringId],
                         "type": "userList"
                 ]
         ] as Map)).getCase()
-        workflowService.save(case_)
 
         assert taskAuthorizationService.canCallGetData(testUser.transformToLoggedUser(), taskId)
         workflowService.deleteCase(case_.stringId)
@@ -519,13 +518,12 @@ class TaskAuthorizationServiceTest {
     void testCannotGetDataWithNegViewUserRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test get data", "", testUser.transformToLoggedUser()).getCase()
         String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
-        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+        dataService.setData(taskId, ImportHelper.populateDataset([
                 "view_neg_ul": [
                         "value": [testUser.stringId],
                         "type": "userList"
                 ]
         ] as Map)).getCase()
-        workflowService.save(case_)
 
         assert !taskAuthorizationService.canCallGetData(testUser.transformToLoggedUser(), taskId)
         workflowService.deleteCase(case_.stringId)
