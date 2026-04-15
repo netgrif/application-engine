@@ -13,7 +13,7 @@ public enum SanitizationMode {
 
     public static SanitizationMode from(String value) {
         if (value == null || value.isBlank()) {
-            return PLAIN_TEXT;
+            return DISABLE_JAVASCRIPT;
         }
 
         for (SanitizationMode mode : values()) {
@@ -22,6 +22,6 @@ public enum SanitizationMode {
             }
         }
 
-        return PLAIN_TEXT;
+        return DISABLE_JAVASCRIPT;
     }
 }

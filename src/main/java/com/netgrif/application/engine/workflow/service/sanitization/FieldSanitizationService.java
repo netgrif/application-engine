@@ -116,11 +116,11 @@ public class FieldSanitizationService implements IFieldSanitizationService {
                 return SAFE_HTML_NO_LINKS_POLICY;
             case SAFE_HTML_RELAXED:
                 return SAFE_HTML_RELAXED_POLICY;
-            case DISABLE_JAVASCRIPT:
-                return DISABLE_JAVASCRIPT_POLICY;
             case PLAIN_TEXT:
-            default:
                 return PLAIN_TEXT_POLICY;
+            case DISABLE_JAVASCRIPT:
+            default:
+                return DISABLE_JAVASCRIPT_POLICY;
         }
     }
 
