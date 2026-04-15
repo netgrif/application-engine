@@ -95,16 +95,6 @@ public class FieldSanitizationIntegrationTest {
     }
 
     @Test
-    void plainDefaultShouldStripHtmlFromScriptPayload() throws Exception {
-        assertStoredEquals("text_plain_default", PAYLOAD_SCRIPT_BOLD, "Hello");
-    }
-
-    @Test
-    void plainDefaultShouldRemoveImgPayload() throws Exception {
-        assertStoredEquals("text_plain_default", PAYLOAD_IMG_ONERROR, "");
-    }
-
-    @Test
     void plainDefaultShouldKeepPlainTextUntouched() throws Exception {
         assertStoredEquals("text_plain_default", PAYLOAD_PLAIN, PAYLOAD_PLAIN);
     }

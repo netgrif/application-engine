@@ -46,23 +46,6 @@ public class FieldSanitizationServiceTest {
     }
 
     @Test
-    void shouldStripHtmlTagsWhenDefaultModeIsPlainText() {
-        TextField field = new TextField();
-        String input = "<b>Hello</b> <script>alert('xss')</script> world";
-        String result = service.sanitize(input, field);
-        assertEquals("Hello  world", result);
-        assertNotEquals(input, result);
-    }
-
-    @Test
-    void shouldStripDangerousAttributesWhenDefaultModeIsPlainText() {
-        TextField field = new TextField();
-        String input = "<img src=\"x\" onerror=\"alert('xss')\">test";
-        String result = service.sanitize(input, field);
-        assertEquals("test", result);
-    }
-
-    @Test
     void shouldNotSanitizeWhenModeIsOff() {
         TextField field = new TextField();
         Component component = Mockito.mock(Component.class);
@@ -93,34 +76,34 @@ public class FieldSanitizationServiceTest {
     }
 
     @Test
-    void shouldUsePlainTextModeWhenComponentIsNull() {
+    void shouldUseOffModeWhenComponentIsNull() {
         TextField field = new TextField();
         field.setComponent(null);
         String input = "<b>Hello</b>";
         String result = service.sanitize(input, field);
-        assertEquals("Hello", result);
+        assertEquals("<b>Hello</b>", result);
     }
 
     @Test
-    void shouldUsePlainTextModeWhenComponentPropertiesAreNull() {
+    void shouldUseOffModeWhenComponentPropertiesAreNull() {
         TextField field = new TextField();
         Component component = Mockito.mock(Component.class);
         when(component.getProperties()).thenReturn(null);
         field.setComponent(component);
         String input = "<b>Hello</b>";
         String result = service.sanitize(input, field);
-        assertEquals("Hello", result);
+        assertEquals("<b>Hello</b>", result);
     }
 
     @Test
-    void shouldUsePlainTextModeWhenSanitizationModePropertyIsMissing() {
+    void shouldUseOffModeWhenSanitizationModePropertyIsMissing() {
         TextField field = new TextField();
         Component component = Mockito.mock(Component.class);
         when(component.getProperties()).thenReturn(Map.of("otherKey", "true"));
         field.setComponent(component);
         String input = "<i>text</i>";
         String result = service.sanitize(input, field);
-        assertEquals("text", result);
+        assertEquals("<i>text</i>", result);
     }
 
     @Test
