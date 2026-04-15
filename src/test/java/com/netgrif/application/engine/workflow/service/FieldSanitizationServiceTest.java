@@ -214,7 +214,7 @@ public class FieldSanitizationServiceTest {
                 () -> service.sanitize(input, field)
         );
 
-        assertEquals("Unsafe content detected in field [null]", exception.getMessage());
+        assertEquals("Field [null] contains unsafe content and the configured action is REJECT.", exception.getMessage());
     }
 
     @Test
@@ -238,7 +238,7 @@ public class FieldSanitizationServiceTest {
                 () -> service.sanitize(input, field)
         );
 
-        assertEquals("Unsafe content detected in field [null]", exception.getMessage());
+        assertEquals("Field [null] contains unsafe content and the configured action is REJECT.", exception.getMessage());
     }
 
     @Test
@@ -291,7 +291,7 @@ public class FieldSanitizationServiceTest {
                 () -> service.sanitize(input, field)
         );
 
-        assertEquals("Unsafe content detected in field [null]", exception.getMessage());
+        assertEquals("Field [null] contains unsafe content and the configured action is REJECT.", exception.getMessage());
     }
 
     @Test
