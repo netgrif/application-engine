@@ -510,7 +510,6 @@ class TaskAuthorizationServiceTest {
                 ]
         ] as Map)).getCase()
         workflowService.save(case_)
-        sleep(4000)
 
         assert taskAuthorizationService.canCallGetData(testUser.transformToLoggedUser(), taskId)
         workflowService.deleteCase(case_.stringId)
@@ -527,7 +526,6 @@ class TaskAuthorizationServiceTest {
                 ]
         ] as Map)).getCase()
         workflowService.save(case_)
-        sleep(4000)
 
         assert !taskAuthorizationService.canCallGetData(testUser.transformToLoggedUser(), taskId)
         workflowService.deleteCase(case_.stringId)
