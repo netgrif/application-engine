@@ -1,0 +1,655 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>1</id>
+	<initials>TES</initials>
+	<title>Data test</title>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+
+	<data type="text">
+		<id>text_plain_default</id>
+		<title>Plain default</title>
+		<placeholder>Plain default</placeholder>
+		<desc>Default plain text sanitization</desc>
+		<init>text</init>
+	</data>
+
+	<data type="text">
+		<id>text_off</id>
+		<title>OFF</title>
+		<component>
+			<name>textarea</name>
+			<property key="sanitizationMode">OFF</property>
+			<property key="sanitizationAction">SANITIZE</property>
+		</component>
+	</data>
+
+	<data type="text">
+		<id>text_plain_sanitize</id>
+		<title>PLAIN_TEXT SANITIZE</title>
+		<component>
+			<name>textarea</name>
+			<property key="sanitizationMode">PLAIN_TEXT</property>
+			<property key="sanitizationAction">SANITIZE</property>
+		</component>
+	</data>
+
+	<data type="text">
+		<id>text_plain_reject</id>
+		<title>PLAIN_TEXT REJECT</title>
+		<component>
+			<name>textarea</name>
+			<property key="sanitizationMode">PLAIN_TEXT</property>
+			<property key="sanitizationAction">REJECT</property>
+		</component>
+	</data>
+
+	<data type="text">
+		<id>text_safe_basic</id>
+		<title>SAFE_HTML_BASIC SANITIZE</title>
+		<component>
+			<name>textarea</name>
+			<property key="sanitizationMode">SAFE_HTML_BASIC</property>
+			<property key="sanitizationAction">SANITIZE</property>
+		</component>
+	</data>
+
+	<data type="text">
+		<id>text_safe_links_only</id>
+		<title>SAFE_HTML_LINKS_ONLY SANITIZE</title>
+		<component>
+			<name>textarea</name>
+			<property key="sanitizationMode">SAFE_HTML_LINKS_ONLY</property>
+			<property key="sanitizationAction">SANITIZE</property>
+		</component>
+	</data>
+
+	<data type="text">
+		<id>text_safe_no_links</id>
+		<title>SAFE_HTML_NO_LINKS SANITIZE</title>
+		<component>
+			<name>htmltextarea</name>
+			<property key="sanitizationMode">SAFE_HTML_NO_LINKS</property>
+			<property key="sanitizationAction">SANITIZE</property>
+		</component>
+	</data>
+
+	<data type="text">
+		<id>text_safe_html</id>
+		<title>SAFE_HTML SANITIZE</title>
+		<component>
+			<name>htmltextarea</name>
+			<property key="sanitizationMode">SAFE_HTML</property>
+			<property key="sanitizationAction">SANITIZE</property>
+		</component>
+	</data>
+
+	<data type="text">
+		<id>text_safe_html_reject</id>
+		<title>SAFE_HTML REJECT</title>
+		<component>
+			<name>htmltextarea</name>
+			<property key="sanitizationMode">SAFE_HTML</property>
+			<property key="sanitizationAction">REJECT</property>
+		</component>
+	</data>
+
+	<data type="text">
+		<id>text_safe_relaxed</id>
+		<title>SAFE_HTML_RELAXED SANITIZE</title>
+		<component>
+			<name>richtextarea</name>
+			<property key="sanitizationMode">SAFE_HTML_RELAXED</property>
+			<property key="sanitizationAction">SANITIZE</property>
+		</component>
+	</data>
+
+	<data type="text">
+		<id>text_safe_relaxed_reject</id>
+		<title>SAFE_HTML_RELAXED REJECT</title>
+		<component>
+			<name>richtextarea</name>
+			<property key="sanitizationMode">SAFE_HTML_RELAXED</property>
+			<property key="sanitizationAction">REJECT</property>
+		</component>
+	</data>
+
+	<data type="text">
+		<id>text_disable_javascript</id>
+		<title>DISABLE_JAVASCRIPT SANITIZE</title>
+		<component>
+			<name>htmltextarea</name>
+			<property key="sanitizationMode">DISABLE_JAVASCRIPT</property>
+			<property key="sanitizationAction">SANITIZE</property>
+		</component>
+	</data>
+
+	<data type="text">
+		<id>text_disable_javascript_reject</id>
+		<title>DISABLE_JAVASCRIPT REJECT</title>
+		<component>
+			<name>htmltextarea</name>
+			<property key="sanitizationMode">DISABLE_JAVASCRIPT</property>
+			<property key="sanitizationAction">REJECT</property>
+		</component>
+	</data>
+
+	<data type="text">
+		<id>text_override_off</id>
+		<title>Override OFF</title>
+		<init>text</init>
+	</data>
+
+	<data type="text">
+		<id>text_override_plain_sanitize</id>
+		<title>Override PLAIN_TEXT SANITIZE</title>
+		<init>text</init>
+	</data>
+
+	<data type="text">
+		<id>text_override_plain_reject</id>
+		<title>Override PLAIN_TEXT REJECT</title>
+		<init>text</init>
+	</data>
+
+	<data type="text">
+		<id>text_override_safe_basic</id>
+		<title>Override SAFE_HTML_BASIC SANITIZE</title>
+		<init>text</init>
+	</data>
+
+	<data type="text">
+		<id>text_override_safe_links_only</id>
+		<title>Override SAFE_HTML_LINKS_ONLY SANITIZE</title>
+		<init>text</init>
+	</data>
+
+	<data type="text">
+		<id>text_override_safe_no_links</id>
+		<title>Override SAFE_HTML_NO_LINKS SANITIZE</title>
+		<init>text</init>
+	</data>
+
+	<data type="text">
+		<id>text_override_safe_html</id>
+		<title>Override SAFE_HTML SANITIZE</title>
+		<init>text</init>
+	</data>
+
+	<data type="text">
+		<id>text_override_safe_html_reject</id>
+		<title>Override SAFE_HTML REJECT</title>
+		<init>text</init>
+	</data>
+
+	<data type="text">
+		<id>text_override_safe_relaxed</id>
+		<title>Override SAFE_HTML_RELAXED SANITIZE</title>
+		<init>text</init>
+	</data>
+
+	<data type="text">
+		<id>text_override_safe_relaxed_reject</id>
+		<title>Override SAFE_HTML_RELAXED REJECT</title>
+		<init>text</init>
+	</data>
+
+	<data type="text">
+		<id>text_override_disable_javascript</id>
+		<title>Override DISABLE_JAVASCRIPT SANITIZE</title>
+		<init>text</init>
+	</data>
+
+	<data type="text">
+		<id>text_override_disable_javascript_reject</id>
+		<title>Override DISABLE_JAVASCRIPT REJECT</title>
+		<init>text</init>
+	</data>
+
+	<transition>
+		<id>1</id>
+		<x>48</x>
+		<y>48</y>
+		<label>Transition</label>
+		<dataGroup>
+			<id>NewDataGroup</id>
+			<stretch>true</stretch>
+
+			<dataRef>
+				<id>text_plain_default</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+
+			<dataRef>
+				<id>text_off</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+
+			<dataRef>
+				<id>text_plain_sanitize</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+
+			<dataRef>
+				<id>text_plain_reject</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+
+			<dataRef>
+				<id>text_safe_basic</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+
+			<dataRef>
+				<id>text_safe_links_only</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>6</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+
+			<dataRef>
+				<id>text_safe_no_links</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>8</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+
+			<dataRef>
+				<id>text_safe_html</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>10</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+
+			<dataRef>
+				<id>text_safe_html_reject</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>12</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+
+			<dataRef>
+				<id>text_safe_relaxed</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>14</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+
+			<dataRef>
+				<id>text_safe_relaxed_reject</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>16</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+
+			<dataRef>
+				<id>text_disable_javascript</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>18</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+
+			<dataRef>
+				<id>text_disable_javascript_reject</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>20</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+
+			<dataRef>
+				<id>text_override_off</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>22</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+					<property key="sanitizationMode">OFF</property>
+					<property key="sanitizationAction">SANITIZE</property>
+				</component>
+			</dataRef>
+
+			<dataRef>
+				<id>text_override_plain_sanitize</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>24</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+					<property key="sanitizationMode">PLAIN_TEXT</property>
+					<property key="sanitizationAction">SANITIZE</property>
+				</component>
+			</dataRef>
+
+			<dataRef>
+				<id>text_override_plain_reject</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>26</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+					<property key="sanitizationMode">PLAIN_TEXT</property>
+					<property key="sanitizationAction">REJECT</property>
+				</component>
+			</dataRef>
+
+			<dataRef>
+				<id>text_override_safe_basic</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>28</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+					<property key="sanitizationMode">SAFE_HTML_BASIC</property>
+					<property key="sanitizationAction">SANITIZE</property>
+				</component>
+			</dataRef>
+
+			<dataRef>
+				<id>text_override_safe_links_only</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>30</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+					<property key="sanitizationMode">SAFE_HTML_LINKS_ONLY</property>
+					<property key="sanitizationAction">SANITIZE</property>
+				</component>
+			</dataRef>
+
+			<dataRef>
+				<id>text_override_safe_no_links</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>32</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>htmltextarea</name>
+					<property key="sanitizationMode">SAFE_HTML_NO_LINKS</property>
+					<property key="sanitizationAction">SANITIZE</property>
+				</component>
+			</dataRef>
+
+			<dataRef>
+				<id>text_override_safe_html</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>34</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>htmltextarea</name>
+					<property key="sanitizationMode">SAFE_HTML</property>
+					<property key="sanitizationAction">SANITIZE</property>
+				</component>
+			</dataRef>
+
+			<dataRef>
+				<id>text_override_safe_html_reject</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>36</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>htmltextarea</name>
+					<property key="sanitizationMode">SAFE_HTML</property>
+					<property key="sanitizationAction">REJECT</property>
+				</component>
+			</dataRef>
+
+			<dataRef>
+				<id>text_override_safe_relaxed</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>38</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>richtextarea</name>
+					<property key="sanitizationMode">SAFE_HTML_RELAXED</property>
+					<property key="sanitizationAction">SANITIZE</property>
+				</component>
+			</dataRef>
+
+			<dataRef>
+				<id>text_override_safe_relaxed_reject</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>40</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>richtextarea</name>
+					<property key="sanitizationMode">SAFE_HTML_RELAXED</property>
+					<property key="sanitizationAction">REJECT</property>
+				</component>
+			</dataRef>
+
+			<dataRef>
+				<id>text_override_disable_javascript</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>42</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>htmltextarea</name>
+					<property key="sanitizationMode">DISABLE_JAVASCRIPT</property>
+					<property key="sanitizationAction">SANITIZE</property>
+				</component>
+			</dataRef>
+
+			<dataRef>
+				<id>text_override_disable_javascript_reject</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>44</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>htmltextarea</name>
+					<property key="sanitizationMode">DISABLE_JAVASCRIPT</property>
+					<property key="sanitizationAction">REJECT</property>
+				</component>
+			</dataRef>
+
+		</dataGroup>
+	</transition>
+</document>
