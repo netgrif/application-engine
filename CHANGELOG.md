@@ -7,7 +7,14 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.4.2](https://github.com/netgrif/application-engine/commits/v6.4.2)
 
-## [6.4.2](https://github.com/netgrif/application-engine/releases/tag/v6.4.2) (2025-05-16)
+## [6.4.3](https://github.com/netgrif/application-engine/releases/tag/v6.4.2) (2026-04-16)
+
+### Fixed
+
+- [NAE-2407] Improve Permission Validation in GetData
+- [NAE-2408] Implement field sanitization modes for text data fields
+
+## [6.4.2](https://github.com/netgrif/application-engine/releases/tag/v6.4.2) (2026-04-07)
 
 ### Fixed
 
