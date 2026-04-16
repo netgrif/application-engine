@@ -5,12 +5,20 @@
     <initials>WSU</initials>
     <title>WorkflowAuthorizationService test</title>
     <role>
+        <id>view_pos_role</id>
+        <name>view pos role</name>
+    </role>
+    <role>
         <id>assign_pos_role</id>
         <name>assign pos role</name>
     </role>
     <role>
         <id>finish_pos_role</id>
         <name>finish pos role</name>
+    </role>
+    <role>
+        <id>view_neg_role</id>
+        <name>view neg role</name>
     </role>
     <role>
         <id>assign_neg_role</id>
@@ -20,6 +28,10 @@
         <id>finish_neg_role</id>
         <name>finish neg role</name>
     </role>
+    <data type="userList">
+        <id>view_pos_ul</id>
+        <title/>
+    </data>
     <data type="userList">
         <id>assign_pos_ul</id>
         <title/>
@@ -38,6 +50,10 @@
     </data>
     <data type="userList">
         <id>cancel_pos_ul</id>
+        <title/>
+    </data>
+    <data type="userList">
+        <id>view_neg_ul</id>
         <title/>
     </data>
     <data type="userList">
@@ -67,6 +83,18 @@
         <y>1</y>
         <label>Transition</label>
         <roleRef>
+            <id>view_pos_role</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>view_neg_role</id>
+            <logic>
+                <view>false</view>
+            </logic>
+        </roleRef>
+        <roleRef>
             <id>assign_pos_role</id>
             <logic>
                 <assign>true</assign>
@@ -90,6 +118,18 @@
                 <finish>false</finish>
             </logic>
         </roleRef>
+        <userRef>
+            <id>view_pos_ul</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </userRef>
+        <userRef>
+            <id>view_neg_ul</id>
+            <logic>
+                <view>false</view>
+            </logic>
+        </userRef>
         <userRef>
             <id>assign_pos_ul</id>
             <logic>

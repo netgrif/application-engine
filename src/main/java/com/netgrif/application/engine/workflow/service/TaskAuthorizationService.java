@@ -142,6 +142,13 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     }
 
     @Override
+    public boolean canCallGetData(LoggedUser loggedUser, String taskId) {
+        Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.VIEW);
+        Boolean userPerm = userHasUserListPermission(loggedUser, taskId, RolePermission.VIEW);
+        return loggedUser.getSelfOrImpersonated().isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
+    }
+
+    @Override
     public boolean canCallSaveFile(LoggedUser loggedUser, String taskId) {
         return loggedUser.getSelfOrImpersonated().isAdmin() || isAssignee(loggedUser, taskId);
     }

@@ -110,7 +110,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.cancel(loggedUser, taskId, locale);
     }
 
-    @Override
+    @PreAuthorize("@taskAuthorizationService.canCallGetData(@userService.getAnonymousLogged(), #taskId)")
     @GetMapping(value = "/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Get all task data")
     public EntityModel<EventOutcomeWithMessage> getData(@PathVariable("id") String taskId, Locale locale) {

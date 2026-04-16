@@ -479,4 +479,53 @@ class TaskAuthorizationServiceTest {
         workflowService.deleteCase(case_.stringId)
     }
 
+    @Test
+    void testCanGetDataWithPosViewRole() {
+        ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "view_pos_role")
+        userService.addRole(testUser, positiveRole.getStringId())
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test get data", "", testUser.transformToLoggedUser()).getCase()
+        assert taskAuthorizationService.canCallGetData(testUser.transformToLoggedUser(), (new ArrayList<>(case_.getTasks())).get(0).task)
+        userService.removeRole(testUser, positiveRole.getStringId())
+        workflowService.deleteCase(case_.stringId)
+    }
+
+    @Test
+    void testCannotGetDataWithNegViewRole() {
+        ProcessRole negativeRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
+        userService.addRole(testUser, negativeRole.getStringId())
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test get data", "", testUser.transformToLoggedUser()).getCase()
+        assert !taskAuthorizationService.canCallGetData(testUser.transformToLoggedUser(), (new ArrayList<>(case_.getTasks())).get(0).task)
+        userService.removeRole(testUser, negativeRole.getStringId())
+        workflowService.deleteCase(case_.stringId)
+    }
+
+    @Test
+    void testCanGetDataWithPosViewUserRef() {
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test get data", "", testUser.transformToLoggedUser()).getCase()
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_pos_ul": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ]
+        ] as Map)).getCase()
+
+        assert taskAuthorizationService.canCallGetData(testUser.transformToLoggedUser(), taskId)
+        workflowService.deleteCase(case_.stringId)
+    }
+
+    @Test
+    void testCannotGetDataWithNegViewUserRef() {
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test get data", "", testUser.transformToLoggedUser()).getCase()
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_neg_ul": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ]
+        ] as Map)).getCase()
+
+        assert !taskAuthorizationService.canCallGetData(testUser.transformToLoggedUser(), taskId)
+        workflowService.deleteCase(case_.stringId)
+    }
 }
