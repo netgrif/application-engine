@@ -5,7 +5,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
-    <version>6.4.2</version>
+    <version>6.4.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>NETGRIF Application Engine</name>
@@ -233,6 +233,11 @@
             <version>0.9.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+            <artifactId>owasp-java-html-sanitizer</artifactId>
+            <version>20260313.1</version>
+        </dependency>
 
         <!-- Session -->
         <dependency>

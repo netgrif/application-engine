@@ -19,6 +19,7 @@ import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
@@ -32,10 +33,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
-import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
-import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.netgrif.application.engine.workflow.service.interfaces.*;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldsResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField;
 import com.querydsl.core.types.Predicate;
@@ -99,6 +97,9 @@ public class DataService implements IDataService {
 
     @Autowired
     protected IValidationService validation;
+
+    @Autowired
+    protected IFieldSanitizationService sanitizationService;
 
     @Autowired
     private StorageResolverService storageResolverService;
@@ -279,6 +280,8 @@ public class DataService implements IDataService {
                 ChangedField changedField = new ChangedField();
                 changedField.setId(fieldId);
                 Object newValue = parseFieldsValues(entry.getValue(), dataField, task.getStringId());
+                newValue = sanitizeValueIfNeeded(useCase, task, field, newValue);
+
                 if (entry.getValue().has("value") || getFieldTypeFromNode((ObjectNode) entry.getValue()).equals("button")) {
                     dataField.setValue(newValue);
                     changedField.addAttribute("value", newValue);
@@ -693,7 +696,7 @@ public class DataService implements IDataService {
 
     private List<EventOutcome> getChangedFieldByFileFieldContainer(String fieldId, Task referencingTask, Case useCase, Map<String, String> params) {
         List<EventOutcome> outcomes = new ArrayList<>();
-        outcomes.addAll( resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
+        outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
                 EventPhase.PRE, useCase, referencingTask, params));
         outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
                 EventPhase.POST, useCase, referencingTask, params));
@@ -1157,4 +1160,37 @@ public class DataService implements IDataService {
 //        }
 //    }
 
+    protected Object sanitizeValueIfNeeded(Case useCase, Task task, Field<?> field, Object value) {
+        if (!(value instanceof String) || !(field instanceof TextField)) {
+            return value;
+        }
+
+        return sanitizationService.sanitize((String) value, resolveFieldForSanitization(useCase, task, field));
+    }
+
+    protected Field<?> resolveFieldForSanitization(Case useCase, Task task, Field<?> originalField) {
+        Field<?> field = originalField.clone();
+        field.setComponent(resolveSanitizationComponent(useCase, task, originalField));
+        return field;
+    }
+
+    protected Component resolveSanitizationComponent(Case useCase, Task task, Field<?> field) {
+        DataField dataField = useCase.getDataField(field.getStringId());
+        if (dataField == null) {
+            return field.getComponent();
+        }
+
+        if (task != null && dataField.getDataRefComponents() != null) {
+            Component dataRefComponent = dataField.getDataRefComponents().get(task.getTransitionId());
+            if (dataRefComponent != null) {
+                return dataRefComponent;
+            }
+        }
+
+        if (dataField.getComponent() != null) {
+            return dataField.getComponent();
+        }
+
+        return field.getComponent();
+    }
 }
