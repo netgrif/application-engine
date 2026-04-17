@@ -206,7 +206,7 @@ public interface ActionApi {
 
     SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name, Map<String, String> params);
 
-    ActionFileHolder getFile(String caseId, String fieldId, boolean forPreview, Map<String, String> params) throws IOException;
+    ActionFileHolder getFile(String caseId, String fieldId, Boolean forPreview, Map<String, String> params) throws IOException;
 
     ActionFileHolder getFileByCaseAndName(String caseId, String fieldId, String name, Map<String, String> params) throws IOException;
 }

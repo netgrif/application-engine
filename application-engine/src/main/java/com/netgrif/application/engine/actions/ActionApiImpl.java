@@ -236,7 +236,7 @@ public class ActionApiImpl implements ActionApi {
     @Override
     public SetDataEventOutcome saveFile(String taskId, String fieldId, ActionFileHolder file, Map<String, String> params) {
         log.debug("Saving file [{}] for task [{}] and field [{}] with params [{}]", file.getFileName(), taskId, fieldId, params);
-        MultipartFile multipartFile = new MockMultipartFile(file.getFileName(), file.getFileContent());
+        MultipartFile multipartFile = new MockMultipartFile(file.getFileName(), file.getFileName(), null, file.getFileContent());
         log.trace("Saving file [{}] for task [{}] and field [{}] with params [{}]", multipartFile.getOriginalFilename(), taskId, fieldId, params);
         return dataService.saveFile(taskId, fieldId, multipartFile, params);
     }
@@ -266,7 +266,7 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
-    public ActionFileHolder getFile(String caseId, String fieldId, boolean forPreview, Map<String, String> params) throws IOException {
+    public ActionFileHolder getFile(String caseId, String fieldId, Boolean forPreview, Map<String, String> params) throws IOException {
         log.debug("Getting file for case [{}] and field [{}] with preview [{}] and params [{}]", caseId, fieldId, forPreview, params);
         FileFieldInputStream fileFieldInputStream = dataService.getFile(caseId, fieldId, forPreview, params);
         return ActionFileHolder.builder()
