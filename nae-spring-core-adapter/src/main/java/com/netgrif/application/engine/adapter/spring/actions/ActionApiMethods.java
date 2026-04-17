@@ -25,7 +25,7 @@ public enum ActionApiMethods {
     DELETE_FILE("deleteFile"),
     DELETE_FILE_BY_NAME("deleteFileByName"),
     GET_FILE("getFile"),
-    GET_FILE_BY_CASE_NAME("getFileByCaseName");
+    GET_FILE_BY_CASE_AND_NAME("getFileByCaseAndName");
 
     private String methodName;
 

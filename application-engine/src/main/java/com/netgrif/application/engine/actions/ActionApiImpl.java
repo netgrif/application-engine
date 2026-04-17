@@ -269,20 +269,24 @@ public class ActionApiImpl implements ActionApi {
     public ActionFileHolder getFile(String caseId, String fieldId, Boolean forPreview, Map<String, String> params) throws IOException {
         log.debug("Getting file for case [{}] and field [{}] with preview [{}] and params [{}]", caseId, fieldId, forPreview, params);
         FileFieldInputStream fileFieldInputStream = dataService.getFile(caseId, fieldId, forPreview, params);
-        return ActionFileHolder.builder()
-                .fileName(fileFieldInputStream.getFileName())
-                .fileContent(IOUtils.toByteArray(fileFieldInputStream.getInputStream()))
-                .build();
+        try (InputStream inputStream = fileFieldInputStream.getInputStream()) {
+            return ActionFileHolder.builder()
+                    .fileName(fileFieldInputStream.getFileName())
+                    .fileContent(IOUtils.toByteArray(inputStream))
+                    .build();
+        }
     }
 
     @Override
     public ActionFileHolder getFileByCaseAndName(String caseId, String fieldId, String name, Map<String, String> params) throws IOException {
         log.debug("Getting file [{}] for case [{}] and field [{}] with params [{}]", name, caseId, fieldId, params);
         FileFieldInputStream fileFieldInputStream = dataService.getFileByCaseAndName(caseId, fieldId, name, params);
-        return ActionFileHolder.builder()
-                .fileName(fileFieldInputStream.getFileName())
-                .fileContent(IOUtils.toByteArray(fileFieldInputStream.getInputStream()))
-                .build();
+        try (InputStream inputStream = fileFieldInputStream.getInputStream()) {
+            return ActionFileHolder.builder()
+                    .fileName(fileFieldInputStream.getFileName())
+                    .fileContent(IOUtils.toByteArray(inputStream))
+                    .build();
+        }
     }
 
     private AbstractUser resolveAbstractUser(AuthPrincipalDto authPrincipalDto) {
