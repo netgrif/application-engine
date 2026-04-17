@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.adapter.spring.actions.ActionApi;
+import com.netgrif.application.engine.adapter.spring.actions.ActionFileHolder;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
@@ -27,16 +28,21 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.task
 import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.params.DeleteCaseParams;
 import com.netgrif.application.engine.workflow.params.TaskParams;
+import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
 import java.util.*;
 
 @Slf4j
@@ -206,6 +212,49 @@ public class ActionApiImpl implements ActionApi {
     @Override
     public AbstractUser getSystemUser() {
         return userService.getSystem();
+    }
+
+    @Override
+    public SetDataEventOutcome saveFile(String taskId, String fieldId, ActionFileHolder file, Map<String, String> params) {
+        MultipartFile multipartFile = new MockMultipartFile(file.getFileName(), file.getFileContent());
+        return dataService.saveFile(taskId, fieldId, multipartFile, params);
+    }
+
+    @Override
+    public SetDataEventOutcome saveFiles(String taskId, String fieldId, ActionFileHolder[] files, Map<String, String> params) {
+        MultipartFile[] multipartFiles = new MultipartFile[files.length];
+        for (int i = 0; i < files.length; i++) {
+            multipartFiles[i] = new MockMultipartFile(files[i].getFileName(), files[i].getFileContent());
+        }
+        return dataService.saveFiles(taskId, fieldId, multipartFiles, params);
+    }
+
+    @Override
+    public SetDataEventOutcome deleteFile(String taskId, String fieldId, Map<String, String> params) {
+        return dataService.deleteFile(taskId, fieldId, params);
+    }
+
+    @Override
+    public SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name, Map<String, String> params) {
+        return dataService.deleteFileByName(taskId, fieldId, name, params);
+    }
+
+    @Override
+    public ActionFileHolder getFile(String caseId, String fieldId, boolean forPreview, Map<String, String> params) throws IOException {
+        FileFieldInputStream fileFieldInputStream = dataService.getFile(caseId, fieldId, forPreview, params);
+        return ActionFileHolder.builder()
+                .fileName(fileFieldInputStream.getFileName())
+                .fileContent(IOUtils.toByteArray(fileFieldInputStream.getInputStream()))
+                .build();
+    }
+
+    @Override
+    public ActionFileHolder getFileByCaseAndName(String caseId, String fieldId, String name, Map<String, String> params) throws IOException {
+        FileFieldInputStream fileFieldInputStream = dataService.getFileByCaseAndName(caseId, fieldId, name, params);
+        return ActionFileHolder.builder()
+                .fileName(fileFieldInputStream.getFileName())
+                .fileContent(IOUtils.toByteArray(fileFieldInputStream.getInputStream()))
+                .build();
     }
 
     private AbstractUser resolveAbstractUser(AuthPrincipalDto authPrincipalDto) {
