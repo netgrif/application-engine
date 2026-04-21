@@ -70,7 +70,7 @@
         <spring.boot.version>3.5.8</spring.boot.version>
         <jackson.version>2.17.1</jackson.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <querydsl.version>5.0.0</querydsl.version>
+        <querydsl.version>5.1.0</querydsl.version>
         <protobuf.version>4.33.1</protobuf.version>
         <grpc.version>1.69.1</grpc.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
