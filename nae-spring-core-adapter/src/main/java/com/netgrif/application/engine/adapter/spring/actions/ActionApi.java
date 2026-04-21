@@ -18,6 +18,8 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Map;
 import java.util.List;
 
@@ -195,4 +197,16 @@ public interface ActionApi {
      * @return the system user
      */
     AbstractUser getSystemUser();
+
+    SetDataEventOutcome saveFile(String taskId, String fieldId, ActionFileHolder file, Map<String, String> params);
+
+    SetDataEventOutcome saveFiles(String taskId, String fieldId, ActionFileHolder[] files, Map<String, String> params);
+
+    SetDataEventOutcome deleteFile(String taskId, String fieldId, Map<String, String> params);
+
+    SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name, Map<String, String> params);
+
+    ActionFileHolder getFile(String caseId, String fieldId, Boolean forPreview, Map<String, String> params) throws IOException;
+
+    ActionFileHolder getFileByCaseAndName(String caseId, String fieldId, String name, Map<String, String> params) throws IOException;
 }

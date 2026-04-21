@@ -523,7 +523,7 @@ public class DataService implements IDataService {
     public FileFieldInputStream getFileByTask(String taskId, String fieldId, boolean forPreview) throws FileNotFoundException {
         Task task = taskService.findOne(taskId);
 
-        FileFieldInputStream fileFieldInputStream = getFileByCase(task.getCaseId(), task, fieldId, forPreview);
+        FileFieldInputStream fileFieldInputStream = getFileByCase(task.getCaseId(), fieldId, forPreview);
 
         if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null)
             throw new FileNotFoundException("File in field %s within task %s was not found!".formatted(fieldId, taskId));
@@ -543,10 +543,10 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public FileFieldInputStream getFileByCase(String caseId, Task task, String fieldId, boolean forPreview) throws FileNotFoundException {
+    public FileFieldInputStream getFileByCase(String caseId, String fieldId, boolean forPreview) throws FileNotFoundException {
         Case useCase = workflowService.findOne(caseId);
         FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
-        return getFile(useCase, task, field, forPreview);
+        return getFile(useCase, field, forPreview);
     }
 
     @Override
@@ -584,12 +584,19 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview) throws FileNotFoundException {
-        return getFile(useCase, task, field, forPreview, new HashMap<>());
+    public FileFieldInputStream getFile(Case useCase, FileField field, boolean forPreview) throws FileNotFoundException {
+        return getFile(useCase, field, forPreview, new HashMap<>());
     }
 
     @Override
-    public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview, Map<String, String> params) throws FileNotFoundException {
+    public FileFieldInputStream getFile(String caseId, String fieldId, boolean forPreview, Map<String, String> params) throws FileNotFoundException {
+        Case useCase = workflowService.findOne(caseId);
+        FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
+        return getFile(useCase, field, forPreview, params);
+    }
+
+    @Override
+    public FileFieldInputStream getFile(Case useCase, FileField field, boolean forPreview, Map<String, String> params) throws FileNotFoundException {
         runGetActionsFromFileField(field.getEvents(), useCase, params);
         if (useCase.getFieldValue(field.getStringId()) == null) {
             throw new FileNotFoundException("Field %s not found on case %s".formatted(field.getStringId(), useCase.getStringId()));

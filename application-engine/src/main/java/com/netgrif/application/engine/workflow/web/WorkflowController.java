@@ -249,7 +249,7 @@ public class WorkflowController {
     @Operation(summary = "Download case file field value", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/{id}/file", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String caseId, @RequestParam("fieldId") String fieldId) throws FileNotFoundException {
-        FileFieldInputStream fileFieldInputStream = dataService.getFileByCase(caseId, null, fieldId, false);
+        FileFieldInputStream fileFieldInputStream = dataService.getFileByCase(caseId, fieldId, false);
 
         if (fileFieldInputStream.getInputStream() == null)
             throw new FileNotFoundException("File in field " + fieldId + " within case " + caseId + " was not found!");

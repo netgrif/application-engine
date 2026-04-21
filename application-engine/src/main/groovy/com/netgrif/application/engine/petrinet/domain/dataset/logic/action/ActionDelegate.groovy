@@ -1586,7 +1586,7 @@ class ActionDelegate {
     }
 
     FileFieldInputStream getFileFieldStream(Case useCase, Task task, FileField field, boolean forPreview = false) {
-        return this.dataService.getFile(useCase, task, field, forPreview)
+        return this.dataService.getFile(useCase, field, forPreview)
     }
 
     /**

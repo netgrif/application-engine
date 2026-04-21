@@ -19,7 +19,13 @@ public enum ActionApiMethods {
     CANCEL_TASK("cancelTask"),
     FINISH_TASK("finishTask"),
     SEARCH_USERS("searchUsers"),
-    GET_SYSTEM_USER("getSystemUser");
+    GET_SYSTEM_USER("getSystemUser"),
+    SAVE_FILE("saveFile"),
+    SAVE_FILES("saveFiles"),
+    DELETE_FILE("deleteFile"),
+    DELETE_FILE_BY_NAME("deleteFileByName"),
+    GET_FILE("getFile"),
+    GET_FILE_BY_CASE_AND_NAME("getFileByCaseAndName");
 
     private String methodName;
 
