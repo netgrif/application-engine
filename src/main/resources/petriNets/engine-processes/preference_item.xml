@@ -1232,6 +1232,12 @@
 		<icon>settings</icon>
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
+			<id>default</id>
+			<logic>
+				<view>true</view>
+			</logic>
+		</roleRef>
+		<roleRef>
 			<id>admin</id>
 			<logic>
 				<perform>true</perform>
@@ -1939,6 +1945,12 @@
 		<y>100</y>
 		<label>Case view settings [referenced]</label>
 		<roleRef>
+			<id>default</id>
+			<logic>
+				<view>true</view>
+			</logic>
+		</roleRef>
+		<roleRef>
 			<id>system</id>
 			<logic>
 				<perform>true</perform>
@@ -2214,6 +2226,12 @@
 		<x>340</x>
 		<y>340</y>
 		<label>Task view settings [referenced]</label>
+		<roleRef>
+			<id>default</id>
+			<logic>
+				<view>true</view>
+			</logic>
+		</roleRef>
 		<roleRef>
 			<id>system</id>
 			<logic>
