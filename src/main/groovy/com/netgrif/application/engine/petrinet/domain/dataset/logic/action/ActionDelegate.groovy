@@ -925,7 +925,7 @@ class ActionDelegate {
      * current action context see other overloads of this action.
      *
      * <p>If the field value is {@code null}, this method returns an empty list.</p>
-     * <p>If the value cannot be converted to case IDs, this method returns {@code null}.</p>
+     * <p>If the value cannot be converted to case IDs, this method returns an empty list.</p>
      *
      * @param caseRef field whose value contains case IDs, may be of types
      * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#CASE_REF},
@@ -960,7 +960,7 @@ class ActionDelegate {
      * action context see other overloads of this action.
      *
      * <p>If the field value is {@code null}, this method returns an empty list.</p>
-     * <p>If the value cannot be converted to case IDs, this method returns {@code null}.</p>
+     * <p>If the value cannot be converted to case IDs, this method returns an empty list.</p>
      *
      * @param caseRef field whose value contains case IDs, may be of types
      * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#CASE_REF},
@@ -1346,7 +1346,7 @@ class ActionDelegate {
      * Finds tasks by their MongoDB IDs.
      *
      * @param mongoIds task identifiers
-     * @return list of matching tasks, or an empty list when the input is {@code null} org {@code empty}
+     * @return list of matching tasks, or an empty list when the input is {@code null} or {@code empty}
      * @see ActionDelegate#findTasks(Field)
      * @see ActionDelegate#findTasks(DataField)
      */
