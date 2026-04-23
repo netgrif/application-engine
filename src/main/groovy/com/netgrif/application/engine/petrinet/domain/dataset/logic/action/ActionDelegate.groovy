@@ -949,7 +949,7 @@ class ActionDelegate {
             return this.findCases([caseRef.value].flatten() as List<String>)
         } catch (ClassCastException e) {
             log.error("Method cannot be used with field with id [${caseRef.importId}].", e)
-            return null
+            return []
         }
     }
 
