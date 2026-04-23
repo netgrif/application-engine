@@ -34,7 +34,7 @@ import javax.mail.internet.MimeMessage
 
 import static java.util.Base64.*
 import static org.junit.jupiter.api.Assertions.assertThrows
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @ActiveProfiles(["test"])
@@ -60,6 +60,9 @@ class ActionDelegateTest {
     private IPetriNetService petriNetService
 
     private static final ACTION_API_NET_IDENTIFIER = "action_api_improvements"
+    private static final ERROR_MESSAGE_TEMPLATE = "field [|fieldId|] in [|testedMethod|] method returned null"
+    private static final FIELD_ID_TEMPLATE = "|fieldId|"
+    private static final TESTED_METHOD_TEMPLATE = "|testedMethod|"
 
     @BeforeEach
     void before() {
@@ -349,7 +352,7 @@ class ActionDelegateTest {
         List<String> transitionIds = ["t1", "t2"]
         IUser user = userService.getLoggedOrSystem()
 
-//        testing "byTransition" variants should be enough, as they call methods, that tak List<Task> instead of List<String>
+//        testing "byTransition" variants should be enough, as they call methods, that take List<Task> instead of List<String>
         List<Task> tasks = actionDelegate.assignTasksByTransitions(transitionIds, testCase)
         assert tasks != null
         assert tasks.size() == transitionIds.size()
@@ -383,73 +386,83 @@ class ActionDelegateTest {
         })
 
         String expectedMessage = "Could not find Case with id [${deletedCaseId}]"
-        assertTrue(expectedMessage == e.getMessage())
+        assertEquals(expectedMessage, e.getMessage())
     }
 
     private void assertTaskSearchResults(String fieldId, Case testCase, int sizeToCheck, boolean singleValueField) {
         actionDelegate.initFieldsMap([(fieldId): fieldId])
+        String errorMessageWithFieldId = ERROR_MESSAGE_TEMPLATE.replace(FIELD_ID_TEMPLATE, fieldId)
         Field field = actionDelegate.map.get(fieldId)
         String firstTaskId = ([field.value].flatten() as List<String>)[0]
 
         Task task = actionDelegate.findTask(field)
-        assert fieldId && task != null
-        assert fieldId && task.stringId == firstTaskId
+        String errorMessage = errorMessageWithFieldId.replace(TESTED_METHOD_TEMPLATE, "findTask(Field)")
+        assert task != null : errorMessage
+        assert task.stringId == firstTaskId : errorMessage
         task = null
 
         List<Task> tasks = actionDelegate.findTasks(field)
-        assert fieldId && tasks != null
-        assert fieldId && !tasks.empty
-        assert fieldId && tasks.size() == sizeToCheck
+        errorMessage = errorMessageWithFieldId.replace(TESTED_METHOD_TEMPLATE, "findTasks(Field)")
+        assert tasks != null : errorMessage
+        assert !tasks.empty : errorMessage
+        assert tasks.size() == sizeToCheck : errorMessage
         if (singleValueField) {
-            assert fieldId && tasks[0].stringId == firstTaskId
+            assert tasks[0].stringId == firstTaskId : errorMessage
         }
         tasks = null
 
         DataField dataField = testCase.getDataField(fieldId)
         task = actionDelegate.findTask(dataField)
-        assert fieldId && task != null
-        assert fieldId && task.stringId == firstTaskId
+        errorMessage = errorMessageWithFieldId.replace(TESTED_METHOD_TEMPLATE, "findTask(DataField)")
+        assert task != null : errorMessage
+        assert task.stringId == firstTaskId : errorMessage
 
         tasks = actionDelegate.findTasks(dataField)
-        assert fieldId && tasks != null
-        assert fieldId && !tasks.empty
-        assert fieldId && tasks.size() == sizeToCheck
+        errorMessage = errorMessageWithFieldId.replace(TESTED_METHOD_TEMPLATE, "findTasks(DataField)")
+        assert tasks != null : errorMessage
+        assert !tasks.empty : errorMessage
+        assert tasks.size() == sizeToCheck : errorMessage
         if (singleValueField) {
-            assert fieldId && tasks[0].stringId == firstTaskId
+            assert tasks[0].stringId == firstTaskId : errorMessage
         }
     }
 
     private void assertCaseSearchResults(String fieldId, Case testCase, int sizeToCheck, boolean singleValueField) {
         actionDelegate.initFieldsMap([(fieldId): fieldId])
+        String errorMessageWithFieldId = ERROR_MESSAGE_TEMPLATE.replace(FIELD_ID_TEMPLATE, fieldId)
         Field field = actionDelegate.map.get(fieldId)
         String firstCaseId = ([field.value].flatten() as List<String>)[0]
 
         Case searchedCase = actionDelegate.findCase(field)
-        assert fieldId && searchedCase != null
-        assert fieldId && searchedCase.stringId == firstCaseId
+        String errorMessage = errorMessageWithFieldId.replace(TESTED_METHOD_TEMPLATE, "findCase(Field)")
+        assert searchedCase != null : errorMessage
+        assert searchedCase.stringId == firstCaseId : errorMessage
         searchedCase = null
 
         List<Case> searchedCases = actionDelegate.findCases(field)
-        assert fieldId && searchedCases != null
-        assert fieldId && !searchedCases.empty
-        assert fieldId && searchedCases.size() == sizeToCheck
+        errorMessage = errorMessageWithFieldId.replace(TESTED_METHOD_TEMPLATE, "findCases(Field)")
+        assert searchedCases != null : errorMessage
+        assert !searchedCases.empty : errorMessage
+        assert searchedCases.size() == sizeToCheck : errorMessage
         if (singleValueField) {
-            assert fieldId && searchedCases[0].stringId == firstCaseId
+            assert searchedCases[0].stringId == firstCaseId : errorMessage
         }
         searchedCases = null
 
 
         DataField dataField = testCase.getDataField(fieldId)
         searchedCase = actionDelegate.findCase(dataField)
-        assert fieldId && searchedCase != null
-        assert fieldId && searchedCase.stringId == firstCaseId
+        errorMessage = errorMessageWithFieldId.replace(TESTED_METHOD_TEMPLATE, "findCase(DataField)")
+        assert searchedCase != null: errorMessage
+        assert searchedCase.stringId == firstCaseId: errorMessage
 
         searchedCases = actionDelegate.findCases(dataField)
-        assert fieldId && searchedCases != null
-        assert fieldId && !searchedCases.empty
-        assert fieldId && searchedCases.size() == sizeToCheck
+        errorMessage = errorMessageWithFieldId.replace(TESTED_METHOD_TEMPLATE, "findCases(DataField)")
+        assert searchedCases != null: errorMessage
+        assert !searchedCases.empty: errorMessage
+        assert searchedCases.size() == sizeToCheck: errorMessage
         if (singleValueField) {
-            assert fieldId && searchedCases[0].stringId == firstCaseId
+            assert searchedCases[0].stringId == firstCaseId: errorMessage
         }
     }
 

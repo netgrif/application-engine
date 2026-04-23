@@ -984,7 +984,7 @@ class ActionDelegate {
             return this.findCases([caseRef.value].flatten() as List<String>)
         } catch (ClassCastException e) {
             log.error("Method cannot be used with field.", e)
-            return null
+            return []
         }
     }
 
@@ -993,14 +993,14 @@ class ActionDelegate {
      * Finds cases by their MongoDB IDs.
      *
      * @param mongoIds list of case IDs
-     * @return list of matching cases, or an empty list when the input is {@code null}
+     * @return list of matching cases, or an empty list when the input is {@code null} or {@code empty}
      * @see ActionDelegate#findCases(Field)
      * @see ActionDelegate#findCases(DataField)
      * @see ActionDelegate#findCases(Closure)
      * @see ActionDelegate#findCases(Closure, Pageable)
      */
     List<Case> findCases(List<String> mongoIds) {
-        if(mongoIds == null) {
+        if(mongoIds == null || mongoIds.empty) {
             log.warn("Null value detected, returning empty list.")
             return []
         }
@@ -1020,7 +1020,7 @@ class ActionDelegate {
      * Use this overload when working on a case from current action context. For working with fields from out of the
      * current action context see other overloads of this action.
      *
-     * <p>If the field value is {@code null}, this method returns an empty list.</p>
+     * <p>If the field value is {@code null}, this method returns {@code null}.</p>
      * <p>If the value cannot be converted to case IDs, this method returns {@code null}.</p>
      *
      * @param caseRef field whose value contains case IDs, may be of types
@@ -1030,7 +1030,7 @@ class ActionDelegate {
      * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
      * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
      * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
-     * @return list of matching cases, or an empty list when the field value is {@code null}
+     * @return referenced case, or {@code null} when the field value is invalid
      * @see ActionDelegate#findCase(DataField)
      * @see ActionDelegate#findCase(String)
      * @see ActionDelegate#findCase(Closure)
@@ -1060,7 +1060,7 @@ class ActionDelegate {
      * Use this overload when working on a case from out of current action context. For working with fields from the current
      * action context see other overloads of this action.
      *
-     * <p>If the field value is {@code null}, this method returns an empty list.</p>
+     * <p>If the field value is {@code null}, this method returns {@code null}.</p>
      * <p>If the value cannot be converted to case IDs, this method returns {@code null}.</p>
      *
      * @param caseRef field whose value contains case IDs, may be of types
@@ -1070,7 +1070,7 @@ class ActionDelegate {
      * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
      * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
      * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
-     * @return list of matching cases, or an empty list when the field value is {@code null}
+     * @return referenced case, or {@code null} when the dataField value is invalid
      * @see ActionDelegate#findCase(Field)
      * @see ActionDelegate#findCase(String)
      * @see ActionDelegate#findCase(Closure)
@@ -1259,7 +1259,7 @@ class ActionDelegate {
      * @return finished tasks
      */
     List<Task> finishTasks(List<Task> tasks, IUser finisher = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        List<FinishTaskEventOutcome> outcomes = taskService.finishTasks(tasks, finisher)
+        List<FinishTaskEventOutcome> outcomes = taskService.finishTasks(tasks, finisher, params)
         this.outcomes.addAll(outcomes)
         return outcomes.collect { it.task }
     }
@@ -1346,12 +1346,12 @@ class ActionDelegate {
      * Finds tasks by their MongoDB IDs.
      *
      * @param mongoIds task identifiers
-     * @return list of matching tasks, or an empty list when the input is {@code null}
+     * @return list of matching tasks, or an empty list when the input is {@code null} org {@code empty}
      * @see ActionDelegate#findTasks(Field)
      * @see ActionDelegate#findTasks(DataField)
      */
     List<Task> findTasks(List<String> mongoIds) {
-        if(mongoIds == null) {
+        if(mongoIds == null || mongoIds.empty) {
             log.warn("Null value detected, returning empty list.")
             return []
         }
@@ -1440,7 +1440,7 @@ class ActionDelegate {
                 log.error("Value of field does not contain at least one element, returning null.")
                 return null
             }
-            return taskService.findOne(castValue[0])
+            return this.findTask(castValue[0])
         } catch (ClassCastException e) {
             log.error("Method cannot be used with field.", e)
             return null
@@ -1479,10 +1479,10 @@ class ActionDelegate {
      * Finds Petri nets by their MongoDB IDs.
      *
      * @param mongoIds list of Petri net identifiers
-     * @return matching Petri nets, or an empty list when the input is {@code null}
+     * @return matching Petri nets, or an empty list when the input is {@code null} or {@code empty}
      */
     List<PetriNet> findPetriNets(List<String> mongoIds) {
-        if(mongoIds == null){
+        if(mongoIds == null || mongoIds.empty){
             log.warn("Null value detected, returning empty list.")
             return []
         }
@@ -1493,10 +1493,10 @@ class ActionDelegate {
      * Finds Petri nets by their {@link ObjectId} values.
      *
      * @param objectIds list of Petri net object identifiers
-     * @return matching Petri nets, or an empty list when the input is {@code null}
+     * @return matching Petri nets, or an empty list when the input is {@code null} or {@code empty}
      */
     List<PetriNet> findPetriNetsByObjectIds(List<ObjectId> objectIds) {
-        if(objectIds == null){
+        if(objectIds == null || objectIds.empty){
             log.warn("Null value detected, returning empty list.")
             return []
         }

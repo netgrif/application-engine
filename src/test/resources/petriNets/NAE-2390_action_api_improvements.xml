@@ -2,7 +2,7 @@
 	<id>action_api_improvements</id>
 	<version>1.0.0</version>
 	<initials>NEW</initials>
-	<title>New Model</title>
+	<title>Action API Improvements Test</title>
 	<icon>device_hub</icon>
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
