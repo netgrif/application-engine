@@ -199,6 +199,14 @@ public abstract class AbstractUser extends AbstractActor {
         return null;
     }
 
+    public boolean isImpersonating() {
+        return false;
+    }
+
+    public String getSelfOrImpersonatedStringId() {
+        return this.getStringId();
+    }
+
     /**
      * Returns a user's first and last name concatenated.
      */

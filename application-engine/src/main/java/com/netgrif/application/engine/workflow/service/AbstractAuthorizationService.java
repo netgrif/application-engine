@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,11 +23,9 @@ public abstract class AbstractAuthorizationService {
         return permissionValue != null && !permissionValue;
     }
 
-    protected Map<String, Boolean> getAggregatePermissions(AbstractUser user, Map<String, Map<String, Boolean>> permissions) {
+    protected Map<String, Boolean> getAggregatePermissions(LoggedUser user, Map<String, Map<String, Boolean>> permissions) {
         Map<String, Boolean> aggregatePermissions = new HashMap<>();
 
-//        Set<String> userProcessRoleIDs = user.getSelfOrImpersonated().getProcessRoles().stream().map(role -> role.get_id().toString()).collect(Collectors.toSet());
-        // TODO: impersonation
         Set<String> userProcessRoleIDs = user.getProcessRoles().stream()
                 .map(role -> role.get_id().toString())
                 .collect(Collectors.toSet());
@@ -53,8 +51,7 @@ public abstract class AbstractAuthorizationService {
         }
     }
 
-    protected Map<String, Boolean> findUserPermissions(Map<String, Map<String, Boolean>> docPermissions, AbstractUser user) {
-        // TODO: impersonation
+    protected Map<String, Boolean> findUserPermissions(Map<String, Map<String, Boolean>> docPermissions, LoggedUser user) {
         if (docPermissions == null) {
             return null;
         }

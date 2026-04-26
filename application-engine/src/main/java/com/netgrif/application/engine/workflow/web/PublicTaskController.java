@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
@@ -81,7 +80,7 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> assign(@PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
         return super.assign(loggedUser, taskId, locale);
     }
 
@@ -96,7 +95,7 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> finish(@PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
         return super.finish(loggedUser, taskId, locale);
     }
 
@@ -111,7 +110,7 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> cancel(@PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
+        LoggedUser loggedUser = userService.getLoggedUserFromContext();
         return super.cancel(loggedUser, taskId, locale);
     }
 
@@ -210,6 +209,6 @@ public class PublicTaskController extends AbstractTaskController {
     @Operation(summary = "Generic task search on Mongo database")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        return super.searchPublic(ActorTransformer.toLoggedUser(userService.getLoggedUser()), pageable, searchBody, operation, assembler, locale);
+        return super.searchPublic(userService.getLoggedUserFromContext(), pageable, searchBody, operation, assembler, locale);
     }
 }

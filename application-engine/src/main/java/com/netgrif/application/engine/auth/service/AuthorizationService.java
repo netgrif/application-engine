@@ -13,8 +13,6 @@ public class AuthorizationService implements IAuthorizationService {
 
     @Override
     public boolean hasAuthority(String authority) {
-        // TODO: impersonation
-//        LoggedUser loggedUser = userService.getLoggedUserFromContext().getSelfOrImpersonated();
         LoggedUser loggedUser = userService.getLoggedUserFromContext();
         return loggedUser.getAuthoritySet().stream().anyMatch(it -> it.getAuthority().equals(authority));
     }

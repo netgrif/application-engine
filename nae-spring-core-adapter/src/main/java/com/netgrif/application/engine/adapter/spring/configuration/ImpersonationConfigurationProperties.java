@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.configuration.properties;
+package com.netgrif.application.engine.adapter.spring.configuration;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "netgrif.engine.impersonation")
+@ConfigurationProperties(prefix = "netgrif.impersonation")
 public class ImpersonationConfigurationProperties {
 
     /**
@@ -26,11 +26,5 @@ public class ImpersonationConfigurationProperties {
      * Indicates whether impersonation functionality is enabled.
      */
     private boolean enabled;
-
-    /**
-     * Specifies the maximum number of impersonation configurations allowed per user.
-     * Defaults to {@code 1000}.
-     */
-    private int configsPerUser = 1000;
 
 }

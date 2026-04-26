@@ -1,12 +1,11 @@
 package com.netgrif.application.engine.migration
 
 import com.netgrif.application.engine.auth.service.UserService
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
@@ -30,7 +29,7 @@ class ActionMigration {
             ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(ImportPetriNetParams.with()
                     .xmlFile(netStream)
                     .releaseType(VersionType.MAJOR)
-                    .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+                    .author(userService.getLoggedOrSystem())
                     .build())
             List<PetriNet> oldPetriNets
 
@@ -44,7 +43,7 @@ class ActionMigration {
                         .collect(Collectors.toList())
             }
 
-            if (oldPetriNets.size() == 0){
+            if (oldPetriNets.size() == 0) {
                 String message = "Older version of Petri net with ID [" + newPetriNet.getNet().importId + "] is not present in MongoDB."
                 log.error(message)
                 throw new IllegalArgumentException(message)

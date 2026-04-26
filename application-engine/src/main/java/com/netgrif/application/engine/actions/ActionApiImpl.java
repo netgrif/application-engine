@@ -142,7 +142,7 @@ public class ActionApiImpl implements ActionApi {
                 .processIdentifier(identifier)
                 .title(title)
                 .color(color)
-                .author(resolveAbstractUser(authPrincipalDto))
+                .author(ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto)))
                 .locale(locale)
                 .params(params)
                 .build());
@@ -178,7 +178,7 @@ public class ActionApiImpl implements ActionApi {
     public AssignTaskEventOutcome assignTask(String taskId, AuthPrincipalDto authPrincipalDto, Map<String, String> params) throws TransitionNotExecutableException {
         log.debug("Assigning task [{}] with auth principal [{}] and params [{}]", taskId, authPrincipalDto, params);
         Task task = taskService.findOne(taskId);
-        AbstractUser user = resolveAbstractUser(authPrincipalDto);
+        LoggedUser user = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
         return taskService.assignTask(TaskParams.with()
                 .task(task)
                 .user(user)
@@ -190,7 +190,7 @@ public class ActionApiImpl implements ActionApi {
     public CancelTaskEventOutcome cancelTask(String taskId, AuthPrincipalDto authPrincipalDto, Map<String, String> params) {
         log.debug("Canceling task [{}] with auth principal [{}] and params [{}]", taskId, authPrincipalDto, params);
         Task task = taskService.findOne(taskId);
-        AbstractUser user = resolveAbstractUser(authPrincipalDto);
+        LoggedUser user = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
         return taskService.cancelTask(TaskParams.with()
                 .task(task)
                 .user(user)
@@ -202,7 +202,7 @@ public class ActionApiImpl implements ActionApi {
     public FinishTaskEventOutcome finishTask(String taskId, AuthPrincipalDto authPrincipalDto, Map<String, String> params) throws TransitionNotExecutableException {
         log.debug("Finishing task [{}] with auth principal [{}] and params [{}]", taskId, authPrincipalDto, params);
         Task task = taskService.findOne(taskId);
-        AbstractUser user = resolveAbstractUser(authPrincipalDto);
+        LoggedUser user = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
         return taskService.finishTask(TaskParams.with()
                 .task(task)
                 .user(user)

@@ -4,6 +4,7 @@ import com.netgrif.application.engine.MockService;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
@@ -135,7 +136,7 @@ public class TaskServiceTest {
 
         service.assignTask(TaskParams.with()
                 .task(task)
-                .user(user)
+                .user(ActorTransformer.toLoggedUser(user))
                 .build());
         Case useCase = caseRepository.findById(outcome.getCase().getStringId()).get();
 
@@ -145,7 +146,7 @@ public class TaskServiceTest {
 
         service.cancelTask(TaskParams.with()
                 .task(task)
-                .user(user)
+                .user(ActorTransformer.toLoggedUser(user))
                 .build());
         useCase = caseRepository.findById(useCase.getStringId()).get();
 

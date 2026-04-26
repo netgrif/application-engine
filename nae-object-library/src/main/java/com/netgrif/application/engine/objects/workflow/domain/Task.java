@@ -43,6 +43,11 @@ public abstract class Task implements Serializable {
     @Getter
     @Setter
     @Indexed
+    private String processIdentifier;
+
+    @Getter
+    @Setter
+    @Indexed
     private String caseId;
 
     @Getter
@@ -78,6 +83,14 @@ public abstract class Task implements Serializable {
     @Getter
     @Setter
     private AbstractUser user;
+
+    @Getter
+    @Setter
+    private String impersonatorUserId;
+
+    @Getter
+    @Setter
+    private String impersonatorUsername;
 
     @Setter
     private List<Trigger> triggers = new LinkedList<>();

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.params;
 
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.TaskService;
@@ -29,7 +29,7 @@ public class TaskParams {
     private Case useCase;
 
     /// Subject user for the specific task event (new assignee or current assignee)
-    private AbstractUser user;
+    private LoggedUser user;
 
     @Builder.Default
     private Map<String, String> params = new HashMap<>();
@@ -38,7 +38,7 @@ public class TaskParams {
         this(task, null);
     }
 
-    public TaskParams(Task task, AbstractUser user) {
+    public TaskParams(Task task, LoggedUser user) {
         this.task = task;
         if (task != null) {
             this.taskId = task.getStringId();
@@ -51,7 +51,7 @@ public class TaskParams {
         this(taskId, null);
     }
 
-    public TaskParams(String taskId, AbstractUser user) {
+    public TaskParams(String taskId, LoggedUser user) {
         this.taskId = taskId;
         this.user = user;
         this.params = new HashMap<>();

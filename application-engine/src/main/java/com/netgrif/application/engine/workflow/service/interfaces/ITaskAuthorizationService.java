@@ -1,25 +1,17 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.RolePermission;
-import com.netgrif.application.engine.petrinet.domain.throwable.IllegalTaskStateException;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
+import com.netgrif.application.engine.petrinet.domain.throwable.IllegalTaskStateException;
 
 public interface ITaskAuthorizationService {
-    Boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions);
 
-    Boolean userHasAtLeastOneRolePermission(AbstractUser user, Task task, RolePermission... permissions);
+    Boolean userHasAtLeastOneRolePermission(LoggedUser user, Task task, RolePermission... permissions);
 
-    Boolean userHasUserListPermission(LoggedUser loggedUser, String taskId, RolePermission... permissions);
+    Boolean userHasUserListPermission(LoggedUser user, Task task, RolePermission... permissions);
 
-    Boolean userHasUserListPermission(AbstractUser user, Task task, RolePermission... permissions);
-
-    boolean isAssignee(LoggedUser loggedUser, String taskId);
-
-    boolean isAssignee(AbstractUser user, String taskId);
-
-    boolean isAssignee(AbstractUser user, Task task);
+    boolean isAssignee(LoggedUser user, Task task);
 
     boolean canCallAssign(LoggedUser loggedUser, String taskId);
 

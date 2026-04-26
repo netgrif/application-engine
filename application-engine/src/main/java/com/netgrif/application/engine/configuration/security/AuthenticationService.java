@@ -1,16 +1,13 @@
 package com.netgrif.application.engine.configuration.security;
 
 
+import com.netgrif.application.engine.auth.repository.ImpersonatorRepository;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
-import com.netgrif.application.engine.configuration.properties.ServerConfigurationProperties;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.configuration.security.interfaces.IAuthenticationService;
-import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
@@ -32,13 +29,13 @@ public class AuthenticationService implements IAuthenticationService, Applicatio
 
     private ConcurrentMap<String, Attempt> cache;
 
-    private final IImpersonationService impersonationService;
+    private final ImpersonatorRepository impersonatorRepository;
     private final SecurityConfigurationProperties securityConfigurationProperties;
 
-    public AuthenticationService(IImpersonationService impersonationService,
+    public AuthenticationService(ImpersonatorRepository impersonatorRepository,
                                  SecurityConfigurationProperties securityConfigurationProperties) {
         super();
-        this.impersonationService = impersonationService;
+        this.impersonatorRepository = impersonatorRepository;
         this.securityConfigurationProperties = securityConfigurationProperties;
         cache = new ConcurrentHashMap<>();
     }
@@ -102,7 +99,7 @@ public class AuthenticationService implements IAuthenticationService, Applicatio
     protected void resolveImpersonatorOnLogin(Object principal) {
         try {
             if (principal instanceof LoggedUser) {
-                impersonationService.removeImpersonator(((LoggedUser) principal).getStringId());
+                impersonatorRepository.deleteById(((LoggedUser) principal).getStringId());
             }
         } catch (Exception e) {
             log.warn("Failed to resolve impersonator " + principal, e);
@@ -111,10 +108,11 @@ public class AuthenticationService implements IAuthenticationService, Applicatio
 
     protected void resolveImpersonatorOnLogout(Object principal) {
         try {
-            // TODO: impersonation
-//            if (principal instanceof LoggedUser && ((LoggedUser) principal).isImpersonating()) {
-//                impersonationService.onSessionDestroy((LoggedUser) principal);
-//            }
+            if (principal instanceof LoggedUser && ((LoggedUser) principal).isImpersonating()) {
+                impersonatorRepository.deleteById(((LoggedUser) principal).getStringId());
+                // TODO: event?
+//                publisher.publishEvent(new ImpersonationEvent(impersonator, impersonator.getImpersonated(), RunPhase.STOP));
+            }
         } catch (Exception e) {
             log.warn("Failed to resolve impersonator " + principal, e);
         }

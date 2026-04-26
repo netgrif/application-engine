@@ -27,6 +27,8 @@ public class Task {
 
     private String transitionId;
 
+    private String processIdentifier;
+
     private TaskLayout layout;
 
     private String title;
@@ -38,6 +40,10 @@ public class Task {
     private Integer priority;
 
     private ActorRef assignee;
+
+    private String impersonatorUserId;
+
+    private String impersonatorUsername;
 
     private Map<String, Map<String, Boolean>> roles;
 
@@ -79,12 +85,15 @@ public class Task {
         this._id = task.getObjectId();
         this.caseId = task.getCaseId();
         this.transitionId = task.getTransitionId();
+        this.processIdentifier = task.getProcessIdentifier();
         this.layout = task.getLayout();
         this.title = task.getTitle().getTranslation(locale);
         this.caseColor = task.getCaseColor();
         this.caseTitle = task.getCaseTitle();
         this.priority = task.getPriority();
         this.assignee = task.getAssignee();
+        this.impersonatorUserId = task.getImpersonatorUserId();
+        this.impersonatorUsername = task.getImpersonatorUsername();
         this.roles = task.getRoles();
         this.users = task.getActors();
         this.startDate = task.getStartDate();
@@ -109,6 +118,7 @@ public class Task {
         _id = new ProcessResourceId(entity.getId());
         caseId = entity.getCaseId();
         transitionId = entity.getTransitionId();
+        processIdentifier = entity.getProcessIdentifier();
         title = entity.getTitle().getDefaultValue();
         caseTitle = entity.getCaseTitle();
         priority = entity.getPriority();

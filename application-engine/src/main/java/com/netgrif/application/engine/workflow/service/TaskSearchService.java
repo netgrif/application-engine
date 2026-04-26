@@ -1,21 +1,24 @@
 package com.netgrif.application.engine.workflow.service;
 
+import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
+import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
+import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
-import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask;
-import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,10 +28,8 @@ public class TaskSearchService extends MongoSearchService<Task> {
     private IPetriNetService petriNetService;
 
     public Predicate buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
-        // TODO: impersonation
-//        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-        LoggedUser loggedOrImpersonated = user;
-        List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, loggedOrImpersonated, locale)).collect(Collectors.toList());
+        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, user, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
             // one of the queries evaluates to empty set => the entire result is an empty set
@@ -52,6 +53,10 @@ public class TaskSearchService extends MongoSearchService<Task> {
         permissionConstraints.or(buildViewActorQueryConstraint(loggedOrImpersonated));
         permissionConstraints.andNot(buildNegativeViewActorsQueryConstraint(loggedOrImpersonated));
         builder.and(permissionConstraints);
+        BooleanExpression impersonatedProcessesConstraints = buildImpersonatedProcessesConstraint(user);
+        if (impersonatedProcessesConstraints != null) {
+            builder.and(impersonatedProcessesConstraints);
+        }
         return builder;
     }
 
@@ -287,6 +292,22 @@ public class TaskSearchService extends MongoSearchService<Task> {
                 )
         );
         return false;
+    }
+
+    private static BooleanExpression buildImpersonatedProcessesConstraint(LoggedUser loggedUser) {
+        if (loggedUser.isAdmin() || !loggedUser.isImpersonating()) {
+            return null;
+        }
+        if (loggedUser.isProcessAccessDeny()) {
+            return null;
+        }
+        if (loggedUser.getImpersonatedProcesses() == null || loggedUser.getImpersonatedProcesses().isEmpty()) {
+            return null;
+        }
+        if (loggedUser.isImpersonatedProcessesListAllowing()) {
+            return QTask.task.processIdentifier.in(loggedUser.getImpersonatedProcesses());
+        }
+        return QTask.task.processIdentifier.notIn(loggedUser.getImpersonatedProcesses());
     }
 
     private void buildTagsQuery(TaskSearchRequest request, BooleanBuilder query) {

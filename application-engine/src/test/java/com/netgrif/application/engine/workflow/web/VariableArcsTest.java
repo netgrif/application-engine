@@ -173,14 +173,14 @@ public class VariableArcsTest {
             Task task = taskService.findOne(taskRef.getStringId());
             taskService.assignTask(TaskParams.with()
                     .task(task)
-                    .user(testUser)
+                    .user(ActorTransformer.toLoggedUser(testUser))
                     .build());
             finishCase = workflowService.findOne(task.getCaseId());
             assert !finishCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_start") &&
                     !finishCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_res");
             taskService.finishTask(TaskParams.with()
                     .task(task)
-                    .user(testUser)
+                    .user(ActorTransformer.toLoggedUser(testUser))
                     .build());
             finishCase = workflowService.findOne(task.getCaseId());
             assert !finishCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_start") &&
@@ -195,7 +195,7 @@ public class VariableArcsTest {
             markingBeforeAssign = finishCase.getActivePlaces().get(task.getTitle().getDefaultValue() + "_start");
             taskService.assignTask(TaskParams.with()
                     .task(task)
-                    .user(testUser)
+                    .user(ActorTransformer.toLoggedUser(testUser))
                     .build());
             finishCase = workflowService.findOne(task.getCaseId());
 
@@ -203,7 +203,7 @@ public class VariableArcsTest {
 
             taskService.finishTask(TaskParams.with()
                     .task(task)
-                    .user(testUser)
+                    .user(ActorTransformer.toLoggedUser(testUser))
                     .build());
             finishCase = workflowService.findOne(task.getCaseId());
 
@@ -218,7 +218,7 @@ public class VariableArcsTest {
             Task task = taskService.findOne(taskRef.getStringId());
             taskService.assignTask(TaskParams.with()
                     .task(task)
-                    .user(testUser)
+                    .user(ActorTransformer.toLoggedUser(testUser))
                     .build());
             finishCase = workflowService.findOne(task.getCaseId());
 
@@ -226,7 +226,7 @@ public class VariableArcsTest {
 
             taskService.finishTask(TaskParams.with()
                     .task(task)
-                    .user(testUser)
+                    .user(ActorTransformer.toLoggedUser(testUser))
                     .build());
             finishCase = workflowService.findOne(task.getCaseId());
 
@@ -241,7 +241,7 @@ public class VariableArcsTest {
             Task task = taskService.findOne(taskRef.getStringId());
             taskService.assignTask(TaskParams.with()
                     .task(task)
-                    .user(testUser)
+                    .user(ActorTransformer.toLoggedUser(testUser))
                     .build());
             finishCase = workflowService.findOne(task.getCaseId());
 
@@ -249,7 +249,7 @@ public class VariableArcsTest {
 
             taskService.finishTask(TaskParams.with()
                     .task(task)
-                    .user(testUser)
+                    .user(ActorTransformer.toLoggedUser(testUser))
                     .build());
             finishCase = workflowService.findOne(task.getCaseId());
 
@@ -288,7 +288,7 @@ public class VariableArcsTest {
             }
             taskService.assignTask(TaskParams.with()
                     .task(task)
-                    .user(testUser)
+                    .user(ActorTransformer.toLoggedUser(testUser))
                     .build());
             cancelCase = workflowService.findOne(task.getCaseId());
             assert !cancelCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_res");
@@ -307,17 +307,17 @@ public class VariableArcsTest {
                 Task addTokensTask = taskService.searchOne(qTask.transitionId.eq("add_tokens").and(qTask.caseId.eq(cancelCase.getStringId())));
                 taskService.assignTask(TaskParams.with()
                         .task(addTokensTask)
-                        .user(testUser)
+                        .user(ActorTransformer.toLoggedUser(testUser))
                         .build());
                 taskService.finishTask(TaskParams.with()
                         .task(addTokensTask)
-                        .user(testUser)
+                        .user(ActorTransformer.toLoggedUser(testUser))
                         .build());
             }
             int tokensAfterCancel = 0;
             taskService.cancelTask(TaskParams.with()
                     .task(task)
-                    .user(testUser)
+                    .user(ActorTransformer.toLoggedUser(testUser))
                     .build());
             cancelCase = workflowService.findOne(task.getCaseId());
             if (!arcType.equals("inhib")) {
@@ -340,11 +340,11 @@ public class VariableArcsTest {
                 Task removeTokensTask = taskService.searchOne(qTask.transitionId.eq("remove_tokens").and(qTask.caseId.eq(cancelCase.getStringId())));
                 taskService.assignTask(TaskParams.with()
                         .task(removeTokensTask)
-                        .user(testUser)
+                        .user(ActorTransformer.toLoggedUser(testUser))
                         .build());
                 taskService.finishTask(TaskParams.with()
                         .task(removeTokensTask)
-                        .user(testUser)
+                        .user(ActorTransformer.toLoggedUser(testUser))
                         .build());
                 tasksAfterPlaceRefReset = taskService.findAllByCase(cancelCase.getStringId(), LocaleContextHolder.getLocale());
             }
@@ -357,7 +357,7 @@ public class VariableArcsTest {
             Task task = taskService.findOne(taskRef.getStringId());
             taskService.assignTask(TaskParams.with()
                     .task(task)
-                    .user(testUser)
+                    .user(ActorTransformer.toLoggedUser(testUser))
                     .build());
             cancelCase = workflowService.findOne(task.getCaseId());
 
@@ -365,7 +365,7 @@ public class VariableArcsTest {
 
             taskService.cancelTask(TaskParams.with()
                     .task(task)
-                    .user(testUser)
+                    .user(ActorTransformer.toLoggedUser(testUser))
                     .build());
             cancelCase = workflowService.findOne(task.getCaseId());
 

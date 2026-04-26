@@ -1,18 +1,16 @@
 package com.netgrif.application.engine.security.service;
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
+import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -73,7 +71,13 @@ public class SecurityContextService implements ISecurityContextService {
     private void reloadSecurityContext(LoggedUser loggedUser, boolean forceRefresh) {
         if (isUserLogged(loggedUser) && cachedTokens.contains(loggedUser.getStringId())) {
             if (forceRefresh) {
-                loggedUser = ActorTransformer.toLoggedUser(userService.findById(loggedUser.getStringId(), null));
+                LoggedUser reloadedLoggedUser = ActorTransformer.toLoggedUser(userService.findById(loggedUser.getStringId(), null));
+                if (loggedUser.isImpersonating()) {
+                    reloadedLoggedUser.setImpersonatedUser(loggedUser.getImpersonatedUser());
+                    reloadedLoggedUser.setImpersonatedProcessesListAllowing(loggedUser.isImpersonatedProcessesListAllowing());
+                    reloadedLoggedUser.setImpersonatedProcesses(loggedUser.getImpersonatedProcesses());
+                }
+                loggedUser = reloadedLoggedUser;
             }
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), ((LoggedUserImpl) loggedUser).getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(token);

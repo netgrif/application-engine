@@ -1,15 +1,15 @@
 package com.netgrif.application.engine
 
-import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase
-import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticTask
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
+import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
 import com.netgrif.application.engine.elastic.service.ElasticIndexService
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.runner.*
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
@@ -72,9 +72,6 @@ class TestHelper {
     private MenuProcessRunner menuProcessRunner
 
     @Autowired
-    private ImpersonationRunner impersonationRunner
-
-    @Autowired
     private ElasticsearchRunner elasticsearchRunner
 
     @Autowired
@@ -104,7 +101,6 @@ class TestHelper {
         groupRunner.run()
         filterRunner.run()
         menuProcessRunner.run()
-        impersonationRunner.run()
         superCreator.run()
         finisherRunner.run()
     }
