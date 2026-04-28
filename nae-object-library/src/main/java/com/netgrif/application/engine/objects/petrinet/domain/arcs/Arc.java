@@ -10,7 +10,7 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Arc extends PetriNetObject {
+public abstract class Arc extends PetriNetObject {
 
     protected Node source;
 
