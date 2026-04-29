@@ -17,6 +17,33 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.5.0](h
 - [NAE-2051] Implement configurable view in menu items
 - [NAE-2039] Search in workflow view
 - [NAE-2052] Integrate ticket view with menu items
+ 
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.4.2](https://github.com/netgrif/application-engine/commits/v6.4.2)
+
+## [6.4.2](https://github.com/netgrif/application-engine/releases/tag/v6.4.2) (2025-05-16)
+
+### Fixed
+
+- [NAE-2225] Not possible to set empty options using setData
+- [NAE-2231] Unable to change behavior of taskRef on finish event without error message
+- Refactor ObjectMapper configuration for Elasticsearch
+- Remove custom serializers for startDate in ElasticTask
+- [NAE-2342] Improve Quartz configuration
+- Minor improvements to manage migrations
+
+### Added
+
+- [NAE-2100] Case view export button as NAE feature
+- [NAE-2136] Speed up Elasticsearch reindex
+- [NAE-2303] TaskRef Security Improvements
+- [NAE-2310] Elasticsearch fulltext query input sanitation
+- [NAE-2246] - Enable Redis TLS & Configure Redis Sentinel
+- [NAE-2401] Timestamp of case dataSet change
+
+## [6.4.1](https://github.com/netgrif/application-engine/releases/tag/v6.4.1) (2025-03-19)
+
+### Fixed
+- [NAE-2031] Dashboard bug fix
 
 ## [6.4.0](https://github.com/netgrif/application-engine/releases/tag/v6.4.0) (2024-12-24)
 

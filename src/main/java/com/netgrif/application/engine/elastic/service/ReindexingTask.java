@@ -1,18 +1,13 @@
 package com.netgrif.application.engine.elastic.service;
 
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
+import com.netgrif.application.engine.elastic.service.interfaces.*;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +31,6 @@ public class ReindexingTask {
     private static final Logger log = LoggerFactory.getLogger(ReindexingTask.class);
 
     private int pageSize;
-    private CaseRepository caseRepository;
     private TaskRepository taskRepository;
     private ElasticCaseRepository elasticCaseRepository;
     private IElasticCaseService elasticCaseService;
@@ -44,12 +38,12 @@ public class ReindexingTask {
     private IElasticCaseMappingService caseMappingService;
     private IElasticTaskMappingService taskMappingService;
     private IWorkflowService workflowService;
+    private IElasticIndexService elasticIndexService;
 
     private LocalDateTime lastRun;
 
     @Autowired
     public ReindexingTask(
-            CaseRepository caseRepository,
             TaskRepository taskRepository,
             ElasticCaseRepository elasticCaseRepository,
             @Qualifier("reindexingTaskElasticCaseService")
@@ -60,8 +54,8 @@ public class ReindexingTask {
             IElasticTaskMappingService taskMappingService,
             IWorkflowService workflowService,
             @Value("${spring.data.elasticsearch.reindexExecutor.size:20}") int pageSize,
-            @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from) {
-        this.caseRepository = caseRepository;
+            @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from,
+            IElasticIndexService elasticIndexService) {
         this.taskRepository = taskRepository;
         this.elasticCaseRepository = elasticCaseRepository;
         this.elasticCaseService = elasticCaseService;
@@ -69,6 +63,7 @@ public class ReindexingTask {
         this.caseMappingService = caseMappingService;
         this.taskMappingService = taskMappingService;
         this.workflowService = workflowService;
+        this.elasticIndexService = elasticIndexService;
         this.pageSize = pageSize;
 
         lastRun = LocalDateTime.now();
@@ -80,25 +75,9 @@ public class ReindexingTask {
     @Scheduled(cron = "#{springElasticsearchReindex}")
     public void reindex() {
         log.info("Reindexing stale cases: started reindexing after " + lastRun);
-
-        BooleanExpression predicate = QCase.case$.lastModified.before(LocalDateTime.now()).and(QCase.case$.lastModified.after(lastRun.minusMinutes(2)));
-
+        elasticIndexService.bulkIndex(false, lastRun, null, null);
         lastRun = LocalDateTime.now();
-        long count = caseRepository.count(predicate);
-        if (count > 0) {
-            reindexAllPages(predicate, count);
-        }
-
         log.info("Reindexing stale cases: end");
-    }
-
-    private void reindexAllPages(BooleanExpression predicate, long count) {
-        long numOfPages = ((count / pageSize) + 1);
-        log.info("Reindexing " + numOfPages + " pages");
-
-        for (int page = 0; page < numOfPages; page++) {
-            reindexPage(predicate, page, numOfPages, false);
-        }
     }
 
     public void forceReindexPage(Predicate predicate, int page, long numOfPages) {

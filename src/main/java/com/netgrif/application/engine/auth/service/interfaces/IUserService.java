@@ -49,6 +49,8 @@ public interface IUserService {
 
     void addDefaultAuthorities(IUser user);
 
+    boolean existsById(String id);
+
     IUser assignAuthority(String userId, String authorityId);
 
     IUser getLoggedOrSystem();
