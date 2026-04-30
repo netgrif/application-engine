@@ -85,7 +85,7 @@ public class WorkflowMvcPerformanceTest {
                 .apply(springSecurity())
                 .build();
 
-        User user = new User();
+        User user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
         user.setFirstName("Firstname");
         user.setLastName("Lastname");
         user.setUsername("username1");

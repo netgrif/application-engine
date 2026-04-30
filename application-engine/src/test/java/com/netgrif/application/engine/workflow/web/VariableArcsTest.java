@@ -122,7 +122,7 @@ public class VariableArcsTest {
         assert outcome.getNet() != null;
         PetriNet net = outcome.getNet();
         this.loaded = service.getPetriNet(net.getStringId());
-        User user = new User();
+        User user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
         user.setFirstName("Test");
         user.setLastName("Test");
 

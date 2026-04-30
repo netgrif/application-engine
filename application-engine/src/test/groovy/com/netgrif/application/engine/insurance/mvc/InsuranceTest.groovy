@@ -141,7 +141,7 @@ class InsuranceTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         def processRoles = ImportHelper.getProcessRolesByImportId(net.getNet(), ["agent": "1", "company": "2"])
-        importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
                 [processRoles.get("agent"), processRoles.get("company")] as ProcessRole[])
         List<ProcessRole> roles = processRoleService.findAll(netId)
