@@ -42,7 +42,7 @@ public class XlsExportServiceTest {
     void shouldCreateXlsxFile() throws Exception {
         LoggedUser superUser = superCreator.getSuperUser().transformToLoggedUser();
 
-        IntStream.range(0,5).forEach(idx -> workflowService.createCaseByIdentifier(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, "Test case", "", superUser));
+        IntStream.range(0,5).forEach(idx -> workflowService.createCaseByIdentifier(FilterRunner.MENU_NET_IDENTIFIER, "Test case", "", superUser));
 
         FilteredCasesRequest request = getTestRequest();
         File excel = xlsExportService.getExportFilteredCasesFile(request, superUser, Locale.ENGLISH);
@@ -59,7 +59,7 @@ public class XlsExportServiceTest {
         FilteredCasesRequest request = new FilteredCasesRequest();
         request.setQuery(List.of(
                 CaseSearchRequest.builder()
-                        .query("processIdentifier:" + FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER)
+                        .query("processIdentifier:" + FilterRunner.MENU_NET_IDENTIFIER)
                         .build()));
         request.setSelectedDataFieldNames(List.of("Menu Item Identifier", "Item URI", "Menu icon identifier", "Name of the item", "Tab icon identifier", "Name of the item"));
         request.setSelectedDataFieldIds(List.of("menu_item_identifier", "nodePath", "menu_icon", "menu_name", "tab_icon", "tab_name"));
