@@ -50,15 +50,15 @@ public class MinIoStorageService implements IStorageService {
 
     @Override
     public Storage createStorage(Data data) {
-        Storage storage = new MinIoStorage();
+        MinIoStorage storage = new MinIoStorage();
         if (!properties.getMinIo().isEnabled()) {
             throw new StorageNotEnabledException("Storage of type [" + MINIO_TYPE + "] is not enabled.");
         }
         if (data.getStorage().getHost() != null) {
             storage.setHost(data.getStorage().getHost());
-        }
-        if (data.getStorage().getBucket() != null) {
-            ((MinIoStorage) storage).setBucket(getBucketOrDefault(data.getStorage().getBucket()));
+            if (data.getStorage().getBucket() != null) {
+                storage.setBucket(getBucketOrDefault(storage.getHost(), data.getStorage().getBucket()));
+            }
         }
         return storage;
     }
@@ -149,8 +149,8 @@ public class MinIoStorageService implements IStorageService {
         return caseId + "/" + fieldId + "-" + name;
     }
 
-    public static String getBucketOrDefault(String bucket) {
-        return bucket != null ? bucket : StorageConfigurationProperties.MinIoStorageProperties.DEFAULT_BUCKET;
+    public String getBucketOrDefault(String host, String bucket) {
+        return bucket != null ? getMappedBucketIfExists(host, bucket) : StorageConfigurationProperties.MinIoStorageProperties.DEFAULT_BUCKET;
     }
 
     protected MinioClient client(String host) {
@@ -158,5 +158,9 @@ public class MinIoStorageService implements IStorageService {
                 .endpoint(properties.getMinIo().getHosts(host).getHost())
                 .credentials(properties.getMinIo().getHosts(host).getUser(), properties.getMinIo().getHosts(host).getPassword())
                 .build();
+    }
+
+    protected String getMappedBucketIfExists(String host, String aliasKey) {
+        return  properties.getMinIo().getHosts(host).getBucketAliases().getOrDefault(aliasKey, aliasKey);
     }
 }
