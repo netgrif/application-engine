@@ -161,6 +161,11 @@ public class MinIoStorageService implements IStorageService {
     }
 
     protected String getMappedBucketIfExists(String host, String aliasKey) {
-        return  properties.getMinIo().getHosts(host).getBucketAliases().getOrDefault(aliasKey, aliasKey);
+        if (properties.getMinIo().getHosts(host) != null
+                && properties.getMinIo().getHosts(host).getBucketAliases() != null
+                && properties.getMinIo().getHosts(host).getBucketAliases().containsKey(aliasKey)) {
+            return properties.getMinIo().getHosts(host).getBucketAliases().get(aliasKey);
+        }
+        return aliasKey;
     }
 }
