@@ -8,7 +8,6 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.AfterDeleteEvent;
-import org.springframework.data.mongodb.core.mapping.event.AfterLoadEvent;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -17,12 +16,6 @@ public class PetriNetEventHandler extends AbstractMongoEventListener<PetriNet> {
 
     @Autowired
     private IElasticPetriNetService service;
-
-    @Override
-    public void onAfterLoad(AfterLoadEvent<PetriNet> event) {
-
-    }
-
     @Override
     public void onAfterDelete(AfterDeleteEvent<PetriNet> event) {
         Document document = event.getDocument();

@@ -9,7 +9,7 @@ public class InhibitorArc extends com.netgrif.application.engine.objects.petrine
         super();
     }
 
-    public InhibitorArc(InhibitorArc arc) {
+    public InhibitorArc(com.netgrif.application.engine.objects.petrinet.domain.arcs.InhibitorArc arc) {
         super(arc);
     }
 

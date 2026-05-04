@@ -2,6 +2,8 @@ package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractActor;
+import com.netgrif.application.engine.objects.auth.domain.Authority;
+import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
@@ -20,14 +22,24 @@ public class UserMongoEventListener extends AbstractMongoEventListener<AbstractA
 
     @Override
     public void onAfterLoad(AfterLoadEvent<AbstractActor> event) {
-        log.trace("User loaded: {}", event.getSource());
-        log.trace("Resolving process roles of user with id: {}", event.getSource());
+        log.trace("User loaded: {}", event.getSource().get("id"));
+        log.trace("Resolving process roles of user with username: {}", event.getSource().get("id"));
     }
 
     @Override
     public void onAfterConvert(AfterConvertEvent<AbstractActor> event) {
         AbstractActor actor = event.getSource();
-        actor.getProcessRoleIds().forEach(processRoleId -> actor.getProcessRoles().add(processRoleService.findById(processRoleId)));
-        actor.getAuthorityIds().forEach(authorityId -> actor.getAuthoritySet().add(authorityService.getOne(authorityId)));
+        actor.getProcessRoleIds().forEach(processRoleId -> {
+            ProcessRole role = processRoleService.findById(processRoleId);
+            if (role != null) {
+                actor.addProcessRole(role);
+            }
+        });
+        actor.getAuthorityIds().forEach(authorityId -> {
+            Authority authority = authorityService.getOne(authorityId);
+            if (authority != null) {
+                actor.addAuthority(authority);
+            }
+        });
     }
 }

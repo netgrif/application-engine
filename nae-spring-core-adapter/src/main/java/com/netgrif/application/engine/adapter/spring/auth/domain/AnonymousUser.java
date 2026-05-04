@@ -3,16 +3,13 @@ package com.netgrif.application.engine.adapter.spring.auth.domain;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Attribute;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
-import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import lombok.Data;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Transient;
 
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Represents an anonymous user in the system, extending the {@link AbstractUser} class.

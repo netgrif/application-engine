@@ -9,7 +9,7 @@ public class Arc extends com.netgrif.application.engine.objects.petrinet.domain.
         super();
     }
 
-    public Arc(Arc arc) {
+    public Arc(com.netgrif.application.engine.objects.petrinet.domain.arcs.Arc arc) {
         super(arc);
     }
 

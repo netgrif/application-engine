@@ -9,7 +9,7 @@ public class ReadArc extends com.netgrif.application.engine.objects.petrinet.dom
         super();
     }
 
-    public ReadArc(ReadArc readArc) {
+    public ReadArc(com.netgrif.application.engine.objects.petrinet.domain.arcs.ReadArc readArc) {
         super(readArc);
     }
 

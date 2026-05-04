@@ -10,6 +10,7 @@ import org.bson.types.ObjectId;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Abstract base class for actors in the system representing entities with authentication and authorization capabilities.
@@ -187,6 +188,7 @@ public abstract class AbstractActor implements Serializable {
 
     public void setAuthorityIds(Set<String> authorityIds) {
         this.authorityIds = authorityIds == null ? new HashSet<>() : new HashSet<>(authorityIds);
+        this.authoritySet = new HashSet<>();
     }
 
     /**
@@ -194,7 +196,7 @@ public abstract class AbstractActor implements Serializable {
      * @param authoritySet set of authorities to set, null creates empty set
      */
     public void setAuthoritySet(Set<Authority> authoritySet) {
-        this.authorityIds = authoritySet == null ? new HashSet<>() : new HashSet<>(authoritySet.stream().map(Authority::getStringId).toList());
+        this.authorityIds = authoritySet == null ? new HashSet<>() : authoritySet.stream().map(Authority::getStringId).collect(Collectors.toSet());
         this.authoritySet = authoritySet == null ? new HashSet<>() : new HashSet<>(authoritySet);
     }
 
@@ -238,16 +240,17 @@ public abstract class AbstractActor implements Serializable {
         if (this.authoritySet == null) {
             this.authoritySet = new HashSet<>();
         }  else {
-            Authority authority = authoritySet.stream().filter(it -> it.getName().equals(name)).findFirst().orElse(null);
-            if (authority != null) {
-                this.authorityIds.remove(authority.getStringId());
-                this.authoritySet.remove(authority);
+            Optional<Authority> authorityOpt = authoritySet.stream().filter(it -> it.getName().equals(name)).findFirst();
+            if (authorityOpt.isPresent()) {
+                this.authorityIds.remove(authorityOpt.get().getStringId());
+                this.authoritySet.remove(authorityOpt.get());
             }
         }
     }
 
     public void setProcessRoleIds(Set<String> processRoleIds) {
-        this.processRoleIds = processRoleIds == null ? new HashSet<>() : new HashSet<>(processRoleIds);;
+        this.processRoleIds = processRoleIds == null ? new HashSet<>() : new HashSet<>(processRoleIds);
+        this.processRoles = new HashSet<>();
     }
 
     /**
@@ -255,13 +258,12 @@ public abstract class AbstractActor implements Serializable {
      * @param processRoleSet set of process roles to set, null creates empty set
      */
     public void setProcessRoles(Set<ProcessRole> processRoleSet) {
+        this.processRoleIds = processRoleSet == null ? new HashSet<>() : processRoleSet.stream().map(ProcessRole::getStringId).collect(Collectors.toSet());
         this.processRoles = processRoleSet == null ? new HashSet<>() : new HashSet<>(processRoleSet);
-        this.processRoleIds = processRoleSet == null ? new HashSet<>() : new HashSet<>(processRoleSet.stream().map(ProcessRole::getStringId).toList());
     }
 
     /**
      * Adds a process role to the actor.
-     * t
      * @param role the process role to add
      */
     public void addProcessRole(ProcessRole role) {

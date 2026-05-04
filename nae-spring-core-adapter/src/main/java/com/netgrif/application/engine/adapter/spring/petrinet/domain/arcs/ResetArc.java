@@ -9,7 +9,7 @@ public class ResetArc extends com.netgrif.application.engine.objects.petrinet.do
         super();
     }
 
-    public ResetArc(ResetArc arc) {
+    public ResetArc(com.netgrif.application.engine.objects.petrinet.domain.arcs.ResetArc arc) {
         super(arc);
     }
 
