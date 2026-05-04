@@ -9,10 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Abstract base class for actors in the system representing entities with authentication and authorization capabilities.
@@ -278,7 +275,7 @@ public abstract class AbstractActor implements Serializable {
         this.processRoles.add(role);
     }
 
-    public void addAllProcessRoles(Set<ProcessRole> roles) {
+    public void addAllProcessRoles(Collection<ProcessRole> roles) {
         if (this.processRoleIds == null) {
             this.processRoleIds = new HashSet<>();
         }
