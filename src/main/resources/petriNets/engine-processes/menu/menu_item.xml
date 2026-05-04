@@ -468,7 +468,7 @@
 	</data>
 	<data type="text">
 		<id>tab_icon_preview</id>
-		<title>Tab icon preview</title>
+		<title name="tab_icon_preview">Tab icon preview</title>
 		<component>
 			<name>htmltextarea</name>
 		</component>
@@ -614,6 +614,7 @@
 		<i18nString name="name_desc">Bude zobrazený v menu</i18nString>
 		<i18nString name="tab_icon">Identifikátor ikony v karte</i18nString>
 		<i18nString name="tab_icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
+		<i18nString name="tab_icon_preview">Náhľad ikony v karte</i18nString>
 		<i18nString name="display_tab_icon">Zobraziť ikonu v karte?</i18nString>
 		<i18nString name="tab_name">Názov položky</i18nString>
 		<i18nString name="tab_name_desc">Bude zobrazený v karte</i18nString>
@@ -670,6 +671,7 @@
 		<i18nString name="name">Titel des Eintrages</i18nString>
 		<i18nString name="name_desc">Wird im Menü angezeigt</i18nString>
 		<i18nString name="tab_icon">Ikonen Identifikator der Registerkarte</i18nString>
+		<i18nString name="tab_icon_preview">Vorschau der Registerkarte Ikone</i18nString>
 		<i18nString name="display_tab_icon">Zeige die Registerkarte Ikone an?</i18nString>
 		<i18nString name="tab_name">Titel der Registerkarte</i18nString>
 		<i18nString name="tab_name_desc">Wird in der Registerkarte angezeigt</i18nString>
@@ -1436,11 +1438,11 @@
 		</dataGroup>
 		<event type="finish">
 			<id>finish</id>
-			<title></title>
+			<title/>
 		</event>
 		<event type="delegate">
 			<id>delegate</id>
-			<title></title>
+			<title/>
 		</event>
 	</transition>
 
