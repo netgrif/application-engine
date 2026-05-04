@@ -610,9 +610,11 @@ public class TaskService implements ITaskService {
         log.info("[{}]: executeTransition [{}] in case [{}]", useCase.getStringId(), task.getTransitionId(), useCase.getTitle());
         try {
             log.info("assignTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
-            assignTask(TaskParams.with()
+            AssignTaskEventOutcome assignTaskEventOutcome = assignTask(TaskParams.with()
                     .task(task)
                     .build());
+
+            task = assignTaskEventOutcome.getTask();
 
             log.info("getData [{}] in case [{}]", task.getTitle(), useCase.getTitle());
             dataService.getData(task.getStringId());
