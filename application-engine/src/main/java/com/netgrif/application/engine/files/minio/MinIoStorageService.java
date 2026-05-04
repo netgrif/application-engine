@@ -56,9 +56,7 @@ public class MinIoStorageService implements IStorageService {
         }
         if (data.getStorage().getHost() != null) {
             storage.setHost(data.getStorage().getHost());
-            if (data.getStorage().getBucket() != null) {
-                storage.setBucket(getBucketOrDefault(storage.getHost(), data.getStorage().getBucket()));
-            }
+            storage.setBucket(getBucketOrDefault(storage.getHost(), data.getStorage().getBucket()));
         }
         return storage;
     }
@@ -161,10 +159,11 @@ public class MinIoStorageService implements IStorageService {
     }
 
     protected String getMappedBucketIfExists(String host, String aliasKey) {
-        if (properties.getMinIo().getHosts(host) != null
-                && properties.getMinIo().getHosts(host).getBucketAliases() != null
-                && properties.getMinIo().getHosts(host).getBucketAliases().containsKey(aliasKey)) {
-            return properties.getMinIo().getHosts(host).getBucketAliases().get(aliasKey);
+        MinIoHostInfo hostInfo = properties.getMinIo().getHosts(host);
+        if (hostInfo != null
+                && hostInfo.getBucketAliases() != null
+                && hostInfo.getBucketAliases().containsKey(aliasKey)) {
+            return hostInfo.getBucketAliases().get(aliasKey);
         }
         return aliasKey;
     }
