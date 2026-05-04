@@ -30,6 +30,6 @@ public class MenuItemConstants {
     public static final String FIELD_VIEW_CONFIGURATION_FORM = "view_configuration_form";
 
     public static final String TRANS_SETTINGS_ID = "item_settings";
-    public static final String TRANS_INIT_ID = "initialize";
+    public static final String TRANS_INIT_ID = "system_initialize";
     public static final String TRANS_SYNC_ID = "data_sync";
 }

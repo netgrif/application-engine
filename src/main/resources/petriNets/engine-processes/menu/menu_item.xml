@@ -25,8 +25,6 @@
 	<roleRef>
 		<id>default</id>
 		<caseLogic>
-			<create>false</create>
-			<delete>false</delete>
 			<view>true</view>
 		</caseLogic>
 	</roleRef>
@@ -643,6 +641,9 @@
 		<i18nString name="use_tabbed_view">Použiť zobrazenie v taboch?</i18nString>
 		<i18nString name="view_configuration_type">Vybrať zobrazenie</i18nString>
 		<i18nString name="configuration_view">Nastavenie zobrazenia</i18nString>
+		<i18nString name="initialize">Vytvoriť menu položku</i18nString>
+		<i18nString name="children_order">Zoradiť pod-položky</i18nString>
+		<i18nString name="create_item_finish">Vytvoriť menu položku</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="icon_preview">Ikonevorschau</i18nString>
@@ -692,6 +693,9 @@
 		<i18nString name="use_tabbed_view">Möchten Sie die Ansicht mit Registerkarten verwenden?</i18nString>
 		<i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
 		<i18nString name="configuration_view">Die Ansichtskonfiguration</i18nString>
+		<i18nString name="initialize">Menüeintrag erstellen</i18nString>
+		<i18nString name="children_order">Untereintrage sortieren</i18nString>
+		<i18nString name="create_item_finish">Erstellen</i18nString>
 	</i18n>
 
 	<!-- TRANSITIONS -->
@@ -699,25 +703,105 @@
 		<id>initialize</id>
 		<x>340</x>
 		<y>220</y>
-		<label>initialize [await sync]</label>
+		<label name="initialize">Create item</label>
 		<icon>hourglass_empty</icon>
 		<roleRef>
 			<id>admin</id>
 			<logic>
 				<perform>true</perform>
-				<view>true</view>
-				<cancel>true</cancel>
-				<assign>true</assign>
 			</logic>
 		</roleRef>
+		<dataGroup>
+			<id>initialize_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>menu_item_identifier</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>move_dest_uri</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>move_dest_uri_new_node</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>move_add_node</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>finish</id>
+			<actions phase="pre">
+				<action>
+					dest: f.move_dest_uri;
+
+					String newUri = dest.value.join("/")
+					newUri = newUri.replace("//","/")
+
+					changeMenuItem useCase uri { newUri }
+				</action>
+			</actions>
+			<title name="create_item_finish">Create</title>
+		</event>
 	</transition>
 	<transition>
 		<id>data_sync</id>
 		<x>340</x>
-		<y>340</y>
+		<y>112</y>
 		<label>Data sync</label>
 		<roleRef>
 			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>admin</id>
 			<logic>
 				<perform>true</perform>
 			</logic>
@@ -735,9 +819,12 @@
 			<id>admin</id>
 			<logic>
 				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>default</id>
+			<logic>
 				<view>true</view>
-				<cancel>true</cancel>
-				<assign>true</assign>
 			</logic>
 		</roleRef>
 		<dataGroup>
@@ -1178,9 +1265,6 @@
 			<id>admin</id>
 			<logic>
 				<perform>true</perform>
-				<view>true</view>
-				<cancel>true</cancel>
-				<assign>true</assign>
 			</logic>
 		</roleRef>
 		<dataGroup>
@@ -1262,9 +1346,6 @@
 			<id>admin</id>
 			<logic>
 				<perform>true</perform>
-				<view>true</view>
-				<cancel>true</cancel>
-				<assign>true</assign>
 			</logic>
 		</roleRef>
 		<dataGroup>
@@ -1320,16 +1401,13 @@
 		<id>children_order</id>
 		<x>580</x>
 		<y>220</y>
-		<label>Manage item order</label>
+		<label name="children_order">Manage item order</label>
 		<icon>low_priority</icon>
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
 			<id>admin</id>
 			<logic>
 				<perform>true</perform>
-				<view>true</view>
-				<cancel>true</cancel>
-				<assign>true</assign>
 			</logic>
 		</roleRef>
 		<dataGroup>
@@ -1368,9 +1446,6 @@
 			<id>system</id>
 			<logic>
 				<perform>true</perform>
-				<view>true</view>
-				<cancel>true</cancel>
-				<assign>true</assign>
 			</logic>
 		</roleRef>
 		<dataGroup>
@@ -1445,6 +1520,19 @@
 			<title/>
 		</event>
 	</transition>
+	<transition>
+		<id>system_initialize</id>
+		<x>336</x>
+		<y>304</y>
+		<label>System create</label>
+		<icon>computer</icon>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+	</transition>
 
 	<!-- PLACES-->
 	<place>
@@ -1505,6 +1593,20 @@
 		<type>read</type>
 		<sourceId>initialized</sourceId>
 		<destinationId>children_order</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a14</id>
+		<type>regular</type>
+		<sourceId>uninitialized</sourceId>
+		<destinationId>system_initialize</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a15</id>
+		<type>regular</type>
+		<sourceId>system_initialize</sourceId>
+		<destinationId>initialized</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 </document>

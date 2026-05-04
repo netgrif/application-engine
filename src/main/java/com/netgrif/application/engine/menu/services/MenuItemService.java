@@ -104,7 +104,7 @@ public class MenuItemService implements IMenuItemService {
             throw new IllegalArgumentException(String.format("Menu item identifier %s is not unique!", sanitizedIdentifier));
         }
 
-        // todo ETASK-23 validation
+        // todo 23 validation
 
         Case parentItemCase = getOrCreateFolderItem(body.getUri());
         I18nString newName = body.getMenuName();
@@ -577,6 +577,9 @@ public class MenuItemService implements IMenuItemService {
 
     protected void resolveAndHandleNewNodePath(Case folderItem, String destUri) {
         String newNodePath = resolveNewNodePath(folderItem, destUri);
+        if (newNodePath.startsWith("//")) {
+            newNodePath = newNodePath.replace("//", uriService.getUriSeparator());
+        }
         UriNode newNode = uriService.getOrCreate(newNodePath, UriContentType.CASE);
         folderItem.getDataField(MenuItemConstants.FIELD_NODE_PATH).setValue(newNode.getUriPath());
     }
