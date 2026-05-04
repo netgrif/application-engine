@@ -34,8 +34,12 @@ public abstract class AbstractActor implements Serializable {
     /** Map of actor's attributes with their values and requirement status */
     protected Map<String, Attribute<?>> attributes = new HashMap<>();
 
+    protected Set<String> authorityIds = new HashSet<>();
+
     /** Set of authorities (permissions) assigned to this actor */
     protected Set<Authority> authoritySet = new HashSet<>();
+
+    protected Set<String> processRoleIds = new HashSet<>();
 
     /** Set of process-specific roles assigned to this actor */
     protected Set<ProcessRole> processRoles = new HashSet<>();
@@ -184,11 +188,16 @@ public abstract class AbstractActor implements Serializable {
         return true;
     }
 
+    public void setAuthorityIds(Set<String> authorityIds) {
+        this.authorityIds = authorityIds == null ? new HashSet<>() : new HashSet<>(authorityIds);
+    }
+
     /**
      * Sets the authority set with a defensive copy.
      * @param authoritySet set of authorities to set, null creates empty set
      */
     public void setAuthoritySet(Set<Authority> authoritySet) {
+        this.authorityIds = authoritySet == null ? new HashSet<>() : new HashSet<>(authoritySet.stream().map(Authority::getStringId).toList());
         this.authoritySet = authoritySet == null ? new HashSet<>() : new HashSet<>(authoritySet);
     }
 
@@ -197,9 +206,13 @@ public abstract class AbstractActor implements Serializable {
      * @param authority the authority to add
      */
     public void addAuthority(Authority authority) {
+        if (this.authorityIds == null) {
+            this.authorityIds = new HashSet<>();
+        }
         if (this.authoritySet == null) {
             this.authoritySet = new HashSet<>();
         }
+        this.authorityIds.add(authority.getStringId());
         this.authoritySet.add(authority);
     }
 
@@ -208,6 +221,11 @@ public abstract class AbstractActor implements Serializable {
      * @param authority the authority to remove
      */
     public void removeAuthority(Authority authority) {
+        if (this.authorityIds == null) {
+            this.authorityIds = new HashSet<>();
+        } else {
+            this.authorityIds.remove(authority.getStringId());
+        }
         if (this.authoritySet == null) {
             this.authoritySet = new HashSet<>();
         } else if (!this.authoritySet.remove(authority)) {
@@ -222,9 +240,17 @@ public abstract class AbstractActor implements Serializable {
     public void removeAuthorityByName(String name) {
         if (this.authoritySet == null) {
             this.authoritySet = new HashSet<>();
-        } else {
-            this.authoritySet.removeIf(it -> it.getName().equals(name));
+        }  else {
+            Authority authority = authoritySet.stream().filter(it -> it.getName().equals(name)).findFirst().orElse(null);
+            if (authority != null) {
+                this.authorityIds.remove(authority.getStringId());
+                this.authoritySet.remove(authority);
+            }
         }
+    }
+
+    public void setProcessRoleIds(Set<String> processRoleIds) {
+        this.processRoleIds = processRoleIds == null ? new HashSet<>() : new HashSet<>(processRoleIds);;
     }
 
     /**
@@ -233,17 +259,34 @@ public abstract class AbstractActor implements Serializable {
      */
     public void setProcessRoles(Set<ProcessRole> processRoleSet) {
         this.processRoles = processRoleSet == null ? new HashSet<>() : new HashSet<>(processRoleSet);
+        this.processRoleIds = processRoleSet == null ? new HashSet<>() : new HashSet<>(processRoleSet.stream().map(ProcessRole::getStringId).toList());
     }
 
     /**
      * Adds a process role to the actor.
+     * t
      * @param role the process role to add
      */
     public void addProcessRole(ProcessRole role) {
+        if (this.processRoleIds == null) {
+            this.processRoleIds = new HashSet<>();
+        }
         if (this.processRoles == null) {
             this.processRoles = new HashSet<>();
         }
+        this.processRoleIds.add(role.getStringId());
         this.processRoles.add(role);
+    }
+
+    public void addAllProcessRoles(Set<ProcessRole> roles) {
+        if (this.processRoleIds == null) {
+            this.processRoleIds = new HashSet<>();
+        }
+        if (this.processRoles == null) {
+            this.processRoles = new HashSet<>();
+        }
+        this.processRoleIds.addAll(roles.stream().map(ProcessRole::getStringId).toList());
+        this.processRoles.addAll(roles);
     }
 
     /**
@@ -251,6 +294,11 @@ public abstract class AbstractActor implements Serializable {
      * @param role the process role to remove
      */
     public void removeProcessRole(ProcessRole role) {
+        if (this.processRoleIds == null) {
+            this.processRoleIds = new HashSet<>();
+        } else {
+            this.processRoleIds.remove(role.getStringId());
+        }
         if (this.processRoles == null) {
             this.processRoles = new HashSet<>();
         } else if (!this.processRoles.remove(role)) {
@@ -263,10 +311,28 @@ public abstract class AbstractActor implements Serializable {
      * @param id ID of the process role to remove
      */
     public void removeProcessRoleById(String id) {
+        if (this.processRoleIds == null) {
+            this.processRoleIds = new HashSet<>();
+        } else {
+            this.processRoleIds.remove(id);
+        }
         if (this.processRoles == null) {
             this.processRoles = new HashSet<>();
         } else {
             this.processRoles.removeIf(it -> it.getStringId().equals(id));
+        }
+    }
+
+    public void clearProcessRoles() {
+        if (this.processRoleIds == null) {
+            this.processRoleIds = new HashSet<>();
+        } else {
+            this.processRoleIds.clear();
+        }
+        if (this.processRoles == null) {
+            this.processRoles = new HashSet<>();
+        } else {
+            this.processRoles.clear();
         }
     }
 

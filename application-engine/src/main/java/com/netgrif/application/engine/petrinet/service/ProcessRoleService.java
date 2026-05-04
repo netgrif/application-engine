@@ -5,12 +5,9 @@ import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleN
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleReferencedException;
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.service.GroupService;
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.auth.service.RealmService;
-import com.netgrif.application.engine.objects.auth.domain.Group;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.objects.auth.domain.Realm;
 import com.netgrif.application.engine.objects.event.events.user.UserRoleChangeEvent;
 import com.netgrif.application.engine.objects.importer.model.EventPhaseType;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
@@ -121,30 +118,29 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     @Override
     public void assignRolesToUser(AbstractUser user, Collection<ProcessResourceId> processResourceIds, LoggedUser loggedUser) {
-        assignRolesToActor(user.getProcessRoles(), processResourceIds);
+        assignRolesToActor(user, processResourceIds);
         saveUserAndReloadContext(user, loggedUser);
     }
 
     @Override
     public void assignRolesToGroup(Group group, Collection<ProcessResourceId> requestedRolesIds) {
-        assignRolesToActor(group.getProcessRoles(), requestedRolesIds);
+        assignRolesToActor(group, requestedRolesIds);
         groupService.save(group);
     }
 
-    protected void assignRolesToActor(Collection<ProcessRole> oldActorRoles, Collection<ProcessResourceId> requestedRolesIds) {
+    protected void assignRolesToActor(AbstractActor abstractActor, Collection<ProcessResourceId> requestedRolesIds) {
         List<ProcessRole> requestedRoles = this.findByIds(requestedRolesIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet()));
         if (requestedRoles.isEmpty() && !requestedRolesIds.isEmpty())
             throw new IllegalArgumentException("No process roles found.");
         if (requestedRoles.size() != requestedRolesIds.size())
             throw new IllegalArgumentException("Not all process roles were found!");
 
-        Set<ProcessRole> userOldRoles = new HashSet<>(oldActorRoles);
+        Set<ProcessRole> userOldRoles = new HashSet<>(abstractActor.getProcessRoles());
         Set<ProcessRole> rolesNewToUser = getRolesNewToActor(userOldRoles, requestedRoles);
         Set<ProcessRole> rolesRemovedFromUser = getRolesRemovedFromActor(userOldRoles, requestedRoles);
 
-
-        oldActorRoles.clear();
-        oldActorRoles.addAll(updateRequestedRoles(userOldRoles, rolesNewToUser, rolesRemovedFromUser));
+        abstractActor.clearProcessRoles();
+        abstractActor.addAllProcessRoles(updateRequestedRoles(userOldRoles, rolesNewToUser, rolesRemovedFromUser));
     }
 
     protected void saveUserAndReloadContext(AbstractUser user, LoggedUser loggedUser) {
