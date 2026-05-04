@@ -104,6 +104,8 @@ public class MenuItemService implements IMenuItemService {
             throw new IllegalArgumentException(String.format("Menu item identifier %s is not unique!", sanitizedIdentifier));
         }
 
+        // todo ETASK-23 validation
+
         Case parentItemCase = getOrCreateFolderItem(body.getUri());
         I18nString newName = body.getMenuName();
         if (newName == null) {

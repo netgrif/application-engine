@@ -46,8 +46,10 @@ public class TabbedCaseViewBody extends ViewBody {
 
         outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_VIEW_SEARCH_TYPE, FieldType.ENUMERATION_MAP,
                 this.viewSearchType);
-        outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_CREATE_CASE_BUTTON_TITLE, FieldType.I18N,
-                this.createCaseButtonTitle);
+        if (this.createCaseButtonTitle != null) {
+            outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_CREATE_CASE_BUTTON_TITLE, FieldType.I18N,
+                    this.createCaseButtonTitle);
+        }
         outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_CREATE_CASE_BUTTON_ICON, FieldType.TEXT,
                 this.createCaseButtonIcon);
         outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_REQUIRE_TITLE_IN_CREATION, FieldType.BOOLEAN,
