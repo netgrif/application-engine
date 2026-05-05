@@ -13,6 +13,10 @@ public class InhibitorArc extends com.netgrif.application.engine.objects.petrine
         super(arc);
     }
 
+    public InhibitorArc(InhibitorArc arc) {
+        super(arc);
+    }
+
     @Override
     @Transient
     public Node getDestination() {

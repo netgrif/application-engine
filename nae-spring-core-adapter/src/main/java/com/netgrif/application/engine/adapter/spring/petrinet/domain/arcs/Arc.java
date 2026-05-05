@@ -13,6 +13,10 @@ public class Arc extends com.netgrif.application.engine.objects.petrinet.domain.
         super(arc);
     }
 
+    public Arc(Arc arc) {
+        super(arc);
+    }
+
     public Arc(Node source, Node destination, int multiplicity) {
         super(source, destination, multiplicity);
     }

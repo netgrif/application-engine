@@ -13,6 +13,10 @@ public class ResetArc extends com.netgrif.application.engine.objects.petrinet.do
         super(arc);
     }
 
+    public ResetArc(ResetArc arc) {
+        super(arc);
+    }
+
     @Override
     @Transient
     public Node getDestination() {

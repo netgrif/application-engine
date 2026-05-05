@@ -13,6 +13,10 @@ public class ReadArc extends com.netgrif.application.engine.objects.petrinet.dom
         super(readArc);
     }
 
+    public ReadArc(ReadArc readArc) {
+        super(readArc);
+    }
+
     @Override
     @Transient
     public Node getDestination() {
