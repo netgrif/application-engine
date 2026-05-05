@@ -205,6 +205,9 @@ public abstract class AbstractActor implements Serializable {
      * @param authority the authority to add
      */
     public void addAuthority(Authority authority) {
+        if (authority == null) {
+            return;
+        }
         if (this.authorityIds == null) {
             this.authorityIds = new HashSet<>();
         }
@@ -220,6 +223,9 @@ public abstract class AbstractActor implements Serializable {
      * @param authority the authority to remove
      */
     public void removeAuthority(Authority authority) {
+        if (authority == null) {
+            return;
+        }
         if (this.authorityIds == null) {
             this.authorityIds = new HashSet<>();
         } else {
@@ -267,6 +273,9 @@ public abstract class AbstractActor implements Serializable {
      * @param role the process role to add
      */
     public void addProcessRole(ProcessRole role) {
+        if (role == null) {
+            return;
+        }
         if (this.processRoleIds == null) {
             this.processRoleIds = new HashSet<>();
         }
@@ -278,6 +287,9 @@ public abstract class AbstractActor implements Serializable {
     }
 
     public void addAllProcessRoles(Collection<ProcessRole> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return;
+        }
         if (this.processRoleIds == null) {
             this.processRoleIds = new HashSet<>();
         }
@@ -293,6 +305,9 @@ public abstract class AbstractActor implements Serializable {
      * @param role the process role to remove
      */
     public void removeProcessRole(ProcessRole role) {
+        if (role == null) {
+            return;
+        }
         if (this.processRoleIds == null) {
             this.processRoleIds = new HashSet<>();
         } else {
