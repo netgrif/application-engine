@@ -10,7 +10,7 @@ public class DataGroup extends com.netgrif.application.engine.objects.petrinet.d
         super();
     }
 
-    public DataGroup(DataGroup group) {
+    public DataGroup(com.netgrif.application.engine.objects.petrinet.domain.DataGroup group) {
         super(group);
     }
 
