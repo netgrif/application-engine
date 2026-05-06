@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.menu.services;
+package com.netgrif.application.engine.menu.service;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
@@ -11,11 +11,12 @@ import com.netgrif.application.engine.menu.domain.MenuItemConstants;
 import com.netgrif.application.engine.menu.domain.ToDataSetOutcome;
 import com.netgrif.application.engine.menu.domain.configurations.ViewBody;
 import com.netgrif.application.engine.menu.domain.configurations.ViewConstants;
-import com.netgrif.application.engine.menu.services.interfaces.IMenuItemService;
+import com.netgrif.application.engine.menu.service.interfaces.IMenuItemService;
 import com.netgrif.application.engine.menu.utils.MenuItemUtils;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.UriContentType;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
+import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
@@ -23,6 +24,7 @@ import com.netgrif.application.engine.startup.DefaultFiltersRunner;
 import com.netgrif.application.engine.startup.FilterRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -398,6 +400,48 @@ public class MenuItemService implements IMenuItemService {
         parentFolder.getDataField(MenuItemConstants.FIELD_CHILD_ITEM_IDS).setValue(childIds);
         parentFolder.getDataField(MenuItemConstants.FIELD_HAS_CHILDREN).setValue(MenuItemUtils.hasFolderChildren(parentFolder));
         return workflowService.save(parentFolder);
+    }
+
+    /**
+     * Retrieves menu item data along with its associated view configuration data. The method collects immediate
+     * data from the menu item case and recursively traverses through all associated view configuration cases,
+     * aggregating their immediate data into a single map.
+     *
+     * @param caseId identifier of the menu item case
+     * @return map where keys are process identifiers (with "_configuration" suffix removed for view cases) and
+     * values are lists of immediate data fields from the corresponding cases
+     */
+    @Override
+    public Map<String, List<Field<?>>> getMenuItemData(String caseId) {
+        Case menuItemCase = workflowService.findOne(caseId);
+        Map<String, List<Field<?>>> immediateDataMap = new HashMap<>();
+        immediateDataMap.put(menuItemCase.getProcessIdentifier(), menuItemCase.getImmediateData());
+        Optional<String> viewCaseIdOpt = getNextViewCaseId(menuItemCase);
+        if (viewCaseIdOpt.isEmpty()) {
+            return immediateDataMap;
+        }
+
+        do {
+            Case viewCase = workflowService.findOne(viewCaseIdOpt.get());
+            immediateDataMap.put(viewCase.getProcessIdentifier().replace("_configuration", ""),
+                    viewCase.getImmediateData());
+            viewCaseIdOpt = getNextViewCaseId(viewCase);
+        } while (viewCaseIdOpt.isPresent());
+
+        return immediateDataMap;
+    }
+
+    protected Optional<String> getNextViewCaseId(Case parentCase) {
+        DataField viewConfigurationIdDataField = parentCase.getDataField(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID);
+        if (viewConfigurationIdDataField == null) {
+            return Optional.empty();
+        }
+        @SuppressWarnings("unchecked")
+        List<String> viewConfigurationIdValue = (List<String>) viewConfigurationIdDataField.getValue();
+        if (viewConfigurationIdValue == null || viewConfigurationIdValue.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(viewConfigurationIdValue.get(0));
     }
 
     protected Case findCase(String processIdentifier, String query) {

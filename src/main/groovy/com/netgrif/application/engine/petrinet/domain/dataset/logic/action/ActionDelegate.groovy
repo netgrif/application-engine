@@ -31,9 +31,9 @@ import com.netgrif.application.engine.menu.domain.configurations.TabbedTaskViewB
 import com.netgrif.application.engine.menu.domain.configurations.ViewBody
 import com.netgrif.application.engine.menu.domain.dashboard.DashboardItemBody
 import com.netgrif.application.engine.menu.domain.dashboard.DashboardManagementBody
-import com.netgrif.application.engine.menu.services.interfaces.DashboardItemService
-import com.netgrif.application.engine.menu.services.interfaces.DashboardManagementService
-import com.netgrif.application.engine.menu.services.interfaces.IMenuItemService
+import com.netgrif.application.engine.menu.service.interfaces.DashboardItemService
+import com.netgrif.application.engine.menu.service.interfaces.DashboardManagementService
+import com.netgrif.application.engine.menu.service.interfaces.IMenuItemService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator

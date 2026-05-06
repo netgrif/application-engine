@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.menu.services.interfaces;
+package com.netgrif.application.engine.menu.service.interfaces;
 
 import com.netgrif.application.engine.menu.domain.dashboard.DashboardManagementBody;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;

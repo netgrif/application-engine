@@ -25,8 +25,6 @@
     <roleRef>
         <id>default</id>
         <caseLogic>
-            <create>false</create>
-            <delete>false</delete>
             <view>true</view>
         </caseLogic>
     </roleRef>
@@ -125,7 +123,7 @@
             <name>autocomplete_dynamic</name>
         </component>
         <action trigger="set">
-            trans: t.settings,
+            trans: t.filter_settings,
             filterAutocomplete: f.this,
             filter_case: f.filter_case,
             update_filter: f.update_filter,
@@ -134,7 +132,7 @@
             updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans)
         </action>
         <action trigger="get">
-            trans: t.settings,
+            trans: t.filter_settings,
             filterAutocomplete: f.this,
             filter_case: f.filter_case,
             update_filter: f.update_filter,
@@ -151,7 +149,7 @@
             <name>raised</name>
         </component>
         <action trigger="set">
-            trans: t.settings,
+            trans: t.filter_settings,
             update_filter: f.update_filter,
             contains_filter: f.contains_filter,
             filter_case: f.filter_case,
@@ -175,7 +173,7 @@
         <id>filter_case</id>
         <title/>
         <action trigger="set">
-            trans: t.settings,
+            trans: t.filter_settings,
             filterHeader: f.filter_header,
             removeButton: f.remove_filter,
             contains_filter: f.contains_filter,
@@ -224,14 +222,6 @@
     </data>
 
     <!-- TASK VIEW CONFIGURATION DATA -->
-    <data type="i18n">
-        <id>view_header</id>
-        <title/>
-        <init name="view_header">Task view</init>
-        <component>
-            <name>divider</name>
-        </component>
-    </data>
     <data type="enumeration_map" immediate="true">
         <id>view_search_type</id>
         <title name="view_search_type">Search type for task view</title>
@@ -315,6 +305,24 @@
         <title name="show_more_menu">Show more menu for task item?</title>
         <init>true</init>
     </data>
+    <data type="taskRef">
+        <id>advanced_content_form</id>
+        <title/>
+        <component>
+            <!-- todo 23 headers-->
+            <name>task-list</name>
+        </component>
+        <event type="get">
+            <id>get</id>
+            <actions phase="pre">
+                <action>
+                    advanced_content_form: f.advanced_content_form;
+                    change advanced_content_form value { [useCase.tasks.find { taskPair -> taskPair.transition == "filter_settings"}.task,
+                                                          useCase.tasks.find { taskPair -> taskPair.transition == "header_settings"}.task] }
+                </action>
+            </actions>
+        </event>
+    </data>
 
     <!-- I18NS -->
     <i18n locale="sk">
@@ -337,9 +345,7 @@
         <i18nString name="default_headers_desc">Napríklad: "meta-title,meta-user"</i18nString>
         <i18nString name="show_more_menu">Zobrazovať menu pre úlohovú položku?</i18nString>
         <i18nString name="item_settings">Nastavenie položky</i18nString>
-        <i18nString name="filter_update_title">Filter</i18nString>
         <i18nString name="filter_header">Súčasný filter</i18nString>
-        <i18nString name="view_header">Zobrazenie úloh</i18nString>
         <i18nString name="item_settings_general">Všeobecné</i18nString>
         <i18nString name="remove_filter">Vymazať filter</i18nString>
     </i18n>
@@ -357,7 +363,6 @@
         <i18nString name="use_default_headers">Eigene Kopfzeilen verwenden?</i18nString>
         <i18nString name="default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
         <i18nString name="default_headers_desc">Beispiel: "meta-title,meta-user"</i18nString>
-        <i18nString name="filter_update_title">Filter</i18nString>
         <i18nString name="filter_header">Aktueller Filter</i18nString>
         <i18nString name="item_settings_general">Allgemein</i18nString>
         <i18nString name="update_filter">Aktualisiere die Ansicht mit dem ausgewählten Filter</i18nString>
@@ -366,7 +371,6 @@
         <i18nString name="view_search_type">Suchmodus im Aufgabenansicht</i18nString>
         <i18nString name="show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Aufgaben anzeigen</i18nString>
         <i18nString name="item_settings">Menüeintrageinstellungen</i18nString>
-        <i18nString name="view_header">Aufgabenansicht</i18nString>
         <i18nString name="remove_filter">Filter entfernen</i18nString>
     </i18n>
 
@@ -376,12 +380,24 @@
         <y>208</y>
         <label>initialize [await sync]</label>
         <icon>hourglass_empty</icon>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>data_sync</id>
         <x>368</x>
         <y>328</y>
         <label>Data sync</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>settings</id>
@@ -393,23 +409,55 @@
             <id>admin</id>
             <logic>
                 <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
                 <view>true</view>
-                <cancel>true</cancel>
-                <assign>true</assign>
             </logic>
         </roleRef>
         <dataGroup>
-            <id>form_title</id>
+            <id>view_dataGroup</id>
             <cols>4</cols>
             <layout>grid</layout>
             <dataRef>
-                <id>view_header</id>
+                <id>view_search_type</id>
                 <logic>
-                    <behavior>visible</behavior>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
                     <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>show_more_menu</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>advanced_content_form</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <template>material</template>
@@ -417,11 +465,38 @@
                 </layout>
             </dataRef>
         </dataGroup>
+        <event type="assign">
+            <id>assign_0</id>
+            <title/>
+        </event>
+        <event type="finish">
+            <id>finish_0</id>
+            <title/>
+        </event>
+    </transition>
+    <transition>
+        <id>filter_settings</id>
+        <x>400</x>
+        <y>48</y>
+        <label name="todo 23">Filter</label>
+        <icon>filter_alt</icon>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>filter_update</id>
             <cols>4</cols>
             <layout>grid</layout>
-            <title name="filter_update_title">Filter</title>
             <dataRef>
                 <id>filter_autocomplete_selection</id>
                 <logic>
@@ -526,50 +601,50 @@
                 </layout>
             </dataRef>
         </dataGroup>
-        <dataGroup>
-            <id>view_dataGroup</id>
-            <cols>4</cols>
-            <layout>grid</layout>
-            <dataRef>
-                <id>view_search_type</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <behavior>required</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>3</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>show_more_menu</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <behavior>required</behavior>
-                </logic>
-                <layout>
-                    <x>3</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>1</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-        </dataGroup>
+        <event type="assign">
+            <id>assign</id>
+            <title/>
+        </event>
+        <event type="cancel">
+            <id>cancel</id>
+            <title/>
+        </event>
+        <event type="finish">
+            <id>finish_0</id>
+            <title/>
+        </event>
+        <event type="delegate">
+            <id>delegate</id>
+            <title/>
+        </event>
+    </transition>
+    <transition>
+        <id>header_settings</id>
+        <x>592</x>
+        <y>48</y>
+        <label name="todo 23">Header</label>
+        <icon>view_column</icon>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>view_headers</id>
-            <cols>5</cols>
+            <cols>3</cols>
             <layout>grid</layout>
             <dataRef>
                 <id>is_header_mode_changeable</id>
                 <logic>
                     <behavior>editable</behavior>
-                    <behavior>required</behavior>
                     <action trigger="set">
                         trans: t.this,
                         isChangeable: f.is_header_mode_changeable,
@@ -594,51 +669,6 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>allow_header_table_mode</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <behavior>required</behavior>
-                </logic>
-                <layout>
-                    <x>1</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>1</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>headers_mode</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <behavior>required</behavior>
-                </logic>
-                <layout>
-                    <x>2</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>headers_default_mode</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <behavior>required</behavior>
-                </logic>
-                <layout>
-                    <x>4</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>1</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
                 <id>use_default_headers</id>
                 <logic>
                     <behavior>editable</behavior>
@@ -652,8 +682,8 @@
                     </action>
                 </logic>
                 <layout>
-                    <x>0</x>
-                    <y>1</y>
+                    <x>1</x>
+                    <y>0</y>
                     <rows>1</rows>
                     <cols>1</cols>
                     <offset>0</offset>
@@ -667,16 +697,76 @@
                     <behavior>editable</behavior>
                 </logic>
                 <layout>
-                    <x>1</x>
-                    <y>1</y>
+                    <x>2</x>
+                    <y>0</y>
                     <rows>1</rows>
-                    <cols>4</cols>
+                    <cols>1</cols>
                     <offset>0</offset>
                     <template>material</template>
                     <appearance>outline</appearance>
                 </layout>
             </dataRef>
+            <dataRef>
+                <id>allow_header_table_mode</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>headers_mode</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>headers_default_mode</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
         </dataGroup>
+        <event type="assign">
+            <id>assign</id>
+            <title/>
+        </event>
+        <event type="cancel">
+            <id>cancel</id>
+            <title/>
+        </event>
+        <event type="finish">
+            <id>finish_0</id>
+            <title/>
+        </event>
+        <event type="delegate">
+            <id>delegate</id>
+            <title/>
+        </event>
     </transition>
     <place>
         <id>initialized</id>
@@ -713,6 +803,20 @@
         <type>regular</type>
         <sourceId>initialize</sourceId>
         <destinationId>initialized</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a4</id>
+        <type>read</type>
+        <sourceId>initialized</sourceId>
+        <destinationId>filter_settings</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a5</id>
+        <type>read</type>
+        <sourceId>initialized</sourceId>
+        <destinationId>header_settings</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>

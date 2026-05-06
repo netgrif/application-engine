@@ -25,8 +25,6 @@
     <roleRef>
         <id>default</id>
         <caseLogic>
-            <create>false</create>
-            <delete>false</delete>
             <view>true</view>
         </caseLogic>
     </roleRef>
@@ -171,14 +169,6 @@
     </data>
 
     <!-- VIEW CONFIGURATION DATA -->
-    <data type="i18n">
-        <id>view_header</id>
-        <title/>
-        <init name="view_header">Single task view</init>
-        <component>
-            <name>divider</name>
-        </component>
-    </data>
     <data type="text">
         <id>transition_id</id>
         <title name="transition_id">Transition id</title>
@@ -193,8 +183,6 @@
         <i18nString name="filter_header">Súčasný filter</i18nString>
         <i18nString name="view_configuration_type">Vybrať zobrazenie</i18nString>
         <i18nString name="settings">Nastavenie</i18nString>
-        <i18nString name="associated_view">Asociované zobrazenie</i18nString>
-        <i18nString name="view_header">Zobrazenie jednej úlohy</i18nString>
         <i18nString name="transition_id">ID prechodu</i18nString>
     </i18n>
     <i18n locale="de">
@@ -204,8 +192,6 @@
         <i18nString name="update_filter">Aktualisiere die Ansicht mit dem ausgewählten Filter</i18nString>
         <i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
         <i18nString name="settings">Einstellungen</i18nString>
-        <i18nString name="associated_view">zugehörige Ansicht</i18nString>
-        <i18nString name="view_header">Einzelaufgabenansicht</i18nString>
         <i18nString name="transition_id">Übergangs-ID</i18nString>
     </i18n>
 
@@ -215,12 +201,24 @@
         <y>208</y>
         <label>initialize [await sync]</label>
         <icon>hourglass_empty</icon>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>data_sync</id>
         <x>368</x>
         <y>328</y>
         <label>Data sync</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>settings</id>
@@ -232,30 +230,14 @@
             <id>admin</id>
             <logic>
                 <perform>true</perform>
-                <view>true</view>
-                <cancel>true</cancel>
-                <assign>true</assign>
             </logic>
         </roleRef>
-        <dataGroup>
-            <id>form_title</id>
-            <cols>4</cols>
-            <layout>grid</layout>
-            <dataRef>
-                <id>view_header</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-        </dataGroup>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>view_dataGroup</id>
             <cols>4</cols>
@@ -275,6 +257,14 @@
                 </layout>
             </dataRef>
         </dataGroup>
+        <event type="assign">
+            <id>assign_0</id>
+            <title/>
+        </event>
+        <event type="finish">
+            <id>finish_0</id>
+            <title/>
+        </event>
     </transition>
     <place>
         <id>initialized</id>

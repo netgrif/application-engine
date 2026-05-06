@@ -505,11 +505,11 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private void setImmediateDataFieldsReadOnly(Case useCase) {
-        List<Field> immediateData = new ArrayList<>();
+        List<Field<?>> immediateData = new ArrayList<>();
 
         useCase.getImmediateDataFields().forEach(fieldId -> {
             try {
-                Field clone = fieldFactory.buildImmediateField(useCase, fieldId);
+                Field<?> clone = fieldFactory.buildImmediateField(useCase, fieldId);
                 immediateData.add(clone);
             } catch (Exception e) {
                 log.error("Could not built immediate field [" + fieldId + "]");
@@ -526,7 +526,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     protected Case setImmediateDataFields(Case useCase) {
-        List<Field> immediateData = new ArrayList<>();
+        List<Field<?>> immediateData = new ArrayList<>();
 
         useCase.getImmediateDataFields().forEach(fieldId ->
                 immediateData.add(fieldFactory.buildImmediateField(useCase, fieldId))

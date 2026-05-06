@@ -3,7 +3,7 @@ package com.netgrif.application.engine.menu.utils;
 import com.netgrif.application.engine.menu.domain.MenuItemConstants;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.TaskPair;
-import com.netgrif.application.engine.menu.services.interfaces.IMenuItemService;
+import com.netgrif.application.engine.menu.service.interfaces.IMenuItemService;
 
 import java.text.Normalizer;
 import java.util.List;

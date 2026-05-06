@@ -1,14 +1,16 @@
-package com.netgrif.application.engine.menu.services.interfaces;
+package com.netgrif.application.engine.menu.service.interfaces;
 
 import com.netgrif.application.engine.menu.domain.FilterBody;
 import com.netgrif.application.engine.menu.domain.MenuItemBody;
 import com.netgrif.application.engine.menu.domain.MenuItemView;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
+import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -27,6 +29,7 @@ public interface IMenuItemService {
     void moveItem(Case item, String destUri) throws TransitionNotExecutableException;
     Case duplicateItem(Case originItem, I18nString newTitle, String newIdentifier) throws TransitionNotExecutableException;
     Case removeChildItemFromParent(String folderId, Case childItem);
+    Map<String, List<Field<?>>> getMenuItemData(String caseId);
 
     /**
      * Gets all tabbed or non-tabbed views

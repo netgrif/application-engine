@@ -591,6 +591,31 @@
 			])
 		</action>
 	</data>
+	<data type="i18n">
+		<id>role_divider</id>
+		<title/>
+		<component>
+			<name>divider</name>
+		</component>
+	</data>
+	<data type="taskRef">
+		<id>advanced_content_form</id>
+		<title/>
+		<component>
+			<name>task-list</name>
+			<!-- todo 23 headers-->
+		</component>
+		<event type="get">
+			<id>get</id>
+			<actions phase="pre">
+				<action>
+					advanced_content_form: f.advanced_content_form;
+					change advanced_content_form value { [useCase.tasks.find { taskPair -> taskPair.transition == "role_settings"}.task,
+														  useCase.tasks.find { taskPair -> taskPair.transition == "view_settings"}.task] }
+				</action>
+			</actions>
+		</event>
+	</data>
 
 	<!-- I18NS -->
 	<i18n locale="sk">
@@ -629,7 +654,6 @@
 		<i18nString name="roles_allowed_desc">Zoznam povolených rolí, ktoré môžu zobraziť túto položku</i18nString>
 		<i18nString name="roles_banned">Zakázané roly</i18nString>
 		<i18nString name="roles_banned_desc">Zoznam zakázaných rolí, ktoré nemôžu zobraziť túto položku</i18nString>
-		<i18nString name="item_settings_general">Všeobecné</i18nString>
 		<i18nString name="menu_item_identifier">Identifikátor položky</i18nString>
 		<i18nString name="nodePath">URI položky</i18nString>
 		<i18nString name="move_dest_uri_new_node">Nový uzol</i18nString>
@@ -660,7 +684,6 @@
 		<i18nString name="custom_view_selector_desc">Beispiel: "demo-tabbed-views"</i18nString>
 		<i18nString name="roles_management_title">Rollen</i18nString>
 		<i18nString name="roles_allowed">Zulässige Rollen</i18nString>
-		<i18nString name="item_settings_general">Allgemein</i18nString>
 		<i18nString name="menu_item_identifier">Identifikationsnummer des Menüeintrages</i18nString>
 		<i18nString name="nodePath">Menüeintrag-URI</i18nString>
 		<i18nString name="move_dest_uri_new_node">Neuer Knoten</i18nString>
@@ -800,12 +823,6 @@
 				<perform>true</perform>
 			</logic>
 		</roleRef>
-		<roleRef>
-			<id>admin</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
 	</transition>
 
 	<transition>
@@ -831,7 +848,6 @@
 			<id>general_0</id>
 			<cols>4</cols>
 			<layout>grid</layout>
-			<title name="item_settings_general">General</title>
 			<dataRef>
 				<id>menu_item_identifier</id>
 				<logic>
@@ -883,7 +899,7 @@
 					<x>2</x>
 					<y>1</y>
 					<rows>1</rows>
-					<cols>1</cols>
+					<cols>2</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
@@ -894,10 +910,10 @@
 					<behavior>visible</behavior>
 				</logic>
 				<layout>
-					<x>3</x>
-					<y>1</y>
+					<x>2</x>
+					<y>2</y>
 					<rows>1</rows>
-					<cols>1</cols>
+					<cols>2</cols>
 					<template>material</template>
 					<appearance>standard</appearance>
 				</layout>
@@ -908,288 +924,8 @@
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
-					<x>1</x>
+					<x>0</x>
 					<y>2</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>standard</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-		<dataGroup>
-			<id>roles_management</id>
-			<cols>5</cols>
-			<layout>grid</layout>
-			<title name="roles_management_title">Roles</title>
-			<dataRef>
-				<id>processes_available</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>2</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>roles_available</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>1</x>
-					<y>0</y>
-					<rows>2</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>add_allowed_roles</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>allowed_roles</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>3</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>remove_allowed_roles</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>4</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>add_banned_roles</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>banned_roles</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>3</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>remove_banned_roles</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>4</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-				</layout>
-			</dataRef>
-		</dataGroup>
-		<dataGroup>
-			<id>configuration_view</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-			<title name="configuration_view">View configuration</title>
-			<dataRef>
-				<id>use_custom_view</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-				<event type="set">
-					<id>0</id>
-					<actions phase="post">
-						<action>
-							trans: t.this,
-							useTabIcon: f.use_tab_icon,
-							use_tabbed_view: f.use_tabbed_view,
-							view_configuration_form: f.view_configuration_form,
-							view_configuration_type: f.view_configuration_type,
-							tabIconPreview: f.tab_icon_preview,
-							tabName: f.tab_name,
-							tabIcon: f.tab_icon,
-							use: f.use_custom_view,
-							selector: f.custom_view_selector;
-
-							if (use.value) {
-								make selector, editable on trans when { true }
-								make [useTabIcon, tabIconPreview, tabName, tabIcon, use_tabbed_view, view_configuration_form,
-										view_configuration_type], hidden on trans when { true }
-								// todo remove configuration or keep it?
-							} else {
-								manageBehaviorOfTabFields(useTabIcon.value, use_tabbed_view.value)
-								make [use_tabbed_view, view_configuration_form, view_configuration_type], editable on trans when { true }
-								make selector, hidden on trans when { true }
-							}
-						</action>
-					</actions>
-				</event>
-			</dataRef>
-			<dataRef>
-				<id>custom_view_selector</id>
-				<logic>
-					<behavior>hidden</behavior>
-				</logic>
-				<layout>
-					<x>1</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>3</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>use_tabbed_view</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>1</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>standard</appearance>
-				</layout>
-				<event type="set">
-					<id>0</id>
-					<actions phase="post">
-						<action>
-							use_tabbed_view: f.use_tabbed_view,
-							use_tab_icon: f.use_tab_icon,
-							view_configuration_type: f.view_configuration_type;
-
-							manageBehaviorOfTabFields(use_tab_icon.value, use_tabbed_view.value)
-
-							change view_configuration_type value { null }
-							change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(use_tabbed_view.value, true) }
-						</action>
-					</actions>
-				</event>
-			</dataRef>
-			<dataRef>
-				<id>tab_name</id>
-				<logic>
-					<behavior>hidden</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>use_tab_icon</id>
-				<logic>
-					<behavior>hidden</behavior>
-				</logic>
-				<layout>
-					<x>3</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-				</layout>
-				<event type="set">
-					<id>0</id>
-					<actions phase="post">
-						<action>
-							use_tabbed_view: f.use_tabbed_view,
-							useIcon: f.use_tab_icon;
-
-							manageBehaviorOfTabFields(useIcon.value, use_tabbed_view.value)
-						</action>
-					</actions>
-				</event>
-			</dataRef>
-			<dataRef>
-				<id>tab_icon</id>
-				<logic>
-					<behavior>hidden</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>tab_icon_preview</id>
-				<logic>
-					<behavior>hidden</behavior>
-				</logic>
-				<layout>
-					<x>1</x>
-					<y>1</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -1197,48 +933,7 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>view_configuration_type</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-				<event type="set">
-					<id>0</id>
-					<actions phase="post">
-						<action>
-							view_configuration_type: f.view_configuration_type,
-							view_configuration_form: f.view_configuration_form,
-							view_configuration_id: f.view_configuration_id;
-
-							if (view_configuration_id.value != null &amp;&amp; !view_configuration_id.value.isEmpty()) {
-								workflowService.deleteCase(view_configuration_id.value[0])
-							}
-
-							if (view_configuration_type.value == null || view_configuration_type.value == "") {
-								change view_configuration_id value { [] }
-								change view_configuration_form value { [] }
-								return
-							}
-
-							def configurationCase = createCase(view_configuration_type.value + "_configuration")
-							def initTask = assignTask("initialize", configurationCase)
-							finishTask(initTask)
-							configurationCase = workflowService.findOne(configurationCase.stringId)
-							change view_configuration_id value { [configurationCase.stringId] }
-							change view_configuration_form value { [configurationCase.tasks.find { it.transition == "settings" }.task] }
-						</action>
-					</actions>
-				</event>
-			</dataRef>
-			<dataRef>
-				<id>view_configuration_form</id>
+				<id>advanced_content_form</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -1252,6 +947,14 @@
 				</layout>
 			</dataRef>
 		</dataGroup>
+		<event type="assign">
+			<id>assign_0</id>
+			<title/>
+		</event>
+		<event type="finish">
+			<id>finish_0</id>
+			<title/>
+		</event>
 	</transition>
 
 	<transition>
@@ -1533,6 +1236,425 @@
 			</logic>
 		</roleRef>
 	</transition>
+	<transition>
+		<id>role_settings</id>
+		<x>400</x>
+		<y>48</y>
+		<label name="todo 23">Role</label>
+		<icon>person</icon>
+		<assignPolicy>auto</assignPolicy>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>default</id>
+			<logic>
+				<view>true</view>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>roles_management</id>
+			<cols>3</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>processes_available</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>2</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>roles_available</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>2</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>add_allowed_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>add_banned_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>role_divider</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>allowed_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>remove_allowed_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>banned_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>remove_banned_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>assign</id>
+			<title/>
+		</event>
+		<event type="cancel">
+			<id>cancel</id>
+			<title/>
+		</event>
+		<event type="finish">
+			<id>finish_0</id>
+			<title/>
+		</event>
+		<event type="delegate">
+			<id>delegate</id>
+			<title/>
+		</event>
+	</transition>
+	<transition>
+		<id>view_settings</id>
+		<x>528</x>
+		<y>48</y>
+		<label name="todo 23">View</label>
+		<icon>image</icon>
+		<assignPolicy>auto</assignPolicy>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>default</id>
+			<logic>
+				<view>true</view>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>configuration_view</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>use_custom_view</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							trans: t.this,
+							useTabIcon: f.use_tab_icon,
+							use_tabbed_view: f.use_tabbed_view,
+							view_configuration_form: f.view_configuration_form,
+							view_configuration_type: f.view_configuration_type,
+							tabIconPreview: f.tab_icon_preview,
+							tabName: f.tab_name,
+							tabIcon: f.tab_icon,
+							use: f.use_custom_view,
+							selector: f.custom_view_selector;
+
+							if (use.value) {
+								make selector, editable on trans when { true }
+								make [useTabIcon, tabIconPreview, tabName, tabIcon, use_tabbed_view, view_configuration_form,
+										view_configuration_type], hidden on trans when { true }
+								// todo remove configuration or keep it?
+							} else {
+								manageBehaviorOfTabFields(useTabIcon.value, use_tabbed_view.value)
+								make [use_tabbed_view, view_configuration_form, view_configuration_type], editable on trans when { true }
+								make selector, hidden on trans when { true }
+							}
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>custom_view_selector</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>use_tabbed_view</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							use_tabbed_view: f.use_tabbed_view,
+							use_tab_icon: f.use_tab_icon,
+							view_configuration_type: f.view_configuration_type;
+
+							manageBehaviorOfTabFields(use_tab_icon.value, use_tabbed_view.value)
+
+							change view_configuration_type value { null }
+							change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(use_tabbed_view.value, true) }
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>tab_name</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>use_tab_icon</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							use_tabbed_view: f.use_tabbed_view,
+							useIcon: f.use_tab_icon;
+
+							manageBehaviorOfTabFields(useIcon.value, use_tabbed_view.value)
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>tab_icon</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>tab_icon_preview</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>view_configuration_type</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							view_configuration_type: f.view_configuration_type,
+							view_configuration_form: f.view_configuration_form,
+							view_configuration_id: f.view_configuration_id;
+
+							if (view_configuration_id.value != null &amp;&amp; !view_configuration_id.value.isEmpty()) {
+								workflowService.deleteCase(view_configuration_id.value[0])
+							}
+
+							if (view_configuration_type.value == null || view_configuration_type.value == "") {
+								change view_configuration_id value { [] }
+								change view_configuration_form value { [] }
+								return
+							}
+
+							def configurationCase = createCase(view_configuration_type.value + "_configuration")
+							def initTask = assignTask("initialize", configurationCase)
+							finishTask(initTask)
+							configurationCase = workflowService.findOne(configurationCase.stringId)
+							change view_configuration_id value { [configurationCase.stringId] }
+							change view_configuration_form value { [configurationCase.tasks.find { it.transition == "settings" }.task] }
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>view_configuration_form</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>assign</id>
+			<title/>
+		</event>
+		<event type="cancel">
+			<id>cancel</id>
+			<title/>
+		</event>
+		<event type="finish">
+			<id>finish_0</id>
+			<title/>
+		</event>
+		<event type="delegate">
+			<id>delegate</id>
+			<title/>
+		</event>
+	</transition>
 
 	<!-- PLACES-->
 	<place>
@@ -1607,6 +1729,20 @@
 		<type>regular</type>
 		<sourceId>system_initialize</sourceId>
 		<destinationId>initialized</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a16</id>
+		<type>read</type>
+		<sourceId>initialized</sourceId>
+		<destinationId>view_settings</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a17</id>
+		<type>read</type>
+		<sourceId>initialized</sourceId>
+		<destinationId>role_settings</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 </document>

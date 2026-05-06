@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.menu.services;
+package com.netgrif.application.engine.menu.service;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
@@ -6,10 +6,12 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.menu.domain.ToDataSetOutcome;
-import com.netgrif.application.engine.menu.domain.dashboard.DashboardItemBody;
 import com.netgrif.application.engine.menu.domain.dashboard.DashboardItemConstants;
-import com.netgrif.application.engine.menu.services.interfaces.DashboardItemService;
+import com.netgrif.application.engine.menu.domain.dashboard.DashboardManagementBody;
+import com.netgrif.application.engine.menu.domain.dashboard.DashboardManagementConstants;
+import com.netgrif.application.engine.menu.service.interfaces.DashboardManagementService;
 import com.netgrif.application.engine.menu.utils.MenuItemUtils;
+import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ImportHelper;
@@ -25,13 +27,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DashboardItemServiceImpl implements DashboardItemService {
+public class DashboardManagementServiceImpl implements DashboardManagementService {
 
     protected final IWorkflowService workflowService;
     protected final IUserService userService;
@@ -40,60 +43,59 @@ public class DashboardItemServiceImpl implements DashboardItemService {
     protected final IPetriNetService petriNetService;
     protected final IElasticCaseService elasticCaseService;
 
+
     /**
-     * Creates a new dashboard item case if it does not already exist.
+     * Creates a new dashboard management case if it does not already exist.
      * If a case with the same ID is found, it is returned instead of creating a new one.
      *
-     * @param body The {@link DashboardItemBody} containing data for the dashboard item.
-     * @return The created or existing {@link Case} representing the dashboard item.
-     * @throws TransitionNotExecutableException if the task transition is not executable.
+     * @param body The {@link DashboardManagementBody} containing data for the dashboard management.
+     * @return The created or existing {@link Case} representing the dashboard management.
      */
     @Override
-    public Case getOrCreate(DashboardItemBody body) throws TransitionNotExecutableException {
+    public Case createDashboardManagement(DashboardManagementBody body) throws TransitionNotExecutableException {
+        Case managementCase;
         MenuItemUtils.sanitize(body.getId());
-        Case itemCase;
 
-        itemCase = findById(body.getId());
-        if (itemCase != null) {
-            log.info("Dashboard item with id:{} already exists", body.getId());
-            return itemCase;
+        managementCase = findDashboardManagement(body.getId());
+        if (managementCase != null) {
+            log.info("Dashboard management with id:{} already exists", body.getId());
+            return managementCase;
         }
-
+        addReferencedMenuItems(body);
         LoggedUser loggedUser = userService.getLoggedOrSystem().transformToLoggedUser();
-        itemCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier(DashboardItemConstants.PROCESS_IDENTIFIER).getStringId(), body.getName().getDefaultValue(), "", loggedUser).getCase();
+        managementCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier(DashboardManagementConstants.PROCESS_IDENTIFIER).getStringId(), body.getName().getDefaultValue(), "", loggedUser).getCase();
         ToDataSetOutcome outcome = body.toDataSet();
-        itemCase = setDataWithExecute(itemCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());
-        return itemCase;
+        managementCase = setDataWithExecute(managementCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());
+        return managementCase;
     }
 
-
     /**
-     * Updates an existing dashboard item case with new data.
+     * Updates an existing dashboard management case with new data.
      *
-     * @param itemCase The existing {@link Case} to update.
-     * @param body The {@link DashboardItemBody} containing updated data.
-     * @return The updated {@link Case} representing the dashboard item.
-     * @throws TransitionNotExecutableException if the task transition is not executable.
+     * @param managementCase The existing {@link Case} to update.
+     * @param body The {@link DashboardManagementBody} containing updated data.
+     * @return The updated {@link Case} representing the dashboard management.
      */
     @Override
-    public Case update(Case itemCase, DashboardItemBody body) throws TransitionNotExecutableException {
+    public Case updateDashboardManagement(Case managementCase, DashboardManagementBody body) throws TransitionNotExecutableException {
         MenuItemUtils.sanitize(body.getId());
+        addReferencedMenuItems(body);
         ToDataSetOutcome outcome = body.toDataSet();
-        itemCase = setDataWithExecute(itemCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());
-        return itemCase;
+        managementCase = setDataWithExecute(managementCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());
+        return managementCase;
     }
 
     /**
-     * Finds an existing dashboard item case by its identifier.
+     * Finds an existing dashboard management case by its identifier.
      *
-     * @param identifier The unique identifier of the dashboard item.
-     * @return The {@link Case} representing the dashboard item, or null if not found.
+     * @param identifier The unique identifier of the dashboard management.
+     * @return The {@link Case} representing the dashboard management, or null if not found.
      */
     @Override
-    public Case findById(String identifier) {
+    public Case findDashboardManagement(String identifier) {
         String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
-                DashboardItemConstants.PROCESS_IDENTIFIER, DashboardItemConstants.FIELD_ID, identifier);
-        return findCase(DashboardItemConstants.PROCESS_IDENTIFIER, query);
+                DashboardManagementConstants.PROCESS_IDENTIFIER, DashboardManagementConstants.FIELD_ID, identifier);
+        return findCase(DashboardManagementConstants.PROCESS_IDENTIFIER, query);
     }
 
     protected Case setData(Case useCase, String transId, Map<String, Map<String, Object>> dataSet) {
@@ -120,5 +122,17 @@ public class DashboardItemServiceImpl implements DashboardItemService {
                 PageRequest.of(0, 1), Locale.getDefault(), false);
 
         return resultPage.hasContent() ? resultPage.getContent().get(0) : null;
+    }
+
+    private void addReferencedMenuItems(DashboardManagementBody body) {
+        if (body.getDashboardItems() == null || body.getDashboardItems().isEmpty()) {
+            return;
+        }
+        HashMap<String, I18nString> menuItemToDashboardItem = new HashMap<>();
+        body.getDashboardItems().keySet().forEach(dashboardItemId -> {
+            Case dashboardItem = workflowService.findOne(dashboardItemId);
+            menuItemToDashboardItem.put(dashboardItemId, new I18nString(String.valueOf(dashboardItem.getFieldValue(DashboardItemConstants.FIELD_MENU_ITEM_LIST))));
+        });
+        body.setMenuItemsToDashboardItems(menuItemToDashboardItem);
     }
 }

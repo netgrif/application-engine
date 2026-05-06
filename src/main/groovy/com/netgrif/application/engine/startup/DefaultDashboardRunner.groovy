@@ -2,7 +2,7 @@ package com.netgrif.application.engine.startup
 
 
 import com.netgrif.application.engine.menu.domain.dashboard.DashboardManagementBody
-import com.netgrif.application.engine.menu.services.interfaces.DashboardManagementService
+import com.netgrif.application.engine.menu.service.interfaces.DashboardManagementService
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
