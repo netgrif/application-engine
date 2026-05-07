@@ -181,6 +181,8 @@ public class MenuItemBody {
                     List.of(viewCase.getStringId()));
             String taskId = MenuItemUtils.findTaskIdInCase(viewCase, ViewConstants.TRANS_SETTINGS_ID);
             outcome.putDataSetEntry(MenuItemConstants.FIELD_VIEW_CONFIGURATION_FORM, FieldType.TASK_REF, List.of(taskId));
+            String allDataTaskId = MenuItemUtils.findTaskIdInCase(viewCase, ViewConstants.TRANS_ALL_MENU_DATA_ID);
+            outcome.putDataSetEntry(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ALL_DATA_FORM, FieldType.TASK_REF, List.of(allDataTaskId));
         }
 
         return outcome;

@@ -73,6 +73,8 @@ public abstract class ViewBody {
                     List.of(associatedViewCase.getStringId()));
             String taskId = MenuItemUtils.findTaskIdInCase(associatedViewCase, ViewConstants.TRANS_SETTINGS_ID);
             outcome.putDataSetEntry(ViewConstants.FIELD_VIEW_CONFIGURATION_FORM, FieldType.TASK_REF, List.of(taskId));
+            String allDataTaskId = MenuItemUtils.findTaskIdInCase(associatedViewCase, ViewConstants.TRANS_ALL_MENU_DATA_ID);
+            outcome.putDataSetEntry(ViewConstants.FIELD_VIEW_CONFIGURATION_ALL_DATA_FORM, FieldType.TASK_REF, List.of(allDataTaskId));
         }
         if (filterCase != null) {
             outcome.putDataSetEntry(ViewConstants.FIELD_VIEW_FILTER_CASE, FieldType.CASE_REF, List.of(filterCase.getStringId()));

@@ -391,6 +391,10 @@
         <title/>
     </data>
     <data type="taskRef">
+        <id>view_configuration_all_data_form</id>
+        <title/>
+    </data>
+    <data type="taskRef">
         <id>advanced_content_form</id>
         <title/>
         <component>
@@ -733,6 +737,7 @@
                         <action>
                             view_configuration_type: f.view_configuration_type,
                             view_configuration_form: f.view_configuration_form,
+                            view_configuration_all_data_form: f.view_configuration_all_data_form,
                             view_configuration_id: f.view_configuration_id;
 
                             if (view_configuration_id.value != null &amp;&amp; !view_configuration_id.value.isEmpty()) {
@@ -742,6 +747,7 @@
                             if (view_configuration_type.value == null || view_configuration_type.value == "") {
                                 change view_configuration_id value { [] }
                                 change view_configuration_form value { [] }
+                                change view_configuration_all_data_form value { [] }
                                 return
                             }
 
@@ -751,6 +757,7 @@
                             configurationCase = workflowService.findOne(configurationCase.stringId)
                             change view_configuration_id value { [configurationCase.stringId] }
                             change view_configuration_form value { [configurationCase.tasks.find { it.transition == "settings" }.task] }
+                            change view_configuration_all_data_form value { [configurationCase.tasks.find { it.transition == "all_menu_data" }.task] }
                         </action>
                     </actions>
                 </event>
@@ -1072,6 +1079,148 @@
             <id>delegate</id>
             <title/>
         </event>
+    </transition>
+    <transition>
+        <id>all_menu_data</id>
+        <x>10</x>
+        <y>10</y>
+        <label>All menu data</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>all_menu_data_0</id>
+            <layout>flow</layout>
+            <dataRef>
+                <id>filter_autocomplete_selection</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>update_filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>selected_filter_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>filter_header</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>current_filter_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>view_search_type</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>show_create_case_button</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>show_more_menu</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>create_case_button_title</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>create_case_button_icon</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>create_case_button_icon_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>require_title_in_creation</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>banned_nets_in_creation</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>is_header_mode_changeable</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>allow_header_table_mode</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>headers_mode</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>headers_default_mode</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>use_case_default_headers</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>default_headers</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>view_configuration_type</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>view_configuration_all_data_form</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <place>
         <id>initialized</id>
