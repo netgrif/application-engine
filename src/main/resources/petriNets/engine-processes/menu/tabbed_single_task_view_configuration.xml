@@ -266,6 +266,28 @@
             <title/>
         </event>
     </transition>
+    <transition>
+        <id>all_menu_data</id>
+        <x>10</x>
+        <y>10</y>
+        <label>All menu data</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>all_menu_data_0</id>
+            <layout>flow</layout>
+            <dataRef>
+                <id>transition_id</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
     <place>
         <id>initialized</id>
         <x>496</x>

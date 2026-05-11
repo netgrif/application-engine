@@ -1899,31 +1899,31 @@ class ActionDelegate {
          title             : { cl ->
              def value = cl()
              I18nString newName = (value instanceof I18nString) ? value : new I18nString(value as String)
-             setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
+             setData(MenuItemConstants.TRANS_SYNC_ID, item, [
                      (MenuItemConstants.FIELD_MENU_NAME): ["type": "i18n", "value": newName]
              ])
          },
          menuIcon          : { cl ->
              def value = cl()
-             setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
+             setData(MenuItemConstants.TRANS_SYNC_ID, item, [
                      (MenuItemConstants.FIELD_MENU_ICON): ["type": "text", "value": value]
              ])
          },
          tabIcon           : { cl ->
              def value = cl()
-             setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
+             setData(MenuItemConstants.TRANS_SYNC_ID, item, [
                      (MenuItemConstants.FIELD_TAB_ICON): ["type": "text", "value": value]
              ])
          },
          useCustomView     : { cl ->
              def value = cl()
-             setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
+             setData(MenuItemConstants.TRANS_SYNC_ID, item, [
                      (MenuItemConstants.FIELD_USE_CUSTOM_VIEW): ["type": "boolean", "value": value]
              ])
          },
          customViewSelector: { cl ->
              def value = cl()
-             setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
+             setData(MenuItemConstants.TRANS_SYNC_ID, item, [
                      (MenuItemConstants.FIELD_CUSTOM_VIEW_SELECTOR): ["type": "text", "value": value]
              ])
          }]

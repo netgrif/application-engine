@@ -93,7 +93,7 @@
 		}
 	</function>
 	<function scope="process" name="manageBehaviorOfTabFields">
-		{ boolean useTabIcon, boolean useTabbedView, String transId = "item_settings" ->
+		{ boolean useTabIcon, boolean useTabbedView, String transId = "view_settings" ->
 			def settingsTrans = useCase.petriNet.transitions[transId]
 
 			make [useCase.getField("use_tab_icon"), useCase.getField("tab_icon"), useCase.getField("tab_name")],
@@ -193,6 +193,7 @@
 			prefixUri = prefixUri.replace("//","/")
 
 			String newUri = prefixUri + uriService.getUriSeparator() + newNodeName.value
+			newUri = newUri.replace("//","/")
 			def newNode = uriService.getOrCreate(newUri, com.netgrif.application.engine.petrinet.domain.UriContentType.CASE)
 
 			change selectedUri value { splitUriPath(newNode.uriPath) }
@@ -737,6 +738,7 @@
 		<label name="initialize">Create item</label>
 <!--		todo 23 tags visible-->
 		<icon>hourglass_empty</icon>
+		<assignPolicy>auto</assignPolicy>
 		<roleRef>
 			<id>admin</id>
 			<logic>
@@ -810,12 +812,15 @@
 			<id>finish</id>
 			<actions phase="pre">
 				<action>
+					name: f.menu_name,
+					identifier: f.menu_item_identifier,
 					dest: f.move_dest_uri;
 
 					String newUri = dest.value.join("/")
 					newUri = newUri.replace("//","/")
 
 					changeMenuItem useCase uri { newUri }
+					change name value { new com.netgrif.application.engine.petrinet.domain.I18nString(identifier.value) }
 				</action>
 			</actions>
 			<title name="create_item_finish">Create</title>
