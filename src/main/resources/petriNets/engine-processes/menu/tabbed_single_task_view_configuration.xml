@@ -53,7 +53,7 @@
                 } else {
                     change filterAutocomplete options {
                         def findAllPredicate = { filterCase -> !selectedFilterRef.value.contains(filterCase.stringId)
-                                &amp;&amp; filterCase.dataSet["filter_type"].value == "Case" }
+                                &amp;&amp; filterCase.dataSet["filter_type"].value == "Task" }
                         return findFilters(filterAutocomplete.value != null ? filterAutocomplete.value : "")
                                 .findAll(findAllPredicate)
                                 .collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
@@ -70,7 +70,7 @@
         <title/>
     </data>
     <data type="taskRef">
-        <id>current_filter_preview</id>
+        <id>current_task_filter_preview</id>
         <title/>
     </data>
     <data type="i18n">
@@ -97,7 +97,7 @@
             <name>autocomplete_dynamic</name>
         </component>
         <action trigger="set">
-            trans: t.settings,
+            trans: t.filter_settings,
             filterAutocomplete: f.this,
             filter_case: f.filter_case,
             update_filter: f.update_filter,
@@ -106,7 +106,7 @@
             updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans)
         </action>
         <action trigger="get">
-            trans: t.settings,
+            trans: t.filter_settings,
             filterAutocomplete: f.this,
             filter_case: f.filter_case,
             update_filter: f.update_filter,
@@ -123,7 +123,7 @@
             <name>raised</name>
         </component>
         <action trigger="set">
-            trans: t.settings,
+            trans: t.filter_settings,
             update_filter: f.update_filter,
             contains_filter: f.contains_filter,
             filter_case: f.filter_case,
@@ -147,7 +147,7 @@
         <id>filter_case</id>
         <title/>
         <action trigger="set">
-            filterTaskRef: f.current_filter_preview,
+            filterTaskRef: f.current_task_filter_preview,
             contains_filter: f.contains_filter,
             filterCaseRef: f.filter_case;
 
@@ -167,13 +167,33 @@
             <allowedNet>filter</allowedNet>
         </allowedNets>
     </data>
-
-    <!-- VIEW CONFIGURATION DATA -->
-    <data type="text">
-        <id>transition_id</id>
-        <title name="transition_id">Transition id</title>
+    <data type="taskRef">
+        <id>advanced_content_form</id>
+        <title/>
+        <component>
+            <!-- todo 23 headers-->
+            <name>task-list</name>
+        </component>
+        <event type="get">
+            <id>get</id>
+            <actions phase="pre">
+                <action>
+                    advanced_content_form: f.advanced_content_form;
+                    change advanced_content_form value { [useCase.tasks.find { taskPair -> taskPair.transition == "filter_settings"}.task] }
+                </action>
+            </actions>
+        </event>
     </data>
-    <!-- END OF VIEW CONFIGURATION DATA -->
+    <data type="boolean">
+        <id>show_page_header</id>
+        <title name="todo 23">Show page header</title>
+        <init>true</init>
+    </data>
+    <data type="boolean">
+        <id>show_page_footer</id>
+        <title name="todo 23">Show page footer</title>
+        <init>false</init>
+    </data>
 
     <!-- I18NS -->
     <i18n locale="sk">
@@ -183,7 +203,6 @@
         <i18nString name="filter_header">Súčasný filter</i18nString>
         <i18nString name="view_configuration_type">Vybrať zobrazenie</i18nString>
         <i18nString name="settings">Nastavenie</i18nString>
-        <i18nString name="transition_id">ID prechodu</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
@@ -192,7 +211,6 @@
         <i18nString name="update_filter">Aktualisiere die Ansicht mit dem ausgewählten Filter</i18nString>
         <i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
         <i18nString name="settings">Einstellungen</i18nString>
-        <i18nString name="transition_id">Übergangs-ID</i18nString>
     </i18n>
 
     <transition>
@@ -226,6 +244,7 @@
         <y>112</y>
         <label name="settings">Settings</label>
         <icon>settings</icon>
+<!--        todo 23 tags visible-->
         <roleRef>
             <id>admin</id>
             <logic>
@@ -243,13 +262,41 @@
             <cols>4</cols>
             <layout>grid</layout>
             <dataRef>
-                <id>transition_id</id>
+                <id>show_page_header</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
                     <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>show_page_footer</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>advanced_content_form</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <template>material</template>
@@ -267,6 +314,117 @@
         </event>
     </transition>
     <transition>
+        <id>filter_settings</id>
+        <x>432</x>
+        <y>48</y>
+        <label name="todo 23">Filter</label>
+        <icon>filter_alt</icon>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>filter_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>filter_autocomplete_selection</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>update_filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>selected_filter_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>filter_header</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>current_task_filter_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>assign</id>
+            <title/>
+        </event>
+        <event type="cancel">
+            <id>cancel</id>
+            <title/>
+        </event>
+        <event type="finish">
+            <id>finish_0</id>
+            <title/>
+        </event>
+        <event type="delegate">
+            <id>delegate</id>
+            <title/>
+        </event>
+    </transition>
+    <transition>
         <id>all_menu_data</id>
         <x>10</x>
         <y>10</y>
@@ -280,8 +438,46 @@
         <dataGroup>
             <id>all_menu_data_0</id>
             <layout>flow</layout>
+            <alignment>start</alignment>
+            <stretch>true</stretch>
             <dataRef>
-                <id>transition_id</id>
+                <id>show_page_header</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>show_page_footer</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>filter_autocomplete_selection</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>update_filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>selected_filter_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>filter_header</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>current_task_filter_preview</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
@@ -323,6 +519,13 @@
         <type>regular</type>
         <sourceId>initialize</sourceId>
         <destinationId>initialized</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a4</id>
+        <type>read</type>
+        <sourceId>initialized</sourceId>
+        <destinationId>filter_settings</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>

@@ -23,7 +23,7 @@ public enum MenuItemView {
             "de", "Ticketansicht mit Registerkarten")), "tabbed_ticket_view",
             List.of("tabbed_single_task_view"), true, true),
     TABBED_SINGLE_TASK_VIEW(new I18nString("Tabbed single task view", Map.of("sk", "Zobrazenie jednej úlohy v taboch",
-            "de", "Einzelaufgabenansicht mit Registerkarten")), "tabbed_single_task_view", List.of(), true, false);
+            "de", "Einzelaufgabenansicht mit Registerkarten")), "tabbed_single_task_view", List.of(), true, true);
 
     private final I18nString name;
     private final String identifier;

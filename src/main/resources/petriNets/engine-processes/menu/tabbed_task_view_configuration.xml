@@ -96,7 +96,7 @@
         <title/>
     </data>
     <data type="taskRef">
-        <id>current_filter_preview</id>
+        <id>current_task_filter_preview</id>
         <title/>
     </data>
     <data type="i18n">
@@ -178,7 +178,7 @@
             removeButton: f.remove_filter,
             contains_filter: f.contains_filter,
             mergeFilters: f.merge_filters,
-            filterTaskRef: f.current_filter_preview,
+            filterTaskRef: f.current_task_filter_preview,
             filterCaseRef: f.filter_case;
 
             if (filterCaseRef.value == null || filterCaseRef.value == []) {
@@ -559,7 +559,7 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>current_filter_preview</id>
+                <id>current_task_filter_preview</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
@@ -782,6 +782,8 @@
         <dataGroup>
             <id>all_menu_data_0</id>
             <layout>flow</layout>
+            <alignment>start</alignment>
+            <stretch>true</stretch>
             <dataRef>
                 <id>filter_autocomplete_selection</id>
                 <logic>
@@ -807,7 +809,7 @@
                 </logic>
             </dataRef>
             <dataRef>
-                <id>current_filter_preview</id>
+                <id>current_task_filter_preview</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>

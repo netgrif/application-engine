@@ -1094,6 +1094,8 @@
         <dataGroup>
             <id>all_menu_data_0</id>
             <layout>flow</layout>
+            <alignment>start</alignment>
+            <stretch>true</stretch>
             <dataRef>
                 <id>filter_autocomplete_selection</id>
                 <logic>

@@ -448,6 +448,7 @@
 	<data type="boolean" immediate="true">
 		<id>use_tabbed_view</id>
 		<title name="use_tabbed_view">Do you want to use view with tabs?</title>
+		<init>true</init>
 	</data>
 
 	<!-- TABBED configuration data -->
@@ -490,7 +491,7 @@
 		<id>view_configuration_type</id>
 		<title name="view_configuration_type">Pick view type</title>
 		<options>
-			<init dynamic="true">menuItemService.getAvailableViewsAsOptions(false, true)</init>
+			<init dynamic="true">menuItemService.getAvailableViewsAsOptions(true, true)</init>
 		</options>
 		<action trigger="set">
 			use_tabbed_view: f.use_tabbed_view,
@@ -508,6 +509,7 @@
 			<allowedNet>tabbed_case_view_configuration</allowedNet>
 			<allowedNet>tabbed_task_view_configuration</allowedNet>
 			<allowedNet>tabbed_ticket_view_configuration</allowedNet>
+			<allowedNet>tabbed_single_task_view_configuration</allowedNet>
 		</allowedNets>
 	</data>
 	<data type="taskRef">
@@ -1532,7 +1534,7 @@
 			<dataRef>
 				<id>tab_name</id>
 				<logic>
-					<behavior>hidden</behavior>
+					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>2</x>
@@ -1546,7 +1548,7 @@
 			<dataRef>
 				<id>use_tab_icon</id>
 				<logic>
-					<behavior>hidden</behavior>
+					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>3</x>
@@ -1571,7 +1573,7 @@
 			<dataRef>
 				<id>tab_icon</id>
 				<logic>
-					<behavior>hidden</behavior>
+					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -1585,7 +1587,7 @@
 			<dataRef>
 				<id>tab_icon_preview</id>
 				<logic>
-					<behavior>hidden</behavior>
+					<behavior>visible</behavior>
 				</logic>
 				<layout>
 					<x>1</x>
@@ -1686,6 +1688,8 @@
 		<dataGroup>
 			<id>all_menu_data_0</id>
 			<layout>flow</layout>
+			<alignment>start</alignment>
+			<stretch>true</stretch>
 			<dataRef>
 				<id>menu_item_identifier</id>
 				<logic>
