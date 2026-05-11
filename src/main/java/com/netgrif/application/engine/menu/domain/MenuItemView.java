@@ -14,16 +14,18 @@ import java.util.stream.Collectors;
  * */
 @Getter
 public enum MenuItemView {
-    TABBED_CASE_VIEW(new I18nString("Tabbed case view", Map.of("sk", "Zobrazenie prípadov v taboch",
-            "de", "Fallansicht mit Registerkarten")), "tabbed_case_view", List.of("tabbed_task_view"),
-            true, true),
-    TABBED_TASK_VIEW(new I18nString("Tabbed task view", Map.of("sk", "Zobrazenie úloh v taboch",
-            "de", "Aufgabenansicht mit Registerkarten")), "tabbed_task_view", List.of(), true, true),
-    TABBED_TICKET_VIEW(new I18nString("Tabbed ticket view", Map.of("sk", "Tiketové zobrazenie v taboch",
-            "de", "Ticketansicht mit Registerkarten")), "tabbed_ticket_view",
-            List.of("tabbed_single_task_view"), true, true),
-    TABBED_SINGLE_TASK_VIEW(new I18nString("Tabbed single task view", Map.of("sk", "Zobrazenie jednej úlohy v taboch",
-            "de", "Einzelaufgabenansicht mit Registerkarten")), "tabbed_single_task_view", List.of(), true, true);
+    TABBED_CASE_VIEW(new I18nString("Tabbed case view",
+            Map.of("sk", "Zobrazenie prípadov v taboch", "de", "Fallansicht mit Registerkarten")),
+            "tabbed_case_view", List.of("tabbed_task_view"), true, false, true),
+    TABBED_TASK_VIEW(new I18nString("Tabbed task view",
+            Map.of("sk", "Zobrazenie úloh v taboch", "de", "Aufgabenansicht mit Registerkarten")),
+            "tabbed_task_view", List.of(), true, false, true),
+    TABBED_TICKET_VIEW(new I18nString("Tabbed ticket view",
+            Map.of("sk", "Tiketové zobrazenie v taboch", "de", "Ticketansicht mit Registerkarten")),
+            "tabbed_ticket_view", List.of("tabbed_single_task_view"), true, false, true),
+    SINGLE_TASK_VIEW(new I18nString("Single task view",
+            Map.of("sk", "Zobrazenie jednej úlohy", "de", "Einzelaufgabenansicht")),
+            "single_task_view", List.of(), true, true, true);
 
     private final I18nString name;
     private final String identifier;
@@ -32,17 +34,19 @@ public enum MenuItemView {
      * */
     private final List<String> allowedAssociatedViews;
     private final boolean isTabbed;
+    private final boolean isUntabbed;
     /**
      * if false, the view cannot be used as first configuration of the menu_item, but can be used as secondary
      * (associated to another view)
      * */
     private final boolean isPrimary;
 
-    MenuItemView(I18nString name, String identifier, List<String> allowedAssociatedViews, boolean isTabbed, boolean isPrimary) {
+    MenuItemView(I18nString name, String identifier, List<String> allowedAssociatedViews, boolean isTabbed, boolean isUntabbed, boolean isPrimary) {
         this.name = name;
         this.identifier = identifier;
         this.allowedAssociatedViews = allowedAssociatedViews;
         this.isTabbed = isTabbed;
+        this.isUntabbed = isUntabbed;
         this.isPrimary = isPrimary;
     }
 
@@ -68,7 +72,7 @@ public enum MenuItemView {
      * */
     public static List<MenuItemView> findAllByIsTabbedAndIsPrimary(boolean isTabbed, boolean isPrimary) {
         return Arrays.stream(MenuItemView.values())
-                .filter(view -> view.isTabbed == isTabbed && view.isPrimary == isPrimary)
+                .filter(view -> (view.isTabbed == isTabbed || view.isUntabbed != isTabbed) && view.isPrimary == isPrimary)
                 .collect(Collectors.toList());
     }
 
@@ -83,7 +87,7 @@ public enum MenuItemView {
     public static List<MenuItemView> findAllByIsTabbedAndParentIdentifier(boolean isTabbed, String parentIdentifier) {
         MenuItemView parentView = fromIdentifier(parentIdentifier);
         return Arrays.stream(MenuItemView.values())
-                .filter(view -> view.isTabbed == isTabbed
+                .filter(view -> (view.isTabbed == isTabbed || view.isUntabbed != isTabbed)
                         && parentView.getAllowedAssociatedViews().contains(view.identifier))
                 .collect(Collectors.toList());
     }

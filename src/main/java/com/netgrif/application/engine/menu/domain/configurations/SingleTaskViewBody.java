@@ -10,8 +10,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TabbedSingleTaskViewBody extends ViewBody {
-    private String transitionId;
+public class SingleTaskViewBody extends ViewBody {
+    private boolean showPageHeader = true;
+    private boolean showPageFooter = false;
 
     @Override
     public ViewBody getAssociatedViewBody() {
@@ -20,12 +21,13 @@ public class TabbedSingleTaskViewBody extends ViewBody {
 
     @Override
     public MenuItemView getViewType() {
-        return MenuItemView.TABBED_SINGLE_TASK_VIEW;
+        return MenuItemView.SINGLE_TASK_VIEW;
     }
 
     @Override
     protected ToDataSetOutcome toDataSetInternal(ToDataSetOutcome outcome) {
-        outcome.putDataSetEntry(TabbedSingleTaskViewConstants.FIELD_TRANSITION_ID, FieldType.TEXT, this.transitionId);
+        outcome.putDataSetEntry(SingleTaskViewConstants.FIELD_SHOW_PAGE_HEADER, FieldType.BOOLEAN, this.showPageHeader);
+        outcome.putDataSetEntry(SingleTaskViewConstants.FIELD_SHOW_PAGE_FOOTER, FieldType.BOOLEAN, this.showPageFooter);
         return outcome;
     }
 }
