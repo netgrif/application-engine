@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TabbedCaseViewBody extends ViewBody {
+public class CaseViewBody extends ViewBody {
     private String viewSearchType = "fulltext_advanced";
     private I18nString createCaseButtonTitle;
     private String createCaseButtonIcon = "add";
@@ -38,39 +38,39 @@ public class TabbedCaseViewBody extends ViewBody {
 
     @Override
     public MenuItemView getViewType() {
-        return MenuItemView.TABBED_CASE_VIEW;
+        return MenuItemView.CASE_VIEW;
     }
 
     @Override
     protected ToDataSetOutcome toDataSetInternal(ToDataSetOutcome outcome) {
 
-        outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_VIEW_SEARCH_TYPE, FieldType.ENUMERATION_MAP,
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_VIEW_SEARCH_TYPE, FieldType.ENUMERATION_MAP,
                 this.viewSearchType);
         if (this.createCaseButtonTitle != null) {
-            outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_CREATE_CASE_BUTTON_TITLE, FieldType.I18N,
+            outcome.putDataSetEntry(CaseViewConstants.FIELD_CREATE_CASE_BUTTON_TITLE, FieldType.I18N,
                     this.createCaseButtonTitle);
         }
-        outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_CREATE_CASE_BUTTON_ICON, FieldType.TEXT,
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_CREATE_CASE_BUTTON_ICON, FieldType.TEXT,
                 this.createCaseButtonIcon);
-        outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_REQUIRE_TITLE_IN_CREATION, FieldType.BOOLEAN,
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_REQUIRE_TITLE_IN_CREATION, FieldType.BOOLEAN,
                 this.requireTitleInCreation);
-        outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_SHOW_CREATE_CASE_BUTTON, FieldType.BOOLEAN,
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_SHOW_CREATE_CASE_BUTTON, FieldType.BOOLEAN,
                 this.showCreateCaseButton);
-        outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_BANNED_NETS_IN_CREATION, FieldType.TEXT,
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_BANNED_NETS_IN_CREATION, FieldType.TEXT,
                 this.bannedNetsInCreation);
-        outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_SHOW_MORE_MENU, FieldType.BOOLEAN,
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_SHOW_MORE_MENU, FieldType.BOOLEAN,
                 this.showMoreMenu);
-        outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_ALLOW_HEADER_TABLE_MODE, FieldType.BOOLEAN,
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_ALLOW_HEADER_TABLE_MODE, FieldType.BOOLEAN,
                 this.allowHeaderTableMode);
-        outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_HEADERS_MODE, FieldType.MULTICHOICE_MAP,
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_HEADERS_MODE, FieldType.MULTICHOICE_MAP,
                 this.headersMode == null ? new ArrayList<>() : this.headersMode);
-        outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_HEADERS_DEFAULT_MODE, FieldType.ENUMERATION_MAP,
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_HEADERS_DEFAULT_MODE, FieldType.ENUMERATION_MAP,
                 this.headersDefaultMode);
-        outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_DEFAULT_HEADERS, FieldType.TEXT,
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_DEFAULT_HEADERS, FieldType.TEXT,
                 this.defaultHeaders != null ? String.join(",", this.defaultHeaders) : null);
-        outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_IS_HEADER_MODE_CHANGEABLE, FieldType.BOOLEAN,
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_IS_HEADER_MODE_CHANGEABLE, FieldType.BOOLEAN,
                 this.isHeaderModeChangeable);
-        outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_USE_CASE_DEFAULT_HEADERS, FieldType.BOOLEAN,
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_USE_CASE_DEFAULT_HEADERS, FieldType.BOOLEAN,
                 this.useDefaultHeaders);
 
         return outcome;

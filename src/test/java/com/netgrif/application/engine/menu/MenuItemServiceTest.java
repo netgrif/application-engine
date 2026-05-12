@@ -3,7 +3,7 @@ package com.netgrif.application.engine.menu;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.menu.domain.FilterBody;
 import com.netgrif.application.engine.menu.domain.MenuItemBody;
-import com.netgrif.application.engine.menu.domain.configurations.TabbedCaseViewBody;
+import com.netgrif.application.engine.menu.domain.configurations.CaseViewBody;
 import com.netgrif.application.engine.menu.domain.configurations.TaskViewBody;
 import com.netgrif.application.engine.menu.service.interfaces.IMenuItemService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
@@ -143,7 +143,7 @@ public class MenuItemServiceTest {
         filterBody.setIcon("home");
         filterBody.setVisibility("private");
 
-        TabbedCaseViewBody caseView = new TabbedCaseViewBody();
+        CaseViewBody caseView = new CaseViewBody();
         caseView.setFilterBody(filterBody);
         caseView.setRequireTitleInCreation(false);
         caseView.setChainedView(new TaskViewBody());

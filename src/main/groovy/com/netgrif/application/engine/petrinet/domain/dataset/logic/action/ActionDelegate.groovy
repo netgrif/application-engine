@@ -26,7 +26,7 @@ import com.netgrif.application.engine.mail.interfaces.IMailService
 import com.netgrif.application.engine.menu.domain.FilterBody
 import com.netgrif.application.engine.menu.domain.MenuItemBody
 import com.netgrif.application.engine.menu.domain.MenuItemConstants
-import com.netgrif.application.engine.menu.domain.configurations.TabbedCaseViewBody
+import com.netgrif.application.engine.menu.domain.configurations.CaseViewBody
 import com.netgrif.application.engine.menu.domain.configurations.TaskViewBody
 import com.netgrif.application.engine.menu.domain.configurations.ViewBody
 import com.netgrif.application.engine.menu.domain.dashboard.DashboardItemBody
@@ -2113,7 +2113,7 @@ class ActionDelegate {
     protected ViewBody createLegacyMenuItemViews(FilterBody filterBody, List<String> caseDefaultHeaders = null,
                                                  List<String> taskDefaultHeaders = null) {
         if (filterBody.getType() == "Case") {
-            ViewBody caseView = new TabbedCaseViewBody()
+            ViewBody caseView = new CaseViewBody()
             caseView.setFilterBody(filterBody)
             caseView.setDefaultHeaders(caseDefaultHeaders)
             caseView.setRequireTitleInCreation(true)

@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
  * */
 @Getter
 public enum MenuItemView {
-    TABBED_CASE_VIEW(new I18nString("Tabbed case view",
-            Map.of("sk", "Zobrazenie prípadov v taboch", "de", "Fallansicht mit Registerkarten")),
-            "tabbed_case_view", List.of("task_view"), true, false, true),
+    CASE_VIEW(new I18nString("Case view",
+            Map.of("sk", "Zobrazenie prípadov", "de", "Fallansicht")),
+            "case_view", List.of("task_view"), true, true, true),
     TASK_VIEW(new I18nString("Task view",
             Map.of("sk", "Zobrazenie úloh", "de", "Aufgabenansicht")),
             "task_view", List.of(), true, true, true),

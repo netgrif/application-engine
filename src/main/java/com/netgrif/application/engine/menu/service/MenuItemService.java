@@ -124,7 +124,7 @@ public class MenuItemService implements IMenuItemService {
 
         Case viewCase = null;
         if (body.hasView()) {
-            viewCase = createView(body.getView());
+            viewCase = createView(body.getView(), body.isUseTabbedView());
         }
         ToDataSetOutcome dataSetOutcome = body.toDataSet(parentItemCase.getStringId(), nodePath, viewCase);
         menuItemCase = setDataWithExecute(menuItemCase, MenuItemConstants.TRANS_INIT_ID, dataSetOutcome.getDataSet());
@@ -150,7 +150,7 @@ public class MenuItemService implements IMenuItemService {
         }
 
         Case viewCase = findView(itemCase);
-        viewCase = handleView(viewCase, body.getView());
+        viewCase = handleView(viewCase, body.getView(), body.isUseTabbedView());
         ToDataSetOutcome dataSetOutcome = body.toDataSet(viewCase);
         itemCase = setData(itemCase, MenuItemConstants.TRANS_SYNC_ID, dataSetOutcome.getDataSet());
         log.debug("Updated menu item case [{}] with identifier [{}].", itemCase.getStringId(), body.getIdentifier());
@@ -475,30 +475,30 @@ public class MenuItemService implements IMenuItemService {
         }
     }
 
-    protected Case handleView(Case existingViewCase, ViewBody body) throws TransitionNotExecutableException {
+    protected Case handleView(Case existingViewCase, ViewBody body, boolean isTabbed) throws TransitionNotExecutableException {
         if (mustUpdateView(existingViewCase, body)) {
-            return updateView(existingViewCase, body);
+            return updateView(existingViewCase, body, isTabbed);
         } else if (mustCreateView(existingViewCase, body)) {
-            return createView(body);
+            return createView(body, isTabbed);
         } else if (mustRemoveView(existingViewCase, body)) {
             removeView(existingViewCase);
             return null;
         } else if (mustRemoveAndCreateView(existingViewCase, body)) {
             removeView(existingViewCase);
-            return createView(body);
+            return createView(body, isTabbed);
         } else {
             return null;
         }
     }
 
-    protected Case createView(ViewBody body) throws TransitionNotExecutableException {
+    protected Case createView(ViewBody body, boolean isTabbed) throws TransitionNotExecutableException {
         IUser loggedUser = userService.getLoggedOrSystem();
         Case viewCase = createCase(body.getViewProcessIdentifier(), body.getViewProcessIdentifier(),
-                loggedUser.transformToLoggedUser());
+                loggedUser.transformToLoggedUser(), isTabbed);
 
         Case associatedViewCase = null;
         if (body.hasAssociatedView()) {
-            associatedViewCase = createView(body.getAssociatedViewBody());
+            associatedViewCase = createView(body.getAssociatedViewBody(), isTabbed);
         }
         Case filterCase = null;
         if (body.getFilterBody() != null) {
@@ -516,12 +516,12 @@ public class MenuItemService implements IMenuItemService {
         return viewCase;
     }
 
-    protected Case updateView(Case viewCase, ViewBody body) throws TransitionNotExecutableException {
+    protected Case updateView(Case viewCase, ViewBody body, boolean isTabbed) throws TransitionNotExecutableException {
         Case filterCase = findFilter(viewCase);
         filterCase = handleFilter(filterCase, body.getFilterBody());
 
         Case associatedViewCase = findView(viewCase);
-        associatedViewCase = handleView(associatedViewCase, body.getAssociatedViewBody());
+        associatedViewCase = handleView(associatedViewCase, body.getAssociatedViewBody(), isTabbed);
 
         ToDataSetOutcome outcome = body.toDataSet(associatedViewCase, filterCase);
         viewCase = setData(viewCase, ViewConstants.TRANS_SYNC_ID, outcome.getDataSet());
@@ -697,6 +697,11 @@ public class MenuItemService implements IMenuItemService {
 
     protected Case createCase(String identifier, String title, LoggedUser loggedUser) {
         return workflowService.createCaseByIdentifier(identifier, title, "", loggedUser).getCase();
+    }
+
+    protected Case createCase(String identifier, String title, LoggedUser loggedUser, boolean isTabbed) {
+        return workflowService.createCaseByIdentifier(identifier, title, "", loggedUser,
+                Map.of("is_tabbed", String.valueOf(isTabbed))).getCase();
     }
 
     protected Case setData(Case useCase, String transId, Map<String, Map<String, Object>> dataSet) {

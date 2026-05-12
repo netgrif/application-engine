@@ -1,7 +1,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-    <id>tabbed_case_view_configuration</id>
-    <initials>TCV</initials>
-    <title>Tabbed case view configuration</title>
+    <id>case_view_configuration</id>
+    <initials>CVC</initials>
+    <title>Case view configuration</title>
     <icon>check_box_outline_blank</icon>
     <defaultRole>true</defaultRole>
     <anonymousRole>false</anonymousRole>
@@ -29,10 +29,19 @@
         </caseLogic>
     </roleRef>
     <caseEvents>
+        <event type="create">
+            <id>view_create</id>
+            <actions phase="post">
+                <action id="0">
+                    is_tabbed_var_arc: f.is_tabbed_var_arc;
+                    change is_tabbed_var_arc value { Boolean.valueOf(params["is_tabbed"]) ? 1 : 0 }
+                </action>
+            </actions>
+        </event>
         <event type="delete">
             <id>view_delete</id>
             <actions phase="pre">
-                <action id="0">
+                <action id="1">
                     removeViewCase()
                 </action>
             </actions>
@@ -406,13 +415,21 @@
             <actions phase="pre">
                 <action>
                     advanced_content_form: f.advanced_content_form;
-                    change advanced_content_form value { [useCase.tasks.find { taskPair -> taskPair.transition == "header_settings"}.task,
-                                                          useCase.tasks.find { taskPair -> taskPair.transition == "create_case_btn_settings"}.task,
-                                                          useCase.tasks.find { taskPair -> taskPair.transition == "filter_settings"}.task,
-                                                          useCase.tasks.find { taskPair -> taskPair.transition == "next_view_settings"}.task] }
+                    String nextViewTaskId = useCase.tasks.find { taskPair -> taskPair.transition == "next_view_settings"}?.task
+                    def taskIds = [useCase.tasks.find { taskPair -> taskPair.transition == "header_settings"}.task,
+                                   useCase.tasks.find { taskPair -> taskPair.transition == "create_case_btn_settings"}.task,
+                                   useCase.tasks.find { taskPair -> taskPair.transition == "filter_settings"}.task]
+                    if (nextViewTaskId != null) {
+                        taskIds.add(nextViewTaskId)
+                    }
+                    change advanced_content_form value { taskIds }
                 </action>
             </actions>
         </event>
+    </data>
+    <data type="number">
+        <id>is_tabbed_var_arc</id>
+        <title>Is tabbed</title>
     </data>
 
     <!-- I18NS -->
@@ -696,7 +713,7 @@
     </transition>
     <transition>
         <id>next_view_settings</id>
-        <x>560</x>
+        <x>336</x>
         <y>48</y>
         <label name="todo 23">Next view</label>
         <icon>queue_play_next</icon>
@@ -927,7 +944,7 @@
     </transition>
     <transition>
         <id>header_settings</id>
-        <x>336</x>
+        <x>560</x>
         <y>48</y>
         <label name="todo 23">Header</label>
         <icon>view_column</icon>
@@ -1240,6 +1257,14 @@
         <tokens>1</tokens>
         <static>false</static>
     </place>
+    <place>
+        <id>is_tabbed</id>
+        <x>240</x>
+        <y>48</y>
+        <label>is_tabbed</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
     <arc>
         <id>a1</id>
         <type>read</type>
@@ -1287,6 +1312,21 @@
         <type>read</type>
         <sourceId>initialized</sourceId>
         <destinationId>create_case_btn_settings</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a8</id>
+        <type>regular</type>
+        <sourceId>initialize</sourceId>
+        <destinationId>is_tabbed</destinationId>
+        <multiplicity>1</multiplicity>
+        <reference>is_tabbed_var_arc</reference>
+    </arc>
+    <arc>
+        <id>a9</id>
+        <type>read</type>
+        <sourceId>is_tabbed</sourceId>
+        <destinationId>next_view_settings</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>

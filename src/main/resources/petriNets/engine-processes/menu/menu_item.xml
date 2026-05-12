@@ -506,7 +506,7 @@
 		<id>view_configuration_id</id>
 		<title/>
 		<allowedNets>
-			<allowedNet>tabbed_case_view_configuration</allowedNet>
+			<allowedNet>case_view_configuration</allowedNet>
 			<allowedNet>task_view_configuration</allowedNet>
 			<allowedNet>tabbed_ticket_view_configuration</allowedNet>
 			<allowedNet>single_task_view_configuration</allowedNet>
@@ -1615,6 +1615,7 @@
 					<id>0</id>
 					<actions phase="post">
 						<action>
+							use_tabbed_view: f.use_tabbed_view,
 							view_configuration_type: f.view_configuration_type,
 							view_configuration_form: f.view_configuration_form,
 							view_configuration_all_data_form: f.view_configuration_all_data_form,
@@ -1631,7 +1632,9 @@
 								return
 							}
 
-							def configurationCase = createCase(view_configuration_type.value + "_configuration")
+							def configurationCase = createCase(view_configuration_type.value + "_configuration", null, "",
+									userService.loggedOrSystem, org.springframework.context.i18n.LocaleContextHolder.getLocale(),
+									["is_tabbed":String.valueOf(use_tabbed_view.value)])
 							def initTask = assignTask("initialize", configurationCase)
 							finishTask(initTask)
 							configurationCase = workflowService.findOne(configurationCase.stringId)

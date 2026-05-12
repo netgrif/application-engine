@@ -6,7 +6,7 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSer
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.menu.domain.MenuItemConstants
 import com.netgrif.application.engine.menu.domain.MenuItemView
-import com.netgrif.application.engine.menu.domain.configurations.TabbedCaseViewConstants
+import com.netgrif.application.engine.menu.domain.configurations.CaseViewConstants
 import com.netgrif.application.engine.menu.domain.configurations.TaskViewConstants
 import com.netgrif.application.engine.menu.utils.MenuItemUtils
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
@@ -91,7 +91,7 @@ class MenuItemApiTest {
         assert item.dataSet[MenuItemConstants.FIELD_BANNED_ROLES].options.containsKey("role_2:filter_api_test")
         assert item.dataSet[MenuItemConstants.FIELD_ALLOWED_ROLES].options.containsKey("role_1:filter_api_test")
         assert item.dataSet[MenuItemConstants.FIELD_USE_TABBED_VIEW].value == true
-        assert item.dataSet[MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE].value == MenuItemView.TABBED_CASE_VIEW.identifier
+        assert item.dataSet[MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE].value == MenuItemView.CASE_VIEW.identifier
 
         assert filter.dataSet["filter"].filterMetadata["filterType"] == "Case"
         assert filter.dataSet["filter"].allowedNets == ["filter", "menu_item"]
@@ -101,12 +101,12 @@ class MenuItemApiTest {
         String tabbedCaseViewId = MenuItemUtils.getCaseIdFromCaseRef(item, MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID)
         assert tabbedCaseViewId != null
         Case tabbedCaseView = workflowService.findOne(tabbedCaseViewId)
-        assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == true
-        assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_VIEW_FILTER_CASE].value[0] == filter.stringId
-        assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_DEFAULT_HEADERS].value == "meta-title,meta-title"
-        assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_CONFIGURATION_TYPE].value == MenuItemView.TASK_VIEW.identifier
+        assert tabbedCaseView.dataSet[CaseViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == true
+        assert tabbedCaseView.dataSet[CaseViewConstants.FIELD_VIEW_FILTER_CASE].value[0] == filter.stringId
+        assert tabbedCaseView.dataSet[CaseViewConstants.FIELD_DEFAULT_HEADERS].value == "meta-title,meta-title"
+        assert tabbedCaseView.dataSet[CaseViewConstants.FIELD_CONFIGURATION_TYPE].value == MenuItemView.TASK_VIEW.identifier
 
-        String tabbedTaskViewId = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseView, TabbedCaseViewConstants.FIELD_VIEW_CONFIGURATION_ID)
+        String tabbedTaskViewId = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseView, CaseViewConstants.FIELD_VIEW_CONFIGURATION_ID)
         assert tabbedTaskViewId != null
         Case tabbedTaskView = workflowService.findOne(tabbedTaskViewId)
         assert tabbedTaskView.dataSet[TaskViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == false
@@ -139,7 +139,7 @@ class MenuItemApiTest {
         Case item = getMenuItem(caze)
         String tabbedCaseViewIdBeforeChange = MenuItemUtils.getCaseIdFromCaseRef(item, MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID)
         Case tabbedCaseViewBeforeChange = workflowService.findOne(tabbedCaseViewIdBeforeChange)
-        String tabbedTaskViewIdBeforeChange = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseViewBeforeChange, TabbedCaseViewConstants.FIELD_VIEW_CONFIGURATION_ID)
+        String tabbedTaskViewIdBeforeChange = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseViewBeforeChange, CaseViewConstants.FIELD_VIEW_CONFIGURATION_ID)
 
         def newUri = uriService.getOrCreate("/netgrif/test_new", UriContentType.DEFAULT)
         caze = setData(caze, [
@@ -157,7 +157,7 @@ class MenuItemApiTest {
         assert item.dataSet[MenuItemConstants.FIELD_MENU_NAME].value.toString() == "CHANGED FILTER"
         assert item.dataSet[MenuItemConstants.FIELD_ALLOWED_ROLES].options.entrySet()[0].key.contains("role_2")
         assert item.dataSet[MenuItemConstants.FIELD_USE_TABBED_VIEW].value == true
-        assert item.dataSet[MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE].value == MenuItemView.TABBED_CASE_VIEW.identifier
+        assert item.dataSet[MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE].value == MenuItemView.CASE_VIEW.identifier
         assert item.uriNodeId == newUri.stringId
 
         assert filter.dataSet["filter"].allowedNets == ["filter"]
@@ -167,12 +167,12 @@ class MenuItemApiTest {
         String tabbedCaseViewId = MenuItemUtils.getCaseIdFromCaseRef(item, MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID)
         assert tabbedCaseViewId != null && tabbedCaseViewId.equals(tabbedCaseViewIdBeforeChange)
         Case tabbedCaseView = workflowService.findOne(tabbedCaseViewId)
-        assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == true
-        assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_VIEW_FILTER_CASE].value[0] == filter.stringId
-        assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_DEFAULT_HEADERS].value == "meta-title,meta-title,meta-title"
-        assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_CONFIGURATION_TYPE].value == MenuItemView.TASK_VIEW.identifier
+        assert tabbedCaseView.dataSet[CaseViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == true
+        assert tabbedCaseView.dataSet[CaseViewConstants.FIELD_VIEW_FILTER_CASE].value[0] == filter.stringId
+        assert tabbedCaseView.dataSet[CaseViewConstants.FIELD_DEFAULT_HEADERS].value == "meta-title,meta-title,meta-title"
+        assert tabbedCaseView.dataSet[CaseViewConstants.FIELD_CONFIGURATION_TYPE].value == MenuItemView.TASK_VIEW.identifier
 
-        String tabbedTaskViewId = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseView, TabbedCaseViewConstants.FIELD_VIEW_CONFIGURATION_ID)
+        String tabbedTaskViewId = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseView, CaseViewConstants.FIELD_VIEW_CONFIGURATION_ID)
         assert tabbedTaskViewId != null && tabbedTaskViewId.equals(tabbedTaskViewIdBeforeChange)
         Case tabbedTaskView = workflowService.findOne(tabbedTaskViewId)
         assert tabbedTaskView.dataSet[TaskViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == false
@@ -354,7 +354,7 @@ class MenuItemApiTest {
         String tabbedCaseViewId = MenuItemUtils.getCaseIdFromCaseRef(leafItemCase, MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID)
         assert tabbedCaseViewId != null
         Case tabbedCaseView = workflowService.findOne(tabbedCaseViewId)
-        String tabbedTaskViewId = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseView, TabbedCaseViewConstants.FIELD_VIEW_CONFIGURATION_ID)
+        String tabbedTaskViewId = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseView, CaseViewConstants.FIELD_VIEW_CONFIGURATION_ID)
         assert tabbedTaskViewId != null
 
         workflowService.deleteCase(testFolder)
