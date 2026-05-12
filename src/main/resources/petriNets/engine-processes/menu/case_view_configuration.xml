@@ -357,8 +357,8 @@
         <init>true</init>
     </data>
     <data type="boolean" immediate="true">
-        <id>use_case_default_headers</id>
-        <title name="use_case_default_headers">Use custom default headers?</title>
+        <id>use_default_headers</id>
+        <title name="use_default_headers">Use custom default headers?</title>
         <init>true</init>
     </data>
     <data type="text" immediate="true">
@@ -462,7 +462,6 @@
         <i18nString name="filter_header">Súčasný filter</i18nString>
         <i18nString name="view_header">Zobrazenie prípadov</i18nString>
         <i18nString name="item_settings_general">Všeobecné</i18nString>
-        <i18nString name="use_case_default_headers">Použiť predvolené hlavičky</i18nString>
         <i18nString name="view_configuration_type">Vybrať zobrazenie</i18nString>
         <i18nString name="settings">Nastavenie</i18nString>
     </i18n>
@@ -495,7 +494,6 @@
         <i18nString name="show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Fällen anzeigen</i18nString>
         <i18nString name="item_settings">Menüeintrageinstellungen</i18nString>
         <i18nString name="view_header">Fallansicht</i18nString>
-        <i18nString name="use_case_default_headers">Benutzerdefinierte Standardheader verwenden?</i18nString>
         <i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
         <i18nString name="settings">Einstellungen</i18nString>
     </i18n>
@@ -994,12 +992,12 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>use_case_default_headers</id>
+                <id>use_default_headers</id>
                 <logic>
                     <behavior>editable</behavior>
                     <action trigger="set">
                         trans: t.this,
-                        use: f.use_case_default_headers,
+                        use: f.use_default_headers,
                         headers: f.default_headers;
 
                         make headers,editable on trans when { use.value }
@@ -1216,7 +1214,7 @@
                 </logic>
             </dataRef>
             <dataRef>
-                <id>use_case_default_headers</id>
+                <id>use_default_headers</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>

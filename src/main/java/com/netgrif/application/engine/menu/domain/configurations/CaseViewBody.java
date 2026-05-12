@@ -70,7 +70,7 @@ public class CaseViewBody extends ViewBody {
                 this.defaultHeaders != null ? String.join(",", this.defaultHeaders) : null);
         outcome.putDataSetEntry(CaseViewConstants.FIELD_IS_HEADER_MODE_CHANGEABLE, FieldType.BOOLEAN,
                 this.isHeaderModeChangeable);
-        outcome.putDataSetEntry(CaseViewConstants.FIELD_USE_CASE_DEFAULT_HEADERS, FieldType.BOOLEAN,
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_USE_DEFAULT_HEADERS, FieldType.BOOLEAN,
                 this.useDefaultHeaders);
 
         return outcome;
