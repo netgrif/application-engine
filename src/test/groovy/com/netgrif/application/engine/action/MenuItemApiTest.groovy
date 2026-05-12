@@ -7,7 +7,7 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import com.netgrif.application.engine.menu.domain.MenuItemConstants
 import com.netgrif.application.engine.menu.domain.MenuItemView
 import com.netgrif.application.engine.menu.domain.configurations.TabbedCaseViewConstants
-import com.netgrif.application.engine.menu.domain.configurations.TabbedTaskViewConstants
+import com.netgrif.application.engine.menu.domain.configurations.TaskViewConstants
 import com.netgrif.application.engine.menu.utils.MenuItemUtils
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.I18nString
@@ -104,14 +104,14 @@ class MenuItemApiTest {
         assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == true
         assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_VIEW_FILTER_CASE].value[0] == filter.stringId
         assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_DEFAULT_HEADERS].value == "meta-title,meta-title"
-        assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_CONFIGURATION_TYPE].value == MenuItemView.TABBED_TASK_VIEW.identifier
+        assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_CONFIGURATION_TYPE].value == MenuItemView.TASK_VIEW.identifier
 
         String tabbedTaskViewId = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseView, TabbedCaseViewConstants.FIELD_VIEW_CONFIGURATION_ID)
         assert tabbedTaskViewId != null
         Case tabbedTaskView = workflowService.findOne(tabbedTaskViewId)
-        assert tabbedTaskView.dataSet[TabbedTaskViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == false
-        assert tabbedTaskView.dataSet[TabbedTaskViewConstants.FIELD_VIEW_FILTER_CASE].value == []
-        assert tabbedTaskView.dataSet[TabbedTaskViewConstants.FIELD_DEFAULT_HEADERS].value == "meta-title,meta-title"
+        assert tabbedTaskView.dataSet[TaskViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == false
+        assert tabbedTaskView.dataSet[TaskViewConstants.FIELD_VIEW_FILTER_CASE].value == []
+        assert tabbedTaskView.dataSet[TaskViewConstants.FIELD_DEFAULT_HEADERS].value == "meta-title,meta-title"
 
         Case testFolder = findCasesElastic("processIdentifier:$FilterRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue.keyword:\"/netgrif/test\"", PageRequest.of(0, 1))[0]
         Case netgrifFolder = findCasesElastic("processIdentifier:$FilterRunner.MENU_NET_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue.keyword:\"/netgrif\"", PageRequest.of(0, 1))[0]
@@ -170,14 +170,14 @@ class MenuItemApiTest {
         assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == true
         assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_VIEW_FILTER_CASE].value[0] == filter.stringId
         assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_DEFAULT_HEADERS].value == "meta-title,meta-title,meta-title"
-        assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_CONFIGURATION_TYPE].value == MenuItemView.TABBED_TASK_VIEW.identifier
+        assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_CONFIGURATION_TYPE].value == MenuItemView.TASK_VIEW.identifier
 
         String tabbedTaskViewId = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseView, TabbedCaseViewConstants.FIELD_VIEW_CONFIGURATION_ID)
         assert tabbedTaskViewId != null && tabbedTaskViewId.equals(tabbedTaskViewIdBeforeChange)
         Case tabbedTaskView = workflowService.findOne(tabbedTaskViewId)
-        assert tabbedTaskView.dataSet[TabbedTaskViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == false
-        assert tabbedTaskView.dataSet[TabbedTaskViewConstants.FIELD_VIEW_FILTER_CASE].value == []
-        assert tabbedTaskView.dataSet[TabbedTaskViewConstants.FIELD_DEFAULT_HEADERS].value == "meta-title,meta-title,meta-title"
+        assert tabbedTaskView.dataSet[TaskViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == false
+        assert tabbedTaskView.dataSet[TaskViewConstants.FIELD_VIEW_FILTER_CASE].value == []
+        assert tabbedTaskView.dataSet[TaskViewConstants.FIELD_DEFAULT_HEADERS].value == "meta-title,meta-title,meta-title"
     }
 
     @Test

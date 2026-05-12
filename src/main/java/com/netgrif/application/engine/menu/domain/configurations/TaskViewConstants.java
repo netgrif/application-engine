@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.menu.domain.configurations;
 
 /**
- * Here are declared constants of process tabbed_task_view_configuration.xml.
+ * Here are declared constants of process task_view_configuration.xml.
  */
-public class TabbedTaskViewConstants extends ViewConstants {
+public class TaskViewConstants extends ViewConstants {
     public static final String FIELD_MERGE_FILTERS = "merge_filters";
     public static final String FIELD_VIEW_SEARCH_TYPE = "view_search_type";
     public static final String FIELD_DEFAULT_HEADERS = "default_headers";

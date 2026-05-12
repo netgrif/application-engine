@@ -4,7 +4,7 @@ import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.menu.domain.FilterBody;
 import com.netgrif.application.engine.menu.domain.MenuItemBody;
 import com.netgrif.application.engine.menu.domain.configurations.TabbedCaseViewBody;
-import com.netgrif.application.engine.menu.domain.configurations.TabbedTaskViewBody;
+import com.netgrif.application.engine.menu.domain.configurations.TaskViewBody;
 import com.netgrif.application.engine.menu.service.interfaces.IMenuItemService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -146,7 +146,7 @@ public class MenuItemServiceTest {
         TabbedCaseViewBody caseView = new TabbedCaseViewBody();
         caseView.setFilterBody(filterBody);
         caseView.setRequireTitleInCreation(false);
-        caseView.setChainedView(new TabbedTaskViewBody());
+        caseView.setChainedView(new TaskViewBody());
 
         MenuItemBody menuItemBody = new MenuItemBody();
         menuItemBody.setUri("/");

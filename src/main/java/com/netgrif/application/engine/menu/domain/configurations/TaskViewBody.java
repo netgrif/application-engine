@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TabbedTaskViewBody extends ViewBody {
+public class TaskViewBody extends ViewBody {
     private Case filter;
     private boolean mergeFilters = true;
     private String viewSearchType = "fulltext_advanced";
@@ -33,29 +33,29 @@ public class TabbedTaskViewBody extends ViewBody {
 
     @Override
     public MenuItemView getViewType() {
-        return MenuItemView.TABBED_TASK_VIEW;
+        return MenuItemView.TASK_VIEW;
     }
 
     @Override
     protected ToDataSetOutcome toDataSetInternal(ToDataSetOutcome outcome) {
 
-        outcome.putDataSetEntry(TabbedTaskViewConstants.FIELD_MERGE_FILTERS, FieldType.BOOLEAN,
+        outcome.putDataSetEntry(TaskViewConstants.FIELD_MERGE_FILTERS, FieldType.BOOLEAN,
                 this.mergeFilters);
-        outcome.putDataSetEntry(TabbedTaskViewConstants.FIELD_VIEW_SEARCH_TYPE, FieldType.ENUMERATION_MAP,
+        outcome.putDataSetEntry(TaskViewConstants.FIELD_VIEW_SEARCH_TYPE, FieldType.ENUMERATION_MAP,
                 this.viewSearchType);
-        outcome.putDataSetEntry(TabbedTaskViewConstants.FIELD_HEADERS_MODE, FieldType.MULTICHOICE_MAP,
+        outcome.putDataSetEntry(TaskViewConstants.FIELD_HEADERS_MODE, FieldType.MULTICHOICE_MAP,
                 this.headersMode == null ? new ArrayList<>() : this.headersMode);
-        outcome.putDataSetEntry(TabbedTaskViewConstants.FIELD_HEADERS_DEFAULT_MODE, FieldType.ENUMERATION_MAP,
+        outcome.putDataSetEntry(TaskViewConstants.FIELD_HEADERS_DEFAULT_MODE, FieldType.ENUMERATION_MAP,
                 this.headersDefaultMode);
-        outcome.putDataSetEntry(TabbedTaskViewConstants.FIELD_IS_HEADER_MODE_CHANGEABLE, FieldType.BOOLEAN,
+        outcome.putDataSetEntry(TaskViewConstants.FIELD_IS_HEADER_MODE_CHANGEABLE, FieldType.BOOLEAN,
                 this.isHeaderModeChangeable);
-        outcome.putDataSetEntry(TabbedTaskViewConstants.FIELD_ALLOW_HEADER_TABLE_MODE, FieldType.BOOLEAN,
+        outcome.putDataSetEntry(TaskViewConstants.FIELD_ALLOW_HEADER_TABLE_MODE, FieldType.BOOLEAN,
                 this.allowHeaderTableMode);
-        outcome.putDataSetEntry(TabbedTaskViewConstants.FIELD_USE_DEFAULT_HEADERS, FieldType.BOOLEAN,
+        outcome.putDataSetEntry(TaskViewConstants.FIELD_USE_DEFAULT_HEADERS, FieldType.BOOLEAN,
                 this.useDefaultHeaders);
-        outcome.putDataSetEntry(TabbedTaskViewConstants.FIELD_DEFAULT_HEADERS, FieldType.TEXT,
+        outcome.putDataSetEntry(TaskViewConstants.FIELD_DEFAULT_HEADERS, FieldType.TEXT,
                 this.defaultHeaders != null ? String.join(",", this.defaultHeaders) : null);
-        outcome.putDataSetEntry(TabbedTaskViewConstants.FIELD_SHOW_MORE_MENU, FieldType.BOOLEAN,
+        outcome.putDataSetEntry(TaskViewConstants.FIELD_SHOW_MORE_MENU, FieldType.BOOLEAN,
                 this.showMoreMenu);
 
         return outcome;

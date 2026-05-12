@@ -27,7 +27,7 @@ import com.netgrif.application.engine.menu.domain.FilterBody
 import com.netgrif.application.engine.menu.domain.MenuItemBody
 import com.netgrif.application.engine.menu.domain.MenuItemConstants
 import com.netgrif.application.engine.menu.domain.configurations.TabbedCaseViewBody
-import com.netgrif.application.engine.menu.domain.configurations.TabbedTaskViewBody
+import com.netgrif.application.engine.menu.domain.configurations.TaskViewBody
 import com.netgrif.application.engine.menu.domain.configurations.ViewBody
 import com.netgrif.application.engine.menu.domain.dashboard.DashboardItemBody
 import com.netgrif.application.engine.menu.domain.dashboard.DashboardManagementBody
@@ -2118,13 +2118,13 @@ class ActionDelegate {
             caseView.setDefaultHeaders(caseDefaultHeaders)
             caseView.setRequireTitleInCreation(true)
 
-            ViewBody taskView = new TabbedTaskViewBody()
+            ViewBody taskView = new TaskViewBody()
             taskView.setDefaultHeaders(taskDefaultHeaders)
             caseView.setChainedView(taskView)
 
             return caseView
         } else if (filterBody.getType() == "Task") {
-            ViewBody taskView = new TabbedTaskViewBody()
+            ViewBody taskView = new TaskViewBody()
             taskView.setFilterBody(filterBody)
             taskView.setDefaultHeaders(taskDefaultHeaders)
             return taskView

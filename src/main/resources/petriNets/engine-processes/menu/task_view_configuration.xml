@@ -1,7 +1,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-    <id>tabbed_task_view_configuration</id>
+    <id>task_view_configuration</id>
     <initials>TTV</initials>
-    <title>Tabbed task view configuration</title>
+    <title>Task view configuration</title>
     <icon>check_box_outline_blank</icon>
     <defaultRole>true</defaultRole>
     <anonymousRole>false</anonymousRole>

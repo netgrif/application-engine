@@ -507,7 +507,7 @@
 		<title/>
 		<allowedNets>
 			<allowedNet>tabbed_case_view_configuration</allowedNet>
-			<allowedNet>tabbed_task_view_configuration</allowedNet>
+			<allowedNet>task_view_configuration</allowedNet>
 			<allowedNet>tabbed_ticket_view_configuration</allowedNet>
 			<allowedNet>single_task_view_configuration</allowedNet>
 		</allowedNets>

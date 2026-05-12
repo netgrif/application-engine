@@ -383,7 +383,7 @@
         <id>view_configuration_id</id>
         <title/>
         <allowedNets>
-            <allowedNet>tabbed_task_view_configuration</allowedNet>
+            <allowedNet>task_view_configuration</allowedNet>
         </allowedNets>
     </data>
     <data type="taskRef">

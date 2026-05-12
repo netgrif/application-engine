@@ -16,13 +16,13 @@ import java.util.stream.Collectors;
 public enum MenuItemView {
     TABBED_CASE_VIEW(new I18nString("Tabbed case view",
             Map.of("sk", "Zobrazenie prípadov v taboch", "de", "Fallansicht mit Registerkarten")),
-            "tabbed_case_view", List.of("tabbed_task_view"), true, false, true),
-    TABBED_TASK_VIEW(new I18nString("Tabbed task view",
-            Map.of("sk", "Zobrazenie úloh v taboch", "de", "Aufgabenansicht mit Registerkarten")),
-            "tabbed_task_view", List.of(), true, false, true),
+            "tabbed_case_view", List.of("task_view"), true, false, true),
+    TASK_VIEW(new I18nString("Task view",
+            Map.of("sk", "Zobrazenie úloh", "de", "Aufgabenansicht")),
+            "task_view", List.of(), true, true, true),
     TABBED_TICKET_VIEW(new I18nString("Tabbed ticket view",
             Map.of("sk", "Tiketové zobrazenie v taboch", "de", "Ticketansicht mit Registerkarten")),
-            "tabbed_ticket_view", List.of("tabbed_single_task_view"), true, false, true),
+            "tabbed_ticket_view", List.of("single_task_view"), true, false, true),
     SINGLE_TASK_VIEW(new I18nString("Single task view",
             Map.of("sk", "Zobrazenie jednej úlohy", "de", "Einzelaufgabenansicht")),
             "single_task_view", List.of(), true, true, true);
