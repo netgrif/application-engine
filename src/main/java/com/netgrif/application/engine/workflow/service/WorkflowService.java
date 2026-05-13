@@ -215,7 +215,6 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Case resolveUserRef(Case useCase) {
         useCase.getUsers().clear();
-        useCase.getNegativeViewUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
             resolveUserRefPermissions(useCase, id, permission);
         });
@@ -226,12 +225,8 @@ public class WorkflowService implements IWorkflowService {
 
     private void resolveUserRefPermissions(Case useCase, String userListId, Map<String, Boolean> permission) {
         List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(userListId).getValue());
-        if (userIds != null && userIds.size() != 0) {
-            if (permission.containsKey("view") && !permission.get("view")) {
-                useCase.getNegativeViewUsers().addAll(userIds);
-            } else {
-                useCase.addUsers(new HashSet<>(userIds), permission);
-            }
+        if (userIds != null && !userIds.isEmpty()) {
+            useCase.addUsers(new HashSet<>(userIds), permission);
         }
     }
 
