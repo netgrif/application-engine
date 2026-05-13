@@ -223,8 +223,8 @@
 
     <!-- TASK VIEW CONFIGURATION DATA -->
     <data type="enumeration_map" immediate="true">
-        <id>view_search_type</id>
-        <title name="view_search_type">Search type for task view</title>
+        <id>task_view_search_type</id>
+        <title name="task_view_search_type">Search type for task view</title>
         <options>
             <option key="hidden" name="hidden">Hidden</option>
             <option key="fulltext" name="fulltext">Fulltext</option>
@@ -233,31 +233,31 @@
         <init>fulltext_advanced</init>
     </data>
     <data type="multichoice_map" immediate="true">
-        <id>headers_mode</id>
-        <title name="headers_mode">Header mode</title>
+        <id>task_headers_mode</id>
+        <title name="task_headers_mode">Header mode</title>
         <options>
             <option key="sort" name="sort">Sort</option>
             <option key="edit" name="edit">Edit</option>
         </options>
         <init>sort,edit</init>
         <action trigger="set">
-            headersMode: f.headers_mode,
-            defaultMode: f.headers_default_mode,
+            headersMode: f.task_headers_mode,
+            defaultMode: f.task_headers_default_mode,
             holder: f.headers_options_holder;
 
             updateOptionsBasedOnValue(defaultMode, headersMode, holder)
         </action>
         <action trigger="get">
-            headersMode: f.headers_mode,
-            defaultMode: f.headers_default_mode,
+            headersMode: f.task_headers_mode,
+            defaultMode: f.task_headers_default_mode,
             holder: f.headers_options_holder;
 
             updateOptionsBasedOnValue(defaultMode, headersMode, holder)
         </action>
     </data>
     <data type="enumeration_map" immediate="true">
-        <id>headers_default_mode</id>
-        <title name="headers_default_mode">Default header mode</title>
+        <id>task_headers_default_mode</id>
+        <title name="task_headers_default_mode">Default header mode</title>
         <options>
             <option key="sort" name="sort">Sort</option>
             <option key="edit" name="edit">Edit</option>
@@ -273,23 +273,23 @@
         </options>
     </data>
     <data type="boolean" immediate="true">
-        <id>is_header_mode_changeable</id>
-        <title name="is_header_mode_changeable">Can header mode be changed?</title>
+        <id>task_is_header_mode_changeable</id>
+        <title name="task_is_header_mode_changeable">Can header mode be changed?</title>
         <init>true</init>
     </data>
     <data type="boolean" immediate="true">
-        <id>allow_header_table_mode</id>
-        <title name="allow_header_table_mode">Allow table mode for headers?</title>
+        <id>task_allow_header_table_mode</id>
+        <title name="task_allow_header_table_mode">Allow table mode for headers?</title>
         <init>true</init>
     </data>
     <data type="boolean" immediate="true">
-        <id>use_default_headers</id>
-        <title name="use_default_headers">Use custom default headers?</title>
+        <id>use_task_default_headers</id>
+        <title name="use_task_default_headers">Use custom default headers?</title>
         <init>true</init>
     </data>
     <data type="text" immediate="true">
-        <id>default_headers</id>
-        <title name="default_headers">Set default headers</title>
+        <id>task_default_headers</id>
+        <title name="task_default_headers">Set default headers</title>
         <desc name="default_headers_desc">Example: "meta-title,meta-user"</desc>
         <action trigger="set">
             defaultHeaders: f.this;
@@ -301,8 +301,8 @@
         </action>
     </data>
     <data type="boolean" immediate="true">
-        <id>show_more_menu</id>
-        <title name="show_more_menu">Show more menu for task item?</title>
+        <id>task_show_more_menu</id>
+        <title name="task_show_more_menu">Show more menu for task item?</title>
         <init>true</init>
     </data>
     <data type="taskRef">
@@ -335,15 +335,15 @@
         <i18nString name="search">Vyhľadávanie</i18nString>
         <i18nString name="edit">Upravovanie</i18nString>
         <i18nString name="merge_filters">Zjednotiť filter so základným filtrom?</i18nString>
-        <i18nString name="view_search_type">Typ vyhľadávania úloh</i18nString>
-        <i18nString name="headers_mode">Mód hlavičiek</i18nString>
-        <i18nString name="headers_default_mode">Predvolený mód hlavičiek</i18nString>
-        <i18nString name="is_header_mode_changeable">Môže byť mód hlavičiek zmenený?</i18nString>
-        <i18nString name="allow_header_table_mode">Povoliť tabuľkový mód pre hlavičky?</i18nString>
-        <i18nString name="use_default_headers">Použiť vlastné predvolené hlavičky?</i18nString>
-        <i18nString name="default_headers">Predvolené hlavičky</i18nString>
+        <i18nString name="task_view_search_type">Typ vyhľadávania úloh</i18nString>
+        <i18nString name="task_headers_mode">Mód hlavičiek</i18nString>
+        <i18nString name="task_headers_default_mode">Predvolený mód hlavičiek</i18nString>
+        <i18nString name="task_is_header_mode_changeable">Môže byť mód hlavičiek zmenený?</i18nString>
+        <i18nString name="task_allow_header_table_mode">Povoliť tabuľkový mód pre hlavičky?</i18nString>
+        <i18nString name="use_task_default_headers">Použiť vlastné predvolené hlavičky?</i18nString>
+        <i18nString name="task_default_headers">Predvolené hlavičky</i18nString>
         <i18nString name="default_headers_desc">Napríklad: "meta-title,meta-user"</i18nString>
-        <i18nString name="show_more_menu">Zobrazovať menu pre úlohovú položku?</i18nString>
+        <i18nString name="task_show_more_menu">Zobrazovať menu pre úlohovú položku?</i18nString>
         <i18nString name="item_settings">Nastavenie položky</i18nString>
         <i18nString name="filter_header">Súčasný filter</i18nString>
         <i18nString name="item_settings_general">Všeobecné</i18nString>
@@ -356,20 +356,20 @@
         <i18nString name="sort">Sortieren</i18nString>
         <i18nString name="search">Suchen</i18nString>
         <i18nString name="edit">Bearbeiten</i18nString>
-        <i18nString name="headers_mode">Kopfzeilenmodus</i18nString>
-        <i18nString name="headers_default_mode">Standardkopfzeilenmodus</i18nString>
-        <i18nString name="is_header_mode_changeable">Erlaube Änderung des Kopfzeilenmodus?</i18nString>
-        <i18nString name="allow_header_table_mode">Erlaube Tabellenmodus?</i18nString>
-        <i18nString name="use_default_headers">Eigene Kopfzeilen verwenden?</i18nString>
-        <i18nString name="default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
+        <i18nString name="task_headers_mode">Kopfzeilenmodus</i18nString>
+        <i18nString name="task_headers_default_mode">Standardkopfzeilenmodus</i18nString>
+        <i18nString name="task_is_header_mode_changeable">Erlaube Änderung des Kopfzeilenmodus?</i18nString>
+        <i18nString name="task_allow_header_table_mode">Erlaube Tabellenmodus?</i18nString>
+        <i18nString name="use_task_default_headers">Eigene Kopfzeilen verwenden?</i18nString>
+        <i18nString name="task_default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
         <i18nString name="default_headers_desc">Beispiel: "meta-title,meta-user"</i18nString>
         <i18nString name="filter_header">Aktueller Filter</i18nString>
         <i18nString name="item_settings_general">Allgemein</i18nString>
         <i18nString name="update_filter">Aktualisiere die Ansicht mit dem ausgewählten Filter</i18nString>
         <i18nString name="fulltext_advanced">Einfacher und erweiterter Suchmodus</i18nString>
         <i18nString name="merge_filters">Mit dem Basisfilter kombinieren?</i18nString>
-        <i18nString name="view_search_type">Suchmodus im Aufgabenansicht</i18nString>
-        <i18nString name="show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Aufgaben anzeigen</i18nString>
+        <i18nString name="task_view_search_type">Suchmodus im Aufgabenansicht</i18nString>
+        <i18nString name="task_show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Aufgaben anzeigen</i18nString>
         <i18nString name="item_settings">Menüeintrageinstellungen</i18nString>
         <i18nString name="remove_filter">Filter entfernen</i18nString>
     </i18n>
@@ -422,7 +422,7 @@
             <cols>4</cols>
             <layout>grid</layout>
             <dataRef>
-                <id>view_search_type</id>
+                <id>task_view_search_type</id>
                 <logic>
                     <behavior>editable</behavior>
                     <behavior>required</behavior>
@@ -437,7 +437,7 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>show_more_menu</id>
+                <id>task_show_more_menu</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -642,14 +642,14 @@
             <cols>3</cols>
             <layout>grid</layout>
             <dataRef>
-                <id>is_header_mode_changeable</id>
+                <id>task_is_header_mode_changeable</id>
                 <logic>
                     <behavior>editable</behavior>
                     <action trigger="set">
                         trans: t.this,
-                        isChangeable: f.is_header_mode_changeable,
-                        mode: f.headers_mode,
-                        defaultMode: f.headers_default_mode;
+                        isChangeable: f.task_is_header_mode_changeable,
+                        mode: f.task_headers_mode,
+                        defaultMode: f.task_headers_default_mode;
 
                         make [mode, defaultMode], editable on trans when { isChangeable.value }
                         make [mode, defaultMode], required on trans when { isChangeable.value }
@@ -669,13 +669,13 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>use_default_headers</id>
+                <id>use_task_default_headers</id>
                 <logic>
                     <behavior>editable</behavior>
                     <action trigger="set">
                         trans: t.this,
-                        use: f.use_default_headers,
-                        headers: f.default_headers;
+                        use: f.use_task_default_headers,
+                        headers: f.task_default_headers;
 
                         make headers,editable on trans when { use.value }
                         make headers,visible on trans when { !use.value }
@@ -692,7 +692,7 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>default_headers</id>
+                <id>task_default_headers</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -707,7 +707,7 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>allow_header_table_mode</id>
+                <id>task_allow_header_table_mode</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -721,7 +721,7 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>headers_mode</id>
+                <id>task_headers_mode</id>
                 <logic>
                     <behavior>editable</behavior>
                     <behavior>required</behavior>
@@ -736,7 +736,7 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>headers_default_mode</id>
+                <id>task_headers_default_mode</id>
                 <logic>
                     <behavior>editable</behavior>
                     <behavior>required</behavior>
@@ -827,49 +827,49 @@
                 </logic>
             </dataRef>
             <dataRef>
-                <id>view_search_type</id>
+                <id>task_view_search_type</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
             <dataRef>
-                <id>show_more_menu</id>
+                <id>task_show_more_menu</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
             <dataRef>
-                <id>is_header_mode_changeable</id>
+                <id>task_is_header_mode_changeable</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
             <dataRef>
-                <id>allow_header_table_mode</id>
+                <id>task_allow_header_table_mode</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
             <dataRef>
-                <id>headers_mode</id>
+                <id>task_headers_mode</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
             <dataRef>
-                <id>headers_default_mode</id>
+                <id>task_headers_default_mode</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
             <dataRef>
-                <id>use_default_headers</id>
+                <id>use_task_default_headers</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
             <dataRef>
-                <id>default_headers</id>
+                <id>task_default_headers</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
