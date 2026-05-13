@@ -88,7 +88,7 @@ class TaskPermissionsTest {
 
         withRoles.forEach {
             testUsers.put(it.getEmail(), userService.addRole(testUsers.get(it.getEmail()), net.roles.values().find { role -> role.importId == "process_role" }.stringId))
-            testUsers.put(it.getEmail(), userService.addRole(testUsers.get(it.getEmail()), netNoDefault.roles.values().find { role -> role.importId == "process_role_no_default" }.stringId))
+            testUsers.put(it.getEmail(), userService.addRole(testUsers.get(it.getEmail()), netNoDefault.roles.values().find { role -> role.importId == "process_role" }.stringId))
         }
 
         testCase = actionDelegate.setData("t_001", testCase, [
