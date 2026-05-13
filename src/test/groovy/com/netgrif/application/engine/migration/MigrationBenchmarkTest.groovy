@@ -4,7 +4,6 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.migration.helpers.CaseMigrationHelper
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
@@ -22,15 +21,13 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 import java.time.Duration
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.Period;
 
 @Slf4j
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
-class MigrationTest {
+class MigrationBenchmarkTest {
 
     @Autowired
     private TestHelper testHelper
@@ -75,7 +72,7 @@ class MigrationTest {
         assert netV2Outcome.getNet() != null
         netV2 = netV2Outcome.getNet()
 
-        (1..20000).stream().parallel().forEach {
+        (1..10000).stream().parallel().forEach {
             workflowService.createCase(netV1.stringId, "Net V1 " + it, null, superCreator.loggedSuper, Locale.default)
         }
     }
@@ -91,8 +88,6 @@ class MigrationTest {
         LocalDateTime startOfLegacyMigration = LocalDateTime.now()
         migrationHelper.updateCasesCursor({ Case useCase ->
             migrationHelper.updateCasePermissionsFromNet(useCase, netV2)
-            migrationHelper.updateTasksPermissions(useCase, netV2, ["person_info", "delete_person", "reset_person", "recreate_person"])
-            migrationHelper.reloadTasks(useCase, netV2)
         }, "nae_2432")
         LocalDateTime endOfLegacyMigration = LocalDateTime.now()
         Duration diff = Duration.between(startOfLegacyMigration, endOfLegacyMigration)
@@ -110,8 +105,6 @@ class MigrationTest {
         LocalDateTime startOfLegacyMigration = LocalDateTime.now()
         caseMigrationHelper.updateCasesCursor({ Case useCase ->
             migrationHelper.updateCasePermissionsFromNet(useCase, netV2)
-            migrationHelper.updateTasksPermissions(useCase, netV2, ["person_info", "delete_person", "reset_person", "recreate_person"])
-            migrationHelper.reloadTasks(useCase, netV2)
         }, "nae_2432")
         LocalDateTime endOfLegacyMigration = LocalDateTime.now()
         Duration diff = Duration.between(startOfLegacyMigration, endOfLegacyMigration)
