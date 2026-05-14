@@ -402,13 +402,11 @@ public class MenuItemService implements IMenuItemService {
     }
 
     /**
-     * Retrieves menu item data along with its associated view configuration data. The method collects immediate
-     * data from the menu item case and recursively traverses through all associated view configuration cases,
-     * aggregating their immediate data into a single map.
-     * todo 23 doc
+     * Retrieves menu item data groups for the specified case and locale.
+     *
      * @param caseId identifier of the menu item case
-     * @return map where keys are process identifiers (with "_configuration" suffix removed for view cases) and
-     * values are lists of immediate data fields from the corresponding cases
+     * @param locale locale to use for retrieving localized data
+     * @return list of data groups from the menu item case
      */
     @Override
     public List<DataGroup> getMenuItemData(String caseId, Locale locale) {

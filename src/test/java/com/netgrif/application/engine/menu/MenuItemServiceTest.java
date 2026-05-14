@@ -6,11 +6,11 @@ import com.netgrif.application.engine.menu.domain.MenuItemBody;
 import com.netgrif.application.engine.menu.domain.configurations.CaseViewBody;
 import com.netgrif.application.engine.menu.domain.configurations.TaskViewBody;
 import com.netgrif.application.engine.menu.service.interfaces.IMenuItemService;
+import com.netgrif.application.engine.petrinet.domain.DataGroup;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -113,15 +113,14 @@ public class MenuItemServiceTest {
 
     @Test
     public void getMenuItemDataTest() throws TransitionNotExecutableException {
-        // todo 23 fix test
         assertThrows(IllegalArgumentException.class, () -> menuItemService.getMenuItemData("wrongCaseId", Locale.getDefault()));
 
         Case menuItemCase = createDefaultMenuItem("my_menu_item",
                 new I18nString("This is name", Map.of("sk", "Toto je nazov")));
 
         login();
-        GetDataGroupsEventOutcome result = menuItemService.getMenuItemData(menuItemCase.getStringId(), Locale.getDefault());
-        assertTrue(result != null);
+        List<DataGroup> result = menuItemService.getMenuItemData(menuItemCase.getStringId(), Locale.getDefault());
+        assertTrue(result != null && !result.isEmpty());
     }
 
     @Test
