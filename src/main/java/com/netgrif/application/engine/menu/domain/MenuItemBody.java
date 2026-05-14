@@ -160,7 +160,9 @@ public class MenuItemBody {
         outcome.putDataSetEntry(MenuItemConstants.FIELD_MENU_NAME, FieldType.I18N, this.menuName);
         outcome.putDataSetEntry(MenuItemConstants.FIELD_MENU_ICON, FieldType.TEXT, this.menuIcon);
         outcome.putDataSetEntry(MenuItemConstants.FIELD_USE_TABBED_VIEW, FieldType.BOOLEAN, this.useTabbedView);
-        outcome.putDataSetEntry(MenuItemConstants.FIELD_TAB_NAME, FieldType.I18N, this.tabName);
+        if (this.tabName != null) {
+            outcome.putDataSetEntry(MenuItemConstants.FIELD_TAB_NAME, FieldType.I18N, this.tabName);
+        }
         outcome.putDataSetEntry(MenuItemConstants.FIELD_TAB_ICON, FieldType.TEXT, this.tabIcon);
         if (this.identifier != null) {
             outcome.putDataSetEntry(MenuItemConstants.FIELD_IDENTIFIER, FieldType.TEXT, this.getIdentifier());

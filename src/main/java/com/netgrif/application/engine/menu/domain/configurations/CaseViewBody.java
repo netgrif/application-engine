@@ -28,6 +28,8 @@ public class CaseViewBody extends ViewBody {
     private List<String> defaultHeaders;
     private boolean isHeaderModeChangeable = true;
     private boolean useDefaultHeaders = true;
+    private I18nString emptyContentText;
+    private String emptyContentIcon;
 
     private ViewBody chainedView;
 
@@ -72,6 +74,12 @@ public class CaseViewBody extends ViewBody {
                 this.isHeaderModeChangeable);
         outcome.putDataSetEntry(CaseViewConstants.FIELD_USE_DEFAULT_HEADERS, FieldType.BOOLEAN,
                 this.useDefaultHeaders);
+        if (this.emptyContentText != null) {
+            outcome.putDataSetEntry(CaseViewConstants.FIELD_EMPTY_CONTENT_TEXT, FieldType.I18N,
+                    this.emptyContentText);
+        }
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_EMPTY_CONTENT_ICON, FieldType.TEXT,
+                this.emptyContentIcon);
 
         return outcome;
     }

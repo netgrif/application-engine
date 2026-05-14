@@ -13,4 +13,6 @@ public class TaskViewConstants extends ViewConstants {
     public static final String FIELD_ALLOW_HEADER_TABLE_MODE = "task_allow_header_table_mode";
     public static final String FIELD_USE_DEFAULT_HEADERS = "use_task_default_headers";
     public static final String FIELD_SHOW_MORE_MENU = "task_show_more_menu";
+    public static final String FIELD_EMPTY_CONTENT_TEXT = "task_empty_content_text";
+    public static final String FIELD_EMPTY_CONTENT_ICON = "task_empty_content_icon";
 }

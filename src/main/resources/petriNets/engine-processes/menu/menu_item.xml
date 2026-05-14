@@ -486,6 +486,9 @@
 		<id>tab_name</id>
 		<title name="tab_name">Name of the item</title>
 		<desc name="tab_name_desc">Will be shown in tab</desc>
+		<init dynamic="true">
+			new com.netgrif.application.engine.petrinet.domain.I18nString("View", [sk: "Zobrazenie", de: "Die Ansicht"])
+		</init>
 	</data>
 	<data type="enumeration_map" immediate="true">
 		<id>view_configuration_type</id>
@@ -1444,7 +1447,7 @@
 		</roleRef>
 		<dataGroup>
 			<id>configuration_view</id>
-			<cols>4</cols>
+			<cols>3</cols>
 			<layout>grid</layout>
 			<dataRef>
 				<id>use_custom_view</id>
@@ -1497,7 +1500,7 @@
 					<x>1</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>3</cols>
+					<cols>2</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
@@ -1532,26 +1535,12 @@
 				</event>
 			</dataRef>
 			<dataRef>
-				<id>tab_name</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
 				<id>use_tab_icon</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
-					<x>3</x>
+					<x>2</x>
 					<y>0</y>
 					<rows>1</rows>
 					<cols>1</cols>
@@ -1571,7 +1560,7 @@
 				</event>
 			</dataRef>
 			<dataRef>
-				<id>tab_icon</id>
+				<id>tab_name</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -1585,15 +1574,29 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>tab_icon_preview</id>
+				<id>tab_icon</id>
 				<logic>
-					<behavior>visible</behavior>
+					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>1</x>
 					<y>1</y>
 					<rows>1</rows>
-					<cols>2</cols>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>tab_icon_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
 					<template>material</template>
 					<appearance>standard</appearance>
 				</layout>
@@ -1607,7 +1610,7 @@
 					<x>0</x>
 					<y>2</y>
 					<rows>1</rows>
-					<cols>4</cols>
+					<cols>3</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
@@ -1654,7 +1657,7 @@
 					<x>0</x>
 					<y>3</y>
 					<rows>1</rows>
-					<cols>4</cols>
+					<cols>3</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>

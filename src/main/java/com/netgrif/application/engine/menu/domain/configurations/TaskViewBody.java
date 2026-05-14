@@ -2,6 +2,7 @@ package com.netgrif.application.engine.menu.domain.configurations;
 
 import com.netgrif.application.engine.menu.domain.MenuItemView;
 import com.netgrif.application.engine.menu.domain.ToDataSetOutcome;
+import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.Data;
@@ -25,6 +26,8 @@ public class TaskViewBody extends ViewBody {
     private boolean useDefaultHeaders = true;
     private List<String> defaultHeaders;
     private boolean showMoreMenu = true;
+    private I18nString emptyContentText;
+    private String emptyContentIcon;
 
     @Override
     public ViewBody getAssociatedViewBody() {
@@ -57,6 +60,12 @@ public class TaskViewBody extends ViewBody {
                 this.defaultHeaders != null ? String.join(",", this.defaultHeaders) : null);
         outcome.putDataSetEntry(TaskViewConstants.FIELD_SHOW_MORE_MENU, FieldType.BOOLEAN,
                 this.showMoreMenu);
+        if (this.emptyContentText != null) {
+            outcome.putDataSetEntry(TaskViewConstants.FIELD_EMPTY_CONTENT_TEXT, FieldType.I18N,
+                    this.emptyContentText);
+        }
+        outcome.putDataSetEntry(TaskViewConstants.FIELD_EMPTY_CONTENT_ICON, FieldType.TEXT,
+                this.emptyContentIcon);
 
         return outcome;
     }

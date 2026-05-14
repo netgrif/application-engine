@@ -431,6 +431,41 @@
         <id>is_tabbed_var_arc</id>
         <title>Is tabbed</title>
     </data>
+    <data type="i18n">
+        <id>case_empty_content_text</id>
+        <title name="todo 23">Empty content text</title>
+        <desc name="todo 23">If empty, default text will be used</desc>
+    </data>
+    <data type="text">
+        <id>case_empty_content_icon</id>
+        <title name="todo 23">Empty content icon</title>
+        <desc name="todo 23">If empty, default icon will be used</desc>
+        <event type="set">
+            <id>0</id>
+            <actions phase="post">
+                <action>
+                    icon: f.this,
+                    iconPreview: f.case_empty_content_icon_preview;
+
+                    if (icon.value == "") {
+                        change iconPreview value {<![CDATA["""<span></span>"""]]>}
+                        return
+                    }
+
+                    change iconPreview value {
+                        <![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + icon.value + <![CDATA["""</span>"""]]>
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>case_empty_content_icon_preview</id>
+        <title name="todo 23">Empty content icon preview</title>
+        <component>
+            <name>htmltextarea</name>
+        </component>
+    </data>
 
     <!-- I18NS -->
     <i18n locale="sk">
@@ -543,7 +578,7 @@
         </roleRef>
         <dataGroup>
             <id>view_dataGroup</id>
-            <cols>4</cols>
+            <cols>3</cols>
             <layout>grid</layout>
             <dataRef>
                 <id>case_view_search_type</id>
@@ -555,7 +590,7 @@
                     <x>0</x>
                     <y>0</y>
                     <rows>1</rows>
-                    <cols>2</cols>
+                    <cols>1</cols>
                     <template>material</template>
                     <appearance>outline</appearance>
                 </layout>
@@ -566,12 +601,54 @@
                     <behavior>editable</behavior>
                     </logic>
                 <layout>
-                    <x>2</x>
+                    <x>1</x>
                     <y>0</y>
                     <rows>1</rows>
-                    <cols>2</cols>
+                    <cols>1</cols>
                     <template>material</template>
                     <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_empty_content_text</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_empty_content_icon</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    </logic>
+                <layout>
+                    <x>1</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_empty_content_icon_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                    </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>standard</appearance>
                 </layout>
             </dataRef>
             <dataRef>
@@ -581,9 +658,9 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>1</y>
+                    <y>2</y>
                     <rows>1</rows>
-                    <cols>4</cols>
+                    <cols>3</cols>
                     <template>material</template>
                     <appearance>outline</appearance>
                 </layout>
@@ -1155,6 +1232,24 @@
             </dataRef>
             <dataRef>
                 <id>case_show_more_menu</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>case_empty_content_text</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>case_empty_content_icon</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>case_empty_content_icon_preview</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>

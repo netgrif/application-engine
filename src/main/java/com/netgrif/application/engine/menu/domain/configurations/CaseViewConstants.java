@@ -18,4 +18,6 @@ public class CaseViewConstants extends ViewConstants {
     public static final String FIELD_HEADERS_DEFAULT_MODE = "case_headers_default_mode";
     public static final String FIELD_IS_HEADER_MODE_CHANGEABLE = "case_is_header_mode_changeable";
     public static final String FIELD_USE_DEFAULT_HEADERS = "use_case_default_headers";
+    public static final String FIELD_EMPTY_CONTENT_TEXT = "case_empty_content_text";
+    public static final String FIELD_EMPTY_CONTENT_ICON = "case_empty_content_icon";
 }
