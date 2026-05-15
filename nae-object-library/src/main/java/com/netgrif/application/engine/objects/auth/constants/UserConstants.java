@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.objects.auth.constants;
 
 public final class UserConstants {
+    public static final String SYSTEM_USER_USERNAME = "system";
     public static final String SYSTEM_USER_EMAIL = "engine@netgrif.com";
     public static final String SYSTEM_USER_NAME = "application";
     public static final String SYSTEM_USER_SURNAME = "engine";

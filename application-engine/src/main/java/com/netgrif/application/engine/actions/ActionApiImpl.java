@@ -329,7 +329,7 @@ public class ActionApiImpl implements ActionApi {
         if (authPrincipalDto == null) {
             throw new IllegalArgumentException("AuthPrincipalDto cannot be null.");
         }
-        Optional<AbstractUser> userOptional = userService.findUserByUsername(authPrincipalDto.getUsername(), authPrincipalDto.getRealmId());
-        return userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] and realm ID [%s] not found".formatted(authPrincipalDto.getUsername(), authPrincipalDto.getRealmId())));
+        Optional<AbstractUser> userOptional = userService.findUserByUsername(authPrincipalDto.username(), authPrincipalDto.realmId());
+        return userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] and realm ID [%s] not found".formatted(authPrincipalDto.username(), authPrincipalDto.realmId())));
     }
 }

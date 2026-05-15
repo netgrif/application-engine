@@ -573,7 +573,7 @@ public class UserServiceImpl implements UserService {
         User system = (User) findByEmail(UserConstants.SYSTEM_USER_EMAIL, null);
         if (system == null) {
             system = new User();
-            system.setUsername(UserConstants.SYSTEM_USER_EMAIL);
+            system.setUsername(UserConstants.SYSTEM_USER_USERNAME);
             system.setEmail(UserConstants.SYSTEM_USER_EMAIL);
             system.setPassword("n/a");
             system.setFirstName(UserConstants.SYSTEM_USER_NAME);
