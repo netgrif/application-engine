@@ -31,6 +31,7 @@ public interface IMenuItemService {
     Case duplicateItem(Case originItem, I18nString newTitle, String newIdentifier) throws TransitionNotExecutableException;
     Case removeChildItemFromParent(String folderId, Case childItem);
     List<DataGroup> getMenuItemData(String caseId, Locale locale);
+    void handleConfigurationTemplate(Case menuItemCase);
 
     /**
      * Gets all tabbed or non-tabbed views

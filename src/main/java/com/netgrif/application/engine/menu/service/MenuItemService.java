@@ -415,6 +415,12 @@ public class MenuItemService implements IMenuItemService {
         return dataService.getDataGroups(taskId, locale).getData();
     }
 
+    // todo 23 doc
+    @Override
+    public void handleConfigurationTemplate(Case menuItemCase) {
+        // todo 23
+    }
+
     protected Case findCase(String processIdentifier, String query) {
         CaseSearchRequest request = CaseSearchRequest.builder()
                 .process(Collections.singletonList(new CaseSearchRequest.PetriNet(processIdentifier)))

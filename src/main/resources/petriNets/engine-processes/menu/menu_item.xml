@@ -630,6 +630,13 @@
 			</actions>
 		</event>
 	</data>
+	<data type="enumeration_map">
+		<id>configuration_templates</id>
+		<title name="todo 23">Pick a configuration template</title>
+		<options>
+			<init dynamic="true">com.netgrif.application.engine.menu.service.MenuItemTemplateHolder.transformToOptions()</init>
+		</options>
+	</data>
 
 	<!-- I18NS -->
 	<i18n locale="sk">
@@ -812,6 +819,20 @@
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
+			<dataRef>
+				<id>configuration_templates</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
 		</dataGroup>
 		<event type="finish">
 			<id>finish</id>
@@ -826,6 +847,15 @@
 
 					changeMenuItem useCase uri { newUri }
 					change name value { new com.netgrif.application.engine.petrinet.domain.I18nString(identifier.value) }
+				</action>
+				<action>
+					configuration_templates: f.configuration_templates;
+
+					if (configuration_templates.value == null || configuration_templates.value == "") {
+						return
+					}
+
+					menuItemService.handleConfigurationTemplate(configuration_templates.value)
 				</action>
 			</actions>
 			<title name="create_item_finish">Create</title>
