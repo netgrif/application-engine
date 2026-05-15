@@ -224,6 +224,39 @@
             <allowedNet>filter</allowedNet>
         </allowedNets>
     </data>
+    <data type="enumeration_map">
+        <id>available_filter_cases</id>
+        <title/>
+        <component>
+            <name>caseref</name>
+            <property key="headers">meta-title,meta-author,filter-visibility</property>
+            <property key="allowedNets">filter</property>
+            <property key="createCase">true</property>
+            <property key="search">true</property>
+            <property key="filter">true</property>
+            <property key="filterQuery">{ "query": "processIdentifier:filter AND (author:&lt;&lt;me&gt;&gt; OR dataSet.visibility.keyValue:public) AND dataSet.filter_type.keyValue:Case" }</property>
+        </component>
+        <event type="set">
+            <id>0</id>
+            <actions phase="post">
+                <action>
+                    available_filter_cases: f.this,
+                    current_filter_preview: f.current_filter_preview;
+
+                    if (available_filter_cases.value == null || available_filter_cases.value == "") {
+                        change current_filter_preview value { [] }
+                        return
+                    }
+                    change current_filter_preview value {
+                        return [findTask({it.caseId.eq(available_filter_cases.value).and(it.transitionId.eq("view_filter"))}).stringId]
+                    }
+                </action>
+            </actions>
+        </event>
+        <allowedNets>
+            <allowedNet>filter</allowedNet>
+        </allowedNets>
+    </data>
 
     <!-- VIEW CONFIGURATION DATA -->
     <data type="enumeration_map" immediate="true">
@@ -699,55 +732,13 @@
             <cols>4</cols>
             <layout>grid</layout>
             <dataRef>
-                <id>filter_autocomplete_selection</id>
+                <id>available_filter_cases</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
                     <y>0</y>
-                    <rows>1</rows>
-                    <cols>3</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>update_filter</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-                <layout>
-                    <x>3</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>1</cols>
-                    <template>material</template>
-                    <appearance>standard</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>selected_filter_preview</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>standard</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>filter_header</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>2</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <template>material</template>
@@ -761,7 +752,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>3</y>
+                    <y>1</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <template>material</template>
@@ -1189,7 +1180,7 @@
             <alignment>start</alignment>
             <stretch>true</stretch>
             <dataRef>
-                <id>filter_autocomplete_selection</id>
+                <id>available_filter_cases</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>

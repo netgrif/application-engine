@@ -121,27 +121,29 @@
     </data>
     <data type="i18n" immediate="true">
         <id>i18n_filter_name</id>
-        <title></title>
+        <title/>
     </data>
     <data type="text">
         <id>filter_case_id</id>
-        <title></title>
+        <title/>
     </data>
     <data type="text">
         <id>menu_identifier</id>
-        <title></title>
+        <title/>
     </data>
     <data type="button">
         <id>and_me</id>
+        <title/>
         <placeholder name="and">AND</placeholder>
     </data>
     <data type="button">
         <id>and_view</id>
+        <title/>
         <placeholder name="and">AND</placeholder>
     </data>
     <data type="taskRef">
         <id>taskref_and_parent</id>
-        <title></title>
+        <title/>
     </data>
     <data type="text">
         <id>trimmed_origin_view_id</id>
@@ -172,7 +174,7 @@
     </data>
     <data type="enumeration_map">
         <id>missing_nets_translation</id>
-        <title></title>
+        <title/>
         <options>
             <option key="sk">Zoznam chýbajúcich procesov pre aktuálny filter:</option>
             <option key="en">List of missing processes for current filter:</option>
@@ -181,7 +183,7 @@
     </data>
     <data type="taskRef">
         <id>my_full_filter</id>
-        <title></title>
+        <title/>
     </data>
     <data type="multichoice_map">
         <id>allowed_nets</id>
