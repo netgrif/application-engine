@@ -2,6 +2,7 @@ package com.netgrif.application.engine.menu.domain;
 
 import com.netgrif.application.engine.menu.domain.configurations.ViewBody;
 import com.netgrif.application.engine.menu.domain.configurations.ViewConstants;
+import com.netgrif.application.engine.menu.domain.templates.Template;
 import com.netgrif.application.engine.menu.utils.MenuItemUtils;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
@@ -31,7 +32,7 @@ public class MenuItemBody {
     private String customViewSelector;
     private boolean isAutoSelect = false;
 
-    private boolean useTabbedView;
+    private boolean useTabbedView = true;
     private String tabIcon;
     private boolean useTabIcon = true;
     private I18nString tabName;
@@ -108,8 +109,14 @@ public class MenuItemBody {
     }
 
     public void setView(ViewBody viewBody) {
-        this.view = viewBody;
-        this.useTabbedView = viewBody == null || viewBody.getViewType().isTabbed();
+        if (viewBody != null) {
+            this.view = viewBody;
+            MenuItemView viewType = viewBody.getViewType();
+            if (viewType.isTabbed() != viewType.isUntabbed()) {
+                // if isTabbed == isUntabbed we cannot determine the result value
+                this.useTabbedView = viewType.isTabbed();
+            }
+        }
     }
 
     /**
@@ -176,6 +183,24 @@ public class MenuItemBody {
         outcome.putDataSetEntryOptions(MenuItemConstants.FIELD_ALLOWED_ROLES, FieldType.MULTICHOICE_MAP, this.allowedRoles);
         outcome.putDataSetEntryOptions(MenuItemConstants.FIELD_BANNED_ROLES, FieldType.MULTICHOICE_MAP, this.bannedRoles);
 
+        outcome = toDataSetWithView(viewCase, outcome);
+
+        return outcome;
+    }
+
+    /**
+     * Transforms minimal attributes into dataSet for view configuration by template.
+     *
+     * @param viewCase case instance of view
+     * @return {@link ToDataSetOutcome} object with dataSet containing only view-related fields
+     */
+    public ToDataSetOutcome toDataSetByConfigTemplate(Case viewCase) {
+        ToDataSetOutcome outcome = new ToDataSetOutcome();
+        outcome.putDataSetEntry(MenuItemConstants.FIELD_USE_TABBED_VIEW, FieldType.BOOLEAN, this.useTabbedView);
+        return toDataSetWithView(viewCase, outcome);
+    }
+
+    protected ToDataSetOutcome toDataSetWithView(Case viewCase, ToDataSetOutcome outcome) {
         if (viewCase != null) {
             outcome.putDataSetEntry(MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE, FieldType.ENUMERATION_MAP,
                     this.view.getViewType().getIdentifier());
@@ -186,7 +211,6 @@ public class MenuItemBody {
             String allDataTaskId = MenuItemUtils.findTaskIdInCase(viewCase, ViewConstants.TRANS_ALL_MENU_DATA_ID);
             outcome.putDataSetEntry(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ALL_DATA_FORM, FieldType.TASK_REF, List.of(allDataTaskId));
         }
-
         return outcome;
     }
 }

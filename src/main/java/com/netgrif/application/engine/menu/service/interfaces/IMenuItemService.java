@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.menu.service.interfaces;
 
+import com.netgrif.application.engine.menu.domain.ConfigurationTemplateOutcome;
 import com.netgrif.application.engine.menu.domain.FilterBody;
 import com.netgrif.application.engine.menu.domain.MenuItemBody;
 import com.netgrif.application.engine.menu.domain.MenuItemView;
@@ -31,7 +32,7 @@ public interface IMenuItemService {
     Case duplicateItem(Case originItem, I18nString newTitle, String newIdentifier) throws TransitionNotExecutableException;
     Case removeChildItemFromParent(String folderId, Case childItem);
     List<DataGroup> getMenuItemData(String caseId, Locale locale);
-    void handleConfigurationTemplate(Case menuItemCase);
+    ConfigurationTemplateOutcome handleConfigurationTemplate(Case menuItemCase) throws TransitionNotExecutableException;
 
     /**
      * Gets all tabbed or non-tabbed views

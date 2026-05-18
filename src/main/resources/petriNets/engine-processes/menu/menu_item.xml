@@ -849,13 +849,10 @@
 					change name value { new com.netgrif.application.engine.petrinet.domain.I18nString(identifier.value) }
 				</action>
 				<action>
-					configuration_templates: f.configuration_templates;
-
-					if (configuration_templates.value == null || configuration_templates.value == "") {
-						return
+					def outcome = menuItemService.handleConfigurationTemplate(useCase)
+					outcome.mapping.each { fieldId, value ->
+						change useCase.getField(fieldId) value { value }
 					}
-
-					menuItemService.handleConfigurationTemplate(configuration_templates.value)
 				</action>
 			</actions>
 			<title name="create_item_finish">Create</title>

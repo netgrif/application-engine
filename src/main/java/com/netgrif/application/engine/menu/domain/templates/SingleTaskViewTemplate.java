@@ -1,9 +1,7 @@
 package com.netgrif.application.engine.menu.domain.templates;
 
-import com.netgrif.application.engine.menu.domain.FilterBody;
 import com.netgrif.application.engine.menu.domain.MenuItemBody;
 import com.netgrif.application.engine.menu.domain.configurations.SingleTaskViewBody;
-import com.netgrif.application.engine.menu.domain.configurations.TaskViewBody;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 
 import java.util.Map;
@@ -19,16 +17,10 @@ public class SingleTaskViewTemplate implements Template {
 
     private static MenuItemBody buildTemplate() {
         MenuItemBody menuItemBody = new MenuItemBody();
-        // todo 23 menu item body data
-        // is tabbed
+        menuItemBody.setUseTabbedView(false);
 
         SingleTaskViewBody singleTaskViewBody = new SingleTaskViewBody();
-        // todo 23 task view body data
-
-        FilterBody filterBody = new FilterBody();
-        // todo 23 filter body data
-
-        singleTaskViewBody.setFilterBody(filterBody);
+        singleTaskViewBody.setFilterBody(Template.defaultTaskFilterBody(NAME));
         menuItemBody.setView(singleTaskViewBody);
 
         return menuItemBody;

@@ -5,12 +5,10 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
-import com.netgrif.application.engine.menu.domain.FilterBody;
-import com.netgrif.application.engine.menu.domain.MenuItemBody;
-import com.netgrif.application.engine.menu.domain.MenuItemConstants;
-import com.netgrif.application.engine.menu.domain.ToDataSetOutcome;
+import com.netgrif.application.engine.menu.domain.*;
 import com.netgrif.application.engine.menu.domain.configurations.ViewBody;
 import com.netgrif.application.engine.menu.domain.configurations.ViewConstants;
+import com.netgrif.application.engine.menu.domain.templates.Template;
 import com.netgrif.application.engine.menu.service.interfaces.IMenuItemService;
 import com.netgrif.application.engine.menu.utils.MenuItemUtils;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
@@ -415,10 +413,42 @@ public class MenuItemService implements IMenuItemService {
         return dataService.getDataGroups(taskId, locale).getData();
     }
 
-    // todo 23 doc
+    /**
+     * Handles the application of a configuration template to a menu item case.
+     * <p>
+     * This method retrieves the selected configuration template from the menu item case,
+     * loads the corresponding template definition, and applies it by creating or updating
+     * the associated view configuration. If no template is selected, the method returns
+     * without making any changes.
+     * </p>
+     *
+     * @param menuItemCase the menu item case to which the configuration template should be applied
+     * @return a ConfigurationTemplateOutcome containing the dataSet outcome from applying the template, 
+     *         or an empty outcome if no template was selected
+     * @throws TransitionNotExecutableException if the workflow transition required for applying the template configuration cannot be executed
+     * @throws IllegalArgumentException if the selected template identifier does not correspond to any registered template
+     */
     @Override
-    public void handleConfigurationTemplate(Case menuItemCase) {
-        // todo 23
+    public ConfigurationTemplateOutcome handleConfigurationTemplate(Case menuItemCase) throws TransitionNotExecutableException {
+        String selectedTemplate = (String) menuItemCase.getFieldValue(MenuItemConstants.FIELD_CONFIGURATION_TEMPLATES);
+        if (selectedTemplate == null || selectedTemplate.isEmpty()) {
+            return new ConfigurationTemplateOutcome();
+        }
+
+        String menuItemIdentifier = (String) menuItemCase.getFieldValue(MenuItemConstants.FIELD_IDENTIFIER);
+        log.debug("Handling configuration template selection for menu item: [{}, {}] and configuration template: {}", 
+                menuItemCase.getStringId(), menuItemIdentifier, selectedTemplate);
+        Optional<Template> templateOpt = MenuItemTemplateHolder.get(selectedTemplate);
+        if (templateOpt.isEmpty()) {
+            throw new IllegalArgumentException(String.format("No configuration template found with name: %s", selectedTemplate));
+        }
+
+        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
+        Case viewCase = createView(menuItemBody.getView(), menuItemBody.isUseTabbedView());
+        ToDataSetOutcome dataSetOutcome = menuItemBody.toDataSetByConfigTemplate(viewCase);
+        log.debug("For menu item: [{}. {}] was used configuration template: {}", menuItemCase.getStringId(),
+                menuItemIdentifier, selectedTemplate);
+        return new ConfigurationTemplateOutcome(dataSetOutcome);
     }
 
     protected Case findCase(String processIdentifier, String query) {

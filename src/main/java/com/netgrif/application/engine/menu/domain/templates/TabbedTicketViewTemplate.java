@@ -18,15 +18,12 @@ public class TabbedTicketViewTemplate implements Template {
 
     private static MenuItemBody buildTemplate() {
         MenuItemBody menuItemBody = new MenuItemBody();
-        // todo 23 menu item body data
-        // is tabbed
+        menuItemBody.setUseTabbedView(true);
 
         TabbedTicketViewBody tabbedTicketViewBody = new TabbedTicketViewBody();
-        // todo 23 case view body data
 
         SingleTaskViewBody singleTaskViewBody = new SingleTaskViewBody();
-        // todo 23 task view body data
-
+        singleTaskViewBody.setFilterBody(Template.defaultTaskFilterBody(NAME));
         tabbedTicketViewBody.setChainedView(singleTaskViewBody);
         menuItemBody.setView(tabbedTicketViewBody);
 

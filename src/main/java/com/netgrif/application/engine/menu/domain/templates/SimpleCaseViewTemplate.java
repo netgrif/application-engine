@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.menu.domain.templates;
 
-import com.netgrif.application.engine.menu.domain.FilterBody;
 import com.netgrif.application.engine.menu.domain.MenuItemBody;
 import com.netgrif.application.engine.menu.domain.configurations.CaseViewBody;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
@@ -18,16 +17,10 @@ public class SimpleCaseViewTemplate implements Template {
 
     private static MenuItemBody buildTemplate() {
         MenuItemBody menuItemBody = new MenuItemBody();
-        // todo 23 menu item body data
-        // is tabbed
+        menuItemBody.setUseTabbedView(false);
 
         CaseViewBody caseViewBody = new CaseViewBody();
-        // todo 23 task view body data
-
-        FilterBody filterBody = new FilterBody();
-        // todo 23 filter body data
-
-        caseViewBody.setFilterBody(filterBody);
+        caseViewBody.setFilterBody(Template.defaultCaseFilterBody(NAME));
         menuItemBody.setView(caseViewBody);
 
         return menuItemBody;

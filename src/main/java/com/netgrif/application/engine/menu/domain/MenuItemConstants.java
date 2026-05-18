@@ -29,6 +29,7 @@ public class MenuItemConstants {
     public static final String FIELD_VIEW_CONFIGURATION_ID = "view_configuration_id";
     public static final String FIELD_VIEW_CONFIGURATION_FORM = "view_configuration_form";
     public static final String FIELD_VIEW_CONFIGURATION_ALL_DATA_FORM = "view_configuration_all_data_form";
+    public static final String FIELD_CONFIGURATION_TEMPLATES = "configuration_templates";
 
     public static final String TRANS_SETTINGS_ID = "item_settings";
     public static final String TRANS_INIT_ID = "system_initialize";
