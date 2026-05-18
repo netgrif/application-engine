@@ -7,6 +7,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 public record AuthPrincipalDto(String username,
                                String realmId,
@@ -28,7 +29,7 @@ public record AuthPrincipalDto(String username,
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AuthPrincipalDto that = (AuthPrincipalDto) o;
-        return username.equals(that.username) && realmId.equals(that.realmId);
+        return Objects.equals(username, that.username) && Objects.equals(realmId, that.realmId);
     }
 
     @Override
