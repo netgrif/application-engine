@@ -3,6 +3,7 @@ package com.netgrif.application.engine.orgstructure.groups
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.objects.auth.constants.UserConstants
 import com.netgrif.application.engine.objects.auth.domain.Authority
 import com.netgrif.application.engine.objects.auth.domain.Group
 import com.netgrif.application.engine.objects.auth.domain.QGroup
@@ -88,7 +89,7 @@ class GroupServiceTest {
         QGroup qGroup = new QGroup("group")
         Group group = groupService.findByPredicate(qGroup.identifier.eq("CUSTOM_GROUP_1"), new FullPageRequest()).getContent().get(0)
         groupService.addUser(userService.findUserByUsername(CUSTOMER_USER_MAIL, null).get(), group)
-        groupService.addUser(userService.findUserByUsername("engine@netgrif.com", null).get(), group)
+        groupService.addUser(userService.findUserByUsername(UserConstants.SYSTEM_USER_USERNAME, null).get(), group)
         return group
     }
 

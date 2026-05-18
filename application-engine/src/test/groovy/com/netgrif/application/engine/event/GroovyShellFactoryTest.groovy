@@ -72,7 +72,7 @@ class GroovyShellFactoryTest {
     void roleActionsTest() {
         roleService.metaClass.groovyShellTestMethod = { String string, I18nString i18nString -> println("groovyShellTestMethod") }
 
-        def user = userService.findUserByUsername(userService.getSystem().getEmail(), null)
+        def user = userService.findUserByUsername(userService.getSystem().getUsername(), null)
         def processRoleCount = user.get().processRoles.size()
         def roles = roleService.findAllByNetStringId(net.getStringId())
         assert roles.size() == 1
