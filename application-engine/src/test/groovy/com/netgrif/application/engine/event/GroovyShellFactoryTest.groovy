@@ -81,7 +81,7 @@ class GroovyShellFactoryTest {
                 new HashSet<ProcessResourceId>(roles.collect { it._id } + user.get().processRoles.collect { it._id }),
                 new LoggedUserImpl(new ObjectId(), null, "a", "a", "", "b", "test@mail.com", "", null, null, null, null)
         )
-        user = userService.findUserByUsername(userService.getSystem().getEmail(), null)
+        user = userService.findUserByUsername(userService.getSystem().getUsername(), null)
         assert user.get().processRoles.size() == processRoleCount + 1
     }
 
