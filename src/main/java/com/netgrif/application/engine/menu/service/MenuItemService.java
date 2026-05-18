@@ -95,6 +95,8 @@ public class MenuItemService implements IMenuItemService {
      * */
     @Override
     public Case createMenuItem(MenuItemBody body) throws TransitionNotExecutableException {
+        validateMenuItemBody(body);
+
         log.debug("Creation of menu item case with identifier [{}] started.", body.getIdentifier());
         IUser loggedUser = userService.getLoggedOrSystem();
         String sanitizedIdentifier = MenuItemUtils.sanitize(body.getIdentifier());
@@ -102,8 +104,6 @@ public class MenuItemService implements IMenuItemService {
         if (existsMenuItem(sanitizedIdentifier)) {
             throw new IllegalArgumentException(String.format("Menu item identifier %s is not unique!", sanitizedIdentifier));
         }
-
-        // todo 23 validation
 
         Case parentItemCase = getOrCreateFolderItem(body.getUri());
         I18nString newName = body.getMenuName();
@@ -140,6 +140,8 @@ public class MenuItemService implements IMenuItemService {
      * */
     @Override
     public Case updateMenuItem(Case itemCase, MenuItemBody body) throws TransitionNotExecutableException {
+        validateMenuItemBody(body);
+
         log.debug("Update of menu item case with identifier [{}] started.", body.getIdentifier());
         String actualUriNodeId = uriService.findByUri(body.getUri()).getStringId();
         if (!itemCase.getUriNodeId().equals(actualUriNodeId)) {
@@ -449,6 +451,18 @@ public class MenuItemService implements IMenuItemService {
         log.debug("For menu item: [{}. {}] was used configuration template: {}", menuItemCase.getStringId(),
                 menuItemIdentifier, selectedTemplate);
         return new ConfigurationTemplateOutcome(dataSetOutcome);
+    }
+
+    protected void validateMenuItemBody(MenuItemBody menuItemBody) {
+        if (menuItemBody == null) {
+            throw new IllegalArgumentException("Input data cannot be null");
+        }
+        if (menuItemBody.getIdentifier() == null) {
+            throw new IllegalArgumentException("Identifier cannot be null");
+        }
+        if (menuItemBody.getUri() == null || menuItemBody.getUri().isBlank()) {
+            throw new IllegalArgumentException("Uri cannot be null");
+        }
     }
 
     protected Case findCase(String processIdentifier, String query) {

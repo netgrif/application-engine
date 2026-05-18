@@ -759,7 +759,9 @@
 		<x>340</x>
 		<y>220</y>
 		<label name="initialize">Create item</label>
-<!--		todo 23 tags visible-->
+		<tags>
+			<tag key="visible">true</tag>
+		</tags>
 		<icon>hourglass_empty</icon>
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
@@ -887,6 +889,9 @@
 		<x>460</x>
 		<y>100</y>
 		<label name="item_settings">Item settings</label>
+		<tags>
+			<tag key="visible">true</tag>
+		</tags>
 		<icon>settings</icon>
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
@@ -1019,6 +1024,9 @@
 		<x>580</x>
 		<y>100</y>
 		<label name="move_item">Move item</label>
+		<tags>
+			<tag key="visible">true</tag>
+		</tags>
 		<icon>move_down</icon>
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
@@ -1100,6 +1108,9 @@
 		<x>580</x>
 		<y>340</y>
 		<label name="duplicate_item">Duplicate item</label>
+		<tags>
+			<tag key="visible">true</tag>
+		</tags>
 		<icon>content_copy</icon>
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
@@ -1162,6 +1173,9 @@
 		<x>580</x>
 		<y>220</y>
 		<label name="children_order">Manage item order</label>
+		<tags>
+			<tag key="visible">true</tag>
+		</tags>
 		<icon>low_priority</icon>
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
