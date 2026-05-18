@@ -1,9 +1,16 @@
 package com.netgrif.application.engine.migration.helpers
 
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.migration.config.properties.MigrationConfigurationProperties
 import com.netgrif.application.engine.migration.config.properties.MigrationConfigurationProperties.TaskMigrationProperties
+import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.querydsl.core.types.Predicate
 import groovy.util.logging.Slf4j
 import org.springframework.data.mongodb.core.BulkOperations
@@ -20,7 +27,7 @@ import org.springframework.stereotype.Component
  */
 @Slf4j
 @Component
-class TaskMigrationHelper extends AbstractMigrationHelper<Task>{
+class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
 
     /**
      * The task migration properties configuration.
@@ -40,6 +47,12 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task>{
      */
     private IPetriNetService petriNetService
 
+    private ITaskService taskService
+
+    private IElasticTaskService elasticTaskService
+
+    private IElasticTaskMappingService elasticTaskMappingService
+
     /**
      * Constructs a new TaskMigrationHelper with the specified MongoTemplate.
      *
@@ -47,10 +60,16 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task>{
      */
     TaskMigrationHelper(MongoTemplate mongoTemplate,
                         MigrationConfigurationProperties migrationConfigurationProperties,
-                        IPetriNetService petriNetService) {
+                        IPetriNetService petriNetService,
+                        ITaskService taskService,
+                        IElasticTaskService elasticTaskService,
+                        IElasticTaskMappingService elasticTaskMappingService) {
         super(Task.class, mongoTemplate)
         this.taskMigrationProperties = migrationConfigurationProperties.tasks
         this.petriNetService = petriNetService
+        this.taskService = taskService
+        this.elasticTaskService = elasticTaskService
+        this.elasticTaskMappingService = elasticTaskMappingService
     }
 
     /**
@@ -65,7 +84,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task>{
     int getPageSize() {
         return taskMigrationProperties.pageSize
     }
-    
+
     /**
      * Prepares a set of bulk operations for tasks during the migration process.
      *
@@ -138,5 +157,42 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task>{
      */
     void updateAllTasksCursor(Closure update, double pageSize = 100.0) {
         iterate(update, DEFAULT_PROCESS_OPERATIONS, new Query(), 0, pageSize as int)
+    }
+
+    /**
+     * Reloads tasks of provided case via TaskService,
+     * handles useCase.petriNet internally
+     * @param useCase Instance of Case for which tasks will be reloaded
+     * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
+     */
+    void reloadTasks(Case useCase, PetriNet net) {
+        PetriNetMigrationHelper.setPetriNet(useCase, net)
+        taskService.reloadTasks(useCase)
+    }
+
+    /**
+     * Indexes provided task in elasticsearch
+     * @param task Instance of Task that will be indexed into elasticsearch index
+     */
+    void elasticTaskIndex(Task task) {
+        try {
+            elasticTaskService.indexNow(elasticTaskMappingService.transform(task))
+        } catch (Exception e) {
+            log.error("Failed to index $task.stringId", e)
+        }
+    }
+
+    /**
+     * Adds role with permissions to existing tasks of net
+     * @param role ProcessRole that will be added to transitions
+     * @param net Instance of Petri Net of updated transitions
+     * @param transitionIds List of transition IDs the role will be added to
+     * @param permissions Map of permissions for the role
+     */
+    void addRoleToExistingTasks(ProcessRole role, PetriNet net, List<String> transitionIds, Map<String, Boolean> permissions) {
+        updateTasks({ Task task ->
+            log.info("Add role '${role.getName()}' with roleId=${role.getImportId()} to transitionId=${task.getTransitionId()} in task ${task.stringId}")
+            task.addRole(role.getStringId(), permissions)
+        }, QTask.task.transitionId.in(transitionIds) & QTask.task.processId.eq(net.getStringId()))
     }
 }

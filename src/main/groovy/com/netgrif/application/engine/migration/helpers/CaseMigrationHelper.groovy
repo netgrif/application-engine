@@ -1,8 +1,14 @@
 package com.netgrif.application.engine.migration.helpers
 
+import com.netgrif.application.engine.elastic.service.ElasticCaseMappingService
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.migration.config.properties.MigrationConfigurationProperties
 import com.netgrif.application.engine.migration.config.properties.MigrationConfigurationProperties.CaseMigrationProperties
+import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.DataField
 import com.querydsl.core.types.Predicate
 import groovy.util.logging.Slf4j
 import org.springframework.data.mongodb.core.BulkOperations
@@ -10,6 +16,8 @@ import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Component
+
+import java.time.LocalDateTime
 
 /**
  * Helper class for managing migrations of Case objects in the application.
@@ -28,6 +36,12 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      */
     private CaseMigrationProperties caseMigrationProperties
 
+    private IPetriNetService petriNetService
+
+    private IElasticCaseService elasticCaseService
+
+    private IElasticCaseMappingService elasticCaseMappingService
+
     /**
      * Constructs a CaseMigrationHelper instance with
      * the provided MongoTemplate and migration configuration properties.
@@ -36,9 +50,15 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param migrationConfigurationProperties Properties for migration configuration, including cases.
      */
     CaseMigrationHelper(MongoTemplate mongoTemplate,
-                        MigrationConfigurationProperties migrationConfigurationProperties) {
+                        MigrationConfigurationProperties migrationConfigurationProperties,
+                        IPetriNetService petriNetService,
+                        IElasticCaseService elasticCaseService,
+                        IElasticCaseMappingService elasticCaseMappingService) {
         super(Case.class, mongoTemplate)
         this.caseMigrationProperties = migrationConfigurationProperties.cases
+        this.petriNetService = petriNetService
+        this.elasticCaseService = elasticCaseService
+        this.elasticCaseMappingService = elasticCaseMappingService
     }
 
     /**
@@ -112,6 +132,137 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      */
     void updateAllCasesCursor(Closure update, double pageSize = 100.0) {
         iterate(update, DEFAULT_PROCESS_OPERATIONS, new Query(), 0, pageSize as int)
+    }
+
+    /**
+     * Indexes provided case in elasticsearch
+     * handles useCase.petriNet internally
+     * @param useCase Instance of Case that will be indexed into elasticsearch index
+     */
+    void elasticIndex(Case useCase) {
+        try {
+            PetriNetMigrationHelper.setPetriNet(useCase, petriNetService.getNewestVersionByIdentifier(useCase.processIdentifier))
+            assert useCase.petriNet
+            elasticCaseService.indexNow(elasticCaseMappingService.transform(useCase))
+        } catch (Exception ex) {
+            if (useCase.lastModified == null) {
+                log.error("Creating new lastModified date for $useCase.stringId")
+                useCase.lastModified = LocalDateTime.now()
+                elasticCaseService.indexNow(elasticCaseMappingService.transform(useCase))
+            } else {
+                log.error("Failed to index $useCase.stringId", ex)
+            }
+        }
+    }
+
+    /**
+     * Delete given data fields from useCase
+     * @param useCase Instance of Case
+     * @param toDelete List of field IDs that will be deleted from useCase
+     */
+    void deleteDataFields(Case useCase, List<String> toDelete) {
+        toDelete.each { dataFieldID ->
+            useCase.dataSet.remove(dataFieldID)
+        }
+    }
+
+    /**
+     * Changes value of given data fields from number to text
+     * @param useCase Instance of Case
+     * @param toChange List of field IDs for value change
+     */
+    void changeDataFieldsValueFromNumberToText(Case useCase, List<String> toChange) {
+        toChange.each { dataFieldID ->
+            if (useCase.dataSet[dataFieldID].value && (useCase.dataSet[dataFieldID].value != null || useCase.dataSet[dataFieldID].value != "")) {
+                double value = useCase.dataSet[dataFieldID].value as double
+                useCase.dataSet[dataFieldID].value = value as String
+            }
+        }
+    }
+
+    /**
+     * Changes value of given data fields from text to number
+     * @param useCase Instance of Case
+     * @param toChange List of field IDs for value change
+     */
+    void changeDataFieldsValueFromTextToNumber(Case useCase, List<String> toChange) {
+        toChange.each { dataFieldID ->
+            if (useCase.dataSet[dataFieldID].value && useCase.dataSet[dataFieldID].value != "") {
+                try {
+                    useCase.dataSet[dataFieldID].value = useCase.dataSet[dataFieldID].value as double
+                } catch (Exception e) {
+                    useCase.dataSet[dataFieldID].value = null
+                    log.error("[${useCase.stringId}] could not convert value ${useCase.dataSet[dataFieldID].value} in field ${dataFieldID}", e)
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds new data fields with their init value into useCase
+     * @param useCase Instance of Case
+     * @param toAdd Map<field id, init value of field>
+     */
+    void addTextDataFields(Case useCase, Map<String, String> toAdd) {
+        toAdd.each { dataFieldID, value ->
+            useCase.dataSet[dataFieldID] = new DataField(value)
+        }
+    }
+
+    /**
+     * Changes value of given data fields from enumeration to multichoice
+     * @param useCase Instance of Case
+     * @param toChange List of field IDs for value change
+     */
+    void changeDataFieldsValueFromEnumerationToMultichoice(Case useCase, List<String> toChange) {
+        toChange.each { dataFieldID ->
+            if (useCase.dataSet[dataFieldID].value && useCase.dataSet[dataFieldID].value != null) {
+                def value
+                if (useCase.dataSet[dataFieldID].value instanceof I18nString) {
+                    value = useCase.dataSet[dataFieldID].value as I18nString
+                } else {
+                    value = new I18nString(useCase.dataSet[dataFieldID].value as String)
+                }
+
+                def newSet = new HashSet<I18nString>()
+                newSet.add(value)
+                useCase.dataSet[dataFieldID].value = newSet
+            }
+        }
+    }
+
+    /**
+     * Adds new choices into enumeration or multichoice field
+     * @param useCase Instance of Case
+     * @param toAdd Map<field id, list of choices to add into data data field>
+     */
+    void addChoices(Case useCase, Map<String, List<String>> toAdd) {
+        toAdd.each { dataFieldID, newChoices ->
+            if (useCase.dataSet[dataFieldID].choices == null) {
+                useCase.dataSet[dataFieldID].setChoices(new HashSet<I18nString>())
+            }
+
+            newChoices.each {
+                useCase.dataSet[dataFieldID].choices.add(new I18nString(it))
+            }
+        }
+    }
+
+    /**
+     * Removes choices from enumeration or multichoice field
+     * @param useCase Instance of Case
+     * @param toAdd Map<field id, list of choices to add into data field>
+     */
+    void removeChoices(Case useCase, Map<String, List<String>> toRemove) {
+        toRemove.each { dataFieldID, choicesToRemove ->
+            if (useCase.dataSet[dataFieldID].value != null) {
+                (useCase.dataSet[dataFieldID].value as Set).removeAll(choicesToRemove)
+            }
+
+            if (useCase.dataSet[dataFieldID].choices != null) {
+                useCase.dataSet[dataFieldID].choices.removeAll(choicesToRemove)
+            }
+        }
     }
 }
 

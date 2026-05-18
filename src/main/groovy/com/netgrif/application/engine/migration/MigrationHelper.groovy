@@ -3,6 +3,10 @@ package com.netgrif.application.engine.migration
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.interfaces.*
 import com.netgrif.application.engine.importer.service.Importer
+import com.netgrif.application.engine.migration.helpers.AbstractMigrationHelper
+import com.netgrif.application.engine.migration.helpers.CaseMigrationHelper
+import com.netgrif.application.engine.migration.helpers.PetriNetMigrationHelper
+import com.netgrif.application.engine.migration.helpers.TaskMigrationHelper
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.Transition
@@ -41,6 +45,15 @@ import java.util.stream.Collectors
 @Slf4j
 @Component
 class MigrationHelper {
+
+    @Autowired
+    private CaseMigrationHelper caseMigrationHelper
+
+    @Autowired
+    private TaskMigrationHelper taskMigrationHelper
+
+    @Autowired
+    private PetriNetMigrationHelper petriNetMigrationHelper
 
     @Autowired
     private CaseRepository caseRepository
@@ -91,14 +104,17 @@ class MigrationHelper {
         return importerProvider.get()
     }
 
+    Closure<PetriNet> updateRoleEvents = { PetriNet existing, PetriNet reimported ->
+        petriNetMigrationHelper.updateRoleEvents(existing, reimported)
+    }
+
     /**
      * Updates all cases filtered by filter Predicate. Update closure is called on each filtered case.
      * @param update Instance of Closure, which should contain code that will be executed for every Case matched by filter
      * @param filter Instance of Predicate, to filter which cases should be updated
      */
     void updateCases(Closure update, Predicate filter) {
-        log.info("Updating cases with filter ${filter.toString()} and update ${update.toString()}")
-        iterateCases(update, { Page<Case> cases -> caseRepository.saveAll(cases) }, filter)
+        caseMigrationHelper.updateCases(update, filter)
     }
 
     /**
@@ -107,26 +123,8 @@ class MigrationHelper {
      * @param sleepFor Optional attribute to set sleep time (in milliseconds) to sleep for after each iterated page. Default 0ms
      * @param filter Instance of Predicate, to filter which cases should be iterated
      */
-    void iterateCases(Closure update, Closure pageProcessed = {}, long sleepFor = 0, Predicate filter) {
-        long caseCount = caseRepository.count(filter)
-        long numOfPages = ((caseCount / 100.0) + 1) as long
-        log.info("Processing cases with filter ${filter.toString()}: $numOfPages pages")
-        numOfPages.times { page ->
-            log.info("Page $page / $numOfPages")
-
-            Page<Case> cases = caseRepository.findAll(filter, PageRequest.of(page, 100))
-
-            cases.each {
-                log.debug("Processing case with id ${it.stringId}")
-                log.trace("Processing case ${it.toString()}")
-                update(it)
-            }
-            pageProcessed(cases)
-            if (sleepFor != 0) {
-                log.debug("Pausing migration for ${sleepFor} milliseconds")
-                sleep(sleepFor)
-            }
-        }
+    void iterateCases(Closure update, Closure pageProcessed = AbstractMigrationHelper.DEFAULT_PROCESS_OPERATIONS, long sleepFor = 0, Predicate filter) {
+        caseMigrationHelper.iterateCases(update, pageProcessed, sleepFor, filter)
     }
 
     /**
@@ -136,37 +134,7 @@ class MigrationHelper {
      * @param pageSize Optional attribute to set page size. Default page size 100.0
      */
     void updateCasesCursor(Closure update, String processIdentifier, double pageSize = 100.0) {
-        long caseCount = caseRepository.count(QCase.case$.processIdentifier.eq(processIdentifier))
-        long numOfPages = ((caseCount / pageSize) + 1) as long
-        log.info("Migrating process $processIdentifier")
-        log.info("Page size: $pageSize")
-        log.info("Processing cases: $numOfPages pages")
-        ObjectId lastId = null
-        if (caseCount > 0) {
-            for (int p = 0; p < numOfPages; p++) {
-                try {
-                    log.info("Page " + (p + 1) + " / $numOfPages")
-
-                    Query query = new Query()
-                    if (lastId == null) {
-                        query.skip(0)
-                    } else {
-                        query.addCriteria(Criteria.where("_id").gt(lastId))
-                    }
-                    query.addCriteria(Criteria.where("processIdentifier").is(processIdentifier))
-                    query.limit(pageSize as Integer)
-
-                    List<Case> cases = mongoTemplate.find(query, Case.class)
-                    cases.each { update(it) }
-                    cases = caseRepository.saveAll(cases)
-
-                    lastId = cases.get(cases.size() - 1).get_id()
-                } catch (Exception e) {
-                    log.error("Failed to iterate page " + (p + 1), e.getMessage())
-                    break
-                }
-            }
-        }
+        caseMigrationHelper.updateCasesCursor(update, processIdentifier, pageSize)
     }
 
     /**
@@ -175,35 +143,7 @@ class MigrationHelper {
      * @param pageSize Optional attribute to set page size. Default page size 100.0
      */
     void updateAllCasesCursor(Closure update, double pageSize = 100.0) {
-        long caseCount = caseRepository.count()
-        long numOfPages = ((caseCount / pageSize) + 1) as long
-        log.info("Page size: $pageSize")
-        log.info("Processing cases: $numOfPages pages")
-        ObjectId lastId = null
-        if (caseCount > 0) {
-            for (int p = 0; p < numOfPages; p++) {
-                try {
-                    log.info("Page " + (p + 1) + " / $numOfPages")
-
-                    Query query = new Query()
-                    if (lastId == null) {
-                        query.skip(0)
-                    } else {
-                        query.addCriteria(Criteria.where("_id").gt(lastId))
-                    }
-                    query.limit(pageSize as Integer)
-
-                    List<Case> cases = mongoTemplate.find(query, Case.class)
-                    cases.each { update(it) }
-                    cases = caseRepository.saveAll(cases)
-
-                    lastId = cases.get(cases.size() - 1).get_id()
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    log.error("Failed to iterate page " + (p + 1))
-                    break
-                }
-            }
-        }
+        caseMigrationHelper.updateAllCasesCursor(update, pageSize)
     }
 
     /**
@@ -212,8 +152,7 @@ class MigrationHelper {
      * @param filter Instance of Predicate, to filter which tasks should be updated
      */
     void updateTasks(Closure update, Predicate filter) {
-        log.info("Updating tasks with filter ${filter.toString()} and update ${update.toString()}")
-        iterateTasks(update, { Page<Task> tasks -> taskRepository.saveAll(tasks) }, filter)
+        taskMigrationHelper.updateTasks(update, filter)
     }
 
     /**
@@ -222,21 +161,8 @@ class MigrationHelper {
      * @param sleepFor Optional attribute to set sleep time (in milliseconds) to sleep for after each iterated page. Default 0ms
      * @param filter Instance of Predicate, to filter which tasks should be iterated
      */
-    void iterateTasks(Closure update, Closure pageProcessed = {}, long sleepFor = 0, Predicate filter) {
-        long taskCount = taskRepository.count(filter)
-        long numOfPages = ((taskCount / 100.0) + 1) as long
-        log.info("Processing tasks with filter ${filter.toString()}: $numOfPages pages")
-        numOfPages.times { page ->
-            log.info("Page $page / $numOfPages")
-
-            Page<Task> tasks = taskRepository.findAll(filter, PageRequest.of(page, 100))
-
-            tasks.each { update(it) }
-            pageProcessed(tasks)
-            if (sleepFor != 0) {
-                sleep(sleepFor)
-            }
-        }
+    void iterateTasks(Closure update, Closure pageProcessed = AbstractMigrationHelper.DEFAULT_PROCESS_OPERATIONS, long sleepFor = 0, Predicate filter) {
+        taskMigrationHelper.iterateTasks(update, pageProcessed, sleepFor, filter)
     }
 
     /**
@@ -246,38 +172,7 @@ class MigrationHelper {
      * @param pageSize Optional attribute to set page size. Default page size 100.0
      */
     void updateTasksCursor(Closure update, String processIdentifier, double pageSize = 100.0) {
-        String processId = petriNetService.getNewestVersionByIdentifier(processIdentifier).stringId
-        long taskCount = taskRepository.count(QTask.task.processId.eq(processId))
-        long numOfPages = ((taskCount / pageSize) + 1) as long
-        log.info("Migrating process $processIdentifier")
-        log.info("Page size: $pageSize")
-        log.info("Processing tasks: $numOfPages pages")
-        ObjectId lastId = null
-        if (taskCount > 0) {
-            for (int p = 0; p < numOfPages; p++) {
-                try {
-                    log.info("Page " + (p + 1) + " / $numOfPages")
-
-                    Query query = new Query()
-                    if (lastId == null) {
-                        query.skip(0)
-                    } else {
-                        query.addCriteria(Criteria.where("_id").gt(lastId))
-                    }
-                    query.addCriteria(Criteria.where("processId").is(processId))
-                    query.limit(pageSize as Integer)
-
-                    List<Task> tasks = mongoTemplate.find(query, Task.class)
-                    tasks.each { update(it) }
-                    tasks = taskRepository.saveAll(tasks)
-
-                    lastId = tasks.get(tasks.size() - 1).objectId
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    log.error("Failed to iterate page " + (p + 1))
-                    break
-                }
-            }
-        }
+        taskMigrationHelper.updateTasksCursor(update, processIdentifier, pageSize)
     }
 
     /**
@@ -288,39 +183,7 @@ class MigrationHelper {
      * @param pageSize Optional attribute to set page size. Default page size 100.0
      */
     void updateSpecificTasksCursor(Closure update, String processIdentifier, List<String> transitionIds, double pageSize = 100.0) {
-        String processId = petriNetService.getNewestVersionByIdentifier(processIdentifier).stringId
-        long taskCount = taskRepository.count(QTask.task.processId.eq(processId) & QTask.task.transitionId.in(transitionIds))
-        long numOfPages = ((taskCount / pageSize) + 1) as long
-        log.info("Migrating process $processIdentifier transitions ${transitionIds.toString()}")
-        log.info("Page size: $pageSize")
-        log.info("Processing tasks: $numOfPages pages")
-        ObjectId lastId = null
-        if (taskCount > 0) {
-            for (int p = 0; p < numOfPages; p++) {
-                try {
-                    log.info("Page " + (p + 1) + " / $numOfPages")
-
-                    Query query = new Query()
-                    if (lastId == null) {
-                        query.skip(0)
-                    } else {
-                        query.addCriteria(Criteria.where("_id").gt(lastId))
-                    }
-                    query.addCriteria(Criteria.where("processId").is(processId))
-                    query.addCriteria(Criteria.where("transitionId").in(transitionIds))
-                    query.limit(pageSize as Integer)
-
-                    List<Task> tasks = mongoTemplate.find(query, Task.class)
-                    tasks.each { update(it) }
-                    tasks = taskRepository.saveAll(tasks)
-
-                    lastId = tasks.get(tasks.size() - 1).objectId
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    log.error("Failed to iterate page " + (p + 1))
-                    break
-                }
-            }
-        }
+        taskMigrationHelper.updateSpecificTasksCursor(update, processIdentifier, transitionIds, pageSize)
     }
 
     /**
@@ -329,35 +192,7 @@ class MigrationHelper {
      * @param pageSize Optional attribute to set page size. Default page size 100.0
      */
     void updateAllTasksCursor(Closure update, double pageSize = 100.0) {
-        long taskCount = taskRepository.count()
-        long numOfPages = ((taskCount / pageSize) + 1) as long
-        log.info("Page size: $pageSize")
-        log.info("Processing tasks: $numOfPages pages")
-        ObjectId lastId = null
-        if (taskCount > 0) {
-            for (int p = 0; p < numOfPages; p++) {
-                try {
-                    log.info("Page " + (p + 1) + " / $numOfPages")
-
-                    Query query = new Query()
-                    if (lastId == null) {
-                        query.skip(0)
-                    } else {
-                        query.addCriteria(Criteria.where("_id").gt(lastId))
-                    }
-                    query.limit(pageSize as Integer)
-
-                    List<Task> tasks = mongoTemplate.find(query, Task.class)
-                    tasks.each { update(it) }
-                    tasks = taskRepository.saveAll(tasks)
-
-                    lastId = tasks.get(tasks.size() - 1).objectId
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    log.error("Failed to iterate page " + (p + 1))
-                    break
-                }
-            }
-        }
+        taskMigrationHelper.updateAllTasksCursor(update, pageSize)
     }
 
     /**
@@ -366,8 +201,7 @@ class MigrationHelper {
      * @param resource Resource object with new version of Petri Net model
      */
     void updateNetIgnoreRoles(String identifier, Resource resource, List<Closure<PetriNet>> customUpdates = null) {
-        PetriNet reimported = service.importPetriNet(resource.inputStream, VersionType.MAJOR, userService.system.transformToLoggedUser()).getNet()
-        updateNetIgnoreRoles(service.getNewestVersionByIdentifier(identifier), reimported, customUpdates)
+        petriNetMigrationHelper.updateNetIgnoreRoles(identifier, resource, customUpdates)
     }
 
     /**
@@ -376,12 +210,7 @@ class MigrationHelper {
      * @param fileName File name of new version of Petri Net model
      */
     void updateNetIgnoreRoles(String identifier, String fileName, List<Closure<PetriNet>> customUpdates = null) {
-        PetriNet currentNet = service.getNewestVersionByIdentifier(identifier)
-        InputStream inputStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
-        IOUtils.copy(inputStream, outputStream)
-        PetriNet reimported = getImporter().importPetriNet(new ByteArrayInputStream(outputStream.toByteArray())).get()
-        updateNetIgnoreRoles(currentNet, reimported, customUpdates)
+        petriNetMigrationHelper.updateNetIgnoreRoles(identifier, fileName, customUpdates)
     }
 
     /**
@@ -390,84 +219,7 @@ class MigrationHelper {
      * @param reimported New version of Petri Net object, its values will be applied to currentNet
      */
     void updateNetIgnoreRoles(PetriNet currentNet, PetriNet reimported, List<Closure<PetriNet>> customUpdates) {
-        if (!currentNet) {
-            log.warn("Net $reimported.identifier does not exist")
-            return
-        }
-        Map<String, ProcessRole> oldProcessRoles = currentNet.roles
-        Map<String, ProcessRole> newProcessRoles = reimported.roles
-
-        reimported = replaceUserFieldRoleReferences(currentNet, reimported)
-
-        ProcessRole defaultRole = roleRepository.findAllByName_DefaultValue(ProcessRole.DEFAULT_ROLE).first()
-        ProcessRole anonymousRole = roleRepository.findAllByName_DefaultValue(ProcessRole.ANONYMOUS_ROLE).first()
-
-        currentNet.places = reimported.places
-        currentNet.transitions = reimported.transitions
-        currentNet.arcs = reimported.arcs
-        currentNet.dataSet = reimported.clone().dataSet
-        currentNet.transactions = reimported.transactions
-        currentNet.importId = reimported.importId
-        currentNet.caseEvents = reimported.caseEvents
-        currentNet.processEvents = reimported.processEvents
-        currentNet.negativeViewRoles = reimported.negativeViewRoles
-        currentNet.userRefs = reimported.userRefs
-        currentNet.functions = reimported.functions
-
-        def newPermissions = [:]
-        reimported.permissions.each { id, permissions ->
-            def newRole = newProcessRoles[id]
-
-            if (!newRole && (defaultRole.stringId == id || anonymousRole.stringId == id)) {
-                log.info("Default role $id on process $currentNet.identifier detected, skipping")
-                newPermissions[id] = permissions
-
-            } else {
-                def oldRole = oldProcessRoles.values().find {
-                    it.importId == newRole.importId
-                }
-
-                if (!oldRole) {
-                    log.warn("Old role does not exist for role $newRole.importId")
-                    return
-                }
-                newPermissions[oldRole.stringId] = permissions
-            }
-        }
-        currentNet.permissions = newPermissions as Map<String, Map<String, Boolean>>
-
-        currentNet.transitions.each { id, t ->
-            Map<String, Map<String, Boolean>> oldRoles = new HashMap<>()
-            t.roles.each { roleMongoId, permissions ->
-                def newRole = newProcessRoles[roleMongoId]
-
-                if (!newRole && (defaultRole.stringId == roleMongoId || anonymousRole.stringId == roleMongoId)) {
-                    log.info("Default role $roleMongoId on transition ${t.importId} detected, skipping")
-                    oldRoles[roleMongoId] = permissions
-
-                } else {
-                    def oldRole = oldProcessRoles.values().find {
-                        it.importId == newRole.importId
-                    }
-
-                    if (!oldRole) {
-                        log.warn("Old role does not exist for role $newRole.importId")
-                        return
-                    }
-                    oldRoles[oldRole.stringId] = permissions
-                }
-            }
-            t.roles = oldRoles
-        }
-
-        resolveDataOrder(currentNet)
-
-        customUpdates && customUpdates.each { Closure<PetriNet> customUpdate ->
-            currentNet = customUpdate(currentNet, reimported)
-        }
-
-        service.save(currentNet)
-        log.info("Migrated $currentNet.identifier")
+        petriNetMigrationHelper.updateNetIgnoreRoles(currentNet, reimported, customUpdates)
     }
 
     /**
@@ -478,8 +230,7 @@ class MigrationHelper {
      * @param permissions New role permissions on transition
      */
     void updateTransitionRoles(PetriNet net, String transitionId, ProcessRole role, Map<String, Boolean> permissions) {
-        Transition trans = net.transitions.values().find { it.importId == transitionId }
-        trans.roles[role.stringId] = permissions
+        petriNetMigrationHelper.updateTransitionRoles(net, transitionId, role, permissions)
     }
 
     /**
@@ -490,8 +241,7 @@ class MigrationHelper {
      * @param permissions New role permissions on transition
      */
     void updateTransitionRoles(PetriNet net, String transitionId, String roleImportId, Map<String, Boolean> permissions) {
-        ProcessRole role = net.roles.values().find { it.importId == roleImportId }
-        updateTransitionRoles(net, transitionId, role, permissions)
+        petriNetMigrationHelper.updateTransitionRoles(net, transitionId, roleImportId, permissions)
     }
 
     /**
@@ -501,10 +251,7 @@ class MigrationHelper {
      * @param permissions New role permissions on transition
      */
     Closure<PetriNet> updateTransitionRolesClosure(String transitionId, String roleImportId, Map<String, Boolean> permissions) {
-        return { PetriNet petriNet, PetriNet reimported ->
-            updateTransitionRoles(petriNet, transitionId, roleImportId, permissions)
-            return petriNet
-        }
+        petriNetMigrationHelper.updateTransitionRolesClosure(transitionId, roleImportId, permissions)
     }
 
     /**
@@ -513,59 +260,7 @@ class MigrationHelper {
      * @param fileName File name of new version of Petri Net model
      */
     void updateDataSet(String identifier, String fileName, Closure<PetriNet> customUpdate = null) {
-        PetriNet existing = service.getNewestVersionByIdentifier(identifier)
-        PetriNet reimported = getImporter().importPetriNet(new File("src/main/resources/petriNets/" + fileName)).get()
-
-        reimported = replaceUserFieldRoleReferences(existing, reimported)
-
-        existing.dataSet = reimported.dataSet
-
-        if (customUpdate) {
-            existing = customUpdate(existing, reimported)
-        }
-
-        service.save(existing)
-        log.info("Migrated $identifier")
-    }
-
-    /**
-     * Updates roles of USER fields in existing Petri Net model, WARNING: new roles referenced in USER fields will be ignored! They need to be migrated manually
-     * @param originalNet Current Petri Net object that will be updated
-     * @param reimportedNet New version of Petri Net object, its values will be applied to currentNet
-     */
-    private PetriNet replaceUserFieldRoleReferences(PetriNet originalNet, PetriNet reimportedNet) {
-        Map<String, ProcessRole> originalNetRoles = [:] // importId: processRole
-        originalNet.roles.forEach { name, role ->
-            originalNetRoles.put(role.importId, role)
-        }
-
-        reimportedNet.dataSet.entrySet().stream().filter {
-            it.value.type == FieldType.USER
-
-        }.forEach { entry ->
-            UserField field = (reimportedNet.dataSet[entry.key] as UserField)
-            field.roles = field.roles.collect { roleId ->
-                Optional<ProcessRole> roleOpt = Optional.ofNullable(reimportedNet.roles[roleId])
-                if (roleOpt.isPresent()) {
-                    ProcessRole oldRole = originalNetRoles[roleOpt.get().importId]
-
-                    if (!oldRole) {
-                        log.warn("Process role in process ${originalNet.identifier} ${originalNet.stringId} with import id ${roleOpt.get().importId} not found!")
-                        return null
-
-                    } else {
-                        return oldRole.stringId
-                    }
-
-                } else {
-                    log.warn("Role not found! ${roleId}")
-                    return null
-                }
-            }.stream().filter { Objects.nonNull(it) }.collect()
-
-        }
-
-        return reimportedNet
+        petriNetMigrationHelper.updateDataSet(identifier, fileName, customUpdate)
     }
 
     /**
@@ -575,7 +270,7 @@ class MigrationHelper {
      * @param title Title of the new Process Role
      */
     def createRoleInNet(String identifier, String id, String title, Map<EventType, Event> events = [:]) {
-        return createRoleInNet(identifier, id, new I18nString(title), events)
+        return petriNetMigrationHelper.createRoleInNet(identifier, id, title, events)
     }
 
     /**
@@ -585,18 +280,7 @@ class MigrationHelper {
      * @param title Title of the new Process Role
      */
     def createRoleInNet(String identifier, String id, I18nString title, Map<EventType, Event> events = [:]) {
-        PetriNet net = service.getNewestVersionByIdentifier(identifier)
-
-        ProcessRole role = new ProcessRole()
-        role.setImportId(id)
-        role.setName(title)
-        role.setEvents(events)
-
-        role = roleRepository.save(role)
-        net.addRole(role)
-        netRepository.save(net)
-
-        return role
+        return petriNetMigrationHelper.createRoleInNet(identifier, id, title, events)
     }
 
     /**
@@ -605,7 +289,7 @@ class MigrationHelper {
      * @param title Title of the new Process Role
      */
     def createGlobalRole(String id, String title, Map<EventType, Event> events = [:]) {
-        return createGlobalRole(id, new I18nString(title), events)
+        return petriNetMigrationHelper.createGlobalRole(id, title, event)
     }
 
     /**
@@ -614,36 +298,7 @@ class MigrationHelper {
      * @param title Title of the new Process Role
      */
     def createGlobalRole(String id, I18nString title, Map<EventType, Event> events = [:]) {
-        ProcessRole role = new ProcessRole()
-
-        if (!id.startsWith("global_")) {
-            role.setImportId("global_" + id)
-        } else {
-            role.setImportId(id)
-        }
-        role.setName(title)
-        role.setEvents(events)
-        role.setGlobal(true)
-
-        role = roleRepository.save(role)
-
-        return role
-    }
-
-    /**
-     * Replaces events in roles from existing with events from roles from reimported
-     */
-    Closure<PetriNet> updateRoleEvents = { PetriNet existing, PetriNet reimported ->
-        List<ProcessRole> newRoles = reimported.roles.values() as List
-        List<ProcessRole> oldRoles = existing.roles.values() as List
-
-        newRoles.each { newRole ->
-            ProcessRole role = oldRoles.find { it.importId == newRole.importId }
-            role.events = newRole.events
-            roleRepository.save(role)
-        }
-
-        return existing
+        return petriNetMigrationHelper.createGlobalRole(id, title, events)
     }
 
     /**
@@ -653,8 +308,7 @@ class MigrationHelper {
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
     void reloadTasks(Case useCase, PetriNet net) {
-        setPetriNet(useCase, net)
-        taskService.reloadTasks(useCase)
+        taskMigrationHelper.reloadTasks(useCase, net)
     }
 
     /**
@@ -663,19 +317,7 @@ class MigrationHelper {
      * @param useCase Instance of Case that will be indexed into elasticsearch index
      */
     void elasticIndex(Case useCase) {
-        try {
-            setPetriNet(useCase, service.getNewestVersionByIdentifier(useCase.processIdentifier))
-            assert useCase.petriNet
-            elasticCaseService.indexNow(caseMappingService.transform(useCase))
-        } catch (Exception ex) {
-            if (useCase.lastModified == null) {
-                log.error("Creating new lastModified date for $useCase.stringId")
-                useCase.lastModified = LocalDateTime.now()
-                elasticCaseService.indexNow(caseMappingService.transform(useCase))
-            } else {
-                log.error("Failed to index $useCase.stringId", ex)
-            }
-        }
+        caseMigrationHelper.elasticIndex(useCase)
     }
 
     /**
@@ -683,11 +325,7 @@ class MigrationHelper {
      * @param task Instance of Task that will be indexed into elasticsearch index
      */
     void elasticTaskIndex(Task task) {
-        try {
-            elasticTaskService.indexNow(elasticTaskMappingService.transform(task))
-        } catch (Exception e) {
-            log.error("Failed to index $task.stringId", e)
-        }
+        taskMigrationHelper.elasticTaskIndex(task)
     }
 
     /**
@@ -698,10 +336,7 @@ class MigrationHelper {
      * @param permissions Map of permissions for the role
      */
     void addRoleToExistingTasks(ProcessRole role, PetriNet net, List<String> transitionIds, Map<String, Boolean> permissions) {
-        updateTasks({ Task task ->
-            log.info("Add role '${role.getName()}' with roleId=${role.getImportId()} to transitionId=${task.getTransitionId()} in task ${task.stringId}")
-            task.addRole(role.getStringId(), permissions)
-        }, QTask.task.transitionId.in(transitionIds) & QTask.task.processId.eq(net.getStringId()))
+        taskMigrationHelper.addRoleToExistingTasks(role, net, transitionIds, permissions)
     }
 
     /**
@@ -710,10 +345,7 @@ class MigrationHelper {
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
     void setPetriNet(Case useCase, PetriNet net) {
-        PetriNet model = net.clone()
-        model.initializeTokens(useCase.getActivePlaces())
-        model.initializeArcs(useCase.getDataSet())
-        useCase.setPetriNet(model)
+        PetriNetMigrationHelper.setPetriNet(useCase, net)
     }
 
     /**
@@ -722,9 +354,7 @@ class MigrationHelper {
      * @param toDelete List of field IDs that will be deleted from useCase
      */
     void deleteDataFields(Case useCase, List<String> toDelete) {
-        toDelete.each { dataFieldID ->
-            useCase.dataSet.remove(dataFieldID)
-        }
+        caseMigrationHelper.deleteDataFields(useCase, toDelete)
     }
 
     /**
@@ -733,12 +363,7 @@ class MigrationHelper {
      * @param toChange List of field IDs for value change
      */
     void changeDataFieldsValueFromNumberToText(Case useCase, List<String> toChange) {
-        toChange.each { dataFieldID ->
-            if (useCase.dataSet[dataFieldID].value && (useCase.dataSet[dataFieldID].value != null || useCase.dataSet[dataFieldID].value != "")) {
-                double value = useCase.dataSet[dataFieldID].value as double
-                useCase.dataSet[dataFieldID].value = value as String
-            }
-        }
+        caseMigrationHelper.changeDataFieldsValueFromNumberToText(useCase, toChange)
     }
 
     /**
@@ -747,16 +372,7 @@ class MigrationHelper {
      * @param toChange List of field IDs for value change
      */
     void changeDataFieldsValueFromTextToNumber(Case useCase, List<String> toChange) {
-        toChange.each { dataFieldID ->
-            if (useCase.dataSet[dataFieldID].value && useCase.dataSet[dataFieldID].value != "") {
-                try {
-                    useCase.dataSet[dataFieldID].value = useCase.dataSet[dataFieldID].value as double
-                } catch (Exception e) {
-                    useCase.dataSet[dataFieldID].value = null
-                    log.error("[${useCase.stringId}] could not convert value ${useCase.dataSet[dataFieldID].value} in field ${dataFieldID}", e)
-                }
-            }
-        }
+        caseMigrationHelper.changeDataFieldsValueFromTextToNumber(useCase, toChange)
     }
 
     /**
@@ -765,9 +381,7 @@ class MigrationHelper {
      * @param toAdd Map<field id, init value of field>
      */
     void addTextDataFields(Case useCase, Map<String, String> toAdd) {
-        toAdd.each { dataFieldID, value ->
-            useCase.dataSet[dataFieldID] = new DataField(value)
-        }
+        caseMigrationHelper.addTextDataFields(useCase, toAdd)
     }
 
     /**
@@ -776,20 +390,7 @@ class MigrationHelper {
      * @param toChange List of field IDs for value change
      */
     void changeDataFieldsValueFromEnumerationToMultichoice(Case useCase, List<String> toChange) {
-        toChange.each { dataFieldID ->
-            if (useCase.dataSet[dataFieldID].value && useCase.dataSet[dataFieldID].value != null) {
-                def value
-                if (useCase.dataSet[dataFieldID].value instanceof I18nString) {
-                    value = useCase.dataSet[dataFieldID].value as I18nString
-                } else {
-                    value = new I18nString(useCase.dataSet[dataFieldID].value as String)
-                }
-
-                def newSet = new HashSet<I18nString>()
-                newSet.add(value)
-                useCase.dataSet[dataFieldID].value = newSet
-            }
-        }
+        caseMigrationHelper.changeDataFieldsValueFromEnumerationToMultichoice(useCase, toChange)
     }
 
     /**
@@ -798,15 +399,7 @@ class MigrationHelper {
      * @param toAdd Map<field id, list of choices to add into data data field>
      */
     void addChoices(Case useCase, Map<String, List<String>> toAdd) {
-        toAdd.each { dataFieldID, newChoices ->
-            if (useCase.dataSet[dataFieldID].choices == null) {
-                useCase.dataSet[dataFieldID].setChoices(new HashSet<I18nString>())
-            }
-
-            newChoices.each {
-                useCase.dataSet[dataFieldID].choices.add(new I18nString(it))
-            }
-        }
+        caseMigrationHelper.addChoices(useCase, toAdd)
     }
 
     /**
@@ -815,15 +408,7 @@ class MigrationHelper {
      * @param toAdd Map<field id, list of choices to add into data field>
      */
     void removeChoices(Case useCase, Map<String, List<String>> toRemove) {
-        toRemove.each { dataFieldID, choicesToRemove ->
-            if (useCase.dataSet[dataFieldID].value != null) {
-                (useCase.dataSet[dataFieldID].value as Set).removeAll(choicesToRemove)
-            }
-
-            if (useCase.dataSet[dataFieldID].choices != null) {
-                useCase.dataSet[dataFieldID].choices.removeAll(choicesToRemove)
-            }
-        }
+        caseMigrationHelper.removeChoices(useCase, toRemove)
     }
 
     /**

@@ -60,6 +60,7 @@ public class DataField implements Referencable, Serializable {
     private Long version = 0l;
 
     @Getter
+    @Setter
     private Map<String, Component> dataRefComponents;
 
     @Getter
