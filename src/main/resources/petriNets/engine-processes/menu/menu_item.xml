@@ -449,6 +449,17 @@
 		<id>use_tabbed_view</id>
 		<title name="use_tabbed_view">Do you want to use view with tabs?</title>
 		<init>true</init>
+		<event type="set">
+			<id>0</id>
+			<actions phase="post">
+				<action>
+					use_tabbed_view: f.use_tabbed_view,
+					use_tab_icon: f.use_tab_icon;
+
+					manageBehaviorOfTabFields(use_tab_icon.value, use_tabbed_view.value)
+				</action>
+			</actions>
+		</event>
 	</data>
 
 	<!-- TABBED configuration data -->
@@ -1550,10 +1561,7 @@
 					<actions phase="post">
 						<action>
 							use_tabbed_view: f.use_tabbed_view,
-							use_tab_icon: f.use_tab_icon,
 							view_configuration_type: f.view_configuration_type;
-
-							manageBehaviorOfTabFields(use_tab_icon.value, use_tabbed_view.value)
 
 							change view_configuration_type value { null }
 							change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(use_tabbed_view.value, true) }

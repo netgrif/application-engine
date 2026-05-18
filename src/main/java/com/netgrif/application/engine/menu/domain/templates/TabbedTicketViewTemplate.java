@@ -12,7 +12,7 @@ public class TabbedTicketViewTemplate implements Template {
     public static final String IDENTIFIER = "tabbed_ticket_view";
 
     private static final I18nString NAME = new I18nString("Tabbed ticket view",
-            Map.of("sk", "", "de", "")); // todo 23 translate
+            Map.of("sk", "Tiketové zobrazenie", "de", "Ticketansicht"));
 
     private static final MenuItemBody TEMPLATE = buildTemplate();
 

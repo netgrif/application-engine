@@ -30,7 +30,7 @@ public class MenuController {
 
     private final IMenuItemService menuItemService;
 
-    // todo 23 menu item authorization
+    // todo menu item authorization
     @Operation(summary = "Get relevant data for the menu item", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{encodedCaseId}", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<MenuItemDataResponse> getMenuItemData(@PathVariable("encodedCaseId") String encodedCaseId, Locale locale) {
@@ -44,6 +44,6 @@ public class MenuController {
         }
     }
 
-    // todo 23 search with authorization
+    // todo search with authorization
 }
 

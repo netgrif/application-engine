@@ -11,7 +11,7 @@ public class SimpleCaseViewTemplate implements Template {
     public static final String IDENTIFIER = "simple_case_view";
 
     private static final I18nString NAME = new I18nString("Simple case view",
-            Map.of("sk", "", "de", "")); // todo 23 translate
+            Map.of("sk", "Zobrazenie prípadov", "de", "Fallansicht"));
 
     private static final MenuItemBody TEMPLATE = buildTemplate();
 

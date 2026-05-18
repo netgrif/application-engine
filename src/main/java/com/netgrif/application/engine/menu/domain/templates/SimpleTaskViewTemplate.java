@@ -11,7 +11,7 @@ public class SimpleTaskViewTemplate implements Template {
     public static final String IDENTIFIER = "simple_task_view";
 
     private static final I18nString NAME = new I18nString("Simple task view",
-            Map.of("sk", "", "de", "")); // todo 23 translate
+            Map.of("sk", "Zobrazenie úloh", "de", "Aufgabenansicht"));
 
     private static final MenuItemBody TEMPLATE = buildTemplate();
 

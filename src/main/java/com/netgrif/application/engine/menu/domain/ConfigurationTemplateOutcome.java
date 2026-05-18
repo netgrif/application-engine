@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigurationTemplateOutcome {
-    // todo 23 doc
+    /**
+     * Map of field data where the key is field ID and the value is field value.
+     */
     public final Map<String, Object> mapping;
 
     public ConfigurationTemplateOutcome() {
