@@ -18,7 +18,6 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 import java.util.List;
@@ -219,7 +218,7 @@ public interface ActionApi {
      * @param authPrincipalDto     the authorization principal used for the search
      * @param isIntersection       true to intersect results of all queries; false for union
      * @param params            additional params for the operation
-     * @return a page of tasks matching the criteria
+     * @return number of tasks matching the query
      */
     Long countTasks(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Boolean isIntersection, Map<String, String> params);
 
