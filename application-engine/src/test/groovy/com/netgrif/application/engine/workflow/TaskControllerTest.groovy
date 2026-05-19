@@ -102,7 +102,7 @@ class TaskControllerTest {
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
-        userService.saveUser(new User(
+        userService.saveUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(
                 firstName: "Dummy",
                 lastName: "Netgrif",
                 username: DUMMY_USER_MAIL,

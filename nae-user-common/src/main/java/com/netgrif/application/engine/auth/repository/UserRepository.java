@@ -202,7 +202,7 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
      */
     default Page<User> findAllByProcessRoles__idIn(Collection<ProcessResourceId> rolesId, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
         Query query = Query.query(
-                Criteria.where("processRoles._id").in(rolesId));
+                Criteria.where("processRoleIds").in(rolesId.stream().map(ProcessResourceId::toString).toList()));
         return resolveUserPage(pageable, mongoTemplate, collection, query);
     }
 

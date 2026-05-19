@@ -9,10 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Abstract base class for actors in the system representing entities with authentication and authorization capabilities.
@@ -34,8 +32,12 @@ public abstract class AbstractActor implements Serializable {
     /** Map of actor's attributes with their values and requirement status */
     protected Map<String, Attribute<?>> attributes = new HashMap<>();
 
+    protected Set<String> authorityIds = new HashSet<>();
+
     /** Set of authorities (permissions) assigned to this actor */
     protected Set<Authority> authoritySet = new HashSet<>();
+
+    protected Set<String> processRoleIds = new HashSet<>();
 
     /** Set of process-specific roles assigned to this actor */
     protected Set<ProcessRole> processRoles = new HashSet<>();
@@ -184,11 +186,17 @@ public abstract class AbstractActor implements Serializable {
         return true;
     }
 
+    public void setAuthorityIds(Set<String> authorityIds) {
+        this.authorityIds = authorityIds == null ? new HashSet<>() : new HashSet<>(authorityIds);
+        this.authoritySet = new HashSet<>();
+    }
+
     /**
      * Sets the authority set with a defensive copy.
      * @param authoritySet set of authorities to set, null creates empty set
      */
     public void setAuthoritySet(Set<Authority> authoritySet) {
+        this.authorityIds = authoritySet == null ? new HashSet<>() : authoritySet.stream().map(Authority::getStringId).collect(Collectors.toSet());
         this.authoritySet = authoritySet == null ? new HashSet<>() : new HashSet<>(authoritySet);
     }
 
@@ -197,9 +205,16 @@ public abstract class AbstractActor implements Serializable {
      * @param authority the authority to add
      */
     public void addAuthority(Authority authority) {
+        if (authority == null) {
+            return;
+        }
+        if (this.authorityIds == null) {
+            this.authorityIds = new HashSet<>();
+        }
         if (this.authoritySet == null) {
             this.authoritySet = new HashSet<>();
         }
+        this.authorityIds.add(authority.getStringId());
         this.authoritySet.add(authority);
     }
 
@@ -208,6 +223,14 @@ public abstract class AbstractActor implements Serializable {
      * @param authority the authority to remove
      */
     public void removeAuthority(Authority authority) {
+        if (authority == null) {
+            return;
+        }
+        if (this.authorityIds == null) {
+            this.authorityIds = new HashSet<>();
+        } else {
+            this.authorityIds.remove(authority.getStringId());
+        }
         if (this.authoritySet == null) {
             this.authoritySet = new HashSet<>();
         } else if (!this.authoritySet.remove(authority)) {
@@ -222,9 +245,18 @@ public abstract class AbstractActor implements Serializable {
     public void removeAuthorityByName(String name) {
         if (this.authoritySet == null) {
             this.authoritySet = new HashSet<>();
-        } else {
-            this.authoritySet.removeIf(it -> it.getName().equals(name));
+        }  else {
+            Optional<Authority> authorityOpt = authoritySet.stream().filter(it -> it.getName().equals(name)).findFirst();
+            if (authorityOpt.isPresent()) {
+                this.authorityIds.remove(authorityOpt.get().getStringId());
+                this.authoritySet.remove(authorityOpt.get());
+            }
         }
+    }
+
+    public void setProcessRoleIds(Set<String> processRoleIds) {
+        this.processRoleIds = processRoleIds == null ? new HashSet<>() : new HashSet<>(processRoleIds);
+        this.processRoles = new HashSet<>();
     }
 
     /**
@@ -232,6 +264,7 @@ public abstract class AbstractActor implements Serializable {
      * @param processRoleSet set of process roles to set, null creates empty set
      */
     public void setProcessRoles(Set<ProcessRole> processRoleSet) {
+        this.processRoleIds = processRoleSet == null ? new HashSet<>() : processRoleSet.stream().map(ProcessRole::getStringId).collect(Collectors.toSet());
         this.processRoles = processRoleSet == null ? new HashSet<>() : new HashSet<>(processRoleSet);
     }
 
@@ -240,10 +273,31 @@ public abstract class AbstractActor implements Serializable {
      * @param role the process role to add
      */
     public void addProcessRole(ProcessRole role) {
+        if (role == null) {
+            return;
+        }
+        if (this.processRoleIds == null) {
+            this.processRoleIds = new HashSet<>();
+        }
         if (this.processRoles == null) {
             this.processRoles = new HashSet<>();
         }
+        this.processRoleIds.add(role.getStringId());
         this.processRoles.add(role);
+    }
+
+    public void addAllProcessRoles(Collection<ProcessRole> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return;
+        }
+        if (this.processRoleIds == null) {
+            this.processRoleIds = new HashSet<>();
+        }
+        if (this.processRoles == null) {
+            this.processRoles = new HashSet<>();
+        }
+        this.processRoleIds.addAll(roles.stream().map(ProcessRole::getStringId).toList());
+        this.processRoles.addAll(roles);
     }
 
     /**
@@ -251,6 +305,14 @@ public abstract class AbstractActor implements Serializable {
      * @param role the process role to remove
      */
     public void removeProcessRole(ProcessRole role) {
+        if (role == null) {
+            return;
+        }
+        if (this.processRoleIds == null) {
+            this.processRoleIds = new HashSet<>();
+        } else {
+            this.processRoleIds.remove(role.getStringId());
+        }
         if (this.processRoles == null) {
             this.processRoles = new HashSet<>();
         } else if (!this.processRoles.remove(role)) {
@@ -263,10 +325,28 @@ public abstract class AbstractActor implements Serializable {
      * @param id ID of the process role to remove
      */
     public void removeProcessRoleById(String id) {
+        if (this.processRoleIds == null) {
+            this.processRoleIds = new HashSet<>();
+        } else {
+            this.processRoleIds.remove(id);
+        }
         if (this.processRoles == null) {
             this.processRoles = new HashSet<>();
         } else {
             this.processRoles.removeIf(it -> it.getStringId().equals(id));
+        }
+    }
+
+    public void clearProcessRoles() {
+        if (this.processRoleIds == null) {
+            this.processRoleIds = new HashSet<>();
+        } else {
+            this.processRoleIds.clear();
+        }
+        if (this.processRoles == null) {
+            this.processRoles = new HashSet<>();
+        } else {
+            this.processRoles.clear();
         }
     }
 

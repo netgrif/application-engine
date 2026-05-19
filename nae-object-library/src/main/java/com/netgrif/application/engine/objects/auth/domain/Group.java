@@ -16,7 +16,7 @@ import java.util.Set;
  */
 @Getter
 @QueryEntity
-public class Group extends AbstractActor implements Serializable {
+public abstract class Group extends AbstractActor implements Serializable {
 
     /**
      * The unique identifier of the group.

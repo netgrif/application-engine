@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @QueryEntity
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class User extends AbstractUser implements Serializable {
+public abstract class User extends AbstractUser implements Serializable {
 
     /**
      * Flag indicating whether the user's email has been verified

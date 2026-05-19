@@ -55,7 +55,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
 
         Optional<AbstractUser> superUser = userService.findUserByUsername(UserConstants.ADMIN_USER_USERNAME, null);
         if (superUser.isEmpty()) {
-            User user = new User();
+            User user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
             user.setFirstName(UserConstants.ADMIN_USER_FIRST_NAME);
             user.setLastName(UserConstants.ADMIN_USER_LAST_NAME);
             user.setUsername(UserConstants.ADMIN_USER_USERNAME);

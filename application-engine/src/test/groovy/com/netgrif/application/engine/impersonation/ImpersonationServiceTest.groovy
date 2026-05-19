@@ -131,21 +131,21 @@ class ImpersonationServiceTest {
         def authorityAnon = authorityService.getOrCreate(Authority.anonymous)
         def authorityAdmin = authorityService.getOrCreate(Authority.admin)
 
-        user1 = helper.createUser(new User(firstName: "Test", lastName: "User", email: "test@netgrif.com", "username": "test@netgrif.com", password: "password", state: UserState.ACTIVE),
+        user1 = helper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Test", lastName: "User", email: "test@netgrif.com", "username": "test@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority] as Authority[],
                 [] as ProcessRole[])
 
         auth1 = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(user1), (user1 as User).password, user1.authoritySet as List<GrantedAuthority>)
         auth1.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        user2 = helper.createUser(new User(firstName: "Test", lastName: "User2", email: "test2@netgrif.com", "username": "test2@netgrif.com", password: "password", state: UserState.ACTIVE),
+        user2 = helper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Test", lastName: "User2", email: "test2@netgrif.com", "username": "test2@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority, authorityAnon] as Authority[],
                 testNet.roles.values() as ProcessRole[])
 
         auth2 = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(user2), (user2 as User).password, user2.authoritySet as List<GrantedAuthority>)
         auth2.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        adminUser = helper.createUser(new User(firstName: "Admin", lastName: "User", email: "admin@netgrif.com", "username": "admin@netgrif.com", password: "password", state: UserState.ACTIVE),
+        adminUser = helper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Admin", lastName: "User", email: "admin@netgrif.com", "username": "admin@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority, authorityAdmin] as Authority[],
                 testNet.roles.values() as ProcessRole[])
 

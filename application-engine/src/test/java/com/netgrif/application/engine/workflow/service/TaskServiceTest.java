@@ -117,7 +117,7 @@ public class TaskServiceTest {
                 .color("color")
                 .author(loggedUser)
                 .build());
-        User user = new User();
+        User user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
         user.setFirstName("name");
         user.setPassword("password");
         user.setLastName("surname");

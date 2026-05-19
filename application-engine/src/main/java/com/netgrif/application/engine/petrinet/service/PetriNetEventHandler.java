@@ -16,7 +16,6 @@ public class PetriNetEventHandler extends AbstractMongoEventListener<PetriNet> {
 
     @Autowired
     private IElasticPetriNetService service;
-
     @Override
     public void onAfterDelete(AfterDeleteEvent<PetriNet> event) {
         Document document = event.getDocument();
