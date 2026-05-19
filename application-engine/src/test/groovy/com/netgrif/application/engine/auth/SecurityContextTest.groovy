@@ -67,7 +67,7 @@ class SecurityContextTest {
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
-        user = new User()
+        user = new com.netgrif.application.engine.adapter.spring.auth.domain.User()
         user.setUsername('test@email.com')
         user.setEmail('test@email.com')
         user.setCredential("password", new PasswordCredential('password', 0, true))

@@ -51,7 +51,9 @@ public class ActorTransformer {
         loggedUser.setFirstName(user.getFirstName());
         loggedUser.setMiddleName(user.getMiddleName());
         loggedUser.setLastName(user.getLastName());
+        loggedUser.setAuthorityIds(user.getAuthorityIds());
         loggedUser.setAuthoritySet(user.getAuthoritySet());
+        loggedUser.setProcessRoleIds(user.getProcessRoleIds());
         loggedUser.setProcessRoles(user.getProcessRoles());
         loggedUser.setAttributes(user.getAttributes());
         loggedUser.setGroupIds(user.getGroupIds());

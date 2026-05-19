@@ -106,7 +106,7 @@ class ElasticSearchViewPermissionTest {
 
         userAuthority = authorityService.getOrCreate(Authority.user)
 
-        testUser = importHelper.createUser(new User(firstName: "Role", lastName: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        testUser = importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Role", lastName: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [userAuthority] as Authority[], [] as ProcessRole[])
     }
 

@@ -132,7 +132,7 @@ public class RegistrationService implements IRegistrationService {
             }
             log.info("Renewing old user [{}]", newUser.email);
         } else {
-            user = new User();
+            user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
             user.setEmail(newUser.email);
             user.setUsername(newUser.email);
             log.info("Creating new user [{}]", newUser.email);

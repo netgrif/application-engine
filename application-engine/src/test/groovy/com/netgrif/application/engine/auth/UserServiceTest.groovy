@@ -135,7 +135,7 @@ class UserServiceTest {
         Optional<AbstractUser> userOptional = userService.findUserByUsername("dummy@netgrif.com", null)
         User user = null
         if (userOptional.isEmpty()) {
-            user = new User()
+            user = new com.netgrif.application.engine.adapter.spring.auth.domain.User()
             user.setFirstName("Dummy")
             user.setLastName("User")
             user.setUsername("dummy@netgrif.com")

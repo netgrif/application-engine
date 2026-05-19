@@ -105,7 +105,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private LoggedUser createAnonymousUser() {
-        User anonymousUser = new User();
+        User anonymousUser = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
         anonymousUser.setState(UserState.ACTIVE);
         anonymousUser = (User) userService.saveUser(anonymousUser, null);
         return ActorTransformer.toLoggedUser(anonymousUser);

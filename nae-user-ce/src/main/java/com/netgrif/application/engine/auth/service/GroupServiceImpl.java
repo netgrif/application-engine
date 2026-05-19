@@ -176,7 +176,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group create(String identifier, String title, AbstractUser groupOwner) {
         log.info("Creating default group for user: [{}]", groupOwner.getStringId());
-        Group group = new Group(identifier, groupOwner.getRealmId());
+        Group group = new com.netgrif.application.engine.adapter.spring.auth.domain.Group(identifier, groupOwner.getRealmId());
         group.setOwnerId(groupOwner.getStringId());
         group.setOwnerUsername(groupOwner.getUsername());
         group.setDisplayName(title);
