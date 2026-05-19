@@ -393,6 +393,11 @@
         <title/>
     </data>
 
+    <data type="boolean" immediate="true">
+        <id>case_allow_export</id>
+        <title name="case_allow_export">Allow export?</title>
+    </data>
+
     <!-- I18NS -->
     <i18n locale="sk">
         <i18nString name="create_case_button_title">Názov tlačidla "Nová inštancia"</i18nString>
@@ -428,6 +433,7 @@
         <i18nString name="view_configuration_type">Vybrať zobrazenie</i18nString>
         <i18nString name="settings">Nastavenie</i18nString>
         <i18nString name="associated_view">Asociované zobrazenie</i18nString>
+        <i18nString name="case_allow_export">Povoliť export?</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
@@ -463,6 +469,7 @@
         <i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
         <i18nString name="settings">Einstellungen</i18nString>
         <i18nString name="associated_view">zugehörige Ansicht</i18nString>
+        <i18nString name="case_allow_export">Erlaube Export?</i18nString>
     </i18n>
 
     <transition>
@@ -892,6 +899,18 @@
                     <offset>0</offset>
                     <template>material</template>
                     <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+            <id>case_allow_export</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>999</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
                 </layout>
             </dataRef>
         </dataGroup>

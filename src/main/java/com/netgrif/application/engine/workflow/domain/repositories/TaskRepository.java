@@ -16,6 +16,8 @@ public interface TaskRepository extends MongoRepository<Task, String>, QuerydslP
 
     List<Task> findAllByCaseId(String id);
 
+    List<Task> findAllByCaseIdIn(Collection<String> ids);
+
     Page<Task> findByCaseIdIn(Pageable pageable, Collection<String> ids);
 
     Page<Task> findByTransitionIdIn(Pageable pageable, Collection<String> ids);
