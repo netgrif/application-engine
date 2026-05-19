@@ -4,42 +4,42 @@ import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRol
 import com.netgrif.application.engine.objects.auth.domain.AbstractActor;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
-import lombok.RequiredArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
-import org.springframework.data.mongodb.core.mapping.event.AfterConvertEvent;
-import org.springframework.data.mongodb.core.mapping.event.AfterLoadEvent;
+import org.bson.Document;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.mongodb.core.mapping.event.AfterConvertCallback;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
-public class UserMongoEventListener extends AbstractMongoEventListener<AbstractActor> {
+public class UserMongoEventListener implements AfterConvertCallback<AbstractActor> {
 
     private final ProcessRoleService processRoleService;
 
     private final AuthorityService authorityService;
 
-    @Override
-    public void onAfterLoad(AfterLoadEvent<AbstractActor> event) {
-        log.trace("User loaded: {}", event.getSource().get("id"));
-        log.trace("Resolving process roles of user with username: {}", event.getSource().get("id"));
+    public UserMongoEventListener(@Lazy ProcessRoleService processRoleService,
+                                  @Lazy AuthorityService authorityService) {
+        this.processRoleService = processRoleService;
+        this.authorityService = authorityService;
     }
 
     @Override
-    public void onAfterConvert(AfterConvertEvent<AbstractActor> event) {
-        AbstractActor actor = event.getSource();
-        actor.getProcessRoleIds().forEach(processRoleId -> {
+    @NonNull
+    public AbstractActor onAfterConvert(AbstractActor entity, @NonNull Document document, @NonNull String collection) {
+        entity.getProcessRoleIds().forEach(processRoleId -> {
             ProcessRole role = processRoleService.findById(processRoleId);
             if (role != null) {
-                actor.addProcessRole(role);
+                entity.addProcessRole(role);
             }
         });
-        actor.getAuthorityIds().forEach(authorityId -> {
+        entity.getAuthorityIds().forEach(authorityId -> {
             Authority authority = authorityService.getOne(authorityId);
             if (authority != null) {
-                actor.addAuthority(authority);
+                entity.addAuthority(authority);
             }
         });
+        return entity;
     }
 }
