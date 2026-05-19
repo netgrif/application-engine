@@ -25,6 +25,8 @@ netgrif:
             host: http://127.0.0.1:9000
             user: root
             password: password
+            bucket-aliases:
+              pistucket: uat-pistucket
     swagger:
       enabled: true
     security:
