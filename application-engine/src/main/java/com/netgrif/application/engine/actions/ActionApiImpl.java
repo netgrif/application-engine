@@ -108,12 +108,27 @@ public class ActionApiImpl implements ActionApi {
 
     @Override
     public Page<Case> searchCases(String processIdentifier, Predicate predicate, Pageable pageable) {
+        return searchCases(processIdentifier, predicate, pageable, new HashMap<>());
+    }
+
+    @Override
+    public Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection) {
+        return searchCases(elasticStringQueries, authPrincipalDto, pageable, isIntersection, new HashMap<>());
+    }
+
+    @Override
+    public Long countCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Boolean isIntersection) {
+        return countCases(elasticStringQueries, authPrincipalDto, isIntersection, new HashMap<>());
+    }
+
+    @Override
+    public Page<Case> searchCases(String processIdentifier, Predicate predicate, Pageable pageable, Map<String, String> params) {
         log.debug("Searching cases for process identifier [{}] with predicate [{}], pageable [{}]", processIdentifier, predicate, pageable);
         return workflowService.search(predicate, pageable);
     }
 
     @Override
-    public Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection) {
+    public Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection, Map<String, String> params) {
         log.debug("Searching cases for elastic queries [{}] with auth principal [{}], pageable [{}], intersect [{}]", elasticStringQueries, authPrincipalDto, pageable, isIntersection);
         boolean intersect = Boolean.TRUE.equals(isIntersection);
         List<CaseSearchRequest> caseSearchRequests = elasticStringQueries.stream().map(query -> CaseSearchRequest.builder().query(query).build()).toList();
@@ -124,7 +139,7 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
-    public Long countCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Boolean isIntersection) {
+    public Long countCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Boolean isIntersection, Map<String, String> params) {
         log.debug("Counting cases for elastic queries [{}] with auth principal [{}], intersect [{}]", elasticStringQueries, authPrincipalDto, isIntersection);
         boolean intersect = Boolean.TRUE.equals(isIntersection);
         List<CaseSearchRequest> caseSearchRequests = elasticStringQueries.stream().map(query -> CaseSearchRequest.builder().query(query).build()).toList();
@@ -159,12 +174,22 @@ public class ActionApiImpl implements ActionApi {
 
     @Override
     public Page<Task> searchTasks(String processIdentifier, Predicate predicate, Pageable pageable) {
+        return searchTasks(processIdentifier, predicate, pageable, new HashMap<>());
+    }
+
+    @Override
+    public Page<Task> searchTasks(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection) {
+        return searchTasks(elasticStringQueries, authPrincipalDto, pageable, isIntersection, new HashMap<>());
+    }
+
+    @Override
+    public Page<Task> searchTasks(String processIdentifier, Predicate predicate, Pageable pageable, Map<String, String> params) {
         log.debug("Searching tasks for process identifier [{}] with predicate [{}], pageable [{}]", processIdentifier, predicate, pageable);
         return taskService.search(predicate, pageable);
     }
 
     @Override
-    public Page<Task> searchTasks(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection) {
+    public Page<Task> searchTasks(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection, Map<String, String> params) {
         log.debug("Searching tasks for elastic queries [{}] with auth principal [{}], pageable [{}], intersect [{}]", elasticStringQueries, authPrincipalDto, pageable, isIntersection);
         boolean intersect = Boolean.TRUE.equals(isIntersection);
         List<ElasticTaskSearchRequest> taskSearchRequests = elasticStringQueries.stream().map(query -> ElasticTaskSearchRequest.builder().query(query).build()).toList();
@@ -172,6 +197,17 @@ public class ActionApiImpl implements ActionApi {
         Locale locale = LocaleContextHolder.getLocale();
         log.trace("Searching tasks for elastic queries [{}] with auth principal [{}], pageable [{}], intersect [{}], locale [{}]", elasticStringQueries, authPrincipalDto, pageable, isIntersection, locale);
         return elasticTaskService.search(taskSearchRequests, loggedUser, pageable, locale, intersect);
+    }
+
+    @Override
+    public Long countTasks(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Boolean isIntersection, Map<String, String> params) {
+        log.debug("Counting tasks for elastic queries [{}] with auth principal [{}], intersect [{}]", elasticStringQueries, authPrincipalDto, isIntersection);
+        boolean intersect = Boolean.TRUE.equals(isIntersection);
+        List<ElasticTaskSearchRequest> taskSearchRequests = elasticStringQueries.stream().map(query -> ElasticTaskSearchRequest.builder().query(query).build()).toList();
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
+        Locale locale = LocaleContextHolder.getLocale();
+        log.trace("Counting tasks for elastic queries [{}] with auth principal [{}], intersect [{}], locale [{}]", elasticStringQueries, authPrincipalDto, isIntersection, locale);
+        return elasticTaskService.count(taskSearchRequests, loggedUser, locale, intersect);
     }
 
     @Override
@@ -293,7 +329,7 @@ public class ActionApiImpl implements ActionApi {
         if (authPrincipalDto == null) {
             throw new IllegalArgumentException("AuthPrincipalDto cannot be null.");
         }
-        Optional<AbstractUser> userOptional = userService.findUserByUsername(authPrincipalDto.getUsername(), authPrincipalDto.getRealmId());
-        return userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] and realm ID [%s] not found".formatted(authPrincipalDto.getUsername(), authPrincipalDto.getRealmId())));
+        Optional<AbstractUser> userOptional = userService.findUserByUsername(authPrincipalDto.username(), authPrincipalDto.realmId());
+        return userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] and realm ID [%s] not found".formatted(authPrincipalDto.username(), authPrincipalDto.realmId())));
     }
 }
