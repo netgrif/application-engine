@@ -56,8 +56,10 @@ public class TaskViewBody extends ViewBody {
                 this.allowHeaderTableMode);
         outcome.putDataSetEntry(TaskViewConstants.FIELD_USE_DEFAULT_HEADERS, FieldType.BOOLEAN,
                 this.useDefaultHeaders);
-        outcome.putDataSetEntry(TaskViewConstants.FIELD_DEFAULT_HEADERS, FieldType.TEXT,
-                this.defaultHeaders != null ? String.join(",", this.defaultHeaders) : null);
+        if (this.defaultHeaders != null) {
+            outcome.putDataSetEntry(TaskViewConstants.FIELD_DEFAULT_HEADERS, FieldType.STRING_COLLECTION,
+                    this.defaultHeaders);
+        }
         outcome.putDataSetEntry(TaskViewConstants.FIELD_SHOW_MORE_MENU, FieldType.BOOLEAN,
                 this.showMoreMenu);
         if (this.emptyContentText != null) {

@@ -62,12 +62,12 @@ public class FilterBody {
         if (metadata == null) {
             metadata = getDefaultMetadata(this.type);
         }
-        outcome.getDataSet().put(DefaultFiltersRunner.FILTER_FIELD_ID, Map.of(
-                "type", "filter",
-                "value", this.query,
-                "allowedNets", this.allowedNets,
-                "filterMetadata", metadata
-        ));
+        Map<String, Object> dataSetValues = new HashMap<>();
+        dataSetValues.put("type", "filter");
+        dataSetValues.put("value", this.query);
+        dataSetValues.put("filterMetadata", metadata);
+        dataSetValues.put("allowedNets", this.allowedNets);
+        outcome.getDataSet().put(DefaultFiltersRunner.FILTER_FIELD_ID, dataSetValues);
 
         return outcome;
     }

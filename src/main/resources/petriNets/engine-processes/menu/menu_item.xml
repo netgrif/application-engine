@@ -290,7 +290,7 @@
 	<data type="enumeration">
 		<id>menu_name_as_visible</id>
 		<title name="name">Name of the item</title>
-		<desc name="name_desc">Is shown in the menu</desc>
+		<desc name="name_desc">Will be shown in the menu</desc>
 		<component>
 			<name>autocomplete</name>
 		</component>
@@ -503,7 +503,7 @@
 	</data>
 	<data type="enumeration_map" immediate="true">
 		<id>view_configuration_type</id>
-		<title name="view_configuration_type">Pick view type</title>
+		<title name="view_configuration_type">View type</title>
 		<options>
 			<init dynamic="true">menuItemService.getAvailableViewsAsOptions(true, true)</init>
 		</options>
@@ -643,7 +643,7 @@
 	</data>
 	<data type="enumeration_map">
 		<id>configuration_templates</id>
-		<title name="todo 23">Pick a configuration template</title>
+		<title name="todo 23">Configuration template</title>
 		<options>
 			<init dynamic="true">com.netgrif.application.engine.menu.service.MenuItemTemplateHolder.transformToOptions()</init>
 		</options>
@@ -695,7 +695,7 @@
 		<i18nString name="is_auto_select">Automatické zvolenie zobrazenia</i18nString>
 		<i18nString name="is_auto_select_desc">Po automatickom zvolení sa dané zobrazenie používateľovi otvorí</i18nString>
 		<i18nString name="use_tabbed_view">Použiť zobrazenie v taboch?</i18nString>
-		<i18nString name="view_configuration_type">Vybrať zobrazenie</i18nString>
+		<i18nString name="view_configuration_type">Typ zobrazenia</i18nString>
 		<i18nString name="configuration_view">Nastavenie zobrazenia</i18nString>
 		<i18nString name="initialize">Vytvoriť menu položku</i18nString>
 		<i18nString name="children_order">Zoradiť pod-položky</i18nString>
@@ -746,7 +746,7 @@
 		<i18nString name="is_auto_select">Automatische Anzeigeauswahl</i18nString>
 		<i18nString name="is_auto_select_desc">Wenn ausgewählt, wird die Ansicht automatisch geöffnet</i18nString>
 		<i18nString name="use_tabbed_view">Möchten Sie die Ansicht mit Registerkarten verwenden?</i18nString>
-		<i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
+		<i18nString name="view_configuration_type">Der Ansichtstyp</i18nString>
 		<i18nString name="configuration_view">Die Ansichtskonfiguration</i18nString>
 		<i18nString name="initialize">Menüeintrag erstellen</i18nString>
 		<i18nString name="children_order">Untereintrage sortieren</i18nString>
@@ -775,7 +775,7 @@
 			<cols>4</cols>
 			<layout>grid</layout>
 			<dataRef>
-				<id>menu_item_identifier</id>
+				<id>menu_name</id>
 				<logic>
 					<behavior>editable</behavior>
 					<behavior>required</behavior>
@@ -784,7 +784,44 @@
 					<x>0</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>4</cols>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							menu_item_identifier: f.menu_item_identifier,
+							menu_name: f.menu_name;
+
+							if (menu_item_identifier.value != null &amp;&amp; !menu_item_identifier.value.isEmpty()
+									|| menu_name.value == null) {
+								return
+							}
+
+							String defaultName = menu_name.value.defaultValue
+							if (defaultName == null || defaultName.isEmpty()) {
+								defaultName = menu_name.value.translations?.values()?.find()
+							}
+
+							String identifier = com.netgrif.application.engine.menu.utils.MenuItemUtils.sanitize(defaultName)
+							change menu_item_identifier value { identifier }
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>menu_item_identifier</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
@@ -836,6 +873,7 @@
 				<id>configuration_templates</id>
 				<logic>
 					<behavior>editable</behavior>
+					<behavior>required</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -859,7 +897,6 @@
 					newUri = newUri.replace("//","/")
 
 					changeMenuItem useCase uri { newUri }
-					change name value { new com.netgrif.application.engine.petrinet.domain.I18nString(identifier.value) }
 				</action>
 				<action>
 					def outcome = menuItemService.handleConfigurationTemplate(useCase)
@@ -939,12 +976,26 @@
 				</layout>
 			</dataRef>
 			<dataRef>
+				<id>configuration_templates</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
 				<id>menu_name</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
-					<x>0</x>
+					<x>2</x>
 					<y>1</y>
 					<rows>1</rows>
 					<cols>2</cols>
@@ -958,8 +1009,8 @@
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
-					<x>2</x>
-					<y>1</y>
+					<x>0</x>
+					<y>2</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -987,7 +1038,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>2</y>
+					<y>3</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -1001,7 +1052,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>3</y>
+					<y>4</y>
 					<rows>1</rows>
 					<cols>4</cols>
 					<template>material</template>
@@ -1502,9 +1553,9 @@
 			<cols>3</cols>
 			<layout>grid</layout>
 			<dataRef>
-				<id>use_custom_view</id>
+				<id>view_configuration_type</id>
 				<logic>
-					<behavior>editable</behavior>
+					<behavior>visible</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -1514,39 +1565,11 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
-				<event type="set">
-					<id>0</id>
-					<actions phase="post">
-						<action>
-							trans: t.this,
-							useTabIcon: f.use_tab_icon,
-							use_tabbed_view: f.use_tabbed_view,
-							view_configuration_form: f.view_configuration_form,
-							view_configuration_type: f.view_configuration_type,
-							tabIconPreview: f.tab_icon_preview,
-							tabName: f.tab_name,
-							tabIcon: f.tab_icon,
-							use: f.use_custom_view,
-							selector: f.custom_view_selector;
-
-							if (use.value) {
-								make selector, editable on trans when { true }
-								make [useTabIcon, tabIconPreview, tabName, tabIcon, use_tabbed_view, view_configuration_form,
-										view_configuration_type], hidden on trans when { true }
-								// todo remove configuration or keep it?
-							} else {
-								manageBehaviorOfTabFields(useTabIcon.value, use_tabbed_view.value)
-								make [use_tabbed_view, view_configuration_form, view_configuration_type], editable on trans when { true }
-								make selector, hidden on trans when { true }
-							}
-						</action>
-					</actions>
-				</event>
 			</dataRef>
 			<dataRef>
-				<id>custom_view_selector</id>
+				<id>tab_name</id>
 				<logic>
-					<behavior>hidden</behavior>
+					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>1</x>
@@ -1558,30 +1581,18 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>use_tabbed_view</id>
+				<id>custom_view_selector</id>
 				<logic>
-					<behavior>editable</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
-					<x>1</x>
+					<x>0</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>1</cols>
+					<cols>3</cols>
 					<template>material</template>
-					<appearance>standard</appearance>
+					<appearance>outline</appearance>
 				</layout>
-				<event type="set">
-					<id>0</id>
-					<actions phase="post">
-						<action>
-							use_tabbed_view: f.use_tabbed_view,
-							view_configuration_type: f.view_configuration_type;
-
-							change view_configuration_type value { null }
-							change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(use_tabbed_view.value, true) }
-						</action>
-					</actions>
-				</event>
 			</dataRef>
 			<dataRef>
 				<id>use_tab_icon</id>
@@ -1589,8 +1600,8 @@
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
-					<x>2</x>
-					<y>0</y>
+					<x>0</x>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -1607,20 +1618,6 @@
 						</action>
 					</actions>
 				</event>
-			</dataRef>
-			<dataRef>
-				<id>tab_name</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
 			</dataRef>
 			<dataRef>
 				<id>tab_icon</id>
@@ -1651,53 +1648,6 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>view_configuration_type</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>3</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-				<event type="set">
-					<id>0</id>
-					<actions phase="post">
-						<action>
-							use_tabbed_view: f.use_tabbed_view,
-							view_configuration_type: f.view_configuration_type,
-							view_configuration_form: f.view_configuration_form,
-							view_configuration_all_data_form: f.view_configuration_all_data_form,
-							view_configuration_id: f.view_configuration_id;
-
-							if (view_configuration_id.value != null &amp;&amp; !view_configuration_id.value.isEmpty()) {
-								workflowService.deleteCase(view_configuration_id.value[0])
-							}
-
-							if (view_configuration_type.value == null || view_configuration_type.value == "") {
-								change view_configuration_id value { [] }
-								change view_configuration_form value { [] }
-								change view_configuration_all_data_form value { [] }
-								return
-							}
-
-							def configurationCase = createCase(view_configuration_type.value + "_configuration", null, "",
-									userService.loggedOrSystem, org.springframework.context.i18n.LocaleContextHolder.getLocale(),
-									["is_tabbed":String.valueOf(use_tabbed_view.value)])
-							def initTask = assignTask("initialize", configurationCase)
-							finishTask(initTask)
-							configurationCase = workflowService.findOne(configurationCase.stringId)
-							change view_configuration_id value { [configurationCase.stringId] }
-							change view_configuration_form value { [configurationCase.tasks.find { it.transition == "settings" }.task] }
-							change view_configuration_all_data_form value { [configurationCase.tasks.find { it.transition == "all_menu_data" }.task] }
-						</action>
-					</actions>
-				</event>
-			</dataRef>
-			<dataRef>
 				<id>view_configuration_form</id>
 				<logic>
 					<behavior>editable</behavior>
@@ -1706,7 +1656,7 @@
 					<x>0</x>
 					<y>3</y>
 					<rows>1</rows>
-					<cols>3</cols>
+					<cols>2</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>

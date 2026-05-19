@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
@@ -981,10 +982,11 @@ public class DataService implements IDataService {
     }
 
     private List<String> parseListString(ObjectNode node, String attributeKey) {
-        ArrayNode arrayNode = (ArrayNode) node.get(attributeKey);
-        if (arrayNode == null) {
+        Object objectNode = node.get(attributeKey);
+        if (objectNode == null || objectNode instanceof NullNode) {
             return null;
         }
+        ArrayNode arrayNode = (ArrayNode) objectNode;
         ArrayList<String> list = new ArrayList<>();
         arrayNode.forEach(string -> list.add(string.asText()));
         return list;

@@ -18,7 +18,6 @@ public interface Template {
         filterBody.setVisibility("private");
         filterBody.setTitle(name);
         filterBody.setQuery("*");
-        filterBody.setAllowedNets(List.of());
         return filterBody;
     }
 
@@ -29,7 +28,6 @@ public interface Template {
         filterBody.setVisibility("private");
         filterBody.setTitle(name);
         filterBody.setQuery("*");
-        filterBody.setAllowedNets(List.of());
         return filterBody;
     }
 }

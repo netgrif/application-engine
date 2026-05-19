@@ -68,8 +68,10 @@ public class CaseViewBody extends ViewBody {
                 this.headersMode == null ? new ArrayList<>() : this.headersMode);
         outcome.putDataSetEntry(CaseViewConstants.FIELD_HEADERS_DEFAULT_MODE, FieldType.ENUMERATION_MAP,
                 this.headersDefaultMode);
-        outcome.putDataSetEntry(CaseViewConstants.FIELD_DEFAULT_HEADERS, FieldType.TEXT,
-                this.defaultHeaders != null ? String.join(",", this.defaultHeaders) : null);
+        if (this.defaultHeaders != null) {
+            outcome.putDataSetEntry(CaseViewConstants.FIELD_DEFAULT_HEADERS, FieldType.STRING_COLLECTION,
+                    this.defaultHeaders);
+        }
         outcome.putDataSetEntry(CaseViewConstants.FIELD_IS_HEADER_MODE_CHANGEABLE, FieldType.BOOLEAN,
                 this.isHeaderModeChangeable);
         outcome.putDataSetEntry(CaseViewConstants.FIELD_USE_DEFAULT_HEADERS, FieldType.BOOLEAN,

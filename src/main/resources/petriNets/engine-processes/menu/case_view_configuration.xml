@@ -394,22 +394,14 @@
         <title name="use_case_default_headers">Use custom default headers?</title>
         <init>true</init>
     </data>
-    <data type="text" immediate="true">
+    <data type="stringCollection" immediate="true">
         <id>case_default_headers</id>
         <title name="case_default_headers">Set default headers</title>
-        <desc name="default_headers_desc">Example: "meta-title,meta-visualId"</desc>
-        <action trigger="set">
-            defaultHeaders: f.this;
-
-            String trimmed = defaultHeaders.value?.replaceAll("\\s","")
-            if (defaultHeaders.value != trimmed) {
-                change defaultHeaders value { trimmed }
-            }
-        </action>
+        <desc name="default_headers_desc">Example: "meta-title", "meta-visualId"</desc>
     </data>
     <data type="enumeration_map" immediate="true">
         <id>view_configuration_type</id>
-        <title name="view_configuration_type">Pick view type</title>
+        <title name="view_configuration_type">View type</title>
         <options>
             <init dynamic="true">menuItemService.getAvailableViewsAsOptions(true, useCase.processIdentifier)</init>
         </options>
@@ -448,7 +440,7 @@
             <actions phase="pre">
                 <action>
                     advanced_content_form: f.advanced_content_form;
-                    String nextViewTaskId = useCase.tasks.find { taskPair -> taskPair.transition == "next_view_settings"}?.task
+                    String nextViewTaskId = useCase.tasks.find { taskPair -> taskPair.transition == "open_case_settings"}?.task
                     def taskIds = [useCase.tasks.find { taskPair -> taskPair.transition == "header_settings"}.task,
                                    useCase.tasks.find { taskPair -> taskPair.transition == "create_case_btn_settings"}.task,
                                    useCase.tasks.find { taskPair -> taskPair.transition == "filter_settings"}.task]
@@ -506,7 +498,7 @@
         <i18nString name="create_case_button_icon">Identifikátor ikony tlačidla "Nová inštancia"</i18nString>
         <i18nString name="create_case_button_icon_preview">Náhľad ikony</i18nString>
         <i18nString name="case_default_headers">Predvolené hlavičky</i18nString>
-        <i18nString name="default_headers_desc">Napríklad: "meta-title,meta-visualId"</i18nString>
+        <i18nString name="default_headers_desc">Napríklad: "meta-title", "meta-visualId"</i18nString>
         <i18nString name="filter_autocomplete_selection">Zvoľte nový filter</i18nString>
         <i18nString name="update_filter">Aktualizovať zobrazenie s vybraným filtrom</i18nString>
         <i18nString name="case_view_search_type">Typ vyhľadávania prípadov</i18nString>
@@ -530,7 +522,7 @@
         <i18nString name="filter_header">Súčasný filter</i18nString>
         <i18nString name="view_header">Zobrazenie prípadov</i18nString>
         <i18nString name="item_settings_general">Všeobecné</i18nString>
-        <i18nString name="view_configuration_type">Vybrať zobrazenie</i18nString>
+        <i18nString name="view_configuration_type">Typ zobrazenia</i18nString>
         <i18nString name="settings">Nastavenie</i18nString>
     </i18n>
     <i18n locale="de">
@@ -539,7 +531,7 @@
         <i18nString name="create_case_button_icon_preview">Ikonevorschau</i18nString>
         <i18nString name="case_default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
         <i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
-        <i18nString name="default_headers_desc">Beispiel: "meta-title,meta-visualId"</i18nString>
+        <i18nString name="default_headers_desc">Beispiel: "meta-title", "meta-visualId"</i18nString>
         <i18nString name="hidden">Versteckt</i18nString>
         <i18nString name="fulltext">Einfacher Suchmodus</i18nString>
         <i18nString name="sort">Sortieren</i18nString>
@@ -562,7 +554,7 @@
         <i18nString name="case_show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Fällen anzeigen</i18nString>
         <i18nString name="item_settings">Menüeintrageinstellungen</i18nString>
         <i18nString name="view_header">Fallansicht</i18nString>
-        <i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
+        <i18nString name="view_configuration_type">Der Ansichtstyp</i18nString>
         <i18nString name="settings">Einstellungen</i18nString>
     </i18n>
 
@@ -778,10 +770,10 @@
         </event>
     </transition>
     <transition>
-        <id>next_view_settings</id>
+        <id>open_case_settings</id>
         <x>336</x>
         <y>48</y>
-        <label name="todo 23">Next view</label>
+        <label name="todo 23">Open case view</label>
         <icon>queue_play_next</icon>
         <assignPolicy>auto</assignPolicy>
         <roleRef>
@@ -1325,6 +1317,32 @@
             </dataRef>
         </dataGroup>
     </transition>
+    <transition>
+        <id>change_to_tabbed</id>
+        <x>240</x>
+        <y>144</y>
+        <label>change_to_tabbed</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+<!--        todo 23-->
+<!--        add action, update is_tabbed_var_arc, reset associated view fields, remove associated view case-->
+    </transition>
+    <transition>
+        <id>change_to_untabbed</id>
+        <x>112</x>
+        <y>48</y>
+        <label>change_to_untabbed</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+    </transition>
     <place>
         <id>initialized</id>
         <x>496</x>
@@ -1346,6 +1364,14 @@
         <x>240</x>
         <y>48</y>
         <label>is_tabbed</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>is_untabbed</id>
+        <x>112</x>
+        <y>144</y>
+        <label>is_untabbed</label>
         <tokens>0</tokens>
         <static>false</static>
     </place>
@@ -1381,7 +1407,7 @@
         <id>a5</id>
         <type>read</type>
         <sourceId>initialized</sourceId>
-        <destinationId>next_view_settings</destinationId>
+        <destinationId>open_case_settings</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
@@ -1410,7 +1436,35 @@
         <id>a9</id>
         <type>read</type>
         <sourceId>is_tabbed</sourceId>
-        <destinationId>next_view_settings</destinationId>
+        <destinationId>open_case_settings</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a10</id>
+        <type>regular</type>
+        <sourceId>is_tabbed</sourceId>
+        <destinationId>change_to_untabbed</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a11</id>
+        <type>regular</type>
+        <sourceId>change_to_untabbed</sourceId>
+        <destinationId>is_untabbed</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a12</id>
+        <type>regular</type>
+        <sourceId>change_to_tabbed</sourceId>
+        <destinationId>is_tabbed</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a14</id>
+        <type>regular</type>
+        <sourceId>is_untabbed</sourceId>
+        <destinationId>change_to_tabbed</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>
