@@ -29,6 +29,9 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -43,6 +46,7 @@ public class MenuItemService implements IMenuItemService {
     protected final IUserService userService;
     protected final IUriService uriService;
     protected final IElasticCaseService elasticCaseService;
+    protected final MongoTemplate mongoTemplate;
 
     protected static final String DEFAULT_FOLDER_ICON = "folder";
 
@@ -204,9 +208,14 @@ public class MenuItemService implements IMenuItemService {
      * */
     @Override
     public Case findMenuItem(String identifier) {
-        String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
-                MenuItemConstants.PROCESS_IDENTIFIER, MenuItemConstants.FIELD_IDENTIFIER, identifier);
-        return findCase(MenuItemConstants.PROCESS_IDENTIFIER, query);
+        Query query = Query.query(
+                Criteria.where("processIdentifier").is(MenuItemConstants.PROCESS_IDENTIFIER)
+                        .and(String.format("dataSet.%s.value", MenuItemConstants.FIELD_IDENTIFIER)).is(identifier)
+        );
+        query.withHint(MenuItemConstants.IDENTIFIER_INDEX_NAME);
+        List<Case> caseAsList = mongoTemplate.find(query, Case.class);
+        Optional<Case> caseOptional = caseAsList.stream().findFirst();
+        return caseOptional.orElse(null);
     }
 
     /**
@@ -234,9 +243,14 @@ public class MenuItemService implements IMenuItemService {
      * */
     @Override
     public Case findFolderCase(UriNode node) {
-        String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
-                MenuItemConstants.PROCESS_IDENTIFIER, MenuItemConstants.FIELD_NODE_PATH, node.getUriPath());
-        return findCase(MenuItemConstants.PROCESS_IDENTIFIER, query);
+        Query query = Query.query(
+                Criteria.where("processIdentifier").is(MenuItemConstants.PROCESS_IDENTIFIER)
+                        .and(String.format("dataSet.%s.value", MenuItemConstants.FIELD_NODE_PATH)).is(node.getUriPath())
+        );
+        query.withHint(MenuItemConstants.NODE_PATH_INDEX_NAME);
+        List<Case> caseAsList = mongoTemplate.find(query, Case.class);
+        Optional<Case> caseOptional = caseAsList.stream().findFirst();
+        return caseOptional.orElse(null);
     }
 
     /**
@@ -248,9 +262,7 @@ public class MenuItemService implements IMenuItemService {
      * */
     @Override
     public boolean existsMenuItem(String identifier) {
-        String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
-                MenuItemConstants.PROCESS_IDENTIFIER, MenuItemConstants.FIELD_IDENTIFIER, identifier);
-        return countCases(MenuItemConstants.PROCESS_IDENTIFIER, query) > 0;
+        return findMenuItem(identifier) != null;
     }
 
     /**

@@ -259,6 +259,10 @@
 		<id>menu_item_identifier</id>
 		<title name="menu_item_identifier">Menu item identifier</title>
 	</data>
+	<data type="text">
+		<id>menu_item_identifier_on_create</id>
+		<title name="menu_item_identifier">Menu item identifier</title>
+	</data>
 	<data type="text" immediate="true">
 		<id>nodePath</id>
 		<title name="nodePath">Item URI</title>
@@ -801,7 +805,7 @@
 					<id>0</id>
 					<actions phase="post">
 						<action>
-							menu_item_identifier: f.menu_item_identifier,
+							menu_item_identifier: f.menu_item_identifier_on_create,
 							menu_name: f.menu_name;
 
 							if (menu_item_identifier.value != null &amp;&amp; !menu_item_identifier.value.isEmpty()
@@ -821,7 +825,7 @@
 				</event>
 			</dataRef>
 			<dataRef>
-				<id>menu_item_identifier</id>
+				<id>menu_item_identifier_on_create</id>
 				<logic>
 					<behavior>editable</behavior>
 					<behavior>required</behavior>
@@ -834,6 +838,23 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							menu_item_identifier: f.menu_item_identifier_on_create;
+
+							if (menuItemService.existsMenuItem(menu_item_identifier.value)) {
+								change menu_item_identifier validations { validation('''regex $.^''',
+										new com.netgrif.application.engine.petrinet.domain.I18nString("Such menu item already exists",
+												[sk: "Taká položka menu už existuje", de: "Ein solcher Menüeintrag existiert bereits"]))
+								}
+							} else {
+								change menu_item_identifier validations { null }
+							}
+						</action>
+					</actions>
+				</event>
 			</dataRef>
 			<dataRef>
 				<id>move_dest_uri</id>
@@ -898,15 +919,6 @@
 			<id>finish</id>
 			<actions phase="pre">
 				<action>
-					identifier: f.menu_item_identifier;
-					String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
-							com.netgrif.application.engine.menu.domain.MenuItemConstants.PROCESS_IDENTIFIER,
-							com.netgrif.application.engine.menu.domain.MenuItemConstants.FIELD_IDENTIFIER, identifier.value)
-					if (countCasesElastic(query) &gt; 1) {
-						throw new IllegalArgumentException("Such menu item already exists. Please, use different identifier")
-					}
-				</action>
-				<action>
 					def outcome = menuItemService.handleConfigurationTemplate(useCase)
 					outcome.mapping.each { fieldId, value ->
 						change useCase.getField(fieldId) value { value }
@@ -914,8 +926,11 @@
 				</action>
 				<action>
 					name: f.menu_name,
-					identifier: f.menu_item_identifier,
+					menu_item_identifier: f.menu_item_identifier,
+					menu_item_identifier_on_create: f.menu_item_identifier_on_create;
 					dest: f.move_dest_uri;
+					
+					change menu_item_identifier value { menu_item_identifier_on_create.value }
 
 					String newUri = dest.value.join("/")
 					newUri = newUri.replace("//","/")

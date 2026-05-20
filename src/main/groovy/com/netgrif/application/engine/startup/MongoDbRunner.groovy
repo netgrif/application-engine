@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.startup
 
+import com.netgrif.application.engine.menu.domain.MenuItemConstants
+import com.netgrif.application.engine.workflow.domain.Case
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -7,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.data.mapping.context.MappingContext
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.index.CompoundIndexDefinition
+import org.springframework.data.mongodb.core.index.IndexDefinition
 import org.springframework.data.mongodb.core.index.IndexOperations
 import org.springframework.data.mongodb.core.index.IndexResolver
 import org.springframework.data.mongodb.core.index.MongoPersistentEntityIndexResolver
@@ -48,23 +52,40 @@ class MongoDbRunner extends AbstractOrderedCommandLineRunner {
             if (host != null && port != null)
                 log.info("Dropping Mongo database ${host}:${port}/${name}")
             else if (uri != null)
-                log.info("Droppiung Mongo database ${uri}")
+                log.info("Dropping Mongo database ${uri}")
             mongoTemplate.getDb().drop()
         }
         if (resolveIndexesOnStartup) {
+            log.info("Ensuring Mongo indexes")
             resolveIndexes()
         }
     }
 
-    void resolveIndexes() {
+    private void resolveIndexes() {
         MappingContext<? extends MongoPersistentEntity<?>, MongoPersistentProperty> mappingContext = mongoTemplate.getConverter().getMappingContext()
         IndexResolver resolver = new MongoPersistentEntityIndexResolver(mappingContext)
         mappingContext.getPersistentEntities()
                 .stream()
                 .filter(it -> it.isAnnotationPresent(Document.class))
                 .forEach(it -> {
-                    IndexOperations indexOps = mongoTemplate.indexOps(it.getType());
-                    resolver.resolveIndexFor(it.getType()).forEach(indexOps::ensureIndex);
+                    IndexOperations indexOps = mongoTemplate.indexOps(it.getType())
+                    resolver.resolveIndexFor(it.getType()).forEach(indexOps::ensureIndex)
                 })
+        customMenuItemDataIndexes().each { indexKey, indexName ->
+            org.bson.Document keys = new org.bson.Document()
+                    .append("processIdentifier", 1)
+                    .append(indexKey, 1)
+            IndexDefinition index = new CompoundIndexDefinition(keys)
+                    .named(indexName)
+                    .background()
+            mongoTemplate.indexOps(Case.class).ensureIndex(index)
+        }
+    }
+
+    private static Map<String, String> customMenuItemDataIndexes() {
+        return Map.of(
+            "dataSet.${MenuItemConstants.FIELD_IDENTIFIER}.value" as String, MenuItemConstants.IDENTIFIER_INDEX_NAME,
+            "dataSet.${MenuItemConstants.FIELD_NODE_PATH}.value" as String, MenuItemConstants.NODE_PATH_INDEX_NAME
+        )
     }
 }

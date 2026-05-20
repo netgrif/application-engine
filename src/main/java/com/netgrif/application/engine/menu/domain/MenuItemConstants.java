@@ -37,4 +37,7 @@ public class MenuItemConstants {
     public static final String TRANS_ALL_MENU_DATA = "all_menu_data";
 
     public static final String PROCESS_IDENTIFIER = "menu_item";
+
+    public static final String IDENTIFIER_INDEX_NAME = "menuItemIdentifierIdx";
+    public static final String NODE_PATH_INDEX_NAME = "menuItemNodePathIdx";
 }
