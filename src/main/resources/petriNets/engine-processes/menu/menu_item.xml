@@ -851,6 +851,10 @@
 								}
 							} else {
 								change menu_item_identifier validations { null }
+								String sanitizedIdentifier = com.netgrif.application.engine.menu.utils.MenuItemUtils.sanitize(menu_item_identifier.value)
+								if (menu_item_identifier.value != sanitizedIdentifier) {
+									change menu_item_identifier value { sanitizedIdentifier }
+								}
 							}
 						</action>
 					</actions>

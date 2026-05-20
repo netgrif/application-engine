@@ -103,10 +103,9 @@ public class MenuItemService implements IMenuItemService {
 
         log.debug("Creation of menu item case with identifier [{}] started.", body.getIdentifier());
         IUser loggedUser = userService.getLoggedOrSystem();
-        String sanitizedIdentifier = MenuItemUtils.sanitize(body.getIdentifier());
 
-        if (existsMenuItem(sanitizedIdentifier)) {
-            throw new IllegalArgumentException(String.format("Menu item identifier %s is not unique!", sanitizedIdentifier));
+        if (existsMenuItem(body.getIdentifier())) {
+            throw new IllegalArgumentException(String.format("Menu item identifier %s is not unique!", body.getIdentifier()));
         }
 
         Case parentItemCase = getOrCreateFolderItem(body.getUri());
@@ -121,7 +120,7 @@ public class MenuItemService implements IMenuItemService {
 
         parentItemCase = appendChildCaseIdAndSave(parentItemCase, menuItemCase.getStringId());
 
-        String nodePath = createNodePath(body.getUri(), sanitizedIdentifier);
+        String nodePath = createNodePath(body.getUri(), body.getIdentifier());
         uriService.getOrCreate(nodePath, UriContentType.CASE);
 
         Case viewCase = null;
@@ -135,28 +134,20 @@ public class MenuItemService implements IMenuItemService {
     }
 
     /**
-     * Updates menu item case and it's configuration cases
+     * Updates menu item case and it's configuration cases (recreates)
      *
      * @param itemCase menu item case to be updated
      * @param body data used for update
      *
-     * @return updated menu item case (configuration cases are updated, but not returned)
+     * @return recreated menu item case (configuration cases are recreated, but not returned)
      * */
     @Override
     public Case updateMenuItem(Case itemCase, MenuItemBody body) throws TransitionNotExecutableException {
         validateMenuItemBody(body);
 
         log.debug("Update of menu item case with identifier [{}] started.", body.getIdentifier());
-        String actualUriNodeId = uriService.findByUri(body.getUri()).getStringId();
-        if (!itemCase.getUriNodeId().equals(actualUriNodeId)) {
-            itemCase.setUriNodeId(actualUriNodeId);
-            itemCase = workflowService.save(itemCase);
-        }
-
-        Case viewCase = findView(itemCase);
-        viewCase = handleView(viewCase, body.getView(), body.isUseTabbedView());
-        ToDataSetOutcome dataSetOutcome = body.toDataSet(viewCase);
-        itemCase = setData(itemCase, MenuItemConstants.TRANS_SYNC_ID, dataSetOutcome.getDataSet());
+        workflowService.deleteCase(itemCase);
+        itemCase = createMenuItem(body);
         log.debug("Updated menu item case [{}] with identifier [{}].", itemCase.getStringId(), body.getIdentifier());
         return itemCase;
     }
@@ -215,7 +206,7 @@ public class MenuItemService implements IMenuItemService {
         query.withHint(MenuItemConstants.IDENTIFIER_INDEX_NAME);
         List<Case> caseAsList = mongoTemplate.find(query, Case.class);
         Optional<Case> caseOptional = caseAsList.stream().findFirst();
-        return caseOptional.orElse(null);
+        return caseOptional.map(aCase -> workflowService.findOne(aCase.getStringId())).orElse(null);
     }
 
     /**
@@ -250,7 +241,7 @@ public class MenuItemService implements IMenuItemService {
         query.withHint(MenuItemConstants.NODE_PATH_INDEX_NAME);
         List<Case> caseAsList = mongoTemplate.find(query, Case.class);
         Optional<Case> caseOptional = caseAsList.stream().findFirst();
-        return caseOptional.orElse(null);
+        return caseOptional.map(aCase -> workflowService.findOne(aCase.getStringId())).orElse(null);
     }
 
     /**
@@ -468,15 +459,21 @@ public class MenuItemService implements IMenuItemService {
         return new ConfigurationTemplateOutcome(dataSetOutcome);
     }
 
-    protected void validateMenuItemBody(MenuItemBody menuItemBody) {
-        if (menuItemBody == null) {
+    protected void validateMenuItemBody(MenuItemBody body) {
+        if (body == null) {
             throw new IllegalArgumentException("Input data cannot be null");
         }
-        if (menuItemBody.getIdentifier() == null) {
+        if (body.getIdentifier() == null) {
             throw new IllegalArgumentException("Identifier cannot be null");
         }
-        if (menuItemBody.getUri() == null || menuItemBody.getUri().isBlank()) {
+        if (body.getUri() == null || body.getUri().isBlank()) {
             throw new IllegalArgumentException("Uri cannot be null");
+        } else {
+            body.setUri(MenuItemUtils.sanitizeUriSegments(body.getUri(), uriService));
+            List<String> uriSegments = List.of(body.getUri().split(uriService.getUriSeparator()));
+            if (uriSegments.contains(body.getIdentifier())) {
+                throw new IllegalArgumentException("Uri cannot contain this identifier");
+            }
         }
     }
 
@@ -521,10 +518,6 @@ public class MenuItemService implements IMenuItemService {
         return setDataWithExecute(duplicatedViewCase, MenuItemConstants.TRANS_INIT_ID, dataSet);
     }
 
-    protected Case findView(Case itemOrViewCase) {
-        return findCaseInCaseRef(itemOrViewCase, MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID);
-    }
-
     protected Case findFilter(Case viewCase) {
         return findCaseInCaseRef(viewCase, ViewConstants.FIELD_VIEW_FILTER_CASE);
     }
@@ -534,22 +527,6 @@ public class MenuItemService implements IMenuItemService {
             String caseId = MenuItemUtils.getCaseIdFromCaseRef(useCase, caseRefId);
             return workflowService.findOne(caseId);
         } catch (IllegalArgumentException | NullPointerException ignore) {
-            return null;
-        }
-    }
-
-    protected Case handleView(Case existingViewCase, ViewBody body, boolean isTabbed) throws TransitionNotExecutableException {
-        if (mustUpdateView(existingViewCase, body)) {
-            return updateView(existingViewCase, body, isTabbed);
-        } else if (mustCreateView(existingViewCase, body)) {
-            return createView(body, isTabbed);
-        } else if (mustRemoveView(existingViewCase, body)) {
-            removeView(existingViewCase);
-            return null;
-        } else if (mustRemoveAndCreateView(existingViewCase, body)) {
-            removeView(existingViewCase);
-            return createView(body, isTabbed);
-        } else {
             return null;
         }
     }
@@ -577,60 +554,6 @@ public class MenuItemService implements IMenuItemService {
         log.trace("Created configuration view case [{}] of identifier [{}]", viewCase.getStringId(),
                 body.getViewProcessIdentifier());
         return viewCase;
-    }
-
-    protected Case updateView(Case viewCase, ViewBody body, boolean isTabbed) throws TransitionNotExecutableException {
-        Case filterCase = findFilter(viewCase);
-        filterCase = handleFilter(filterCase, body.getFilterBody());
-
-        Case associatedViewCase = findView(viewCase);
-        associatedViewCase = handleView(associatedViewCase, body.getAssociatedViewBody(), isTabbed);
-
-        ToDataSetOutcome outcome = body.toDataSet(associatedViewCase, filterCase);
-        viewCase = setData(viewCase, ViewConstants.TRANS_SYNC_ID, outcome.getDataSet());
-
-        log.trace("Updated configuration view case [{}] of identifier [{}]", viewCase.getStringId(),
-                body.getViewProcessIdentifier());
-        return viewCase;
-    }
-
-    protected void removeView(Case viewCase) {
-        workflowService.deleteCase(viewCase);
-        log.trace("Removed configuration view case [{}].", viewCase.getStringId());
-    }
-
-    protected Case handleFilter(Case filterCase, FilterBody body) throws TransitionNotExecutableException {
-        if (mustCreateFilter(filterCase, body)) {
-            return createFilter(body);
-        } else if (mustUpdateFilter(filterCase, body)) {
-            return updateFilter(filterCase, body);
-        } else {
-            return filterCase;
-        }
-    }
-
-    protected boolean mustUpdateView(Case useCase, ViewBody body) {
-        return body != null && useCase != null && useCase.getProcessIdentifier().equals(body.getViewProcessIdentifier());
-    }
-
-    protected boolean mustRemoveAndCreateView(Case useCase, ViewBody body) {
-        return body != null && useCase != null && !useCase.getProcessIdentifier().equals(body.getViewProcessIdentifier());
-    }
-
-    protected boolean mustRemoveView(Case useCase, ViewBody body) {
-        return body == null && useCase != null;
-    }
-
-    protected boolean mustCreateView(Case useCase, ViewBody body) {
-        return body != null && useCase == null;
-    }
-
-    protected boolean mustCreateFilter(Case filterCase, FilterBody body) {
-        return filterCase == null && body != null;
-    }
-
-    protected boolean mustUpdateFilter(Case filterCase, FilterBody body) {
-        return filterCase != null && body != null;
     }
 
     protected List<Case> updateNodeInChildrenFoldersRecursive(Case parentFolder) {
