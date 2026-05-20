@@ -17,6 +17,7 @@ public class SimpleTaskViewTemplate implements Template {
 
     private static MenuItemBody buildTemplate() {
         MenuItemBody menuItemBody = new MenuItemBody();
+        menuItemBody.setConfigurationTemplateIdentifier(IDENTIFIER);
         menuItemBody.setUseTabbedView(false);
 
         TaskViewBody taskViewBody = new TaskViewBody();

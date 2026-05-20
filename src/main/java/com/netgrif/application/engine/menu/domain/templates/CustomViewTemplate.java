@@ -15,6 +15,7 @@ public class CustomViewTemplate implements Template {
 
     private static MenuItemBody buildTemplate() {
         MenuItemBody menuItemBody = new MenuItemBody();
+        menuItemBody.setConfigurationTemplateIdentifier(IDENTIFIER);
         menuItemBody.setUseTabbedView(false);
         menuItemBody.setUseCustomView(true);
 

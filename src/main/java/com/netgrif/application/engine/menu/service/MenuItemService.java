@@ -446,7 +446,10 @@ public class MenuItemService implements IMenuItemService {
         }
 
         MenuItemBody menuItemBody = templateOpt.get().getTemplate();
-        Case viewCase = createView(menuItemBody.getView(), menuItemBody.isUseTabbedView());
+        Case viewCase = null;
+        if (menuItemBody.hasView()) {
+            viewCase = createView(menuItemBody.getView(), menuItemBody.isUseTabbedView());
+        }
         ToDataSetOutcome dataSetOutcome = menuItemBody.toDataSetByConfigTemplate(viewCase);
         log.debug("For menu item: [{}. {}] was used configuration template: {}", menuItemCase.getStringId(),
                 menuItemIdentifier, selectedTemplate);

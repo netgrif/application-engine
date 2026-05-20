@@ -17,6 +17,7 @@ public class SimpleCaseViewTemplate implements Template {
 
     private static MenuItemBody buildTemplate() {
         MenuItemBody menuItemBody = new MenuItemBody();
+        menuItemBody.setConfigurationTemplateIdentifier(IDENTIFIER);
         menuItemBody.setUseTabbedView(false);
 
         CaseViewBody caseViewBody = new CaseViewBody();

@@ -37,6 +37,12 @@
         <title>Admin</title>
     </role>
 
+    <function scope="process" name="initializeAdvancedForm">
+        { ->
+            def advancedContentFormField = useCase.getField("advanced_content_form")
+            change advancedContentFormField value { [useCase.tasks.find { taskPair -> taskPair.transition == "filter_settings"}.task] }
+        }
+    </function>
     <function scope="process" name="updateFilterAutocompleteOptions">
         {
             com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
@@ -174,15 +180,6 @@
             <!-- todo 23 headers-->
             <name>task-list</name>
         </component>
-        <event type="get">
-            <id>get</id>
-            <actions phase="pre">
-                <action>
-                    advanced_content_form: f.advanced_content_form;
-                    change advanced_content_form value { [useCase.tasks.find { taskPair -> taskPair.transition == "filter_settings"}.task] }
-                </action>
-            </actions>
-        </event>
     </data>
     <data type="boolean">
         <id>show_page_header</id>
@@ -225,6 +222,14 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <event type="finish">
+            <id>finish</id>
+            <actions phase="post">
+                <action>
+                    initializeAdvancedForm()
+                </action>
+            </actions>
+        </event>
     </transition>
     <transition>
         <id>data_sync</id>

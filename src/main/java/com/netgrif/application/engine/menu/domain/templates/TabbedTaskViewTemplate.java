@@ -17,6 +17,7 @@ public class TabbedTaskViewTemplate implements Template {
 
     private static MenuItemBody buildTemplate() {
         MenuItemBody menuItemBody = new MenuItemBody();
+        menuItemBody.setConfigurationTemplateIdentifier(IDENTIFIER);
         menuItemBody.setUseTabbedView(true);
 
         TaskViewBody taskViewBody = new TaskViewBody();

@@ -18,6 +18,7 @@ public class TabbedCaseViewTemplate implements Template {
 
     private static MenuItemBody buildTemplate() {
         MenuItemBody menuItemBody = new MenuItemBody();
+        menuItemBody.setConfigurationTemplateIdentifier(IDENTIFIER);
         menuItemBody.setUseTabbedView(true);
 
         CaseViewBody caseViewBody = new CaseViewBody();

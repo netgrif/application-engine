@@ -47,6 +47,12 @@
         <title>Admin</title>
     </role>
 
+    <function scope="process" name="initializeAdvancedForm">
+        { ->
+            def advancedContentFormField = useCase.getField("advanced_content_form")
+            change advancedContentFormField value { [useCase.tasks.find { taskPair -> taskPair.transition == "next_view_settings"}.task] }
+        }
+    </function>
     <function scope="process" name="updateFilterAutocompleteOptions">
         {
             com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
@@ -90,7 +96,7 @@
     <!-- ASSOCIATED VIEW: this section can be removed if needed -->
     <data type="enumeration_map" immediate="true">
         <id>view_configuration_type</id>
-        <title name="view_configuration_type">Pick view type</title>
+        <title name="view_configuration_type">View type</title>
         <options>
             <init dynamic="true">menuItemService.getAvailableViewsAsOptions(true, useCase.processIdentifier)</init>
         </options>
@@ -127,15 +133,6 @@
             <!-- todo 23 headers-->
             <name>task-list</name>
         </component>
-        <event type="get">
-            <id>get</id>
-            <actions phase="pre">
-                <action>
-                    advanced_content_form: f.advanced_content_form;
-                    change advanced_content_form value { [useCase.tasks.find { taskPair -> taskPair.transition == "next_view_settings"}.task] }
-                </action>
-            </actions>
-        </event>
     </data>
     <!-- END OF VIEW CONFIGURATION DATA -->
 
@@ -145,7 +142,7 @@
         <i18nString name="update_filter">Aktualizovať zobrazenie s vybraným filtrom</i18nString>
         <i18nString name="filter_update_title">Filter</i18nString>
         <i18nString name="filter_header">Súčasný filter</i18nString>
-        <i18nString name="view_configuration_type">Vybrať zobrazenie</i18nString>
+        <i18nString name="view_configuration_type">Zobrazenie</i18nString>
         <i18nString name="settings">Nastavenie</i18nString>
     </i18n>
     <i18n locale="de">
@@ -153,7 +150,7 @@
         <i18nString name="filter_update_title">Filter</i18nString>
         <i18nString name="filter_header">Aktueller Filter</i18nString>
         <i18nString name="update_filter">Aktualisiere die Ansicht mit dem ausgewählten Filter</i18nString>
-        <i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
+        <i18nString name="view_configuration_type">Der Ansichtstyp</i18nString>
         <i18nString name="settings">Einstellungen</i18nString>
     </i18n>
 
@@ -169,6 +166,14 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <event type="finish">
+            <id>finish</id>
+            <actions phase="post">
+                <action>
+                    initializeAdvancedForm()
+                </action>
+            </actions>
+        </event>
     </transition>
     <transition>
         <id>data_sync</id>
@@ -255,7 +260,7 @@
             <dataRef>
                 <id>view_configuration_type</id>
                 <logic>
-                    <behavior>editable</behavior>
+                    <behavior>visible</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
@@ -266,36 +271,6 @@
                     <template>material</template>
                     <appearance>outline</appearance>
                 </layout>
-                <event type="set">
-                    <id>0</id>
-                    <actions phase="post">
-                        <action>
-                            view_configuration_type: f.view_configuration_type,
-                            view_configuration_form: f.view_configuration_form,
-                            view_configuration_all_data_form: f.view_configuration_all_data_form,
-                            view_configuration_id: f.view_configuration_id;
-
-                            if (view_configuration_id.value != null &amp;&amp; !view_configuration_id.value.isEmpty()) {
-                                workflowService.deleteCase(view_configuration_id.value[0])
-                            }
-
-                            if (view_configuration_type.value == null || view_configuration_type.value == "") {
-                                change view_configuration_id value { [] }
-                                change view_configuration_form value { [] }
-                                change view_configuration_all_data_form value { [] }
-                                return
-                            }
-
-                            def configurationCase = createCase(view_configuration_type.value + "_configuration")
-                            def initTask = assignTask("initialize", configurationCase)
-                            finishTask(initTask)
-                            change view_configuration_id value { [configurationCase.stringId] }
-                            configurationCase = workflowService.findOne(configurationCase.stringId)
-                            change view_configuration_form value { [configurationCase.tasks.find { it.transition == "settings" }.task] }
-                            change view_configuration_all_data_form value { [configurationCase.tasks.find { it.transition == "all_menu_data" }.task] }
-                        </action>
-                    </actions>
-                </event>
             </dataRef>
             <dataRef>
                 <id>view_configuration_form</id>

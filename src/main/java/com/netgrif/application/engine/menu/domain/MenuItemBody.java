@@ -23,6 +23,7 @@ import java.util.Map;
 public class MenuItemBody {
     private String uri;
     private String identifier;
+    private String configurationTemplateIdentifier;
 
     private String menuIcon = "filter_none";
     private I18nString menuName;
@@ -182,6 +183,7 @@ public class MenuItemBody {
         outcome.putDataSetEntry(MenuItemConstants.FIELD_IS_AUTO_SELECT, FieldType.BOOLEAN, this.isAutoSelect);
         outcome.putDataSetEntryOptions(MenuItemConstants.FIELD_ALLOWED_ROLES, FieldType.MULTICHOICE_MAP, this.allowedRoles);
         outcome.putDataSetEntryOptions(MenuItemConstants.FIELD_BANNED_ROLES, FieldType.MULTICHOICE_MAP, this.bannedRoles);
+        outcome.putDataSetEntry(MenuItemConstants.FIELD_CONFIGURATION_TEMPLATES, FieldType.ENUMERATION_MAP, this.configurationTemplateIdentifier);
 
         outcome = toDataSetWithView(viewCase, outcome);
 
@@ -197,6 +199,7 @@ public class MenuItemBody {
     public ToDataSetOutcome toDataSetByConfigTemplate(Case viewCase) {
         ToDataSetOutcome outcome = new ToDataSetOutcome();
         outcome.putDataSetEntry(MenuItemConstants.FIELD_USE_TABBED_VIEW, FieldType.BOOLEAN, this.useTabbedView);
+        outcome.putDataSetEntry(MenuItemConstants.FIELD_USE_CUSTOM_VIEW, FieldType.BOOLEAN, this.useCustomView);
         return toDataSetWithView(viewCase, outcome);
     }
 
