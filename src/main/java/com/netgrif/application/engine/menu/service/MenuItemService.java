@@ -110,7 +110,7 @@ public class MenuItemService implements IMenuItemService {
         if (newName == null) {
             newName = new I18nString(body.getIdentifier());
         }
-        Case menuItemCase = createCase(FilterRunner.MENU_NET_IDENTIFIER, newName.getDefaultValue(),
+        Case menuItemCase = createCase(MenuItemConstants.PROCESS_IDENTIFIER, newName.getDefaultValue(),
                 loggedUser.transformToLoggedUser());
         menuItemCase.setUriNodeId(uriService.findByUri(body.getUri()).getStringId());
         menuItemCase = workflowService.save(menuItemCase);
@@ -205,8 +205,8 @@ public class MenuItemService implements IMenuItemService {
     @Override
     public Case findMenuItem(String identifier) {
         String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
-                FilterRunner.MENU_NET_IDENTIFIER, MenuItemConstants.FIELD_IDENTIFIER, identifier);
-        return findCase(FilterRunner.MENU_NET_IDENTIFIER, query);
+                MenuItemConstants.PROCESS_IDENTIFIER, MenuItemConstants.FIELD_IDENTIFIER, identifier);
+        return findCase(MenuItemConstants.PROCESS_IDENTIFIER, query);
     }
 
     /**
@@ -221,8 +221,8 @@ public class MenuItemService implements IMenuItemService {
     public Case findMenuItem(String uri, String name) {
         UriNode uriNode = uriService.findByUri(uri);
         String query = String.format("processIdentifier:%s AND title.keyword:\"%s\" AND uriNodeId:\"%s\"",
-                FilterRunner.MENU_NET_IDENTIFIER, name, uriNode.getStringId());
-        return findCase(FilterRunner.MENU_NET_IDENTIFIER, query);
+                MenuItemConstants.PROCESS_IDENTIFIER, name, uriNode.getStringId());
+        return findCase(MenuItemConstants.PROCESS_IDENTIFIER, query);
     }
 
     /**
@@ -235,8 +235,8 @@ public class MenuItemService implements IMenuItemService {
     @Override
     public Case findFolderCase(UriNode node) {
         String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
-                FilterRunner.MENU_NET_IDENTIFIER, MenuItemConstants.FIELD_NODE_PATH, node.getUriPath());
-        return findCase(FilterRunner.MENU_NET_IDENTIFIER, query);
+                MenuItemConstants.PROCESS_IDENTIFIER, MenuItemConstants.FIELD_NODE_PATH, node.getUriPath());
+        return findCase(MenuItemConstants.PROCESS_IDENTIFIER, query);
     }
 
     /**
@@ -249,8 +249,8 @@ public class MenuItemService implements IMenuItemService {
     @Override
     public boolean existsMenuItem(String identifier) {
         String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
-                FilterRunner.MENU_NET_IDENTIFIER, MenuItemConstants.FIELD_IDENTIFIER, identifier);
-        return countCases(FilterRunner.MENU_NET_IDENTIFIER, query) > 0;
+                MenuItemConstants.PROCESS_IDENTIFIER, MenuItemConstants.FIELD_IDENTIFIER, identifier);
+        return countCases(MenuItemConstants.PROCESS_IDENTIFIER, query) > 0;
     }
 
     /**
@@ -339,7 +339,7 @@ public class MenuItemService implements IMenuItemService {
             duplicatedViewCase = duplicateView(originViewCase);
         }
 
-        Case duplicated = createCase(FilterRunner.MENU_NET_IDENTIFIER, newTitle.getDefaultValue(),
+        Case duplicated = createCase(MenuItemConstants.PROCESS_IDENTIFIER, newTitle.getDefaultValue(),
                 userService.getLoggedOrSystem().transformToLoggedUser());
         duplicated.setUriNodeId(originItem.getUriNodeId());
         duplicated.setDataSet(originItem.getDataSet());
@@ -684,7 +684,7 @@ public class MenuItemService implements IMenuItemService {
             return folderCase;
         }
 
-        folderCase = createCase(FilterRunner.MENU_NET_IDENTIFIER, body.getMenuName().getDefaultValue(),
+        folderCase = createCase(MenuItemConstants.PROCESS_IDENTIFIER, body.getMenuName().getDefaultValue(),
                 loggedUser.transformToLoggedUser());
         folderCase.setUriNodeId(node.getParentId());
         folderCase = workflowService.save(folderCase);

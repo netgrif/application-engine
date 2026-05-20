@@ -898,6 +898,15 @@
 			<id>finish</id>
 			<actions phase="pre">
 				<action>
+					identifier: f.menu_item_identifier;
+					String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
+							com.netgrif.application.engine.menu.domain.MenuItemConstants.PROCESS_IDENTIFIER,
+							com.netgrif.application.engine.menu.domain.MenuItemConstants.FIELD_IDENTIFIER, identifier.value)
+					if (countCasesElastic(query) &gt; 1) {
+						throw new IllegalArgumentException("Such menu item already exists. Please, use different identifier")
+					}
+				</action>
+				<action>
 					def outcome = menuItemService.handleConfigurationTemplate(useCase)
 					outcome.mapping.each { fieldId, value ->
 						change useCase.getField(fieldId) value { value }

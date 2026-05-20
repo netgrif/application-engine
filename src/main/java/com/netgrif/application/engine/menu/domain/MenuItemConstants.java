@@ -35,4 +35,6 @@ public class MenuItemConstants {
     public static final String TRANS_INIT_ID = "system_initialize";
     public static final String TRANS_SYNC_ID = "data_sync";
     public static final String TRANS_ALL_MENU_DATA = "all_menu_data";
+
+    public static final String PROCESS_IDENTIFIER = "menu_item";
 }
