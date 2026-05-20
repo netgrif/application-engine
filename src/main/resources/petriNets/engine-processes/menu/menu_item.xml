@@ -899,6 +899,23 @@
 					changeMenuItem useCase uri { newUri }
 				</action>
 				<action>
+					trans: t.view_settings,
+					useTabIcon: f.use_tab_icon,
+					view_configuration_form: f.view_configuration_form,
+					view_configuration_type: f.view_configuration_type,
+					tabIconPreview: f.tab_icon_preview,
+					tabName: f.tab_name,
+					tabIcon: f.tab_icon,
+					use_custom_view: f.use_custom_view,
+					selector: f.custom_view_selector;
+
+					if (use_custom_view.value) {
+						make selector, editable on trans when { true }
+						make [useTabIcon, tabIconPreview, tabName, tabIcon, view_configuration_form,
+								view_configuration_type], hidden on trans when { true }
+					}
+				</action>
+				<action>
 					def outcome = menuItemService.handleConfigurationTemplate(useCase)
 					outcome.mapping.each { fieldId, value ->
 						change useCase.getField(fieldId) value { value }
@@ -1357,6 +1374,28 @@
 				<perform>true</perform>
 			</logic>
 		</roleRef>
+		<event type="finish">
+			<id>finish</id>
+			<actions phase="pre">
+				<action>
+					trans: t.view_settings,
+					useTabIcon: f.use_tab_icon,
+					view_configuration_form: f.view_configuration_form,
+					view_configuration_type: f.view_configuration_type,
+					tabIconPreview: f.tab_icon_preview,
+					tabName: f.tab_name,
+					tabIcon: f.tab_icon,
+					use_custom_view: f.use_custom_view,
+					selector: f.custom_view_selector;
+
+					if (use_custom_view.value) {
+						make selector, editable on trans when { true }
+						make [useTabIcon, tabIconPreview, tabName, tabIcon, view_configuration_form,
+								view_configuration_type], hidden on trans when { true }
+					}
+				</action>
+			</actions>
+		</event>
 	</transition>
 	<transition>
 		<id>role_settings</id>

@@ -35,7 +35,7 @@ public class FilterBody {
      *
      * @return metadata containing filter type as map
      * */
-    public static Map<String, Object> getDefaultMetadata(String type) {
+    public static Map<String, Object> getDefaultMetadata(String type, boolean allAllowedNets) {
         Map<String, Object> resultMap = new HashMap<>();
 
         resultMap.put("searchCategories", List.of());
@@ -43,6 +43,7 @@ public class FilterBody {
         resultMap.put("filterType", type);
         resultMap.put("defaultSearchCategories", true);
         resultMap.put("inheritAllowedNets", false);
+        resultMap.put("allAllowedNets", allAllowedNets);
 
         return resultMap;
     }
@@ -60,7 +61,7 @@ public class FilterBody {
         outcome.putDataSetEntry(DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID, FieldType.I18N, this.title);
         Map<String, Object> metadata = this.metadata;
         if (metadata == null) {
-            metadata = getDefaultMetadata(this.type);
+            metadata = getDefaultMetadata(this.type, this.allowedNets == null);
         }
         Map<String, Object> dataSetValues = new HashMap<>();
         dataSetValues.put("type", "filter");

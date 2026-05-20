@@ -1,14 +1,12 @@
 package com.netgrif.application.engine.menu.domain.templates;
 
 import com.netgrif.application.engine.menu.domain.MenuItemBody;
-import com.netgrif.application.engine.menu.domain.configurations.SingleTaskViewBody;
-import com.netgrif.application.engine.menu.domain.configurations.TabbedTicketViewBody;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 
 import java.util.Map;
 
 public class CustomViewTemplate implements Template {
-    public static final String IDENTIFIER = "none";
+    public static final String IDENTIFIER = "custom_view";
 
     private static final I18nString NAME = new I18nString("Custom view",
             Map.of("sk", "Vlastné zobrazenie", "de", "Benutzerdefinierte Ansicht"));
