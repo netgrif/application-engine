@@ -1,16 +1,13 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.menu.domain.MenuItemConstants
-import com.netgrif.application.engine.workflow.domain.Case
+
+import com.netgrif.application.engine.menu.service.interfaces.IMenuItemService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Profile
 import org.springframework.data.mapping.context.MappingContext
 import org.springframework.data.mongodb.core.MongoTemplate
-import org.springframework.data.mongodb.core.index.CompoundIndexDefinition
-import org.springframework.data.mongodb.core.index.IndexDefinition
 import org.springframework.data.mongodb.core.index.IndexOperations
 import org.springframework.data.mongodb.core.index.IndexResolver
 import org.springframework.data.mongodb.core.index.MongoPersistentEntityIndexResolver
@@ -20,13 +17,15 @@ import org.springframework.data.mongodb.core.mapping.MongoPersistentProperty
 import org.springframework.stereotype.Component
 
 @Component
-@Profile("!test")
 class MongoDbRunner extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(MongoDbRunner)
 
     @Autowired
     private MongoTemplate mongoTemplate
+
+    @Autowired
+    private IMenuItemService menuItemService
 
     @Value('${spring.data.mongodb.database}')
     private String name
@@ -71,21 +70,6 @@ class MongoDbRunner extends AbstractOrderedCommandLineRunner {
                     IndexOperations indexOps = mongoTemplate.indexOps(it.getType())
                     resolver.resolveIndexFor(it.getType()).forEach(indexOps::ensureIndex)
                 })
-        customMenuItemDataIndexes().each { indexKey, indexName ->
-            org.bson.Document keys = new org.bson.Document()
-                    .append("processIdentifier", 1)
-                    .append(indexKey, 1)
-            IndexDefinition index = new CompoundIndexDefinition(keys)
-                    .named(indexName)
-                    .background()
-            mongoTemplate.indexOps(Case.class).ensureIndex(index)
-        }
-    }
-
-    private static Map<String, String> customMenuItemDataIndexes() {
-        return Map.of(
-            "dataSet.${MenuItemConstants.FIELD_IDENTIFIER}.value" as String, MenuItemConstants.IDENTIFIER_INDEX_NAME,
-            "dataSet.${MenuItemConstants.FIELD_NODE_PATH}.value" as String, MenuItemConstants.NODE_PATH_INDEX_NAME
-        )
+        menuItemService.ensureDatabaseIndexes()
     }
 }

@@ -28,6 +28,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.CompoundIndexDefinition;
+import org.springframework.data.mongodb.core.index.IndexDefinition;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -46,8 +48,36 @@ public class MenuItemService implements IMenuItemService {
     protected final IElasticCaseService elasticCaseService;
     protected final MongoTemplate mongoTemplate;
 
-    protected static final String DEFAULT_FOLDER_ICON = "folder";
+    protected Boolean existDatabaseIndexes;
 
+    protected static final String DEFAULT_FOLDER_ICON = "folder";
+    protected static final Map<String, String> CUSTOM_MENU_ITEM_INDEXES = Map.of(
+            String.format("dataSet.%s.value", MenuItemConstants.FIELD_IDENTIFIER), MenuItemConstants.IDENTIFIER_INDEX_NAME,
+            String.format("dataSet.%s.value", MenuItemConstants.FIELD_NODE_PATH), MenuItemConstants.NODE_PATH_INDEX_NAME
+    );
+
+
+    /**
+     * Ensures custom MongoDB compound indexes for menu items are created on the Case collection.
+     * Creates background indexes combining <code>processIdentifier</code> with menu item identifier
+     * and node path fields to optimize menu item queries.
+     *
+     * @see #CUSTOM_MENU_ITEM_INDEXES
+     */
+    @Override
+    public void ensureDatabaseIndexes() {
+        log.info("Ensuring Mongo database menu item indexes");
+        CUSTOM_MENU_ITEM_INDEXES.forEach( (indexKey, indexName) -> {
+            org.bson.Document keys = new org.bson.Document()
+                .append("processIdentifier", 1)
+                .append(indexKey, 1);
+            IndexDefinition index = new CompoundIndexDefinition(keys)
+                    .named(indexName)
+                    .background();
+            mongoTemplate.indexOps(Case.class).ensureIndex(index);
+        });
+        existDatabaseIndexes = Boolean.TRUE;
+    }
 
     /**
      * Creates menu item case and it's configuration cases
@@ -164,6 +194,9 @@ public class MenuItemService implements IMenuItemService {
                 Criteria.where("processIdentifier").is(MenuItemConstants.PROCESS_IDENTIFIER)
                         .and(String.format("dataSet.%s.value", MenuItemConstants.FIELD_IDENTIFIER)).is(identifier)
         );
+        if (existDatabaseIndexes == null || !existDatabaseIndexes) {
+            ensureDatabaseIndexes();
+        }
         query.withHint(MenuItemConstants.IDENTIFIER_INDEX_NAME);
         List<Case> caseAsList = mongoTemplate.find(query, Case.class);
         Optional<Case> caseOptional = caseAsList.stream().findFirst();
@@ -199,6 +232,9 @@ public class MenuItemService implements IMenuItemService {
                 Criteria.where("processIdentifier").is(MenuItemConstants.PROCESS_IDENTIFIER)
                         .and(String.format("dataSet.%s.value", MenuItemConstants.FIELD_NODE_PATH)).is(node.getUriPath())
         );
+        if (existDatabaseIndexes == null || !existDatabaseIndexes) {
+            ensureDatabaseIndexes();
+        }
         query.withHint(MenuItemConstants.NODE_PATH_INDEX_NAME);
         List<Case> caseAsList = mongoTemplate.find(query, Case.class);
         Optional<Case> caseOptional = caseAsList.stream().findFirst();

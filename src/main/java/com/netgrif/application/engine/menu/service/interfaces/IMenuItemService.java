@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 public interface IMenuItemService {
 
+    void ensureDatabaseIndexes();
     Case createMenuItem(MenuItemBody body) throws TransitionNotExecutableException;
     Case updateMenuItem(Case itemCase, MenuItemBody body) throws TransitionNotExecutableException;
     Case createOrUpdateMenuItem(MenuItemBody body) throws TransitionNotExecutableException;
