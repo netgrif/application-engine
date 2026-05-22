@@ -43,7 +43,7 @@ class TestHelper {
     @Autowired
     private IFieldActionsCacheService actionsCacheService
     @Autowired
-    private FilterRunner filterRunner
+    private MenuRunner filterRunner
     @Autowired
     private FinisherRunner finisherRunner
     @Autowired

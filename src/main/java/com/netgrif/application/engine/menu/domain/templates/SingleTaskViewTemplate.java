@@ -13,29 +13,30 @@ public class SingleTaskViewTemplate implements Template {
     private static final I18nString NAME = new I18nString("Single task view",
             Map.of("sk", "Zobrazenie jednej úlohy", "de", "Anzeige einer Aufgabe"));
 
-    private static final MenuItemBody TEMPLATE = buildTemplate();
-
     private static MenuItemBody buildTemplate() {
         MenuItemBody menuItemBody = new MenuItemBody();
         menuItemBody.setConfigurationTemplateIdentifier(IDENTIFIER);
         menuItemBody.setUseTabbedView(false);
 
         SingleTaskViewBody singleTaskViewBody = new SingleTaskViewBody();
-        singleTaskViewBody.setFilterBody(Template.defaultTaskFilterBody(NAME));
+        singleTaskViewBody.setFilterBody(Template.defaultTaskFilterBody());
         menuItemBody.setView(singleTaskViewBody);
 
         return menuItemBody;
     }
 
+    @Override
     public String getIdentifier() {
         return IDENTIFIER;
     }
 
+    @Override
     public I18nString getName() {
         return NAME;
     }
 
+    @Override
     public MenuItemBody getTemplate() {
-        return TEMPLATE;
+        return buildTemplate();
     }
 }

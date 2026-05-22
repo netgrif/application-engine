@@ -5,6 +5,7 @@ package com.netgrif.application.engine.menu.domain.configurations;
  */
 public class TaskViewConstants extends ViewConstants {
     public static final String FIELD_MERGE_FILTERS = "merge_filters";
+    public static final String FIELD_FILTER = "task_filter";
     public static final String FIELD_VIEW_SEARCH_TYPE = "task_view_search_type";
     public static final String FIELD_DEFAULT_HEADERS = "task_default_headers";
     public static final String FIELD_HEADERS_MODE = "task_headers_mode";

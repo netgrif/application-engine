@@ -11,22 +11,20 @@ public interface Template {
     I18nString getName();
     MenuItemBody getTemplate();
 
-    static FilterBody defaultTaskFilterBody(I18nString name) {
+    static FilterBody defaultTaskFilterBody() {
         FilterBody filterBody = new FilterBody();
         filterBody.setIcon("filter");
         filterBody.setType("Task");
         filterBody.setVisibility("private");
-        filterBody.setTitle(name);
         filterBody.setQuery("*");
         return filterBody;
     }
 
-    static FilterBody defaultCaseFilterBody(I18nString name) {
+    static FilterBody defaultCaseFilterBody() {
         FilterBody filterBody = new FilterBody();
         filterBody.setIcon("filter");
         filterBody.setType("Case");
         filterBody.setVisibility("private");
-        filterBody.setTitle(name);
         filterBody.setQuery("*");
         return filterBody;
     }

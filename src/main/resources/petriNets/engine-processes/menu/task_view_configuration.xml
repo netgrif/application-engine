@@ -44,33 +44,6 @@
                                                      useCase.tasks.find { taskPair -> taskPair.transition == "header_settings"}.task] }
         }
     </function>
-    <function scope="process" name="updateFilterAutocompleteOptions">
-        {
-            com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
-            com.netgrif.application.engine.petrinet.domain.dataset.TaskField previewTaskRef,
-            com.netgrif.application.engine.petrinet.domain.dataset.CaseField selectedFilterRef,
-            com.netgrif.application.engine.petrinet.domain.dataset.ButtonField updateBtn,
-            com.netgrif.application.engine.petrinet.domain.Transition trans
-                ->
-                if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
-                    change previewTaskRef value {
-                        return [findTask({it.caseId.eq(filterAutocomplete.value).and(it.transitionId.eq("view_filter"))}).stringId]
-                    }
-                    make updateBtn,editable on trans when { true }
-                } else {
-                    change filterAutocomplete options {
-                        def findAllPredicate = { filterCase -> !selectedFilterRef.value.contains(filterCase.stringId)
-                                &amp;&amp; filterCase.dataSet["filter_type"].value == "Task" }
-                        def options = findFilters(filterAutocomplete.value != null ? filterAutocomplete.value : "")
-                                .findAll(findAllPredicate)
-                                .collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
-                        return options
-                    }
-                    change previewTaskRef value { [] }
-                    make updateBtn,visible on trans when { true }
-                }
-        }
-    </function>
     <function scope="process" name="updateOptionsBasedOnValue">
         {
             com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField toBeUpdated,
@@ -97,118 +70,6 @@
         }
     </function>
 
-    <!-- FILTER configuration data -->
-    <data type="taskRef">
-        <id>selected_filter_preview</id>
-        <title/>
-    </data>
-    <data type="taskRef">
-        <id>current_task_filter_preview</id>
-        <title/>
-    </data>
-    <data type="i18n">
-        <id>filter_header</id>
-        <title/>
-        <init name="filter_header">Current filter</init>
-        <component>
-            <name>divider</name>
-        </component>
-    </data>
-    <data type="text">
-        <id>new_filter_id</id>
-        <title/>
-    </data>
-    <data type="boolean" immediate="true">
-        <id>contains_filter</id>
-        <title/>
-        <init>false</init>
-    </data>
-    <data type="enumeration_map">
-        <id>filter_autocomplete_selection</id>
-        <title name="filter_autocomplete_selection">Select new filter</title>
-        <component>
-            <name>autocomplete_dynamic</name>
-        </component>
-        <action trigger="set">
-            trans: t.filter_settings,
-            filterAutocomplete: f.this,
-            filter_case: f.filter_case,
-            update_filter: f.update_filter,
-            previewTaskRef: f.selected_filter_preview;
-
-            updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans)
-        </action>
-        <action trigger="get">
-            trans: t.filter_settings,
-            filterAutocomplete: f.this,
-            filter_case: f.filter_case,
-            update_filter: f.update_filter,
-            previewTaskRef: f.selected_filter_preview;
-
-            updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans)
-        </action>
-    </data>
-    <data type="button">
-        <id>update_filter</id>
-        <title/>
-        <placeholder name="update_filter">Update view with selected filter</placeholder>
-        <component>
-            <name>raised</name>
-        </component>
-        <action trigger="set">
-            trans: t.filter_settings,
-            update_filter: f.update_filter,
-            contains_filter: f.contains_filter,
-            filter_case: f.filter_case,
-            filterAutocomplete: f.filter_autocomplete_selection;
-
-            boolean containsFilter = filterAutocomplete.value != null &amp;&amp; filterAutocomplete.value != ""
-            if (containsFilter) {
-                def filterCase = findCase({it._id.eq(filterAutocomplete.value)})
-                if (filterCase.dataSet["filter_type"].value != "Task") {
-                    throw new IllegalArgumentException("Filter is of wrong type. Only filter of Task type allowed.")
-                }
-            }
-
-            change contains_filter value { containsFilter }
-            change filter_case value { [filterAutocomplete.value] }
-            change filterAutocomplete value { "" }
-            make update_filter,visible on trans when { true }
-        </action>
-    </data>
-    <data type="caseRef">
-        <id>filter_case</id>
-        <title/>
-        <action trigger="set">
-            trans: t.filter_settings,
-            filterHeader: f.filter_header,
-            removeButton: f.remove_filter,
-            contains_filter: f.contains_filter,
-            mergeFilters: f.merge_filters,
-            filterTaskRef: f.current_task_filter_preview,
-            filterCaseRef: f.filter_case;
-
-            if (filterCaseRef.value == null || filterCaseRef.value == []) {
-                make [mergeFilters, removeButton], hidden on trans when { true }
-                make filterHeader, hidden on trans when { true }
-                change filterTaskRef value { [] }
-                change contains_filter value { false }
-                return
-            }
-
-            def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
-            change filterTaskRef value {
-                return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]
-            }
-
-            make [mergeFilters, removeButton], editable on trans when { true }
-            make filterHeader,visible on trans when { true }
-            change contains_filter value { true }
-        </action>
-        <allowedNets>
-            <allowedNet>filter</allowedNet>
-        </allowedNets>
-    </data>
     <data type="button">
         <id>remove_filter</id>
         <title/>
@@ -217,15 +78,17 @@
             <name>raised</name>
         </component>
         <action trigger="set">
-            filterCase: f.filter_case;
-
-            change filterCase value { [] }
+            // todo 23
         </action>
     </data>
     <data type="boolean" immediate="true">
         <id>merge_filters</id>
         <title name="merge_filters">Merge with base filter?</title>
         <init>true</init>
+    </data>
+    <data type="filter">
+        <id>task_filter</id>
+        <title name="todo 23">Filter</title>
     </data>
 
     <!-- TASK VIEW CONFIGURATION DATA -->
@@ -350,8 +213,6 @@
 
     <!-- I18NS -->
     <i18n locale="sk">
-        <i18nString name="filter_autocomplete_selection">Zvoľte nový filter</i18nString>
-        <i18nString name="update_filter">Aktualizovať zobrazenie s vybraným filtrom</i18nString>
         <i18nString name="hidden">Skryté</i18nString>
         <i18nString name="fulltext">Fulltext</i18nString>
         <i18nString name="fulltext_advanced">Fulltext a rozšírené</i18nString>
@@ -369,12 +230,10 @@
         <i18nString name="default_headers_desc">Napríklad: "meta-title", "meta-user"</i18nString>
         <i18nString name="task_show_more_menu">Zobrazovať menu pre úlohovú položku?</i18nString>
         <i18nString name="item_settings">Nastavenie položky</i18nString>
-        <i18nString name="filter_header">Súčasný filter</i18nString>
         <i18nString name="item_settings_general">Všeobecné</i18nString>
         <i18nString name="remove_filter">Vymazať filter</i18nString>
     </i18n>
     <i18n locale="de">
-        <i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
         <i18nString name="hidden">Versteckt</i18nString>
         <i18nString name="fulltext">Einfacher Suchmodus</i18nString>
         <i18nString name="sort">Sortieren</i18nString>
@@ -387,9 +246,7 @@
         <i18nString name="use_task_default_headers">Eigene Kopfzeilen verwenden?</i18nString>
         <i18nString name="task_default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
         <i18nString name="default_headers_desc">Beispiel: "meta-title", "meta-user"</i18nString>
-        <i18nString name="filter_header">Aktueller Filter</i18nString>
         <i18nString name="item_settings_general">Allgemein</i18nString>
-        <i18nString name="update_filter">Aktualisiere die Ansicht mit dem ausgewählten Filter</i18nString>
         <i18nString name="fulltext_advanced">Einfacher und erweiterter Suchmodus</i18nString>
         <i18nString name="merge_filters">Mit dem Basisfilter kombinieren?</i18nString>
         <i18nString name="task_view_search_type">Suchmodus im Aufgabenansicht</i18nString>
@@ -572,7 +429,7 @@
             <cols>4</cols>
             <layout>grid</layout>
             <dataRef>
-                <id>filter_autocomplete_selection</id>
+                <id>task_filter</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -580,70 +437,9 @@
                     <x>0</x>
                     <y>0</y>
                     <rows>1</rows>
-                    <cols>3</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>update_filter</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-                <layout>
-                    <x>3</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>1</cols>
-                    <template>material</template>
-                    <appearance>standard</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>selected_filter_preview</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>standard</appearance>
-                </layout>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>current_additional_filter</id>
-            <cols>4</cols>
-            <layout>grid</layout>
-            <dataRef>
-                <id>filter_header</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
                     <cols>4</cols>
                     <template>material</template>
                     <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>current_task_filter_preview</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>standard</appearance>
                 </layout>
             </dataRef>
             <dataRef>
@@ -653,7 +449,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>2</y>
+                    <y>1</y>
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>
@@ -667,7 +463,7 @@
                 </logic>
                 <layout>
                     <x>1</x>
-                    <y>2</y>
+                    <y>1</y>
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>
@@ -859,31 +655,7 @@
             <alignment>start</alignment>
             <stretch>true</stretch>
             <dataRef>
-                <id>filter_autocomplete_selection</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>update_filter</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>selected_filter_preview</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>filter_header</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>current_task_filter_preview</id>
+                <id>task_filter</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>

@@ -931,7 +931,7 @@
 				<action>
 					name: f.menu_name,
 					menu_item_identifier: f.menu_item_identifier,
-					menu_item_identifier_on_create: f.menu_item_identifier_on_create;
+					menu_item_identifier_on_create: f.menu_item_identifier_on_create,
 					dest: f.move_dest_uri;
 					
 					change menu_item_identifier value { menu_item_identifier_on_create.value }

@@ -12,16 +12,6 @@
 	<!-- PROCESS ROLE REFS -->
 	<!-- PROCESS USER REFS -->
 	<!-- FUNCTIONS -->
-	<function scope="process" name="updateAvailableEntries">
-		{
-			com.netgrif.application.engine.workflow.domain.Case useCase ->
-
-			def cases = findCasesElastic(
-							"processIdentifier:\"preference_filter_item\" AND dataSet.parentId.textValue.keyword:\"$useCase.stringId\"" as String,
-							org.springframework.data.domain.PageRequest.of(0, 1000))
-			change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
-		}
-	</function>
 	<role>
 		<id>system</id>
 		<title>System</title>
@@ -122,11 +112,6 @@
 		<id>update_available_entries_btn</id>
 		<title></title>
 		<placeholder name="update_available_entries_btn_placeholder">Update entries</placeholder>
-		<action trigger="set">
-			availableEntries: f.available_export_entries;
-
-			updateAvailableEntries(useCase)
-		</action>
 	</data>
 	<data type="button">
 		<id>clear_menu_selection_btn</id>
@@ -265,8 +250,6 @@
 			finishTask(initTask)
 
 			workflowService.save(useCase)
-
-			updateAvailableEntries(useCase)
 		</action>
 	</data>
 	<!-- I18NS -->
@@ -384,30 +367,6 @@
 				</layout>
 			</dataRef>
 		</dataGroup>
-		<event type="finish">
-			<id>1</id>
-			<actions phase="pre">
-				<action>
-					availableEntries: f.available_export_entries;
-
-                    defaultFilters = findDefaultFilters()
-
-					defaultFilters.forEach { filterCase -&gt;
-						def optionCase = createCase("preference_filter_item", filterCase.title + " filter preference")
-
-						def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(optionCase.stringId))})
-						assignTask(initTask)
-						setData(initTask, [
-								"filter_case": ["type":"caseRef", "value": [filterCase.stringId], "allowedNets":["filter"]],
-								"parentId": ["type":"text", "value":useCase.stringId], "menu_identifier": ["type":"text", value:"defaultMenu"]
-						])
-						finishTask(initTask)
-					}
-
-					updateAvailableEntries(useCase)
-				</action>
-			</actions>
-		</event>
 	</transition>
 	<transition>
 		<id>6</id>

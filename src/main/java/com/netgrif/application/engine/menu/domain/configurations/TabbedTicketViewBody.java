@@ -24,6 +24,11 @@ public class TabbedTicketViewBody extends ViewBody {
     }
 
     @Override
+    public String getFilterFieldId() {
+        return "";
+    }
+
+    @Override
     protected ToDataSetOutcome toDataSetInternal(ToDataSetOutcome outcome) {
         return outcome;
     }

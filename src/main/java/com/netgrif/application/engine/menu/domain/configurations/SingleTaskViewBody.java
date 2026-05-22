@@ -25,6 +25,11 @@ public class SingleTaskViewBody extends ViewBody {
     }
 
     @Override
+    public String getFilterFieldId() {
+        return SingleTaskViewConstants.FIELD_FILTER;
+    }
+
+    @Override
     protected ToDataSetOutcome toDataSetInternal(ToDataSetOutcome outcome) {
         outcome.putDataSetEntry(SingleTaskViewConstants.FIELD_SHOW_PAGE_HEADER, FieldType.BOOLEAN, this.showPageHeader);
         outcome.putDataSetEntry(SingleTaskViewConstants.FIELD_SHOW_PAGE_FOOTER, FieldType.BOOLEAN, this.showPageFooter);

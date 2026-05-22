@@ -14,8 +14,6 @@ public class TabbedTicketViewTemplate implements Template {
     private static final I18nString NAME = new I18nString("Tabbed ticket view",
             Map.of("sk", "Tiketové zobrazenie", "de", "Ticketansicht"));
 
-    private static final MenuItemBody TEMPLATE = buildTemplate();
-
     private static MenuItemBody buildTemplate() {
         MenuItemBody menuItemBody = new MenuItemBody();
         menuItemBody.setConfigurationTemplateIdentifier(IDENTIFIER);
@@ -24,22 +22,25 @@ public class TabbedTicketViewTemplate implements Template {
         TabbedTicketViewBody tabbedTicketViewBody = new TabbedTicketViewBody();
 
         SingleTaskViewBody singleTaskViewBody = new SingleTaskViewBody();
-        singleTaskViewBody.setFilterBody(Template.defaultTaskFilterBody(NAME));
+        singleTaskViewBody.setFilterBody(Template.defaultTaskFilterBody());
         tabbedTicketViewBody.setChainedView(singleTaskViewBody);
         menuItemBody.setView(tabbedTicketViewBody);
 
         return menuItemBody;
     }
 
+    @Override
     public String getIdentifier() {
         return IDENTIFIER;
     }
 
+    @Override
     public I18nString getName() {
         return NAME;
     }
 
+    @Override
     public MenuItemBody getTemplate() {
-        return TEMPLATE;
+        return buildTemplate();
     }
 }

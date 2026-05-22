@@ -14,8 +14,8 @@ import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.UriContentType
 import com.netgrif.application.engine.petrinet.domain.UriNode
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
-import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.MenuRunner
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
@@ -46,7 +46,7 @@ class MenuItemApiTest {
     private ImportHelper helper
 
     @Autowired
-    private FilterRunner filterRunner
+    private MenuRunner filterRunner
 
     @Autowired
     private IUserService userService

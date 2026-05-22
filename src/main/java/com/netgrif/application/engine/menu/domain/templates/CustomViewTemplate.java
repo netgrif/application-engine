@@ -11,8 +11,6 @@ public class CustomViewTemplate implements Template {
     private static final I18nString NAME = new I18nString("Custom view",
             Map.of("sk", "Vlastné zobrazenie", "de", "Benutzerdefinierte Ansicht"));
 
-    private static final MenuItemBody TEMPLATE = buildTemplate();
-
     private static MenuItemBody buildTemplate() {
         MenuItemBody menuItemBody = new MenuItemBody();
         menuItemBody.setConfigurationTemplateIdentifier(IDENTIFIER);
@@ -22,15 +20,18 @@ public class CustomViewTemplate implements Template {
         return menuItemBody;
     }
 
+    @Override
     public String getIdentifier() {
         return IDENTIFIER;
     }
 
+    @Override
     public I18nString getName() {
         return NAME;
     }
 
+    @Override
     public MenuItemBody getTemplate() {
-        return TEMPLATE;
+        return buildTemplate();
     }
 }

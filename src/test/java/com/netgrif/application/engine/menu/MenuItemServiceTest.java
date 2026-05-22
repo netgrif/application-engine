@@ -135,7 +135,6 @@ public class MenuItemServiceTest {
 
     private Case createDefaultMenuItem(String identifier, I18nString name) throws TransitionNotExecutableException {
         FilterBody filterBody = new FilterBody();
-        filterBody.setTitle(new I18nString("My case view filter"));
         filterBody.setQuery("processIdentifier:process1");
         filterBody.setType("Case");
         filterBody.setAllowedNets(List.of("process1"));

@@ -13,8 +13,6 @@ public class TabbedTaskViewTemplate implements Template {
     private static final I18nString NAME = new I18nString("Tabbed task view",
             Map.of("sk", "Zobrazenie úloh v záložkách", "de", "Aufgabenansicht in Registerkarten"));
 
-    private static final MenuItemBody TEMPLATE = buildTemplate();
-
     private static MenuItemBody buildTemplate() {
         MenuItemBody menuItemBody = new MenuItemBody();
         menuItemBody.setConfigurationTemplateIdentifier(IDENTIFIER);
@@ -22,21 +20,24 @@ public class TabbedTaskViewTemplate implements Template {
 
         TaskViewBody taskViewBody = new TaskViewBody();
 
-        taskViewBody.setFilterBody(Template.defaultTaskFilterBody(NAME));
+        taskViewBody.setFilterBody(Template.defaultTaskFilterBody());
         menuItemBody.setView(taskViewBody);
 
         return menuItemBody;
     }
 
+    @Override
     public String getIdentifier() {
         return IDENTIFIER;
     }
 
+    @Override
     public I18nString getName() {
         return NAME;
     }
 
+    @Override
     public MenuItemBody getTemplate() {
-        return TEMPLATE;
+        return buildTemplate();
     }
 }

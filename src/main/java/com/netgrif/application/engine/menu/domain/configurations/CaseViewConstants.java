@@ -4,7 +4,6 @@ package com.netgrif.application.engine.menu.domain.configurations;
  * Here are declared constants of process case_view_configuration.xml.
  */
 public class CaseViewConstants extends ViewConstants {
-    public static final String FIELD_NEW_FILTER_ID = "new_filter_id";
     public static final String FIELD_DEFAULT_HEADERS = "case_default_headers";
     public static final String FIELD_REQUIRE_TITLE_IN_CREATION = "require_title_in_creation";
     public static final String FIELD_VIEW_SEARCH_TYPE = "case_view_search_type";
@@ -20,4 +19,5 @@ public class CaseViewConstants extends ViewConstants {
     public static final String FIELD_USE_DEFAULT_HEADERS = "use_case_default_headers";
     public static final String FIELD_EMPTY_CONTENT_TEXT = "case_empty_content_text";
     public static final String FIELD_EMPTY_CONTENT_ICON = "case_empty_content_icon";
+    public static final String FIELD_FILTER = "case_filter";
 }

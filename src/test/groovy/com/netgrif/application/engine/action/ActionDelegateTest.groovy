@@ -8,7 +8,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.PublicViewProperties
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
-import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
+
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -35,9 +35,6 @@ class ActionDelegateTest {
     private ActionDelegate actionDelegate
 
     @Autowired
-    private IFilterImportExportService importExportService
-
-    @Autowired
     private IUserService userService
 
     @Autowired
@@ -46,14 +43,6 @@ class ActionDelegateTest {
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
-    }
-
-    @Test
-    @Disabled("Context user")
-    void importFiltersTest(){
-        List<String> actionDelegateList = actionDelegate.importFilters()
-        List<String> importedTasksIds = importExportService.importFilters()
-        assert actionDelegateList.size() == importedTasksIds.size()
     }
 
     @Test

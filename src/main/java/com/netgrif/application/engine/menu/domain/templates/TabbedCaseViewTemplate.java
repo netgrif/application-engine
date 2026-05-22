@@ -14,8 +14,6 @@ public class TabbedCaseViewTemplate implements Template {
     private static final I18nString NAME = new I18nString("Tabbed case view",
             Map.of("sk", "Zobrazenie prípadov v záložkách", "de", "Registerkartenansicht für Fälle"));
 
-    private static final MenuItemBody TEMPLATE = buildTemplate();
-
     private static MenuItemBody buildTemplate() {
         MenuItemBody menuItemBody = new MenuItemBody();
         menuItemBody.setConfigurationTemplateIdentifier(IDENTIFIER);
@@ -23,22 +21,25 @@ public class TabbedCaseViewTemplate implements Template {
 
         CaseViewBody caseViewBody = new CaseViewBody();
 
-        caseViewBody.setFilterBody(Template.defaultCaseFilterBody(NAME));
+        caseViewBody.setFilterBody(Template.defaultCaseFilterBody());
         caseViewBody.setChainedView(new TaskViewBody());
         menuItemBody.setView(caseViewBody);
 
         return menuItemBody;
     }
 
+    @Override
     public String getIdentifier() {
         return IDENTIFIER;
     }
 
+    @Override
     public I18nString getName() {
         return NAME;
     }
 
+    @Override
     public MenuItemBody getTemplate() {
-        return TEMPLATE;
+        return buildTemplate();
     }
 }

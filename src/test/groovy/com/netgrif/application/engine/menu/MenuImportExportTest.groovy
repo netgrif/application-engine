@@ -17,9 +17,7 @@ import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.menu.domain.MenuAndFilters
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
-import com.netgrif.application.engine.workflow.service.UserFilterSearchService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
-import com.netgrif.application.engine.workflow.service.interfaces.IMenuImportExportService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
@@ -72,10 +70,7 @@ class MenuImportExportTest {
             "Menu entry \"My tasks\": OK\n"
 
     @Autowired
-    IMenuImportExportService menuImportExportService
-
-    @Autowired
-    FilterRunner filterRunner
+    MenuRunner filterRunner
 
     @Autowired
     TestHelper testHelper
@@ -88,12 +83,6 @@ class MenuImportExportTest {
 
     @Autowired
     ImportHelper importHelper
-
-    @Autowired
-    DefaultFiltersRunner defaultFiltersRunner
-
-    @Autowired
-    UserFilterSearchService userFilterSearchService
 
     @Autowired
     ITaskService taskService
@@ -123,7 +112,6 @@ class MenuImportExportTest {
     @BeforeEach
     void beforeTest() {
         this.testHelper.truncateDbs();
-        this.defaultFiltersRunner.run()
         this.dummyUser = createDummyUser();
     }
 

@@ -69,32 +69,6 @@
             change advancedContentFormField value { taskIds }
         }
     </function>
-    <function scope="process" name="updateFilterAutocompleteOptions">
-        {
-            com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
-            com.netgrif.application.engine.petrinet.domain.dataset.TaskField previewTaskRef,
-            com.netgrif.application.engine.petrinet.domain.dataset.CaseField selectedFilterRef,
-            com.netgrif.application.engine.petrinet.domain.dataset.ButtonField updateBtn,
-            com.netgrif.application.engine.petrinet.domain.Transition trans
-                ->
-                if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
-                    change previewTaskRef value {
-                        return [findTask({it.caseId.eq(filterAutocomplete.value).and(it.transitionId.eq("view_filter"))}).stringId]
-                    }
-                    make updateBtn,editable on trans when { true }
-                } else {
-                    change filterAutocomplete options {
-                        def findAllPredicate = { filterCase -> !selectedFilterRef.value.contains(filterCase.stringId)
-                                &amp;&amp; filterCase.dataSet["filter_type"].value == "Case" }
-                        return findFilters(filterAutocomplete.value != null ? filterAutocomplete.value : "")
-                                .findAll(findAllPredicate)
-                                .collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
-                    }
-                    change previewTaskRef value { [] }
-                    make updateBtn,visible on trans when { true }
-                }
-        }
-    </function>
     <function scope="process" name="removeViewCase">
         { ->
 
@@ -133,143 +107,6 @@
                 change toBeUpdated options { newOptions }
         }
     </function>
-
-    <!-- FILTER configuration data -->
-    <data type="taskRef">
-        <id>selected_filter_preview</id>
-        <title/>
-    </data>
-    <data type="taskRef">
-        <id>current_filter_preview</id>
-        <title/>
-    </data>
-    <data type="i18n">
-        <id>filter_header</id>
-        <title/>
-        <init name="filter_header">Current filter</init>
-        <component>
-            <name>divider</name>
-        </component>
-    </data>
-    <data type="text">
-        <id>new_filter_id</id>
-        <title/>
-    </data>
-    <data type="boolean" immediate="true">
-        <id>contains_filter</id>
-        <title/>
-        <init>false</init>
-    </data>
-    <data type="enumeration_map">
-        <id>filter_autocomplete_selection</id>
-        <title name="filter_autocomplete_selection">Select new filter</title>
-        <component>
-            <name>autocomplete_dynamic</name>
-        </component>
-        <action trigger="set">
-            trans: t.filter_settings,
-            filterAutocomplete: f.this,
-            filter_case: f.filter_case,
-            update_filter: f.update_filter,
-            previewTaskRef: f.selected_filter_preview;
-
-            updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans)
-        </action>
-        <action trigger="get">
-            trans: t.filter_settings,
-            filterAutocomplete: f.this,
-            filter_case: f.filter_case,
-            update_filter: f.update_filter,
-            previewTaskRef: f.selected_filter_preview;
-
-            updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans)
-        </action>
-    </data>
-    <data type="button">
-        <id>update_filter</id>
-        <title/>
-        <placeholder name="update_filter">Update view with selected filter</placeholder>
-        <component>
-            <name>raised</name>
-        </component>
-        <action trigger="set">
-            trans: t.filter_settings,
-            update_filter: f.update_filter,
-            contains_filter: f.contains_filter,
-            filter_case: f.filter_case,
-            filterAutocomplete: f.filter_autocomplete_selection;
-
-            boolean containsFilter = filterAutocomplete.value != null &amp;&amp; filterAutocomplete.value != ""
-            if (containsFilter) {
-                def filterCase = findCase({it._id.eq(filterAutocomplete.value)})
-                if (filterCase.dataSet["filter_type"].value != "Case") {
-                    throw new IllegalArgumentException("Filter is of wrong type. Only filter of Case type allowed.")
-                }
-            }
-
-            change contains_filter value { containsFilter }
-            change filter_case value { [filterAutocomplete.value] }
-            change filterAutocomplete value { "" }
-            make update_filter,visible on trans when { true }
-        </action>
-    </data>
-    <data type="caseRef">
-        <id>filter_case</id>
-        <title/>
-        <action trigger="set">
-            filterTaskRef: f.current_filter_preview,
-            contains_filter: f.contains_filter,
-            filterCaseRef: f.filter_case;
-
-            if (filterCaseRef.value == null || filterCaseRef.value == []) {
-                change filterTaskRef value { [] }
-                change contains_filter value { false }
-                return
-            }
-
-            def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
-            change filterTaskRef value {
-                return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]
-            }
-            change contains_filter value { true }
-        </action>
-        <allowedNets>
-            <allowedNet>filter</allowedNet>
-        </allowedNets>
-    </data>
-    <data type="enumeration_map">
-        <id>available_filter_cases</id>
-        <title/>
-        <component>
-            <name>caseref</name>
-            <property key="headers">meta-title,meta-author,filter-visibility</property>
-            <property key="allowedNets">filter</property>
-            <property key="createCase">true</property>
-            <property key="search">true</property>
-            <property key="filter">true</property>
-            <property key="filterQuery">{ "query": "processIdentifier:filter AND (author:&lt;&lt;me&gt;&gt; OR dataSet.visibility.keyValue:public) AND dataSet.filter_type.keyValue:Case" }</property>
-        </component>
-        <event type="set">
-            <id>0</id>
-            <actions phase="post">
-                <action>
-                    available_filter_cases: f.this,
-                    current_filter_preview: f.current_filter_preview;
-
-                    if (available_filter_cases.value == null || available_filter_cases.value == "") {
-                        change current_filter_preview value { [] }
-                        return
-                    }
-                    change current_filter_preview value {
-                        return [findTask({it.caseId.eq(available_filter_cases.value).and(it.transitionId.eq("view_filter"))}).stringId]
-                    }
-                </action>
-            </actions>
-        </event>
-        <allowedNets>
-            <allowedNet>filter</allowedNet>
-        </allowedNets>
-    </data>
 
     <!-- VIEW CONFIGURATION DATA -->
     <data type="enumeration_map" immediate="true">
@@ -488,6 +325,10 @@
             <name>htmltextarea</name>
         </component>
     </data>
+    <data type="filter">
+        <id>case_filter</id>
+        <title name="todo 23">Filter</title>
+    </data>
 
     <!-- I18NS -->
     <i18n locale="sk">
@@ -496,8 +337,6 @@
         <i18nString name="create_case_button_icon_preview">Náhľad ikony</i18nString>
         <i18nString name="case_default_headers">Predvolené hlavičky</i18nString>
         <i18nString name="default_headers_desc">Napríklad: "meta-title", "meta-visualId"</i18nString>
-        <i18nString name="filter_autocomplete_selection">Zvoľte nový filter</i18nString>
-        <i18nString name="update_filter">Aktualizovať zobrazenie s vybraným filtrom</i18nString>
         <i18nString name="case_view_search_type">Typ vyhľadávania prípadov</i18nString>
         <i18nString name="hidden">Skryté</i18nString>
         <i18nString name="fulltext">Fulltext</i18nString>
@@ -516,7 +355,6 @@
         <i18nString name="case_allow_header_table_mode">Povoliť tabuľkový mód pre hlavičky?</i18nString>
         <i18nString name="use_case_default_headers">Použiť vlastné predvolené hlavičky?</i18nString>
         <i18nString name="item_settings">Nastavenie položky</i18nString>
-        <i18nString name="filter_header">Súčasný filter</i18nString>
         <i18nString name="view_header">Zobrazenie prípadov</i18nString>
         <i18nString name="item_settings_general">Všeobecné</i18nString>
         <i18nString name="view_configuration_type">Typ zobrazenia</i18nString>
@@ -527,7 +365,6 @@
         <i18nString name="create_case_button_icon">Ikone ID</i18nString>
         <i18nString name="create_case_button_icon_preview">Ikonevorschau</i18nString>
         <i18nString name="case_default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
-        <i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
         <i18nString name="default_headers_desc">Beispiel: "meta-title", "meta-visualId"</i18nString>
         <i18nString name="hidden">Versteckt</i18nString>
         <i18nString name="fulltext">Einfacher Suchmodus</i18nString>
@@ -539,9 +376,7 @@
         <i18nString name="case_is_header_mode_changeable">Erlaube Änderung des Kopfzeilenmodus?</i18nString>
         <i18nString name="case_allow_header_table_mode">Erlaube Tabellenmodus?</i18nString>
         <i18nString name="use_case_default_headers">Eigene Kopfzeilen verwenden?</i18nString>
-        <i18nString name="filter_header">Aktueller Filter</i18nString>
         <i18nString name="item_settings_general">Allgemein</i18nString>
-        <i18nString name="update_filter">Aktualisiere die Ansicht mit dem ausgewählten Filter</i18nString>
         <i18nString name="case_view_search_type">Suchmodus im Fallansicht</i18nString>
         <i18nString name="fulltext_advanced">Einfacher und erweiterter Suchmodus</i18nString>
         <i18nString name="require_title_in_creation">Erforde den Titel beim erzeugen von Fällen?</i18nString>
@@ -729,7 +564,7 @@
             <cols>4</cols>
             <layout>grid</layout>
             <dataRef>
-                <id>available_filter_cases</id>
+                <id>case_filter</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -740,20 +575,6 @@
                     <cols>4</cols>
                     <template>material</template>
                     <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>current_filter_preview</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>standard</appearance>
                 </layout>
             </dataRef>
         </dataGroup>
@@ -1147,31 +968,7 @@
             <alignment>start</alignment>
             <stretch>true</stretch>
             <dataRef>
-                <id>available_filter_cases</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>update_filter</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>selected_filter_preview</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>filter_header</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>current_filter_preview</id>
+                <id>case_filter</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>

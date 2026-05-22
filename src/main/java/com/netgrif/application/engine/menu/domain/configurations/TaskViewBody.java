@@ -16,7 +16,6 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class TaskViewBody extends ViewBody {
-    private Case filter;
     private boolean mergeFilters = true;
     private String viewSearchType = "fulltext_advanced";
     private List<String> headersMode = new ArrayList<>(List.of("sort", "edit"));
@@ -37,6 +36,11 @@ public class TaskViewBody extends ViewBody {
     @Override
     public MenuItemView getViewType() {
         return MenuItemView.TASK_VIEW;
+    }
+
+    @Override
+    public String getFilterFieldId() {
+        return TaskViewConstants.FIELD_FILTER;
     }
 
     @Override

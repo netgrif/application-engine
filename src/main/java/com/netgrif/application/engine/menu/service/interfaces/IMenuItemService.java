@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 
 public interface IMenuItemService {
 
-    Case createFilter(FilterBody body) throws TransitionNotExecutableException;
-    Case updateFilter(Case filterCase, FilterBody body);
     Case createMenuItem(MenuItemBody body) throws TransitionNotExecutableException;
     Case updateMenuItem(Case itemCase, MenuItemBody body) throws TransitionNotExecutableException;
     Case createOrUpdateMenuItem(MenuItemBody body) throws TransitionNotExecutableException;

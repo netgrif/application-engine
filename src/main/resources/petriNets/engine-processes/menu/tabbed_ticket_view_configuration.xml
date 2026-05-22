@@ -53,32 +53,6 @@
             change advancedContentFormField value { [useCase.tasks.find { taskPair -> taskPair.transition == "next_view_settings"}.task] }
         }
     </function>
-    <function scope="process" name="updateFilterAutocompleteOptions">
-        {
-            com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
-            com.netgrif.application.engine.petrinet.domain.dataset.TaskField previewTaskRef,
-            com.netgrif.application.engine.petrinet.domain.dataset.CaseField selectedFilterRef,
-            com.netgrif.application.engine.petrinet.domain.dataset.ButtonField updateBtn,
-            com.netgrif.application.engine.petrinet.domain.Transition trans
-                ->
-                if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
-                    change previewTaskRef value {
-                        return [findTask({it.caseId.eq(filterAutocomplete.value).and(it.transitionId.eq("view_filter"))}).stringId]
-                    }
-                    make updateBtn,editable on trans when { true }
-                } else {
-                    change filterAutocomplete options {
-                        def findAllPredicate = { filterCase -> !selectedFilterRef.value.contains(filterCase.stringId)
-                                &amp;&amp; filterCase.dataSet["filter_type"].value == "Case" }
-                        return findFilters(filterAutocomplete.value != null ? filterAutocomplete.value : "")
-                                .findAll(findAllPredicate)
-                                .collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
-                    }
-                    change previewTaskRef value { [] }
-                    make updateBtn,visible on trans when { true }
-                }
-        }
-    </function>
     <function scope="process" name="removeViewCase">
         { ->
 
@@ -138,18 +112,10 @@
 
     <!-- I18NS -->
     <i18n locale="sk">
-        <i18nString name="filter_autocomplete_selection">Zvoľte nový filter</i18nString>
-        <i18nString name="update_filter">Aktualizovať zobrazenie s vybraným filtrom</i18nString>
-        <i18nString name="filter_update_title">Filter</i18nString>
-        <i18nString name="filter_header">Súčasný filter</i18nString>
         <i18nString name="view_configuration_type">Zobrazenie</i18nString>
         <i18nString name="settings">Nastavenie</i18nString>
     </i18n>
     <i18n locale="de">
-        <i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
-        <i18nString name="filter_update_title">Filter</i18nString>
-        <i18nString name="filter_header">Aktueller Filter</i18nString>
-        <i18nString name="update_filter">Aktualisiere die Ansicht mit dem ausgewählten Filter</i18nString>
         <i18nString name="view_configuration_type">Der Ansichtstyp</i18nString>
         <i18nString name="settings">Einstellungen</i18nString>
     </i18n>

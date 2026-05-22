@@ -44,6 +44,11 @@ public class CaseViewBody extends ViewBody {
     }
 
     @Override
+    public String getFilterFieldId() {
+        return CaseViewConstants.FIELD_FILTER;
+    }
+
+    @Override
     protected ToDataSetOutcome toDataSetInternal(ToDataSetOutcome outcome) {
 
         outcome.putDataSetEntry(CaseViewConstants.FIELD_VIEW_SEARCH_TYPE, FieldType.ENUMERATION_MAP,

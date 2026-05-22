@@ -18,8 +18,6 @@ import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
-import com.netgrif.application.engine.startup.DefaultFiltersRunner;
-import com.netgrif.application.engine.startup.FilterRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -49,43 +47,6 @@ public class MenuItemService implements IMenuItemService {
     protected final MongoTemplate mongoTemplate;
 
     protected static final String DEFAULT_FOLDER_ICON = "folder";
-
-    /**
-     * Creates new filter case
-     *
-     * @param body filter data used for creation
-     *
-     * @return initialized filter case instance with the provided data
-     * */
-    @Override
-    public Case createFilter(FilterBody body) throws TransitionNotExecutableException {
-        IUser loggedUser = userService.getLoggedOrSystem();
-        Case filterCase = createCase(FilterRunner.FILTER_PETRI_NET_IDENTIFIER, body.getTitle().getDefaultValue(), loggedUser.transformToLoggedUser());
-        filterCase.setIcon(body.getIcon());
-        filterCase = workflowService.save(filterCase);
-        ToDataSetOutcome dataSetOutcome = body.toDataSet();
-        filterCase = setDataWithExecute(filterCase, DefaultFiltersRunner.AUTO_CREATE_TRANSITION, dataSetOutcome.getDataSet());
-        log.trace("Created filter case [{}][{}]", filterCase.getStringId(), body.getTitle().getDefaultValue());
-        return filterCase;
-    }
-
-    /**
-     * Updates existing filter case
-     *
-     * @param filterCase filter to be updated
-     * @param body data values used for update
-     *
-     * @return updated filter case instance
-     * */
-    @Override
-    public Case updateFilter(Case filterCase, FilterBody body) {
-        filterCase.setIcon(body.getIcon());
-        filterCase = workflowService.save(filterCase);
-        ToDataSetOutcome dataSetOutcome = body.toDataSet();
-        filterCase = setData(filterCase, DefaultFiltersRunner.DETAILS_TRANSITION, dataSetOutcome.getDataSet());
-        log.trace("Updated filter case [{}][{}]", filterCase.getStringId(), body.getTitle().getDefaultValue());
-        return filterCase;
-    }
 
 
     /**
@@ -518,19 +479,6 @@ public class MenuItemService implements IMenuItemService {
         return setDataWithExecute(duplicatedViewCase, MenuItemConstants.TRANS_INIT_ID, dataSet);
     }
 
-    protected Case findFilter(Case viewCase) {
-        return findCaseInCaseRef(viewCase, ViewConstants.FIELD_VIEW_FILTER_CASE);
-    }
-
-    protected Case findCaseInCaseRef(Case useCase, String caseRefId) {
-        try {
-            String caseId = MenuItemUtils.getCaseIdFromCaseRef(useCase, caseRefId);
-            return workflowService.findOne(caseId);
-        } catch (IllegalArgumentException | NullPointerException ignore) {
-            return null;
-        }
-    }
-
     protected Case createView(ViewBody body, boolean isTabbed) throws TransitionNotExecutableException {
         IUser loggedUser = userService.getLoggedOrSystem();
         Case viewCase = createCase(body.getViewProcessIdentifier(), body.getViewProcessIdentifier(),
@@ -540,15 +488,8 @@ public class MenuItemService implements IMenuItemService {
         if (body.hasAssociatedView()) {
             associatedViewCase = createView(body.getAssociatedViewBody(), isTabbed);
         }
-        Case filterCase = null;
-        if (body.getFilterBody() != null) {
-            if (body.getFilterBody().getFilter() != null) {
-                filterCase = body.getFilterBody().getFilter();
-            } else {
-                filterCase = createFilter(body.getFilterBody());
-            }
-        }
-        ToDataSetOutcome dataSetOutcome = body.toDataSet(associatedViewCase, filterCase);
+
+        ToDataSetOutcome dataSetOutcome = body.toDataSet(associatedViewCase);
         viewCase = setDataWithExecute(viewCase, ViewConstants.TRANS_INIT_ID, dataSetOutcome.getDataSet());
 
         log.trace("Created configuration view case [{}] of identifier [{}]", viewCase.getStringId(),

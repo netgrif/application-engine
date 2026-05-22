@@ -1,9 +1,5 @@
 package com.netgrif.application.engine.menu.domain;
 
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
-import com.netgrif.application.engine.startup.DefaultFiltersRunner;
-import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,18 +11,12 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 public class FilterBody {
-    private Case filter;
-    private I18nString title;
     private String query;
     private String type;
     private List<String> allowedNets;
     private String icon;
     private String visibility;
     private Map<String, Object> metadata;
-
-    public FilterBody(Case filterCase) {
-        this.filter = filterCase;
-    }
 
     /**
      * Gets default metadata with provided filter type
@@ -53,12 +43,7 @@ public class FilterBody {
      *
      * @return {@link ToDataSetOutcome} object with dataSet
      * */
-    public ToDataSetOutcome toDataSet() {
-        ToDataSetOutcome outcome = new ToDataSetOutcome();
-
-        outcome.putDataSetEntry(DefaultFiltersRunner.FILTER_TYPE_FIELD_ID, FieldType.ENUMERATION_MAP, this.type);
-        outcome.putDataSetEntry(DefaultFiltersRunner.FILTER_VISIBILITY_FIELD_ID, FieldType.ENUMERATION_MAP, this.visibility);
-        outcome.putDataSetEntry(DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID, FieldType.I18N, this.title);
+    public ToDataSetOutcome toDataSet(ToDataSetOutcome viewDataSetOutcome, String filterFieldId) {
         Map<String, Object> metadata = this.metadata;
         if (metadata == null) {
             metadata = getDefaultMetadata(this.type, this.allowedNets == null);
@@ -68,8 +53,8 @@ public class FilterBody {
         dataSetValues.put("value", this.query);
         dataSetValues.put("filterMetadata", metadata);
         dataSetValues.put("allowedNets", this.allowedNets);
-        outcome.getDataSet().put(DefaultFiltersRunner.FILTER_FIELD_ID, dataSetValues);
+        viewDataSetOutcome.getDataSet().put(filterFieldId, dataSetValues);
 
-        return outcome;
+        return viewDataSetOutcome;
     }
 }

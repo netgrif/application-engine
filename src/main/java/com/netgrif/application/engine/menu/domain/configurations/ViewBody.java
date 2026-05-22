@@ -24,6 +24,7 @@ public abstract class ViewBody {
 
     public abstract ViewBody getAssociatedViewBody();
     public abstract MenuItemView getViewType();
+    public abstract String getFilterFieldId();
     /**
      * Internal method, that must transform data in concrete class and add them into received outcome. Method must return
      * the updated outcome.
@@ -52,18 +53,17 @@ public abstract class ViewBody {
      * @return {@link ToDataSetOutcome} object containing dataSet
      * */
     public ToDataSetOutcome toDataSet() {
-        return toDataSet(null, null);
+        return toDataSet(null);
     };
 
     /**
      * Transforms data of this class into {@link ToDataSetOutcome}, which contains prepared data for the {@link IDataService#setData}
      *
      * @param associatedViewCase case instance of associated view. If provided, caseRef and taskRef are initialized.
-     * @param filterCase case instance of filter. If provided, caseRef is initialized
      *
      * @return {@link ToDataSetOutcome} object containing dataSet
      * */
-    public ToDataSetOutcome toDataSet(Case associatedViewCase, Case filterCase) {
+    public ToDataSetOutcome toDataSet(Case associatedViewCase) {
         ToDataSetOutcome outcome = new ToDataSetOutcome();
 
         if (associatedViewCase != null) {
@@ -76,8 +76,8 @@ public abstract class ViewBody {
             String allDataTaskId = MenuItemUtils.findTaskIdInCase(associatedViewCase, ViewConstants.TRANS_ALL_MENU_DATA_ID);
             outcome.putDataSetEntry(ViewConstants.FIELD_VIEW_CONFIGURATION_ALL_DATA_FORM, FieldType.TASK_REF, List.of(allDataTaskId));
         }
-        if (filterCase != null) {
-            outcome.putDataSetEntry(ViewConstants.FIELD_VIEW_FILTER_CASE, FieldType.CASE_REF, List.of(filterCase.getStringId()));
+        if (filterBody != null) {
+            outcome = filterBody.toDataSet(outcome, getFilterFieldId());
         }
 
         return toDataSetInternal(outcome);
