@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.menu.domain.configurations;
 
-import com.netgrif.application.engine.menu.domain.MenuItemView;
+import com.netgrif.application.engine.menu.domain.MenuItemViewType;
 import com.netgrif.application.engine.menu.domain.ToDataSetOutcome;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import lombok.Data;
@@ -20,8 +20,8 @@ public class SingleTaskViewBody extends ViewBody {
     }
 
     @Override
-    public MenuItemView getViewType() {
-        return MenuItemView.SINGLE_TASK_VIEW;
+    public MenuItemViewType getViewType() {
+        return MenuItemViewType.SINGLE_TASK_VIEW;
     }
 
     @Override

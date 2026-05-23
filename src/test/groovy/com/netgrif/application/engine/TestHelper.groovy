@@ -3,6 +3,7 @@ package com.netgrif.application.engine
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
+import com.netgrif.application.engine.menu.service.interfaces.IMenuItemService
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
@@ -52,6 +53,10 @@ class TestHelper {
     private UriRunner uriRunner
     @Autowired
     private IPetriNetService petriNetService
+    @Autowired
+    private IMenuItemService menuItemService
+    @Autowired
+    private MongoDbRunner mongoDbRunner
 
     void truncateDbs() {
         template.db.drop()
@@ -66,6 +71,7 @@ class TestHelper {
         actionsCacheService.clearNamespaceFunctionCache()
         petriNetService.evictAllCaches()
 
+        mongoDbRunner.run()
         defaultRoleRunner.run()
         anonymousRoleRunner.run()
         systemUserRunner.run()
@@ -75,5 +81,6 @@ class TestHelper {
         impersonationRunner.run()
         superCreator.run()
         finisherRunner.run()
+        menuItemService.ensureDatabaseIndexes()
     }
 }

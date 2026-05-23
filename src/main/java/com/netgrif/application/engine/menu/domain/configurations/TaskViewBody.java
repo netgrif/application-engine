@@ -1,10 +1,9 @@
 package com.netgrif.application.engine.menu.domain.configurations;
 
-import com.netgrif.application.engine.menu.domain.MenuItemView;
+import com.netgrif.application.engine.menu.domain.MenuItemViewType;
 import com.netgrif.application.engine.menu.domain.ToDataSetOutcome;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
-import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -34,8 +33,8 @@ public class TaskViewBody extends ViewBody {
     }
 
     @Override
-    public MenuItemView getViewType() {
-        return MenuItemView.TASK_VIEW;
+    public MenuItemViewType getViewType() {
+        return MenuItemViewType.TASK_VIEW;
     }
 
     @Override

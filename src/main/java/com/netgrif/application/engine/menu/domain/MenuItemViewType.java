@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * Here is listed and configured every configuration process available for menu items.
  * */
 @Getter
-public enum MenuItemView {
+public enum MenuItemViewType {
     CASE_VIEW(new I18nString("Case view",
             Map.of("sk", "Zobrazenie prípadov", "de", "Fallansicht")),
             "case_view", List.of("task_view"), true, true, true),
@@ -41,7 +41,8 @@ public enum MenuItemView {
      * */
     private final boolean isPrimary;
 
-    MenuItemView(I18nString name, String identifier, List<String> allowedAssociatedViews, boolean isTabbed, boolean isUntabbed, boolean isPrimary) {
+    MenuItemViewType(I18nString name, String identifier, List<String> allowedAssociatedViews, boolean isTabbed,
+                     boolean isUntabbed, boolean isPrimary) {
         this.name = name;
         this.identifier = identifier;
         this.allowedAssociatedViews = allowedAssociatedViews;
@@ -53,8 +54,8 @@ public enum MenuItemView {
     /**
      * Builds enum value by the view identifier
      * */
-    public static MenuItemView fromIdentifier(String identifier) {
-        for (MenuItemView view : MenuItemView.values()) {
+    public static MenuItemViewType fromIdentifier(String identifier) {
+        for (MenuItemViewType view : MenuItemViewType.values()) {
             if (view.identifier.equals(identifier)) {
                 return view;
             }
@@ -70,8 +71,8 @@ public enum MenuItemView {
      *
      * @return List of views based on {@link #isTabbed}
      * */
-    public static List<MenuItemView> findAllByIsTabbedAndIsPrimary(boolean isTabbed, boolean isPrimary) {
-        return Arrays.stream(MenuItemView.values())
+    public static List<MenuItemViewType> findAllByIsTabbedAndIsPrimary(boolean isTabbed, boolean isPrimary) {
+        return Arrays.stream(MenuItemViewType.values())
                 .filter(view -> (view.isTabbed == isTabbed || view.isUntabbed != isTabbed) && view.isPrimary == isPrimary)
                 .collect(Collectors.toList());
     }
@@ -84,9 +85,9 @@ public enum MenuItemView {
      *
      * @return List of views based on {@link #isTabbed} and {@link #allowedAssociatedViews}
      * */
-    public static List<MenuItemView> findAllByIsTabbedAndParentIdentifier(boolean isTabbed, String parentIdentifier) {
-        MenuItemView parentView = fromIdentifier(parentIdentifier);
-        return Arrays.stream(MenuItemView.values())
+    public static List<MenuItemViewType> findAllByIsTabbedAndParentIdentifier(boolean isTabbed, String parentIdentifier) {
+        MenuItemViewType parentView = fromIdentifier(parentIdentifier);
+        return Arrays.stream(MenuItemViewType.values())
                 .filter(view -> (view.isTabbed == isTabbed || view.isUntabbed != isTabbed)
                         && parentView.getAllowedAssociatedViews().contains(view.identifier))
                 .collect(Collectors.toList());

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.startup
 
 import com.netgrif.application.engine.menu.domain.MenuItemConstants
-import com.netgrif.application.engine.menu.domain.MenuItemView
+import com.netgrif.application.engine.menu.domain.MenuItemViewType
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import groovy.util.logging.Slf4j
@@ -30,7 +30,7 @@ class MenuRunner extends AbstractOrderedCommandLineRunner {
     }
 
     private List<PetriNet> createConfigurationNets() {
-        return MenuItemView.values().each { view ->
+        return MenuItemViewType.values().each { view ->
             String processIdentifier = view.getIdentifier() + "_configuration"
             String filePath = String.format("engine-processes/menu/%s.xml", processIdentifier)
             helper.importProcess(String.format("Petri net for %s", processIdentifier), processIdentifier, filePath)

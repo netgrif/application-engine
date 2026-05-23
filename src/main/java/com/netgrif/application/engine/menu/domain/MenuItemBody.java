@@ -2,7 +2,6 @@ package com.netgrif.application.engine.menu.domain;
 
 import com.netgrif.application.engine.menu.domain.configurations.ViewBody;
 import com.netgrif.application.engine.menu.domain.configurations.ViewConstants;
-import com.netgrif.application.engine.menu.domain.templates.Template;
 import com.netgrif.application.engine.menu.utils.MenuItemUtils;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
@@ -112,7 +111,7 @@ public class MenuItemBody {
     public void setView(ViewBody viewBody) {
         if (viewBody != null) {
             this.view = viewBody;
-            MenuItemView viewType = viewBody.getViewType();
+            MenuItemViewType viewType = viewBody.getViewType();
             if (viewType.isTabbed() != viewType.isUntabbed()) {
                 // if isTabbed == isUntabbed we cannot determine the result value
                 this.useTabbedView = viewType.isTabbed();
@@ -165,7 +164,11 @@ public class MenuItemBody {
         if (nodePath != null) {
             outcome.putDataSetEntry(MenuItemConstants.FIELD_NODE_PATH, FieldType.TEXT, nodePath);
         }
-        outcome.putDataSetEntry(MenuItemConstants.FIELD_MENU_NAME, FieldType.I18N, this.menuName);
+        if (this.menuName == null) {
+            outcome.putDataSetEntry(MenuItemConstants.FIELD_MENU_NAME, FieldType.I18N, new I18nString(this.identifier));
+        } else {
+            outcome.putDataSetEntry(MenuItemConstants.FIELD_MENU_NAME, FieldType.I18N, this.menuName);
+        }
         outcome.putDataSetEntry(MenuItemConstants.FIELD_MENU_ICON, FieldType.TEXT, this.menuIcon);
         outcome.putDataSetEntry(MenuItemConstants.FIELD_USE_TABBED_VIEW, FieldType.BOOLEAN, this.useTabbedView);
         if (this.tabName != null) {

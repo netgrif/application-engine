@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.menu.domain.configurations;
 
 import com.netgrif.application.engine.menu.domain.FilterBody;
-import com.netgrif.application.engine.menu.domain.MenuItemView;
+import com.netgrif.application.engine.menu.domain.MenuItemViewType;
 import com.netgrif.application.engine.menu.domain.ToDataSetOutcome;
 import com.netgrif.application.engine.menu.utils.MenuItemUtils;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
@@ -23,7 +23,7 @@ public abstract class ViewBody {
     protected FilterBody filterBody;
 
     public abstract ViewBody getAssociatedViewBody();
-    public abstract MenuItemView getViewType();
+    public abstract MenuItemViewType getViewType();
     public abstract String getFilterFieldId();
     /**
      * Internal method, that must transform data in concrete class and add them into received outcome. Method must return

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.menu.domain.configurations;
 
-import com.netgrif.application.engine.menu.domain.MenuItemView;
+import com.netgrif.application.engine.menu.domain.MenuItemViewType;
 import com.netgrif.application.engine.menu.domain.ToDataSetOutcome;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
@@ -39,8 +39,8 @@ public class CaseViewBody extends ViewBody {
     }
 
     @Override
-    public MenuItemView getViewType() {
-        return MenuItemView.CASE_VIEW;
+    public MenuItemViewType getViewType() {
+        return MenuItemViewType.CASE_VIEW;
     }
 
     @Override
