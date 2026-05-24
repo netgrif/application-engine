@@ -6,6 +6,7 @@ import com.netgrif.application.engine.menu.domain.MenuItemViewType;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
@@ -31,6 +32,8 @@ public interface IMenuItemService {
     Case removeChildItemFromParent(String folderId, Case childItem);
     List<DataGroup> getMenuItemData(String caseId, Locale locale);
     ConfigurationTemplateOutcome handleConfigurationTemplate(Case menuItemCase) throws TransitionNotExecutableException;
+    Map<String, I18nString> collectRoles(List<ProcessRole> roles);
+    Map<String, I18nString> collectRoles(Map<String, String> roles);
 
     /**
      * Gets all tabbed or non-tabbed views

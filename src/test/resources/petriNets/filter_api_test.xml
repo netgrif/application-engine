@@ -68,34 +68,6 @@
 		<id>group</id>
 		<title>Skupina</title>
 	</data>
-
-	<data type="button">
-		<id>create_filter_and_menu</id>
-		<title>create filter and menu</title>
-
-		<event type="set">
-			<actions phase="post">
-				<action>
-					menu_stringId: f.menu_stringId,
-					filter_stringId: f.filter_stringId,
-					uri: f.uri,
-					title: f.title,
-					allowed_nets: f.allowed_nets,
-					query: f.query,
-					identifier: f.identifier,
-					icon: f.icon;
-
-					def filter = createCaseFilter(title.value, query.value, allowed_nets.value.split(",") as List, icon.value)
-					def item = createMenuItem(uri.value, identifier.value, title.value, icon.value, filter,
-									["role_1": "filter_api_test"], ["role_2": "filter_api_test"],
-									["meta-title,meta-title"], ["meta-title,meta-title"])
-
-					change menu_stringId value { item.stringId }
-					change filter_stringId value { filter.stringId }
-				</action>
-			</actions>
-		</event>
-	</data>
 	<data type="button">
 		<id>change_filter_and_menu</id>
 		<title>change filter and menu</title>

@@ -5,12 +5,13 @@ import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.menu.domain.FilterBody;
 import com.netgrif.application.engine.menu.domain.MenuItemBody;
 import com.netgrif.application.engine.menu.domain.MenuItemConstants;
-import com.netgrif.application.engine.menu.domain.configurations.CaseViewBody;
-import com.netgrif.application.engine.menu.domain.configurations.TaskViewBody;
-import com.netgrif.application.engine.menu.domain.configurations.ViewConstants;
+import com.netgrif.application.engine.menu.domain.MenuItemViewType;
+import com.netgrif.application.engine.menu.domain.configurations.*;
+import com.netgrif.application.engine.menu.domain.templates.TabbedCaseViewTemplate;
 import com.netgrif.application.engine.menu.domain.templates.Template;
 import com.netgrif.application.engine.menu.service.MenuItemService;
 import com.netgrif.application.engine.menu.service.MenuItemTemplateHolder;
+import com.netgrif.application.engine.menu.utils.MenuItemUtils;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
@@ -18,6 +19,7 @@ import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExe
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.domain.TaskPair;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -27,6 +29,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
@@ -85,7 +89,7 @@ public class MenuItemServiceTest {
     }
 
     @Test
-    public void createMenuItemTest() {
+    public void createMenuItemTest() throws TransitionNotExecutableException {
         assertThrows(IllegalArgumentException.class, () -> menuItemService.createMenuItem(null));
         MenuItemBody emptyBody = new MenuItemBody();
         assertThrows(IllegalArgumentException.class, () -> menuItemService.createMenuItem(emptyBody));
@@ -109,17 +113,17 @@ public class MenuItemServiceTest {
             menuItemBody.setIdentifier(templateIdentifier);
             menuItemBody.setConfigurationTemplateIdentifier(templateIdentifier);
             try {
-                createAndAssertMenuItem(menuItemBody);
+                createByTemplateAndAssert(menuItemBody);
             } catch (TransitionNotExecutableException e) {
                 throw new RuntimeException(e);
             }
         });
 
-        // todo 23 detailny test pre zlozite view (porovnat aj s MenuItemApiTest)
+        createAndAssertDetailed();
     }
 
     @SuppressWarnings("unchecked")
-    private void createAndAssertMenuItem(MenuItemBody menuItemBody) throws TransitionNotExecutableException {
+    private void createByTemplateAndAssert(MenuItemBody menuItemBody) throws TransitionNotExecutableException {
         caseRepository.deleteAll();
         Case menuItemCase = menuItemService.createMenuItem(menuItemBody);
 
@@ -177,6 +181,106 @@ public class MenuItemServiceTest {
                 assertTrue(nextViewConfigurationAllDataFormValue.contains(getTaskId(nextViewCase, ViewConstants.TRANS_ALL_MENU_DATA_ID)));
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void createAndAssertDetailed() throws TransitionNotExecutableException {
+        Optional<Template> templateOpt = MenuItemTemplateHolder.get(TabbedCaseViewTemplate.IDENTIFIER);
+        assertTrue(templateOpt.isPresent());
+        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
+        menuItemBody.setUri("/netgrif/test");
+        menuItemBody.setIdentifier("new_menu_item");
+        menuItemBody.setMenuIcon("device_hub");
+        assertNotNull(menuItemBody.getView());
+        assertNotNull(menuItemBody.getView().getFilterBody());
+        menuItemBody.getView().getFilterBody().setAllowedNets(List.of("menu_item"));
+        menuItemBody.getView().getFilterBody().setQuery("processIdentifier:menu_item");
+        menuItemBody.getView().getFilterBody().setType("Case");
+        ((CaseViewBody) menuItemBody.getView()).setDefaultHeaders(List.of("meta-title", "meta-processIdentifier"));
+        assertNotNull(menuItemBody.getView().getAssociatedViewBody());
+        ((TaskViewBody) menuItemBody.getView().getAssociatedViewBody()).setDefaultHeaders(List.of("meta-title"));
+        menuItemBody.setAllowedRoles(menuItemService.collectRoles(Map.of("admin", "menu_item")));
+        menuItemBody.setBannedRoles(menuItemService.collectRoles(Map.of("system", "menu_item")));
+
+        Case menuItemCase = menuItemService.createMenuItem(menuItemBody);
+
+        // MENU ITEM
+        UriNode leafNode = uriService.findByUri("/netgrif/test/new_menu_item");
+        assertNotNull(leafNode);
+        assertEquals(menuItemCase.getUriNodeId(), uriService.findByUri("/netgrif/test").getStringId());
+        assertEquals("device_hub", menuItemCase.getFieldValue(MenuItemConstants.FIELD_MENU_ICON));
+        I18nString menuName = (I18nString) menuItemCase.getFieldValue(MenuItemConstants.FIELD_MENU_NAME);
+        assertEquals(new I18nString("new_menu_item"), menuName);
+        assertEquals("new_menu_item", menuItemCase.getFieldValue(MenuItemConstants.FIELD_IDENTIFIER).toString());
+
+        Map<String, ?> bannedRolesOptions = menuItemCase.getDataSet().get(MenuItemConstants.FIELD_BANNED_ROLES).getOptions();
+        assertTrue(bannedRolesOptions.containsKey("system:menu_item"));
+        Map<String, ?> allowedRolesOptions = menuItemCase.getDataSet().get(MenuItemConstants.FIELD_ALLOWED_ROLES).getOptions();
+        assertTrue(allowedRolesOptions.containsKey("admin:menu_item"));
+
+        // CASE VIEW
+        assertEquals(true, menuItemCase.getFieldValue(MenuItemConstants.FIELD_USE_TABBED_VIEW));
+        assertEquals(MenuItemViewType.CASE_VIEW.getIdentifier(), menuItemCase.getFieldValue(MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE));
+
+        String caseViewId = MenuItemUtils.getCaseIdFromCaseRef(menuItemCase, MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID);
+        assertNotNull(caseViewId);
+        Case caseView = workflowService.findOne(caseViewId);
+        DataField filterDataField = caseView.getDataField(CaseViewConstants.FIELD_FILTER);
+        assertEquals("Case", filterDataField.getFilterMetadata().get("filterType"));
+        assertTrue(filterDataField.getAllowedNets().size() == 1 && filterDataField.getAllowedNets().contains("menu_item"));
+        assertEquals("processIdentifier:menu_item", filterDataField.getValue());
+
+        List<String> caseDefaultHeaders = (List<String>) caseView.getFieldValue(CaseViewConstants.FIELD_DEFAULT_HEADERS);
+        assertEquals(2, caseDefaultHeaders.size());
+        assertTrue(caseDefaultHeaders.containsAll(List.of("meta-title", "meta-processIdentifier")));
+        assertEquals(MenuItemViewType.TASK_VIEW.getIdentifier(), caseView.getFieldValue(CaseViewConstants.FIELD_CONFIGURATION_TYPE));
+
+        // TASK VIEW
+        String taskViewId = MenuItemUtils.getCaseIdFromCaseRef(caseView, CaseViewConstants.FIELD_VIEW_CONFIGURATION_ID);
+        assertNotNull(taskViewId);
+        Case taskView = workflowService.findOne(taskViewId);
+        List<String> taskDefaultHeaders = (List<String>) taskView.getFieldValue(TaskViewConstants.FIELD_DEFAULT_HEADERS);
+        assertEquals(1, taskDefaultHeaders.size());
+        assertTrue(taskDefaultHeaders.contains("meta-title"));
+
+        // FOLDERS
+        Case testFolder = findMenuItem("test");
+        Case netgrifFolder = findMenuItem("netgrif");
+
+        UriNode testNode = uriService.findByUri("/netgrif");
+        UriNode netgrifNode = uriService.getRoot();
+
+        Case rootFolder = findMenuItem("");
+
+        assertNotNull(testFolder);
+        assertNotNull(testNode);
+        assertEquals(testNode.getStringId(), testFolder.getUriNodeId());
+
+        String testFolderParentId = MenuItemUtils.getCaseIdFromCaseRef(testFolder, MenuItemConstants.FIELD_PARENT_ID);
+        assertEquals(netgrifFolder.getStringId(), testFolderParentId);
+
+        List<String> testFolderChildIds = MenuItemUtils.getCaseIdsFromCaseRef(testFolder, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
+        assertNotNull(testFolderChildIds);
+        assertTrue(testFolderChildIds.contains(menuItemCase.getStringId()));
+
+        String itemParentId = MenuItemUtils.getCaseIdFromCaseRef(menuItemCase, MenuItemConstants.FIELD_PARENT_ID);
+        assertEquals(testFolder.getStringId(), itemParentId);
+
+        assertEquals(netgrifNode.getStringId(), netgrifFolder.getUriNodeId());
+
+        String netgrifFolderParentId = MenuItemUtils.getCaseIdFromCaseRef(netgrifFolder, MenuItemConstants.FIELD_PARENT_ID);
+        assertEquals(rootFolder.getStringId(), netgrifFolderParentId);
+
+        List<String> netgrifFolderChildIds = MenuItemUtils.getCaseIdsFromCaseRef(netgrifFolder, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
+        assertNotNull(netgrifFolderChildIds);
+        assertTrue(netgrifFolderChildIds.contains(testFolder.getStringId()));
+
+        String rootFolderParentId = MenuItemUtils.getCaseIdFromCaseRef(rootFolder, MenuItemConstants.FIELD_PARENT_ID);
+        assertNull(rootFolderParentId);
+
+        List<String> rootFolderChildIds = MenuItemUtils.getCaseIdsFromCaseRef(rootFolder, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
+        assertNotNull(rootFolderChildIds);
+        assertTrue(rootFolderChildIds.contains(netgrifFolder.getStringId()));
     }
 
     @Test
@@ -290,5 +394,16 @@ public class MenuItemServiceTest {
                 .filter((taskPair -> taskPair.getTransition().equals(transId)))
                 .map(TaskPair::getTask)
                 .findFirst().orElse(null);
+    }
+
+    private Case findMenuItem(String identifier) {
+        Query query = Query.query(
+                Criteria.where("processIdentifier").is(MenuItemConstants.PROCESS_IDENTIFIER)
+                        .and(String.format("dataSet.%s.value", MenuItemConstants.FIELD_IDENTIFIER)).is(identifier)
+        );
+        query.withHint(MenuItemConstants.IDENTIFIER_INDEX_NAME);
+        List<Case> caseAsList = mongoTemplate.find(query, Case.class);
+        Optional<Case> caseOptional = caseAsList.stream().findFirst();
+        return caseOptional.map(aCase -> workflowService.findOne(aCase.getStringId())).orElse(null);
     }
 }

@@ -76,62 +76,6 @@ class MenuItemApiTest {
     }
 
     @Test
-    void testCreateFilterAndMenuItems() {
-        Case caze = createMenuItem()
-        Case item = getMenuItem(caze)
-        Case filter = getFilter(caze)
-
-        Thread.sleep(4000)
-        UriNode leafNode = uriService.findByUri("/netgrif/test/new_menu_item")
-        assert leafNode != null
-        assert item.uriNodeId == uriService.findByUri("/netgrif/test").stringId
-        assert item.dataSet[MenuItemConstants.FIELD_MENU_ICON].value == "device_hub"
-        assert item.dataSet[MenuItemConstants.FIELD_MENU_NAME].value == new I18nString("FILTER")
-        assert item.dataSet[MenuItemConstants.FIELD_IDENTIFIER].value.toString() == "new_menu_item"
-        assert item.dataSet[MenuItemConstants.FIELD_BANNED_ROLES].options.containsKey("role_2:filter_api_test")
-        assert item.dataSet[MenuItemConstants.FIELD_ALLOWED_ROLES].options.containsKey("role_1:filter_api_test")
-        assert item.dataSet[MenuItemConstants.FIELD_USE_TABBED_VIEW].value == true
-        assert item.dataSet[MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE].value == MenuItemViewType.CASE_VIEW.identifier
-
-        assert filter.dataSet["filter"].filterMetadata["filterType"] == "Case"
-        assert filter.dataSet["filter"].allowedNets == ["filter", "menu_item"]
-        assert filter.dataSet["filter"].value == "processIdentifier:filter OR processIdentifier:menu_item"
-        assert filter.dataSet["filter_type"].value == "Case"
-
-        String tabbedCaseViewId = MenuItemUtils.getCaseIdFromCaseRef(item, MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID)
-        assert tabbedCaseViewId != null
-        Case tabbedCaseView = workflowService.findOne(tabbedCaseViewId)
-        assert tabbedCaseView.dataSet[CaseViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == true
-        assert tabbedCaseView.dataSet[CaseViewConstants.FIELD_VIEW_FILTER_CASE].value[0] == filter.stringId
-        assert tabbedCaseView.dataSet[CaseViewConstants.FIELD_DEFAULT_HEADERS].value == "meta-title,meta-title"
-        assert tabbedCaseView.dataSet[CaseViewConstants.FIELD_CONFIGURATION_TYPE].value == MenuItemViewType.TASK_VIEW.identifier
-
-        String tabbedTaskViewId = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseView, CaseViewConstants.FIELD_VIEW_CONFIGURATION_ID)
-        assert tabbedTaskViewId != null
-        Case tabbedTaskView = workflowService.findOne(tabbedTaskViewId)
-        assert tabbedTaskView.dataSet[TaskViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == false
-        assert tabbedTaskView.dataSet[TaskViewConstants.FIELD_VIEW_FILTER_CASE].value == []
-        assert tabbedTaskView.dataSet[TaskViewConstants.FIELD_DEFAULT_HEADERS].value == "meta-title,meta-title"
-
-        Case testFolder = findCasesElastic("processIdentifier:$MenuItemConstants.PROCESS_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue.keyword:\"/netgrif/test\"", PageRequest.of(0, 1))[0]
-        Case netgrifFolder = findCasesElastic("processIdentifier:$MenuItemConstants.PROCESS_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue.keyword:\"/netgrif\"", PageRequest.of(0, 1))[0]
-        UriNode testNode = uriService.findByUri("/netgrif")
-        UriNode netgrifNode = uriService.getRoot()
-        Case rootFolder = findCasesElastic("processIdentifier:$MenuItemConstants.PROCESS_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue.keyword:\"/\"", PageRequest.of(0, 1))[0]
-
-        assert testFolder != null && testNode != null
-        assert testFolder.uriNodeId == testNode.stringId
-        assert testFolder.dataSet[MenuItemConstants.FIELD_PARENT_ID].value == [netgrifFolder.stringId]
-        assert (testFolder.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value as ArrayList).contains(item.stringId)
-        assert item.dataSet[MenuItemConstants.FIELD_PARENT_ID].value == [testFolder.stringId]
-        assert netgrifFolder.uriNodeId == netgrifNode.stringId
-        assert netgrifFolder.dataSet[MenuItemConstants.FIELD_PARENT_ID].value == [rootFolder.stringId]
-        assert (netgrifFolder.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value as ArrayList).contains(testFolder.stringId)
-        assert rootFolder.dataSet[MenuItemConstants.FIELD_PARENT_ID].value == []
-        assert (rootFolder.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value as ArrayList).contains(netgrifFolder.stringId)
-    }
-
-    @Test
     void testChangeFilterAndMenuItems() {
         Case caze = createMenuItem()
         Thread.sleep(3000)

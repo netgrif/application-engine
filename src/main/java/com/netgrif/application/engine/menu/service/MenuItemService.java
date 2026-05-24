@@ -11,12 +11,12 @@ import com.netgrif.application.engine.menu.domain.configurations.ViewConstants;
 import com.netgrif.application.engine.menu.domain.templates.Template;
 import com.netgrif.application.engine.menu.service.interfaces.IMenuItemService;
 import com.netgrif.application.engine.menu.utils.MenuItemUtils;
-import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.UriContentType;
-import com.netgrif.application.engine.petrinet.domain.UriNode;
+import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -26,6 +26,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.CompoundIndexDefinition;
@@ -47,10 +48,13 @@ public class MenuItemService implements IMenuItemService {
     protected final IUriService uriService;
     protected final IElasticCaseService elasticCaseService;
     protected final MongoTemplate mongoTemplate;
+    protected final IPetriNetService petriNetService;
+    protected final IProcessRoleService processRoleService;
 
     protected Boolean existDatabaseIndexes;
 
     protected static final String DEFAULT_FOLDER_ICON = "folder";
+    protected static final String GLOBAL_ROLE = "GLOBAL_ROLE";
     protected static final Map<String, String> CUSTOM_MENU_ITEM_INDEXES = Map.of(
             String.format("dataSet.%s.value", MenuItemConstants.FIELD_IDENTIFIER), MenuItemConstants.IDENTIFIER_INDEX_NAME,
             String.format("dataSet.%s.value", MenuItemConstants.FIELD_NODE_PATH), MenuItemConstants.NODE_PATH_INDEX_NAME
@@ -454,6 +458,64 @@ public class MenuItemService implements IMenuItemService {
         log.debug("For menu item: [{}. {}] was used configuration template: {}", menuItemCase.getStringId(),
                 menuItemIdentifier, selectedTemplate);
         return new ConfigurationTemplateOutcome(dataSetOutcome);
+    }
+
+    @Override
+    public Map<String, I18nString> collectRoles(List<ProcessRole> roles) {
+        // todo rework authorization
+        Map<String, I18nString> roleMap = new HashMap<>();
+        for (ProcessRole role : roles) {
+            String key;
+            I18nString displayName;
+
+            if (role.isGlobal()) {
+                key = role.getImportId() + ":" + GLOBAL_ROLE;
+                displayName = new I18nString(role.getName() + " (🌍 Global role)");
+            } else {
+                PetriNet net = petriNetService.get(new ObjectId(role.getNetId()));
+                key = role.getImportId() + ":" + net.getIdentifier();
+                displayName = new I18nString(role.getName() + " (" + net.getTitle() + ")");
+            }
+
+            roleMap.put(key, displayName);
+        }
+        return roleMap;
+    }
+
+    @Override
+    public Map<String, I18nString> collectRoles(Map<String, String> roles) {
+        // todo rework authorization
+        Map<String, PetriNet> temp = new HashMap<>();
+        Map<String, I18nString> result = new HashMap<>();
+
+        for (Map.Entry<String, String> entry : roles.entrySet()) {
+            if (GLOBAL_ROLE.equals(entry.getValue())) {
+                Set<ProcessRole> findGlobalRole = processRoleService.findAllByImportId(ProcessRole.GLOBAL + entry.getKey());
+                if (findGlobalRole == null || findGlobalRole.isEmpty()) {
+                    continue;
+                }
+                Optional<ProcessRole> roleOpt = findGlobalRole.stream()
+                        .filter(ProcessRole::isGlobal)
+                        .findFirst();
+                if (roleOpt.isEmpty()) {
+                    continue;
+                }
+                result.put(roleOpt.get().getImportId() + ":" + GLOBAL_ROLE,
+                        new I18nString(roleOpt.get().getName() + " (🌍 Global role)"));
+            } else {
+                if (!temp.containsKey(entry.getValue())) {
+                    temp.put(entry.getValue(), petriNetService.getNewestVersionByIdentifier(entry.getValue()));
+                }
+                PetriNet net = temp.get(entry.getValue());
+                Optional<ProcessRole> roleOpt = net.getRoles().values().stream()
+                        .filter(r -> r.getImportId().equals(entry.getKey()))
+                        .findFirst();
+                roleOpt.ifPresent(processRole -> result.put(processRole.getImportId() + ":" + net.getIdentifier(),
+                        new I18nString(processRole.getName() + " (" + net.getTitle() + ")")));
+            }
+        }
+
+        return result;
     }
 
     protected void validateMenuItemBody(MenuItemBody body) {
