@@ -272,6 +272,8 @@ public interface ActionApi {
      */
     AbstractUser getSystemUser();
 
+    AuthPrincipalDto getSystemUserDto();
+
     SetDataEventOutcome saveFile(String taskId, String fieldId, ActionFileHolder file, Map<String, String> params);
 
     SetDataEventOutcome saveFiles(String taskId, String fieldId, ActionFileHolder[] files, Map<String, String> params);
@@ -283,4 +285,14 @@ public interface ActionApi {
     ActionFileHolder getFile(String caseId, String fieldId, Boolean forPreview, Map<String, String> params) throws IOException;
 
     ActionFileHolder getFileByCaseAndName(String caseId, String fieldId, String name, Map<String, String> params) throws IOException;
+
+    boolean isProcessUp(String processIdentifier);
+
+    boolean isProcessDown(String processIdentifier);
+
+    ProcessAvailability getProcessAvailability(String processIdentifier);
+
+    ProcessAvailabilities getProcessAvailability(List<String> processIdentifiers);
+
+    ProcessAvailabilities getProcessAvailability(String... processIdentifiers);
 }
