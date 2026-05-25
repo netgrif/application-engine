@@ -24,39 +24,49 @@ public abstract class ElasticViewPermissionService {
                 .mustNot(buildNegativeViewUser(user));
     }
 
+    /**
+     * Build a positive view role query using termsQuery for efficiency.
+     * This reduces the number of clauses by sending all roles at once.
+     */
     private BoolQueryBuilder buildPositiveViewRoleQuery(LoggedUser user) {
         BoolQueryBuilder positiveViewRole = boolQuery();
-        BoolQueryBuilder positiveViewRoleQuery = boolQuery();
-        for (String roleId : user.getProcessRoles()) {
-            positiveViewRoleQuery.should(termQuery("viewRoles", roleId));
+        if (!user.getProcessRoles().isEmpty()) {
+            positiveViewRole.should(termsQuery("viewRoles", user.getProcessRoles()));
         }
-        positiveViewRole.should(positiveViewRoleQuery);
+        positiveViewRole.should(positiveViewRole);
         positiveViewRole.minimumShouldMatch(1);
         return positiveViewRole;
     }
 
+    /**
+     * Build a negative view role query by excluding negative roles.
+     */
     private BoolQueryBuilder buildNegativeViewRoleQuery(LoggedUser user) {
-        BoolQueryBuilder negativeViewRoleQuery = boolQuery();
-        for (String roleId : user.getProcessRoles()) {
-            negativeViewRoleQuery.should(termQuery("negativeViewRoles", roleId));
+        BoolQueryBuilder negativeViewRole = boolQuery();
+        if (!user.getProcessRoles().isEmpty()) {
+            negativeViewRole.should(termsQuery("negativeViewRoles", user.getProcessRoles()));
         }
-        negativeViewRoleQuery.minimumShouldMatch(1);
-        return negativeViewRoleQuery;
+        negativeViewRole.minimumShouldMatch(1);
+        return negativeViewRole;
     }
 
+    /**
+     * Build a positive view user query using filter (as score is not needed).
+     */
     private BoolQueryBuilder buildPositiveViewUser(LoggedUser user) {
         BoolQueryBuilder positiveViewUser = boolQuery();
-        BoolQueryBuilder positiveViewUserQuery = boolQuery();
-        positiveViewUserQuery.must(termQuery("viewUsers", user.getId()));
-        positiveViewUser.should(positiveViewUserQuery);
+        positiveViewUser.should(termQuery("viewUsers", user.getId()));
         positiveViewUser.minimumShouldMatch(1);
         return positiveViewUser;
     }
 
+    /**
+     * Build a negative view user query to exclude the specified user.
+     */
     private BoolQueryBuilder buildNegativeViewUser(LoggedUser user) {
-        BoolQueryBuilder negativeViewUserQuery = boolQuery();
-        negativeViewUserQuery.should(termQuery("negativeViewUsers", user.getId()));
-        negativeViewUserQuery.minimumShouldMatch(1);
-        return negativeViewUserQuery;
+        BoolQueryBuilder negativeViewUser = boolQuery();
+        negativeViewUser.should(termQuery("negativeViewUsers", user.getId()));
+        negativeViewUser.minimumShouldMatch(1);
+        return negativeViewUser;
     }
 }

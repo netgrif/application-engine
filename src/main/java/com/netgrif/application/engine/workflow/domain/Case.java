@@ -43,6 +43,10 @@ public class Case implements Serializable {
     private LocalDateTime lastModified;
 
     @Getter
+    @Setter
+    private LocalDateTime lastModifiedDataSet;
+
+    @Getter
     private String visualId;
 
     @NotNull
@@ -239,10 +243,10 @@ public class Case implements Serializable {
                 this.dataSet.get(key).setComponent(field.getComponent());
             }
             if (field instanceof UserField) {
-                this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
+                this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()), false);
             }
             if (field instanceof UserListField) {
-                this.dataSet.get(key).setChoices(((UserListField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
+                this.dataSet.get(key).setChoices(((UserListField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()), false);
             }
             if (field instanceof FieldWithAllowedNets) {
                 this.dataSet.get(key).setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());
@@ -257,9 +261,9 @@ public class Case implements Serializable {
                 dynamicChoicesFields.add((ChoiceField<?>) field);
             }
         });
-        dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field, params)));
-        dynamicChoicesFields.forEach(field -> this.dataSet.get(field.getImportId()).setChoices(initValueExpressionEvaluator.evaluateChoices(this, field, params)));
-        dynamicOptionsFields.forEach(field -> this.dataSet.get(field.getImportId()).setOptions(initValueExpressionEvaluator.evaluateOptions(this, field, params)));
+        dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field, params), false));
+        dynamicChoicesFields.forEach(field -> this.dataSet.get(field.getImportId()).setChoices(initValueExpressionEvaluator.evaluateChoices(this, field, params), false));
+        dynamicOptionsFields.forEach(field -> this.dataSet.get(field.getImportId()).setOptions(initValueExpressionEvaluator.evaluateOptions(this, field, params), false));
         populateDataSetBehaviorAndComponents();
     }
 
