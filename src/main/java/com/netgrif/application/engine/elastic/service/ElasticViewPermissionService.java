@@ -33,13 +33,12 @@ public abstract class ElasticViewPermissionService {
         if (!user.getProcessRoles().isEmpty()) {
             positiveViewRole.should(termsQuery("viewRoles", user.getProcessRoles()));
         }
-        positiveViewRole.should(positiveViewRole);
         positiveViewRole.minimumShouldMatch(1);
         return positiveViewRole;
     }
 
     /**
-     * Build a negative view role query by excluding negative roles.
+     * Build a negative view role query.
      */
     private BoolQueryBuilder buildNegativeViewRoleQuery(LoggedUser user) {
         BoolQueryBuilder negativeViewRole = boolQuery();
@@ -51,7 +50,7 @@ public abstract class ElasticViewPermissionService {
     }
 
     /**
-     * Build a positive view user query using filter (as score is not needed).
+     * Build a positive view user query.
      */
     private BoolQueryBuilder buildPositiveViewUser(LoggedUser user) {
         BoolQueryBuilder positiveViewUser = boolQuery();
@@ -61,7 +60,7 @@ public abstract class ElasticViewPermissionService {
     }
 
     /**
-     * Build a negative view user query to exclude the specified user.
+     * Build a negative view user query.
      */
     private BoolQueryBuilder buildNegativeViewUser(LoggedUser user) {
         BoolQueryBuilder negativeViewUser = boolQuery();
