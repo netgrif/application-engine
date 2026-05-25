@@ -2,10 +2,8 @@ package com.netgrif.application.engine.menu;
 
 import com.mongodb.client.MongoCollection;
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.menu.domain.FilterBody;
-import com.netgrif.application.engine.menu.domain.MenuItemBody;
-import com.netgrif.application.engine.menu.domain.MenuItemConstants;
-import com.netgrif.application.engine.menu.domain.MenuItemViewType;
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.menu.domain.*;
 import com.netgrif.application.engine.menu.domain.configurations.*;
 import com.netgrif.application.engine.menu.domain.templates.CustomViewTemplate;
 import com.netgrif.application.engine.menu.domain.templates.SimpleTaskViewTemplate;
@@ -17,13 +15,16 @@ import com.netgrif.application.engine.menu.utils.MenuItemUtils;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
+import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
+import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.domain.TaskPair;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,6 +71,12 @@ public class MenuItemServiceTest {
 
     @Autowired
     private IWorkflowService workflowService;
+
+    @Autowired
+    private IUserService userService;
+
+    @Autowired
+    private IDataService dataService;
 
     @BeforeEach
     public void beforeEach() {
@@ -423,8 +430,29 @@ public class MenuItemServiceTest {
     }
 
     @Test
-    public void removeChildItemFromParentTest() {
-        // todo
+    public void removeChildItemFromParentTest() throws TransitionNotExecutableException {
+        Optional<Template> templateOpt = MenuItemTemplateHolder.get(CustomViewTemplate.IDENTIFIER);
+        assertTrue(templateOpt.isPresent());
+        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
+        menuItemBody.setUri("/folderik");
+        menuItemBody.setIdentifier("test");
+
+        Case testItemCase = menuItemService.createMenuItem(menuItemBody);
+
+        Case folderikCase = findMenuItem("folderik");
+        assertNotNull(folderikCase);
+        List<String> childrenCaseIds = MenuItemUtils.getCaseIdsFromCaseRef(folderikCase, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
+        assertNotNull(childrenCaseIds);
+        assertEquals(1, childrenCaseIds.size());
+        assertTrue(childrenCaseIds.contains(testItemCase.getStringId()));
+        assertTrue((Boolean) folderikCase.getFieldValue(MenuItemConstants.FIELD_HAS_CHILDREN));
+
+        folderikCase = menuItemService.removeChildItemFromParent(folderikCase.getStringId(), testItemCase);
+
+        childrenCaseIds = MenuItemUtils.getCaseIdsFromCaseRef(folderikCase, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
+        assertNotNull(childrenCaseIds);
+        assertEquals(0, childrenCaseIds.size());
+        assertFalse((Boolean) folderikCase.getFieldValue(MenuItemConstants.FIELD_HAS_CHILDREN));
     }
 
     @Test
@@ -440,8 +468,33 @@ public class MenuItemServiceTest {
     }
 
     @Test
-    public void handleConfigurationTemplateTest() {
-        // todo
+    @SuppressWarnings("unchecked")
+    public void handleConfigurationTemplateTest() throws TransitionNotExecutableException {
+        Case menuItemCase = workflowService.createCaseByIdentifier(MenuItemConstants.PROCESS_IDENTIFIER, "", "",
+                userService.getSystem().transformToLoggedUser()).getCase();
+
+        menuItemCase = dataService.setData(MenuItemUtils.findTaskIdInCase(menuItemCase, MenuItemConstants.TRANS_INIT_ID),
+                ImportHelper.populateDataset(
+                        Map.of(MenuItemConstants.FIELD_CONFIGURATION_TEMPLATES,
+                                Map.of("type", FieldType.ENUMERATION_MAP.getName(), "value", TabbedCaseViewTemplate.IDENTIFIER))
+                )
+        ).getCase();
+
+        ConfigurationTemplateOutcome outcome = menuItemService.handleConfigurationTemplate(menuItemCase);
+
+        assertTrue((Boolean) outcome.mapping.get(MenuItemConstants.FIELD_USE_TABBED_VIEW));
+        assertFalse((Boolean) outcome.mapping.get(MenuItemConstants.FIELD_USE_CUSTOM_VIEW));
+        assertEquals(MenuItemViewType.CASE_VIEW.getIdentifier(), outcome.mapping.get(MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE));
+        List<String> viewCaseIdAsList = (List<String>) outcome.mapping.get(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID);
+        assertEquals(1, viewCaseIdAsList.size());
+        Case viewCase = workflowService.findOne(viewCaseIdAsList.get(0));
+        assertEquals("case_view_configuration", viewCase.getProcessIdentifier());
+        List<String> viewFormTaskIdAsList = (List<String>) outcome.mapping.get(MenuItemConstants.FIELD_VIEW_CONFIGURATION_FORM);
+        assertEquals(1, viewFormTaskIdAsList.size());
+        assertEquals(MenuItemUtils.findTaskIdInCase(viewCase, ViewConstants.TRANS_SETTINGS_ID), viewFormTaskIdAsList.get(0));
+        List<String> viewAllFormTaskIdAsList = (List<String>) outcome.mapping.get(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ALL_DATA_FORM);
+        assertEquals(1, viewAllFormTaskIdAsList.size());
+        assertEquals(MenuItemUtils.findTaskIdInCase(viewCase, ViewConstants.TRANS_ALL_MENU_DATA_ID), viewAllFormTaskIdAsList.get(0));
     }
 
     @Test

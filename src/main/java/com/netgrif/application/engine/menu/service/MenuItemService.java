@@ -123,7 +123,7 @@ public class MenuItemService implements IMenuItemService {
             viewCase = createView(body.getView(), body.isUseTabbedView());
         }
         ToDataSetOutcome dataSetOutcome = body.toDataSet(parentItemCase.getStringId(), nodePath, viewCase);
-        menuItemCase = setDataWithExecute(menuItemCase, MenuItemConstants.TRANS_INIT_ID, dataSetOutcome.getDataSet());
+        menuItemCase = setDataWithExecute(menuItemCase, MenuItemConstants.TRANS_SYS_INIT_ID, dataSetOutcome.getDataSet());
         log.debug("Created menu item case [{}] with identifier [{}].", menuItemCase.getStringId(), body.getIdentifier());
         return menuItemCase;
     }
@@ -384,7 +384,7 @@ public class MenuItemService implements IMenuItemService {
             addConfigurationIntoDataSet(duplicatedViewCase, dataSet);
         }
 
-        setDataWithExecute(duplicated, MenuItemConstants.TRANS_INIT_ID, dataSet);
+        setDataWithExecute(duplicated, MenuItemConstants.TRANS_SYS_INIT_ID, dataSet);
 
         List<String> parentIdAsList = MenuItemUtils.getCaseIdsFromCaseRef(originItem, MenuItemConstants.FIELD_PARENT_ID);
         if (parentIdAsList != null && !parentIdAsList.isEmpty()) {
@@ -586,7 +586,7 @@ public class MenuItemService implements IMenuItemService {
             addConfigurationIntoDataSet(duplicatedAssociatedViewCase, dataSet);
         }
 
-        return setDataWithExecute(duplicatedViewCase, MenuItemConstants.TRANS_INIT_ID, dataSet);
+        return setDataWithExecute(duplicatedViewCase, MenuItemConstants.TRANS_SYS_INIT_ID, dataSet);
     }
 
     protected Case createView(ViewBody body, boolean isTabbed) throws TransitionNotExecutableException {
@@ -687,7 +687,7 @@ public class MenuItemService implements IMenuItemService {
             Case parentFolderCase = getOrCreateFolderRecursive(parentNode, body, folderCase);
             dataSetOutcome.putDataSetEntry(MenuItemConstants.FIELD_PARENT_ID, FieldType.CASE_REF, List.of(parentFolderCase.getStringId()));
         }
-        folderCase = setDataWithExecute(folderCase, MenuItemConstants.TRANS_INIT_ID, dataSetOutcome.getDataSet());
+        folderCase = setDataWithExecute(folderCase, MenuItemConstants.TRANS_SYS_INIT_ID, dataSetOutcome.getDataSet());
 
         log.trace("Created folder menu item [{}] with identifier [{}]", folderCase.getStringId(), body.getIdentifier());
         return folderCase;

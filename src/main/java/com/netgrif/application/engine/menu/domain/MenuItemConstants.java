@@ -32,7 +32,8 @@ public class MenuItemConstants {
     public static final String FIELD_CONFIGURATION_TEMPLATES = "configuration_templates";
 
     public static final String TRANS_SETTINGS_ID = "item_settings";
-    public static final String TRANS_INIT_ID = "system_initialize";
+    public static final String TRANS_SYS_INIT_ID = "system_initialize";
+    public static final String TRANS_INIT_ID = "initialize";
     public static final String TRANS_SYNC_ID = "data_sync";
     public static final String TRANS_ALL_MENU_DATA = "all_menu_data";
 
