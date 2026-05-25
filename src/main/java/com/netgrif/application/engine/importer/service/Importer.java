@@ -1157,7 +1157,9 @@ public class Importer {
             }
         }
 
-        if (!importTransition.getRoleRef().isEmpty() || !importTransition.getUsersRef().isEmpty() || !importTransition.getUserRef().isEmpty()) {
+        if ((importTransition.getRoleRef() != null && !importTransition.getRoleRef().isEmpty()) ||
+                (importTransition.getUsersRef() != null && !importTransition.getUsersRef().isEmpty()) ||
+                (importTransition.getUserRef() != null && !importTransition.getUserRef().isEmpty())) {
             return;
         }
 

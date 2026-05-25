@@ -72,6 +72,10 @@ class TaskPermissionsTest {
     void init() {
         testHelper.truncateDbs()
         actionDelegate.outcomes = []
+        testUsers.clear()
+        correctResults.clear()
+        testCase = null
+        testCaseNoDefault = null
 
         PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/" + TEST_NET), VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
         PetriNet netNoDefault = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/" + TEST_NET_NO_DEFAULT), VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
@@ -139,9 +143,11 @@ class TaskPermissionsTest {
         Map<String, String> userColumns = userColumns()
 
         List<String> lines = csvFile.readLines("UTF-8").findAll { it?.trim() }
+        assert !lines.isEmpty(): "CSV file is empty: ${csvFilePath}"
         List<String> header = lines.first().split(",", -1)*.trim()
 
         int transitionIdIndex = header.indexOf("Transition ID")
+        assert transitionIdIndex >= 0: "Missing required column 'Transition ID' in ${csvFilePath}"
 
         lines.tail().each { line ->
             List<String> columns = line.split(",", -1)*.trim()
@@ -149,6 +155,7 @@ class TaskPermissionsTest {
 
             userColumns.each { csvColumnName, userEmail ->
                 int permissionIndex = header.indexOf(csvColumnName)
+                assert permissionIndex >= 0: "Missing required column '${csvColumnName}' in ${csvFilePath}"
 
                 String permissionValue = columns[permissionIndex]
                         .replace(".", "")
