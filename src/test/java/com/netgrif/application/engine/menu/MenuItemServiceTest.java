@@ -25,6 +25,7 @@ import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.domain.TaskPair;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,6 +78,9 @@ public class MenuItemServiceTest {
 
     @Autowired
     private IDataService dataService;
+
+    @Autowired
+    private ITaskService taskService;
 
     @BeforeEach
     public void beforeEach() {
@@ -420,13 +424,166 @@ public class MenuItemServiceTest {
     }
 
     @Test
-    public void moveItemTest() {
-        // todo
+    public void moveItemTest() throws TransitionNotExecutableException {
+        Optional<Template> templateOpt = MenuItemTemplateHolder.get(CustomViewTemplate.IDENTIFIER);
+        assertTrue(templateOpt.isPresent());
+        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
+        menuItemBody.setUri("/netgrif/test");
+        menuItemBody.setIdentifier("new_menu_item");
+        Case newMenuItemCase = menuItemService.createMenuItem(menuItemBody);
+        menuItemBody.setUri("/netgrif2/test2");
+        menuItemBody.setIdentifier("new_menu_item2");
+        Case newMenuItem2Case = menuItemService.createMenuItem(menuItemBody);
+
+        assertThrows(IllegalArgumentException.class, () -> menuItemService.moveItem(null, "/mypath"));
+        Case finalNewMenuItemCase = newMenuItemCase;
+        assertThrows(IllegalArgumentException.class, () -> menuItemService.moveItem(finalNewMenuItemCase, null));
+
+        menuItemService.moveItem(newMenuItemCase, "/netgrif2");
+
+        newMenuItemCase = workflowService.findOne(newMenuItemCase.getStringId());
+        UriNode netgrif2Node = uriService.findByUri("/netgrif2");
+        assertEquals(netgrif2Node.getStringId(), newMenuItemCase.getUriNodeId());
+        Case netgrif2FolderCase = findMenuItem("netgrif2");
+        List<String> netgrif2ChildIds = MenuItemUtils.getCaseIdsFromCaseRef(netgrif2FolderCase, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
+        assertNotNull(netgrif2ChildIds);
+        assertEquals(2, netgrif2ChildIds.size());
+        assertTrue(netgrif2ChildIds.contains(newMenuItemCase.getStringId()));
+
+        Case finalNetgrif2FolderCase = netgrif2FolderCase;
+        assertThrows(IllegalArgumentException.class, () -> menuItemService.moveItem(finalNetgrif2FolderCase, "/netgrif2/cyclic"));
+
+        menuItemService.moveItem(netgrif2FolderCase, "/netgrif/test3");
+        Case test3FolderCase = findMenuItem("test3");
+        Case netgrifFolderCase = findMenuItem("netgrif");
+
+        String test3ParentCaseId = MenuItemUtils.getCaseIdFromCaseRef(test3FolderCase, MenuItemConstants.FIELD_PARENT_ID);
+        assertNotNull(test3ParentCaseId);
+        assertEquals(test3ParentCaseId, netgrifFolderCase.getStringId());
+
+        netgrif2FolderCase = workflowService.findOne(netgrif2FolderCase.getStringId());
+        UriNode test3Node = uriService.findByUri("/netgrif/test3");
+        assertEquals(test3Node.getStringId(), netgrif2FolderCase.getUriNodeId());
+        assertEquals("/netgrif/test3/netgrif2", netgrif2FolderCase.getFieldValue(MenuItemConstants.FIELD_NODE_PATH));
+        netgrif2ChildIds = MenuItemUtils.getCaseIdsFromCaseRef(netgrif2FolderCase, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
+        assertNotNull(netgrif2ChildIds);
+        assertEquals(2, netgrif2ChildIds.size());
+
+        Case test2FolderCase = findMenuItem("test2");
+        netgrif2Node = uriService.findByUri("/netgrif/test3/netgrif2");
+        assertEquals(netgrif2Node.getStringId(), test2FolderCase.getUriNodeId());
+        assertEquals("/netgrif/test3/netgrif2/test2", test2FolderCase.getFieldValue(MenuItemConstants.FIELD_NODE_PATH));
+
+        newMenuItem2Case = workflowService.findOne(newMenuItem2Case.getStringId());
+        UriNode test2Node = uriService.findByUri("/netgrif/test3/netgrif2/test2");
+        assertEquals(test2Node.getStringId(), newMenuItem2Case.getUriNodeId());
     }
 
     @Test
-    public void duplicateItemTest() {
-        // todo
+    public void duplicateFolderItemTest() throws TransitionNotExecutableException {
+        String starterUri = "/netgrif/test";
+        Optional<Template> templateOpt = MenuItemTemplateHolder.get(TabbedCaseViewTemplate.IDENTIFIER);
+        assertTrue(templateOpt.isPresent());
+        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
+        menuItemBody.setUri(starterUri);
+        menuItemBody.setIdentifier("new_menu_item");
+        menuItemService.createMenuItem(menuItemBody);
+        Case originFolderCase = findMenuItem("test");
+
+        String newTitle = "New title";
+        String newIdentifier = "new_identifier";
+
+        String duplicateTaskId = MenuItemUtils.findTaskIdInCase(originFolderCase, "duplicate_item");
+        taskService.assignTask(duplicateTaskId);
+
+        originFolderCase.getDataField(MenuItemConstants.FIELD_DUPLICATE_TITLE).setValue(new I18nString(""));
+        originFolderCase.getDataField(MenuItemConstants.FIELD_DUPLICATE_IDENTIFIER).setValue(newIdentifier);
+        originFolderCase = workflowService.save(originFolderCase);
+        assertThrows(IllegalArgumentException.class, () -> taskService.finishTask(duplicateTaskId));
+
+        originFolderCase.getDataField(MenuItemConstants.FIELD_DUPLICATE_TITLE).setValue(new I18nString(newTitle));
+        originFolderCase.getDataField(MenuItemConstants.FIELD_DUPLICATE_IDENTIFIER).setValue("new_menu_item");
+        originFolderCase = workflowService.save(originFolderCase);
+        assertThrows(IllegalArgumentException.class, () -> taskService.finishTask(duplicateTaskId));
+
+        originFolderCase.getDataField(MenuItemConstants.FIELD_DUPLICATE_TITLE).setValue(new I18nString(newTitle));
+        originFolderCase.getDataField(MenuItemConstants.FIELD_DUPLICATE_IDENTIFIER).setValue(newIdentifier);
+        originFolderCase = workflowService.save(originFolderCase);
+        taskService.finishTask(duplicateTaskId);
+
+        Case duplicatedFolderCase = findMenuItem(newIdentifier);
+        assertNotNull(duplicatedFolderCase);
+
+        UriNode leafNode = uriService.findByUri("/netgrif/" + newIdentifier);
+
+        assertNotNull(leafNode);
+        assertEquals(duplicatedFolderCase.getUriNodeId(), originFolderCase.getUriNodeId());
+        assertEquals(new I18nString(""), duplicatedFolderCase.getFieldValue(MenuItemConstants.FIELD_DUPLICATE_TITLE));
+        assertEquals("", duplicatedFolderCase.getFieldValue(MenuItemConstants.FIELD_DUPLICATE_IDENTIFIER));
+        assertEquals(newTitle, duplicatedFolderCase.getTitle());
+        assertEquals(new I18nString(newTitle), duplicatedFolderCase.getFieldValue(MenuItemConstants.FIELD_MENU_NAME));
+        assertEquals(newIdentifier, duplicatedFolderCase.getFieldValue(MenuItemConstants.FIELD_IDENTIFIER));
+        assertEquals("/netgrif/" + newIdentifier, duplicatedFolderCase.getFieldValue(MenuItemConstants.FIELD_NODE_PATH));
+        List<String> duplicatedChildIds = MenuItemUtils.getCaseIdsFromCaseRef(duplicatedFolderCase, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
+        assertNotNull(duplicatedChildIds);
+        assertEquals(0, duplicatedChildIds.size());
+        assertFalse((Boolean) duplicatedFolderCase.getFieldValue(MenuItemConstants.FIELD_HAS_CHILDREN));
+        assertEquals(1, duplicatedFolderCase.getActivePlaces().get("initialized"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void duplicateLeafItemTest() throws TransitionNotExecutableException {
+        String starterUri = "/netgrif/test";
+        Optional<Template> templateOpt = MenuItemTemplateHolder.get(TabbedCaseViewTemplate.IDENTIFIER);
+        assertTrue(templateOpt.isPresent());
+        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
+        menuItemBody.setUri(starterUri);
+        menuItemBody.setIdentifier("new_menu_item");
+        Case originLeafItemCase = menuItemService.createMenuItem(menuItemBody);
+
+        String newTitle = "New title";
+        String newIdentifier = "new_identifier";
+
+        Case duplicatedLeafItemCase = menuItemService.duplicateItem(originLeafItemCase, new I18nString(newTitle), newIdentifier);
+        assertEquals(duplicatedLeafItemCase.getUriNodeId(), originLeafItemCase.getUriNodeId());
+        assertEquals(duplicatedLeafItemCase.getFieldValue(MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE),
+                originLeafItemCase.getFieldValue(MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE));
+
+        String duplicatedCaseViewId = MenuItemUtils.getCaseIdFromCaseRef(duplicatedLeafItemCase, MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID);
+        assertNotNull(duplicatedCaseViewId);
+        String originCaseViewId = MenuItemUtils.getCaseIdFromCaseRef(originLeafItemCase, MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID);
+        assertNotNull(originCaseViewId);
+        assertNotEquals(duplicatedCaseViewId, originCaseViewId);
+
+        List<String> duplicatedFormValue = (List<String>) duplicatedLeafItemCase.getFieldValue(MenuItemConstants.FIELD_VIEW_CONFIGURATION_FORM);
+        assertNotNull(duplicatedFormValue);
+        assertEquals(1, duplicatedFormValue.size());
+        List<String> originFormValue = (List<String>) originLeafItemCase.getFieldValue(MenuItemConstants.FIELD_VIEW_CONFIGURATION_FORM);
+        assertNotNull(originFormValue);
+        assertEquals(1, originFormValue.size());
+        assertNotEquals(duplicatedFormValue.get(0), originFormValue.get(0));
+
+        List<String> duplicatedAllFormValue = (List<String>) duplicatedLeafItemCase.getFieldValue(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ALL_DATA_FORM);
+        assertNotNull(duplicatedAllFormValue);
+        assertEquals(1, duplicatedAllFormValue.size());
+        List<String> originAllFormValue = (List<String>) originLeafItemCase.getFieldValue(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ALL_DATA_FORM);
+        assertNotNull(originAllFormValue);
+        assertEquals(1, originAllFormValue.size());
+        assertNotEquals(duplicatedFormValue.get(0), originAllFormValue.get(0));
+
+        Case duplicatedCaseViewCase = workflowService.findOne(duplicatedCaseViewId);
+        Case originCaseViewCase = workflowService.findOne(originCaseViewId);
+        assertEquals(duplicatedCaseViewCase.getProcessIdentifier(), originCaseViewCase.getProcessIdentifier());
+
+        assertEquals(duplicatedCaseViewCase.getFieldValue(MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE),
+                originCaseViewCase.getFieldValue(MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE));
+
+        String duplicatedTaskViewId = MenuItemUtils.getCaseIdFromCaseRef(duplicatedCaseViewCase, ViewConstants.FIELD_VIEW_CONFIGURATION_ID);
+        assertNotNull(duplicatedTaskViewId);
+        String originTaskViewId = MenuItemUtils.getCaseIdFromCaseRef(originCaseViewCase, ViewConstants.FIELD_VIEW_CONFIGURATION_ID);
+        assertNotNull(originTaskViewId);
+        assertNotEquals(duplicatedTaskViewId, originTaskViewId);
     }
 
     @Test

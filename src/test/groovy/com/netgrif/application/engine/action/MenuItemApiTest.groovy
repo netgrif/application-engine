@@ -5,14 +5,9 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.menu.domain.MenuItemConstants
-import com.netgrif.application.engine.menu.domain.MenuItemViewType
 import com.netgrif.application.engine.menu.domain.configurations.CaseViewConstants
-import com.netgrif.application.engine.menu.domain.configurations.TaskViewConstants
 import com.netgrif.application.engine.menu.utils.MenuItemUtils
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
-import com.netgrif.application.engine.petrinet.domain.I18nString
-import com.netgrif.application.engine.petrinet.domain.UriContentType
-import com.netgrif.application.engine.petrinet.domain.UriNode
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.MenuRunner
@@ -75,129 +70,6 @@ class MenuItemApiTest {
         helper.createNet("filter_api_test.xml")
     }
 
-    @Test
-    void testMoveMenuItem() {
-        Case apiCase = createMenuItem("/netgrif/test")
-        String viewId = apiCase.dataSet["menu_stringId"].value
-        apiCase = createMenuItem("/netgrif2/test2", "new_menu_item2")
-        String viewId2 = apiCase.dataSet["menu_stringId"].value
-
-        // move view
-        Thread.sleep(2000)
-        apiCase = setData(apiCase, [
-            "move_dest_uri": "/netgrif2",
-            "move_item_id": viewId,
-            "move_folder_path": null,
-            "move_item": "0"
-        ])
-
-        Case viewCase = workflowService.findOne(viewId)
-        Thread.sleep(2000)
-
-        UriNode node = uriService.findByUri("/netgrif2")
-        Case folderCase = findCasesElastic("processIdentifier:$MenuItemConstants.PROCESS_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue:\"/netgrif2\"", PageRequest.of(0, 1))[0]
-
-        assert viewCase.uriNodeId == node.stringId
-        ArrayList<String> childIds = folderCase.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value as ArrayList<String>
-        assert childIds.contains(viewId) && childIds.size() == 2
-
-        // cyclic move
-        assertThrows(IllegalArgumentException.class, () -> {
-            setData(apiCase, [
-                    "move_dest_uri": "/netgrif2/cyclic",
-                    "move_item_id": null,
-                    "move_folder_path": "/netgrif2",
-                    "move_item": "0"
-            ])
-        })
-
-        // move folder
-        setData(apiCase, [
-            "move_dest_uri": "/netgrif/test3",
-            "move_item_id": null,
-            "move_folder_path": "/netgrif2",
-            "move_item": "0"
-        ])
-        Thread.sleep(2000)
-
-        folderCase = findCasesElastic("processIdentifier:$MenuItemConstants.PROCESS_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue:\"/netgrif/test3\"", PageRequest.of(0, 1))[0]
-        Case folderCase2 = findCasesElastic("processIdentifier:$MenuItemConstants.PROCESS_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue:\"/netgrif\"", PageRequest.of(0, 1))[0]
-        assert folderCase != null && folderCase.dataSet[MenuItemConstants.FIELD_PARENT_ID].value == [folderCase2.stringId]
-
-        folderCase = findCasesElastic("processIdentifier:$MenuItemConstants.PROCESS_IDENTIFIER AND dataSet.${MenuItemConstants.FIELD_NODE_PATH}.textValue:\"/netgrif/test3/netgrif2\"", PageRequest.of(0, 1))[0]
-        assert folderCase != null
-        node = uriService.findByUri("/netgrif/test3")
-        assert node != null
-        assert folderCase.uriNodeId == node.stringId
-        assert folderCase.dataSet[MenuItemConstants.FIELD_NODE_PATH].value == "/netgrif/test3/netgrif2"
-
-        childIds = folderCase.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value as ArrayList<String>
-        assert childIds.size() == 2
-
-        folderCase = workflowService.findOne(childIds[0])
-        node = uriService.findByUri("/netgrif/test3/netgrif2")
-        assert folderCase.dataSet[MenuItemConstants.FIELD_NODE_PATH].value == "/netgrif/test3/netgrif2/test2"
-        assert folderCase.uriNodeId == node.stringId
-
-        viewCase = workflowService.findOne(viewId2)
-        node = uriService.findByUri("/netgrif/test3/netgrif2/test2")
-        assert viewCase.uriNodeId == node.stringId
-    }
-
-    @Test
-    void testDuplicateMenuItem() {
-        String starterUri = "/netgrif/test"
-        Case apiCase = createMenuItem(starterUri, "new_menu_item")
-        Thread.sleep(2000)
-
-        String itemId = apiCase.dataSet["menu_stringId"].value
-        Case origin = workflowService.findOne(itemId)
-        Case testFolder = workflowService.findOne((origin.dataSet[MenuItemConstants.FIELD_PARENT_ID].value as ArrayList<String>)[0])
-
-        String newTitle = "New title"
-        String newIdentifier = "new_identifier"
-
-        String duplicateTaskId = testFolder.tasks.find { it.transition == "duplicate_item" }.task
-        taskService.assignTask(duplicateTaskId)
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            testFolder.dataSet[MenuItemConstants.FIELD_DUPLICATE_TITLE].value = new I18nString("")
-            testFolder.dataSet[MenuItemConstants.FIELD_DUPLICATE_IDENTIFIER].value = newIdentifier
-            testFolder = workflowService.save(testFolder)
-            taskService.finishTask(duplicateTaskId)
-        })
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            testFolder.dataSet[MenuItemConstants.FIELD_DUPLICATE_TITLE].value = new I18nString(newTitle)
-            testFolder.dataSet[MenuItemConstants.FIELD_DUPLICATE_IDENTIFIER].value = "new_menu_item"
-            testFolder = workflowService.save(testFolder)
-            taskService.finishTask(duplicateTaskId)
-        })
-
-        testFolder.dataSet[MenuItemConstants.FIELD_DUPLICATE_TITLE].value = new I18nString(newTitle)
-        testFolder.dataSet[MenuItemConstants.FIELD_DUPLICATE_IDENTIFIER].value = newIdentifier
-        testFolder = workflowService.save(testFolder)
-        taskService.finishTask(duplicateTaskId)
-
-        Case duplicated = workflowService.searchOne(QCase.case$.processIdentifier.eq("menu_item")
-                .and(QCase.case$.dataSet.get(MenuItemConstants.FIELD_IDENTIFIER).value.eq(newIdentifier)))
-        assert duplicated != null
-
-        UriNode leafNode = uriService.findByUri("/netgrif/" + newIdentifier)
-
-        assert duplicated.uriNodeId == testFolder.uriNodeId
-        assert leafNode != null
-        assert duplicated.dataSet[MenuItemConstants.FIELD_DUPLICATE_TITLE].value == new I18nString("")
-        assert duplicated.dataSet[MenuItemConstants.FIELD_DUPLICATE_IDENTIFIER].value == ""
-        assert duplicated.title == newTitle
-        assert duplicated.dataSet[MenuItemConstants.FIELD_MENU_NAME].value == new I18nString(newTitle)
-        assert duplicated.dataSet[MenuItemConstants.FIELD_IDENTIFIER].value == newIdentifier
-        assert duplicated.dataSet[MenuItemConstants.FIELD_NODE_PATH].value == "/netgrif/" + newIdentifier
-        assert duplicated.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value == []
-        assert duplicated.dataSet[MenuItemConstants.FIELD_HAS_CHILDREN].value == false
-        assert duplicated.activePlaces["initialized"] == 1
-    }
-
     List<Case> findCasesElastic(String query, Pageable pageable) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
@@ -223,6 +95,7 @@ class MenuItemApiTest {
     @Test
     void testRemoveMenuItem() {
         String starterUri = "/netgrif/test"
+        // todo 23 rework creation
         Case apiCase = createMenuItem(starterUri, "new_menu_item")
         Case leafItemCase = getMenuItem(apiCase)
 
@@ -264,10 +137,6 @@ class MenuItemApiTest {
 
     Case getMenuItem(Case caze) {
         return workflowService.findOne(caze.dataSet["menu_stringId"].value as String)
-    }
-
-    Case getFilter(Case caze) {
-        return workflowService.findOne(caze.dataSet["filter_stringId"].value as String)
     }
 
     def setData(Case caze, Map<String, String> dataSet) {

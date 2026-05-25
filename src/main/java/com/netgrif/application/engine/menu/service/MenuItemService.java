@@ -281,6 +281,12 @@ public class MenuItemService implements IMenuItemService {
      * */
     @Override
     public void moveItem(Case itemCase, String destUri) throws TransitionNotExecutableException {
+        if (destUri == null) {
+            throw new IllegalArgumentException("Destination path cannot be null");
+        }
+        if (itemCase == null) {
+            throw new IllegalArgumentException("Item case cannot be null");
+        }
         log.debug("Move of menu item case [{}] started. Destination path [{}]", itemCase.getStringId(), destUri);
         if (MenuItemUtils.isCyclicNodePath(itemCase, destUri)) {
             throw new IllegalArgumentException(String.format("Cyclic path not supported. Destination path: %s", destUri));
@@ -559,15 +565,6 @@ public class MenuItemService implements IMenuItemService {
         return resultPage.hasContent() ? resultPage.getContent().get(0) : null;
     }
 
-    protected long countCases(String processIdentifier, String query) {
-        CaseSearchRequest request = CaseSearchRequest.builder()
-                .process(Collections.singletonList(new CaseSearchRequest.PetriNet(processIdentifier)))
-                .query(query)
-                .build();
-        return elasticCaseService.count(List.of(request), userService.getLoggedOrSystem().transformToLoggedUser(),
-                Locale.getDefault(), false);
-    }
-
     protected Case duplicateView(Case viewCase) throws TransitionNotExecutableException {
         Case duplicatedAssociatedViewCase = null;
         if (MenuItemUtils.hasView(viewCase)) {
@@ -586,7 +583,7 @@ public class MenuItemService implements IMenuItemService {
             addConfigurationIntoDataSet(duplicatedAssociatedViewCase, dataSet);
         }
 
-        return setDataWithExecute(duplicatedViewCase, MenuItemConstants.TRANS_SYS_INIT_ID, dataSet);
+        return setDataWithExecute(duplicatedViewCase, ViewConstants.TRANS_INIT_ID, dataSet);
     }
 
     protected Case createView(ViewBody body, boolean isTabbed) throws TransitionNotExecutableException {
@@ -730,6 +727,9 @@ public class MenuItemService implements IMenuItemService {
         String taskId = MenuItemUtils.findTaskIdInCase(configurationCase, ViewConstants.TRANS_SETTINGS_ID);
         dataSet.put(MenuItemConstants.FIELD_VIEW_CONFIGURATION_FORM, Map.of("type", FieldType.TASK_REF.getName(),
                 "value", List.of(taskId)));
+        String allTaskId = MenuItemUtils.findTaskIdInCase(configurationCase, ViewConstants.TRANS_ALL_MENU_DATA_ID);
+        dataSet.put(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ALL_DATA_FORM, Map.of("type", FieldType.TASK_REF.getName(),
+                "value", List.of(allTaskId)));
     }
 
     protected Case createCase(String identifier, String title, LoggedUser loggedUser) {
