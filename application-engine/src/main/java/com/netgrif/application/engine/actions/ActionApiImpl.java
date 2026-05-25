@@ -358,11 +358,15 @@ public class ActionApiImpl implements ActionApi {
     @Override
     public ProcessAvailability getProcessAvailability(String processIdentifier) {
         PetriNet petriNet = petriNetService.getDefaultVersionByIdentifier(processIdentifier);
-        return ProcessAvailability.from(processIdentifier, petriNet != null);
+        if (petriNet == null) {
+                return ProcessAvailability.notFound(processIdentifier);
+            }
+        return ProcessAvailability.from(processIdentifier, true);
     }
 
     @Override
     public ProcessAvailabilities getProcessAvailability(List<String> processIdentifiers) {
+        Objects.requireNonNull(processIdentifiers, "processIdentifiers cannot be null");
         return new ProcessAvailabilities(processIdentifiers.stream()
                 .map(this::getProcessAvailability)
                 .collect(Collectors.toList()));
@@ -370,6 +374,7 @@ public class ActionApiImpl implements ActionApi {
 
     @Override
     public ProcessAvailabilities getProcessAvailability(String... processIdentifiers) {
+        Objects.requireNonNull(processIdentifiers, "processIdentifiers cannot be null");
         return new ProcessAvailabilities(Arrays.stream(processIdentifiers)
                 .map(this::getProcessAvailability)
                 .collect(Collectors.toList()));

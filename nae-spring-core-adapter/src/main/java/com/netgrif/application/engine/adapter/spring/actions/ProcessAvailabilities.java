@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.adapter.spring.actions;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Wrapper for list of {@link ProcessAvailability}
@@ -9,6 +10,10 @@ import java.util.List;
  * @param availabilities
  */
 public record ProcessAvailabilities(List<ProcessAvailability> availabilities) {
+
+    public ProcessAvailabilities {
+        availabilities = List.copyOf(availabilities);
+    }
 
     /**
      * Checks if a process with the given identifier is in the "up" state.
@@ -96,7 +101,7 @@ public record ProcessAvailabilities(List<ProcessAvailability> availabilities) {
 
     private boolean is(String processIdentifier, ProcessAvailability.Status status) {
         return availabilities.stream()
-                .anyMatch(processAvailability -> processAvailability.processIdentifier().equals(processIdentifier) && processAvailability.status() == status);
+                .anyMatch(processAvailability -> Objects.equals(processIdentifier, processAvailability.processIdentifier()) && processAvailability.status() == status);
     }
 
     private boolean isAny(ProcessAvailability.Status status) {
@@ -104,6 +109,6 @@ public record ProcessAvailabilities(List<ProcessAvailability> availabilities) {
     }
 
     private boolean isAll(ProcessAvailability.Status status) {
-        return availabilities.stream().allMatch(processAvailability -> processAvailability.status() == status);
+        return availabilities != null && !availabilities.isEmpty() && availabilities.stream().allMatch(processAvailability -> processAvailability.status() == status);
     }
 }
