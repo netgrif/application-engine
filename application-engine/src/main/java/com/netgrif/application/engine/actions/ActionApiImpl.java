@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.adapter.spring.actions.ActionApi;
 import com.netgrif.application.engine.adapter.spring.actions.ActionFileHolder;
+import com.netgrif.application.engine.adapter.spring.actions.ProcessAvailabilities;
+import com.netgrif.application.engine.adapter.spring.actions.ProcessAvailability;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
@@ -15,6 +17,7 @@ import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.dto.AuthPrincipalDto;
+import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
@@ -25,6 +28,7 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.data
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.params.DeleteCaseParams;
 import com.netgrif.application.engine.workflow.params.TaskParams;
@@ -40,12 +44,15 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
+@Component
 public class ActionApiImpl implements ActionApi {
 
     private UserService userService;
@@ -59,6 +66,8 @@ public class ActionApiImpl implements ActionApi {
     private IElasticCaseService elasticCaseService;
 
     private IElasticTaskService elasticTaskService;
+
+    private IPetriNetService petriNetService;
 
     @Autowired
     public void setDataService(IDataService dataService) {
@@ -88,6 +97,11 @@ public class ActionApiImpl implements ActionApi {
     @Autowired
     public void setElasticTaskService(IElasticTaskService elasticTaskService) {
         this.elasticTaskService = elasticTaskService;
+    }
+
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
     }
 
     @Override
@@ -270,6 +284,12 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
+    public AuthPrincipalDto getSystemUserDto() {
+        AbstractUser systemUser = getSystemUser();
+        return new AuthPrincipalDto(systemUser.getUsername(), systemUser.getRealmId(), null);
+    }
+
+    @Override
     public SetDataEventOutcome saveFile(String taskId, String fieldId, ActionFileHolder file, Map<String, String> params) {
         log.debug("Saving file [{}] for task [{}] and field [{}] with params [{}]", file.getFileName(), taskId, fieldId, params);
         MultipartFile multipartFile = new MockMultipartFile(file.getFileName(), file.getFileName(), null, file.getFileContent());
@@ -323,6 +343,41 @@ public class ActionApiImpl implements ActionApi {
                     .fileContent(IOUtils.toByteArray(inputStream))
                     .build();
         }
+    }
+
+    @Override
+    public boolean isProcessUp(String processIdentifier) {
+        return getProcessAvailability(processIdentifier).isUp();
+    }
+
+    @Override
+    public boolean isProcessDown(String processIdentifier) {
+        return getProcessAvailability(processIdentifier).isDown();
+    }
+
+    @Override
+    public ProcessAvailability getProcessAvailability(String processIdentifier) {
+        PetriNet petriNet = petriNetService.getDefaultVersionByIdentifier(processIdentifier);
+        if (petriNet == null) {
+                return ProcessAvailability.notFound(processIdentifier);
+            }
+        return ProcessAvailability.from(processIdentifier, true);
+    }
+
+    @Override
+    public ProcessAvailabilities getProcessAvailability(List<String> processIdentifiers) {
+        Objects.requireNonNull(processIdentifiers, "processIdentifiers cannot be null");
+        return new ProcessAvailabilities(processIdentifiers.stream()
+                .map(this::getProcessAvailability)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public ProcessAvailabilities getProcessAvailability(String... processIdentifiers) {
+        Objects.requireNonNull(processIdentifiers, "processIdentifiers cannot be null");
+        return new ProcessAvailabilities(Arrays.stream(processIdentifiers)
+                .map(this::getProcessAvailability)
+                .collect(Collectors.toList()));
     }
 
     private AbstractUser resolveAbstractUser(AuthPrincipalDto authPrincipalDto) {
