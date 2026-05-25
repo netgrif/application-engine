@@ -139,6 +139,9 @@ public class MenuItemService implements IMenuItemService {
     @Override
     public Case updateMenuItem(Case itemCase, MenuItemBody body) throws TransitionNotExecutableException {
         validateMenuItemBody(body);
+        if (itemCase == null) {
+            throw new IllegalArgumentException("Menu item case is null. Cannot update");
+        }
 
         log.debug("Update of menu item case with identifier [{}] started.", body.getIdentifier());
         workflowService.deleteCase(itemCase);
@@ -157,6 +160,9 @@ public class MenuItemService implements IMenuItemService {
      * */
     @Override
     public Case createOrUpdateMenuItem(MenuItemBody body) throws TransitionNotExecutableException {
+        if (body == null) {
+            throw new IllegalArgumentException("Menu item body cannot be null");
+        }
         Case itemCase = findMenuItem(MenuItemUtils.sanitize(body.getIdentifier()));
         if (itemCase != null) {
             return updateMenuItem(itemCase, body);
@@ -175,6 +181,9 @@ public class MenuItemService implements IMenuItemService {
      * */
     @Override
     public Case createOrIgnoreMenuItem(MenuItemBody body) throws TransitionNotExecutableException {
+        if (body == null) {
+            throw new IllegalArgumentException("Menu item body cannot be null");
+        }
         Case itemCase = findMenuItem(body.getIdentifier());
         if (itemCase != null) {
             log.debug("Ignored creation or update of menu item case [{}] with identifier [{}].", itemCase.getStringId(),
@@ -232,6 +241,9 @@ public class MenuItemService implements IMenuItemService {
      * */
     @Override
     public Case findFolderCase(UriNode node) {
+        if (node == null) {
+            throw new IllegalArgumentException("Node cannot be null");
+        }
         Query query = Query.query(
                 Criteria.where("processIdentifier").is(MenuItemConstants.PROCESS_IDENTIFIER)
                         .and(String.format("dataSet.%s.value", MenuItemConstants.FIELD_NODE_PATH)).is(node.getUriPath())

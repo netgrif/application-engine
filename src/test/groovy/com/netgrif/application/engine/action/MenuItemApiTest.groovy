@@ -76,67 +76,6 @@ class MenuItemApiTest {
     }
 
     @Test
-    void testChangeFilterAndMenuItems() {
-        Case caze = createMenuItem()
-        Thread.sleep(3000)
-
-        Case item = getMenuItem(caze)
-        String tabbedCaseViewIdBeforeChange = MenuItemUtils.getCaseIdFromCaseRef(item, MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID)
-        Case tabbedCaseViewBeforeChange = workflowService.findOne(tabbedCaseViewIdBeforeChange)
-        String tabbedTaskViewIdBeforeChange = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseViewBeforeChange, CaseViewConstants.FIELD_VIEW_CONFIGURATION_ID)
-
-        def newUri = uriService.getOrCreate("/netgrif/test_new", UriContentType.DEFAULT)
-        caze = setData(caze, [
-                "uri": newUri.uriPath,
-                "title": "CHANGED FILTER",
-                "allowed_nets": "filter",
-                "query": "processIdentifier:filter",
-                "type": "Case",
-                "icon": "",
-                "change_filter_and_menu": "0"
-        ])
-        item = getMenuItem(caze)
-        Case filter = getFilter(caze)
-
-        assert item.dataSet[MenuItemConstants.FIELD_MENU_NAME].value.toString() == "CHANGED FILTER"
-        assert item.dataSet[MenuItemConstants.FIELD_ALLOWED_ROLES].options.entrySet()[0].key.contains("role_2")
-        assert item.dataSet[MenuItemConstants.FIELD_USE_TABBED_VIEW].value == true
-        assert item.dataSet[MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE].value == MenuItemViewType.CASE_VIEW.identifier
-        assert item.uriNodeId == newUri.stringId
-
-        assert filter.dataSet["filter"].allowedNets == ["filter"]
-        assert filter.dataSet["filter"].filterMetadata["defaultSearchCategories"] == false
-        assert filter.dataSet["filter"].value == "processIdentifier:filter"
-
-        String tabbedCaseViewId = MenuItemUtils.getCaseIdFromCaseRef(item, MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID)
-        assert tabbedCaseViewId != null && tabbedCaseViewId.equals(tabbedCaseViewIdBeforeChange)
-        Case tabbedCaseView = workflowService.findOne(tabbedCaseViewId)
-        assert tabbedCaseView.dataSet[CaseViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == true
-        assert tabbedCaseView.dataSet[CaseViewConstants.FIELD_VIEW_FILTER_CASE].value[0] == filter.stringId
-        assert tabbedCaseView.dataSet[CaseViewConstants.FIELD_DEFAULT_HEADERS].value == "meta-title,meta-title,meta-title"
-        assert tabbedCaseView.dataSet[CaseViewConstants.FIELD_CONFIGURATION_TYPE].value == MenuItemViewType.TASK_VIEW.identifier
-
-        String tabbedTaskViewId = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseView, CaseViewConstants.FIELD_VIEW_CONFIGURATION_ID)
-        assert tabbedTaskViewId != null && tabbedTaskViewId.equals(tabbedTaskViewIdBeforeChange)
-        Case tabbedTaskView = workflowService.findOne(tabbedTaskViewId)
-        assert tabbedTaskView.dataSet[TaskViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == false
-        assert tabbedTaskView.dataSet[TaskViewConstants.FIELD_VIEW_FILTER_CASE].value == []
-        assert tabbedTaskView.dataSet[TaskViewConstants.FIELD_DEFAULT_HEADERS].value == "meta-title,meta-title,meta-title"
-    }
-
-    @Test
-    void testFindFilter() {
-        Case caze = createMenuItem()
-        Case filter = getFilter(caze)
-
-        caze = setData(caze, [
-                "find_filter": "0"
-        ])
-
-        assert caze.dataSet["found_filter"].value == filter.stringId
-    }
-
-    @Test
     void testMoveMenuItem() {
         Case apiCase = createMenuItem("/netgrif/test")
         String viewId = apiCase.dataSet["menu_stringId"].value

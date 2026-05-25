@@ -1089,32 +1089,6 @@
             </dataRef>
         </dataGroup>
     </transition>
-    <transition>
-        <id>change_to_tabbed</id>
-        <x>240</x>
-        <y>144</y>
-        <label>change_to_tabbed</label>
-        <roleRef>
-            <id>system</id>
-            <logic>
-                <view>true</view>
-            </logic>
-        </roleRef>
-<!--        todo 23-->
-<!--        add action, update is_tabbed_var_arc, reset associated view fields, remove associated view case-->
-    </transition>
-    <transition>
-        <id>change_to_untabbed</id>
-        <x>112</x>
-        <y>48</y>
-        <label>change_to_untabbed</label>
-        <roleRef>
-            <id>system</id>
-            <logic>
-                <view>true</view>
-            </logic>
-        </roleRef>
-    </transition>
     <place>
         <id>initialized</id>
         <x>496</x>
@@ -1209,34 +1183,6 @@
         <type>read</type>
         <sourceId>is_tabbed</sourceId>
         <destinationId>open_case_settings</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>a10</id>
-        <type>regular</type>
-        <sourceId>is_tabbed</sourceId>
-        <destinationId>change_to_untabbed</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>a11</id>
-        <type>regular</type>
-        <sourceId>change_to_untabbed</sourceId>
-        <destinationId>is_untabbed</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>a12</id>
-        <type>regular</type>
-        <sourceId>change_to_tabbed</sourceId>
-        <destinationId>is_tabbed</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>a14</id>
-        <type>regular</type>
-        <sourceId>is_untabbed</sourceId>
-        <destinationId>change_to_tabbed</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>
