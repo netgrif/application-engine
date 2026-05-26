@@ -3,6 +3,7 @@ package com.netgrif.application.engine.menu;
 import com.mongodb.client.MongoCollection;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.menu.domain.*;
 import com.netgrif.application.engine.menu.domain.configurations.*;
 import com.netgrif.application.engine.menu.domain.templates.CustomViewTemplate;
@@ -701,6 +702,43 @@ public class MenuItemServiceTest {
         options = menuItemService.getAvailableViewsAsOptions(true, MenuItemViewType.TASK_VIEW.getIdentifier());
         assertNotNull(options);
         assertEquals(0, options.size());
+    }
+
+    @Test
+    void testRemoveMenuItem() throws TransitionNotExecutableException, InterruptedException {
+        Optional<Template> templateOpt = MenuItemTemplateHolder.get(TabbedCaseViewTemplate.IDENTIFIER);
+        assertTrue(templateOpt.isPresent());
+        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
+        menuItemBody.setUri("/netgrif/test");
+        menuItemBody.setIdentifier("new_menu_item");
+        Case leafItemCase = menuItemService.createMenuItem(menuItemBody);
+
+        Case testFolder = findMenuItem("test");
+        String netgrifFolderId = MenuItemUtils.getCaseIdFromCaseRef(testFolder, MenuItemConstants.FIELD_PARENT_ID);
+
+        Case netgrifFolder = workflowService.findOne(netgrifFolderId);
+        List<String> childIds = MenuItemUtils.getCaseIdsFromCaseRef(netgrifFolder, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
+        assertNotNull(childIds);
+        assertTrue(childIds.contains(testFolder.getStringId()));
+        assertDoesNotThrow(() -> workflowService.findOne(testFolder.getStringId()));
+        assertDoesNotThrow(() -> workflowService.findOne(leafItemCase.getStringId()));
+        String tabbedCaseViewId = MenuItemUtils.getCaseIdFromCaseRef(leafItemCase, MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID);
+        assertNotNull(tabbedCaseViewId);
+        Case tabbedCaseView = workflowService.findOne(tabbedCaseViewId);
+        String tabbedTaskViewId = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseView, CaseViewConstants.FIELD_VIEW_CONFIGURATION_ID);
+        assertNotNull(tabbedTaskViewId);
+        assertDoesNotThrow(() -> workflowService.findOne(tabbedTaskViewId));
+
+        workflowService.deleteCase(testFolder);
+        Thread.sleep(2000);
+        netgrifFolder = workflowService.findOne(netgrifFolderId);
+        List<String> updatedChildIds = MenuItemUtils.getCaseIdsFromCaseRef(netgrifFolder, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
+        assertNotNull(updatedChildIds);
+        assertFalse(updatedChildIds.contains(testFolder.getStringId()));
+        assertThrows(IllegalArgumentException.class, () -> workflowService.findOne(testFolder.getStringId()));
+        assertThrows(IllegalArgumentException.class, () -> workflowService.findOne(leafItemCase.getStringId()));
+        assertThrows(IllegalArgumentException.class, () -> workflowService.findOne(tabbedCaseViewId));
+        assertThrows(IllegalArgumentException.class, () -> workflowService.findOne(tabbedTaskViewId));
     }
 
     private Case createDefaultMenuItem(String identifier, I18nString name) throws TransitionNotExecutableException {
