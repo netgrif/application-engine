@@ -325,7 +325,7 @@ class ActionDelegateTest {
         String keyTransformationTestString = "Key transformation test "
         String valueTransformationTestString = "Value transformation test "
         options = actionDelegate.casesToOptions(cases, { return "Value transformation test ".concat(it.title) }, { return "Key transformation test ".concat(it.stringId) })
-        assertNotNull(options != null)
+        assertNotNull(options)
         assertEquals(options.size(), cases.size())
         assertTrue(options.keySet().containsAll(cases.collect { keyTransformationTestString.concat(it.stringId) }))
         assertEquals(options.get(keyTransformationTestString.concat(case1.stringId)).defaultValue, valueTransformationTestString.concat(case1.title))
