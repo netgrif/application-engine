@@ -1305,7 +1305,7 @@ class ActionDelegate {
             return this.findTasks([taskRef.value].flatten() as List<String>)
         } catch (ClassCastException e) {
             log.error("Method cannot be used with field with id [${taskRef.importId}].", e)
-            return null
+            return []
         }
     }
     
@@ -1338,7 +1338,7 @@ class ActionDelegate {
             return this.findTasks([taskRef.value].flatten() as List<String>)
         } catch (ClassCastException e) {
             log.error("Method cannot be used with field.", e)
-            return null
+            return []
         }
     }
 
