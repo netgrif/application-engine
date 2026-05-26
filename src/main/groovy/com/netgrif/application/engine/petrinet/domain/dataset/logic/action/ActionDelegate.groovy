@@ -1283,7 +1283,7 @@ class ActionDelegate {
      * current action context see other overloads of this action.
      *
      * <p>If the field value is {@code null}, this method returns an empty list.</p>
-     * <p>If the value cannot be converted to task IDs, this method returns {@code null}.</p>
+     * <p>If the value cannot be converted to task IDs, this method returns an empty list.</p>
      *
      * @param taskRef field whose value contains task IDs
      * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TASK_REF},
@@ -1316,7 +1316,7 @@ class ActionDelegate {
      * current action context see other overloads of this action.
      *
      * <p>If the field value is {@code null}, this method returns an empty list.</p>
-     * <p>If the value cannot be converted to task IDs, this method returns {@code null}.</p>
+     * <p>If the value cannot be converted to task IDs, this method returns an empty list.</p>
      *
      * @param taskRef field whose value contains task IDs
      * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TASK_REF},
