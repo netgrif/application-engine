@@ -942,7 +942,7 @@ class ActionDelegate {
      */
     List<Case> findCases(Field caseRef) {
         if(caseRef.value == null) {
-            log.error("Value of field with id [${caseRef.importId}] is null, returning empty list.")
+            log.debug("[findCases(Field)]: Value of field with id [${caseRef.importId}] is null, returning empty list.")
             return []
         }
         try {
@@ -977,7 +977,7 @@ class ActionDelegate {
      */
     List<Case> findCases(DataField caseRef) {
         if(caseRef.value == null) {
-            log.error("Value of field is null, returning empty list.")
+            log.debug("[findCases(DataField]: Value of field is null, returning empty list.")
             return []
         }
         try {
@@ -1001,7 +1001,7 @@ class ActionDelegate {
      */
     List<Case> findCases(List<String> mongoIds) {
         if(mongoIds == null || mongoIds.empty) {
-            log.warn("Null value detected, returning empty list.")
+            log.debug("[findCases(List<String>)]: Null value detected, returning empty list.")
             return []
         }
         return workflowService.findAllById(mongoIds)
@@ -1037,13 +1037,13 @@ class ActionDelegate {
      */
     Case findCase(Field caseRef) {
         if(caseRef.value == null) {
-            log.error("Value of field with id [${caseRef.importId}] is null, returning null.")
+            log.debug("[findCase(Field]: Value of field with id [${caseRef.importId}] is null, returning null.")
             return null
         }
         try {
             List<String> castValue = [caseRef.value].flatten() as List<String>
             if(castValue.size() == 0) {
-                log.error("Value of field with id [${caseRef.importId}] does not contain at least one element, returning null.")
+                log.debug("[findCase(Field]: Value of field with id [${caseRef.importId}] does not contain at least one element, returning null.")
                 return null
             }
             return this.findCase(castValue[0])
@@ -1077,13 +1077,13 @@ class ActionDelegate {
      */
     Case findCase(DataField caseRef) {
         if(caseRef.value == null) {
-            log.error("Value of field is null, returning null.")
+            log.debug("[findCase(DataField)]: Value of field is null, returning null.")
             return null
         }
         try {
             List<String> castValue = [caseRef.value].flatten() as List<String>
             if(castValue.size() == 0) {
-                log.error("Value of field does not contain at least one element, returning null.")
+                log.debug("[findCase(DataField)]: Value of field does not contain at least one element, returning null.")
                 return null
             }
             return this.findCase(castValue[0])
@@ -1124,7 +1124,7 @@ class ActionDelegate {
      */
     Case deleteCase(String mongoId) {
         if(mongoId == null){
-            log.warn("Null value detected, returning null.")
+            log.debug("[deleteCase(String)]: Null value detected, returning null.")
             return null
         }
         return this.deleteCase(workflowService.findOne(mongoId))
@@ -1138,7 +1138,7 @@ class ActionDelegate {
      */
     Case deleteCase(Case toDelete) {
         if(toDelete == null){
-            log.warn("Null value detected, returning null.")
+            log.debug("[deleteCase(Case)]: Null value detected, returning null.")
             return null
         }
         return workflowService.deleteCase(toDelete).case
@@ -1298,7 +1298,7 @@ class ActionDelegate {
      */
     List<Task> findTasks(Field taskRef) {
         if(taskRef.value == null) {
-            log.error("Value of field with id [${taskRef.importId}] is null, returning empty list.")
+            log.debug("[findTasks(Field)]: Value of field with id [${taskRef.importId}] is null, returning empty list.")
             return []
         }
         try {
@@ -1331,7 +1331,7 @@ class ActionDelegate {
      */
     List<Task> findTasks(DataField taskRef) {
         if(taskRef.value == null) {
-            log.error("Value of field is null, returning empty list.")
+            log.debug("[findTasks(DataField)]: Value of field is null, returning empty list.")
             return []
         }
         try {
@@ -1352,7 +1352,7 @@ class ActionDelegate {
      */
     List<Task> findTasks(List<String> mongoIds) {
         if(mongoIds == null || mongoIds.empty) {
-            log.warn("Null value detected, returning empty list.")
+            log.debug("[findTasks(List<String>)]: Null value detected, returning empty list.")
             return []
         }
         return taskService.findAllById(mongoIds)
@@ -1391,13 +1391,13 @@ class ActionDelegate {
      */
     Task findTask(Field taskRef) {
         if(taskRef.value == null) {
-            log.error("Value of field with id [${taskRef.importId}] is null, returning null")
+            log.debug("[findTask(Field)]: Value of field with id [${taskRef.importId}] is null, returning null")
             return null
         }
         try {
             List<String> castValue = [taskRef.value].flatten() as List<String>
             if(castValue.size() == 0) {
-                log.error("Value of field with id [${taskRef.importId}] does not contain at least one element, returning null.")
+                log.debug("[findTask(Field)]: Value of field with id [${taskRef.importId}] does not contain at least one element, returning null.")
                 return null
             }
             return this.findTask(castValue[0])
@@ -1431,13 +1431,13 @@ class ActionDelegate {
      */
     Task findTask(DataField taskRef) {
         if(taskRef.value == null) {
-            log.error("Value of field is null, returning null")
+            log.debug("[findTask(DataField)]: Value of field is null, returning null")
             return null
         }
         try {
             List<String> castValue = [taskRef.value].flatten() as List<String>
             if(castValue.size() == 0) {
-                log.error("Value of field does not contain at least one element, returning null.")
+                log.debug("[findTask(DataField)]: Value of field does not contain at least one element, returning null.")
                 return null
             }
             return this.findTask(castValue[0])
@@ -1455,7 +1455,7 @@ class ActionDelegate {
      */
     PetriNet findPetriNet(String mongoId) {
         if(mongoId == null){
-            log.warn("Null value detected, returning null.")
+            log.debug("[findPetriNet(String)]: Null value detected, returning null.")
             return null
         }
         return petriNetService.getPetriNet(mongoId)
@@ -1469,7 +1469,7 @@ class ActionDelegate {
      */
     PetriNet findPetriNet(ObjectId objectId) {
         if(objectId == null){
-            log.warn("Null value detected, returning null.")
+            log.debug("[findPetriNet(ObjectId)]: Null value detected, returning null.")
             return null
         }
         return petriNetService.get(objectId)
@@ -1483,7 +1483,7 @@ class ActionDelegate {
      */
     List<PetriNet> findPetriNets(List<String> mongoIds) {
         if(mongoIds == null || mongoIds.empty){
-            log.warn("Null value detected, returning empty list.")
+            log.debug("[findPetriNets(List<String>)]: Null value detected, returning empty list.")
             return []
         }
         return petriNetService.findAllById(mongoIds)
@@ -1497,7 +1497,7 @@ class ActionDelegate {
      */
     List<PetriNet> findPetriNetsByObjectIds(List<ObjectId> objectIds) {
         if(objectIds == null || objectIds.empty){
-            log.warn("Null value detected, returning empty list.")
+            log.debug("[findPetriNetsByObjectIds(List<ObjectId>)]: Null value detected, returning empty list.")
             return []
         }
         return petriNetService.get(objectIds as Collection<ObjectId>)
@@ -1514,7 +1514,7 @@ class ActionDelegate {
      */
     PetriNet findPetriNetByIdentifier(String identifier, Version version = null) {
         if(identifier == null) {
-            log.warn("Null identifier value detected, returning null.")
+            log.debug("[findPetriNetByIdentifier(String, Version)]: Null identifier value detected, returning null.")
             return null
         }
         return version == null ? petriNetService.getNewestVersionByIdentifier(identifier) : petriNetService.getPetriNet(identifier, version)
@@ -1536,7 +1536,7 @@ class ActionDelegate {
 
     String getTaskId(String transitionId, Case aCase = useCase) {
         List<TaskReference> refs = taskService.findAllByCase(aCase.stringId, null)
-        refs.find { it.transitionId == transitionId }.stringId
+        return refs.find { it.transitionId == transitionId }.stringId
     }
 
     /**
