@@ -330,6 +330,12 @@
         <title name="todo 23">Filter</title>
     </data>
 
+<!--    todo 23 review field-->
+    <data type="boolean" immediate="true">
+        <id>case_allow_export</id>
+        <title name="case_allow_export">Allow export?</title>
+    </data>
+
     <!-- I18NS -->
     <i18n locale="sk">
         <i18nString name="create_case_button_title">Názov tlačidla "Nová inštancia"</i18nString>
@@ -359,6 +365,7 @@
         <i18nString name="item_settings_general">Všeobecné</i18nString>
         <i18nString name="view_configuration_type">Typ zobrazenia</i18nString>
         <i18nString name="settings">Nastavenie</i18nString>
+        <i18nString name="case_allow_export">Povoliť export?</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
@@ -388,6 +395,7 @@
         <i18nString name="view_header">Fallansicht</i18nString>
         <i18nString name="view_configuration_type">Der Ansichtstyp</i18nString>
         <i18nString name="settings">Einstellungen</i18nString>
+        <i18nString name="case_allow_export">Erlaube Export?</i18nString>
     </i18n>
 
     <transition>
@@ -1085,6 +1093,13 @@
                 <id>view_configuration_all_data_form</id>
                 <logic>
                     <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+<!--            todo 23 review dataref - add to settings -->
+            <dataRef>
+                <id>case_allow_export</id>
+                <logic>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
         </dataGroup>

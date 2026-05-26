@@ -9,7 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Objects;
 
 public class SingleItemAsListDeserializer extends StdDeserializer<Object> implements ContextualDeserializer {
 
@@ -27,13 +30,16 @@ public class SingleItemAsListDeserializer extends StdDeserializer<Object> implem
 
     @Override
     public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) {
+        return new SingleItemAsListDeserializer((Class<? extends SingleItemAsList>) getItemClass(deserializationContext, beanProperty));
+    }
+
+    protected Class<?> getItemClass(DeserializationContext deserializationContext, BeanProperty beanProperty) {
         final JavaType type;
         if (beanProperty != null)
             type = beanProperty.getType();
         else
             type = deserializationContext.getContextualType();
-
-        return new SingleItemAsListDeserializer((Class<? extends SingleItemAsList>) type.getRawClass());
+        return type.getRawClass();
     }
 
     @Override
@@ -63,5 +69,16 @@ public class SingleItemAsListDeserializer extends StdDeserializer<Object> implem
         }
 
         return wrapper;
+    }
+
+    protected boolean isWrapperClass(Object object, Class<?> wrapperClass, Class<?> wrappedClass) {
+        try {
+            Type superClass = object.getClass().getGenericSuperclass();
+            return Objects.equals(object.getClass(), wrapperClass) ||
+                    (superClass != null &&
+                            Objects.equals(((ParameterizedType) superClass).getActualTypeArguments()[0], wrappedClass));
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

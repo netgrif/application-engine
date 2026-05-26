@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.elastic.web.requestbodies;
 
+import com.netgrif.application.engine.elastic.service.ElasticsearchQuerySanitizer;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
@@ -14,14 +15,14 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ElasticTaskSearchRequest extends TaskSearchRequest {
     public String query;
-    
+
     public ElasticTaskSearchRequest(Map<String, Object> request) {
         if (request.containsKey("role") && request.get("role") instanceof List) {
             this.role = (List<String>) request.get("role");
         }
         if (request.containsKey("useCase") && request.get("useCase") instanceof List) {
             List<Map<String, String>> useCases = (List<Map<String, String>>) request.get("useCase");
-            this.useCase = useCases.stream().map(map ->  {
+            this.useCase = useCases.stream().map(map -> {
                 TaskSearchCaseRequest useCase = new TaskSearchCaseRequest();
                 if (map.containsKey("id"))
                     useCase.id = map.get("id");
@@ -44,7 +45,8 @@ public class ElasticTaskSearchRequest extends TaskSearchRequest {
             this.transitionId = (List<String>) request.get("transitionId");
         }
         if (request.containsKey("fullText") && request.get("fullText") instanceof String) {
-            this.fullText = (String) request.get("fullText");
+            String originalFullText = (String) request.get("fullText");
+            this.fullText = ElasticsearchQuerySanitizer.sanitize(originalFullText);
         }
         if (request.containsKey("group") && request.get("group") instanceof List) {
             this.group = (List<String>) request.get("group");
