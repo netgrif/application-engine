@@ -197,8 +197,8 @@ public final class FieldFactory {
     }
 
     // TODO: refactor this shit
-    Field getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
-        Field field;
+    Field<?> getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
+        Field<?> field;
         switch (data.getType()) {
             case TEXT:
                 field = buildTextField(data);
@@ -248,6 +248,7 @@ public final class FieldFactory {
             case MULTICHOICE_MAP:
                 field = buildMultichoiceMapField(data, importer);
                 break;
+            case FILTER: // "FILTER" is deprecated
             case CASE_FILTER:
                 field = buildCaseFilterField(data);
                 break;
