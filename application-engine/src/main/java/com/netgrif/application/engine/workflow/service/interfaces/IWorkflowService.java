@@ -31,6 +31,8 @@ public interface IWorkflowService {
 
     Case resolveActorRef(Case useCase, boolean canSaveUseCase);
 
+    void updateCaseFromDb(Case useCase);
+
     CreateCaseEventOutcome createCase(CreateCaseParams createCaseParams);
 
     Page<Case> findAllByAuthor(String authorId, String petriNet, Pageable pageable);

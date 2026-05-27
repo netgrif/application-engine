@@ -51,6 +51,9 @@ public class EventService implements IEventService {
         List<Function> functions = useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions();
         actions.forEach(action -> {
             List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, params, functions);
+            if (useCase != null) {
+                workflowService.updateCaseFromDb(useCase);
+            }
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
                         if (((SetDataEventOutcome) outcome).getChangedFields().isEmpty()) return;
@@ -75,6 +78,9 @@ public class EventService implements IEventService {
         List<Function> functions = useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions();
         actions.forEach(action -> {
             List<EventOutcome> outcomes = actionsRunner.run(action, useCase, taskOpt, params, functions);
+            if (useCase != null) {
+                workflowService.updateCaseFromDb(useCase);
+            }
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
                         if (((SetDataEventOutcome) outcome).getChangedFields().isEmpty()) return;
