@@ -245,52 +245,7 @@ public class FilterImportExportService implements IFilterImportExportService {
             workflowService.save(filterCase.get());
         });
         taskService.assignTasks(taskService.findAllById(new ArrayList<>(importedFilterTaskIds.values())), userService.getLoggedUser());
-        changeFilterField(importedFilterTaskIds.values());
         return importedFilterTaskIds;
-    }
-
-    /**
-     * Method which provides reloading of imported filters fields, so if allowed nets are missing,
-     * htmlTextArea is shown with list of missing allowed nets, otherwise filter preview is shown.
-     *
-     * @param filterFields - list of task ids of filters which value should be reloaded
-     */
-    @Override
-    public void changeFilterField(Collection<String> filterFields) {
-        filterFields.forEach(f -> {
-            Task importedFilterTask = taskService.findOne(f);
-            Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
-            PetriNet filterNet = petriNetService.getNewestVersionByIdentifier(FILTER_NET_IDENTIFIER);
-            List<String> requiredNets = filterCase.getDataSet().get(FIELD_FILTER).getAllowedNets();
-            List<String> currentNets = petriNetService.getExistingPetriNetIdentifiersFromIdentifiersList(requiredNets);
-            if (currentNets.size() < requiredNets.size()) {
-                requiredNets.removeAll(currentNets);
-                StringBuilder htmlTextAreaValue = new StringBuilder(
-                        ((EnumerationMapField) filterNet.getDataSet().get(FIELD_MISSING_NETS_TRANSLATION)).getOptions().get(
-                                LocaleContextHolder.getLocale().getLanguage()
-                        ).getDefaultValue()
-                );
-                htmlTextAreaValue.append("<ul style=\"color: red\">");
-                requiredNets.forEach(net -> htmlTextAreaValue.append("<li>").append(net).append("</li>"));
-                htmlTextAreaValue.append("</ul>");
-                Map<String, Map<String, String>> taskData = new HashMap<>();
-                Map<String, String> missingNets = new HashMap<>();
-                missingNets.put("type", "text");
-                missingNets.put("value", htmlTextAreaValue.toString());
-                taskData.put(FIELD_MISSING_ALLOWED_NETS, missingNets);
-                this.dataService.setData(importedFilterTask, ImportHelper.populateDataset(taskData));
-                filterCase = workflowService.findOne(filterCase.getStringId());
-                changeVisibilityByAllowedNets(true, filterCase);
-            } else {
-                changeVisibilityByAllowedNets(false, filterCase);
-            }
-            workflowService.save(filterCase);
-        });
-    }
-
-    private void changeVisibilityByAllowedNets(boolean allowedNetsMissing, Case filterCase) {
-        filterCase.getDataSet().get(allowedNetsMissing ? FIELD_MISSING_ALLOWED_NETS : FIELD_FILTER).makeVisible(IMPORT_FILTER_TRANSITION);
-        filterCase.getDataSet().get(allowedNetsMissing ? FIELD_FILTER : FIELD_MISSING_ALLOWED_NETS).makeHidden(IMPORT_FILTER_TRANSITION);
     }
 
     @Transactional
@@ -350,7 +305,6 @@ public class FilterImportExportService implements IFilterImportExportService {
         DataField filterField = filter.getDataField(FIELD_FILTER);
         exportFilter.setFilterValue((String) filterField.getValue());
         exportFilter.setAllowedNets(filterField.getAllowedNets());
-        exportFilter.setFilterMetadataExport(filterField.getFilterMetadata());
 
         DataField visibility = filter.getDataField(FIELD_VISIBILITY);
         exportFilter.setVisibility(visibility.getValue().toString());

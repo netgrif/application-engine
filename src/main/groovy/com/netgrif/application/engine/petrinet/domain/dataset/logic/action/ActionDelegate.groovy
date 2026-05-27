@@ -672,7 +672,7 @@ class ActionDelegate {
              saveChangedChoices(field, targetCase, targetTask)
          },
          allowedNets        : { cl ->
-             if (!(field instanceof CaseField)) // TODO make this work with FilterField as well
+             if (!(field instanceof CaseField))
                  return
 
              def allowedNets = cl()

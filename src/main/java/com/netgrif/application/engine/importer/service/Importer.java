@@ -249,7 +249,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void resolveUserRef(CaseUserRef userRef) {
+    protected void resolveUserRef(CaseActorRef userRef) {
         CaseLogic logic = userRef.getCaseLogic();
         String usersId = userRef.getId();
 
@@ -766,7 +766,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void addUserLogic(Transition transition, UserRef userRef) {
+    protected void addUserLogic(Transition transition, ActorRef userRef) {
         Logic logic = userRef.getLogic();
         String userRefId = userRef.getId();
 

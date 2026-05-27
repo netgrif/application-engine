@@ -251,9 +251,6 @@ public class Case implements Serializable {
             if (field instanceof FieldWithAllowedNets) {
                 this.dataSet.get(key).setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());
             }
-            if (field instanceof FilterField) {
-                this.dataSet.get(key).setFilterMetadata(((FilterField) field).getFilterMetadata());
-            }
             if (field instanceof MapOptionsField && ((MapOptionsField) field).isDynamic()) {
                 dynamicOptionsFields.add((MapOptionsField<I18nString, ?>) field);
             }
