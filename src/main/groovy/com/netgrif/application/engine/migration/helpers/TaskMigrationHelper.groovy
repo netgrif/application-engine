@@ -5,11 +5,13 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskSer
 import com.netgrif.application.engine.migration.config.properties.MigrationConfigurationProperties
 import com.netgrif.application.engine.migration.config.properties.MigrationConfigurationProperties.TaskMigrationProperties
 import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Transition
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.TaskPair
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.querydsl.core.types.Predicate
 import groovy.util.logging.Slf4j
@@ -47,10 +49,28 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      */
     private IPetriNetService petriNetService
 
+    /**
+     * Service for handling task operations.
+     *
+     * This service provides methods for managing task entities,
+     * including finding, saving, and reloading tasks during migration processes.
+     */
     private ITaskService taskService
 
+    /**
+     * Service for handling Elasticsearch task indexing operations.
+     *
+     * This service is used to index task documents into Elasticsearch,
+     * enabling full-text search and analytics capabilities for tasks.
+     */
     private IElasticTaskService elasticTaskService
 
+    /**
+     * Service for mapping task entities to Elasticsearch documents.
+     *
+     * This service transforms task domain objects into their Elasticsearch
+     * representation before indexing, ensuring proper field mapping and data structure.
+     */
     private IElasticTaskMappingService elasticTaskMappingService
 
     /**
@@ -194,5 +214,38 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
             log.info("Add role '${role.getName()}' with roleId=${role.getImportId()} to transitionId=${task.getTransitionId()} in task ${task.stringId}")
             task.addRole(role.getStringId(), permissions)
         }, QTask.task.transitionId.in(transitionIds) & QTask.task.processId.eq(net.getStringId()))
+    }
+
+    /**
+     * Updates permissions on existing tasks filtered by relevantTransitionIds
+     * @param useCase Instance of Case
+     * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
+     * @param relevantTransitionIds List of transition IDs for permissions update
+     */
+    void updateTasksPermissions(Case useCase, PetriNet net, List<String> relevantTransitionIds) {
+        useCase.tasks.findAll { it.transition in relevantTransitionIds }.each { taskPair ->
+            updateTaskPermissions(useCase, taskPair, net)
+        }
+    }
+
+    /**
+     * Updates permissions on existing task
+     * @param useCase Instance of Case
+     * @param taskPair TaskPair object of updated Task
+     * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
+     */
+    void updateTaskPermissions(Case useCase, TaskPair taskPair, PetriNet net) {
+        try {
+            Transition newTransition = net.getTransition(taskPair.transition)
+            Task oldTask = taskService.findOne(taskPair.task)
+            oldTask.setProcessId(net.stringId)
+            oldTask.getRoles().clear()
+            oldTask.setRoles(newTransition.roles)
+            oldTask.setNegativeViewRoles(newTransition.negativeViewRoles)
+            oldTask.resolveViewRoles()
+            taskService.save(oldTask)
+        } catch (Exception e) {
+            log.error("Failed to update task permissions $useCase.stringId $taskPair.transition", e)
+        }
     }
 }

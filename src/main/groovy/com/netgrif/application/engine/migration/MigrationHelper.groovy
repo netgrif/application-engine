@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.migration
 
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.elastic.service.interfaces.*
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.migration.helpers.AbstractMigrationHelper
 import com.netgrif.application.engine.migration.helpers.CaseMigrationHelper
@@ -9,101 +7,62 @@ import com.netgrif.application.engine.migration.helpers.PetriNetMigrationHelper
 import com.netgrif.application.engine.migration.helpers.TaskMigrationHelper
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.Transition
-import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.domain.events.Event
 import com.netgrif.application.engine.petrinet.domain.events.EventType
-import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
-import com.netgrif.application.engine.petrinet.service.PetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.workflow.domain.*
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
-import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
+import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.TaskPair
 import com.querydsl.core.types.Predicate
 import groovy.util.logging.Slf4j
-import org.apache.tomcat.util.http.fileupload.IOUtils
-import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.mongodb.core.MongoTemplate
-import org.springframework.data.mongodb.core.query.Criteria
-import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Component
 
-import javax.inject.Provider
-import java.text.Collator
-import java.time.LocalDateTime
-import java.util.stream.Collectors
-
+/**
+ * Helper class for migrating cases, tasks and Petri net models.
+ * Provides convenience methods for updating existing data and models during system migrations.
+ * This class delegates migration operations to specialized helper classes for cases, tasks, and Petri nets.
+ */
 @Slf4j
 @Component
 class MigrationHelper {
 
+    /**
+     * Helper for case-related migration operations including updating, iterating, and indexing cases.
+     */
     @Autowired
     private CaseMigrationHelper caseMigrationHelper
 
+    /**
+     * Helper for task-related migration operations including updating, iterating, and managing task permissions.
+     */
     @Autowired
     private TaskMigrationHelper taskMigrationHelper
 
+    /**
+     * Helper for Petri net model migration operations including updating models, roles, and data sets.
+     */
     @Autowired
     private PetriNetMigrationHelper petriNetMigrationHelper
 
-    @Autowired
-    private CaseRepository caseRepository
-
-    @Autowired
-    private TaskRepository taskRepository
-
-    @Autowired
-    private PetriNetService service
-
-    @Autowired
-    private Provider<Importer> importerProvider
-
-    @Autowired
-    private ProcessRoleRepository roleRepository
-
-    @Autowired
-    private PetriNetRepository netRepository
-
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private IElasticCaseService elasticCaseService
-
-    @Autowired
-    private IElasticCaseMappingService caseMappingService
-
-    @Autowired
-    private IElasticTaskService elasticTaskService
-
-    @Autowired
-    private IElasticTaskMappingService elasticTaskMappingService
-
-    @Autowired
-    private IUserService userService
-
-    @Autowired
-    private IElasticIndexService elasticIndexService
-
-    @Autowired
-    private MongoTemplate mongoTemplate
-
-    @Autowired
-    private IPetriNetService petriNetService
-
+    /**
+     * Returns the Importer service instance used for importing and processing Petri net models.
+     * This method delegates to the PetriNetMigrationHelper to retrieve the importer.
+     * @return Importer service instance
+     */
     private Importer getImporter() {
-        return importerProvider.get()
+        return petriNetMigrationHelper.getImporter()
     }
 
+    /**
+     * Closure for updating role events between existing and reimported Petri net models.
+     * This closure synchronizes role-related events from the reimported model to the existing model,
+     * ensuring that role event configurations are properly migrated during process updates.
+     * @param existing The current Petri Net model that will be updated with new role events
+     * @param reimported The newly imported Petri Net model containing updated role event definitions
+     * @return Updated Petri Net model with synchronized role events
+     */
     Closure<PetriNet> updateRoleEvents = { PetriNet existing, PetriNet reimported ->
         petriNetMigrationHelper.updateRoleEvents(existing, reimported)
     }
@@ -344,7 +303,7 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
-    void setPetriNet(Case useCase, PetriNet net) {
+    static void setPetriNet(Case useCase, PetriNet net) {
         PetriNetMigrationHelper.setPetriNet(useCase, net)
     }
 
@@ -353,8 +312,8 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param toDelete List of field IDs that will be deleted from useCase
      */
-    void deleteDataFields(Case useCase, List<String> toDelete) {
-        caseMigrationHelper.deleteDataFields(useCase, toDelete)
+    static void deleteDataFields(Case useCase, List<String> toDelete) {
+        CaseMigrationHelper.deleteDataFields(useCase, toDelete)
     }
 
     /**
@@ -362,8 +321,8 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param toChange List of field IDs for value change
      */
-    void changeDataFieldsValueFromNumberToText(Case useCase, List<String> toChange) {
-        caseMigrationHelper.changeDataFieldsValueFromNumberToText(useCase, toChange)
+    static void changeDataFieldsValueFromNumberToText(Case useCase, List<String> toChange) {
+        CaseMigrationHelper.changeDataFieldsValueFromNumberToText(useCase, toChange)
     }
 
     /**
@@ -371,8 +330,8 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param toChange List of field IDs for value change
      */
-    void changeDataFieldsValueFromTextToNumber(Case useCase, List<String> toChange) {
-        caseMigrationHelper.changeDataFieldsValueFromTextToNumber(useCase, toChange)
+    static void changeDataFieldsValueFromTextToNumber(Case useCase, List<String> toChange) {
+        CaseMigrationHelper.changeDataFieldsValueFromTextToNumber(useCase, toChange)
     }
 
     /**
@@ -380,8 +339,8 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param toAdd Map<field id, init value of field>
      */
-    void addTextDataFields(Case useCase, Map<String, String> toAdd) {
-        caseMigrationHelper.addTextDataFields(useCase, toAdd)
+    static void addTextDataFields(Case useCase, Map<String, String> toAdd) {
+        CaseMigrationHelper.addTextDataFields(useCase, toAdd)
     }
 
     /**
@@ -389,8 +348,8 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param toChange List of field IDs for value change
      */
-    void changeDataFieldsValueFromEnumerationToMultichoice(Case useCase, List<String> toChange) {
-        caseMigrationHelper.changeDataFieldsValueFromEnumerationToMultichoice(useCase, toChange)
+    static void changeDataFieldsValueFromEnumerationToMultichoice(Case useCase, List<String> toChange) {
+        CaseMigrationHelper.changeDataFieldsValueFromEnumerationToMultichoice(useCase, toChange)
     }
 
     /**
@@ -398,8 +357,8 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param toAdd Map<field id, list of choices to add into data data field>
      */
-    void addChoices(Case useCase, Map<String, List<String>> toAdd) {
-        caseMigrationHelper.addChoices(useCase, toAdd)
+    static void addChoices(Case useCase, Map<String, List<String>> toAdd) {
+        CaseMigrationHelper.addChoices(useCase, toAdd)
     }
 
     /**
@@ -407,8 +366,8 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param toAdd Map<field id, list of choices to add into data field>
      */
-    void removeChoices(Case useCase, Map<String, List<String>> toRemove) {
-        caseMigrationHelper.removeChoices(useCase, toRemove)
+    static void removeChoices(Case useCase, Map<String, List<String>> toRemove) {
+        CaseMigrationHelper.removeChoices(useCase, toRemove)
     }
 
     /**
@@ -416,25 +375,16 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param fieldId Field ID for value change
      */
-    private void changeFileFieldToFileList(Case useCase, String fieldId) {
-        FileListFieldValue fileListFieldValue = new FileListFieldValue()
-        fileListFieldValue.namesPaths.add(useCase.dataSet[fieldId].value as FileFieldValue)
-        useCase.dataSet[fieldId].value = fileListFieldValue
+    static void changeFileFieldToFileList(Case useCase, String fieldId) {
+        CaseMigrationHelper.changeFileFieldToFileList(useCase, fieldId)
     }
 
     /**
      * Helper method used in updateNetIgnoreRoles method, it sorts PetriNet dataSet alphabetically
      * @param petriNet Instance of Petri Net
      */
-    void resolveDataOrder(PetriNet petriNet) {
-        Collator skCollator = Collator.getInstance(new Locale("sk", "SK"))
-        List<Field> fields = new LinkedList<>(petriNet.getDataSet().values())
-        fields = fields.stream().sorted({ f1, f2 ->
-            int comparedTypes = f2.type.name <=> f1.type.name
-            if (comparedTypes != 0) return comparedTypes
-            return skCollator.compare((f1.name?.defaultValue ?: f1.stringId), (f2.name?.defaultValue ?: f2.stringId))
-        }).collect(Collectors.toList())
-        petriNet.dataSet = fields.collectEntries { [(it.getStringId()): (it)] } as Map<String, Field>
+    static void resolveDataOrder(PetriNet petriNet) {
+        PetriNetMigrationHelper.resolveDataOrder(petriNet)
     }
 
     /**
@@ -442,56 +392,24 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
-    void updateCaseComponents(Case useCase, PetriNet net) {
-        Map<String, com.netgrif.application.engine.petrinet.domain.Component> components = createComponentsMap(net)
-        Map<String, Map<String, com.netgrif.application.engine.petrinet.domain.Component>> dataRefComponents = createDataRefComponentsMap(net)
-
-        useCase.dataSet.each {dataField ->
-            if (components[dataField.key]) {
-                useCase.dataSet[dataField.key].component = components[dataField.key]
-            }
-            if (dataRefComponents[dataField.key]) {
-                useCase.dataSet[dataField.key].dataRefComponents = dataRefComponents[dataField.key]
-            }
-        }
+    static void updateCaseComponents(Case useCase, PetriNet net) {
+        CaseMigrationHelper.updateCaseComponents(useCase, net)
     }
 
     /**
      * Method that collects all dataRef components of given PetriNet. Should be used in updateCases method, when a new dataRef component is added into PetriNet.
      * @param net Instance of PetriNet
      */
-    Map<String, Map<String, com.netgrif.application.engine.petrinet.domain.Component>> createDataRefComponentsMap(PetriNet net) {
-        Map<String, Map<String, com.netgrif.application.engine.petrinet.domain.Component>> componentsMap = [:]
-        net.transitions.each {transition ->
-            String transId = transition.key
-            transition.value.dataSet.each {dataField ->
-                String fieldId = dataField.key
-                if (dataField.value.component) {
-                    if (!componentsMap[fieldId]) {
-                        componentsMap.put(fieldId, [(transId) : dataField.value.component])
-                    } else {
-                        Map<String, com.netgrif.application.engine.petrinet.domain.Component> existingMap = componentsMap[fieldId]
-                        existingMap.put(transId, dataField.value.component)
-                        componentsMap.put(fieldId, existingMap)
-                    }
-                }
-            }
-        }
-        return componentsMap
+    static Map<String, Map<String, com.netgrif.application.engine.petrinet.domain.Component>> createDataRefComponentsMap(PetriNet net) {
+        PetriNetMigrationHelper.createDataRefComponentsMap(net)
     }
 
     /**
      * Method that collects all dataField components of given PetriNet. Should be used in updateCases method, when a new dataField component is added into PetriNet.
      * @param net Instance of PetriNet
      */
-    Map<String, com.netgrif.application.engine.petrinet.domain.Component> createComponentsMap(PetriNet net) {
-        Map<String, com.netgrif.application.engine.petrinet.domain.Component> componentsMap = [:]
-        net.dataSet.each {dataField ->
-            if (dataField.value.component) {
-                componentsMap.put(dataField.key, dataField.value.component)
-            }
-        }
-        return componentsMap
+    static Map<String, com.netgrif.application.engine.petrinet.domain.Component> createComponentsMap(PetriNet net) {
+        PetriNetMigrationHelper.createComponentsMap(net)
     }
 
     /**
@@ -499,26 +417,8 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
-    void updateCasePermissionsFromNet(Case useCase, PetriNet net, boolean updateTasks = false) {
-        useCase.permissions = net.getPermissions().entrySet().stream()
-                .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
-                .map(role -> {
-                    Map<String, Boolean> permissionMap = new HashMap<>()
-                    if (role.getValue().containsKey("delete"))
-                        permissionMap.put("delete", role.getValue().get("delete"))
-                    if (role.getValue().containsKey("view")) {
-                        permissionMap.put("view", role.getValue().get("view"))
-                    }
-                    return new AbstractMap.SimpleEntry<>(role.getKey(), permissionMap)
-                })
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
-        useCase.resolveViewRoles()
-        useCase.setEnabledRoles(net.getRoles().keySet())
-        if (updateTasks) {
-            useCase.tasks.each { taskPair ->
-                updateTaskPermissions(useCase, taskPair, net)
-            }
-        }
+    static void updateCasePermissionsFromNet(Case useCase, PetriNet net, boolean updateTasks = false) {
+        CaseMigrationHelper.updateCasePermissionsFromNet(useCase, net, updateTasks)
     }
 
     /**
@@ -528,9 +428,7 @@ class MigrationHelper {
      * @param relevantTransitionIds List of transition IDs for permissions update
      */
     void updateTasksPermissions(Case useCase, PetriNet net, List<String> relevantTransitionIds) {
-        useCase.tasks.findAll { it.transition in relevantTransitionIds }.each { taskPair ->
-            updateTaskPermissions(useCase, taskPair, net)
-        }
+        taskMigrationHelper.updateTasksPermissions(useCase, net, relevantTransitionIds)
     }
 
     /**
@@ -540,18 +438,7 @@ class MigrationHelper {
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
     void updateTaskPermissions(Case useCase, TaskPair taskPair, PetriNet net) {
-        try {
-            Transition newTransition = net.getTransition(taskPair.transition)
-            Task oldTask = taskService.findOne(taskPair.task)
-            oldTask.setProcessId(net.stringId)
-            oldTask.getRoles().clear()
-            oldTask.setRoles(newTransition.roles)
-            oldTask.setNegativeViewRoles(newTransition.negativeViewRoles)
-            oldTask.resolveViewRoles()
-            taskService.save(oldTask)
-        } catch (Exception e) {
-            log.error("Failed to update task permissions $useCase.stringId $taskPair.transition", e)
-        }
+        taskMigrationHelper.updateTaskPermissions(useCase, taskPair, net)
     }
 
     /**
@@ -559,7 +446,7 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param newNet Instance of Petri Net, it needs to match processIdentifier of useCase
      */
-    void migratePetriNet(Case useCase, PetriNet newNet) {
-        useCase.setPetriNetObjectId(newNet.objectId)
+    static void migratePetriNet(Case useCase, PetriNet newNet) {
+        CaseMigrationHelper.migratePetriNet(useCase, newNet)
     }
 }

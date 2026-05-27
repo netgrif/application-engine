@@ -31,22 +31,58 @@ import javax.inject.Provider
 import java.text.Collator
 import java.util.stream.Collectors
 
+/**
+ * Helper class for managing Petri Net migration operations in MongoDB.
+ * <p>
+ * This component provides utilities for migrating and updating Petri Net models, including:
+ * <ul>
+ *   <li>Updating existing Petri Nets while preserving role references</li>
+ *   <li>Managing process roles and permissions</li>
+ *   <li>Handling data set migrations</li>
+ *   <li>Creating and updating roles in Petri Net models</li>
+ *   <li>Bulk operations for efficient database updates</li>
+ * </ul>
+ * <p>
+ * The helper extends {@link AbstractMigrationHelper} to leverage common migration patterns
+ * and uses Spring Data MongoDB for database operations.
+ *
+ * @see AbstractMigrationHelper* @see PetriNet* @see IPetriNetService* @see ProcessRoleRepository
+ */
 @Slf4j
 @Component
 class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
 
+
+    /**
+     * Configuration properties specific to Petri Net migration operations.
+     * Contains settings such as page size and other Petri Net-related migration configurations.
+     */
     private PetriNetMigrationProperties petriNetMigrationProperties
 
+    /**
+     * Service interface for managing Petri Net operations including importing, saving, and retrieving Petri Net models.
+     */
     private IPetriNetService petriNetService
 
+    /**
+     * Repository for persisting and retrieving process roles from the database.
+     */
     private ProcessRoleRepository processRoleRepository
 
+    /**
+     * Provider that supplies {@link Importer} instances for importing Petri Net models from various sources.
+     * Uses lazy initialization to create Importer instances on demand.
+     */
     private Provider<Importer> importerProvider
 
     /**
-     * Constructs a new PetriNetMigrationHelper with the specified MongoTemplate.
+     * Constructs a new PetriNetMigrationHelper with the specified dependencies.
      *
      * @param mongoTemplate the {@link MongoTemplate} to use for interacting with MongoDB
+     * @param migrationConfigurationProperties the {@link MigrationConfigurationProperties} containing migration settings including page size and other configuration
+     * @param petriNetService the {@link IPetriNetService} for managing Petri Net operations such as importing, saving, and retrieving Petri Nets
+     * @param processRoleRepository the {@link ProcessRoleRepository} for persisting and retrieving process roles from the database
+     * @param importerProvider the {@link Provider} that supplies {@link Importer} instances for importing Petri Net models from various sources
      */
     PetriNetMigrationHelper(MongoTemplate mongoTemplate,
                             MigrationConfigurationProperties migrationConfigurationProperties,
@@ -60,11 +96,23 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
         this.importerProvider = importerProvider
     }
 
+    /**
+     * Returns the page size for pagination during migration operations.
+     *
+     * @return the page size configured in {@link PetriNetMigrationProperties}
+     */
     @Override
     int getPageSize() {
         return petriNetMigrationProperties.pageSize
     }
 
+    /**
+     * Prepares bulk operations for updating a Petri Net document in MongoDB.
+     *
+     * @param document the {@link PetriNet} document to be updated
+     * @param update the closure that performs the update operation on the document
+     * @param bulkOperations the {@link BulkOperations} to add the replace operation to
+     */
     @Override
     void prepareOperations(PetriNet document, Closure update, BulkOperations bulkOperations) {
         log.debug("Updating case with ID ${document.stringId}")
@@ -101,6 +149,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * Updates existing Petri Net model with new values. New process roles are ignored! New roles in existing user type fields will be ignored!
      * @param currentNet Current Petri Net object that will be updated
      * @param reimported New version of Petri Net object, its values will be applied to currentNet
+     * @param customUpdates Optional list of custom update closures to be applied after the standard update
      */
     void updateNetIgnoreRoles(PetriNet currentNet, PetriNet reimported, List<Closure<PetriNet>> customUpdates) {
         if (!currentNet) {
@@ -187,7 +236,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * Helper method used in updateNetIgnoreRoles method, it sorts PetriNet dataSet alphabetically
      * @param petriNet Instance of Petri Net
      */
-    void resolveDataOrder(PetriNet petriNet) {
+    static void resolveDataOrder(PetriNet petriNet) {
         Collator skCollator = Collator.getInstance(new Locale("sk", "SK"))
         List<Field> fields = new LinkedList<>(petriNet.getDataSet().values())
         fields = fields.stream().sorted({ f1, f2 ->
@@ -205,7 +254,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param role ProcessRole that will be updated on transition
      * @param permissions New role permissions on transition
      */
-    void updateTransitionRoles(PetriNet net, String transitionId, ProcessRole role, Map<String, Boolean> permissions) {
+    static void updateTransitionRoles(PetriNet net, String transitionId, ProcessRole role, Map<String, Boolean> permissions) {
         Transition trans = net.transitions.values().find { it.importId == transitionId }
         trans.roles[role.stringId] = permissions
     }
@@ -217,7 +266,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param roleImportId ID of a role that will be updated on transition
      * @param permissions New role permissions on transition
      */
-    void updateTransitionRoles(PetriNet net, String transitionId, String roleImportId, Map<String, Boolean> permissions) {
+    static void updateTransitionRoles(PetriNet net, String transitionId, String roleImportId, Map<String, Boolean> permissions) {
         ProcessRole role = net.roles.values().find { it.importId == roleImportId }
         updateTransitionRoles(net, transitionId, role, permissions)
     }
@@ -228,7 +277,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param roleImportId ID of a role that will be updated on transition
      * @param permissions New role permissions on transition
      */
-    Closure<PetriNet> updateTransitionRolesClosure(String transitionId, String roleImportId, Map<String, Boolean> permissions) {
+    static Closure<PetriNet> updateTransitionRolesClosure(String transitionId, String roleImportId, Map<String, Boolean> permissions) {
         return { PetriNet petriNet, PetriNet reimported ->
             updateTransitionRoles(petriNet, transitionId, roleImportId, permissions)
             return petriNet
@@ -291,8 +340,9 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * Updates roles of USER fields in existing Petri Net model, WARNING: new roles referenced in USER fields will be ignored! They need to be migrated manually
      * @param originalNet Current Petri Net object that will be updated
      * @param reimportedNet New version of Petri Net object, its values will be applied to currentNet
+     * @return the updated reimported Petri Net with replaced role references
      */
-    private PetriNet replaceUserFieldRoleReferences(PetriNet originalNet, PetriNet reimportedNet) {
+    private static PetriNet replaceUserFieldRoleReferences(PetriNet originalNet, PetriNet reimportedNet) {
         Map<String, ProcessRole> originalNetRoles = [:] // importId: processRole
         originalNet.roles.forEach { name, role ->
             originalNetRoles.put(role.importId, role)
@@ -360,6 +410,9 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
 
     /**
      * Replaces events in roles from existing with events from roles from reimported
+     * @param existing the existing {@link PetriNet} whose role events will be updated
+     * @param reimported the reimported {@link PetriNet} containing new role events
+     * @return the updated existing Petri Net
      */
     PetriNet updateRoleEvents(PetriNet existing, PetriNet reimported) {
         List<ProcessRole> newRoles = reimported.roles.values() as List
@@ -388,8 +441,47 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
 
     /**
      * Provides an {@link com.netgrif.application.engine.importer.service.Importer} instance
+     * @return a new {@link Importer} instance from the provider
      * */
-    private Importer getImporter() {
+    Importer getImporter() {
         return importerProvider.get()
+    }
+
+    /**
+     * Method that collects all dataRef components of given PetriNet. Should be used in updateCases method, when a new dataRef component is added into PetriNet.
+     * @param net Instance of PetriNet
+     */
+    static Map<String, Map<String, com.netgrif.application.engine.petrinet.domain.Component>> createDataRefComponentsMap(PetriNet net) {
+        Map<String, Map<String, com.netgrif.application.engine.petrinet.domain.Component>> componentsMap = [:]
+        net.transitions.each {transition ->
+            String transId = transition.key
+            transition.value.dataSet.each {dataField ->
+                String fieldId = dataField.key
+                if (dataField.value.component) {
+                    if (!componentsMap[fieldId]) {
+                        componentsMap.put(fieldId, [(transId) : dataField.value.component])
+                    } else {
+                        Map<String, com.netgrif.application.engine.petrinet.domain.Component> existingMap = componentsMap[fieldId]
+                        existingMap.put(transId, dataField.value.component)
+                        componentsMap.put(fieldId, existingMap)
+                    }
+                }
+            }
+        }
+        return componentsMap
+    }
+
+    /**
+     * Method that collects all dataField components of given PetriNet. Should be used in updateCases method, when a new dataField component is added into PetriNet.
+     * @param net Instance of PetriNet
+     */
+    static Map<String, com.netgrif.application.engine.petrinet.domain.Component> createComponentsMap(PetriNet net) {
+        Map<String, com.netgrif.application.engine.petrinet.domain.Component> componentsMap = [:]
+        net.dataSet.each {dataField ->
+            if (dataField.value.component) {
+                componentsMap.put(dataField.key, dataField.value.component)
+            }
+        }
+        return componentsMap
     }
 }

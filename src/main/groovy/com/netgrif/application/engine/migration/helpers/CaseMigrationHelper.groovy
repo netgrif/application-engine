@@ -1,11 +1,13 @@
 package com.netgrif.application.engine.migration.helpers
 
-import com.netgrif.application.engine.elastic.service.ElasticCaseMappingService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.migration.config.properties.MigrationConfigurationProperties
 import com.netgrif.application.engine.migration.config.properties.MigrationConfigurationProperties.CaseMigrationProperties
 import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.DataField
@@ -18,6 +20,7 @@ import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Component
 
 import java.time.LocalDateTime
+import java.util.stream.Collectors 
 
 /**
  * Helper class for managing migrations of Case objects in the application.
@@ -36,11 +39,25 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      */
     private CaseMigrationProperties caseMigrationProperties
 
+    /**
+     * Service for managing PetriNet operations.
+     */
     private IPetriNetService petriNetService
 
+    /**
+     * Service for indexing and managing cases in Elasticsearch.
+     */
     private IElasticCaseService elasticCaseService
 
+    /**
+     * Service for mapping Case objects to Elasticsearch documents.
+     */
     private IElasticCaseMappingService elasticCaseMappingService
+
+    /**
+     * Helper for managing task migrations associated with cases.
+     */
+    private TaskMigrationHelper taskMigrationHelper
 
     /**
      * Constructs a CaseMigrationHelper instance with
@@ -53,12 +70,14 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
                         MigrationConfigurationProperties migrationConfigurationProperties,
                         IPetriNetService petriNetService,
                         IElasticCaseService elasticCaseService,
-                        IElasticCaseMappingService elasticCaseMappingService) {
+                        IElasticCaseMappingService elasticCaseMappingService,
+                        TaskMigrationHelper taskMigrationHelper) {
         super(Case.class, mongoTemplate)
         this.caseMigrationProperties = migrationConfigurationProperties.cases
         this.petriNetService = petriNetService
         this.elasticCaseService = elasticCaseService
         this.elasticCaseMappingService = elasticCaseMappingService
+        this.taskMigrationHelper = taskMigrationHelper
     }
 
     /**
@@ -160,7 +179,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param useCase Instance of Case
      * @param toDelete List of field IDs that will be deleted from useCase
      */
-    void deleteDataFields(Case useCase, List<String> toDelete) {
+    static void deleteDataFields(Case useCase, List<String> toDelete) {
         toDelete.each { dataFieldID ->
             useCase.dataSet.remove(dataFieldID)
         }
@@ -171,7 +190,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param useCase Instance of Case
      * @param toChange List of field IDs for value change
      */
-    void changeDataFieldsValueFromNumberToText(Case useCase, List<String> toChange) {
+    static void changeDataFieldsValueFromNumberToText(Case useCase, List<String> toChange) {
         toChange.each { dataFieldID ->
             if (useCase.dataSet[dataFieldID].value && (useCase.dataSet[dataFieldID].value != null || useCase.dataSet[dataFieldID].value != "")) {
                 double value = useCase.dataSet[dataFieldID].value as double
@@ -185,7 +204,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param useCase Instance of Case
      * @param toChange List of field IDs for value change
      */
-    void changeDataFieldsValueFromTextToNumber(Case useCase, List<String> toChange) {
+    static void changeDataFieldsValueFromTextToNumber(Case useCase, List<String> toChange) {
         toChange.each { dataFieldID ->
             if (useCase.dataSet[dataFieldID].value && useCase.dataSet[dataFieldID].value != "") {
                 try {
@@ -203,7 +222,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param useCase Instance of Case
      * @param toAdd Map<field id, init value of field>
      */
-    void addTextDataFields(Case useCase, Map<String, String> toAdd) {
+    static void addTextDataFields(Case useCase, Map<String, String> toAdd) {
         toAdd.each { dataFieldID, value ->
             useCase.dataSet[dataFieldID] = new DataField(value)
         }
@@ -214,7 +233,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param useCase Instance of Case
      * @param toChange List of field IDs for value change
      */
-    void changeDataFieldsValueFromEnumerationToMultichoice(Case useCase, List<String> toChange) {
+    static void changeDataFieldsValueFromEnumerationToMultichoice(Case useCase, List<String> toChange) {
         toChange.each { dataFieldID ->
             if (useCase.dataSet[dataFieldID].value && useCase.dataSet[dataFieldID].value != null) {
                 def value
@@ -236,7 +255,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param useCase Instance of Case
      * @param toAdd Map<field id, list of choices to add into data data field>
      */
-    void addChoices(Case useCase, Map<String, List<String>> toAdd) {
+    static void addChoices(Case useCase, Map<String, List<String>> toAdd) {
         toAdd.each { dataFieldID, newChoices ->
             if (useCase.dataSet[dataFieldID].choices == null) {
                 useCase.dataSet[dataFieldID].setChoices(new HashSet<I18nString>())
@@ -253,7 +272,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param useCase Instance of Case
      * @param toAdd Map<field id, list of choices to add into data field>
      */
-    void removeChoices(Case useCase, Map<String, List<String>> toRemove) {
+    static void removeChoices(Case useCase, Map<String, List<String>> toRemove) {
         toRemove.each { dataFieldID, choicesToRemove ->
             if (useCase.dataSet[dataFieldID].value != null) {
                 (useCase.dataSet[dataFieldID].value as Set).removeAll(choicesToRemove)
@@ -263,6 +282,72 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
                 useCase.dataSet[dataFieldID].choices.removeAll(choicesToRemove)
             }
         }
+    }
+
+    /**
+     * Changes value from FileFieldValue to FileListFieldValue
+     * @param useCase Instance of Case
+     * @param fieldId Field ID for value change
+     */
+    static void changeFileFieldToFileList(Case useCase, String fieldId) {
+        FileListFieldValue fileListFieldValue = new FileListFieldValue()
+        fileListFieldValue.namesPaths.add(useCase.dataSet[fieldId].value as FileFieldValue)
+        useCase.dataSet[fieldId].value = fileListFieldValue
+    }
+
+    /**
+     * Update dataField and dataRef components of given case
+     * @param useCase Instance of Case
+     * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
+     */
+    static void updateCaseComponents(Case useCase, PetriNet net) {
+        Map<String, com.netgrif.application.engine.petrinet.domain.Component> components = PetriNetMigrationHelper.createComponentsMap(net)
+        Map<String, Map<String, com.netgrif.application.engine.petrinet.domain.Component>> dataRefComponents = PetriNetMigrationHelper.createDataRefComponentsMap(net)
+
+        useCase.dataSet.each {dataField ->
+            if (components[dataField.key]) {
+                useCase.dataSet[dataField.key].component = components[dataField.key]
+            }
+            if (dataRefComponents[dataField.key]) {
+                useCase.dataSet[dataField.key].dataRefComponents = dataRefComponents[dataField.key]
+            }
+        }
+    }
+
+    /**
+     * Updates case permissions from PetriNet
+     * @param useCase Instance of Case
+     * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
+     */
+    static void updateCasePermissionsFromNet(Case useCase, PetriNet net, boolean updateTasks = false) {
+        useCase.permissions = net.getPermissions().entrySet().stream()
+                .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
+                .map(role -> {
+                    Map<String, Boolean> permissionMap = new HashMap<>()
+                    if (role.getValue().containsKey("delete"))
+                        permissionMap.put("delete", role.getValue().get("delete"))
+                    if (role.getValue().containsKey("view")) {
+                        permissionMap.put("view", role.getValue().get("view"))
+                    }
+                    return new AbstractMap.SimpleEntry<>(role.getKey(), permissionMap)
+                })
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
+        useCase.resolveViewRoles()
+        useCase.setEnabledRoles(net.getRoles().keySet())
+        if (updateTasks) {
+            useCase.tasks.each { taskPair ->
+                taskMigrationHelper.updateTaskPermissions(useCase, taskPair, net)
+            }
+        }
+    }
+
+    /**
+     * Changes PetriNet reference in useCase
+     * @param useCase Instance of Case
+     * @param newNet Instance of Petri Net, it needs to match processIdentifier of useCase
+     */
+    static void migratePetriNet(Case useCase, PetriNet newNet) {
+        useCase.setPetriNetObjectId(newNet.objectId)
     }
 }
 
