@@ -20,4 +20,5 @@ public class CaseViewConstants extends ViewConstants {
     public static final String FIELD_EMPTY_CONTENT_TEXT = "case_empty_content_text";
     public static final String FIELD_EMPTY_CONTENT_ICON = "case_empty_content_icon";
     public static final String FIELD_FILTER = "case_filter";
+    public static final String FIELD_ALLOW_EXPORT = "case_allow_export";
 }

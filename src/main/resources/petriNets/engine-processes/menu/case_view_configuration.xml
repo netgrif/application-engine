@@ -329,9 +329,7 @@
         <id>case_filter</id>
         <title name="todo 23">Filter</title>
     </data>
-
-<!--    todo 23 review field-->
-    <data type="boolean" immediate="true">
+    <data type="boolean">
         <id>case_allow_export</id>
         <title name="case_allow_export">Allow export?</title>
     </data>
@@ -483,6 +481,20 @@
                 </layout>
             </dataRef>
             <dataRef>
+                <id>case_allow_export</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
                 <id>case_empty_content_text</id>
                 <logic>
                     <behavior>editable</behavior>
@@ -531,7 +543,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>2</y>
+                    <y>3</y>
                     <rows>1</rows>
                     <cols>3</cols>
                     <template>material</template>
@@ -1095,11 +1107,10 @@
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
-<!--            todo 23 review dataref - add to settings -->
             <dataRef>
                 <id>case_allow_export</id>
                 <logic>
-                    <behavior>hidden</behavior>
+                    <behavior>visible</behavior>
                 </logic>
             </dataRef>
         </dataGroup>

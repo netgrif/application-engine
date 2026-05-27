@@ -30,6 +30,7 @@ public class CaseViewBody extends ViewBody {
     private boolean useDefaultHeaders = true;
     private I18nString emptyContentText;
     private String emptyContentIcon;
+    private boolean allowExport;
 
     private ViewBody chainedView;
 
@@ -87,6 +88,8 @@ public class CaseViewBody extends ViewBody {
         }
         outcome.putDataSetEntry(CaseViewConstants.FIELD_EMPTY_CONTENT_ICON, FieldType.TEXT,
                 this.emptyContentIcon);
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_ALLOW_EXPORT, FieldType.BOOLEAN,
+                this.allowExport);
 
         return outcome;
     }
