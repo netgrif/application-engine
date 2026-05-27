@@ -254,7 +254,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public void updateCaseFromDb(Case useCase) {
-        Case actual = findOneNoNet(useCase.getStringId());
+        Case actual = findOne(useCase.getStringId());
         actual.getDataSet().forEach((id, dataField) -> {
             if (dataField.isNewerThen(useCase.getDataField(id))) {
                 useCase.getDataSet().put(id, dataField);

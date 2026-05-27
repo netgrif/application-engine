@@ -47,7 +47,7 @@ public interface ActionApi {
      * @return the outcome of the set data operation
      * @throws JsonProcessingException if there is an error processing JSON data
      */
-    SetDataEventOutcome setData(String taskId, Map<String, Map<String, String>> dataSet, Map<String, String> params) throws JsonProcessingException;
+    SetDataEventOutcome setData(String taskId, Map<String, Map<String, Object>> dataSet, Map<String, String> params) throws JsonProcessingException;
 
     /**
      * Finds a specific case by its ID.
