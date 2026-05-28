@@ -7,6 +7,8 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.DataField
+import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.util.logging.Slf4j
@@ -16,7 +18,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
@@ -51,15 +54,6 @@ class MigrationBenchmarkTest {
 
     private static FileWriter writer
 
-    @BeforeAll
-    static void beforeAll() {
-        File report = new File("src/main/resources/migration_report.txt")
-        if (report.createNewFile()) {
-            log.info("New migration report file created")
-        }
-        writer = new FileWriter(report)
-    }
-
     @BeforeEach
     void beforeEach() {
         testHelper.truncateDbs()
@@ -72,48 +66,36 @@ class MigrationBenchmarkTest {
         assert netV2Outcome.getNet() != null
         netV2 = netV2Outcome.getNet()
 
-        (1..10000).stream().parallel().forEach {
+        (1..100).stream().parallel().forEach {
             workflowService.createCase(netV1.stringId, "Net V1 " + it, null, superCreator.loggedSuper, Locale.default)
         }
     }
 
-    @AfterAll
-    static void afterAll() {
-        writer.close()
-    }
-
-    //TODO: to be deleted
-    @Test
-    void migrateCasesWitLegacyCursor() {
-        LocalDateTime startOfLegacyMigration = LocalDateTime.now()
-        migrationHelper.updateCasesCursor({ Case useCase ->
-            migrationHelper.updateCasePermissionsFromNet(useCase, netV2)
-        }, "nae_2432")
-        LocalDateTime endOfLegacyMigration = LocalDateTime.now()
-        Duration diff = Duration.between(startOfLegacyMigration, endOfLegacyMigration)
-        writer.write("==============================\n")
-        writer.write("LEGACY MIGRATION HELPER\n")
-        writer.write("Migrated 10000 cases\n")
-        writer.write("Started at " + startOfLegacyMigration.toString() + "\n")
-        writer.write("Ended at " + endOfLegacyMigration.toString() + "\n")
-        writer.write("Duration: " + diff.toString() + "\n")
-        writer.write("==============================\n")
-    }
-
     @Test
     void migrateCasesWithCursor() {
-        LocalDateTime startOfLegacyMigration = LocalDateTime.now()
+        List<Case> caseList = workflowService.search(QCase.case$.processIdentifier.eq("nae_2432"), Pageable.ofSize(100)).getContent()
+        caseList.forEach {
+            assert !it.dataSet.containsKey("income")
+            assert !it.dataSet.containsKey("recreate_info_text")
+            assert it.enabledRoles.size() == 0
+            assert it.tasks.size() == 1 && it.tasks[0].transition == "person_info"
+        }
+
         caseMigrationHelper.updateCasesCursor({ Case useCase ->
             migrationHelper.updateCasePermissionsFromNet(useCase, netV2)
+            migrationHelper.updateTasksPermissions(useCase, netV2, ["t1", "t2"])
+            migrationHelper.reloadTasks(useCase, netV2)
+
+            useCase.dataSet["income"] = new DataField(0)
+            useCase.dataSet["recreate_info_text"] = new DataField("")
+
         }, "nae_2432")
-        LocalDateTime endOfLegacyMigration = LocalDateTime.now()
-        Duration diff = Duration.between(startOfLegacyMigration, endOfLegacyMigration)
-        writer.write("==============================\n")
-        writer.write("NEW MIGRATION HELPER\n")
-        writer.write("Migrated 10000 cases\n")
-        writer.write("Started at " + startOfLegacyMigration.toString() + "\n")
-        writer.write("Ended at " + endOfLegacyMigration.toString() + "\n")
-        writer.write("Duration: " + diff.toString() + "\n")
-        writer.write("==============================\n")
+        caseList = workflowService.search(QCase.case$.processIdentifier.eq("nae_2432"), Pageable.ofSize(100)).getContent()
+        caseList.forEach {
+            assert it.dataSet.containsKey("income")
+            assert it.dataSet.containsKey("recreate_info_text")
+            assert it.enabledRoles.size() == 5
+            assert it.tasks.size() == 2 && it.tasks[0].transition == "person_info" && it.tasks[1].transition == "recreate_person"
+        }
     }
 }
