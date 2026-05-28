@@ -267,7 +267,7 @@ class MigrationHelper {
      */
     def createGlobalRole(String id, String title, Map<EventType, Event> events = [:]) {
         log.debug("createGlobalRole called with id: {}, title: {}", id, title)
-        return petriNetMigrationHelper.createGlobalRole(id, title, event)
+        return petriNetMigrationHelper.createGlobalRole(id, title, events)
     }
 
     /**

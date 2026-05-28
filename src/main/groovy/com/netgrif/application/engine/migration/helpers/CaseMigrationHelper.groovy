@@ -284,6 +284,9 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
         log.debug("Starting addChoices for case: ${useCase.stringId}, fields: ${toAdd.keySet()}")
         toAdd.each { dataFieldID, newChoices ->
             DataField dataField = useCase.dataSet[dataFieldID]
+            if (!dataField) {
+                return
+            }
             if (dataField.choices == null) {
                 dataField.setChoices(new HashSet<I18nString>())
             }
@@ -305,6 +308,9 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
         toRemove.each { dataFieldID, choicesToRemove ->
             log.trace("Removing choices ${choicesToRemove} from field ${dataFieldID} in case: ${useCase.stringId}")
             DataField dataField = useCase.dataSet[dataFieldID]
+            if (!dataField) {
+                return
+            }
             if (dataField.value != null) {
                 (dataField.value as Set).removeAll(choicesToRemove)
             }
@@ -324,7 +330,10 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
         log.debug("Starting changeFileFieldToFileList for case: ${useCase.stringId}, field: ${fieldId}")
         FileListFieldValue fileListFieldValue = new FileListFieldValue()
         DataField dataField = useCase.dataSet[fieldId]
-        def existingValue = dataField?.value
+        if (!dataField) {
+            return
+        }
+        def existingValue = dataField.value
         if (existingValue != null) {
             fileListFieldValue.namesPaths.add(existingValue as FileFieldValue)
         }

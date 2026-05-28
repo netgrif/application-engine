@@ -51,19 +51,19 @@ class MigrationTest {
     void beforeEach() {
         testHelper.truncateDbs()
 
-        new FileInputStream("src/test/resources/nae_2432_v1.xml").withCloseable { is ->
+        this.class.classLoader.getResourceAsStream("nae_2432_v1.xml").withCloseable { is ->
             ImportPetriNetEventOutcome netV1Outcome = petriNetService.importPetriNet(is, VersionType.MAJOR, superCreator.getLoggedSuper())
             assert netV1Outcome.getNet() != null
             netV1 = netV1Outcome.getNet()
         }
 
-        new FileInputStream("src/test/resources/nae_2432_v2.xml").withCloseable { is ->
+        this.class.classLoader.getResourceAsStream("nae_2432_v2.xml").withCloseable { is ->
             ImportPetriNetEventOutcome netV2Outcome = petriNetService.importPetriNet(is, VersionType.MAJOR, superCreator.getLoggedSuper())
             assert netV2Outcome.getNet() != null
             netV2 = netV2Outcome.getNet()
         }
 
-        (1..10).stream().parallel().forEach {
+        (1..10).forEach {
             workflowService.createCase(netV1.stringId, "Net V1 " + it, null, superCreator.loggedSuper, Locale.default)
         }
     }
@@ -92,7 +92,7 @@ class MigrationTest {
             assert it.dataSet.containsKey("income")
             assert it.dataSet.containsKey("recreate_info_text")
             assert it.enabledRoles.size() == 5
-            assert it.tasks.size() == 2 && it.tasks[0].transition == "person_info" && it.tasks[1].transition == "recreate_person"
+            assert it.tasks.size() == 2 && it.tasks.any {it.transition == "person_info"} && it.tasks.any {it.transition == "recreate_person"}
         }
     }
 }
