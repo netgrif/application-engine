@@ -133,6 +133,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param resource Resource object with new version of Petri Net model
      */
     void updateNetIgnoreRoles(String identifier, Resource resource, List<Closure<PetriNet>> customUpdates = null) {
+        log.debug("Starting updateNetIgnoreRoles for identifier: {} with Resource", identifier)
         PetriNet reimported = petriNetService.importPetriNet(resource.inputStream, VersionType.MAJOR, userService.getSystem().transformToLoggedUser()).getNet()
         updateNetIgnoreRoles(petriNetService.getNewestVersionByIdentifier(identifier), reimported, customUpdates)
     }
@@ -143,6 +144,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param fileName File name of new version of Petri Net model
      */
     void updateNetIgnoreRoles(String identifier, String fileName, List<Closure<PetriNet>> customUpdates = null) {
+        log.debug("Starting updateNetIgnoreRoles for identifier: {} with fileName: {}", identifier, fileName)
         PetriNet currentNet = petriNetService.getNewestVersionByIdentifier(identifier)
         InputStream inputStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
@@ -159,6 +161,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param customUpdates Optional list of custom update closures to be applied after the standard update
      */
     void updateNetIgnoreRoles(PetriNet currentNet, PetriNet reimported, List<Closure<PetriNet>> customUpdates) {
+        log.debug("Starting updateNetIgnoreRoles for currentNet: {} and reimported: {}", currentNet?.identifier, reimported?.identifier)
         if (!currentNet) {
             log.warn("Net $reimported.identifier does not exist")
             return
@@ -185,6 +188,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
 
         def newPermissions = [:]
         reimported.permissions.each { id, permissions ->
+            log.trace("Processing permission for role id: {}", id)
             def newRole = newProcessRoles[id]
 
             if (!newRole && (defaultRole.stringId == id || anonymousRole.stringId == id)) {
@@ -200,14 +204,17 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
                     log.warn("Old role does not exist for role $newRole.importId")
                     return
                 }
+                log.trace("Mapping new role {} to old role {}", newRole.importId, oldRole.stringId)
                 newPermissions[oldRole.stringId] = permissions
             }
         }
         currentNet.permissions = newPermissions as Map<String, Map<String, Boolean>>
 
         currentNet.transitions.each { id, t ->
+            log.trace("Processing transition roles for transition: {}", t.importId)
             Map<String, Map<String, Boolean>> oldRoles = new HashMap<>()
             t.roles.each { roleMongoId, permissions ->
+                log.trace("Processing transition role with mongoId: {}", roleMongoId)
                 def newRole = newProcessRoles[roleMongoId]
 
                 if (!newRole && (defaultRole.stringId == roleMongoId || anonymousRole.stringId == roleMongoId)) {
@@ -223,6 +230,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
                         log.warn("Old role does not exist for role $newRole.importId")
                         return
                     }
+                    log.trace("Mapping transition role {} to old role {}", newRole.importId, oldRole.stringId)
                     oldRoles[oldRole.stringId] = permissions
                 }
             }
@@ -243,7 +251,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * Helper method used in updateNetIgnoreRoles method, it sorts PetriNet dataSet alphabetically
      * @param petriNet Instance of Petri Net
      */
-    static void resolveDataOrder(PetriNet petriNet, Locale locale = Locale.getDefault()) {
+    static void resolveDataOrder(PetriNet petriNet, Locale locale = Locale.ROOT) {
         Collator collator = Collator.getInstance(locale)
         List<Field> fields = new LinkedList<>(petriNet.getDataSet().values())
         fields = fields.stream().sorted({ f1, f2 ->
@@ -262,6 +270,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param permissions New role permissions on transition
      */
     static void updateTransitionRoles(PetriNet net, String transitionId, ProcessRole role, Map<String, Boolean> permissions) {
+        log.debug("Updating transition roles for transitionId: {} in net: {}", transitionId, net?.identifier)
         Transition trans = net.transitions.values().find { it.importId == transitionId }
         if (!trans) {
             log.warn("Transition with importId $transitionId not found in net $net.identifier")
@@ -305,6 +314,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param fileName File name of new version of Petri Net model
      */
     void updateDataSet(String identifier, String fileName, Closure<PetriNet> customUpdate = null) {
+        log.debug("Starting updateDataSet for identifier: {} with fileName: {}", identifier, fileName)
         PetriNet existing = petriNetService.getNewestVersionByIdentifier(identifier)
         InputStream inputStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
         PetriNet reimported = getImporter().importPetriNet(inputStream)
@@ -329,6 +339,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param title Title of the new Process Role
      */
     ProcessRole createRoleInNet(String identifier, String id, String title, Map<EventType, Event> events = [:]) {
+        log.debug("Creating role in net with identifier: {}, id: {}, title: {}", identifier, id, title)
         return createRoleInNet(identifier, id, new I18nString(title), events)
     }
 
@@ -339,6 +350,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param title Title of the new Process Role
      */
     ProcessRole createRoleInNet(String identifier, String id, I18nString title, Map<EventType, Event> events = [:]) {
+        log.debug("Creating role in net with identifier: {}, id: {}, title: {}", identifier, id, title?.defaultValue)
         PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier)
 
         ProcessRole role = new ProcessRole()
@@ -369,6 +381,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
             it.value.type == FieldType.USER
 
         }.forEach { entry ->
+            log.trace("Processing user field role references for field: {}", entry.key)
             UserField field = (reimportedNet.dataSet[entry.key] as UserField)
             field.roles = field.roles.collect { roleId ->
                 Optional<ProcessRole> roleOpt = Optional.ofNullable(reimportedNet.roles[roleId])
@@ -380,6 +393,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
                         return null
 
                     } else {
+                        log.trace("Mapped user field role {} to {}", roleOpt.get().importId, oldRole.stringId)
                         return oldRole.stringId
                     }
 
@@ -400,6 +414,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param title Title of the new Process Role
      */
     ProcessRole createGlobalRole(String id, String title, Map<EventType, Event> events = [:]) {
+        log.debug("Creating global role with id: {}, title: {}", id, title)
         return createGlobalRole(id, new I18nString(title), events)
     }
 
@@ -409,6 +424,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param title Title of the new Process Role
      */
     ProcessRole createGlobalRole(String id, I18nString title, Map<EventType, Event> events = [:]) {
+        log.debug("Creating global role with id: {}, title: {}", id, title?.defaultValue)
         ProcessRole role = new ProcessRole()
 
         if (!id.startsWith("global_")) {
@@ -432,10 +448,12 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @return the updated existing Petri Net
      */
     PetriNet updateRoleEvents(PetriNet existing, PetriNet reimported) {
+        log.debug("Starting updateRoleEvents for existing net: {} and reimported net: {}", existing?.identifier, reimported?.identifier)
         List<ProcessRole> newRoles = reimported.roles.values() as List
         List<ProcessRole> oldRoles = existing.roles.values() as List
 
         newRoles.each { newRole ->
+            log.trace("Processing role events for role: {}", newRole.importId)
             ProcessRole role = oldRoles.find { it.importId == newRole.importId }
             if (!role) {
                 log.warn("No existing role found for importId $newRole.importId, skipping event update")
@@ -454,6 +472,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
     static void setPetriNet(Case useCase, PetriNet net) {
+        log.debug("Setting PetriNet for case: {} with net: {}", useCase?.stringId, net?.identifier)
         PetriNet model = net.clone()
         model.initializeTokens(useCase.getActivePlaces())
         model.initializeArcs(useCase.getDataSet())
@@ -473,12 +492,14 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param net Instance of PetriNet
      */
     static Map<String, Map<String, com.netgrif.application.engine.petrinet.domain.Component>> createDataRefComponentsMap(PetriNet net) {
+        log.debug("Creating dataRef components map for net: {}", net?.identifier)
         Map<String, Map<String, com.netgrif.application.engine.petrinet.domain.Component>> componentsMap = [:]
-        net.transitions.each {transition ->
+        net.transitions.each { transition ->
             String transId = transition.key
-            transition.value.dataSet.each {dataField ->
+            transition.value.dataSet.each { dataField ->
                 String fieldId = dataField.key
                 if (dataField.value.component) {
+                    log.trace("Adding dataRef component for field: {} in transition: {}", fieldId, transId)
                     if (!componentsMap[fieldId]) {
                         componentsMap.put(fieldId, [(transId) : dataField.value.component])
                     } else {
@@ -497,9 +518,11 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param net Instance of PetriNet
      */
     static Map<String, com.netgrif.application.engine.petrinet.domain.Component> createComponentsMap(PetriNet net) {
+        log.debug("Creating components map for net: {}", net?.identifier)
         Map<String, com.netgrif.application.engine.petrinet.domain.Component> componentsMap = [:]
-        net.dataSet.each {dataField ->
+        net.dataSet.each { dataField ->
             if (dataField.value.component) {
+                log.trace("Adding component for field: {}", dataField.key)
                 componentsMap.put(dataField.key, dataField.value.component)
             }
         }

@@ -114,7 +114,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param filter A QueryDSL Predicate object specifying the conditions to filter the cases.
      */
     void updateCases(Closure update, Predicate filter) {
-        log.info("Updating cases with filter ${filter.toString()} and update ${update.toString()}")
+        log.debug("Updating cases with filter ${filter.toString()} and update ${update.toString()}")
         iterate(update, DEFAULT_PROCESS_OPERATIONS, toQuery(filter))
     }
 
@@ -128,6 +128,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param filter A QueryDSL Predicate object specifying the conditions to filter the cases.
      */
     void iterateCases(Closure update, Closure pageProcessed = DEFAULT_PROCESS_OPERATIONS, long sleepFor = 0, Predicate filter) {
+        log.debug("Starting iterateCases with filter: ${filter.toString()}, sleepFor: ${sleepFor}ms")
         iterate(update, pageProcessed, toQuery(filter), sleepFor)
     }
 
@@ -139,6 +140,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param pageSize Optional page size for processing cases. Default is 100.
      */
     void updateCasesCursor(Closure update, String processIdentifier, int pageSize = 100) {
+        log.debug("Starting updateCasesCursor for processIdentifier: ${processIdentifier}, pageSize: ${pageSize}")
         Query query = new Query(Criteria.where("processIdentifier").is(processIdentifier))
         iterate(update, DEFAULT_PROCESS_OPERATIONS, query, 0, pageSize as int)
     }
@@ -150,6 +152,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param pageSize Optional page size for processing cases. Default is 100.
      */
     void updateAllCasesCursor(Closure update, int pageSize = 100) {
+        log.debug("Starting updateAllCasesCursor with pageSize: ${pageSize}")
         iterate(update, DEFAULT_PROCESS_OPERATIONS, new Query(), 0, pageSize as int)
     }
 
@@ -159,12 +162,14 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param useCase Instance of Case that will be indexed into elasticsearch index
      */
     void elasticIndex(Case useCase) {
+        log.debug("Starting elasticIndex for case: ${useCase.stringId}")
         try {
             PetriNetMigrationHelper.setPetriNet(useCase, petriNetService.get(useCase.petriNetObjectId))
             if (!useCase.petriNet) {
                 log.error("Failed to set petriNet for case $useCase.stringId")
                 return
             }
+            log.trace("Successfully set petriNet for case: ${useCase.stringId}")
             elasticCaseService.indexNow(elasticCaseMappingService.transform(useCase))
         } catch (Exception ex) {
             if (useCase.lastModified == null) {
@@ -187,7 +192,9 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param toDelete List of field IDs that will be deleted from useCase
      */
     static void deleteDataFields(Case useCase, Set<String> toDelete) {
+        log.debug("Starting deleteDataFields for case: ${useCase.stringId}, fields to delete: ${toDelete}")
         toDelete.each { dataFieldID ->
+            log.trace("Removing data field: ${dataFieldID} from case: ${useCase.stringId}")
             useCase.dataSet.remove(dataFieldID)
         }
     }
@@ -198,11 +205,13 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param toChange List of field IDs for value change
      */
     static void changeDataFieldsValueFromNumberToText(Case useCase, Set<String> toChange) {
+        log.debug("Starting changeDataFieldsValueFromNumberToText for case: ${useCase.stringId}, fields to change: ${toChange}")
         toChange.each { dataFieldID ->
             DataField dataField = useCase.dataSet[dataFieldID]
             if (dataField?.value != null && dataField.value != "") {
                 double value = dataField.value as double
                 dataField.value = value as String
+                log.trace("Converted field ${dataFieldID} from number ${value} to text in case: ${useCase.stringId}")
             }
         }
     }
@@ -213,11 +222,14 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param toChange List of field IDs for value change
      */
     static void changeDataFieldsValueFromTextToNumber(Case useCase, Set<String> toChange) {
+        log.debug("Starting changeDataFieldsValueFromTextToNumber for case: ${useCase.stringId}, fields to change: ${toChange}")
         toChange.each { dataFieldID ->
             DataField dataField = useCase.dataSet[dataFieldID]
             if (dataField.value && dataField.value != "") {
                 try {
+                    def originalValue = dataField.value
                     dataField.value = dataField.value as double
+                    log.trace("Converted field ${dataFieldID} from text ${originalValue} to number in case: ${useCase.stringId}")
                 } catch (Exception e) {
                     def originalValue = dataField.value
                     dataField.value = null
@@ -233,7 +245,9 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param toAdd Map<field id, init value of field>
      */
     static void addTextDataFields(Case useCase, Map<String, String> toAdd) {
+        log.debug("Starting addTextDataFields for case: ${useCase.stringId}, fields to add: ${toAdd.keySet()}")
         toAdd.each { dataFieldID, value ->
+            log.trace("Adding text data field ${dataFieldID} with value '${value}' to case: ${useCase.stringId}")
             useCase.dataSet[dataFieldID] = new DataField(value)
         }
     }
@@ -244,6 +258,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param toChange List of field IDs for value change
      */
     static void changeDataFieldsValueFromEnumerationToMultichoice(Case useCase, Set<String> toChange) {
+        log.debug("Starting changeDataFieldsValueFromEnumerationToMultichoice for case: ${useCase.stringId}, fields to change: ${toChange}")
         toChange.each { dataFieldID ->
             DataField dataField = useCase.dataSet[dataFieldID]
             if (dataField.value && dataField.value != null) {
@@ -257,6 +272,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
                 def newSet = new HashSet<I18nString>()
                 newSet.add(value)
                 dataField.value = newSet
+                log.trace("Converted field ${dataFieldID} from enumeration to multichoice in case: ${useCase.stringId}")
             }
         }
     }
@@ -267,6 +283,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param toAdd Map<field id, list of choices to add into data data field>
      */
     static void addChoices(Case useCase, Map<String, List<String>> toAdd) {
+        log.debug("Starting addChoices for case: ${useCase.stringId}, fields: ${toAdd.keySet()}")
         toAdd.each { dataFieldID, newChoices ->
             DataField dataField = useCase.dataSet[dataFieldID]
             if (dataField.choices == null) {
@@ -274,6 +291,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
             }
 
             newChoices.each {
+                log.trace("Adding choice '${it}' to field ${dataFieldID} in case: ${useCase.stringId}")
                 dataField.choices.add(new I18nString(it))
             }
         }
@@ -285,7 +303,9 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param toAdd Map<field id, list of choices to add into data field>
      */
     static void removeChoices(Case useCase, Map<String, List<String>> toRemove) {
+        log.debug("Starting removeChoices for case: ${useCase.stringId}, fields: ${toRemove.keySet()}")
         toRemove.each { dataFieldID, choicesToRemove ->
+            log.trace("Removing choices ${choicesToRemove} from field ${dataFieldID} in case: ${useCase.stringId}")
             DataField dataField = useCase.dataSet[dataFieldID]
             if (dataField.value != null) {
                 (dataField.value as Set).removeAll(choicesToRemove)
@@ -303,6 +323,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param fieldId Field ID for value change
      */
     static void changeFileFieldToFileList(Case useCase, String fieldId) {
+        log.debug("Starting changeFileFieldToFileList for case: ${useCase.stringId}, field: ${fieldId}")
         FileListFieldValue fileListFieldValue = new FileListFieldValue()
         DataField dataField = useCase.dataSet[fieldId]
         def existingValue = dataField?.value
@@ -310,6 +331,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
             fileListFieldValue.namesPaths.add(existingValue as FileFieldValue)
         }
         dataField.value = fileListFieldValue
+        log.trace("Converted field ${fieldId} from FileFieldValue to FileListFieldValue in case: ${useCase.stringId}")
     }
 
     /**
@@ -318,14 +340,17 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
     static void updateCaseComponents(Case useCase, PetriNet net) {
+        log.debug("Starting updateCaseComponents for case: ${useCase.stringId}, net: ${net.stringId}")
         Map<String, com.netgrif.application.engine.petrinet.domain.Component> components = PetriNetMigrationHelper.createComponentsMap(net)
         Map<String, Map<String, com.netgrif.application.engine.petrinet.domain.Component>> dataRefComponents = PetriNetMigrationHelper.createDataRefComponentsMap(net)
 
-        useCase.dataSet.each {dataField ->
+        useCase.dataSet.each { dataField ->
             if (components[dataField.key]) {
+                log.trace("Updating component for field ${dataField.key} in case: ${useCase.stringId}")
                 useCase.dataSet[dataField.key].component = components[dataField.key]
             }
             if (dataRefComponents[dataField.key]) {
+                log.trace("Updating dataRef components for field ${dataField.key} in case: ${useCase.stringId}")
                 useCase.dataSet[dataField.key].dataRefComponents = dataRefComponents[dataField.key]
             }
         }
@@ -337,6 +362,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
     void updateCasePermissionsFromNet(Case useCase, PetriNet net, boolean updateTasks = false) {
+        log.debug("Starting updateCasePermissionsFromNet for case: ${useCase.stringId}, net: ${net.stringId}, updateTasks: ${updateTasks}")
         useCase.permissions = net.getPermissions().entrySet().stream()
                 .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
                 .map(role -> {
@@ -351,6 +377,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
         useCase.resolveViewRoles()
         useCase.setEnabledRoles(net.getRoles().keySet())
+        log.trace("Updated permissions and enabled roles for case: ${useCase.stringId}")
         if (updateTasks) {
             useCase.tasks.each { taskPair ->
                 taskMigrationHelper.updateTaskPermissions(useCase, taskPair, net)
@@ -364,7 +391,9 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param newNet Instance of Petri Net, it needs to match processIdentifier of useCase
      */
     static void migratePetriNet(Case useCase, PetriNet newNet) {
+        log.debug("Starting migratePetriNet for case: ${useCase.stringId}, new net: ${newNet.stringId}")
         useCase.setPetriNetObjectId(newNet.objectId)
+        log.trace("Updated petriNet reference for case: ${useCase.stringId} to net: ${newNet.stringId}")
     }
 }
 

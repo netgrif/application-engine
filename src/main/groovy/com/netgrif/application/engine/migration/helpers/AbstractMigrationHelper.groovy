@@ -130,7 +130,7 @@ abstract class AbstractMigrationHelper<T> {
                 while (cursor.hasNext()) {
                     prepareOperations(cursor.next(), update, bulkOps)
                     if (++currentBatchSize == pageSize as long || !cursor.hasNext()) {
-                        log.info("Processed ${type.getSimpleName()} document page {} / {}", page, numOfPages)
+                        log.debug("Processed ${type.getSimpleName()} document page {} / {}", page, numOfPages)
                         processOperations(bulkOps)
                         bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, type)
                         currentBatchSize = 0

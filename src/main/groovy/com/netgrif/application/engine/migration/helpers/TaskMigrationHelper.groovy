@@ -20,6 +20,7 @@ import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Component
+
 /**
  * A helper class for managing task migrations. 
  * This class extends {@link AbstractMigrationHelper} and provides methods for updating, iterating, 
@@ -129,7 +130,9 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * @param filter Instance of Predicate, to filter which tasks should be updated
      */
     void updateTasks(Closure update, Predicate filter) {
+        log.debug("Starting updateTasks with filter: ${filter.toString()}")
         log.info("Updating tasks with filter ${filter.toString()} and update ${update.toString()}")
+        log.trace("Converting filter to query and calling iterate")
         iterate(update, DEFAULT_PROCESS_OPERATIONS, toQuery(filter))
     }
 
@@ -140,6 +143,8 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * @param filter Instance of Predicate, to filter which tasks should be iterated
      */
     void iterateTasks(Closure update, Closure pageProcessed = DEFAULT_PROCESS_OPERATIONS, long sleepFor = 0, Predicate filter) {
+        log.debug("Starting iterateTasks with filter: ${filter.toString()}, sleepFor: ${sleepFor}ms")
+        log.trace("Converting filter to query and calling iterate with pageProcessed closure")
         iterate(update, pageProcessed, toQuery(filter), sleepFor)
     }
 
@@ -147,11 +152,13 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * Updates all tasks of a given process.
      * @param update Instance of Closure, which should contain code that will be executed for every Task matched by filter
      * @param processIdentifier identifier of PetriNet, to filter which tasks should be updated
-     * @param pageSize Optional attribute to set page size. Default page size 100.0
+     * @param pageSize Optional attribute to set page size. Default page size 100
      */
-    void updateTasksCursor(Closure update, String processIdentifier, double pageSize = 100.0) {
+    void updateTasksCursor(Closure update, String processIdentifier, int pageSize = 100) {
+        log.debug("Starting updateTasksCursor for processIdentifier: ${processIdentifier}, pageSize: ${pageSize}")
         String processId = petriNetService.getNewestVersionByIdentifier(processIdentifier).stringId
         Query query = new Query(Criteria.where("processId").is(processId))
+        log.trace("Created query for processId: ${processId}, calling iterate")
         iterate(update, DEFAULT_PROCESS_OPERATIONS, query, 0, pageSize as int)
     }
 
@@ -160,12 +167,14 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * @param update Instance of Closure, which should contain code that will be executed for every Task matched by filter
      * @param processIdentifier identifier of PetriNet, to filter which tasks should be updated
      * @param transitionIds List of transition IDs to limit filter to specific transitions of given processIdentifier
-     * @param pageSize Optional attribute to set page size. Default page size 100.0
+     * @param pageSize Optional attribute to set page size. Default page size 100
      */
-    void updateSpecificTasksCursor(Closure update, String processIdentifier, List<String> transitionIds, double pageSize = 100.0) {
+    void updateSpecificTasksCursor(Closure update, String processIdentifier, List<String> transitionIds, int pageSize = 100) {
+        log.debug("Starting updateSpecificTasksCursor for processIdentifier: ${processIdentifier}, transitionIds: ${transitionIds}, pageSize: ${pageSize}")
         String processId = petriNetService.getNewestVersionByIdentifier(processIdentifier).stringId
         Query query = new Query(Criteria.where("processId").is(processId))
         query.addCriteria(Criteria.where("transitionId").in(transitionIds))
+        log.trace("Created query with criteria for processId: ${processId} and transitionIds: ${transitionIds}, calling iterate")
         iterate(update, DEFAULT_PROCESS_OPERATIONS, query, 0, pageSize as int)
     }
 
@@ -174,7 +183,9 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * @param update Instance of Closure, which should contain code that will be executed for every Task
      * @param pageSize Optional attribute to set page size. Default page size 100.0
      */
-    void updateAllTasksCursor(Closure update, double pageSize = 100.0) {
+    void updateAllTasksCursor(Closure update, int pageSize = 100) {
+        log.debug("Starting updateAllTasksCursor with pageSize: ${pageSize}")
+        log.trace("Calling iterate with empty query to process all tasks")
         iterate(update, DEFAULT_PROCESS_OPERATIONS, new Query(), 0, pageSize as int)
     }
 
@@ -185,7 +196,9 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
     void reloadTasks(Case useCase, PetriNet net) {
+        log.debug("Starting reloadTasks for case: ${useCase.stringId}, net identifier: ${net.identifier}")
         PetriNetMigrationHelper.setPetriNet(useCase, net)
+        log.trace("Set PetriNet for case, calling taskService.reloadTasks")
         taskService.reloadTasks(useCase)
     }
 
@@ -194,7 +207,9 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * @param task Instance of Task that will be indexed into elasticsearch index
      */
     void elasticTaskIndex(Task task) {
+        log.debug("Starting elasticTaskIndex for task: ${task.stringId}")
         try {
+            log.trace("Transforming and indexing task: ${task.stringId} into elasticsearch")
             elasticTaskService.indexNow(elasticTaskMappingService.transform(task))
         } catch (Exception e) {
             log.error("Failed to index $task.stringId", e)
@@ -209,8 +224,10 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * @param permissions Map of permissions for the role
      */
     void addRoleToExistingTasks(ProcessRole role, PetriNet net, List<String> transitionIds, Map<String, Boolean> permissions) {
+        log.debug("Starting addRoleToExistingTasks for role: ${role.getName()}, net: ${net.identifier}, transitionIds: ${transitionIds}")
+        log.trace("Calling updateTasks to add role with permissions: ${permissions}")
         updateTasks({ Task task ->
-            log.info("Add role '${role.getName()}' with roleId=${role.getImportId()} to transitionId=${task.getTransitionId()} in task ${task.stringId}")
+            log.trace("Add role '${role.getName()}' with roleId=${role.getImportId()} to transitionId=${task.getTransitionId()} in task ${task.stringId}")
             task.addRole(role.getStringId(), permissions)
         }, QTask.task.transitionId.in(transitionIds) & QTask.task.processId.eq(net.getStringId()))
     }
@@ -222,7 +239,9 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * @param relevantTransitionIds List of transition IDs for permissions update
      */
     void updateTasksPermissions(Case useCase, PetriNet net, List<String> relevantTransitionIds) {
+        log.debug("Starting updateTasksPermissions for case: ${useCase.stringId}, net: ${net.identifier}, relevantTransitionIds: ${relevantTransitionIds}")
         useCase.tasks.findAll { it.transition in relevantTransitionIds }.each { taskPair ->
+            log.trace("Processing task permissions for transition: ${taskPair.transition} in case: ${useCase.stringId}")
             updateTaskPermissions(useCase, taskPair, net)
         }
     }
@@ -234,9 +253,11 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
     void updateTaskPermissions(Case useCase, TaskPair taskPair, PetriNet net) {
+        log.debug("Starting updateTaskPermissions for case: ${useCase.stringId}, task transition: ${taskPair.transition}")
         try {
             Transition newTransition = net.getTransition(taskPair.transition)
             Task oldTask = taskService.findOne(taskPair.task)
+            log.trace("Updating task roles and permissions for task: ${oldTask.stringId}")
             oldTask.setProcessId(net.stringId)
             oldTask.setRoles(newTransition.roles)
             oldTask.setNegativeViewRoles(newTransition.negativeViewRoles)

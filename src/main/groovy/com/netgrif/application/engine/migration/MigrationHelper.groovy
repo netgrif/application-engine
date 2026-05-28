@@ -73,6 +73,7 @@ class MigrationHelper {
      * @param filter Instance of Predicate, to filter which cases should be updated
      */
     void updateCases(Closure update, Predicate filter) {
+        log.debug("updateCases called with filter: {}", filter)
         caseMigrationHelper.updateCases(update, filter)
     }
 
@@ -83,6 +84,7 @@ class MigrationHelper {
      * @param filter Instance of Predicate, to filter which cases should be iterated
      */
     void iterateCases(Closure update, Closure pageProcessed = AbstractMigrationHelper.DEFAULT_PROCESS_OPERATIONS, long sleepFor = 0, Predicate filter) {
+        log.debug("iterateCases called with filter: {}, sleepFor: {}", filter, sleepFor)
         caseMigrationHelper.iterateCases(update, pageProcessed, sleepFor, filter)
     }
 
@@ -90,18 +92,20 @@ class MigrationHelper {
      * Updates all cases of a given process.
      * @param update Instance of Closure, which should contain code that will be executed for every Case matched by filter
      * @param processIdentifier identifier of PetriNet, to filter which cases should be updated
-     * @param pageSize Optional attribute to set page size. Default page size 100.0
+     * @param pageSize Optional attribute to set page size. Default page size 100
      */
-    void updateCasesCursor(Closure update, String processIdentifier, double pageSize = 100.0) {
+    void updateCasesCursor(Closure update, String processIdentifier, int pageSize = 100) {
+        log.debug("updateCasesCursor called with processIdentifier: {}, pageSize: {}", processIdentifier, pageSize)
         caseMigrationHelper.updateCasesCursor(update, processIdentifier, pageSize)
     }
 
     /**
      * Update all cases.
      * @param update Instance of Closure, which should contain code that will be executed for every Case
-     * @param pageSize Optional attribute to set page size. Default page size 100.0
+     * @param pageSize Optional attribute to set page size. Default page size 100
      */
-    void updateAllCasesCursor(Closure update, double pageSize = 100.0) {
+    void updateAllCasesCursor(Closure update, int pageSize = 100) {
+        log.debug("updateAllCasesCursor called with pageSize: {}", pageSize)
         caseMigrationHelper.updateAllCasesCursor(update, pageSize)
     }
 
@@ -111,6 +115,7 @@ class MigrationHelper {
      * @param filter Instance of Predicate, to filter which tasks should be updated
      */
     void updateTasks(Closure update, Predicate filter) {
+        log.debug("updateTasks called with filter: {}", filter)
         taskMigrationHelper.updateTasks(update, filter)
     }
 
@@ -121,6 +126,7 @@ class MigrationHelper {
      * @param filter Instance of Predicate, to filter which tasks should be iterated
      */
     void iterateTasks(Closure update, Closure pageProcessed = AbstractMigrationHelper.DEFAULT_PROCESS_OPERATIONS, long sleepFor = 0, Predicate filter) {
+        log.debug("iterateTasks called with filter: {}, sleepFor: {}", filter, sleepFor)
         taskMigrationHelper.iterateTasks(update, pageProcessed, sleepFor, filter)
     }
 
@@ -128,9 +134,10 @@ class MigrationHelper {
      * Updates all tasks of a given process.
      * @param update Instance of Closure, which should contain code that will be executed for every Task matched by filter
      * @param processIdentifier identifier of PetriNet, to filter which tasks should be updated
-     * @param pageSize Optional attribute to set page size. Default page size 100.0
+     * @param pageSize Optional attribute to set page size. Default page size 100
      */
-    void updateTasksCursor(Closure update, String processIdentifier, double pageSize = 100.0) {
+    void updateTasksCursor(Closure update, String processIdentifier, int pageSize = 100) {
+        log.debug("updateTasksCursor called with processIdentifier: {}, pageSize: {}", processIdentifier, pageSize)
         taskMigrationHelper.updateTasksCursor(update, processIdentifier, pageSize)
     }
 
@@ -139,18 +146,20 @@ class MigrationHelper {
      * @param update Instance of Closure, which should contain code that will be executed for every Task matched by filter
      * @param processIdentifier identifier of PetriNet, to filter which tasks should be updated
      * @param transitionIds List of transition IDs to limit filter to specific transitions of given processIdentifier
-     * @param pageSize Optional attribute to set page size. Default page size 100.0
+     * @param pageSize Optional attribute to set page size. Default page size 100
      */
-    void updateSpecificTasksCursor(Closure update, String processIdentifier, List<String> transitionIds, double pageSize = 100.0) {
+    void updateSpecificTasksCursor(Closure update, String processIdentifier, List<String> transitionIds, int pageSize = 100) {
+        log.debug("updateSpecificTasksCursor called with processIdentifier: {}, transitionIds: {}, pageSize: {}", processIdentifier, transitionIds, pageSize)
         taskMigrationHelper.updateSpecificTasksCursor(update, processIdentifier, transitionIds, pageSize)
     }
 
     /**
      * Update all tasks.
      * @param update Instance of Closure, which should contain code that will be executed for every Task
-     * @param pageSize Optional attribute to set page size. Default page size 100.0
+     * @param pageSize Optional attribute to set page size. Default page size 100
      */
-    void updateAllTasksCursor(Closure update, double pageSize = 100.0) {
+    void updateAllTasksCursor(Closure update, int pageSize = 100) {
+        log.debug("updateAllTasksCursor called with pageSize: {}", pageSize)
         taskMigrationHelper.updateAllTasksCursor(update, pageSize)
     }
 
@@ -160,6 +169,7 @@ class MigrationHelper {
      * @param resource Resource object with new version of Petri Net model
      */
     void updateNetIgnoreRoles(String identifier, Resource resource, List<Closure<PetriNet>> customUpdates = null) {
+        log.debug("updateNetIgnoreRoles called with identifier: {}, resource: {}", identifier, resource)
         petriNetMigrationHelper.updateNetIgnoreRoles(identifier, resource, customUpdates)
     }
 
@@ -169,6 +179,7 @@ class MigrationHelper {
      * @param fileName File name of new version of Petri Net model
      */
     void updateNetIgnoreRoles(String identifier, String fileName, List<Closure<PetriNet>> customUpdates = null) {
+        log.debug("updateNetIgnoreRoles called with identifier: {}, fileName: {}", identifier, fileName)
         petriNetMigrationHelper.updateNetIgnoreRoles(identifier, fileName, customUpdates)
     }
 
@@ -178,6 +189,7 @@ class MigrationHelper {
      * @param reimported New version of Petri Net object, its values will be applied to currentNet
      */
     void updateNetIgnoreRoles(PetriNet currentNet, PetriNet reimported, List<Closure<PetriNet>> customUpdates) {
+        log.debug("updateNetIgnoreRoles called with currentNet: {}, reimported: {}", currentNet?.identifier, reimported?.identifier)
         petriNetMigrationHelper.updateNetIgnoreRoles(currentNet, reimported, customUpdates)
     }
 
@@ -189,6 +201,7 @@ class MigrationHelper {
      * @param permissions New role permissions on transition
      */
     void updateTransitionRoles(PetriNet net, String transitionId, ProcessRole role, Map<String, Boolean> permissions) {
+        log.debug("updateTransitionRoles called with net: {}, transitionId: {}, role: {}, permissions: {}", net?.identifier, transitionId, role?.stringId, permissions)
         petriNetMigrationHelper.updateTransitionRoles(net, transitionId, role, permissions)
     }
 
@@ -200,6 +213,7 @@ class MigrationHelper {
      * @param permissions New role permissions on transition
      */
     void updateTransitionRoles(PetriNet net, String transitionId, String roleImportId, Map<String, Boolean> permissions) {
+        log.debug("updateTransitionRoles called with net: {}, transitionId: {}, roleImportId: {}, permissions: {}", net?.identifier, transitionId, roleImportId, permissions)
         petriNetMigrationHelper.updateTransitionRoles(net, transitionId, roleImportId, permissions)
     }
 
@@ -210,6 +224,7 @@ class MigrationHelper {
      * @param permissions New role permissions on transition
      */
     Closure<PetriNet> updateTransitionRolesClosure(String transitionId, String roleImportId, Map<String, Boolean> permissions) {
+        log.debug("updateTransitionRolesClosure called with transitionId: {}, roleImportId: {}, permissions: {}", transitionId, roleImportId, permissions)
         petriNetMigrationHelper.updateTransitionRolesClosure(transitionId, roleImportId, permissions)
     }
 
@@ -219,6 +234,7 @@ class MigrationHelper {
      * @param fileName File name of new version of Petri Net model
      */
     void updateDataSet(String identifier, String fileName, Closure<PetriNet> customUpdate = null) {
+        log.debug("updateDataSet called with identifier: {}, fileName: {}", identifier, fileName)
         petriNetMigrationHelper.updateDataSet(identifier, fileName, customUpdate)
     }
 
@@ -229,6 +245,7 @@ class MigrationHelper {
      * @param title Title of the new Process Role
      */
     def createRoleInNet(String identifier, String id, String title, Map<EventType, Event> events = [:]) {
+        log.debug("createRoleInNet called with identifier: {}, id: {}, title: {}", identifier, id, title)
         return petriNetMigrationHelper.createRoleInNet(identifier, id, title, events)
     }
 
@@ -239,6 +256,7 @@ class MigrationHelper {
      * @param title Title of the new Process Role
      */
     def createRoleInNet(String identifier, String id, I18nString title, Map<EventType, Event> events = [:]) {
+        log.debug("createRoleInNet called with identifier: {}, id: {}, title: {}", identifier, id, title)
         return petriNetMigrationHelper.createRoleInNet(identifier, id, title, events)
     }
 
@@ -248,6 +266,7 @@ class MigrationHelper {
      * @param title Title of the new Process Role
      */
     def createGlobalRole(String id, String title, Map<EventType, Event> events = [:]) {
+        log.debug("createGlobalRole called with id: {}, title: {}", id, title)
         return petriNetMigrationHelper.createGlobalRole(id, title, event)
     }
 
@@ -257,6 +276,7 @@ class MigrationHelper {
      * @param title Title of the new Process Role
      */
     def createGlobalRole(String id, I18nString title, Map<EventType, Event> events = [:]) {
+        log.debug("createGlobalRole called with id: {}, title: {}", id, title)
         return petriNetMigrationHelper.createGlobalRole(id, title, events)
     }
 
@@ -267,6 +287,7 @@ class MigrationHelper {
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
     void reloadTasks(Case useCase, PetriNet net) {
+        log.debug("reloadTasks called with useCase: {}, net: {}", useCase?.stringId, net?.identifier)
         taskMigrationHelper.reloadTasks(useCase, net)
     }
 
@@ -276,6 +297,7 @@ class MigrationHelper {
      * @param useCase Instance of Case that will be indexed into elasticsearch index
      */
     void elasticIndex(Case useCase) {
+        log.debug("elasticIndex called with useCase: {}", useCase?.stringId)
         caseMigrationHelper.elasticIndex(useCase)
     }
 
@@ -284,6 +306,7 @@ class MigrationHelper {
      * @param task Instance of Task that will be indexed into elasticsearch index
      */
     void elasticTaskIndex(Task task) {
+        log.debug("elasticTaskIndex called with task: {}", task?.stringId)
         taskMigrationHelper.elasticTaskIndex(task)
     }
 
@@ -295,6 +318,7 @@ class MigrationHelper {
      * @param permissions Map of permissions for the role
      */
     void addRoleToExistingTasks(ProcessRole role, PetriNet net, List<String> transitionIds, Map<String, Boolean> permissions) {
+        log.debug("addRoleToExistingTasks called with role: {}, net: {}, transitionIds: {}, permissions: {}", role?.stringId, net?.identifier, transitionIds, permissions)
         taskMigrationHelper.addRoleToExistingTasks(role, net, transitionIds, permissions)
     }
 
@@ -418,6 +442,7 @@ class MigrationHelper {
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
     void updateCasePermissionsFromNet(Case useCase, PetriNet net, boolean updateTasks = false) {
+        log.debug("updateCasePermissionsFromNet called with useCase: {}, net: {}, updateTasks: {}", useCase?.stringId, net?.identifier, updateTasks)
         caseMigrationHelper.updateCasePermissionsFromNet(useCase, net, updateTasks)
     }
 
@@ -428,6 +453,7 @@ class MigrationHelper {
      * @param relevantTransitionIds List of transition IDs for permissions update
      */
     void updateTasksPermissions(Case useCase, PetriNet net, List<String> relevantTransitionIds) {
+        log.debug("updateTasksPermissions called with useCase: {}, net: {}, relevantTransitionIds: {}", useCase?.stringId, net?.identifier, relevantTransitionIds)
         taskMigrationHelper.updateTasksPermissions(useCase, net, relevantTransitionIds)
     }
 
@@ -438,6 +464,7 @@ class MigrationHelper {
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
     void updateTaskPermissions(Case useCase, TaskPair taskPair, PetriNet net) {
+        log.debug("updateTaskPermissions called with useCase: {}, taskPair: {}, net: {}", useCase?.stringId, taskPair?.task?.stringId, net?.identifier)
         taskMigrationHelper.updateTaskPermissions(useCase, taskPair, net)
     }
 
