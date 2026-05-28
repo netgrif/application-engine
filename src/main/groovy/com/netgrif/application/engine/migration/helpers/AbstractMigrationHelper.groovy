@@ -82,7 +82,7 @@ abstract class AbstractMigrationHelper<T> {
             BulkWriteResult bulkWriteResult = bulkOps.execute()
             log.debug("Processed bulk write of ${bulkWriteResult.modifiedCount}")
         } catch (BulkWriteException e) {
-            log.error("Failed to write bulk operation", e.getMessage())
+            log.error("Failed to write bulk operation", e)
             e.getWriteErrors().forEach {
                 log.error("Error writing document with ID ${it.toString()}. Cause: ${it.getMessage()}")
             }
