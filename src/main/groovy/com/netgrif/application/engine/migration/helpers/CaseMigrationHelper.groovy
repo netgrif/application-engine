@@ -102,7 +102,6 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
     @Override
     void prepareOperations(Case useCase, Closure update, BulkOperations bulkOperations) {
         log.debug("Updating case with ID ${useCase.stringId}")
-        log.trace("Updating case ${useCase.toString()}")
         update(useCase)
         bulkOperations.replaceOne(Query.query(Criteria.where("_id").is(useCase.get_id())), useCase)
     }
