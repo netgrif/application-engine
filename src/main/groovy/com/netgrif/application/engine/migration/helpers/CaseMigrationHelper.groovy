@@ -223,7 +223,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
         log.debug("Starting changeDataFieldsValueFromTextToNumber for case: ${useCase.stringId}, fields to change: ${toChange}")
         toChange.each { dataFieldID ->
             DataField dataField = useCase.dataSet[dataFieldID]
-            if (dataField.value && dataField.value != "") {
+            if (dataField?.value != null && dataField.value != "") {
                 try {
                     def originalValue = dataField.value
                     dataField.value = dataField.value as double
