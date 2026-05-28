@@ -312,7 +312,7 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param toDelete List of field IDs that will be deleted from useCase
      */
-    static void deleteDataFields(Case useCase, List<String> toDelete) {
+    static void deleteDataFields(Case useCase, Set<String> toDelete) {
         CaseMigrationHelper.deleteDataFields(useCase, toDelete)
     }
 
@@ -321,7 +321,7 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param toChange List of field IDs for value change
      */
-    static void changeDataFieldsValueFromNumberToText(Case useCase, List<String> toChange) {
+    static void changeDataFieldsValueFromNumberToText(Case useCase, Set<String> toChange) {
         CaseMigrationHelper.changeDataFieldsValueFromNumberToText(useCase, toChange)
     }
 
@@ -330,7 +330,7 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param toChange List of field IDs for value change
      */
-    static void changeDataFieldsValueFromTextToNumber(Case useCase, List<String> toChange) {
+    static void changeDataFieldsValueFromTextToNumber(Case useCase, Set<String> toChange) {
         CaseMigrationHelper.changeDataFieldsValueFromTextToNumber(useCase, toChange)
     }
 
@@ -348,7 +348,7 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param toChange List of field IDs for value change
      */
-    static void changeDataFieldsValueFromEnumerationToMultichoice(Case useCase, List<String> toChange) {
+    static void changeDataFieldsValueFromEnumerationToMultichoice(Case useCase, Set<String> toChange) {
         CaseMigrationHelper.changeDataFieldsValueFromEnumerationToMultichoice(useCase, toChange)
     }
 
@@ -417,8 +417,8 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
-    static void updateCasePermissionsFromNet(Case useCase, PetriNet net, boolean updateTasks = false) {
-        CaseMigrationHelper.updateCasePermissionsFromNet(useCase, net, updateTasks)
+    void updateCasePermissionsFromNet(Case useCase, PetriNet net, boolean updateTasks = false) {
+        caseMigrationHelper.updateCasePermissionsFromNet(useCase, net, updateTasks)
     }
 
     /**

@@ -38,7 +38,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * such as the size of the page used to process tasks in the migration.
      * It is loaded from the {@link MigrationConfigurationProperties} during initialization.
      */
-    private TaskMigrationProperties taskMigrationProperties
+    private final TaskMigrationProperties taskMigrationProperties
 
     /**
      * Service for handling Petri Net operations.
@@ -47,7 +47,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * such as retrieving the latest version of a Petri Net by its identifier
      * during task migrations.
      */
-    private IPetriNetService petriNetService
+    private final IPetriNetService petriNetService
 
     /**
      * Service for handling task operations.
@@ -55,7 +55,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * This service provides methods for managing task entities,
      * including finding, saving, and reloading tasks during migration processes.
      */
-    private ITaskService taskService
+    private final ITaskService taskService
 
     /**
      * Service for handling Elasticsearch task indexing operations.
@@ -63,7 +63,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * This service is used to index task documents into Elasticsearch,
      * enabling full-text search and analytics capabilities for tasks.
      */
-    private IElasticTaskService elasticTaskService
+    private final IElasticTaskService elasticTaskService
 
     /**
      * Service for mapping task entities to Elasticsearch documents.
@@ -71,7 +71,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * This service transforms task domain objects into their Elasticsearch
      * representation before indexing, ensuring proper field mapping and data structure.
      */
-    private IElasticTaskMappingService elasticTaskMappingService
+    private final IElasticTaskMappingService elasticTaskMappingService
 
     /**
      * Constructs a new TaskMigrationHelper with the specified MongoTemplate.
@@ -118,8 +118,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      */
     @Override
     void prepareOperations(Task document, Closure update, BulkOperations bulkOperations) {
-        log.debug("Updating case with ID ${document.stringId}")
-        log.trace("Updating case ${document.toString()}")
+        log.debug("Updating task with ID ${document.stringId}")
         update(document)
         bulkOperations.replaceOne(Query.query(Criteria.where("_id").is(document.getObjectId())), document)
     }
@@ -239,7 +238,6 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
             Transition newTransition = net.getTransition(taskPair.transition)
             Task oldTask = taskService.findOne(taskPair.task)
             oldTask.setProcessId(net.stringId)
-            oldTask.getRoles().clear()
             oldTask.setRoles(newTransition.roles)
             oldTask.setNegativeViewRoles(newTransition.negativeViewRoles)
             oldTask.resolveViewRoles()

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.migration.helpers
 
-
+import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.migration.config.properties.MigrationConfigurationProperties
 import com.netgrif.application.engine.migration.config.properties.MigrationConfigurationProperties.PetriNetMigrationProperties
@@ -57,23 +57,28 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * Configuration properties specific to Petri Net migration operations.
      * Contains settings such as page size and other Petri Net-related migration configurations.
      */
-    private PetriNetMigrationProperties petriNetMigrationProperties
+    private final PetriNetMigrationProperties petriNetMigrationProperties
 
     /**
      * Service interface for managing Petri Net operations including importing, saving, and retrieving Petri Net models.
      */
-    private IPetriNetService petriNetService
+    private final IPetriNetService petriNetService
 
     /**
      * Repository for persisting and retrieving process roles from the database.
      */
-    private ProcessRoleRepository processRoleRepository
+    private final ProcessRoleRepository processRoleRepository
 
     /**
      * Provider that supplies {@link Importer} instances for importing Petri Net models from various sources.
      * Uses lazy initialization to create Importer instances on demand.
      */
-    private Provider<Importer> importerProvider
+    private final Provider<Importer> importerProvider
+
+    /**
+     * Service for managing user-related operations, including retrieving system user for Petri Net imports.
+     */
+    private final UserService userService
 
     /**
      * Constructs a new PetriNetMigrationHelper with the specified dependencies.
@@ -83,17 +88,20 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param petriNetService the {@link IPetriNetService} for managing Petri Net operations such as importing, saving, and retrieving Petri Nets
      * @param processRoleRepository the {@link ProcessRoleRepository} for persisting and retrieving process roles from the database
      * @param importerProvider the {@link Provider} that supplies {@link Importer} instances for importing Petri Net models from various sources
+     * @param userService the {@link UserService} for managing user-related operations, including retrieving system user for Petri Net imports
      */
     PetriNetMigrationHelper(MongoTemplate mongoTemplate,
                             MigrationConfigurationProperties migrationConfigurationProperties,
                             IPetriNetService petriNetService,
                             ProcessRoleRepository processRoleRepository,
-                            Provider<Importer> importerProvider) {
+                            Provider<Importer> importerProvider,
+                            UserService userService) {
         super(PetriNet.class, mongoTemplate)
         this.petriNetMigrationProperties = migrationConfigurationProperties.petriNets
         this.petriNetService = petriNetService
         this.processRoleRepository = processRoleRepository
         this.importerProvider = importerProvider
+        this.userService = userService
     }
 
     /**
@@ -115,8 +123,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      */
     @Override
     void prepareOperations(PetriNet document, Closure update, BulkOperations bulkOperations) {
-        log.debug("Updating case with ID ${document.stringId}")
-        log.trace("Updating case ${document.toString()}")
+        log.debug("Updating Petri Net with ID ${document.stringId}")
         update(document)
         bulkOperations.replaceOne(Query.query(Criteria.where("_id").is(document.getObjectId())), document)
     }
@@ -127,7 +134,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param resource Resource object with new version of Petri Net model
      */
     void updateNetIgnoreRoles(String identifier, Resource resource, List<Closure<PetriNet>> customUpdates = null) {
-        PetriNet reimported = petriNetService.importPetriNet(resource.inputStream, VersionType.MAJOR, userService.system.transformToLoggedUser()).getNet()
+        PetriNet reimported = petriNetService.importPetriNet(resource.inputStream, VersionType.MAJOR, userService.getSystem().transformToLoggedUser()).getNet()
         updateNetIgnoreRoles(petriNetService.getNewestVersionByIdentifier(identifier), reimported, customUpdates)
     }
 
@@ -141,7 +148,8 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
         InputStream inputStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
         IOUtils.copy(inputStream, outputStream)
-        PetriNet reimported = getImporter().importPetriNet(new ByteArrayInputStream(outputStream.toByteArray())).get()
+        PetriNet reimported = getImporter().importPetriNet(new ByteArrayInputStream(outputStream.toByteArray()))
+                .orElseThrow { new IllegalStateException("Failed to import Petri Net from file: $fileName") }
         updateNetIgnoreRoles(currentNet, reimported, customUpdates)
     }
 
@@ -236,13 +244,13 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * Helper method used in updateNetIgnoreRoles method, it sorts PetriNet dataSet alphabetically
      * @param petriNet Instance of Petri Net
      */
-    static void resolveDataOrder(PetriNet petriNet) {
-        Collator skCollator = Collator.getInstance(new Locale("sk", "SK"))
+    static void resolveDataOrder(PetriNet petriNet, Locale locale = Locale.getDefault()) {
+        Collator collator = Collator.getInstance(locale)
         List<Field> fields = new LinkedList<>(petriNet.getDataSet().values())
         fields = fields.stream().sorted({ f1, f2 ->
             int comparedTypes = f2.type.name <=> f1.type.name
             if (comparedTypes != 0) return comparedTypes
-            return skCollator.compare((f1.name?.defaultValue ?: f1.stringId), (f2.name?.defaultValue ?: f2.stringId))
+            return collator.compare((f1.name?.defaultValue ?: f1.stringId), (f2.name?.defaultValue ?: f2.stringId))
         }).collect(Collectors.toList())
         petriNet.dataSet = fields.collectEntries { [(it.getStringId()): (it)] } as LinkedHashMap<String, Field>
     }
@@ -256,6 +264,10 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      */
     static void updateTransitionRoles(PetriNet net, String transitionId, ProcessRole role, Map<String, Boolean> permissions) {
         Transition trans = net.transitions.values().find { it.importId == transitionId }
+        if (!trans) {
+            log.warn("Transition with importId $transitionId not found in net $net.identifier")
+            return
+        }
         trans.roles[role.stringId] = permissions
     }
 
@@ -268,6 +280,10 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      */
     static void updateTransitionRoles(PetriNet net, String transitionId, String roleImportId, Map<String, Boolean> permissions) {
         ProcessRole role = net.roles.values().find { it.importId == roleImportId }
+        if (!role) {
+            log.warn("Transition with importId $transitionId not found in net $net.identifier")
+            return
+        }
         updateTransitionRoles(net, transitionId, role, permissions)
     }
 
@@ -291,7 +307,9 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      */
     void updateDataSet(String identifier, String fileName, Closure<PetriNet> customUpdate = null) {
         PetriNet existing = petriNetService.getNewestVersionByIdentifier(identifier)
-        PetriNet reimported = getImporter().importPetriNet(new File("src/main/resources/petriNets/" + fileName)).get()
+        InputStream inputStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
+        PetriNet reimported = getImporter().importPetriNet(inputStream)
+                .orElseThrow { new IllegalStateException("Failed to import Petri Net from file: $fileName") }
 
         reimported = replaceUserFieldRoleReferences(existing, reimported)
 
@@ -420,6 +438,10 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
 
         newRoles.each { newRole ->
             ProcessRole role = oldRoles.find { it.importId == newRole.importId }
+            if (!role) {
+                log.warn("No existing role found for importId $newRole.importId, skipping event update")
+                return
+            }
             role.events = newRole.events
             processRoleRepository.save(role)
         }

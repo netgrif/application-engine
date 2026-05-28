@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.migration.config.properties
 
-import lombok.Data
+
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 
@@ -14,7 +14,6 @@ class MigrationConfigurationProperties {
 
     private PetriNetMigrationProperties petriNets = new PetriNetMigrationProperties()
 
-    @Data
     static class CaseMigrationProperties {
 
         private int pageSize = 100
@@ -24,7 +23,6 @@ class MigrationConfigurationProperties {
         }
     }
 
-    @Data
     static class TaskMigrationProperties {
 
         private int pageSize = 100
@@ -34,7 +32,6 @@ class MigrationConfigurationProperties {
         }
     }
 
-    @Data
     static class PetriNetMigrationProperties {
 
         private int pageSize = 100

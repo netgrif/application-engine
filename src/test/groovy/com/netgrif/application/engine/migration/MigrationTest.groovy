@@ -12,8 +12,6 @@ import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.util.logging.Slf4j
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith
@@ -23,14 +21,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-import java.time.Duration
-import java.time.LocalDateTime
-
 @Slf4j
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
-class MigrationBenchmarkTest {
+class MigrationTest {
 
     @Autowired
     private TestHelper testHelper
@@ -52,28 +47,30 @@ class MigrationBenchmarkTest {
 
     private PetriNet netV1, netV2
 
-    private static FileWriter writer
-
     @BeforeEach
     void beforeEach() {
         testHelper.truncateDbs()
 
-        ImportPetriNetEventOutcome netV1Outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/nae_2432_v1.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert netV1Outcome.getNet() != null
-        netV1 = netV1Outcome.getNet()
+        new FileInputStream("src/test/resources/nae_2432_v1.xml").withCloseable { is ->
+            ImportPetriNetEventOutcome netV1Outcome = petriNetService.importPetriNet(is, VersionType.MAJOR, superCreator.getLoggedSuper())
+            assert netV1Outcome.getNet() != null
+            netV1 = netV1Outcome.getNet()
+        }
 
-        ImportPetriNetEventOutcome netV2Outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/nae_2432_v2.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert netV2Outcome.getNet() != null
-        netV2 = netV2Outcome.getNet()
+        new FileInputStream("src/test/resources/nae_2432_v2.xml").withCloseable { is ->
+            ImportPetriNetEventOutcome netV2Outcome = petriNetService.importPetriNet(is, VersionType.MAJOR, superCreator.getLoggedSuper())
+            assert netV2Outcome.getNet() != null
+            netV2 = netV2Outcome.getNet()
+        }
 
-        (1..100).stream().parallel().forEach {
+        (1..10).stream().parallel().forEach {
             workflowService.createCase(netV1.stringId, "Net V1 " + it, null, superCreator.loggedSuper, Locale.default)
         }
     }
 
     @Test
     void migrateCasesWithCursor() {
-        List<Case> caseList = workflowService.search(QCase.case$.processIdentifier.eq("nae_2432"), Pageable.ofSize(100)).getContent()
+        List<Case> caseList = workflowService.search(QCase.case$.processIdentifier.eq("nae_2432"), Pageable.ofSize(10)).getContent()
         caseList.forEach {
             assert !it.dataSet.containsKey("income")
             assert !it.dataSet.containsKey("recreate_info_text")
@@ -90,7 +87,7 @@ class MigrationBenchmarkTest {
             useCase.dataSet["recreate_info_text"] = new DataField("")
 
         }, "nae_2432")
-        caseList = workflowService.search(QCase.case$.processIdentifier.eq("nae_2432"), Pageable.ofSize(100)).getContent()
+        caseList = workflowService.search(QCase.case$.processIdentifier.eq("nae_2432"), Pageable.ofSize(10)).getContent()
         caseList.forEach {
             assert it.dataSet.containsKey("income")
             assert it.dataSet.containsKey("recreate_info_text")

@@ -34,14 +34,14 @@ abstract class AbstractMigrationHelper<T> {
      * It is expected to be provided by subclasses, as the class itself is generic and requires
      * specific document type initialization to perform the corresponding operations.
      */
-    private Class<T> type
+    private final Class<T> type
 
     /**
      * The {@link MongoTemplate} used for interacting with the MongoDB database.
      * This is the core dependency of the helper class, allowing it to execute queries,
      * bulk operations, and other database operations on the specified document type.
      */
-    private MongoTemplate mongoTemplate
+    private final MongoTemplate mongoTemplate
 
     /**
      * Constructs a new AbstractMigrationHelper with the specified MongoTemplate.
@@ -86,6 +86,7 @@ abstract class AbstractMigrationHelper<T> {
             e.getWriteErrors().forEach {
                 log.error("Error writing document with ID ${it.toString()}. Cause: ${it.getMessage()}")
             }
+            throw e
         }
     }
 
@@ -113,14 +114,17 @@ abstract class AbstractMigrationHelper<T> {
      */
     void iterate(Closure update, Closure processOperations = DEFAULT_PROCESS_OPERATIONS,
                  Query query = new Query(), long sleepFor = 0, int pageSize = getPageSize()) {
+        if (pageSize <= 0) {
+            throw new IllegalArgumentException("pageSize must be > 0")
+        }
         long count = mongoTemplate.count(query, type)
         if (count > 0) {
-            long numOfPages = ((count / pageSize) + 1) as long
+            long numOfPages = Math.ceil(count / pageSize) as long
             log.info("Processing ${type.getSimpleName()} documents with filter ${query.toString()}: $numOfPages pages")
 
             long page = 1, currentBatchSize = 0
             query.cursorBatchSize(pageSize)
-            BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, Case.class)
+            BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, type)
 
             try (CloseableIterator<T> cursor = mongoTemplate.stream(query, type)) {
                 while (cursor.hasNext()) {
@@ -128,7 +132,7 @@ abstract class AbstractMigrationHelper<T> {
                     if (++currentBatchSize == pageSize as long || !cursor.hasNext()) {
                         log.info("Processed ${type.getSimpleName()} document page {} / {}", page, numOfPages)
                         processOperations(bulkOps)
-                        bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, Case.class)
+                        bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, type)
                         currentBatchSize = 0
                         page++
                         if (sleepFor > 0) {

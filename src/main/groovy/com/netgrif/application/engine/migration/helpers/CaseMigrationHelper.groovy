@@ -13,6 +13,7 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.DataField
 import com.querydsl.core.types.Predicate
 import groovy.util.logging.Slf4j
+import org.junit.Assert
 import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
@@ -37,27 +38,27 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
     /**
      * Configuration properties for case migration.
      */
-    private CaseMigrationProperties caseMigrationProperties
+    private final CaseMigrationProperties caseMigrationProperties
 
     /**
      * Service for managing PetriNet operations.
      */
-    private IPetriNetService petriNetService
+    private final IPetriNetService petriNetService
 
     /**
      * Service for indexing and managing cases in Elasticsearch.
      */
-    private IElasticCaseService elasticCaseService
+    private final IElasticCaseService elasticCaseService
 
     /**
      * Service for mapping Case objects to Elasticsearch documents.
      */
-    private IElasticCaseMappingService elasticCaseMappingService
+    private final IElasticCaseMappingService elasticCaseMappingService
 
     /**
      * Helper for managing task migrations associated with cases.
      */
-    private TaskMigrationHelper taskMigrationHelper
+    private final TaskMigrationHelper taskMigrationHelper
 
     /**
      * Constructs a CaseMigrationHelper instance with
@@ -136,9 +137,9 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      *
      * @param update A closure containing the code to execute for each matching case.
      * @param processIdentifier The identifier of the PetriNet process.
-     * @param pageSize Optional page size for processing cases. Default is 100.0.
+     * @param pageSize Optional page size for processing cases. Default is 100.
      */
-    void updateCasesCursor(Closure update, String processIdentifier, double pageSize = 100.0) {
+    void updateCasesCursor(Closure update, String processIdentifier, int pageSize = 100) {
         Query query = new Query(Criteria.where("processIdentifier").is(processIdentifier))
         iterate(update, DEFAULT_PROCESS_OPERATIONS, query, 0, pageSize as int)
     }
@@ -147,9 +148,9 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * Updates all cases in the system. The update closure is executed for each case.
      *
      * @param update A closure containing the code to execute for each case.
-     * @param pageSize Optional page size for processing cases. Default is 100.0.
+     * @param pageSize Optional page size for processing cases. Default is 100.
      */
-    void updateAllCasesCursor(Closure update, double pageSize = 100.0) {
+    void updateAllCasesCursor(Closure update, int pageSize = 100) {
         iterate(update, DEFAULT_PROCESS_OPERATIONS, new Query(), 0, pageSize as int)
     }
 
@@ -160,14 +161,21 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      */
     void elasticIndex(Case useCase) {
         try {
-            PetriNetMigrationHelper.setPetriNet(useCase, petriNetService.getNewestVersionByIdentifier(useCase.processIdentifier))
-            assert useCase.petriNet
+            PetriNetMigrationHelper.setPetriNet(useCase, petriNetService.get(useCase.petriNetObjectId))
+            if (!useCase.petriNet) {
+                log.error("Failed to set petriNet for case $useCase.stringId")
+                return
+            }
             elasticCaseService.indexNow(elasticCaseMappingService.transform(useCase))
         } catch (Exception ex) {
             if (useCase.lastModified == null) {
-                log.error("Creating new lastModified date for $useCase.stringId")
+                log.warn("Creating new lastModified date for $useCase.stringId")
                 useCase.lastModified = LocalDateTime.now()
-                elasticCaseService.indexNow(elasticCaseMappingService.transform(useCase))
+                try {
+                    elasticCaseService.indexNow(elasticCaseMappingService.transform(useCase))
+                } catch (Exception retryEx) {
+                    log.error("Failed to index $useCase.stringId after setting lastModified", retryEx)
+                }
             } else {
                 log.error("Failed to index $useCase.stringId", ex)
             }
@@ -179,7 +187,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param useCase Instance of Case
      * @param toDelete List of field IDs that will be deleted from useCase
      */
-    static void deleteDataFields(Case useCase, List<String> toDelete) {
+    static void deleteDataFields(Case useCase, Set<String> toDelete) {
         toDelete.each { dataFieldID ->
             useCase.dataSet.remove(dataFieldID)
         }
@@ -190,11 +198,12 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param useCase Instance of Case
      * @param toChange List of field IDs for value change
      */
-    static void changeDataFieldsValueFromNumberToText(Case useCase, List<String> toChange) {
+    static void changeDataFieldsValueFromNumberToText(Case useCase, Set<String> toChange) {
         toChange.each { dataFieldID ->
-            if (useCase.dataSet[dataFieldID].value && (useCase.dataSet[dataFieldID].value != null || useCase.dataSet[dataFieldID].value != "")) {
-                double value = useCase.dataSet[dataFieldID].value as double
-                useCase.dataSet[dataFieldID].value = value as String
+            DataField dataField = useCase.dataSet[dataFieldID]
+            if (dataField?.value != null && dataField.value != "") {
+                double value = dataField.value as double
+                dataField.value = value as String
             }
         }
     }
@@ -204,14 +213,16 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param useCase Instance of Case
      * @param toChange List of field IDs for value change
      */
-    static void changeDataFieldsValueFromTextToNumber(Case useCase, List<String> toChange) {
+    static void changeDataFieldsValueFromTextToNumber(Case useCase, Set<String> toChange) {
         toChange.each { dataFieldID ->
-            if (useCase.dataSet[dataFieldID].value && useCase.dataSet[dataFieldID].value != "") {
+            DataField dataField = useCase.dataSet[dataFieldID]
+            if (dataField.value && dataField.value != "") {
                 try {
-                    useCase.dataSet[dataFieldID].value = useCase.dataSet[dataFieldID].value as double
+                    dataField.value = dataField.value as double
                 } catch (Exception e) {
-                    useCase.dataSet[dataFieldID].value = null
-                    log.error("[${useCase.stringId}] could not convert value ${useCase.dataSet[dataFieldID].value} in field ${dataFieldID}", e)
+                    def originalValue = dataField.value
+                    dataField.value = null
+                    log.error("[${useCase.stringId}] could not convert value ${originalValue} in field ${dataFieldID}", e)
                 }
             }
         }
@@ -233,19 +244,20 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param useCase Instance of Case
      * @param toChange List of field IDs for value change
      */
-    static void changeDataFieldsValueFromEnumerationToMultichoice(Case useCase, List<String> toChange) {
+    static void changeDataFieldsValueFromEnumerationToMultichoice(Case useCase, Set<String> toChange) {
         toChange.each { dataFieldID ->
-            if (useCase.dataSet[dataFieldID].value && useCase.dataSet[dataFieldID].value != null) {
+            DataField dataField = useCase.dataSet[dataFieldID]
+            if (dataField.value && dataField.value != null) {
                 def value
-                if (useCase.dataSet[dataFieldID].value instanceof I18nString) {
-                    value = useCase.dataSet[dataFieldID].value as I18nString
+                if (dataField.value instanceof I18nString) {
+                    value = dataField.value as I18nString
                 } else {
-                    value = new I18nString(useCase.dataSet[dataFieldID].value as String)
+                    value = new I18nString(dataField.value as String)
                 }
 
                 def newSet = new HashSet<I18nString>()
                 newSet.add(value)
-                useCase.dataSet[dataFieldID].value = newSet
+                dataField.value = newSet
             }
         }
     }
@@ -257,12 +269,13 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      */
     static void addChoices(Case useCase, Map<String, List<String>> toAdd) {
         toAdd.each { dataFieldID, newChoices ->
-            if (useCase.dataSet[dataFieldID].choices == null) {
-                useCase.dataSet[dataFieldID].setChoices(new HashSet<I18nString>())
+            DataField dataField = useCase.dataSet[dataFieldID]
+            if (dataField.choices == null) {
+                dataField.setChoices(new HashSet<I18nString>())
             }
 
             newChoices.each {
-                useCase.dataSet[dataFieldID].choices.add(new I18nString(it))
+                dataField.choices.add(new I18nString(it))
             }
         }
     }
@@ -274,12 +287,13 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      */
     static void removeChoices(Case useCase, Map<String, List<String>> toRemove) {
         toRemove.each { dataFieldID, choicesToRemove ->
-            if (useCase.dataSet[dataFieldID].value != null) {
-                (useCase.dataSet[dataFieldID].value as Set).removeAll(choicesToRemove)
+            DataField dataField = useCase.dataSet[dataFieldID]
+            if (dataField.value != null) {
+                (dataField.value as Set).removeAll(choicesToRemove)
             }
 
-            if (useCase.dataSet[dataFieldID].choices != null) {
-                useCase.dataSet[dataFieldID].choices.removeAll(choicesToRemove)
+            if (dataField.choices != null) {
+                dataField.choices.removeAll(choicesToRemove)
             }
         }
     }
@@ -291,8 +305,12 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      */
     static void changeFileFieldToFileList(Case useCase, String fieldId) {
         FileListFieldValue fileListFieldValue = new FileListFieldValue()
-        fileListFieldValue.namesPaths.add(useCase.dataSet[fieldId].value as FileFieldValue)
-        useCase.dataSet[fieldId].value = fileListFieldValue
+        DataField dataField = useCase.dataSet[fieldId]
+        def existingValue = dataField?.value
+        if (existingValue != null) {
+            fileListFieldValue.namesPaths.add(existingValue as FileFieldValue)
+        }
+        dataField.value = fileListFieldValue
     }
 
     /**
@@ -319,7 +337,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param useCase Instance of Case
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
-    static void updateCasePermissionsFromNet(Case useCase, PetriNet net, boolean updateTasks = false) {
+    void updateCasePermissionsFromNet(Case useCase, PetriNet net, boolean updateTasks = false) {
         useCase.permissions = net.getPermissions().entrySet().stream()
                 .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
                 .map(role -> {
