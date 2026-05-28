@@ -1,10 +1,13 @@
 package com.netgrif.application.engine.migration
 
+import com.netgrif.application.engine.configuration.properties.MigrationProperties
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.migration.helpers.AbstractMigrationHelper
 import com.netgrif.application.engine.migration.helpers.CaseMigrationHelper
 import com.netgrif.application.engine.migration.helpers.PetriNetMigrationHelper
 import com.netgrif.application.engine.migration.helpers.TaskMigrationHelper
+import com.netgrif.application.engine.migration.model.MigrationError
+import com.netgrif.application.engine.migration.model.MigrationErrorPolicy
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.events.Event
@@ -47,13 +50,18 @@ class MigrationHelper {
     private PetriNetMigrationHelper petriNetMigrationHelper
 
     /**
-     * Returns the Importer service instance used for importing and processing Petri net models.
-     * This method delegates to the PetriNetMigrationHelper to retrieve the importer.
-     * @return Importer service instance
+     * Configuration properties for migration operations.
+     * Contains settings such as default error policy and other migration-related configuration.
      */
-    private Importer getImporter() {
-        return petriNetMigrationHelper.getImporter()
-    }
+    @Autowired
+    private MigrationProperties migrationProperties
+
+    /**
+     * Thread-local storage for the current migration error policy.
+     * Allows different threads to maintain their own error handling policies during migration operations.
+     * If not set, defaults to the policy specified in migrationProperties.
+     */
+    private final ThreadLocal<MigrationErrorPolicy> currentErrorPolicy = new ThreadLocal<>()
 
     /**
      * Closure for updating role events between existing and reimported Petri net models.
@@ -68,13 +76,54 @@ class MigrationHelper {
     }
 
     /**
+     * Returns the Importer service instance used for importing and processing Petri net models.
+     * This method delegates to the PetriNetMigrationHelper to retrieve the importer.
+     * @return Importer service instance
+     */
+    private Importer getImporter() {
+        return petriNetMigrationHelper.getImporter()
+    }
+
+    /**
+     * Retrieves the current error policy for migration operations.
+     * If no policy is set in the thread-local storage, returns the default policy from migration properties.
+     *
+     * @return the current {@link MigrationErrorPolicy} or the default policy if none is set
+     */
+    MigrationErrorPolicy getCurrentErrorPolicy() {
+        return currentErrorPolicy.get() ?: MigrationErrorPolicy.defaultErrorPolicy(migrationProperties.errorPolicy)
+    }
+
+    /**
+     * Executes the provided closure with a specific error policy, then restores the previous policy.
+     * This method allows temporary override of the error handling policy for a specific migration operation.
+     * The previous policy is automatically restored after the closure execution, even if an exception occurs.
+     *
+     * @param policy the {@link MigrationErrorPolicy} to use during the closure execution
+     * @param code the closure containing migration code to execute with the specified error policy
+     */
+    void withErrorPolicy(MigrationErrorPolicy policy, Closure code) {
+        MigrationErrorPolicy previous = currentErrorPolicy.get()
+        currentErrorPolicy.set(policy)
+        try {
+            code.call()
+        } finally {
+            if (previous) {
+                currentErrorPolicy.set(previous)
+            } else {
+                currentErrorPolicy.remove()
+            }
+        }
+    }
+
+    /**
      * Updates all cases filtered by filter Predicate. Update closure is called on each filtered case.
      * @param update Instance of Closure, which should contain code that will be executed for every Case matched by filter
      * @param filter Instance of Predicate, to filter which cases should be updated
      */
     void updateCases(Closure update, Predicate filter) {
         log.debug("updateCases called with filter: {}", filter)
-        caseMigrationHelper.updateCases(update, filter)
+        caseMigrationHelper.updateCases(update, filter, getCurrentErrorPolicy())
     }
 
     /**
@@ -83,9 +132,10 @@ class MigrationHelper {
      * @param sleepFor Optional attribute to set sleep time (in milliseconds) to sleep for after each iterated page. Default 0ms
      * @param filter Instance of Predicate, to filter which cases should be iterated
      */
-    void iterateCases(Closure update, Closure pageProcessed = AbstractMigrationHelper.DEFAULT_PROCESS_OPERATIONS, long sleepFor = 0, Predicate filter) {
+    void iterateCases(Closure update, Closure pageProcessed = AbstractMigrationHelper.DEFAULT_PROCESS_OPERATIONS, 
+                      long sleepFor = 0, Predicate filter) {
         log.debug("iterateCases called with filter: {}, sleepFor: {}", filter, sleepFor)
-        caseMigrationHelper.iterateCases(update, pageProcessed, sleepFor, filter)
+        caseMigrationHelper.iterateCases(update, pageProcessed, sleepFor, filter, getCurrentErrorPolicy())
     }
 
     /**
@@ -96,7 +146,7 @@ class MigrationHelper {
      */
     void updateCasesCursor(Closure update, String processIdentifier, int pageSize = 100) {
         log.debug("updateCasesCursor called with processIdentifier: {}, pageSize: {}", processIdentifier, pageSize)
-        caseMigrationHelper.updateCasesCursor(update, processIdentifier, pageSize)
+        caseMigrationHelper.updateCasesCursor(update, processIdentifier, pageSize, getCurrentErrorPolicy())
     }
 
     /**
@@ -106,7 +156,7 @@ class MigrationHelper {
      */
     void updateAllCasesCursor(Closure update, int pageSize = 100) {
         log.debug("updateAllCasesCursor called with pageSize: {}", pageSize)
-        caseMigrationHelper.updateAllCasesCursor(update, pageSize)
+        caseMigrationHelper.updateAllCasesCursor(update, pageSize, getCurrentErrorPolicy())
     }
 
     /**
@@ -116,7 +166,7 @@ class MigrationHelper {
      */
     void updateTasks(Closure update, Predicate filter) {
         log.debug("updateTasks called with filter: {}", filter)
-        taskMigrationHelper.updateTasks(update, filter)
+        taskMigrationHelper.updateTasks(update, filter, getCurrentErrorPolicy())
     }
 
     /**
@@ -127,7 +177,7 @@ class MigrationHelper {
      */
     void iterateTasks(Closure update, Closure pageProcessed = AbstractMigrationHelper.DEFAULT_PROCESS_OPERATIONS, long sleepFor = 0, Predicate filter) {
         log.debug("iterateTasks called with filter: {}, sleepFor: {}", filter, sleepFor)
-        taskMigrationHelper.iterateTasks(update, pageProcessed, sleepFor, filter)
+        taskMigrationHelper.iterateTasks(update, pageProcessed, sleepFor, filter, getCurrentErrorPolicy())
     }
 
     /**
@@ -138,7 +188,7 @@ class MigrationHelper {
      */
     void updateTasksCursor(Closure update, String processIdentifier, int pageSize = 100) {
         log.debug("updateTasksCursor called with processIdentifier: {}, pageSize: {}", processIdentifier, pageSize)
-        taskMigrationHelper.updateTasksCursor(update, processIdentifier, pageSize)
+        taskMigrationHelper.updateTasksCursor(update, processIdentifier, pageSize, getCurrentErrorPolicy())
     }
 
     /**
@@ -150,7 +200,7 @@ class MigrationHelper {
      */
     void updateSpecificTasksCursor(Closure update, String processIdentifier, List<String> transitionIds, int pageSize = 100) {
         log.debug("updateSpecificTasksCursor called with processIdentifier: {}, transitionIds: {}, pageSize: {}", processIdentifier, transitionIds, pageSize)
-        taskMigrationHelper.updateSpecificTasksCursor(update, processIdentifier, transitionIds, pageSize)
+        taskMigrationHelper.updateSpecificTasksCursor(update, processIdentifier, transitionIds, pageSize, getCurrentErrorPolicy())
     }
 
     /**
@@ -160,7 +210,7 @@ class MigrationHelper {
      */
     void updateAllTasksCursor(Closure update, int pageSize = 100) {
         log.debug("updateAllTasksCursor called with pageSize: {}", pageSize)
-        taskMigrationHelper.updateAllTasksCursor(update, pageSize)
+        taskMigrationHelper.updateAllTasksCursor(update, pageSize, getCurrentErrorPolicy())
     }
 
     /**
@@ -298,7 +348,7 @@ class MigrationHelper {
      */
     void elasticIndex(Case useCase) {
         log.debug("elasticIndex called with useCase: {}", useCase?.stringId)
-        caseMigrationHelper.elasticIndex(useCase)
+        caseMigrationHelper.elasticIndex(useCase, getCurrentErrorPolicy())
     }
 
     /**
@@ -307,7 +357,7 @@ class MigrationHelper {
      */
     void elasticTaskIndex(Task task) {
         log.debug("elasticTaskIndex called with task: {}", task?.stringId)
-        taskMigrationHelper.elasticTaskIndex(task)
+        taskMigrationHelper.elasticTaskIndex(task, getCurrentErrorPolicy())
     }
 
     /**
@@ -443,7 +493,7 @@ class MigrationHelper {
      */
     void updateCasePermissionsFromNet(Case useCase, PetriNet net, boolean updateTasks = false) {
         log.debug("updateCasePermissionsFromNet called with useCase: {}, net: {}, updateTasks: {}", useCase?.stringId, net?.identifier, updateTasks)
-        caseMigrationHelper.updateCasePermissionsFromNet(useCase, net, updateTasks)
+        caseMigrationHelper.updateCasePermissionsFromNet(useCase, net, updateTasks, getCurrentErrorPolicy())
     }
 
     /**
@@ -454,7 +504,7 @@ class MigrationHelper {
      */
     void updateTasksPermissions(Case useCase, PetriNet net, List<String> relevantTransitionIds) {
         log.debug("updateTasksPermissions called with useCase: {}, net: {}, relevantTransitionIds: {}", useCase?.stringId, net?.identifier, relevantTransitionIds)
-        taskMigrationHelper.updateTasksPermissions(useCase, net, relevantTransitionIds)
+        taskMigrationHelper.updateTasksPermissions(useCase, net, relevantTransitionIds, getCurrentErrorPolicy())
     }
 
     /**
@@ -464,8 +514,8 @@ class MigrationHelper {
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
     void updateTaskPermissions(Case useCase, TaskPair taskPair, PetriNet net) {
-        log.debug("updateTaskPermissions called with useCase: {}, taskPair: {}, net: {}", useCase?.stringId, taskPair?.task?.stringId, net?.identifier)
-        taskMigrationHelper.updateTaskPermissions(useCase, taskPair, net)
+        log.debug("updateTaskPermissions called with useCase: {}, taskPair: {}, net: {}", useCase?.stringId, taskPair?.task?.toString(), net?.identifier)
+        taskMigrationHelper.updateTaskPermissions(useCase, taskPair, net, getCurrentErrorPolicy())
     }
 
     /**
@@ -475,5 +525,51 @@ class MigrationHelper {
      */
     static void migratePetriNet(Case useCase, PetriNet newNet) {
         CaseMigrationHelper.migratePetriNet(useCase, newNet)
+    }
+
+    /**
+     * Returns cached migration errors without clearing them.
+     *
+     * @return immutable snapshot of cached migration errors
+     */
+    List<MigrationError> getErrors() {
+        return AbstractMigrationHelper.getErrors()
+    }
+
+    /**
+     * Returns cached migration errors and clears the cache.
+     *
+     * @return cached migration errors collected since the last clear/pop
+     */
+    List<MigrationError> popErrors() {
+        return AbstractMigrationHelper.popErrors()
+    }
+
+    /**
+     * Clears cached migration errors.
+     */
+    void clearErrors() {
+        AbstractMigrationHelper.clearErrors()
+    }
+
+    /**
+     * Indicates whether any migration errors were cached.
+     *
+     * @return true if at least one error is cached
+     */
+    boolean hasErrors() {
+        return AbstractMigrationHelper.hasErrors()
+    }
+
+    /**
+     * Runs migration code with a clean error cache and returns errors collected during execution.
+     *
+     * @param migrationCode migration logic to execute
+     * @return errors collected during migrationCode execution
+     */
+    List<MigrationError> collectErrors(Closure migrationCode) {
+        clearErrors()
+        migrationCode.call()
+        return popErrors()
     }
 }

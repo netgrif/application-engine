@@ -2,8 +2,12 @@ package com.netgrif.application.engine.migration.helpers
 
 import com.mongodb.BulkWriteException
 import com.mongodb.bulk.BulkWriteResult
+import com.netgrif.application.engine.configuration.properties.MigrationProperties
+import com.netgrif.application.engine.migration.model.MigrationError
+import com.netgrif.application.engine.migration.model.MigrationErrorHandlingMode
+import com.netgrif.application.engine.migration.model.MigrationErrorPolicy
+import com.netgrif.application.engine.migration.throwable.MigrationErrorException
 import com.netgrif.application.engine.utils.MongodbUtils
-import com.netgrif.application.engine.workflow.domain.Case
 import com.querydsl.core.types.Predicate
 import groovy.util.logging.Slf4j
 import org.springframework.data.mongodb.core.BulkOperations
@@ -11,13 +15,16 @@ import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.util.CloseableIterator
 
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicInteger
+
 /**
  * AbstractMigrationHelper is an abstract utility class to facilitate the bulk migration of
  * MongoDB documents. The class provides mechanisms for iterating over documents, preparing 
  * bulk migration operations, and executing those operations efficiently using Spring Data MongoDB's
  * BulkOperations. It is generic and requires the subtype (document type) to be specified.
  *
- * @param <T>  The type of documents this helper will operate on.
+ * @param <T>   The type of documents this helper will operate on.
  */
 @Slf4j
 abstract class AbstractMigrationHelper<T> {
@@ -26,7 +33,7 @@ abstract class AbstractMigrationHelper<T> {
      * Default Closure used to process bulk operations. It uses the {@link #handleBulkOps} method 
      * to safely execute the bulk operations and log results or errors.
      */
-    static final Closure DEFAULT_PROCESS_OPERATIONS = { BulkOperations bulkOperations -> handleBulkOps(bulkOperations) }
+    static final Closure DEFAULT_PROCESS_OPERATIONS = { BulkOperations bulkOperations, Class<?> type -> handleBulkOps(bulkOperations, type) }
 
 
     /**
@@ -34,23 +41,40 @@ abstract class AbstractMigrationHelper<T> {
      * It is expected to be provided by subclasses, as the class itself is generic and requires
      * specific document type initialization to perform the corresponding operations.
      */
-    private final Class<T> type
+    protected final Class<T> type
 
     /**
      * The {@link MongoTemplate} used for interacting with the MongoDB database.
      * This is the core dependency of the helper class, allowing it to execute queries,
      * bulk operations, and other database operations on the specified document type.
      */
-    private final MongoTemplate mongoTemplate
+    protected final MongoTemplate mongoTemplate
+
+    /**
+     * Configuration properties for migration operations, providing settings such as error handling policies,
+     * page sizes, and other migration-related parameters used throughout the migration process.
+     */
+    protected final MigrationProperties migrationProperties
+
+    /**
+     * A thread-safe map that stores migration errors encountered during the migration process.
+     * The map is keyed by a string identifier (typically a document ID or migration step identifier)
+     * and contains a list of {@link MigrationError} objects representing all errors associated with that key.
+     * This structure allows for efficient error tracking and reporting during bulk migration operations.
+     */
+    private static final List<MigrationError> MIGRATION_ERRORS = new CopyOnWriteArrayList<>()
 
     /**
      * Constructs a new AbstractMigrationHelper with the specified MongoTemplate.
      *
      * @param mongoTemplate the {@link MongoTemplate} to use for interacting with MongoDB
      */
-    AbstractMigrationHelper(Class<T> type, MongoTemplate mongoTemplate) {
+    AbstractMigrationHelper(Class<T> type,
+                            MongoTemplate mongoTemplate,
+                            MigrationProperties migrationProperties) {
         this.type = type
         this.mongoTemplate = mongoTemplate
+        this.migrationProperties = migrationProperties
     }
 
     /**
@@ -72,32 +96,100 @@ abstract class AbstractMigrationHelper<T> {
     abstract void prepareOperations(T document, Closure update, BulkOperations bulkOperations)
 
     /**
+     * Resolves and extracts the unique identifier from the given document.
+     * This method must be implemented by subclasses to provide the logic for determining
+     * the document's ID, which is used for error reporting and logging during migration operations.
+     * The implementation should handle the specific ID field structure of the document type.
+     *
+     * @param document the document from which to resolve the identifier
+     * @return the unique identifier of the document as a String, or null if the ID cannot be resolved
+     */
+    abstract String resolveId(T document)
+
+    /**
+     * Caches a migration error into the thread-safe error list for later retrieval and reporting.
+     * This method is typically called when an error occurs during document migration operations,
+     * allowing the migration process to continue while collecting all errors for review.
+     *
+     * @param helper the name or identifier of the migration helper where the error occurred
+     * @param operation the specific operation being performed when the error occurred
+     * @param entityType the type of entity (document type) being migrated
+     * @param entityId the unique identifier of the entity that caused the error
+     * @param message a descriptive message explaining the error
+     * @param cause the optional {@link Throwable} that caused the error; defaults to null
+     */
+    static void cacheError(String helper,
+                           String operation,
+                           Class<?> entityType,
+                           String entityId,
+                           String message,
+                           Throwable cause = null) {
+        MIGRATION_ERRORS.add(MigrationError.of(helper, operation, entityType, entityId, message, cause))
+    }
+
+    /**
+     * Returns an unmodifiable view of all migration errors collected during the migration process.
+     * The returned list is a snapshot of the current errors and will not reflect any subsequent
+     * changes to the error cache.
+     *
+     * @return an unmodifiable {@link List} of {@link MigrationError} objects
+     */
+    static List<MigrationError> getErrors() {
+        return Collections.unmodifiableList(new ArrayList<>(MIGRATION_ERRORS))
+    }
+
+    /**
+     * Retrieves all cached migration errors and clears the error cache in a single operation.
+     * This method is useful for retrieving errors for reporting purposes while simultaneously
+     * resetting the error cache for a new migration operation.
+     *
+     * @return a {@link List} of all {@link MigrationError} objects that were cached
+     */
+    static List<MigrationError> popErrors() {
+        List<MigrationError> errors = new ArrayList<>(MIGRATION_ERRORS)
+        MIGRATION_ERRORS.clear()
+        return errors
+    }
+
+    /**
+     * Clears all cached migration errors from the error list.
+     * This method should be called to reset the error cache before starting a new migration
+     * operation or after errors have been processed and reported.
+     */
+    static void clearErrors() {
+        MIGRATION_ERRORS.clear()
+    }
+
+    /**
+     * Checks whether any migration errors have been cached.
+     * This method is useful for quickly determining if any errors occurred during
+     * the migration process without retrieving the full error list.
+     *
+     * @return {@code true} if one or more errors are cached, {@code false} otherwise
+     */
+    static boolean hasErrors() {
+        return !MIGRATION_ERRORS.isEmpty()
+    }
+
+    /**
      * A static method to handle the execution of bulk operations.
      * It executes the given {@link BulkOperations} instance and logs the results or any errors.
      *
      * @param bulkOps the bulk operations to execute
      */
-    static void handleBulkOps(BulkOperations bulkOps) {
+    static void handleBulkOps(BulkOperations bulkOps, Class<?> type) {
         try {
             BulkWriteResult bulkWriteResult = bulkOps.execute()
             log.debug("Processed bulk write of ${bulkWriteResult.modifiedCount}")
         } catch (BulkWriteException e) {
             log.error("Failed to write bulk operation", e)
             e.getWriteErrors().forEach {
-                log.error("Error writing document with ID ${it.toString()}. Cause: ${it.getMessage()}")
+                String message = "Error writing document with ID ${it.toString()}. Cause: ${it.getMessage()}"
+                log.error(message)
+                cacheError(AbstractMigrationHelper.simpleName, "bulkWrite", type, it.toString(), message, e)
             }
             throw e
         }
-    }
-
-    /**
-     * Converts a QueryDSL {@link Predicate} to a MongoDB {@link Query}.
-     *
-     * @param predicate the QueryDSL predicate to convert
-     * @return a MongoDB Query object representing the predicate
-     */
-    protected Query toQuery(Predicate predicate) {
-        return MongodbUtils.toQuery(mongoTemplate, type, predicate)
     }
 
     /**
@@ -113,7 +205,8 @@ abstract class AbstractMigrationHelper<T> {
      * @param pageSize the size of each page (number of documents); defaults to the result of {@link #getPageSize()}
      */
     void iterate(Closure update, Closure processOperations = DEFAULT_PROCESS_OPERATIONS,
-                 Query query = new Query(), long sleepFor = 0, int pageSize = getPageSize()) {
+                 Query query = new Query(), long sleepFor = 0, int pageSize = getPageSize(),
+                 MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         if (pageSize <= 0) {
             throw new IllegalArgumentException("pageSize must be > 0")
         }
@@ -122,18 +215,40 @@ abstract class AbstractMigrationHelper<T> {
             long numOfPages = Math.ceil(count / pageSize) as long
             log.info("Processing ${type.getSimpleName()} documents with filter ${query.toString()}: $numOfPages pages")
 
-            long page = 1, currentBatchSize = 0
+            long page = 1, currentBatchSize = 0, currentBulkOpsSize = 0
             query.cursorBatchSize(pageSize)
             BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, type)
 
             try (CloseableIterator<T> cursor = mongoTemplate.stream(query, type)) {
                 while (cursor.hasNext()) {
-                    prepareOperations(cursor.next(), update, bulkOps)
+                    T document = cursor.next()
+
+                    try {
+                        prepareOperations(document, update, bulkOps)
+                        currentBulkOpsSize++
+                    } catch (Exception e) {
+                        String entityId = resolveId(document)
+                        String message = "Failed to prepare migration operation for ${type.simpleName} ${entityId}"
+                        log.error(message, e)
+                        handleMigrationError(errorPolicy, "iterate", type, entityId, message, e)
+                    }
+
                     if (++currentBatchSize == pageSize as long || !cursor.hasNext()) {
                         log.debug("Processed ${type.getSimpleName()} document page {} / {}", page, numOfPages)
-                        processOperations(bulkOps)
+
+                        try {
+                            if (currentBulkOpsSize > 0) {
+                                processOperations(bulkOps, type)
+                            }
+                        } catch (Exception e) {
+                            String message = "Failed to process ${type.simpleName} bulk operations on page ${page}"
+                            log.error(message, e)
+                            cacheError(this.class.simpleName, "iterate", type, null, message, e)
+                        }
+
                         bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, type)
                         currentBatchSize = 0
+                        currentBulkOpsSize = 0
                         page++
                         if (sleepFor > 0) {
                             log.debug("Pausing migration for ${sleepFor} milliseconds")
@@ -141,7 +256,115 @@ abstract class AbstractMigrationHelper<T> {
                         }
                     }
                 }
+            } catch (Exception e) {
+                String message = "Failed to iterate ${type.simpleName} documents with filter ${query}"
+                log.error(message, e)
+                handleMigrationError(errorPolicy, "iterate", type, null, message, e)
+                throw e
+            } finally {
+                finishMigrationErrorPolicy(errorPolicy)
             }
+        }
+    }
+
+    /**
+     * Returns the default migration error policy configured in the application properties.
+     * This policy determines how errors should be handled during migration operations,
+     * including whether to cache errors, throw exceptions immediately, or continue processing.
+     *
+     * @return a {@link MigrationErrorPolicy} instance based on the configured migration properties
+     */
+    MigrationErrorPolicy defaultErrorPolicy() {
+        return MigrationErrorPolicy.defaultErrorPolicy(migrationProperties.errorPolicy)
+    }
+
+    /**
+     * Converts a QueryDSL {@link Predicate} to a MongoDB {@link Query}.
+     * This method delegates to the {@link MongodbUtils} utility to perform the conversion,
+     * using the current MongoTemplate and document type.
+     *
+     * @param predicate the QueryDSL predicate to convert
+     * @return a MongoDB Query object representing the predicate
+     */
+    protected Query toQuery(Predicate predicate) {
+        return MongodbUtils.toQuery(mongoTemplate, type, predicate)
+    }
+
+    /**
+     * Handles migration errors according to the specified error policy.
+     * This method implements different error handling strategies based on the policy mode,
+     * including caching errors, throwing exceptions immediately, throwing after reaching an error limit,
+     * or continuing processing to throw after all operations complete.
+     *
+     * @param policy the {@link MigrationErrorPolicy} defining how to handle the error
+     * @param operation the name of the operation being performed when the error occurred
+     * @param type the class type of the entity being migrated
+     * @param entityId the unique identifier of the entity that caused the error, or null if not applicable
+     * @param message a descriptive message explaining the error
+     * @param cause the optional {@link Throwable} that caused the error; defaults to null
+     * @throws MigrationErrorException if the error policy requires throwing an exception
+     */
+    protected void handleMigrationError(MigrationErrorPolicy policy, String operation, Class<?> type, String entityId,
+                                        String message, Throwable cause = null) {
+        if (policy.cacheErrors) {
+            cacheError(this.class.simpleName, operation, type, entityId, message, cause)
+        }
+
+        switch (policy.mode) {
+            case MigrationErrorHandlingMode.THROW_IMMEDIATELY:
+                throwError(policy, message, cause)
+                break
+            case MigrationErrorHandlingMode.THROW_AFTER_LIMIT:
+                if (getErrors().size() >= policy.maxErrors) {
+                    throw new MigrationErrorException("Migration failed after reaching error limit ${policy.maxErrors}", getErrors(), cause)
+                }
+                break
+            case MigrationErrorHandlingMode.CONTINUE:
+                break
+            case MigrationErrorHandlingMode.THROW_AFTER_PROCESSING:
+                break
+        }
+    }
+
+    /**
+     * Throws an exception based on the specified error policy and error details.
+     * If the policy specifies throwing the original exception and the cause is a RuntimeException,
+     * the original exception is re-thrown. Otherwise, a new {@link MigrationErrorException} is thrown
+     * containing the message, all cached errors, and the original cause.
+     *
+     * @param policy the {@link MigrationErrorPolicy} defining how to throw the error
+     * @param message a descriptive message explaining the error
+     * @param cause the optional {@link Throwable} that caused the error; defaults to null
+     * @throws RuntimeException or {@link MigrationErrorException} depending on the policy and cause
+     */
+    protected static void throwError(MigrationErrorPolicy policy, String message, Throwable cause = null) {
+        if (policy.throwOriginal && cause instanceof RuntimeException) {
+            throw cause
+        }
+
+        throw new MigrationErrorException(
+                message,
+                getErrors(),
+                cause
+        )
+    }
+
+    /**
+     * Finalizes the migration error policy after processing is complete.
+     * If the error policy mode is {@link MigrationErrorHandlingMode#THROW_AFTER_PROCESSING}
+     * and errors were collected during processing, throws a {@link MigrationErrorException}
+     * containing all cached errors. This method should be called in the finally block
+     * of migration operations to ensure proper error handling.
+     *
+     * @param policy the {@link MigrationErrorPolicy} defining the error handling behavior
+     * @throws MigrationErrorException if the policy requires throwing after processing and errors exist
+     */
+    protected static void finishMigrationErrorPolicy(MigrationErrorPolicy policy) {
+        if (policy.mode == MigrationErrorHandlingMode.THROW_AFTER_PROCESSING && hasErrors()) {
+            throw new MigrationErrorException(
+                    "Migration finished with ${getErrors().size()} errors",
+                    getErrors()
+            )
         }
     }
 }

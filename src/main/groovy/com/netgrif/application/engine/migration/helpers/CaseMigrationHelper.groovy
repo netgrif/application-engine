@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.migration.helpers
 
+import com.netgrif.application.engine.configuration.properties.MigrationProperties
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
-import com.netgrif.application.engine.migration.config.properties.MigrationConfigurationProperties
-import com.netgrif.application.engine.migration.config.properties.MigrationConfigurationProperties.CaseMigrationProperties
+import com.netgrif.application.engine.migration.model.MigrationErrorPolicy
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component
 
 import java.time.LocalDateTime
 import java.util.stream.Collectors
+
 /**
  * Helper class for managing migrations of Case objects in the application.
  * Provides methods for updating and iterating over case objects, filtered
@@ -32,11 +33,6 @@ import java.util.stream.Collectors
 @Slf4j
 @Component
 class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
-
-    /**
-     * Configuration properties for case migration.
-     */
-    protected final CaseMigrationProperties caseMigrationProperties
 
     /**
      * Service for managing PetriNet operations.
@@ -66,13 +62,12 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param migrationConfigurationProperties Properties for migration configuration, including cases.
      */
     CaseMigrationHelper(MongoTemplate mongoTemplate,
-                        MigrationConfigurationProperties migrationConfigurationProperties,
+                        MigrationProperties migrationProperties,
                         IPetriNetService petriNetService,
                         IElasticCaseService elasticCaseService,
                         IElasticCaseMappingService elasticCaseMappingService,
                         TaskMigrationHelper taskMigrationHelper) {
-        super(Case.class, mongoTemplate)
-        this.caseMigrationProperties = migrationConfigurationProperties.cases
+        super(Case.class, mongoTemplate, migrationProperties)
         this.petriNetService = petriNetService
         this.elasticCaseService = elasticCaseService
         this.elasticCaseMappingService = elasticCaseMappingService
@@ -86,7 +81,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      */
     @Override
     int getPageSize() {
-        return caseMigrationProperties.pageSize
+        return migrationProperties.cases.pageSize
     }
 
     /**
@@ -105,15 +100,26 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
     }
 
     /**
+     * Resolves and retrieves the string representation of the ID for the given Case document.
+     *
+     * @param document The Case document whose ID should be resolved.
+     * @return The string representation of the case's ID.
+     */
+    @Override
+    String resolveId(Case document) {
+        return document.getStringId()
+    }
+
+    /**
      * Updates all cases that match the given filter predicate. The update closure
      * is executed for each matched case.
      *
      * @param update A closure containing the code to execute for each matching case.
      * @param filter A QueryDSL Predicate object specifying the conditions to filter the cases.
      */
-    void updateCases(Closure update, Predicate filter) {
+    void updateCases(Closure update, Predicate filter, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Updating cases with filter ${filter.toString()} and update ${update.toString()}")
-        iterate(update, DEFAULT_PROCESS_OPERATIONS, toQuery(filter))
+        iterate(update, DEFAULT_PROCESS_OPERATIONS, toQuery(filter), 0, getPageSize(), errorPolicy)
     }
 
     /**
@@ -125,9 +131,10 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param sleepFor Optional sleep time (in milliseconds) between processing pages. Default is 0ms.
      * @param filter A QueryDSL Predicate object specifying the conditions to filter the cases.
      */
-    void iterateCases(Closure update, Closure pageProcessed = DEFAULT_PROCESS_OPERATIONS, long sleepFor = 0, Predicate filter) {
+    void iterateCases(Closure update, Closure pageProcessed = DEFAULT_PROCESS_OPERATIONS, long sleepFor = 0,
+                      Predicate filter, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting iterateCases with filter: ${filter.toString()}, sleepFor: ${sleepFor}ms")
-        iterate(update, pageProcessed, toQuery(filter), sleepFor)
+        iterate(update, pageProcessed, toQuery(filter), sleepFor, getPageSize(), errorPolicy)
     }
 
     /**
@@ -137,10 +144,11 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param processIdentifier The identifier of the PetriNet process.
      * @param pageSize Optional page size for processing cases. Default is 100.
      */
-    void updateCasesCursor(Closure update, String processIdentifier, int pageSize = 100) {
+    void updateCasesCursor(Closure update, String processIdentifier, int pageSize = 100,
+                           MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting updateCasesCursor for processIdentifier: ${processIdentifier}, pageSize: ${pageSize}")
         Query query = new Query(Criteria.where("processIdentifier").is(processIdentifier))
-        iterate(update, DEFAULT_PROCESS_OPERATIONS, query, 0, pageSize as int)
+        iterate(update, DEFAULT_PROCESS_OPERATIONS, query, 0, pageSize as int, errorPolicy)
     }
 
     /**
@@ -149,9 +157,9 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param update A closure containing the code to execute for each case.
      * @param pageSize Optional page size for processing cases. Default is 100.
      */
-    void updateAllCasesCursor(Closure update, int pageSize = 100) {
+    void updateAllCasesCursor(Closure update, int pageSize = 100, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting updateAllCasesCursor with pageSize: ${pageSize}")
-        iterate(update, DEFAULT_PROCESS_OPERATIONS, new Query(), 0, pageSize as int)
+        iterate(update, DEFAULT_PROCESS_OPERATIONS, new Query(), 0, pageSize as int, errorPolicy)
     }
 
     /**
@@ -159,12 +167,14 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * handles useCase.petriNet internally
      * @param useCase Instance of Case that will be indexed into elasticsearch index
      */
-    void elasticIndex(Case useCase) {
+    void elasticIndex(Case useCase, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting elasticIndex for case: ${useCase.stringId}")
         try {
             PetriNetMigrationHelper.setPetriNet(useCase, petriNetService.get(useCase.petriNetObjectId))
             if (!useCase.petriNet) {
-                log.error("Failed to set petriNet for case $useCase.stringId")
+                String message = "Failed to set petriNet for case $useCase.stringId"
+                log.error(message)
+                cacheError(this.class.simpleName, "elasticIndex", type, useCase.stringId, message)
                 return
             }
             log.trace("Successfully set petriNet for case: ${useCase.stringId}")
@@ -176,10 +186,14 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
                 try {
                     elasticCaseService.indexNow(elasticCaseMappingService.transform(useCase))
                 } catch (Exception retryEx) {
-                    log.error("Failed to index $useCase.stringId after setting lastModified", retryEx)
+                    String message = "Failed to index $useCase.stringId after setting lastModified"
+                    log.error(message, retryEx)
+                    handleMigrationError(errorPolicy, "elasticIndex", type, useCase.stringId, message, ex)
                 }
             } else {
-                log.error("Failed to index $useCase.stringId", ex)
+                String message = "Failed to index $useCase.stringId"
+                log.error(message, ex)
+                handleMigrationError(errorPolicy, "elasticIndex", type, useCase.stringId, message, ex)
             }
         }
     }
@@ -219,7 +233,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param useCase Instance of Case
      * @param toChange List of field IDs for value change
      */
-    static void changeDataFieldsValueFromTextToNumber(Case useCase, Set<String> toChange) {
+    static void changeDataFieldsValueFromTextToNumber(Case useCase, Set<String> toChange, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting changeDataFieldsValueFromTextToNumber for case: ${useCase.stringId}, fields to change: ${toChange}")
         toChange.each { dataFieldID ->
             DataField dataField = useCase.dataSet[dataFieldID]
@@ -231,7 +245,9 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
                 } catch (Exception e) {
                     def originalValue = dataField.value
                     dataField.value = null
-                    log.error("[${useCase.stringId}] could not convert value ${originalValue} in field ${dataFieldID}", e)
+                    String message = "[${useCase.stringId}] could not convert value ${originalValue} in field ${dataFieldID}"
+                    log.error(message, e)
+                    handleMigrationError(errorPolicy, "changeDataFieldsValueFromTextToNumber", type, useCase.stringId, message, e)
                 }
             }
         }
@@ -368,7 +384,8 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param useCase Instance of Case
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
-    void updateCasePermissionsFromNet(Case useCase, PetriNet net, boolean updateTasks = false) {
+    void updateCasePermissionsFromNet(Case useCase, PetriNet net, boolean updateTasks = false
+                                      , MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting updateCasePermissionsFromNet for case: ${useCase.stringId}, net: ${net.stringId}, updateTasks: ${updateTasks}")
         useCase.permissions = net.getPermissions().entrySet().stream()
                 .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
@@ -387,7 +404,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
         log.trace("Updated permissions and enabled roles for case: ${useCase.stringId}")
         if (updateTasks) {
             useCase.tasks.each { taskPair ->
-                taskMigrationHelper.updateTaskPermissions(useCase, taskPair, net)
+                taskMigrationHelper.updateTaskPermissions(useCase, taskPair, net, errorPolicy)
             }
         }
     }

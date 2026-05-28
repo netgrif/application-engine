@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.migration.helpers
 
+import com.netgrif.application.engine.configuration.properties.MigrationProperties
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
-import com.netgrif.application.engine.migration.config.properties.MigrationConfigurationProperties
-import com.netgrif.application.engine.migration.config.properties.MigrationConfigurationProperties.TaskMigrationProperties
+import com.netgrif.application.engine.migration.model.MigrationErrorPolicy
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.Transition
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
@@ -31,15 +31,6 @@ import org.springframework.stereotype.Component
 @Slf4j
 @Component
 class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
-
-    /**
-     * The task migration properties configuration.
-     *
-     * This property provides the configuration values for task migration,
-     * such as the size of the page used to process tasks in the migration.
-     * It is loaded from the {@link MigrationConfigurationProperties} during initialization.
-     */
-    protected final TaskMigrationProperties taskMigrationProperties
 
     /**
      * Service for handling Petri Net operations.
@@ -80,13 +71,12 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * @param mongoTemplate the {@link MongoTemplate} to use for interacting with MongoDB
      */
     TaskMigrationHelper(MongoTemplate mongoTemplate,
-                        MigrationConfigurationProperties migrationConfigurationProperties,
+                        MigrationProperties migrationProperties,
                         IPetriNetService petriNetService,
                         ITaskService taskService,
                         IElasticTaskService elasticTaskService,
                         IElasticTaskMappingService elasticTaskMappingService) {
-        super(Task.class, mongoTemplate)
-        this.taskMigrationProperties = migrationConfigurationProperties.tasks
+        super(Task.class, mongoTemplate, migrationProperties)
         this.petriNetService = petriNetService
         this.taskService = taskService
         this.elasticTaskService = elasticTaskService
@@ -96,14 +86,14 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
     /**
      * Returns the page size for the task migration process.
      *
-     * The page size is configured in the {@link TaskMigrationProperties} and determines
+     * The page size is configured in the {@link MigrationProperties.TaskMigrationProperties} and determines
      * the number of tasks processed in a single batch during migration operations.
      *
      * @return an integer indicating the configured page size
      */
     @Override
     int getPageSize() {
-        return taskMigrationProperties.pageSize
+        return migrationProperties.tasks.pageSize
     }
 
     /**
@@ -125,15 +115,29 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
     }
 
     /**
+     * Resolves and returns the unique identifier of the given task document.
+     *
+     * This method extracts the string representation of the task's identifier,
+     * which is used for logging and tracking purposes during migration operations.
+     *
+     * @param document the {@link Task} document whose identifier should be resolved
+     * @return a {@link String} representing the unique identifier of the task
+     */
+    @Override
+    String resolveId(Task document) {
+        return document.getStringId()
+    }
+
+    /**
      * Updates all tasks filtered by filter Predicate. Update closure is called on each filtered task.
      * @param update Instance of Closure, which should contain code that will be executed for every Task matched by filter
      * @param filter Instance of Predicate, to filter which tasks should be updated
      */
-    void updateTasks(Closure update, Predicate filter) {
+    void updateTasks(Closure update, Predicate filter, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting updateTasks with filter: ${filter.toString()}")
         log.info("Updating tasks with filter ${filter.toString()} and update ${update.toString()}")
         log.trace("Converting filter to query and calling iterate")
-        iterate(update, DEFAULT_PROCESS_OPERATIONS, toQuery(filter))
+        iterate(update, DEFAULT_PROCESS_OPERATIONS, toQuery(filter), 0, getPageSize(), errorPolicy)
     }
 
     /**
@@ -142,10 +146,11 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * @param sleepFor Optional attribute to set sleep time (in milliseconds) to sleep for after each iterated page. Default 0ms
      * @param filter Instance of Predicate, to filter which tasks should be iterated
      */
-    void iterateTasks(Closure update, Closure pageProcessed = DEFAULT_PROCESS_OPERATIONS, long sleepFor = 0, Predicate filter) {
+    void iterateTasks(Closure update, Closure pageProcessed = DEFAULT_PROCESS_OPERATIONS, long sleepFor = 0, Predicate filter,
+                      MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting iterateTasks with filter: ${filter.toString()}, sleepFor: ${sleepFor}ms")
         log.trace("Converting filter to query and calling iterate with pageProcessed closure")
-        iterate(update, pageProcessed, toQuery(filter), sleepFor)
+        iterate(update, pageProcessed, toQuery(filter), sleepFor, getPageSize(), errorPolicy)
     }
 
     /**
@@ -154,12 +159,13 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * @param processIdentifier identifier of PetriNet, to filter which tasks should be updated
      * @param pageSize Optional attribute to set page size. Default page size 100
      */
-    void updateTasksCursor(Closure update, String processIdentifier, int pageSize = 100) {
+    void updateTasksCursor(Closure update, String processIdentifier, int pageSize = 100,
+                           MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting updateTasksCursor for processIdentifier: ${processIdentifier}, pageSize: ${pageSize}")
         String processId = petriNetService.getNewestVersionByIdentifier(processIdentifier).stringId
         Query query = new Query(Criteria.where("processId").is(processId))
         log.trace("Created query for processId: ${processId}, calling iterate")
-        iterate(update, DEFAULT_PROCESS_OPERATIONS, query, 0, pageSize as int)
+        iterate(update, DEFAULT_PROCESS_OPERATIONS, query, 0, pageSize as int, errorPolicy)
     }
 
     /**
@@ -169,13 +175,14 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * @param transitionIds List of transition IDs to limit filter to specific transitions of given processIdentifier
      * @param pageSize Optional attribute to set page size. Default page size 100
      */
-    void updateSpecificTasksCursor(Closure update, String processIdentifier, List<String> transitionIds, int pageSize = 100) {
+    void updateSpecificTasksCursor(Closure update, String processIdentifier, List<String> transitionIds, int pageSize = 100,
+                                   MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting updateSpecificTasksCursor for processIdentifier: ${processIdentifier}, transitionIds: ${transitionIds}, pageSize: ${pageSize}")
         String processId = petriNetService.getNewestVersionByIdentifier(processIdentifier).stringId
         Query query = new Query(Criteria.where("processId").is(processId))
         query.addCriteria(Criteria.where("transitionId").in(transitionIds))
         log.trace("Created query with criteria for processId: ${processId} and transitionIds: ${transitionIds}, calling iterate")
-        iterate(update, DEFAULT_PROCESS_OPERATIONS, query, 0, pageSize as int)
+        iterate(update, DEFAULT_PROCESS_OPERATIONS, query, 0, pageSize as int, errorPolicy)
     }
 
     /**
@@ -183,10 +190,10 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * @param update Instance of Closure, which should contain code that will be executed for every Task
      * @param pageSize Optional attribute to set page size. Default page size 100.0
      */
-    void updateAllTasksCursor(Closure update, int pageSize = 100) {
+    void updateAllTasksCursor(Closure update, int pageSize = 100, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting updateAllTasksCursor with pageSize: ${pageSize}")
         log.trace("Calling iterate with empty query to process all tasks")
-        iterate(update, DEFAULT_PROCESS_OPERATIONS, new Query(), 0, pageSize as int)
+        iterate(update, DEFAULT_PROCESS_OPERATIONS, new Query(), 0, pageSize as int, errorPolicy)
     }
 
     /**
@@ -206,13 +213,15 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * Indexes provided task in elasticsearch
      * @param task Instance of Task that will be indexed into elasticsearch index
      */
-    void elasticTaskIndex(Task task) {
+    void elasticTaskIndex(Task task, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting elasticTaskIndex for task: ${task.stringId}")
         try {
             log.trace("Transforming and indexing task: ${task.stringId} into elasticsearch")
             elasticTaskService.indexNow(elasticTaskMappingService.transform(task))
         } catch (Exception e) {
-            log.error("Failed to index $task.stringId", e)
+            String message = "Failed to index $task.stringId"
+            log.error(message, e)
+            handleMigrationError(errorPolicy, "elasticTaskIndex", type, task.stringId, message, e)
         }
     }
 
@@ -238,11 +247,11 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      * @param relevantTransitionIds List of transition IDs for permissions update
      */
-    void updateTasksPermissions(Case useCase, PetriNet net, List<String> relevantTransitionIds) {
+    void updateTasksPermissions(Case useCase, PetriNet net, List<String> relevantTransitionIds, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting updateTasksPermissions for case: ${useCase.stringId}, net: ${net.identifier}, relevantTransitionIds: ${relevantTransitionIds}")
         useCase.tasks.findAll { it.transition in relevantTransitionIds }.each { taskPair ->
             log.trace("Processing task permissions for transition: ${taskPair.transition} in case: ${useCase.stringId}")
-            updateTaskPermissions(useCase, taskPair, net)
+            updateTaskPermissions(useCase, taskPair, net, errorPolicy)
         }
     }
 
@@ -252,7 +261,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * @param taskPair TaskPair object of updated Task
      * @param net Instance of Petri Net, it needs to match processIdentifier of useCase
      */
-    void updateTaskPermissions(Case useCase, TaskPair taskPair, PetriNet net) {
+    void updateTaskPermissions(Case useCase, TaskPair taskPair, PetriNet net, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting updateTaskPermissions for case: ${useCase.stringId}, task transition: ${taskPair.transition}")
         try {
             Transition newTransition = net.getTransition(taskPair.transition)
@@ -264,7 +273,9 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
             oldTask.resolveViewRoles()
             taskService.save(oldTask)
         } catch (Exception e) {
-            log.error("Failed to update task permissions $useCase.stringId $taskPair.transition", e)
+            String message = "Failed to update task permissions $useCase.stringId $taskPair.transition"
+            log.error(message, e)
+            handleMigrationError(errorPolicy, "updateTaskPermissions", type, taskPair?.task?.toString(), message, e)
         }
     }
 }

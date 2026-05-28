@@ -1,9 +1,8 @@
 package com.netgrif.application.engine.migration.helpers
 
 import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.configuration.properties.MigrationProperties
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.migration.config.properties.MigrationConfigurationProperties
-import com.netgrif.application.engine.migration.config.properties.MigrationConfigurationProperties.PetriNetMigrationProperties
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.Transition
@@ -53,12 +52,6 @@ import java.util.stream.Collectors
 class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
 
     /**
-     * Configuration properties specific to Petri Net migration operations.
-     * Contains settings such as page size and other Petri Net-related migration configurations.
-     */
-    protected final PetriNetMigrationProperties petriNetMigrationProperties
-
-    /**
      * Service interface for managing Petri Net operations including importing, saving, and retrieving Petri Net models.
      */
     protected final IPetriNetService petriNetService
@@ -83,20 +76,19 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * Constructs a new PetriNetMigrationHelper with the specified dependencies.
      *
      * @param mongoTemplate the {@link MongoTemplate} to use for interacting with MongoDB
-     * @param migrationConfigurationProperties the {@link MigrationConfigurationProperties} containing migration settings including page size and other configuration
+     * @param migrationProperties the {@link MigrationProperties} containing migration settings including page size and other configuration
      * @param petriNetService the {@link IPetriNetService} for managing Petri Net operations such as importing, saving, and retrieving Petri Nets
      * @param processRoleRepository the {@link ProcessRoleRepository} for persisting and retrieving process roles from the database
      * @param importerProvider the {@link Provider} that supplies {@link Importer} instances for importing Petri Net models from various sources
      * @param userService the {@link UserService} for managing user-related operations, including retrieving system user for Petri Net imports
      */
     PetriNetMigrationHelper(MongoTemplate mongoTemplate,
-                            MigrationConfigurationProperties migrationConfigurationProperties,
+                            MigrationProperties migrationProperties,
                             IPetriNetService petriNetService,
                             ProcessRoleRepository processRoleRepository,
                             Provider<Importer> importerProvider,
                             UserService userService) {
-        super(PetriNet.class, mongoTemplate)
-        this.petriNetMigrationProperties = migrationConfigurationProperties.petriNets
+        super(PetriNet.class, mongoTemplate, migrationProperties)
         this.petriNetService = petriNetService
         this.processRoleRepository = processRoleRepository
         this.importerProvider = importerProvider
@@ -106,11 +98,11 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
     /**
      * Returns the page size for pagination during migration operations.
      *
-     * @return the page size configured in {@link PetriNetMigrationProperties}
+     * @return the page size configured in {@link MigrationProperties.PetriNetMigrationProperties}
      */
     @Override
     int getPageSize() {
-        return petriNetMigrationProperties.pageSize
+        return migrationProperties.petriNets.pageSize
     }
 
     /**
@@ -125,6 +117,20 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
         log.debug("Updating Petri Net with ID ${document.stringId}")
         update(document)
         bulkOperations.replaceOne(Query.query(Criteria.where("_id").is(document.getObjectId())), document)
+    }
+
+    /**
+     * Resolves and returns the string identifier of a Petri Net document.
+     * <p>
+     * This method is used during migration operations to uniquely identify Petri Net documents
+     * when performing bulk operations or logging migration progress.
+     *
+     * @param document the {@link PetriNet} document whose identifier should be resolved
+     * @return the string representation of the Petri Net's unique identifier
+     */
+    @Override
+    String resolveId(PetriNet document) {
+        return document.getStringId()
     }
 
     /**
