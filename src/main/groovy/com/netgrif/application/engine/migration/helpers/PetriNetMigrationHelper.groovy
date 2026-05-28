@@ -52,33 +52,32 @@ import java.util.stream.Collectors
 @Component
 class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
 
-
     /**
      * Configuration properties specific to Petri Net migration operations.
      * Contains settings such as page size and other Petri Net-related migration configurations.
      */
-    private final PetriNetMigrationProperties petriNetMigrationProperties
+    protected final PetriNetMigrationProperties petriNetMigrationProperties
 
     /**
      * Service interface for managing Petri Net operations including importing, saving, and retrieving Petri Net models.
      */
-    private final IPetriNetService petriNetService
+    protected final IPetriNetService petriNetService
 
     /**
      * Repository for persisting and retrieving process roles from the database.
      */
-    private final ProcessRoleRepository processRoleRepository
+    protected final ProcessRoleRepository processRoleRepository
 
     /**
      * Provider that supplies {@link Importer} instances for importing Petri Net models from various sources.
      * Uses lazy initialization to create Importer instances on demand.
      */
-    private final Provider<Importer> importerProvider
+    protected final Provider<Importer> importerProvider
 
     /**
      * Service for managing user-related operations, including retrieving system user for Petri Net imports.
      */
-    private final UserService userService
+    protected final UserService userService
 
     /**
      * Constructs a new PetriNetMigrationHelper with the specified dependencies.

@@ -38,7 +38,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * such as the size of the page used to process tasks in the migration.
      * It is loaded from the {@link MigrationConfigurationProperties} during initialization.
      */
-    private final TaskMigrationProperties taskMigrationProperties
+    protected final TaskMigrationProperties taskMigrationProperties
 
     /**
      * Service for handling Petri Net operations.
@@ -47,7 +47,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * such as retrieving the latest version of a Petri Net by its identifier
      * during task migrations.
      */
-    private final IPetriNetService petriNetService
+    protected final IPetriNetService petriNetService
 
     /**
      * Service for handling task operations.
@@ -55,7 +55,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * This service provides methods for managing task entities,
      * including finding, saving, and reloading tasks during migration processes.
      */
-    private final ITaskService taskService
+    protected final ITaskService taskService
 
     /**
      * Service for handling Elasticsearch task indexing operations.
@@ -63,7 +63,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * This service is used to index task documents into Elasticsearch,
      * enabling full-text search and analytics capabilities for tasks.
      */
-    private final IElasticTaskService elasticTaskService
+    protected final IElasticTaskService elasticTaskService
 
     /**
      * Service for mapping task entities to Elasticsearch documents.
@@ -71,7 +71,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * This service transforms task domain objects into their Elasticsearch
      * representation before indexing, ensuring proper field mapping and data structure.
      */
-    private final IElasticTaskMappingService elasticTaskMappingService
+    protected final IElasticTaskMappingService elasticTaskMappingService
 
     /**
      * Constructs a new TaskMigrationHelper with the specified MongoTemplate.

@@ -38,27 +38,27 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
     /**
      * Configuration properties for case migration.
      */
-    private final CaseMigrationProperties caseMigrationProperties
+    protected final CaseMigrationProperties caseMigrationProperties
 
     /**
      * Service for managing PetriNet operations.
      */
-    private final IPetriNetService petriNetService
+    protected final IPetriNetService petriNetService
 
     /**
      * Service for indexing and managing cases in Elasticsearch.
      */
-    private final IElasticCaseService elasticCaseService
+    protected final IElasticCaseService elasticCaseService
 
     /**
      * Service for mapping Case objects to Elasticsearch documents.
      */
-    private final IElasticCaseMappingService elasticCaseMappingService
+    protected final IElasticCaseMappingService elasticCaseMappingService
 
     /**
      * Helper for managing task migrations associated with cases.
      */
-    private final TaskMigrationHelper taskMigrationHelper
+    protected final TaskMigrationHelper taskMigrationHelper
 
     /**
      * Constructs a CaseMigrationHelper instance with
