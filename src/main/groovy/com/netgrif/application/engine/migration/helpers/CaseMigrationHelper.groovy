@@ -13,7 +13,6 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.DataField
 import com.querydsl.core.types.Predicate
 import groovy.util.logging.Slf4j
-import org.junit.Assert
 import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
@@ -21,8 +20,7 @@ import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Component
 
 import java.time.LocalDateTime
-import java.util.stream.Collectors 
-
+import java.util.stream.Collectors
 /**
  * Helper class for managing migrations of Case objects in the application.
  * Provides methods for updating and iterating over case objects, filtered
