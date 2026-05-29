@@ -119,7 +119,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      */
     void updateCases(Closure update, Predicate filter, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Updating cases with filter ${filter.toString()} and update ${update.toString()}")
-        iterate(update, DEFAULT_PROCESS_OPERATIONS, toQuery(filter), 0, getPageSize(), errorPolicy)
+        iterate(update, null, toQuery(filter), 0, getPageSize(), errorPolicy)
     }
 
     /**
@@ -127,11 +127,11 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * is executed for each matched case, and the pageProcessed closure is called after each page.
      *
      * @param update A closure containing the code to execute for each matching case.
-     * @param pageProcessed A closure executed after processing each page. Defaults to DEFAULT_PROCESS_OPERATIONS.
+     * @param pageProcessed A closure executed after processing each page. Defaults to null.
      * @param sleepFor Optional sleep time (in milliseconds) between processing pages. Default is 0ms.
      * @param filter A QueryDSL Predicate object specifying the conditions to filter the cases.
      */
-    void iterateCases(Closure update, Closure pageProcessed = DEFAULT_PROCESS_OPERATIONS, long sleepFor = 0,
+    void iterateCases(Closure update, Closure pageProcessed = null, long sleepFor = 0,
                       Predicate filter, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting iterateCases with filter: ${filter.toString()}, sleepFor: ${sleepFor}ms")
         iterate(update, pageProcessed, toQuery(filter), sleepFor, getPageSize(), errorPolicy)
@@ -148,7 +148,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
                            MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting updateCasesCursor for processIdentifier: ${processIdentifier}, pageSize: ${pageSize}")
         Query query = new Query(Criteria.where("processIdentifier").is(processIdentifier))
-        iterate(update, DEFAULT_PROCESS_OPERATIONS, query, 0, pageSize as int, errorPolicy)
+        iterate(update, null, query, 0, pageSize as int, errorPolicy)
     }
 
     /**
@@ -159,7 +159,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      */
     void updateAllCasesCursor(Closure update, int pageSize = 100, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting updateAllCasesCursor with pageSize: ${pageSize}")
-        iterate(update, DEFAULT_PROCESS_OPERATIONS, new Query(), 0, pageSize as int, errorPolicy)
+        iterate(update, null, new Query(), 0, pageSize as int, errorPolicy)
     }
 
     /**
@@ -174,7 +174,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
             if (!useCase.petriNet) {
                 String message = "Failed to set petriNet for case $useCase.stringId"
                 log.error(message)
-                cacheError(this.class.simpleName, "elasticIndex", type, useCase.stringId, message)
+                handleMigrationError(errorPolicy, "elasticIndex", type, useCase.stringId, message)
                 return
             }
             log.trace("Successfully set petriNet for case: ${useCase.stringId}")
@@ -188,7 +188,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
                 } catch (Exception retryEx) {
                     String message = "Failed to index $useCase.stringId after setting lastModified"
                     log.error(message, retryEx)
-                    handleMigrationError(errorPolicy, "elasticIndex", type, useCase.stringId, message, ex)
+                    handleMigrationError(errorPolicy, "elasticIndex", type, useCase.stringId, message, retryEx)
                 }
             } else {
                 String message = "Failed to index $useCase.stringId"

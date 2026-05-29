@@ -30,13 +30,6 @@ import java.util.concurrent.atomic.AtomicInteger
 abstract class AbstractMigrationHelper<T> {
 
     /**
-     * Default Closure used to process bulk operations. It uses the {@link #handleBulkOps} method 
-     * to safely execute the bulk operations and log results or errors.
-     */
-    static final Closure DEFAULT_PROCESS_OPERATIONS = { BulkOperations bulkOperations, Class<?> type -> handleBulkOps(bulkOperations, type) }
-
-
-    /**
      * The type of the documents this helper is operating on.
      * It is expected to be provided by subclasses, as the class itself is generic and requires
      * specific document type initialization to perform the corresponding operations.
@@ -62,7 +55,7 @@ abstract class AbstractMigrationHelper<T> {
      * and contains a list of {@link MigrationError} objects representing all errors associated with that key.
      * This structure allows for efficient error tracking and reporting during bulk migration operations.
      */
-    private static final List<MigrationError> MIGRATION_ERRORS = new CopyOnWriteArrayList<>()
+    private final List<MigrationError> migrationErrors
 
     /**
      * Constructs a new AbstractMigrationHelper with the specified MongoTemplate.
@@ -75,6 +68,7 @@ abstract class AbstractMigrationHelper<T> {
         this.type = type
         this.mongoTemplate = mongoTemplate
         this.migrationProperties = migrationProperties
+        this.migrationErrors = new CopyOnWriteArrayList<>()
     }
 
     /**
@@ -118,13 +112,13 @@ abstract class AbstractMigrationHelper<T> {
      * @param message a descriptive message explaining the error
      * @param cause the optional {@link Throwable} that caused the error; defaults to null
      */
-    static void cacheError(String helper,
+    void cacheError(String helper,
                            String operation,
                            Class<?> entityType,
                            String entityId,
                            String message,
                            Throwable cause = null) {
-        MIGRATION_ERRORS.add(MigrationError.of(helper, operation, entityType, entityId, message, cause))
+        migrationErrors.add(MigrationError.of(helper, operation, entityType, entityId, message, cause))
     }
 
     /**
@@ -134,50 +128,52 @@ abstract class AbstractMigrationHelper<T> {
      *
      * @return an unmodifiable {@link List} of {@link MigrationError} objects
      */
-    static List<MigrationError> getErrors() {
-        return Collections.unmodifiableList(new ArrayList<>(MIGRATION_ERRORS))
+    List<MigrationError> getErrors() {
+        return Collections.unmodifiableList(new ArrayList<>(migrationErrors))
     }
 
     /**
-     * Retrieves all cached migration errors and clears the error cache in a single operation.
+     * Retrieves all cached migration errors from this helper instance and clears the error cache.
      * This method is useful for retrieving errors for reporting purposes while simultaneously
      * resetting the error cache for a new migration operation.
      *
      * @return a {@link List} of all {@link MigrationError} objects that were cached
      */
-    static List<MigrationError> popErrors() {
-        List<MigrationError> errors = new ArrayList<>(MIGRATION_ERRORS)
-        MIGRATION_ERRORS.clear()
-        return errors
+    List<MigrationError> popErrors() {
+        synchronized (migrationErrors) {
+            List<MigrationError> errors = new ArrayList<>(migrationErrors)
+            migrationErrors.clear()
+            return errors
+        }
+    }
+
+/**
+ * Clears all cached migration errors from this helper instance.
+ * This method should be called to reset this helper's error cache before starting a new migration
+ * operation or after errors have been processed and reported.
+ */
+    void clearErrors() {
+        migrationErrors.clear()
     }
 
     /**
-     * Clears all cached migration errors from the error list.
-     * This method should be called to reset the error cache before starting a new migration
-     * operation or after errors have been processed and reported.
-     */
-    static void clearErrors() {
-        MIGRATION_ERRORS.clear()
-    }
-
-    /**
-     * Checks whether any migration errors have been cached.
+     * Checks whether any migration errors have been cached by this helper instance.
      * This method is useful for quickly determining if any errors occurred during
      * the migration process without retrieving the full error list.
      *
      * @return {@code true} if one or more errors are cached, {@code false} otherwise
      */
-    static boolean hasErrors() {
-        return !MIGRATION_ERRORS.isEmpty()
+    boolean hasErrors() {
+        return !migrationErrors.isEmpty()
     }
 
     /**
-     * A static method to handle the execution of bulk operations.
+     * Handles the execution of bulk operations.
      * It executes the given {@link BulkOperations} instance and logs the results or any errors.
      *
      * @param bulkOps the bulk operations to execute
      */
-    static void handleBulkOps(BulkOperations bulkOps, Class<?> type) {
+    void handleBulkOps(BulkOperations bulkOps, Class<?> type) {
         try {
             BulkWriteResult bulkWriteResult = bulkOps.execute()
             log.debug("Processed bulk write of ${bulkWriteResult.modifiedCount}")
@@ -186,30 +182,33 @@ abstract class AbstractMigrationHelper<T> {
             e.getWriteErrors().forEach {
                 String message = "Error writing document with ID ${it.toString()}. Cause: ${it.getMessage()}"
                 log.error(message)
-                cacheError(AbstractMigrationHelper.simpleName, "bulkWrite", type, it.toString(), message, e)
+                cacheError(this.class.simpleName, "bulkWrite", type, it.toString(), message, e)
             }
             throw e
         }
     }
 
     /**
-     * Iterates over the documents in the collection, applies updates, and executes bulk operations.
-     * The iteration is paginated based on the provided or default page size, and supports customizable 
+     Iterates over the documents in the collection, applies updates, and executes bulk operations.     * The iteration is paginated based on the provided or default page size, and supports customizable
      * bulk operation processing and optional sleep intervals between pages.
      *
      * @param update a {@link Closure} defining the update to apply to documents
      * @param processOperations an optional {@link Closure} to process bulk operations; defaults 
-     *                          to {@link #DEFAULT_PROCESS_OPERATIONS}
+     *                          to null
      * @param query an optional MongoDB {@link Query} to filter documents; defaults to an empty query
      * @param sleepFor the optional number of milliseconds to sleep between processing pages; defaults to 0
      * @param pageSize the size of each page (number of documents); defaults to the result of {@link #getPageSize()}
      */
-    void iterate(Closure update, Closure processOperations = DEFAULT_PROCESS_OPERATIONS,
+    void iterate(Closure update, Closure processOperations = null,
                  Query query = new Query(), long sleepFor = 0, int pageSize = getPageSize(),
                  MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         if (pageSize <= 0) {
             throw new IllegalArgumentException("pageSize must be > 0")
         }
+        Closure effectiveProcessOperations = processOperations ?: { BulkOperations bulkOperations, Class<?> entityType ->
+            handleBulkOps(bulkOperations, entityType)
+        }
+
         long count = mongoTemplate.count(query, type)
         if (count > 0) {
             long numOfPages = Math.ceil(count / pageSize) as long
@@ -238,13 +237,12 @@ abstract class AbstractMigrationHelper<T> {
 
                         try {
                             if (currentBulkOpsSize > 0) {
-                                processOperations(bulkOps, type)
+                                effectiveProcessOperations(bulkOps, type)
                             }
                         } catch (Exception e) {
                             String message = "Failed to process ${type.simpleName} bulk operations on page ${page}"
                             log.error(message, e)
-                            cacheError(this.class.simpleName, "iterate", type, null, message, e)
-                        }
+                            handleMigrationError(errorPolicy, "bulkWrite", type, null, message, e)                        }
 
                         bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, type)
                         currentBatchSize = 0
@@ -337,7 +335,7 @@ abstract class AbstractMigrationHelper<T> {
      * @param cause the optional {@link Throwable} that caused the error; defaults to null
      * @throws RuntimeException or {@link MigrationErrorException} depending on the policy and cause
      */
-    protected static void throwError(MigrationErrorPolicy policy, String message, Throwable cause = null) {
+    protected void throwError(MigrationErrorPolicy policy, String message, Throwable cause = null) {
         if (policy.throwOriginal && cause instanceof RuntimeException) {
             throw cause
         }
@@ -359,7 +357,7 @@ abstract class AbstractMigrationHelper<T> {
      * @param policy the {@link MigrationErrorPolicy} defining the error handling behavior
      * @throws MigrationErrorException if the policy requires throwing after processing and errors exist
      */
-    protected static void finishMigrationErrorPolicy(MigrationErrorPolicy policy) {
+    protected void finishMigrationErrorPolicy(MigrationErrorPolicy policy) {
         if (policy.mode == MigrationErrorHandlingMode.THROW_AFTER_PROCESSING && hasErrors()) {
             throw new MigrationErrorException(
                     "Migration finished with ${getErrors().size()} errors",

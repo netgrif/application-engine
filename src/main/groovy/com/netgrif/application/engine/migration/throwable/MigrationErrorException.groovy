@@ -25,7 +25,7 @@ class MigrationErrorException extends RuntimeException {
      */
     MigrationErrorException(String message, List<MigrationError> errors, Throwable cause = null) {
         super(message, cause)
-        this.errors = Collections.unmodifiableList(errors ?: [])
+        this.errors = Collections.unmodifiableList(new ArrayList<>(errors ?: []))
     }
 
     /**

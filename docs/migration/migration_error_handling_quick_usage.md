@@ -1,10 +1,12 @@
-## Migration Error Handling — Quick Usage
+# Migration Error Handling — Quick Usage
+
 Use `MigrationErrorPolicy` to control what happens when a migration helper encounters an error. 
 ``` groovy
 import com.netgrif.application.engine.migration.model.MigrationErrorPolicy
 ```
 
-### Available policies
+## Available policies
+
 ``` groovy
 MigrationErrorPolicy.continueOnError()        // log/cache errors and continue
 MigrationErrorPolicy.throwImmediately()       // stop on first error
@@ -12,7 +14,8 @@ MigrationErrorPolicy.throwAfterLimit(10)      // stop after 10 errors
 MigrationErrorPolicy.throwAfterProcessing()   // process all, then fail if errors exist
 ```
 
-#### Basic usage
+### Basic usage
+
 ``` groovy
 migrationHelper.withErrorPolicy(MigrationErrorPolicy.throwAfterProcessing()) {
     migrationHelper.updateAllCasesCursor({ Case useCase ->
@@ -21,7 +24,8 @@ migrationHelper.withErrorPolicy(MigrationErrorPolicy.throwAfterProcessing()) {
 }
 ```
 
-#### Continue migration and inspect errors
+### Continue migration and inspect errors
+
 ``` groovy
 migrationHelper.clearErrors()
 
@@ -38,8 +42,8 @@ errors.each { error ->
 }
 ```
 
+### Stop after a number of errors
 
-#### Stop after a number of errors
 ``` groovy
 migrationHelper.withErrorPolicy(MigrationErrorPolicy.throwAfterLimit(20)) {
     migrationHelper.updateAllTasksCursor({ Task task ->
@@ -48,8 +52,8 @@ migrationHelper.withErrorPolicy(MigrationErrorPolicy.throwAfterLimit(20)) {
 }
 ```
 
- 
-#### Fail after full processing
+### Fail after full processing
+
 ``` groovy
 import com.netgrif.application.engine.migration.throwable.MigrationErrorException
 
@@ -70,8 +74,8 @@ try {
 }
 ```
 
+### Error cache helpers
 
-#### Error cache helpers
 ``` groovy
 migrationHelper.clearErrors()  // clears cached errors
 migrationHelper.hasErrors()    // true if errors exist
@@ -79,8 +83,8 @@ migrationHelper.getErrors()    // returns errors without clearing
 migrationHelper.popErrors()    // returns errors and clears cache
 ```
 
- 
-#### Recommended production pattern
+### Recommended production pattern
+
 ``` groovy
 migrationHelper.clearErrors()
 
@@ -88,5 +92,4 @@ migrationHelper.withErrorPolicy(MigrationErrorPolicy.throwAfterProcessing()) {
     // migration logic
 }
 ```
-
 Use throwAfterProcessing() for most production migrations because it collects a full error report and fails only after all possible records are processed.

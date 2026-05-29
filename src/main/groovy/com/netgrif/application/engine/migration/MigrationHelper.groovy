@@ -132,7 +132,7 @@ class MigrationHelper {
      * @param sleepFor Optional attribute to set sleep time (in milliseconds) to sleep for after each iterated page. Default 0ms
      * @param filter Instance of Predicate, to filter which cases should be iterated
      */
-    void iterateCases(Closure update, Closure pageProcessed = AbstractMigrationHelper.DEFAULT_PROCESS_OPERATIONS, 
+    void iterateCases(Closure update, Closure pageProcessed = null, 
                       long sleepFor = 0, Predicate filter) {
         log.debug("iterateCases called with filter: {}, sleepFor: {}", filter, sleepFor)
         caseMigrationHelper.iterateCases(update, pageProcessed, sleepFor, filter, getCurrentErrorPolicy())
@@ -175,7 +175,7 @@ class MigrationHelper {
      * @param sleepFor Optional attribute to set sleep time (in milliseconds) to sleep for after each iterated page. Default 0ms
      * @param filter Instance of Predicate, to filter which tasks should be iterated
      */
-    void iterateTasks(Closure update, Closure pageProcessed = AbstractMigrationHelper.DEFAULT_PROCESS_OPERATIONS, long sleepFor = 0, Predicate filter) {
+    void iterateTasks(Closure update, Closure pageProcessed = null, long sleepFor = 0, Predicate filter) {
         log.debug("iterateTasks called with filter: {}, sleepFor: {}", filter, sleepFor)
         taskMigrationHelper.iterateTasks(update, pageProcessed, sleepFor, filter, getCurrentErrorPolicy())
     }
@@ -533,7 +533,11 @@ class MigrationHelper {
      * @return immutable snapshot of cached migration errors
      */
     List<MigrationError> getErrors() {
-        return AbstractMigrationHelper.getErrors()
+        List<MigrationError> errors = []
+        errors.addAll(caseMigrationHelper.getErrors())
+        errors.addAll(taskMigrationHelper.getErrors())
+        errors.addAll(petriNetMigrationHelper.getErrors())
+        return Collections.unmodifiableList(errors)
     }
 
     /**
@@ -542,14 +546,20 @@ class MigrationHelper {
      * @return cached migration errors collected since the last clear/pop
      */
     List<MigrationError> popErrors() {
-        return AbstractMigrationHelper.popErrors()
+        List<MigrationError> errors = []
+        errors.addAll(caseMigrationHelper.popErrors())
+        errors.addAll(taskMigrationHelper.popErrors())
+        errors.addAll(petriNetMigrationHelper.popErrors())
+        return errors
     }
 
     /**
      * Clears cached migration errors.
      */
     void clearErrors() {
-        AbstractMigrationHelper.clearErrors()
+        caseMigrationHelper.clearErrors()
+        taskMigrationHelper.clearErrors()
+        petriNetMigrationHelper.clearErrors()
     }
 
     /**
@@ -558,7 +568,7 @@ class MigrationHelper {
      * @return true if at least one error is cached
      */
     boolean hasErrors() {
-        return AbstractMigrationHelper.hasErrors()
+        return caseMigrationHelper.hasErrors() || taskMigrationHelper.hasErrors() || petriNetMigrationHelper.hasErrors()
     }
 
     /**
@@ -569,7 +579,10 @@ class MigrationHelper {
      */
     List<MigrationError> collectErrors(Closure migrationCode) {
         clearErrors()
-        migrationCode.call()
-        return popErrors()
+        try {
+            migrationCode.call()
+        } finally {
+            return popErrors()
+        }
     }
 }

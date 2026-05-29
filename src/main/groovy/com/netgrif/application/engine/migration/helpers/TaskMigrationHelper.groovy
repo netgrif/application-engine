@@ -137,7 +137,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
         log.debug("Starting updateTasks with filter: ${filter.toString()}")
         log.info("Updating tasks with filter ${filter.toString()} and update ${update.toString()}")
         log.trace("Converting filter to query and calling iterate")
-        iterate(update, DEFAULT_PROCESS_OPERATIONS, toQuery(filter), 0, getPageSize(), errorPolicy)
+        iterate(update, null, toQuery(filter), 0, getPageSize(), errorPolicy)
     }
 
     /**
@@ -146,7 +146,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      * @param sleepFor Optional attribute to set sleep time (in milliseconds) to sleep for after each iterated page. Default 0ms
      * @param filter Instance of Predicate, to filter which tasks should be iterated
      */
-    void iterateTasks(Closure update, Closure pageProcessed = DEFAULT_PROCESS_OPERATIONS, long sleepFor = 0, Predicate filter,
+    void iterateTasks(Closure update, Closure pageProcessed = null, long sleepFor = 0, Predicate filter,
                       MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting iterateTasks with filter: ${filter.toString()}, sleepFor: ${sleepFor}ms")
         log.trace("Converting filter to query and calling iterate with pageProcessed closure")
@@ -165,7 +165,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
         String processId = petriNetService.getNewestVersionByIdentifier(processIdentifier).stringId
         Query query = new Query(Criteria.where("processId").is(processId))
         log.trace("Created query for processId: ${processId}, calling iterate")
-        iterate(update, DEFAULT_PROCESS_OPERATIONS, query, 0, pageSize as int, errorPolicy)
+        iterate(update, null, query, 0, pageSize as int, errorPolicy)
     }
 
     /**
@@ -182,7 +182,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
         Query query = new Query(Criteria.where("processId").is(processId))
         query.addCriteria(Criteria.where("transitionId").in(transitionIds))
         log.trace("Created query with criteria for processId: ${processId} and transitionIds: ${transitionIds}, calling iterate")
-        iterate(update, DEFAULT_PROCESS_OPERATIONS, query, 0, pageSize as int, errorPolicy)
+        iterate(update, null, query, 0, pageSize as int, errorPolicy)
     }
 
     /**
@@ -193,7 +193,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
     void updateAllTasksCursor(Closure update, int pageSize = 100, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting updateAllTasksCursor with pageSize: ${pageSize}")
         log.trace("Calling iterate with empty query to process all tasks")
-        iterate(update, DEFAULT_PROCESS_OPERATIONS, new Query(), 0, pageSize as int, errorPolicy)
+        iterate(update, null, new Query(), 0, pageSize as int, errorPolicy)
     }
 
     /**

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.migration.model
 
-import com.netgrif.application.engine.configuration.properties.MigrationProperties
+import com.netgrif.application.engine.configuration.properties.MigrationProperties.ErrorPolicy
 
 /**
  * Configuration class that defines how errors should be handled during migration processes.
@@ -52,9 +52,18 @@ class MigrationErrorPolicy {
      * @param migrationProperties the migration configuration properties containing error policy settings
      * @return a new MigrationErrorPolicy configured according to the application properties
      */
-    static MigrationErrorPolicy defaultErrorPolicy(MigrationProperties.ErrorPolicy props) {
+    static MigrationErrorPolicy defaultErrorPolicy(ErrorPolicy props) {
+        if (props == null || props.mode == null || props.mode.trim().isEmpty()) {
+            return new MigrationErrorPolicy()
+        }
+        MigrationErrorHandlingMode parsedMode
+        try {
+            parsedMode = MigrationErrorHandlingMode.valueOf(props.mode.trim().toUpperCase(Locale.ROOT))
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Invalid nae.migration.error-policy.mode '${props.mode}'. Supported values: ${MigrationErrorHandlingMode.values()*.name().join(', ')}", ex)
+        }
         return new MigrationErrorPolicy(
-                mode: MigrationErrorHandlingMode.valueOf(props.mode),
+                mode: parsedMode,
                 maxErrors: props.maxErrors,
                 cacheErrors: props.cacheErrors,
                 throwOriginal: props.throwOriginal
@@ -89,6 +98,9 @@ class MigrationErrorPolicy {
      * @return a new MigrationErrorPolicy configured to throw after reaching the error limit
      */
     static MigrationErrorPolicy throwAfterLimit(int maxErrors) {
+        if (maxErrors <= 0) {
+            throw new IllegalArgumentException("maxErrors must be > 0 for THROW_AFTER_LIMIT")
+        }
         return new MigrationErrorPolicy(
                 mode: MigrationErrorHandlingMode.THROW_AFTER_LIMIT,
                 maxErrors: maxErrors
@@ -139,6 +151,9 @@ class MigrationErrorPolicy {
      * @param maxErrors the maximum error count threshold
      */
     void setMaxErrors(int maxErrors) {
+        if (maxErrors < 0) {
+            throw new IllegalArgumentException("maxErrors cannot be negative")
+        }
         this.maxErrors = maxErrors
     }
 
