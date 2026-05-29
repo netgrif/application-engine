@@ -16,7 +16,7 @@ class ProcessFilterField extends Field<String> {
 
     @Override
     Field clone() {
-        CaseFilterField clone = new CaseFilterField()
+        ProcessFilterField clone = new ProcessFilterField()
         super.clone(clone)
         return clone
     }

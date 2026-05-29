@@ -16,7 +16,7 @@ class TaskFilterField extends Field<String> {
 
     @Override
     Field clone() {
-        CaseFilterField clone = new CaseFilterField()
+        TaskFilterField clone = new TaskFilterField()
         super.clone(clone)
         return clone
     }
