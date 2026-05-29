@@ -148,7 +148,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
                            MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting updateCasesCursor for processIdentifier: ${processIdentifier}, pageSize: ${pageSize}")
         Query query = new Query(Criteria.where("processIdentifier").is(processIdentifier))
-        iterate(update, null, query, 0, pageSize as int, errorPolicy)
+        iterate(update, null, query, 0, pageSize, errorPolicy)
     }
 
     /**
@@ -159,7 +159,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      */
     void updateAllCasesCursor(Closure update, int pageSize = 100, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting updateAllCasesCursor with pageSize: ${pageSize}")
-        iterate(update, null, new Query(), 0, pageSize as int, errorPolicy)
+        iterate(update, null, new Query(), 0, pageSize, errorPolicy)
     }
 
     /**
