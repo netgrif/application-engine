@@ -404,8 +404,8 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param toChange List of field IDs for value change
      */
-    static void changeDataFieldsValueFromTextToNumber(Case useCase, Set<String> toChange) {
-        CaseMigrationHelper.changeDataFieldsValueFromTextToNumber(useCase, toChange)
+    void changeDataFieldsValueFromTextToNumber(Case useCase, Set<String> toChange) {
+        caseMigrationHelper.changeDataFieldsValueFromTextToNumber(useCase, toChange)
     }
 
     /**

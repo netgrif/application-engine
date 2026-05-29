@@ -233,7 +233,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param useCase Instance of Case
      * @param toChange List of field IDs for value change
      */
-    static void changeDataFieldsValueFromTextToNumber(Case useCase, Set<String> toChange, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
+    void changeDataFieldsValueFromTextToNumber(Case useCase, Set<String> toChange, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting changeDataFieldsValueFromTextToNumber for case: ${useCase.stringId}, fields to change: ${toChange}")
         toChange.each { dataFieldID ->
             DataField dataField = useCase.dataSet[dataFieldID]
@@ -275,6 +275,9 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
         log.debug("Starting changeDataFieldsValueFromEnumerationToMultichoice for case: ${useCase.stringId}, fields to change: ${toChange}")
         toChange.each { dataFieldID ->
             DataField dataField = useCase.dataSet[dataFieldID]
+            if (!dataField) {
+                return
+            }
             if (dataField.value && dataField.value != null) {
                 def value
                 if (dataField.value instanceof I18nString) {
