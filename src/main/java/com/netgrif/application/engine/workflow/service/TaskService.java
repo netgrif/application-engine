@@ -618,7 +618,8 @@ public class TaskService implements ITaskService {
         }
     }
 
-    protected void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {
+    @Override
+    public void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {
         log.info("[" + useCase.getStringId() + "]: Task " + task.getTitle() + " scheduled to run at " + time.toString());
         scheduler.schedule(() -> {
             try {

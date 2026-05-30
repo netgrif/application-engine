@@ -16,6 +16,7 @@ import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -24,6 +25,8 @@ import java.util.Set;
 public interface ITaskService {
 
     void reloadTasks(Case useCase);
+
+    void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase);
 
     Task findOne(String taskId);
 
