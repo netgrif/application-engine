@@ -16,4 +16,7 @@ public class TaskViewConstants extends ViewConstants {
     public static final String FIELD_SHOW_MORE_MENU = "task_show_more_menu";
     public static final String FIELD_EMPTY_CONTENT_TEXT = "task_empty_content_text";
     public static final String FIELD_EMPTY_CONTENT_ICON = "task_empty_content_icon";
+    public static final String FIELD_ALL_ALLOWED_NETS = "task_all_allowed_nets";
+    public static final String FIELD_ALLOWED_NETS = "task_allowed_nets";
+    public static final String FIELD_INHERIT_ALLOWED_NETS = "task_inherit_allowed_nets";
 }

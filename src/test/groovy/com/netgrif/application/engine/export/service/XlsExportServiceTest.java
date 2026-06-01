@@ -1,11 +1,9 @@
 package com.netgrif.application.engine.export.service;
 
-import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.export.service.interfaces.IXlsExportService;
-import com.netgrif.application.engine.startup.FilterRunner;
+import com.netgrif.application.engine.menu.domain.MenuItemConstants;
 import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.export.web.requestbodies.FilteredCasesRequest;
@@ -42,7 +40,7 @@ public class XlsExportServiceTest {
     void shouldCreateXlsxFile() throws Exception {
         LoggedUser superUser = superCreator.getSuperUser().transformToLoggedUser();
 
-        IntStream.range(0,5).forEach(idx -> workflowService.createCaseByIdentifier(FilterRunner.MENU_NET_IDENTIFIER, "Test case", "", superUser));
+        IntStream.range(0,5).forEach(idx -> workflowService.createCaseByIdentifier(MenuItemConstants.PROCESS_IDENTIFIER, "Test case", "", superUser));
 
         FilteredCasesRequest request = getTestRequest();
         File excel = xlsExportService.getExportFilteredCasesFile(request, superUser, Locale.ENGLISH);
@@ -59,7 +57,7 @@ public class XlsExportServiceTest {
         FilteredCasesRequest request = new FilteredCasesRequest();
         request.setQuery(List.of(
                 CaseSearchRequest.builder()
-                        .query("processIdentifier:" + FilterRunner.MENU_NET_IDENTIFIER)
+                        .query("processIdentifier:" + MenuItemConstants.PROCESS_IDENTIFIER)
                         .build()));
         request.setSelectedDataFieldNames(List.of("Menu Item Identifier", "Item URI", "Menu icon identifier", "Name of the item", "Tab icon identifier", "Name of the item"));
         request.setSelectedDataFieldIds(List.of("menu_item_identifier", "nodePath", "menu_icon", "menu_name", "tab_icon", "tab_name"));

@@ -31,6 +31,9 @@ public class CaseViewBody extends ViewBody {
     private I18nString emptyContentText;
     private String emptyContentIcon;
     private boolean allowExport;
+    private boolean allAllowedNets = true;
+    private List<String> allowedNets;
+    private boolean inheritAllowedNets = true;
 
     private ViewBody chainedView;
 
@@ -47,6 +50,11 @@ public class CaseViewBody extends ViewBody {
     @Override
     public String getFilterFieldId() {
         return CaseViewConstants.FIELD_FILTER;
+    }
+
+    @Override
+    public FieldType getFilterType() {
+        return FieldType.CASE_FILTER;
     }
 
     @Override
@@ -90,6 +98,15 @@ public class CaseViewBody extends ViewBody {
                 this.emptyContentIcon);
         outcome.putDataSetEntry(CaseViewConstants.FIELD_ALLOW_EXPORT, FieldType.BOOLEAN,
                 this.allowExport);
+
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_ALL_ALLOWED_NETS, FieldType.BOOLEAN,
+                this.allAllowedNets);
+        if (this.allowedNets != null) {
+            outcome.putDataSetEntry(CaseViewConstants.FIELD_ALLOWED_NETS, FieldType.STRING_COLLECTION,
+                    this.allowedNets);
+        }
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_INHERIT_ALLOWED_NETS, FieldType.BOOLEAN,
+                this.inheritAllowedNets);
 
         return outcome;
     }

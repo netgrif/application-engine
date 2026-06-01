@@ -3,8 +3,7 @@ package com.netgrif.application.engine.menu.domain.templates;
 import com.netgrif.application.engine.menu.domain.FilterBody;
 import com.netgrif.application.engine.menu.domain.MenuItemBody;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
-
-import java.util.List;
+import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 
 public interface Template {
     String getIdentifier();
@@ -13,18 +12,14 @@ public interface Template {
 
     static FilterBody defaultTaskFilterBody() {
         FilterBody filterBody = new FilterBody();
-        filterBody.setIcon("filter");
-        filterBody.setType("Task");
-        filterBody.setVisibility("private");
+        filterBody.setType(FieldType.TASK_FILTER);
         filterBody.setQuery("*");
         return filterBody;
     }
 
     static FilterBody defaultCaseFilterBody() {
         FilterBody filterBody = new FilterBody();
-        filterBody.setIcon("filter");
-        filterBody.setType("Case");
-        filterBody.setVisibility("private");
+        filterBody.setType(FieldType.CASE_FILTER);
         filterBody.setQuery("*");
         return filterBody;
     }

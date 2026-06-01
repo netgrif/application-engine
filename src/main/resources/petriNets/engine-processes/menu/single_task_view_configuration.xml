@@ -62,9 +62,11 @@
         <title name="todo 23">Show page footer</title>
         <init>false</init>
     </data>
-    <data type="filter">
+    <data type="taskFilter">
         <id>task_filter</id>
         <title name="todo 23">Filter</title>
+        <desc name="todo 23">Use Elasticsearch string query</desc>
+        <init>*</init>
     </data>
 
     <!-- I18NS -->

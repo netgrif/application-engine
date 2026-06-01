@@ -86,9 +86,11 @@
         <title name="merge_filters">Merge with base filter?</title>
         <init>true</init>
     </data>
-    <data type="filter">
+    <data type="taskFilter">
         <id>task_filter</id>
         <title name="todo 23">Filter</title>
+        <desc name="todo 23">Use Elasticsearch string query</desc>
+        <init>*</init>
     </data>
 
     <!-- TASK VIEW CONFIGURATION DATA -->
@@ -209,6 +211,20 @@
         <component>
             <name>htmltextarea</name>
         </component>
+    </data>
+    <data type="stringCollection">
+        <id>task_allowed_nets</id>
+        <title name="todo 23">Allowed nets</title>
+    </data>
+    <data type="boolean">
+        <id>task_all_allowed_nets</id>
+        <title name="todo 23">All allowed nets?</title>
+        <init>true</init>
+    </data>
+    <data type="boolean">
+        <id>task_inherit_allowed_nets</id>
+        <title name="todo 23">Inherit allowed nets?</title>
+        <init>true</init>
     </data>
 
     <!-- I18NS -->
@@ -382,13 +398,55 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>advanced_content_form</id>
+                <id>task_all_allowed_nets</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
                     <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_allowed_nets</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_inherit_allowed_nets</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>advanced_content_form</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
                     <rows>1</rows>
                     <cols>3</cols>
                     <template>material</template>
@@ -698,6 +756,24 @@
             </dataRef>
             <dataRef>
                 <id>task_empty_content_icon_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>task_all_allowed_nets</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>task_allowed_nets</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>task_inherit_allowed_nets</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>

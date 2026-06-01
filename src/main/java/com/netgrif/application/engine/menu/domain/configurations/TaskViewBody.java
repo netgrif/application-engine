@@ -26,6 +26,9 @@ public class TaskViewBody extends ViewBody {
     private boolean showMoreMenu = true;
     private I18nString emptyContentText;
     private String emptyContentIcon;
+    private boolean allAllowedNets = true;
+    private List<String> allowedNets;
+    private boolean inheritAllowedNets = true;
 
     @Override
     public ViewBody getAssociatedViewBody() {
@@ -40,6 +43,11 @@ public class TaskViewBody extends ViewBody {
     @Override
     public String getFilterFieldId() {
         return TaskViewConstants.FIELD_FILTER;
+    }
+
+    @Override
+    public FieldType getFilterType() {
+        return FieldType.TASK_FILTER;
     }
 
     @Override
@@ -71,6 +79,15 @@ public class TaskViewBody extends ViewBody {
         }
         outcome.putDataSetEntry(TaskViewConstants.FIELD_EMPTY_CONTENT_ICON, FieldType.TEXT,
                 this.emptyContentIcon);
+
+        outcome.putDataSetEntry(TaskViewConstants.FIELD_ALL_ALLOWED_NETS, FieldType.BOOLEAN,
+                this.allAllowedNets);
+        if (this.allowedNets != null) {
+            outcome.putDataSetEntry(TaskViewConstants.FIELD_ALLOWED_NETS, FieldType.STRING_COLLECTION,
+                    this.allowedNets);
+        }
+        outcome.putDataSetEntry(TaskViewConstants.FIELD_INHERIT_ALLOWED_NETS, FieldType.BOOLEAN,
+                this.inheritAllowedNets);
 
         return outcome;
     }

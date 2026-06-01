@@ -206,9 +206,8 @@ public class MenuItemServiceTest {
         menuItemBody.setMenuIcon("device_hub");
         assertNotNull(menuItemBody.getView());
         assertNotNull(menuItemBody.getView().getFilterBody());
-        menuItemBody.getView().getFilterBody().setAllowedNets(List.of("menu_item"));
         menuItemBody.getView().getFilterBody().setQuery("processIdentifier:menu_item");
-        menuItemBody.getView().getFilterBody().setType("Case");
+        menuItemBody.getView().getFilterBody().setType(FieldType.CASE_FILTER);
         ((CaseViewBody) menuItemBody.getView()).setDefaultHeaders(List.of("meta-title", "meta-processIdentifier"));
         assertNotNull(menuItemBody.getView().getAssociatedViewBody());
         ((TaskViewBody) menuItemBody.getView().getAssociatedViewBody()).setDefaultHeaders(List.of("meta-title"));
@@ -239,9 +238,9 @@ public class MenuItemServiceTest {
         assertNotNull(caseViewId);
         Case caseView = workflowService.findOne(caseViewId);
         DataField filterDataField = caseView.getDataField(CaseViewConstants.FIELD_FILTER);
-        assertEquals("Case", filterDataField.getFilterMetadata().get("filterType"));
-        assertTrue(filterDataField.getAllowedNets().size() == 1 && filterDataField.getAllowedNets().contains("menu_item"));
         assertEquals("processIdentifier:menu_item", filterDataField.getValue());
+        assertEquals(true, caseView.getFieldValue(CaseViewConstants.FIELD_ALL_ALLOWED_NETS));
+        assertEquals(true, caseView.getFieldValue(CaseViewConstants.FIELD_INHERIT_ALLOWED_NETS));
 
         List<String> caseDefaultHeaders = (List<String>) caseView.getFieldValue(CaseViewConstants.FIELD_DEFAULT_HEADERS);
         assertEquals(2, caseDefaultHeaders.size());
@@ -744,10 +743,7 @@ public class MenuItemServiceTest {
     private Case createDefaultMenuItem(String identifier, I18nString name) throws TransitionNotExecutableException {
         FilterBody filterBody = new FilterBody();
         filterBody.setQuery("processIdentifier:process1");
-        filterBody.setType("Case");
-        filterBody.setAllowedNets(List.of("process1"));
-        filterBody.setIcon("home");
-        filterBody.setVisibility("private");
+        filterBody.setType(FieldType.CASE_FILTER);
 
         CaseViewBody caseView = new CaseViewBody();
         caseView.setFilterBody(filterBody);

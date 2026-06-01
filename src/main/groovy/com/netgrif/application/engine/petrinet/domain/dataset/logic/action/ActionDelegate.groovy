@@ -49,7 +49,6 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.rules.domain.RuleRepository
-
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.Case
@@ -84,7 +83,7 @@ import org.springframework.data.domain.Pageable
 
 import java.time.ZoneId
 import java.util.stream.Collectors
-// todo 23 imports
+
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -1877,11 +1876,6 @@ class ActionDelegate {
      * */
     Case updateMenuItem(Case item, MenuItemBody body) {
         return menuItemService.updateMenuItem(item, body)
-    }
-
-    static Map defaultFilterMetadata(String type, boolean allAllowedNets = false) {
-        // todo 23 remove boolean
-        return FilterBody.getDefaultMetadata(type, allAllowedNets)
     }
 
     void removeChildItemFromParent(String folderId, Case childItem) {

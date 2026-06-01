@@ -25,6 +25,7 @@ public abstract class ViewBody {
     public abstract ViewBody getAssociatedViewBody();
     public abstract MenuItemViewType getViewType();
     public abstract String getFilterFieldId();
+    public abstract FieldType getFilterType();
     /**
      * Internal method, that must transform data in concrete class and add them into received outcome. Method must return
      * the updated outcome.
@@ -77,6 +78,7 @@ public abstract class ViewBody {
             outcome.putDataSetEntry(ViewConstants.FIELD_VIEW_CONFIGURATION_ALL_DATA_FORM, FieldType.TASK_REF, List.of(allDataTaskId));
         }
         if (filterBody != null) {
+            filterBody.setType(getFilterType());
             outcome = filterBody.toDataSet(outcome, getFilterFieldId());
         }
 
