@@ -16,7 +16,6 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petr
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.workflow.domain.*
 import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -63,7 +62,7 @@ class MigrationTest {
     void beforeEach() {
         testHelper.truncateDbs()
 
-        this.class.classLoader.getResourceAsStream("petriNets/nae_2432_v1.xml").withCloseable { is ->
+        this.class.classLoader.getResourceAsStream("petriNets/migration_test_v1.xml").withCloseable { is ->
             ImportPetriNetParams importPetriNetParams = ImportPetriNetParams.with()
                     .xmlFile(is)
                     .releaseType(VersionType.MAJOR)
@@ -74,7 +73,7 @@ class MigrationTest {
             netV1 = netV1Outcome.getNet()
         }
 
-        this.class.classLoader.getResourceAsStream("petriNets/nae_2432_v2.xml").withCloseable { is ->
+        this.class.classLoader.getResourceAsStream("petriNets/migration_test_v2.xml").withCloseable { is ->
             ImportPetriNetParams importPetriNetParams = ImportPetriNetParams.with()
                     .xmlFile(is)
                     .releaseType(VersionType.MAJOR)
@@ -99,7 +98,7 @@ class MigrationTest {
     @Test
     void migrationHelperShouldMigrateCasesAndReloadTasksThroughFacade() {
         List<Case> casesBeforeMigration = workflowService.search(
-                QCase.case$.processIdentifier.eq("nae_2432"),
+                QCase.case$.processIdentifier.eq("migration_test"),
                 Pageable.ofSize(10)
         ).content
 
@@ -122,11 +121,11 @@ class MigrationTest {
                         "recreate_info_text": ""
                 ])
                 useCase.dataSet["income"] = new DataField(1000)
-            }, "nae_2432", 2)
+            }, "migration_test", 2)
         }
 
         List<Case> casesAfterMigration = workflowService.search(
-                QCase.case$.processIdentifier.eq("nae_2432"),
+                QCase.case$.processIdentifier.eq("migration_test"),
                 Pageable.ofSize(10)
         ).content
 
@@ -148,7 +147,7 @@ class MigrationTest {
     @Test
     void migrationHelperShouldUpdatePetriNetAndApplyCustomTransitionRoleUpdate() {
         ProcessRole role = migrationHelper.createRoleInNet(
-                "nae_2432",
+                "migration_test",
                 "migration_supervisor",
                 "Migration supervisor"
         )
@@ -162,9 +161,9 @@ class MigrationTest {
                 ]
         )
 
-        migrationHelper.updateNetIgnoreRoles("nae_2432", "nae_2432_v2.xml", [updateTransitionRole])
+        migrationHelper.updateNetIgnoreRoles("migration_test", "migration_test_v2.xml", [updateTransitionRole])
 
-        PetriNet migratedNet = petriNetService.getDefaultVersionByIdentifier("nae_2432")
+        PetriNet migratedNet = petriNetService.getDefaultVersionByIdentifier("migration_test")
 
         assert migratedNet.dataSet.containsKey("income")
         assert migratedNet.dataSet.containsKey("recreate_info_text")
@@ -186,7 +185,7 @@ class MigrationTest {
     @Test
     void migrationHelperShouldUpdateTasksAndAddRoleToExistingTasks() {
         ProcessRole role = migrationHelper.createRoleInNet(
-                "nae_2432",
+                "migration_test",
                 "migration_task_role",
                 "Migration task role"
         )
@@ -202,7 +201,7 @@ class MigrationTest {
         )
 
         Page<Case> casePage = workflowService.search(
-                QCase.case$.processIdentifier.eq("nae_2432"),
+                QCase.case$.processIdentifier.eq("migration_test"),
                 Pageable.ofSize(10)
         )
 
@@ -258,7 +257,7 @@ class MigrationTest {
         assert !migrationHelper.hasErrors()
 
         List<Case> cases = workflowService.search(
-                QCase.case$.processIdentifier.eq("nae_2432"),
+                QCase.case$.processIdentifier.eq("migration_test"),
                 Pageable.ofSize(10)
         ).content
 
@@ -285,9 +284,9 @@ class MigrationTest {
 
     @Test
     void updateNetIgnoreRolesShouldMigrateExistingNet() {
-        migrationHelper.updateNetIgnoreRoles("nae_2432", "nae_2432_v2.xml")
+        migrationHelper.updateNetIgnoreRoles("migration_test", "migration_test_v2.xml")
 
-        def net = petriNetService.getDefaultVersionByIdentifier("nae_2432")
+        def net = petriNetService.getDefaultVersionByIdentifier("migration_test")
 
         assert net.dataSet.containsKey("income")
         assert net.transitions.values().any { it.importId == "recreate_person" }
