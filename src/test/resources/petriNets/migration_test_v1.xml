@@ -1,5 +1,5 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-	<id>nae_2432</id>
+	<id>migration_test</id>
 	<version>1.0.0</version>
 	<initials>NAE</initials>
 	<title>NAE-2432</title>
@@ -8,26 +8,6 @@
 	<anonymousRole>true</anonymousRole>
 	<transitionRole>false</transitionRole>
 	<caseName>NAE-2432</caseName>
-	<role>
-		<id>data_editor</id>
-		<title>Data editor</title>
-	</role>
-	<role>
-		<id>person_creator</id>
-		<title>Person creator</title>
-	</role>
-	<role>
-		<id>person_recreator</id>
-		<title>Person recreator</title>
-	</role>
-	<role>
-		<id>person_remover</id>
-		<title>Person remover</title>
-	</role>
-	<role>
-		<id>person_reseter</id>
-		<title>Person resetter</title>
-	</role>
 	<data type="text">
 		<id>delete_info_text</id>
 		<title/>
@@ -38,12 +18,6 @@
 		<title>First name</title>
 		<placeholder>John</placeholder>
 		<desc>First name of person</desc>
-	</data>
-	<data type="number">
-		<id>income</id>
-		<title>Income</title>
-		<desc>Income of person</desc>
-		<init>1000</init>
 	</data>
 	<data type="text">
 		<id>last_name</id>
@@ -58,11 +32,6 @@
 		<desc>Notes about this person</desc>
 	</data>
 	<data type="text">
-		<id>recreate_info_text</id>
-		<title/>
-		<init>&lt;h1&gt;Finish this task to recreate person.&lt;/h1&gt;</init>
-	</data>
-	<data type="text">
 		<id>reset_info_text</id>
 		<title/>
 		<init>&lt;h1&gt;Finish task to reset this person.&lt;/h1&gt;</init>
@@ -73,13 +42,6 @@
 		<y>176</y>
 		<label>Delete person</label>
 		<icon>delete</icon>
-		<roleRef>
-			<id>person_remover</id>
-			<logic>
-				<view>true</view>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
 		<dataGroup>
 			<id>delete_person_0</id>
 			<cols>4</cols>
@@ -109,20 +71,6 @@
 		<y>176</y>
 		<label>Person info</label>
 		<icon>person</icon>
-		<roleRef>
-			<id>data_editor</id>
-			<logic>
-				<view>true</view>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>person_creator</id>
-			<logic>
-				<view>true</view>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
 		<dataGroup>
 			<id>t1_0</id>
 			<cols>4</cols>
@@ -160,31 +108,13 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>income</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-				<component>
-					<name>currency</name>
-					<property key="fractionSize">2</property>
-				</component>
-			</dataRef>
-			<dataRef>
 				<id>note</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>2</y>
+					<y>1</y>
 					<rows>2</rows>
 					<cols>4</cols>
 					<template>material</template>
@@ -197,54 +127,11 @@
 		</dataGroup>
 	</transition>
 	<transition>
-		<id>recreate_person</id>
-		<x>976</x>
-		<y>48</y>
-		<label>Recreate person</label>
-		<icon>emergency</icon>
-		<roleRef>
-			<id>person_recreator</id>
-			<logic>
-				<view>true</view>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<dataGroup>
-			<id>recreate_person_0</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-			<dataRef>
-				<id>recreate_info_text</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>2</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-				<component>
-					<name>htmltextarea</name>
-				</component>
-			</dataRef>
-		</dataGroup>
-	</transition>
-	<transition>
 		<id>reset_person</id>
 		<x>816</x>
 		<y>304</y>
 		<label>Reset person</label>
 		<icon>reset_tv</icon>
-		<roleRef>
-			<id>person_reseter</id>
-			<logic>
-				<view>true</view>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
 		<dataGroup>
 			<id>reset_person_0</id>
 			<cols>4</cols>
@@ -293,7 +180,7 @@
 		<id>p4</id>
 		<x>976</x>
 		<y>176</y>
-		<tokens>0</tokens>
+		<tokens>1</tokens>
 		<static>false</static>
 	</place>
 	<arc>
@@ -302,24 +189,6 @@
 		<sourceId>p1</sourceId>
 		<destinationId>person_info</destinationId>
 		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>a10</id>
-		<type>regular</type>
-		<sourceId>p4</sourceId>
-		<destinationId>recreate_person</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>a11</id>
-		<type>regular</type>
-		<sourceId>recreate_person</sourceId>
-		<destinationId>p1</destinationId>
-		<multiplicity>1</multiplicity>
-		<breakpoint>
-			<x>336</x>
-			<y>48</y>
-		</breakpoint>
 	</arc>
 	<arc>
 		<id>a2</id>

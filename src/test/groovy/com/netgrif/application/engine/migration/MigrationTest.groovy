@@ -61,13 +61,13 @@ class MigrationTest {
     void beforeEach() {
         testHelper.truncateDbs()
 
-        this.class.classLoader.getResourceAsStream("petriNets/nae_2432_v1.xml").withCloseable { is ->
+        this.class.classLoader.getResourceAsStream("petriNets/migration_test_v1.xml").withCloseable { is ->
             ImportPetriNetEventOutcome netV1Outcome = petriNetService.importPetriNet(is, VersionType.MAJOR, superCreator.getLoggedSuper())
             assert netV1Outcome.getNet() != null
             netV1 = netV1Outcome.getNet()
         }
 
-        this.class.classLoader.getResourceAsStream("petriNets/nae_2432_v2.xml").withCloseable { is ->
+        this.class.classLoader.getResourceAsStream("petriNets/migration_test_v2.xml").withCloseable { is ->
             ImportPetriNetEventOutcome netV2Outcome = petriNetService.importPetriNet(is, VersionType.MAJOR, superCreator.getLoggedSuper())
             assert netV2Outcome.getNet() != null
             netV2 = netV2Outcome.getNet()
@@ -81,7 +81,7 @@ class MigrationTest {
     @Test
     void migrationHelperShouldMigrateCasesAndReloadTasksThroughFacade() {
         List<Case> casesBeforeMigration = workflowService.search(
-                QCase.case$.processIdentifier.eq("nae_2432"),
+                QCase.case$.processIdentifier.eq("migration_test"),
                 Pageable.ofSize(10)
         ).content
 
@@ -104,11 +104,11 @@ class MigrationTest {
                         "recreate_info_text": ""
                 ])
                 useCase.dataSet["income"] = new DataField(1000)
-            }, "nae_2432", 2)
+            }, "migration_test", 2)
         }
 
         List<Case> casesAfterMigration = workflowService.search(
-                QCase.case$.processIdentifier.eq("nae_2432"),
+                QCase.case$.processIdentifier.eq("migration_test"),
                 Pageable.ofSize(10)
         ).content
 
@@ -130,7 +130,7 @@ class MigrationTest {
     @Test
     void migrationHelperShouldUpdatePetriNetAndApplyCustomTransitionRoleUpdate() {
         ProcessRole role = migrationHelper.createRoleInNet(
-                "nae_2432",
+                "migration_test",
                 "migration_supervisor",
                 "Migration supervisor"
         )
@@ -144,9 +144,9 @@ class MigrationTest {
                 ]
         )
 
-        migrationHelper.updateNetIgnoreRoles("nae_2432", "nae_2432_v2.xml", [updateTransitionRole])
+        migrationHelper.updateNetIgnoreRoles("migration_test", "migration_test_v2.xml", [updateTransitionRole])
 
-        PetriNet migratedNet = petriNetService.getNewestVersionByIdentifier("nae_2432")
+        PetriNet migratedNet = petriNetService.getNewestVersionByIdentifier("migration_test")
 
         assert migratedNet.dataSet.containsKey("income")
         assert migratedNet.dataSet.containsKey("recreate_info_text")
@@ -168,7 +168,7 @@ class MigrationTest {
     @Test
     void migrationHelperShouldUpdateTasksAndAddRoleToExistingTasks() {
         ProcessRole role = migrationHelper.createRoleInNet(
-                "nae_2432",
+                "migration_test",
                 "migration_task_role",
                 "Migration task role"
         )
@@ -184,7 +184,7 @@ class MigrationTest {
         )
 
         Page<Case> casePage = workflowService.search(
-                QCase.case$.processIdentifier.eq("nae_2432"),
+                QCase.case$.processIdentifier.eq("migration_test"),
                 Pageable.ofSize(10)
         )
 
@@ -240,7 +240,7 @@ class MigrationTest {
         assert !migrationHelper.hasErrors()
 
         List<Case> cases = workflowService.search(
-                QCase.case$.processIdentifier.eq("nae_2432"),
+                QCase.case$.processIdentifier.eq("migration_test"),
                 Pageable.ofSize(10)
         ).content
 
@@ -267,9 +267,9 @@ class MigrationTest {
 
     @Test
     void updateNetIgnoreRolesShouldMigrateExistingNet() {
-        migrationHelper.updateNetIgnoreRoles("nae_2432", "nae_2432_v2.xml")
+        migrationHelper.updateNetIgnoreRoles("migration_test", "migration_test_v2.xml")
 
-        def net = petriNetService.getNewestVersionByIdentifier("nae_2432")
+        def net = petriNetService.getNewestVersionByIdentifier("migration_test")
 
         assert net.dataSet.containsKey("income")
         assert net.transitions.values().any { it.importId == "recreate_person" }
