@@ -216,6 +216,11 @@ public class Case implements Serializable {
         resolveViewUserRefs();
     }
 
+    public Case(PetriNet petriNet, ObjectId id) {
+        this(petriNet);
+        this._id = id;
+    }
+
     public String getStringId() {
         return _id.toString();
     }

@@ -27,6 +27,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,7 +72,6 @@ public class CaseImporter {
     @Getter
     private final Map<String, String> importedIdsMapping = new HashMap<>();
 
-    @Transactional
     public List<Case> importCases(InputStream xml) {
         List<Case> importedCases = new ArrayList<>();
         try {
@@ -89,7 +89,6 @@ public class CaseImporter {
         return importedCases;
     }
 
-    @Transactional
     protected void importCase() {
         Version version = new Version();
         PetriNet model = petriNetService.getPetriNet(xmlCase.getProcessIdentifier(), version);
@@ -98,7 +97,7 @@ public class CaseImporter {
             log.error("Petri net with identifier [{}] not found, skipping case import", xmlCase.getProcessIdentifier());
             return;
         }
-        ProcessResourceId importedCaseId = new ProcessResourceId(model.getStringId(), xmlCase.getId().split("-")[1].trim());
+        ObjectId importedCaseId = new ObjectId(xmlCase.getId());
         try {
             workflowService.findOne(importedCaseId.toString());
             log.warn("Case with id [{}] already exists, new id will be generated for imported case", importedCaseId);
@@ -112,7 +111,6 @@ public class CaseImporter {
         importDataSet();
     }
 
-    @Transactional
     protected void importTasks() {
         List<Task> importedTasks = new ArrayList<>();
         if (xmlCase.getTask() == null) {
@@ -122,7 +120,7 @@ public class CaseImporter {
             Transition transition = this.importedCase.getPetriNet().getTransition(task.getTransitionId());
             final Task importedTask = Task.with()
                     .title(transition.getTitle())
-                    ._id(new ProcessResourceId(this.importedCase.getPetriNetId(), task.getId().split("-")[1].trim()))
+                    ._id(new ObjectId(task.getId()))
                     .caseId(this.importedCase.getStringId())
                     .processId(this.importedCase.getProcessIdentifier())
                     .transitionId(transition.getImportId())
@@ -180,7 +178,6 @@ public class CaseImporter {
         importedTasksMap.put(this.importedCase.getStringId(), importedTasks);
     }
 
-    @Transactional
     protected void importDataSet() {
         xmlCase.getDataField().forEach(field -> {
             DataField dataField = new DataField();
@@ -272,7 +269,7 @@ public class CaseImporter {
         switch (dataType) {
             case DATE:
             case DATE_TIME:
-                parsedValue = parseDateTimeFromXml(value.getValue().getFirst());
+                parsedValue = parseDateTimeFromXml(value.getValue().get(0));
                 if (dataType == DataType.DATE) {
                     parsedValue = ((LocalDateTime) parsedValue).toLocalDate();
                 }
@@ -284,13 +281,13 @@ public class CaseImporter {
             case TASK_REF:
                 parsedValue = parseStringCollection(value).stream()
                         .filter(this.importedIdsMapping::containsKey)
-                        .map(this.importedIdsMapping::get).toList();
+                        .map(this.importedIdsMapping::get).collect(Collectors.toList());
                 break;
             case NUMBER:
-                parsedValue = Double.parseDouble(value.getValue().getFirst());
+                parsedValue = Double.parseDouble(value.getValue().get(0));
                 break;
             case BOOLEAN:
-                parsedValue = Boolean.parseBoolean(value.getValue().getFirst());
+                parsedValue = Boolean.parseBoolean(value.getValue().get(0));
                 break;
             case MULTICHOICE:
             case MULTICHOICE_MAP:
@@ -304,7 +301,7 @@ public class CaseImporter {
                 }
                 break;
             case USER:
-                parsedValue = parseUserFieldValue(value.getValue().getFirst());
+                parsedValue = parseUserFieldValue(value.getValue().get(0));
                 break;
             case USER_LIST:
                 List<UserFieldValue> userFieldValues = value.getValue().stream()
@@ -318,7 +315,7 @@ public class CaseImporter {
                 }
                 break;
             case FILE:
-                parsedValue = createFileFieldValue(field, value.getValue().getFirst());
+                parsedValue = createFileFieldValue(field, value.getValue().get(0));
                 break;
             case FILE_LIST:
                 FileListFieldValue fileListValue = new FileListFieldValue();
@@ -327,14 +324,14 @@ public class CaseImporter {
                 break;
             case ENUMERATION:
             case I_18_N:
-                parsedValue = new I18nString(value.getValue().getFirst());
+                parsedValue = new I18nString(value.getValue().get(0));
                 ((I18nString) parsedValue).setTranslations(parseTranslations(value.getId()));
                 break;
             case BUTTON:
-                parsedValue = Integer.parseInt(value.getValue().getFirst());
+                parsedValue = Integer.parseInt(value.getValue().get(0));
                 break;
             default:
-                parsedValue = value.getValue().getFirst();
+                parsedValue = value.getValue().get(0);
                 break;
         }
         return parsedValue;
@@ -415,7 +412,6 @@ public class CaseImporter {
         return component == null ? null : componentFactory.buildComponent(component);
     }
 
-    @Transactional
     protected void importCaseMetadata() {
 //        todo id and visualId cannot be set, both are generated in constructor
         IUser user;
@@ -483,7 +479,6 @@ public class CaseImporter {
         return map;
     }
 
-    @Transactional
     protected void unmarshallXml(InputStream xml) throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(Cases.class);
 

@@ -35,6 +35,7 @@ public class Task implements Serializable {
 
     @Id
     @Builder.Default
+    @Getter
     private ObjectId _id = new ObjectId();
 
     @Indexed

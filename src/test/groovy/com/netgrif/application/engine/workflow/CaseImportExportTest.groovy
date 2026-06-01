@@ -36,7 +36,7 @@ import java.time.format.DateTimeFormatter
 @ExtendWith(SpringExtension.class)
 class CaseImportExportTest {
 
-    private final String testNetFileName = "nae_1843.xml"
+    private final String testNetFileName = "NAE-2445-ImportExport.xml"
     private final String testNetIdentifier = "data/export_data"
     private final String outputFileLocation = "src" + File.separator + "test" + File.separator + "resources" + File.separator
     private final String outputFileName = "case_export_test.zip"

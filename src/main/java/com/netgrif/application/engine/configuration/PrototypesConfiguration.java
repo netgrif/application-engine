@@ -10,6 +10,8 @@ import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDrawe
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
+import com.netgrif.application.engine.workflow.service.CaseExporter;
+import com.netgrif.application.engine.workflow.service.CaseImporter;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -59,5 +61,16 @@ public class PrototypesConfiguration {
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public UserResourceAssembler userResourceAssembler() {
         return new UserResourceAssembler();
+    }
+
+    @Bean("caseExporter")
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public CaseExporter caseExporter() {
+        return new CaseExporter();
+    }
+    @Bean("caseImporter")
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public CaseImporter caseImporter() {
+        return new CaseImporter();
     }
 }

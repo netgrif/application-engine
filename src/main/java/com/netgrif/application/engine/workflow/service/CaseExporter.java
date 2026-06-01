@@ -26,6 +26,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class CaseExporter {
@@ -39,8 +40,8 @@ public class CaseExporter {
     private final ObjectFactory objectFactory = new ObjectFactory();
 
     private OutputStream outputStream;
-    private com.netgrif.application.engine.workflow.domain.Case caseToExport;
-    private Case xmlCase;
+    private Case caseToExport;
+    private com.netgrif.application.engine.importer.model.Case xmlCase;
     private HashMap<String, I18N> translations;
 
     //    todo custom error handling?
@@ -57,7 +58,7 @@ public class CaseExporter {
         try {
             marshallCase(xmlCases);
         } catch (JAXBException e) {
-            log.error("Error occured during masrhalling of cases", e);
+            log.error("Error occurred during marshalling of cases", e);
             throw new RuntimeException(e);
         }
     }
@@ -66,11 +67,11 @@ public class CaseExporter {
         JAXBContext jaxbContext = JAXBContext.newInstance(com.netgrif.application.engine.importer.model.Cases.class);
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, properties.getLocation());
+        marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, "https://petriflow.com/petriflow.schema.xsd");
         marshaller.marshal(caseToExport, this.outputStream);
     }
 
-    private Case exportCase() {
+    private com.netgrif.application.engine.importer.model.Case exportCase() {
         this.xmlCase = objectFactory.createCase();
         exportCaseMetadata(caseToExport);
         exportTasks();
@@ -104,7 +105,7 @@ public class CaseExporter {
     private void exportTasks() {
         List<com.netgrif.application.engine.workflow.domain.Task> tasksToExport = caseToExport.getTasks().stream()
                 .map(taskPair -> taskService.findOne(taskPair.getTask()))
-                .toList();
+                .collect(Collectors.toList());
         tasksToExport.forEach(taskToExport -> this.xmlCase.getTask().add(exportTask(taskToExport)));
     }
 

@@ -11,5 +11,5 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "nae.case.export")
 public class CaseExportProperties {
 
-    private String fileName;
+    private String fileName = "case_export.xml";
 }
