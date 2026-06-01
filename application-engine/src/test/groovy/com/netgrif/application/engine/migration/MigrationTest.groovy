@@ -164,7 +164,7 @@ class MigrationTest {
 
         migrationHelper.updateNetIgnoreRoles("nae_2432", "nae_2432_v2.xml", [updateTransitionRole])
 
-        PetriNet migratedNet = petriNetService.getNewestVersionByIdentifier("nae_2432")
+        PetriNet migratedNet = petriNetService.getDefaultVersionByIdentifier("nae_2432")
 
         assert migratedNet.dataSet.containsKey("income")
         assert migratedNet.dataSet.containsKey("recreate_info_text")
@@ -287,7 +287,7 @@ class MigrationTest {
     void updateNetIgnoreRolesShouldMigrateExistingNet() {
         migrationHelper.updateNetIgnoreRoles("nae_2432", "nae_2432_v2.xml")
 
-        def net = petriNetService.getNewestVersionByIdentifier("nae_2432")
+        def net = petriNetService.getDefaultVersionByIdentifier("nae_2432")
 
         assert net.dataSet.containsKey("income")
         assert net.transitions.values().any { it.importId == "recreate_person" }

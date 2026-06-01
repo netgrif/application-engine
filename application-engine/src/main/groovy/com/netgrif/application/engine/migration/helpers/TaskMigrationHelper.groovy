@@ -162,7 +162,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
     void updateTasksCursor(Closure update, String processIdentifier, int pageSize = 100,
                            MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting updateTasksCursor for processIdentifier: ${processIdentifier}, pageSize: ${pageSize}")
-        String processId = petriNetService.getNewestVersionByIdentifier(processIdentifier).stringId
+        String processId = petriNetService.getDefaultVersionByIdentifier(processIdentifier).stringId
         Query query = new Query(Criteria.where("processId").is(processId))
         log.trace("Created query for processId: ${processId}, calling iterate")
         iterate(update, null, query, 0, pageSize as int, errorPolicy)
@@ -178,7 +178,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
     void updateSpecificTasksCursor(Closure update, String processIdentifier, List<String> transitionIds, int pageSize = 100,
                                    MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting updateSpecificTasksCursor for processIdentifier: ${processIdentifier}, transitionIds: ${transitionIds}, pageSize: ${pageSize}")
-        String processId = petriNetService.getNewestVersionByIdentifier(processIdentifier).stringId
+        String processId = petriNetService.getDefaultVersionByIdentifier(processIdentifier).stringId
         Query query = new Query(Criteria.where("processId").is(processId))
         query.addCriteria(Criteria.where("transitionId").in(transitionIds))
         log.trace("Created query with criteria for processId: ${processId} and transitionIds: ${transitionIds}, calling iterate")

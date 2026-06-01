@@ -140,7 +140,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
     void updateNetIgnoreRoles(String identifier, Resource resource, List<Closure<PetriNet>> customUpdates = null) {
         log.debug("Starting updateNetIgnoreRoles for identifier: {} with Resource", identifier)
         PetriNet reimported = petriNetService.importPetriNet(resource.inputStream, VersionType.MAJOR, userService.getSystem().transformToLoggedUser()).getNet()
-        updateNetIgnoreRoles(petriNetService.getNewestVersionByIdentifier(identifier), reimported, customUpdates)
+        updateNetIgnoreRoles(petriNetService.getDefaultVersionByIdentifier(identifier), reimported, customUpdates)
     }
 
     /**
@@ -320,7 +320,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      */
     void updateDataSet(String identifier, String fileName, Closure<PetriNet> customUpdate = null) {
         log.debug("Starting updateDataSet for identifier: {} with fileName: {}", identifier, fileName)
-        PetriNet existing = petriNetService.getNewestVersionByIdentifier(identifier)
+        PetriNet existing = petriNetService.getDefaultVersionByIdentifier(identifier)
         InputStream inputStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
         PetriNet reimported = getImporter().importPetriNet(inputStream)
                 .orElseThrow { new IllegalStateException("Failed to import Petri Net from file: $fileName") }
