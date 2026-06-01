@@ -84,7 +84,7 @@ import org.springframework.data.domain.Pageable
 
 import java.time.ZoneId
 import java.util.stream.Collectors
-
+// todo 23 imports
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -662,7 +662,7 @@ class ActionDelegate {
              saveChangedChoices(field, targetCase, targetTask)
          },
          allowedNets        : { cl ->
-             if (!(field instanceof CaseField)) // TODO make this work with FilterField as well
+             if (!(field instanceof CaseField))
                  return
 
              def allowedNets = cl()
@@ -1880,6 +1880,7 @@ class ActionDelegate {
     }
 
     static Map defaultFilterMetadata(String type, boolean allAllowedNets = false) {
+        // todo 23 remove boolean
         return FilterBody.getDefaultMetadata(type, allAllowedNets)
     }
 

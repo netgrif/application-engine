@@ -447,7 +447,7 @@ public class MenuItemService implements IMenuItemService {
      * </p>
      *
      * @param menuItemCase the menu item case to which the configuration template should be applied
-     * @return a ConfigurationTemplateOutcome containing the dataSet outcome from applying the template, 
+     * @return a ConfigurationTemplateOutcome containing the dataSet outcome from applying the template,
      *         or an empty outcome if no template was selected
      * @throws TransitionNotExecutableException if the workflow transition required for applying the template configuration cannot be executed
      * @throws IllegalArgumentException if the selected template identifier does not correspond to any registered template
@@ -460,7 +460,7 @@ public class MenuItemService implements IMenuItemService {
         }
 
         String menuItemIdentifier = (String) menuItemCase.getFieldValue(MenuItemConstants.FIELD_IDENTIFIER);
-        log.debug("Handling configuration template selection for menu item: [{}, {}] and configuration template: {}", 
+        log.debug("Handling configuration template selection for menu item: [{}, {}] and configuration template: {}",
                 menuItemCase.getStringId(), menuItemIdentifier, selectedTemplate);
         Optional<Template> templateOpt = MenuItemTemplateHolder.get(selectedTemplate);
         if (templateOpt.isEmpty()) {
