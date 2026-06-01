@@ -58,7 +58,9 @@ class FilterTest {
 
     @Test
     void filterTest() {
-        PetriNet testProcess = petriNetService.importPetriNet(new FileInputStream(PROCESS_PATH), VersionType.MAJOR, superCreator.loggedSuper).getNet()
+        InputStream inputStream = new FileInputStream(PROCESS_PATH)
+        PetriNet testProcess = petriNetService.importPetriNet(inputStream, VersionType.MAJOR, superCreator.loggedSuper).getNet()
+        inputStream.close()
         assertEquals(CaseFilterField.class, testProcess.getField("filter_field").get().class)
         assertEquals(CaseFilterField.class, testProcess.getField("case_filter_field").get().class)
         assertEquals(TaskFilterField.class, testProcess.getField("task_filter_field").get().class)
