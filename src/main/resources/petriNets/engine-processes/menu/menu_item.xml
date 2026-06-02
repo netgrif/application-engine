@@ -929,19 +929,6 @@
 					}
 				</action>
 				<action>
-					name: f.menu_name,
-					menu_item_identifier: f.menu_item_identifier,
-					menu_item_identifier_on_create: f.menu_item_identifier_on_create,
-					dest: f.move_dest_uri;
-					
-					change menu_item_identifier value { menu_item_identifier_on_create.value }
-
-					String newUri = dest.value.join("/")
-					newUri = newUri.replace("//","/")
-
-					changeMenuItem useCase uri { newUri }
-				</action>
-				<action>
 					trans: t.view_settings,
 					useTabIcon: f.use_tab_icon,
 					view_configuration_form: f.view_configuration_form,
@@ -962,6 +949,19 @@
 			<actions phase="post">
 				<action>
 					initializeAdvancedForm()
+				</action>
+				<action>
+					name: f.menu_name,
+					menu_item_identifier: f.menu_item_identifier,
+					menu_item_identifier_on_create: f.menu_item_identifier_on_create,
+					dest: f.move_dest_uri;
+
+					change menu_item_identifier value { menu_item_identifier_on_create.value }
+
+					String newUri = dest.value.join("/")
+					newUri = newUri.replace("//","/")
+
+					changeMenuItem useCase uri { newUri }
 				</action>
 			</actions>
 			<title name="create_item_finish">Create</title>
