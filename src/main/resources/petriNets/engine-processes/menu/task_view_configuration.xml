@@ -70,20 +70,9 @@
         }
     </function>
 
-    <data type="button">
-        <id>remove_filter</id>
-        <title/>
-        <placeholder name="remove_filter">Remove filter</placeholder>
-        <component>
-            <name>raised</name>
-        </component>
-        <action trigger="set">
-            // todo 23
-        </action>
-    </data>
     <data type="boolean" immediate="true">
         <id>merge_filters</id>
-        <title name="merge_filters">Merge with base filter?</title>
+        <title name="merge_filters">Merge with base filter if present?</title>
         <init>true</init>
     </data>
     <data type="taskFilter">
@@ -235,7 +224,7 @@
         <i18nString name="sort">Zoraďovanie</i18nString>
         <i18nString name="search">Vyhľadávanie</i18nString>
         <i18nString name="edit">Upravovanie</i18nString>
-        <i18nString name="merge_filters">Zjednotiť filter so základným filtrom?</i18nString>
+        <i18nString name="merge_filters">Zjednotiť filter so základným filtrom ak existuje?</i18nString>
         <i18nString name="task_view_search_type">Typ vyhľadávania úloh</i18nString>
         <i18nString name="task_headers_mode">Mód hlavičiek</i18nString>
         <i18nString name="task_headers_default_mode">Predvolený mód hlavičiek</i18nString>
@@ -247,7 +236,6 @@
         <i18nString name="task_show_more_menu">Zobrazovať menu pre úlohovú položku?</i18nString>
         <i18nString name="item_settings">Nastavenie položky</i18nString>
         <i18nString name="item_settings_general">Všeobecné</i18nString>
-        <i18nString name="remove_filter">Vymazať filter</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="hidden">Versteckt</i18nString>
@@ -264,11 +252,10 @@
         <i18nString name="default_headers_desc">Beispiel: "meta-title", "meta-user"</i18nString>
         <i18nString name="item_settings_general">Allgemein</i18nString>
         <i18nString name="fulltext_advanced">Einfacher und erweiterter Suchmodus</i18nString>
-        <i18nString name="merge_filters">Mit dem Basisfilter kombinieren?</i18nString>
+        <i18nString name="merge_filters">Mit dem Basisfilter kombinieren, falls vorhanden?</i18nString>
         <i18nString name="task_view_search_type">Suchmodus im Aufgabenansicht</i18nString>
         <i18nString name="task_show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Aufgaben anzeigen</i18nString>
         <i18nString name="item_settings">Menüeintrageinstellungen</i18nString>
-        <i18nString name="remove_filter">Filter entfernen</i18nString>
     </i18n>
 
     <transition>
@@ -503,24 +490,10 @@
             <dataRef>
                 <id>merge_filters</id>
                 <logic>
-                    <behavior>hidden</behavior>
+                    <behavior>editable</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>1</cols>
-                    <template>material</template>
-                    <appearance>standard</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>remove_filter</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-                <layout>
-                    <x>1</x>
                     <y>1</y>
                     <rows>1</rows>
                     <cols>1</cols>
@@ -720,12 +693,6 @@
             </dataRef>
             <dataRef>
                 <id>merge_filters</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>remove_filter</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
