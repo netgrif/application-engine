@@ -120,13 +120,11 @@ public class MenuItemServiceTest {
 
         Map<String, ?> templateOptions = MenuItemTemplateHolder.transformToOptions();
         templateOptions.keySet().forEach((templateIdentifier) -> {
-            Optional<Template> templateOpt = MenuItemTemplateHolder.get(templateIdentifier);
-            assertTrue(templateOpt.isPresent());
-            MenuItemBody menuItemBody = templateOpt.get().getTemplate();
-            menuItemBody.setUri(uriService.getRoot().getUriPath());
-            menuItemBody.setIdentifier(templateIdentifier);
+            Optional<MenuItemBody> menuItemBodyOpt = MenuItemTemplateHolder.get(templateIdentifier,
+                    uriService.getRoot().getUriPath(), templateIdentifier);
+            assertTrue(menuItemBodyOpt.isPresent());
             try {
-                createByTemplateAndAssert(menuItemBody);
+                createByTemplateAndAssert(menuItemBodyOpt.get());
             } catch (TransitionNotExecutableException e) {
                 throw new RuntimeException(e);
             }
@@ -198,9 +196,9 @@ public class MenuItemServiceTest {
 
     @SuppressWarnings("unchecked")
     private void createAndAssertDetailed() throws TransitionNotExecutableException {
-        Optional<Template> templateOpt = MenuItemTemplateHolder.get(TabbedCaseViewTemplate.IDENTIFIER);
-        assertTrue(templateOpt.isPresent());
-        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
+        Optional<MenuItemBody> menuItemBodyOpt = MenuItemTemplateHolder.get(TabbedCaseViewTemplate.IDENTIFIER);
+        assertTrue(menuItemBodyOpt.isPresent());
+        MenuItemBody menuItemBody = menuItemBodyOpt.get();
         menuItemBody.setUri("/netgrif/test");
         menuItemBody.setIdentifier("new_menu_item");
         menuItemBody.setMenuIcon("device_hub");
@@ -299,9 +297,9 @@ public class MenuItemServiceTest {
     public void updateMenuItemTest() throws TransitionNotExecutableException {
         assertThrows(IllegalArgumentException.class, () -> menuItemService.updateMenuItem(null, null));
 
-        Optional<Template> templateOpt = MenuItemTemplateHolder.get(SimpleTaskViewTemplate.IDENTIFIER);
-        assertTrue(templateOpt.isPresent());
-        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
+        Optional<MenuItemBody> menuItemBodyOpt = MenuItemTemplateHolder.get(SimpleTaskViewTemplate.IDENTIFIER);
+        assertTrue(menuItemBodyOpt.isPresent());
+        MenuItemBody menuItemBody = menuItemBodyOpt.get();
         menuItemBody.setUri(uriService.getRoot().getUriPath());
         menuItemBody.setIdentifier("test");
         Case menuItemCase = menuItemService.createMenuItem(menuItemBody);
@@ -315,13 +313,11 @@ public class MenuItemServiceTest {
         assertThrows(IllegalArgumentException.class, () -> menuItemService.updateMenuItem(menuItemCase, null));
         assertThrows(IllegalArgumentException.class, () -> menuItemService.updateMenuItem(menuItemCase, new MenuItemBody()));
 
-        templateOpt = MenuItemTemplateHolder.get(TabbedCaseViewTemplate.IDENTIFIER);
-        assertTrue(templateOpt.isPresent());
-        menuItemBody = templateOpt.get().getTemplate();
-        menuItemBody.setUri(uriService.getRoot().getUriPath());
-        menuItemBody.setIdentifier("test");
+        menuItemBodyOpt = MenuItemTemplateHolder.get(TabbedCaseViewTemplate.IDENTIFIER, uriService.getRoot().getUriPath(),
+                "test");
+        assertTrue(menuItemBodyOpt.isPresent());
 
-        Case updatedMenuItemCase = menuItemService.updateMenuItem(menuItemCase, menuItemBody);
+        Case updatedMenuItemCase = menuItemService.updateMenuItem(menuItemCase, menuItemBodyOpt.get());
 
         assertThrows(IllegalArgumentException.class, () -> workflowService.findOne(oldMenuItemCaseId));
         assertThrows(IllegalArgumentException.class, () -> workflowService.findOne(oldViewCaseId));
@@ -342,14 +338,12 @@ public class MenuItemServiceTest {
     public void createOrUpdateMenuItemTest() throws TransitionNotExecutableException {
         assertThrows(IllegalArgumentException.class, () -> menuItemService.createOrUpdateMenuItem(null));
 
-        Optional<Template> templateOpt = MenuItemTemplateHolder.get(CustomViewTemplate.IDENTIFIER);
-        assertTrue(templateOpt.isPresent());
-        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
-        menuItemBody.setUri(uriService.getRoot().getUriPath());
-        menuItemBody.setIdentifier("test");
+        Optional<MenuItemBody> menuItemBodyOpt = MenuItemTemplateHolder.get(CustomViewTemplate.IDENTIFIER,
+                uriService.getRoot().getUriPath(), "test");
+        assertTrue(menuItemBodyOpt.isPresent());
 
-        Case firstMenuItemCase = menuItemService.createOrUpdateMenuItem(menuItemBody);
-        Case secondMenuItemCase = menuItemService.createOrUpdateMenuItem(menuItemBody);
+        Case firstMenuItemCase = menuItemService.createOrUpdateMenuItem(menuItemBodyOpt.get());
+        Case secondMenuItemCase = menuItemService.createOrUpdateMenuItem(menuItemBodyOpt.get());
 
         assertNotEquals(firstMenuItemCase.getStringId(), secondMenuItemCase.getStringId());
         assertThrows(IllegalArgumentException.class, () -> workflowService.findOne(firstMenuItemCase.getStringId()));
@@ -359,14 +353,12 @@ public class MenuItemServiceTest {
     public void createOrIgnoreMenuItemTest() throws TransitionNotExecutableException {
         assertThrows(IllegalArgumentException.class, () -> menuItemService.createOrIgnoreMenuItem(null));
 
-        Optional<Template> templateOpt = MenuItemTemplateHolder.get(CustomViewTemplate.IDENTIFIER);
-        assertTrue(templateOpt.isPresent());
-        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
-        menuItemBody.setUri(uriService.getRoot().getUriPath());
-        menuItemBody.setIdentifier("test");
+        Optional<MenuItemBody> menuItemBodyOpt = MenuItemTemplateHolder.get(CustomViewTemplate.IDENTIFIER,
+                uriService.getRoot().getUriPath(), "test");
+        assertTrue(menuItemBodyOpt.isPresent());
 
-        Case firstMenuItemCase = menuItemService.createOrIgnoreMenuItem(menuItemBody);
-        Case secondMenuItemCase = menuItemService.createOrIgnoreMenuItem(menuItemBody);
+        Case firstMenuItemCase = menuItemService.createOrIgnoreMenuItem(menuItemBodyOpt.get());
+        Case secondMenuItemCase = menuItemService.createOrIgnoreMenuItem(menuItemBodyOpt.get());
 
         assertEquals(firstMenuItemCase.getStringId(), secondMenuItemCase.getStringId());
     }
@@ -376,9 +368,9 @@ public class MenuItemServiceTest {
         assertNull(menuItemService.findMenuItem(null));
         assertNull(menuItemService.findMenuItem("wrong"));
 
-        Optional<Template> templateOpt = MenuItemTemplateHolder.get(CustomViewTemplate.IDENTIFIER);
-        assertTrue(templateOpt.isPresent());
-        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
+        Optional<MenuItemBody> menuItemBodyOpt = MenuItemTemplateHolder.get(CustomViewTemplate.IDENTIFIER);
+        assertTrue(menuItemBodyOpt.isPresent());
+        MenuItemBody menuItemBody = menuItemBodyOpt.get();
         menuItemBody.setUri(uriService.getRoot().getUriPath());
         String identifier = "test";
         menuItemBody.setIdentifier(identifier);
@@ -393,13 +385,10 @@ public class MenuItemServiceTest {
         assertThrows(IllegalArgumentException.class, () -> menuItemService.findFolderCase(null));
         assertNull(menuItemService.findFolderCase(new UriNode()));
 
-        Optional<Template> templateOpt = MenuItemTemplateHolder.get(CustomViewTemplate.IDENTIFIER);
-        assertTrue(templateOpt.isPresent());
-        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
-        menuItemBody.setUri("/folderik");
-        menuItemBody.setIdentifier("test");
+        Optional<MenuItemBody> menuItemBodyOpt = MenuItemTemplateHolder.get(CustomViewTemplate.IDENTIFIER, "/folderik", "test");
+        assertTrue(menuItemBodyOpt.isPresent());
 
-        Case createdMenuItemCase = menuItemService.createMenuItem(menuItemBody);
+        Case createdMenuItemCase = menuItemService.createMenuItem(menuItemBodyOpt.get());
         String parentFolderCaseId = MenuItemUtils.getCaseIdFromCaseRef(createdMenuItemCase, MenuItemConstants.FIELD_PARENT_ID);
         assertNotNull(parentFolderCaseId);
         UriNode node = uriService.findById(createdMenuItemCase.getUriNodeId());
@@ -412,9 +401,9 @@ public class MenuItemServiceTest {
         assertFalse(menuItemService.existsMenuItem(null));
         assertFalse(menuItemService.existsMenuItem("wrong"));
 
-        Optional<Template> templateOpt = MenuItemTemplateHolder.get(CustomViewTemplate.IDENTIFIER);
-        assertTrue(templateOpt.isPresent());
-        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
+        Optional<MenuItemBody> menuItemBodyOpt = MenuItemTemplateHolder.get(CustomViewTemplate.IDENTIFIER);
+        assertTrue(menuItemBodyOpt.isPresent());
+        MenuItemBody menuItemBody = menuItemBodyOpt.get();
         menuItemBody.setUri(uriService.getRoot().getUriPath());
         String identifier = "test";
         menuItemBody.setIdentifier(identifier);
@@ -425,9 +414,9 @@ public class MenuItemServiceTest {
 
     @Test
     public void moveItemTest() throws TransitionNotExecutableException {
-        Optional<Template> templateOpt = MenuItemTemplateHolder.get(CustomViewTemplate.IDENTIFIER);
-        assertTrue(templateOpt.isPresent());
-        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
+        Optional<MenuItemBody> menuItemBodyOpt = MenuItemTemplateHolder.get(CustomViewTemplate.IDENTIFIER);
+        assertTrue(menuItemBodyOpt.isPresent());
+        MenuItemBody menuItemBody = menuItemBodyOpt.get();
         menuItemBody.setUri("/netgrif/test");
         menuItemBody.setIdentifier("new_menu_item");
         Case newMenuItemCase = menuItemService.createMenuItem(menuItemBody);
@@ -486,9 +475,9 @@ public class MenuItemServiceTest {
     @Test
     public void duplicateFolderItemTest() throws TransitionNotExecutableException {
         String starterUri = "/netgrif/test";
-        Optional<Template> templateOpt = MenuItemTemplateHolder.get(TabbedCaseViewTemplate.IDENTIFIER);
-        assertTrue(templateOpt.isPresent());
-        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
+        Optional<MenuItemBody> menuItemBodyOpt = MenuItemTemplateHolder.get(TabbedCaseViewTemplate.IDENTIFIER);
+        assertTrue(menuItemBodyOpt.isPresent());
+        MenuItemBody menuItemBody = menuItemBodyOpt.get();
         menuItemBody.setUri(starterUri);
         menuItemBody.setIdentifier("new_menu_item");
         menuItemService.createMenuItem(menuItemBody);
@@ -539,9 +528,9 @@ public class MenuItemServiceTest {
     @SuppressWarnings("unchecked")
     public void duplicateLeafItemTest() throws TransitionNotExecutableException {
         String starterUri = "/netgrif/test";
-        Optional<Template> templateOpt = MenuItemTemplateHolder.get(TabbedCaseViewTemplate.IDENTIFIER);
-        assertTrue(templateOpt.isPresent());
-        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
+        Optional<MenuItemBody> menuItemBodyOpt = MenuItemTemplateHolder.get(TabbedCaseViewTemplate.IDENTIFIER);
+        assertTrue(menuItemBodyOpt.isPresent());
+        MenuItemBody menuItemBody = menuItemBodyOpt.get();
         menuItemBody.setUri(starterUri);
         menuItemBody.setIdentifier("new_menu_item");
         Case originLeafItemCase = menuItemService.createMenuItem(menuItemBody);
@@ -592,9 +581,9 @@ public class MenuItemServiceTest {
 
     @Test
     public void removeChildItemFromParentTest() throws TransitionNotExecutableException {
-        Optional<Template> templateOpt = MenuItemTemplateHolder.get(CustomViewTemplate.IDENTIFIER);
-        assertTrue(templateOpt.isPresent());
-        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
+        Optional<MenuItemBody> menuItemBodyOpt = MenuItemTemplateHolder.get(CustomViewTemplate.IDENTIFIER);
+        assertTrue(menuItemBodyOpt.isPresent());
+        MenuItemBody menuItemBody = menuItemBodyOpt.get();
         menuItemBody.setUri("/folderik");
         menuItemBody.setIdentifier("test");
 
@@ -709,9 +698,9 @@ public class MenuItemServiceTest {
 
     @Test
     void testRemoveMenuItem() throws TransitionNotExecutableException, InterruptedException {
-        Optional<Template> templateOpt = MenuItemTemplateHolder.get(TabbedCaseViewTemplate.IDENTIFIER);
-        assertTrue(templateOpt.isPresent());
-        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
+        Optional<MenuItemBody> menuItemBodyOpt = MenuItemTemplateHolder.get(TabbedCaseViewTemplate.IDENTIFIER);
+        assertTrue(menuItemBodyOpt.isPresent());
+        MenuItemBody menuItemBody = menuItemBodyOpt.get();
         menuItemBody.setUri("/netgrif/test");
         menuItemBody.setIdentifier("new_menu_item");
         Case leafItemCase = menuItemService.createMenuItem(menuItemBody);
