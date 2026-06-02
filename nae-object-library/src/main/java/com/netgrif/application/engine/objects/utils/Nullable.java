@@ -84,6 +84,17 @@ public final class Nullable<T> implements Serializable {
     }
 
     /**
+     * Returns an empty {@code Nullable} instance holding no value but with explicit type information.
+     *
+     * @param <T>  the type of the value that can be held by this {@code Nullable} instance
+     * @param type the {@code Class} object representing the type {@code T}, can be {@code null}
+     * @return an empty {@code Nullable} instance with type information
+     */
+    public static <T> Nullable<T> empty(Class<T> type) {
+        return new Nullable<>(null, type);
+    }
+
+    /**
      * Checks if a value is present in this instance.
      *
      * @return {@code true} if the value is not {@code null}, otherwise {@code false}
@@ -149,7 +160,7 @@ public final class Nullable<T> implements Serializable {
         if (isEmpty()) {
             return this;
         } else {
-            return predicate.test(value) ? this : empty();
+            return predicate.test(value) ? this : empty(type);
         }
     }
 
@@ -300,7 +311,8 @@ public final class Nullable<T> implements Serializable {
         }
 
         return obj instanceof Nullable<?> other
-                && Objects.equals(value, other.value);
+            && Objects.equals(value, other.value)
+            && Objects.equals(type, other.type);
     }
 
     /**
@@ -311,7 +323,7 @@ public final class Nullable<T> implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hashCode(value);
+        return Objects.hash(value, type);
     }
 
     /**
