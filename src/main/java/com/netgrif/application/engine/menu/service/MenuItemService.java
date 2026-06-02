@@ -464,12 +464,12 @@ public class MenuItemService implements IMenuItemService {
         String menuItemIdentifier = (String) menuItemCase.getFieldValue(MenuItemConstants.FIELD_IDENTIFIER);
         log.debug("Handling configuration template selection for menu item: [{}, {}] and configuration template: {}",
                 menuItemCase.getStringId(), menuItemIdentifier, selectedTemplate);
-        Optional<Template> templateOpt = MenuItemTemplateHolder.get(selectedTemplate);
-        if (templateOpt.isEmpty()) {
+        Optional<MenuItemBody> menuItemBodyOpt = MenuItemTemplateHolder.get(selectedTemplate);
+        if (menuItemBodyOpt.isEmpty()) {
             throw new IllegalArgumentException(String.format("No configuration template found with name: %s", selectedTemplate));
         }
 
-        MenuItemBody menuItemBody = templateOpt.get().getTemplate();
+        MenuItemBody menuItemBody = menuItemBodyOpt.get();
         Case viewCase = null;
         if (menuItemBody.hasView()) {
             viewCase = createView(menuItemBody.getView(), menuItemBody.isUseTabbedView());
