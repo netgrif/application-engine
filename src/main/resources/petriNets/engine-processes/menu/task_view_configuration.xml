@@ -162,8 +162,8 @@
         <id>advanced_content_form</id>
         <title/>
         <component>
-            <!-- todo 23 headers-->
             <name>task-list</name>
+            <property key="headers">meta-caseId,meta-title</property>
         </component>
     </data>
     <data type="i18n">

@@ -651,7 +651,7 @@
 		<title/>
 		<component>
 			<name>task-list</name>
-			<!-- todo 23 headers-->
+			<property key="headers">meta-title</property>
 		</component>
 	</data>
 	<data type="enumeration_map">
