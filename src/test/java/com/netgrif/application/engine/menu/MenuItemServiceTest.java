@@ -461,6 +461,10 @@ public class MenuItemServiceTest {
         assertNotNull(test3ParentCaseId);
         assertEquals(test3ParentCaseId, netgrifFolderCase.getStringId());
 
+        List<String> netgrifFolderChildIds = MenuItemUtils.getCaseIdsFromCaseRef(netgrifFolderCase, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
+        assertNotNull(netgrifFolderChildIds);
+        assertTrue(netgrifFolderChildIds.contains(test3FolderCase.getStringId()));
+
         netgrif2FolderCase = workflowService.findOne(netgrif2FolderCase.getStringId());
         UriNode test3Node = uriService.findByUri("/netgrif/test3");
         assertEquals(test3Node.getStringId(), netgrif2FolderCase.getUriNodeId());
