@@ -77,8 +77,8 @@
     </data>
     <data type="taskFilter">
         <id>task_filter</id>
-        <title name="todo 23">Filter</title>
-        <desc name="todo 23">Use Elasticsearch string query</desc>
+        <title name="task_filter">Filter</title>
+        <desc name="task_filter_desc">Use Elasticsearch string query</desc>
         <init>*</init>
     </data>
 
@@ -168,13 +168,13 @@
     </data>
     <data type="i18n">
         <id>task_empty_content_text</id>
-        <title name="todo 23">Empty content text</title>
-        <desc name="todo 23">If empty, default text will be used</desc>
+        <title name="task_empty_content_text">Empty content text</title>
+        <desc name="task_empty_content_text_desc">If empty, default text will be used</desc>
     </data>
     <data type="text">
         <id>task_empty_content_icon</id>
-        <title name="todo 23">Empty content icon</title>
-        <desc name="todo 23">If empty, default icon will be used</desc>
+        <title name="task_empty_content_icon">Empty content icon</title>
+        <desc name="task_empty_content_icon_desc">If empty, default icon will be used</desc>
         <event type="set">
             <id>0</id>
             <actions phase="post">
@@ -196,23 +196,23 @@
     </data>
     <data type="text">
         <id>task_empty_content_icon_preview</id>
-        <title name="todo 23">Empty content icon preview</title>
+        <title name="task_empty_content_icon_preview">Empty content icon preview</title>
         <component>
             <name>htmltextarea</name>
         </component>
     </data>
     <data type="stringCollection">
         <id>task_allowed_nets</id>
-        <title name="todo 23">Allowed nets</title>
+        <title name="task_allowed_nets">Allowed nets</title>
     </data>
     <data type="boolean">
         <id>task_all_allowed_nets</id>
-        <title name="todo 23">All allowed nets?</title>
+        <title name="task_all_allowed_nets">All allowed nets?</title>
         <init>true</init>
     </data>
     <data type="boolean">
         <id>task_inherit_allowed_nets</id>
-        <title name="todo 23">Inherit allowed nets?</title>
+        <title name="task_inherit_allowed_nets">Inherit allowed nets?</title>
         <init>true</init>
     </data>
 
@@ -236,6 +236,18 @@
         <i18nString name="task_show_more_menu">Zobrazovať menu pre úlohovú položku?</i18nString>
         <i18nString name="item_settings">Nastavenie položky</i18nString>
         <i18nString name="item_settings_general">Všeobecné</i18nString>
+        <i18nString name="task_empty_content_text">Text prázdneho obsahu</i18nString>
+        <i18nString name="task_empty_content_text_desc">Ak je toto pole prázdne, bude použitý predvolený text</i18nString>
+        <i18nString name="task_empty_content_icon">Ikona prázdneho obsahu</i18nString>
+        <i18nString name="task_empty_content_icon_desc">Ak je toto pole prázdne, bude použitá predvolená ikona</i18nString>
+        <i18nString name="task_empty_content_icon_preview">Náhľad ikony prázdneho obsahu</i18nString>
+        <i18nString name="task_allowed_nets">Povolené procesy</i18nString>
+        <i18nString name="task_all_allowed_nets">Povoliť všetky procesy?</i18nString>
+        <i18nString name="task_inherit_allowed_nets">Zdediť povolené procesy?</i18nString>
+        <i18nString name="task_filter">Filter</i18nString>
+        <i18nString name="task_filter_desc">Použi Elasticsearch string query</i18nString>
+        <i18nString name="filter_settings">Filter</i18nString>
+        <i18nString name="header_settings">Hlavičky</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="hidden">Versteckt</i18nString>
@@ -256,6 +268,18 @@
         <i18nString name="task_view_search_type">Suchmodus im Aufgabenansicht</i18nString>
         <i18nString name="task_show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Aufgaben anzeigen</i18nString>
         <i18nString name="item_settings">Menüeintrageinstellungen</i18nString>
+        <i18nString name="task_empty_content_text">Text für leeren Inhalt</i18nString>
+        <i18nString name="task_empty_content_text_desc">Wenn dieses Feld leer ist, wird der Standardtext verwendet</i18nString>
+        <i18nString name="task_empty_content_icon">Icon für leeren Inhalt</i18nString>
+        <i18nString name="task_empty_content_icon_desc">Wenn dieses Feld leer ist, wird das Standard-Icon verwendet</i18nString>
+        <i18nString name="task_empty_content_icon_preview">Vorschau des Icons für leeren Inhalt</i18nString>
+        <i18nString name="task_allowed_nets">Erlaubte Prozesse</i18nString>
+        <i18nString name="task_all_allowed_nets">Alle Prozesse erlauben?</i18nString>
+        <i18nString name="task_inherit_allowed_nets">Erlaubte Prozesse erben?</i18nString>
+        <i18nString name="task_filter">Filter</i18nString>
+        <i18nString name="task_filter_desc">Elasticsearch String-Query verwenden</i18nString>
+        <i18nString name="filter_settings">Filter</i18nString>
+        <i18nString name="header_settings">Kopfzeilen</i18nString>
     </i18n>
 
     <transition>
@@ -454,7 +478,7 @@
         <id>filter_settings</id>
         <x>400</x>
         <y>48</y>
-        <label name="todo 23">Filter</label>
+        <label name="filter_settings">Filter</label>
         <icon>filter_alt</icon>
         <assignPolicy>auto</assignPolicy>
         <roleRef>
@@ -523,7 +547,7 @@
         <id>header_settings</id>
         <x>592</x>
         <y>48</y>
-        <label name="todo 23">Header</label>
+        <label name="header_settings">Header</label>
         <icon>view_column</icon>
         <assignPolicy>auto</assignPolicy>
         <roleRef>

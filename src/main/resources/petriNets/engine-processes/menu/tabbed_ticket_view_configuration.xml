@@ -114,10 +114,12 @@
     <i18n locale="sk">
         <i18nString name="view_configuration_type">Zobrazenie</i18nString>
         <i18nString name="settings">Nastavenie</i18nString>
+        <i18nString name="next_view_settings">Ďalšie zobrazenie</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="view_configuration_type">Der Ansichtstyp</i18nString>
         <i18nString name="settings">Einstellungen</i18nString>
+        <i18nString name="next_view_settings">Nächste Ansicht</i18nString>
     </i18n>
 
     <transition>
@@ -204,7 +206,7 @@
         <id>next_view_settings</id>
         <x>400</x>
         <y>48</y>
-        <label name="todo 23">Next view</label>
+        <label name="next_view_settings">Next view</label>
         <icon>queue_play_next</icon>
         <assignPolicy>auto</assignPolicy>
         <roleRef>
