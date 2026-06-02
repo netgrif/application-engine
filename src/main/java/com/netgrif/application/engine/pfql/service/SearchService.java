@@ -9,6 +9,7 @@ import com.netgrif.application.engine.pfql.service.utils.SearchUtils;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.netgrif.application.engine.pfql.domain.enums.QueryType.*;
 import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.evaluateQuery;
 
 @Slf4j
@@ -28,47 +28,44 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.eval
 public class SearchService implements ISearchService {
 
     private final PetriNetRepository petriNetRepository;
-
     private final IElasticCaseService elasticCaseService;
-
+    private final IWorkflowService workflowService;
     private final CaseRepository caseRepository;
-
     private final TaskRepository taskRepository;
-
     private final UserRepository userRepository;
-
     private final IUserService userService;
-
-    private Long countCasesElastic(String elasticQuery) {
-        CaseSearchRequest caseSearchRequest = new CaseSearchRequest();
-        caseSearchRequest.query = elasticQuery;
-        return elasticCaseService.count(
-                List.of(caseSearchRequest),
-                userService.getLoggedOrSystem().transformToLoggedUser(),
-                LocaleContextHolder.getLocale(),
-                false
-        );
-    }
-
-    private List<Case> findCasesElastic(String elasticQuery, Pageable pageable) {
-        CaseSearchRequest caseSearchRequest = new CaseSearchRequest();
-        caseSearchRequest.query = elasticQuery;
-        return elasticCaseService.search(
-                List.of(caseSearchRequest),
-                userService.getLoggedOrSystem().transformToLoggedUser(),
-                pageable,
-                LocaleContextHolder.getLocale(),
-                false
-        ).getContent();
-    }
-
-    private boolean existsCasesElastic(String elasticQuery) {
-        return countCasesElastic(elasticQuery) > 0;
-    }
 
     @Override
     public String explainQuery(String input) {
         return SearchUtils.explainQuery(input);
+    }
+
+    public List<Case> searchCases(String query) {
+        QueryLangEvaluator evaluator = evaluateQuery(query);
+        Pageable pageable = evaluator.getPageable();
+
+        if (!evaluator.getSearchWithElastic()) {
+            Predicate predicate = evaluator.getFullMongoQuery();
+            return caseRepository.findAll(predicate, pageable).getContent();
+        }
+
+        String elasticQuery = evaluator.getFullElasticQuery();
+        return findCasesElastic(elasticQuery, pageable);
+    }
+
+    public Case searchCase(String query) {
+        QueryLangEvaluator evaluator = evaluateQuery(query);
+        Pageable pageable = evaluator.getPageable();
+
+        if (!evaluator.getSearchWithElastic()) {
+            Predicate predicate = evaluator.getFullMongoQuery();
+            return caseRepository.findAll(predicate, PageRequest.of(0, 1))
+                    .getContent().stream().findFirst().orElse(null);
+        }
+
+        String elasticQuery = evaluator.getFullElasticQuery();
+        List<Case> cases = findCasesElastic(elasticQuery, pageable);
+        return cases.stream().findFirst().orElse(null);
     }
 
     @Override
@@ -154,5 +151,32 @@ public class SearchService implements ISearchService {
                 return userRepository.exists(predicate);
         }
         return false;
+    }
+
+    private Long countCasesElastic(String elasticQuery) {
+        CaseSearchRequest caseSearchRequest = new CaseSearchRequest();
+        caseSearchRequest.query = elasticQuery;
+        return elasticCaseService.count(
+                List.of(caseSearchRequest),
+                userService.getLoggedOrSystem().transformToLoggedUser(),
+                LocaleContextHolder.getLocale(),
+                false
+        );
+    }
+
+    private List<Case> findCasesElastic(String elasticQuery, Pageable pageable) {
+        CaseSearchRequest caseSearchRequest = new CaseSearchRequest();
+        caseSearchRequest.query = elasticQuery;
+        return elasticCaseService.search(
+                List.of(caseSearchRequest),
+                userService.getLoggedOrSystem().transformToLoggedUser(),
+                pageable,
+                LocaleContextHolder.getLocale(),
+                false
+        ).getContent();
+    }
+
+    private boolean existsCasesElastic(String elasticQuery) {
+        return countCasesElastic(elasticQuery) > 0;
     }
 }
