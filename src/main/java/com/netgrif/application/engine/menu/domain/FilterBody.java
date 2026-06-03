@@ -21,6 +21,9 @@ public class FilterBody {
      * */
     public ToDataSetOutcome toDataSet(ToDataSetOutcome viewDataSetOutcome, String filterFieldId) {
         Map<String, Object> dataSetValues = new HashMap<>();
+        if (this.type == null) {
+            throw new IllegalArgumentException("Filter type is not provided");
+        }
         dataSetValues.put("type", this.type.getName());
         dataSetValues.put("value", this.query);
         viewDataSetOutcome.getDataSet().put(filterFieldId, dataSetValues);

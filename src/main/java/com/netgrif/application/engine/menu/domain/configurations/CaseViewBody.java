@@ -26,7 +26,7 @@ public class CaseViewBody extends ViewBody {
     private List<String> headersMode = new ArrayList<>(List.of("sort", "edit", "search"));
     private String headersDefaultMode = "sort";
     private List<String> defaultHeaders;
-    private boolean isHeaderModeChangeable = true;
+    private boolean headerModeChangeable = true;
     private boolean useDefaultHeaders = true;
     private I18nString emptyContentText;
     private String emptyContentIcon;
@@ -87,7 +87,7 @@ public class CaseViewBody extends ViewBody {
                     this.defaultHeaders);
         }
         outcome.putDataSetEntry(CaseViewConstants.FIELD_IS_HEADER_MODE_CHANGEABLE, FieldType.BOOLEAN,
-                this.isHeaderModeChangeable);
+                this.headerModeChangeable);
         outcome.putDataSetEntry(CaseViewConstants.FIELD_USE_DEFAULT_HEADERS, FieldType.BOOLEAN,
                 this.useDefaultHeaders);
         if (this.emptyContentText != null) {

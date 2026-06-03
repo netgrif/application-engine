@@ -563,7 +563,7 @@ public class MenuItemServiceTest {
         List<String> originAllFormValue = (List<String>) originLeafItemCase.getFieldValue(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ALL_DATA_FORM);
         assertNotNull(originAllFormValue);
         assertEquals(1, originAllFormValue.size());
-        assertNotEquals(duplicatedFormValue.get(0), originAllFormValue.get(0));
+        assertNotEquals(duplicatedAllFormValue.get(0), originAllFormValue.get(0));
 
         Case duplicatedCaseViewCase = workflowService.findOne(duplicatedCaseViewId);
         Case originCaseViewCase = workflowService.findOne(originCaseViewId);
@@ -632,17 +632,17 @@ public class MenuItemServiceTest {
 
         ConfigurationTemplateOutcome outcome = menuItemService.handleConfigurationTemplate(menuItemCase);
 
-        assertTrue((Boolean) outcome.mapping.get(MenuItemConstants.FIELD_USE_TABBED_VIEW));
-        assertFalse((Boolean) outcome.mapping.get(MenuItemConstants.FIELD_USE_CUSTOM_VIEW));
-        assertEquals(MenuItemViewType.CASE_VIEW.getIdentifier(), outcome.mapping.get(MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE));
-        List<String> viewCaseIdAsList = (List<String>) outcome.mapping.get(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID);
+        assertTrue((Boolean) outcome.getMapping().get(MenuItemConstants.FIELD_USE_TABBED_VIEW));
+        assertFalse((Boolean) outcome.getMapping().get(MenuItemConstants.FIELD_USE_CUSTOM_VIEW));
+        assertEquals(MenuItemViewType.CASE_VIEW.getIdentifier(), outcome.getMapping().get(MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE));
+        List<String> viewCaseIdAsList = (List<String>) outcome.getMapping().get(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID);
         assertEquals(1, viewCaseIdAsList.size());
         Case viewCase = workflowService.findOne(viewCaseIdAsList.get(0));
         assertEquals("case_view_configuration", viewCase.getProcessIdentifier());
-        List<String> viewFormTaskIdAsList = (List<String>) outcome.mapping.get(MenuItemConstants.FIELD_VIEW_CONFIGURATION_FORM);
+        List<String> viewFormTaskIdAsList = (List<String>) outcome.getMapping().get(MenuItemConstants.FIELD_VIEW_CONFIGURATION_FORM);
         assertEquals(1, viewFormTaskIdAsList.size());
         assertEquals(MenuItemUtils.findTaskIdInCase(viewCase, ViewConstants.TRANS_SETTINGS_ID), viewFormTaskIdAsList.get(0));
-        List<String> viewAllFormTaskIdAsList = (List<String>) outcome.mapping.get(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ALL_DATA_FORM);
+        List<String> viewAllFormTaskIdAsList = (List<String>) outcome.getMapping().get(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ALL_DATA_FORM);
         assertEquals(1, viewAllFormTaskIdAsList.size());
         assertEquals(MenuItemUtils.findTaskIdInCase(viewCase, ViewConstants.TRANS_ALL_MENU_DATA_ID), viewAllFormTaskIdAsList.get(0));
     }

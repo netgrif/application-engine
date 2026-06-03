@@ -184,10 +184,11 @@ public class MenuItemService implements IMenuItemService {
         if (body == null) {
             throw new IllegalArgumentException("Menu item body cannot be null");
         }
-        Case itemCase = findMenuItem(body.getIdentifier());
+        String sanitizedIdentifier = MenuItemUtils.sanitize(body.getIdentifier());
+        Case itemCase = findMenuItem(sanitizedIdentifier);
         if (itemCase != null) {
             log.debug("Ignored creation or update of menu item case [{}] with identifier [{}].", itemCase.getStringId(),
-                    body.getIdentifier());
+                    sanitizedIdentifier);
             return itemCase;
         } else {
             return createMenuItem(body);

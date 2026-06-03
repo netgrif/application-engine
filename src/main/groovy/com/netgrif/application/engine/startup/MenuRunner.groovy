@@ -29,8 +29,8 @@ class MenuRunner extends AbstractOrderedCommandLineRunner {
         helper.importProcess("Petri net for menu item", MenuItemConstants.PROCESS_IDENTIFIER, MENU_ITEM_FILE_NAME)
     }
 
-    private List<PetriNet> createConfigurationNets() {
-        return MenuItemViewType.values().each { view ->
+    private void createConfigurationNets() {
+        MenuItemViewType.values().each { view ->
             String processIdentifier = view.getIdentifier() + "_configuration"
             String filePath = String.format("engine-processes/menu/%s.xml", processIdentifier)
             helper.importProcess(String.format("Petri net for %s", processIdentifier), processIdentifier, filePath)

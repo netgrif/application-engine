@@ -10,7 +10,7 @@ import java.util.List;
 public class MenuItemDataResponse {
 
     /**
-     * Map containing menu item data where key is the view type and value is a list of immediate fields.
+     * List of data groups containing menu item data.
      */
     @Getter
     private final List<DataGroup> data;

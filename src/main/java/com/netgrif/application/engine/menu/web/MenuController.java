@@ -38,9 +38,12 @@ public class MenuController {
             String caseId = new String(Base64.getDecoder().decode(encodedCaseId));
             List<DataGroup> dataGroups = menuItemService.getMenuItemData(caseId, locale);
             return EntityModel.of(new MenuItemDataResponse(dataGroups));
+        } catch (IllegalArgumentException e) {
+            log.warn("Requested with invalid input", e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested with invalid input");
         } catch (Exception e) {
             log.error("Getting menu item data failed", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Getting menu item data failed", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Getting menu item data failed");
         }
     }
 

@@ -70,7 +70,7 @@ class MenuImportExportTest {
             "Menu entry \"My tasks\": OK\n"
 
     @Autowired
-    MenuRunner filterRunner
+    MenuRunner menuRunner
 
     @Autowired
     TestHelper testHelper

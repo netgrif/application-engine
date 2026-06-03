@@ -930,7 +930,7 @@
 			<actions phase="pre">
 				<action>
 					def outcome = menuItemService.handleConfigurationTemplate(useCase)
-					outcome.mapping.each { fieldId, value ->
+					outcome.getMapping().each { fieldId, value ->
 						change useCase.getField(fieldId) value { value }
 					}
 				</action>
