@@ -3,6 +3,7 @@ package com.netgrif.application.engine.migration
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
+import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.migration.model.MigrationError
 import com.netgrif.application.engine.migration.model.MigrationErrorPolicy
 import com.netgrif.application.engine.migration.throwable.MigrationErrorException
@@ -56,13 +57,20 @@ class MigrationTest {
     @Autowired
     private MigrationHelper migrationHelper
 
+    @Autowired
+    private ElasticCaseRepository elasticCaseRepository
+
     private PetriNet netV1, netV2
+
+    private static final String MIGRATION_TEST_V1 = "petriNets/migration_test_v1.xml"
+
+    private static final String MIGRATION_TEST_V2 = "petriNets/migration_test_v2.xml"
 
     @BeforeEach
     void beforeEach() {
         testHelper.truncateDbs()
 
-        this.class.classLoader.getResourceAsStream("petriNets/migration_test_v1.xml").withCloseable { is ->
+        this.class.classLoader.getResourceAsStream(MIGRATION_TEST_V1).withCloseable { is ->
             ImportPetriNetParams importPetriNetParams = ImportPetriNetParams.with()
                     .xmlFile(is)
                     .releaseType(VersionType.MAJOR)
@@ -73,7 +81,7 @@ class MigrationTest {
             netV1 = netV1Outcome.getNet()
         }
 
-        this.class.classLoader.getResourceAsStream("petriNets/migration_test_v2.xml").withCloseable { is ->
+        this.class.classLoader.getResourceAsStream(MIGRATION_TEST_V2).withCloseable { is ->
             ImportPetriNetParams importPetriNetParams = ImportPetriNetParams.with()
                     .xmlFile(is)
                     .releaseType(VersionType.MAJOR)
@@ -113,15 +121,15 @@ class MigrationTest {
 
         migrationHelper.withErrorPolicy(MigrationErrorPolicy.throwAfterProcessing()) {
             migrationHelper.updateCasesCursor({ Case useCase ->
+                migrationHelper.removeCase(useCase)
                 migrationHelper.updateCasePermissionsFromNet(useCase, netV2)
                 migrationHelper.reloadTasks(useCase, netV2)
-                MigrationHelper.migratePetriNet(useCase, netV2)
-
+                migrationHelper.migratePetriNet(useCase, netV2)
                 MigrationHelper.addTextDataFields(useCase, [
                         "recreate_info_text": ""
                 ])
                 useCase.dataSet["income"] = new DataField(1000)
-            }, "migration_test", 2)
+            }, netV1.getObjectId(), 2)
         }
 
         List<Case> casesAfterMigration = workflowService.search(

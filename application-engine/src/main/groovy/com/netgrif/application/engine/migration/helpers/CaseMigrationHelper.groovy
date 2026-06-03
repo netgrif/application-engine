@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.migration.helpers
 
+import com.mongodb.client.result.DeleteResult
 import com.netgrif.application.engine.configuration.properties.MigrationProperties
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
@@ -10,10 +11,13 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldV
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileListFieldValue
 import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.objects.workflow.domain.DataField
+import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.querydsl.core.types.Predicate
 import groovy.util.logging.Slf4j
+import org.bson.types.ObjectId
 import org.springframework.data.mongodb.core.BulkOperations
+import org.springframework.data.mongodb.core.FindAndReplaceOptions
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
@@ -96,7 +100,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
     void prepareOperations(Case useCase, Closure update, BulkOperations bulkOperations) {
         log.debug("Updating case with ID ${useCase.stringId}")
         update(useCase)
-        bulkOperations.replaceOne(Query.query(Criteria.where("_id").is(useCase.get_id())), useCase)
+        bulkOperations.replaceOne(Query.query(Criteria.where("_id").is(useCase.get_id())), useCase, FindAndReplaceOptions.options().upsert())
     }
 
     /**
@@ -148,6 +152,22 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
                            MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting updateCasesCursor for processIdentifier: ${processIdentifier}, pageSize: ${pageSize}")
         Query query = new Query(Criteria.where("processIdentifier").is(processIdentifier))
+        iterate(update, null, query, 0, pageSize, errorPolicy)
+    }
+
+    /**
+     * Updates all cases associated with a specific PetriNet identified by its ObjectId.
+     * The update closure is executed for each matching case.
+     *
+     * @param update A closure containing the code to execute for each matching case.
+     * @param petriNetObjectId The ObjectId of the PetriNet whose cases should be updated.
+     * @param pageSize Optional page size for processing cases. Default is 100.
+     * @param errorPolicy Optional error handling policy. Defaults to the default error policy.
+     */
+    void updateCasesCursor(Closure update, ObjectId petriNetObjectId, int pageSize = 100,
+                           MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
+        log.debug("Starting updateCasesCursor for petriNetObjectId: ${petriNetObjectId}, pageSize: ${pageSize}")
+        Query query = new Query(Criteria.where("petriNetObjectId").is(petriNetObjectId))
         iterate(update, null, query, 0, pageSize, errorPolicy)
     }
 
@@ -413,12 +433,36 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
     }
 
     /**
+     * Removes a case from both MongoDB and Elasticsearch.
+     * Deletes the case document from MongoDB and removes its corresponding index entry from Elasticsearch.
+     * If the MongoDB deletion is not acknowledged, an error is logged and handled according to the error policy.
+     *
+     * @param useCase The case instance to be removed from the system.
+     * @param errorPolicy The error handling policy to apply if the removal fails. Defaults to the default error policy.
+     */
+    void removeCase(Case useCase, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
+        log.debug("Starting removeCase for case: ${useCase.stringId}")
+        DeleteResult deleteResult = mongoTemplate.remove(useCase)
+        log.trace("MongoDB delete result for case ${useCase.stringId}: acknowledged=${deleteResult.wasAcknowledged()}, deletedCount=${deleteResult.deletedCount}")
+        if (!deleteResult.wasAcknowledged()) {
+            String message = "Failed to delete case ${useCase.stringId} from MongoDB during PetriNet migration"
+            log.error(message)
+            handleMigrationError(errorPolicy, "migratePetriNet", type, useCase.stringId, message)
+            return
+        }
+        elasticCaseService.remove(useCase.getStringId())
+        log.trace("Successfully removed case ${useCase.stringId} from Elasticsearch")
+    }
+
+    /**
      * Changes PetriNet reference in useCase
      * @param useCase Instance of Case
      * @param newNet Instance of Petri Net, it needs to match processIdentifier of useCase
      */
-    static void migratePetriNet(Case useCase, PetriNet newNet) {
+    void migratePetriNet(Case useCase, PetriNet newNet, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting migratePetriNet for case: ${useCase.stringId}, new net: ${newNet.stringId}")
+        ProcessResourceId newCaseId = new ProcessResourceId(newNet.getStringId(), useCase.get_id().getObjectId())
+        useCase.set_id(newCaseId)
         useCase.setPetriNetObjectId(newNet.objectId)
         log.trace("Updated petriNet reference for case: ${useCase.stringId} to net: ${newNet.stringId}")
     }

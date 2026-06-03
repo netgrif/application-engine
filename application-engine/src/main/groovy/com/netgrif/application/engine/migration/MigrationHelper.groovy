@@ -17,6 +17,7 @@ import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.objects.workflow.domain.TaskPair
 import com.querydsl.core.types.Predicate
 import groovy.util.logging.Slf4j
+import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Component
@@ -145,6 +146,18 @@ class MigrationHelper {
     void updateCasesCursor(Closure update, String processIdentifier, int pageSize = 100) {
         log.debug("updateCasesCursor called with processIdentifier: {}, pageSize: {}", processIdentifier, pageSize)
         caseMigrationHelper.updateCasesCursor(update, processIdentifier, pageSize, getCurrentErrorPolicy())
+    }
+
+
+    /**
+     * Updates all cases of a given process identified by ObjectId.
+     * @param update Instance of Closure, which should contain code that will be executed for every Case matched by filter
+     * @param petriNetObjectId ObjectId of PetriNet, to filter which cases should be updated
+     * @param pageSize Optional attribute to set page size. Default page size 100
+     */
+    void updateCasesCursor(Closure update, ObjectId petriNetObjectId, int pageSize = 100) {
+        log.debug("updateCasesCursor called with petriNetObjectId: {}, pageSize: {}", petriNetObjectId, pageSize)
+        caseMigrationHelper.updateCasesCursor(update, petriNetObjectId, pageSize, getCurrentErrorPolicy())
     }
 
     /**
@@ -521,8 +534,19 @@ class MigrationHelper {
      * @param useCase Instance of Case
      * @param newNet Instance of Petri Net, it needs to match processIdentifier of useCase
      */
-    static void migratePetriNet(Case useCase, PetriNet newNet) {
-        CaseMigrationHelper.migratePetriNet(useCase, newNet)
+    void migratePetriNet(Case useCase, PetriNet newNet) {
+        caseMigrationHelper.migratePetriNet(useCase, newNet)
+    }
+
+    /**
+     * Removes a case from the system.
+     * This operation delegates to the CaseMigrationHelper to perform the actual deletion,
+     * respecting the current error policy for handling any issues that may occur during removal.
+     *
+     * @param useCase Instance of Case to be removed from the system
+     */
+    void removeCase(Case useCase) {
+        caseMigrationHelper.removeCase(useCase, getCurrentErrorPolicy())
     }
 
     /**
