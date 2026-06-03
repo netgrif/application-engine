@@ -68,6 +68,8 @@ public class DataService implements IDataService {
 
     public static final int MONGO_ID_LENGTH = 24;
 
+    private static final Set<FieldType> setDataForbiddenFieldTypes = Set.of(FieldType.TASK_REF, FieldType.CASE_REF);
+
     @Autowired
     protected ApplicationEventPublisher publisher;
 
@@ -219,6 +221,22 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params) {
+        return setData(task, values, params, false);
+    }
+
+    /**
+     * Updates the data field's attributes of the provided task.
+     *
+     * @param task the task object of which the data are updated
+     * @param values information about how to update the data fields
+     * @param params additional information to be injected to the action delegate context
+     * @param runStrict if set to true, additional validations are going to be applied when updating the data fields. If
+     *                set to false, minimal restrictions are considered.
+     *
+     * @return outcome containing Case, Task and changes that have been made.
+     * */
+    @Override
+    public SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params, boolean runStrict) {
         Case useCase = workflowService.findOne(task.getCaseId());
         IUser user = userService.getLoggedOrSystem();
 
@@ -230,8 +248,20 @@ public class DataService implements IDataService {
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
         values.fields().forEachRemaining(entry -> {
             String fieldId = entry.getKey();
+            if (runStrict) {
+                Field<?> field = useCase.getField(fieldId);
+                if (field == null) {
+                    throw new IllegalArgumentException("Such field with id [" + fieldId + "] does not exist in petri net [" + useCase.getPetriNetId() + "]");
+                }
+                if (setDataForbiddenFieldTypes.contains(field.getType())) {
+                    return;
+                }
+            }
             DataField dataField = useCase.getDataSet().get(fieldId);
             if (dataField != null) {
+                if (runStrict && !isDataFieldEditable(dataField, task.getTransitionId())) {
+                    throw new IllegalArgumentException("Cannot edit data field [" + fieldId + "], which is not editable on transition [" + task.getTransitionId() + "].");
+                }
                 Field field = useCase.getPetriNet().getField(fieldId).get();
                 outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task, params));
                 if (outcome.getMessage() == null) {
@@ -301,6 +331,15 @@ public class DataService implements IDataService {
         updateDataset(useCase);
         outcome.setCase(workflowService.save(useCase));
         return outcome;
+    }
+
+    private boolean isDataFieldEditable(DataField dataField, String transId) {
+        Map<String, Set<FieldBehavior>> behaviorMap = dataField.getBehavior();
+        if (behaviorMap == null) {
+            return false;
+        }
+        Set<FieldBehavior> behaviorSet = behaviorMap.get(transId);
+        return behaviorSet != null && behaviorSet.contains(FieldBehavior.EDITABLE);
     }
 
     @Override
@@ -653,7 +692,8 @@ public class DataService implements IDataService {
     }
 
     private List<EventOutcome> getChangedFieldByFileFieldContainer(String fieldId, Task referencingTask, Case useCase, Map<String, String> params) {
-        List<EventOutcome> outcomes = new ArrayList<>(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
+        List<EventOutcome> outcomes = new ArrayList<>();
+        outcomes.addAll( resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
                 EventPhase.PRE, useCase, referencingTask, params));
         outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
                 EventPhase.POST, useCase, referencingTask, params));
@@ -1050,16 +1090,13 @@ public class DataService implements IDataService {
         if (optionsNode == null) {
             return null;
         }
+
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
         module.addDeserializer(I18nString.class, new I18nStringDeserializer());
         mapper.registerModule(module);
-        Map<String, I18nString> optionsMapped = mapper.convertValue(optionsNode, new TypeReference<Map<String, I18nString>>() {
-        });
-        if (optionsMapped.isEmpty()) {
-            return null;
-        }
-        return optionsMapped;
+
+        return mapper.convertValue(optionsNode, new TypeReference<>() {});
     }
 
     private void setDataFieldOptions(Map<String, I18nString> options, DataField dataField, ChangedField changedField, String fieldType) {
