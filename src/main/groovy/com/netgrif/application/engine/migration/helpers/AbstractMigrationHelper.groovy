@@ -50,10 +50,11 @@ abstract class AbstractMigrationHelper<T> {
     protected final MigrationProperties migrationProperties
 
     /**
-     * A thread-safe map that stores migration errors encountered during the migration process.
-     * The map is keyed by a string identifier (typically a document ID or migration step identifier)
-     * and contains a list of {@link MigrationError} objects representing all errors associated with that key.
-     * This structure allows for efficient error tracking and reporting during bulk migration operations.
+     * A thread-safe list of migration errors that occurred during the migration process.
+     * This list stores all errors encountered while processing documents, allowing the migration
+     * to continue execution while collecting errors for later review and reporting.
+     * The list uses {@link CopyOnWriteArrayList} to ensure thread-safety during concurrent
+     * migration operations.
      */
     private final List<MigrationError> migrationErrors
 
