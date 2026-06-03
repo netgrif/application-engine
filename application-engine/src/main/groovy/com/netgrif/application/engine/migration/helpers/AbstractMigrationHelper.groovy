@@ -51,10 +51,11 @@ abstract class AbstractMigrationHelper<T> {
     protected final MigrationProperties migrationProperties
 
     /**
-     * A thread-safe map that stores migration errors encountered during the migration process.
-     * The map is keyed by a string identifier (typically a document ID or migration step identifier)
-     * and contains a list of {@link MigrationError} objects representing all errors associated with that key.
-     * This structure allows for efficient error tracking and reporting during bulk migration operations.
+     * A thread-safe list of migration errors that occurred during the migration process.
+     * This list stores all errors encountered while processing documents, allowing the migration
+     * to continue execution while collecting errors for later review and reporting.
+     * The list uses {@link CopyOnWriteArrayList} to ensure thread-safety during concurrent
+     * migration operations.
      */
     private final List<MigrationError> migrationErrors
 
@@ -244,7 +245,8 @@ abstract class AbstractMigrationHelper<T> {
                         } catch (Exception e) {
                             String message = "Failed to process ${type.simpleName} bulk operations on page ${page}"
                             log.error(message, e)
-                            handleMigrationError(errorPolicy, "bulkWrite", type, null, message, e)                        }
+                            handleMigrationError(errorPolicy, "bulkWrite", type, null, message, e)
+                        }
 
                         bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, type)
                         currentBatchSize = 0
@@ -257,6 +259,9 @@ abstract class AbstractMigrationHelper<T> {
                     }
                 }
             } catch (Exception e) {
+                if (e instanceof MigrationErrorException) {
+                    throw e
+                }
                 String message = "Failed to iterate ${type.simpleName} documents with filter ${query}"
                 log.error(message, e)
                 handleMigrationError(errorPolicy, "iterate", type, null, message, e)
@@ -315,8 +320,8 @@ abstract class AbstractMigrationHelper<T> {
                 throwError(policy, message, cause)
                 break
             case MigrationErrorHandlingMode.THROW_AFTER_LIMIT:
-                if (getErrors().size() >= policy.maxErrors) {
-                    throw new MigrationErrorException("Migration failed after reaching error limit ${policy.maxErrors}", getErrors(), cause)
+                if (policy.maxErrors > 0 && getErrors().size() >= policy.maxErrors) {
+                    throwError(policy, "Migration failed after reaching error limit ${policy.maxErrors}", cause)
                 }
                 break
             case MigrationErrorHandlingMode.CONTINUE:
@@ -360,7 +365,7 @@ abstract class AbstractMigrationHelper<T> {
      * @throws MigrationErrorException if the policy requires throwing after processing and errors exist
      */
     protected void finishMigrationErrorPolicy(MigrationErrorPolicy policy) {
-        if (policy.mode == MigrationErrorHandlingMode.THROW_AFTER_PROCESSING && hasErrors()) {
+        if ((policy.mode == MigrationErrorHandlingMode.THROW_AFTER_PROCESSING || (policy.mode == MigrationErrorHandlingMode.THROW_AFTER_LIMIT && policy.maxErrors <= 0)) && hasErrors()) {
             throw new MigrationErrorException(
                     "Migration finished with ${getErrors().size()} errors",
                     getErrors()

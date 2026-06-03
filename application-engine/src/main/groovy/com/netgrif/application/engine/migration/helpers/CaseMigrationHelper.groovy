@@ -445,9 +445,9 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
         DeleteResult deleteResult = mongoTemplate.remove(useCase)
         log.trace("MongoDB delete result for case ${useCase.stringId}: acknowledged=${deleteResult.wasAcknowledged()}, deletedCount=${deleteResult.deletedCount}")
         if (!deleteResult.wasAcknowledged()) {
-            String message = "Failed to delete case ${useCase.stringId} from MongoDB during PetriNet migration"
+            String message = "Failed to delete case ${useCase.stringId} from MongoDB"
             log.error(message)
-            handleMigrationError(errorPolicy, "migratePetriNet", type, useCase.stringId, message)
+            handleMigrationError(errorPolicy, "removeCase", type, useCase.stringId, message)
             return
         }
         elasticCaseService.remove(useCase.getStringId())

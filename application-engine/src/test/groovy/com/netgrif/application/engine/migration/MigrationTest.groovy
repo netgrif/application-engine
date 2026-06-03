@@ -69,6 +69,7 @@ class MigrationTest {
     @BeforeEach
     void beforeEach() {
         testHelper.truncateDbs()
+        migrationHelper.clearErrors()
 
         this.class.classLoader.getResourceAsStream(MIGRATION_TEST_V1).withCloseable { is ->
             ImportPetriNetParams importPetriNetParams = ImportPetriNetParams.with()
