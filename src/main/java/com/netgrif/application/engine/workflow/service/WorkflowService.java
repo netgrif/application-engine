@@ -5,7 +5,6 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventLog;
 import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
@@ -75,7 +74,7 @@ public class WorkflowService implements IWorkflowService {
     protected ITaskService taskService;
 
     @Autowired
-    protected CaseSearchService searchService;
+    protected LegacyCaseSearchService searchService;
 
     @Autowired
     protected ApplicationEventPublisher publisher;
@@ -188,6 +187,7 @@ public class WorkflowService implements IWorkflowService {
     public Page<Case> search(Predicate predicate, Pageable pageable) {
         Page<Case> page = repository.findAll(predicate, pageable);
         page.getContent().forEach(this::setPetriNet);
+        decryptDataSets(page.getContent());
         return setImmediateDataFields(page);
     }
 
@@ -212,6 +212,26 @@ public class WorkflowService implements IWorkflowService {
             return repository.count(searchPredicate);
         } else {
             return 0;
+        }
+    }
+
+    @Override
+    public long count(Predicate predicate) {
+        // todo 2443 logged user permissions
+        if (predicate != null) {
+            return repository.count(predicate);
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    public boolean exists(Predicate predicate) {
+        // todo 2443 logged user permissions
+        if (predicate != null) {
+            return repository.exists(predicate);
+        } else {
+            return false;
         }
     }
 

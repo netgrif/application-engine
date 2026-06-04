@@ -38,6 +38,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutc
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
@@ -520,6 +521,36 @@ public class PetriNetService implements IPetriNetService {
         query.with(pageable);
         List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
         return new PageImpl<>(nets.stream().map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()), pageable, mongoTemplate.count(queryTotal, PetriNet.class));
+    }
+
+    @Override
+    public Page<PetriNet> search(Predicate predicate, Pageable pageable) {
+        if (pageable == null) {
+            pageable = Pageable.unpaged();
+        }
+        if (predicate != null) {
+            // todo 2443 logged user permissions
+            return repository.findAll(predicate, pageable);
+        }
+        return Page.empty();
+    }
+
+    @Override
+    public long count(Predicate predicate) {
+        if (predicate != null) {
+            // todo 2443 logged user permissions
+            return repository.count(predicate);
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean exists(Predicate predicate) {
+        if (predicate != null) {
+            // todo 2443 logged user permissions
+            return repository.exists(predicate);
+        }
+        return false;
     }
 
     private void addValueCriteria(Query query, Query queryTotal, Criteria criteria) {

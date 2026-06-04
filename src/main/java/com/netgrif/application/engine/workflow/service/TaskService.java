@@ -82,7 +82,7 @@ public class TaskService implements ITaskService {
     protected MongoTemplate mongoTemplate;
 
     @Autowired
-    protected TaskSearchService searchService;
+    protected LegacyTaskSearchService searchService;
 
     @Autowired
     @Qualifier("taskScheduler")

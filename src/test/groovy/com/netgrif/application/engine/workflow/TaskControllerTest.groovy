@@ -21,7 +21,7 @@ import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.DataField
 import com.netgrif.application.engine.workflow.domain.Task
-import com.netgrif.application.engine.workflow.service.TaskSearchService
+import com.netgrif.application.engine.workflow.service.LegacyTaskSearchService
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -50,7 +50,7 @@ class TaskControllerTest {
     private TaskService taskService
 
     @Autowired
-    private TaskSearchService taskSearchService
+    private LegacyTaskSearchService taskSearchService
 
     @Autowired
     private IElasticTaskService elasticTaskService

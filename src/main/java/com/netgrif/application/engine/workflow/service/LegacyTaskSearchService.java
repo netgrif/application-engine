@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class TaskSearchService extends MongoSearchService<Task> {
+public class LegacyTaskSearchService extends MongoSearchService<Task> {
 
     @Autowired
     private IPetriNetService petriNetService;
