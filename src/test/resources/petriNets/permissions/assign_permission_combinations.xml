@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>assign_permission_combinations</id>
+    <version>1.0.0</version>
+    <initials>APC</initials>
+    <title>Assign Permission Combinations</title>
+    <defaultRole>true</defaultRole>
+
+    <role>
+        <id>process_role</id>
+        <title>Process Role</title>
+    </role>
+
+    <data type="userList">
+        <id>users</id>
+        <title>Users</title>
+    </data>
+
+    <transition>
+        <id>t_001</id>
+        <x>100</x>
+        <y>100</y>
+        <label>role=true default=true user=true</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_002</id>
+        <x>300</x>
+        <y>100</y>
+        <label>role=true default=true user=false</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_003</id>
+        <x>500</x>
+        <y>100</y>
+        <label>role=true default=true user=undefined</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+    </transition>
+
+    <transition>
+        <id>t_004</id>
+        <x>700</x>
+        <y>100</y>
+        <label>role=true default=false user=true</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_005</id>
+        <x>900</x>
+        <y>100</y>
+        <label>role=true default=false user=false</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_006</id>
+        <x>1100</x>
+        <y>100</y>
+        <label>role=true default=false user=undefined</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+    </transition>
+
+    <transition>
+        <id>t_007</id>
+        <x>1300</x>
+        <y>100</y>
+        <label>role=true default=undefined user=true</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_008</id>
+        <x>1500</x>
+        <y>100</y>
+        <label>role=true default=undefined user=false</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_009</id>
+        <x>1700</x>
+        <y>100</y>
+        <label>role=true default=undefined user=undefined</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+    </transition>
+
+    <transition>
+        <id>t_010</id>
+        <x>100</x>
+        <y>300</y>
+        <label>role=false default=true user=true</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_011</id>
+        <x>300</x>
+        <y>300</y>
+        <label>role=false default=true user=false</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_012</id>
+        <x>500</x>
+        <y>300</y>
+        <label>role=false default=true user=undefined</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+    </transition>
+
+    <transition>
+        <id>t_013</id>
+        <x>700</x>
+        <y>300</y>
+        <label>role=false default=false user=true</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_014</id>
+        <x>900</x>
+        <y>300</y>
+        <label>role=false default=false user=false</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_015</id>
+        <x>1100</x>
+        <y>300</y>
+        <label>role=false default=false user=undefined</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+    </transition>
+
+    <transition>
+        <id>t_016</id>
+        <x>1300</x>
+        <y>300</y>
+        <label>role=false default=undefined user=true</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_017</id>
+        <x>1500</x>
+        <y>300</y>
+        <label>role=false default=undefined user=false</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_018</id>
+        <x>1700</x>
+        <y>300</y>
+        <label>role=false default=undefined user=undefined</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+    </transition>
+
+    <transition>
+        <id>t_019</id>
+        <x>100</x>
+        <y>500</y>
+        <label>role=undefined default=true user=true</label>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_020</id>
+        <x>300</x>
+        <y>500</y>
+        <label>role=undefined default=true user=false</label>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_021</id>
+        <x>500</x>
+        <y>500</y>
+        <label>role=undefined default=true user=undefined</label>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+    </transition>
+
+    <transition>
+        <id>t_022</id>
+        <x>700</x>
+        <y>500</y>
+        <label>role=undefined default=false user=true</label>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_023</id>
+        <x>900</x>
+        <y>500</y>
+        <label>role=undefined default=false user=false</label>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_024</id>
+        <x>1100</x>
+        <y>500</y>
+        <label>role=undefined default=false user=undefined</label>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+    </transition>
+
+    <transition>
+        <id>t_025</id>
+        <x>1300</x>
+        <y>500</y>
+        <label>role=undefined default=undefined user=true</label>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_026</id>
+        <x>1500</x>
+        <y>500</y>
+        <label>role=undefined default=undefined user=false</label>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_027</id>
+        <x>1700</x>
+        <y>500</y>
+        <label>role=undefined default=undefined user=undefined</label>
+    </transition>
+</document>

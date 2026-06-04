@@ -1,0 +1,10 @@
+Transition title,default role,roleRef,No permissions,Has role
+role=true default=true,true,true,true,true
+role=true default=false,false,true,false,false
+role=true default=undefined,undefined,true,false,true
+role=false default=true,true,false,true,false
+role=false default=false,false,false,false,false
+role=false default=undefined,undefined,false,false,false
+role=undefined default=true,true,undefined,true,true
+role=undefined default=false,false,undefined,false,false
+role=undefined default=undefined,undefined,undefined,true,true

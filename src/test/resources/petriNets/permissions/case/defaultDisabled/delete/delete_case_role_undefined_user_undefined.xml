@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>delete_case_role_undefined_user_undefined</id>
+    <version>1.0.0</version>
+    <initials>DCP</initials>
+    <title>Delete Case Role undefined User undefined</title>
+    <defaultRole>false</defaultRole>
+
+    <role>
+        <id>process_role</id>
+        <title>Process Role</title>
+    </role>
+
+    <data type="userList">
+        <id>users</id>
+        <title>Users</title>
+    </data>
+    <transition>
+        <id>t_001</id>
+        <x>200</x>
+        <y>200</y>
+        <label>default transition</label>
+    </transition>
+</document>
