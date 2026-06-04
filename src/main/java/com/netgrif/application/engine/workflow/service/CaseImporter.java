@@ -90,11 +90,11 @@ public class CaseImporter {
     }
 
     protected void importCase() {
-        Version version = new Version();
+        Version version = resolveVersion();
         PetriNet model = petriNetService.getPetriNet(xmlCase.getProcessIdentifier(), version);
         if (model == null) {
 //            todo throw error?
-            log.error("Petri net with identifier [{}] not found, skipping case import", xmlCase.getProcessIdentifier());
+            log.error("Petri net with identifier [{}] and version [{}] not found, skipping case import", xmlCase.getProcessIdentifier(), version.toString());
             return;
         }
         ObjectId importedCaseId = new ObjectId(xmlCase.getId());
@@ -111,6 +111,18 @@ public class CaseImporter {
         importDataSet();
     }
 
+    protected Version resolveVersion() {
+        String[] versionParts = xmlCase.getProcessVersion().split("\\.");
+        if( versionParts.length != 3) {
+            throw new IllegalArgumentException("Invalid version format: " + xmlCase.getProcessVersion());
+        }
+        try {
+            return new Version(Integer.parseInt(versionParts[0]), Integer.parseInt(versionParts[1]), Integer.parseInt(versionParts[2]));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid version format: " + xmlCase.getProcessVersion());
+        }
+    }
+
     protected void importTasks() {
         List<Task> importedTasks = new ArrayList<>();
         if (xmlCase.getTask() == null) {
@@ -118,9 +130,18 @@ public class CaseImporter {
         }
         this.xmlCase.getTask().forEach(task -> {
             Transition transition = this.importedCase.getPetriNet().getTransition(task.getTransitionId());
+            ObjectId taskId;
+            try {
+                taskService.findOne(task.getId());
+                log.warn("Task with id [{}] already exists, new id will be generated for imported task", task.getId());
+                taskId = new ObjectId();
+            } catch (IllegalArgumentException e) {
+                taskId = new ObjectId(task.getId());
+            }
+
             final Task importedTask = Task.with()
                     .title(transition.getTitle())
-                    ._id(new ObjectId(task.getId()))
+                    ._id(taskId)
                     .caseId(this.importedCase.getStringId())
                     .processId(this.importedCase.getProcessIdentifier())
                     .transitionId(transition.getImportId())
@@ -151,6 +172,7 @@ public class CaseImporter {
             }
             ProcessRole defaultRole = processRoleService.defaultRole();
             ProcessRole anonymousRole = processRoleService.anonymousRole();
+
             for (Map.Entry<String, Map<String, Boolean>> entry : transition.getRoles().entrySet()) {
                 if (this.importedCase.getEnabledRoles().contains(entry.getKey())
                         || defaultRole.getStringId().equals(entry.getKey())
