@@ -14,6 +14,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+import groovy.util.logging.Slf4j
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -44,6 +45,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 
+@Slf4j
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
@@ -308,11 +310,16 @@ class CasePermissionsTest {
         assertTrue(testNets.size() > 0)
         Map<String, PetriNet> importedNets = [:]
         for (File testNet in testNets) {
-            PetriNet net = petriNetService.importPetriNet(new FileInputStream(testNet), VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
-            withRoles.forEach { user ->
-                assignRoleToUser(net, user)
+            try (FileInputStream fis = new FileInputStream(testNet)) {
+                PetriNet net = petriNetService.importPetriNet(fis, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+                withRoles.forEach { user ->
+                    assignRoleToUser(net, user)
+                }
+                importedNets.put(net.identifier, net)
+            } catch (FileNotFoundException e) {
+                log.error("Could not import net [${testNet.name}]", e)
+                throw new IllegalArgumentException(e)
             }
-            importedNets.put(net.identifier, net)
         }
         return importedNets
     }
