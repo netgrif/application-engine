@@ -1,4 +1,4 @@
-// todo NAE-1997: generate this with plugin
+// todo 2443 generate this with plugin
 grammar QueryLang;
 
 query: resource=(PROCESS | PROCESSES) delimeter processConditions (paging)? (processSorting)? EOF # processQuery
@@ -223,12 +223,12 @@ tasksUserIdComparison: tasksUserId SPACE stringComparison # tasksUserIdBasic
                      ;
 
 // basic comparisons
-objectIdComparison: (NOT SPACE?)? op=EQ SPACE STRING ;
-stringComparison: (NOT SPACE?)? op=(EQ | CONTAINS | LT | GT | LTE | GTE) SPACE STRING ;
-numberComparison: (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE number=(INT | DOUBLE) ;
-dateComparison: (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE DATE ;
-dateTimeComparison: (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE DATETIME ;
-booleanComparison: (NOT SPACE?)? op=EQ SPACE BOOLEAN ;
+objectIdComparison: (NOT SPACE?)? op=(EQ | NEQ) SPACE STRING ;
+stringComparison: (NOT SPACE?)? op=(EQ | NEQ | CONTAINS | LT | GT | LTE | GTE) SPACE STRING ;
+numberComparison: (NOT SPACE?)? op=(EQ | NEQ | LT | GT | LTE | GTE) SPACE number=(INT | DOUBLE) ;
+dateComparison: (NOT SPACE?)? op=(EQ | NEQ | LT | GT | LTE | GTE) SPACE DATE ;
+dateTimeComparison: (NOT SPACE?)? op=(EQ | NEQ | LT | GT | LTE | GTE) SPACE DATETIME ;
+booleanComparison: (NOT SPACE?)? op=(EQ | NEQ) SPACE BOOLEAN ;
 
 // in list/in range comparisons
 inListStringComparison: (NOT SPACE?)? op=IN SPACE stringList ;
@@ -252,6 +252,7 @@ AND: A N D | '&' ;
 OR: O R | '|' ;
 NOT: N O T | '!' ;
 EQ: E Q | '==' ;
+NEQ: N E Q | '!=' ;
 LT: L T | '<' ;
 GT: G T | '>' ;
 LTE: L T E | '<=' ;

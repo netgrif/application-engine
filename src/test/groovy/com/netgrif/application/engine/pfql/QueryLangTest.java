@@ -90,8 +90,7 @@ public class QueryLangTest {
         cases = searchService.search("cases: processIdentifier eq 'query_test' and data.boolean_0.value == true");
         assert ((Page<Case>)cases).getTotalElements() == 5;
 
-        // TODO: release/8.0.0 add 'neq'/'!=', simplify 'not' requires ()
-        cases = searchService.search("cases: processIdentifier eq 'query_test'    and data.boolean_0.value == true and not (data.text_0.value == '4')");
+        cases = searchService.search("cases: processIdentifier eq 'query_test'    and data.boolean_0.value == true and data.text_0.value != '4'");
         assert ((Page<Case>)cases).getTotalElements() == 4;
     }
 
@@ -213,6 +212,11 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery(String.format("process: id neq '%s'", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QPetriNet.petriNet._id.eq(GENERIC_OBJECT_ID).not();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // and comparison
         actual = evaluateQuery(String.format("process: id eq '%s' and title eq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QPetriNet.petriNet._id.eq(GENERIC_OBJECT_ID).and(QPetriNet.petriNet.title.defaultValue.eq("test"));
@@ -221,6 +225,11 @@ public class QueryLangTest {
 
         // and not comparison
         actual = evaluateQuery(String.format("process: id eq '%s' and title not eq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QPetriNet.petriNet._id.eq(GENERIC_OBJECT_ID).and(QPetriNet.petriNet.title.defaultValue.eq("test").not());
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("process: id eq '%s' and title != 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QPetriNet.petriNet._id.eq(GENERIC_OBJECT_ID).and(QPetriNet.petriNet.title.defaultValue.eq("test").not());
 
         compareMongoQueries(mongoDbUtils, actual, expected);
@@ -380,6 +389,11 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery(String.format("case: id neq '%s'", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QCase.case$._id.eq(GENERIC_OBJECT_ID).not();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // and comparison
         actual = evaluateQuery(String.format("case: id eq '%s' and title eq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QCase.case$._id.eq(GENERIC_OBJECT_ID).and(QCase.case$.title.eq("test"));
@@ -392,6 +406,11 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery(String.format("case: id eq '%s' and title != 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QCase.case$._id.eq(GENERIC_OBJECT_ID).and(QCase.case$.title.eq("test").not());
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // or comparison
         actual = evaluateQuery(String.format("case: id eq '%s' or title eq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QCase.case$._id.eq(GENERIC_OBJECT_ID).or(QCase.case$.title.eq("test"));
@@ -400,6 +419,11 @@ public class QueryLangTest {
 
         // or not comparison
         actual = evaluateQuery(String.format("case: id eq '%s' or title not eq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QCase.case$._id.eq(GENERIC_OBJECT_ID).or(QCase.case$.title.eq("test").not());
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("case: id eq '%s' or title neq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QCase.case$._id.eq(GENERIC_OBJECT_ID).or(QCase.case$.title.eq("test").not());
 
         compareMongoQueries(mongoDbUtils, actual, expected);
@@ -518,6 +542,11 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery(String.format("task: id != '%s'", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QTask.task._id.eq(GENERIC_OBJECT_ID).not();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // and comparison
         actual = evaluateQuery(String.format("task: id eq '%s' and title eq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QTask.task._id.eq(GENERIC_OBJECT_ID).and(QTask.task.title.defaultValue.eq("test"));
@@ -530,6 +559,11 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery(String.format("task: id eq '%s' and title neq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QTask.task._id.eq(GENERIC_OBJECT_ID).and(QTask.task.title.defaultValue.eq("test").not());
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // or comparison
         actual = evaluateQuery(String.format("task: id eq '%s' or title eq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QTask.task._id.eq(GENERIC_OBJECT_ID).or(QTask.task.title.defaultValue.eq("test"));
@@ -538,6 +572,11 @@ public class QueryLangTest {
 
         // or not comparison
         actual = evaluateQuery(String.format("task: id eq '%s' or title not eq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QTask.task._id.eq(GENERIC_OBJECT_ID).or(QTask.task.title.defaultValue.eq("test").not());
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("task: id eq '%s' or title neq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QTask.task._id.eq(GENERIC_OBJECT_ID).or(QTask.task.title.defaultValue.eq("test").not());
 
         compareMongoQueries(mongoDbUtils, actual, expected);
@@ -598,6 +637,11 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery(String.format("user: id != '%s'", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QUser.user._id.eq(GENERIC_OBJECT_ID).not();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // and comparison
         actual = evaluateQuery(String.format("user: id eq '%s' and email eq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QUser.user._id.eq(GENERIC_OBJECT_ID).and(QUser.user.email.eq("test"));
@@ -610,6 +654,11 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery(String.format("user: id eq '%s' and email neq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QUser.user._id.eq(GENERIC_OBJECT_ID).and(QUser.user.email.eq("test").not());
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // or comparison
         actual = evaluateQuery(String.format("user: id eq '%s' or email eq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QUser.user._id.eq(GENERIC_OBJECT_ID).or(QUser.user.email.eq("test"));
@@ -618,6 +667,11 @@ public class QueryLangTest {
 
         // or not comparison
         actual = evaluateQuery(String.format("user: id eq '%s' or email not eq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QUser.user._id.eq(GENERIC_OBJECT_ID).or(QUser.user.email.eq("test").not());
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("user: id eq '%s' or email != 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QUser.user._id.eq(GENERIC_OBJECT_ID).or(QUser.user.email.eq("test").not());
 
         compareMongoQueries(mongoDbUtils, actual, expected);
@@ -713,6 +767,9 @@ public class QueryLangTest {
         String actual = evaluateQuery(String.format("process: id not eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assert actual == null;
 
+        actual = evaluateQuery(String.format("process: id neq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
         // and comparison
         actual = evaluateQuery(String.format("process: id eq '%s' and title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assert actual == null;
@@ -721,12 +778,18 @@ public class QueryLangTest {
         actual = evaluateQuery(String.format("process: id eq '%s' and title not eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assert actual == null;
 
+        actual = evaluateQuery(String.format("process: id eq '%s' and title != 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
         // or comparison
         actual = evaluateQuery(String.format("process: id eq '%s' or title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assert actual == null;
 
         // or not comparison
         actual = evaluateQuery(String.format("process: id eq '%s' or title not eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery(String.format("process: id eq '%s' or title != 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assert actual == null;
 
         // parenthesis comparison
@@ -836,6 +899,10 @@ public class QueryLangTest {
         String expected = String.format("NOT stringId:%s", GENERIC_OBJECT_ID);
         assert expected.equals(actual);
 
+        actual = evaluateQuery(String.format("case: id neq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("NOT stringId:%s", GENERIC_OBJECT_ID);
+        assert expected.equals(actual);
+
         // and comparison
         actual = evaluateQuery(String.format("case: id eq '%s' and title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         expected = String.format("stringId:%s AND title:test", GENERIC_OBJECT_ID);
@@ -846,6 +913,10 @@ public class QueryLangTest {
         expected = String.format("stringId:%s AND NOT title:test", GENERIC_OBJECT_ID);
         assert expected.equals(actual);
 
+        actual = evaluateQuery(String.format("case: id eq '%s' and title != 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("stringId:%s AND NOT title:test", GENERIC_OBJECT_ID);
+        assert expected.equals(actual);
+
         // or comparison
         actual = evaluateQuery(String.format("case: id eq '%s' or title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         expected = String.format("stringId:%s OR title:test", GENERIC_OBJECT_ID);
@@ -853,6 +924,10 @@ public class QueryLangTest {
 
         // or not comparison
         actual = evaluateQuery(String.format("case: id eq '%s' or title not eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("stringId:%s OR NOT title:test", GENERIC_OBJECT_ID);
+        assert expected.equals(actual);
+
+        actual = evaluateQuery(String.format("case: id eq '%s' or title neq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         expected = String.format("stringId:%s OR NOT title:test", GENERIC_OBJECT_ID);
         assert expected.equals(actual);
 
@@ -956,6 +1031,9 @@ public class QueryLangTest {
         String actual = evaluateQuery(String.format("task: id not eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assert actual == null;
 
+        actual = evaluateQuery(String.format("task: id neq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
         // and comparison
         actual = evaluateQuery(String.format("task: id eq '%s' and title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assert actual == null;
@@ -964,12 +1042,18 @@ public class QueryLangTest {
         actual = evaluateQuery(String.format("task: id eq '%s' and title not eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assert actual == null;
 
+        actual = evaluateQuery(String.format("task: id eq '%s' and title != 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
         // or comparison
         actual = evaluateQuery(String.format("task: id eq '%s' or title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assert actual == null;
 
         // or not comparison
         actual = evaluateQuery(String.format("task: id eq '%s' or title not eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery(String.format("task: id eq '%s' or title neq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assert actual == null;
 
         // parenthesis comparison
@@ -1021,6 +1105,9 @@ public class QueryLangTest {
         String actual = evaluateQuery(String.format("user: id not eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assert actual == null;
 
+        actual = evaluateQuery(String.format("user: id != '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
         // and comparison
         actual = evaluateQuery(String.format("user: id eq '%s' and email eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assert actual == null;
@@ -1029,12 +1116,18 @@ public class QueryLangTest {
         actual = evaluateQuery(String.format("user: id eq '%s' and email not eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assert actual == null;
 
+        actual = evaluateQuery(String.format("user: id eq '%s' and email neq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
         // or comparison
         actual = evaluateQuery(String.format("user: id eq '%s' or email eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assert actual == null;
 
         // or not comparison
         actual = evaluateQuery(String.format("user: id eq '%s' or email not eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery(String.format("user: id eq '%s' or email != 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assert actual == null;
 
         // parenthesis comparison

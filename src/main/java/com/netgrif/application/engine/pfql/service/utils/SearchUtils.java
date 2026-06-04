@@ -35,12 +35,12 @@ import java.util.stream.Collectors;
 public class SearchUtils {
 
     public static final Map<ComparisonType, List<Integer>> comparisonOperators = Map.of(
-            ComparisonType.ID, List.of(QueryLangParser.EQ, QueryLangParser.IN),
-            ComparisonType.STRING, List.of(QueryLangParser.EQ, QueryLangParser.CONTAINS, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
-            ComparisonType.NUMBER, List.of(QueryLangParser.EQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
-            ComparisonType.DATE, List.of(QueryLangParser.EQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
-            ComparisonType.DATETIME, List.of(QueryLangParser.EQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
-            ComparisonType.BOOLEAN, List.of(QueryLangParser.EQ)
+            ComparisonType.ID, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.IN),
+            ComparisonType.STRING, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.CONTAINS, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
+            ComparisonType.NUMBER, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
+            ComparisonType.DATE, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
+            ComparisonType.DATETIME, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
+            ComparisonType.BOOLEAN, List.of(QueryLangParser.EQ, QueryLangParser.NEQ)
     );
 
     public static final Map<String, String> processAttrToSortPropMapping = Map.of(
@@ -196,8 +196,11 @@ public class SearchUtils {
     }
 
     public static Predicate buildObjectIdPredicate(QObjectId qObjectId, int op, ObjectId objectId, boolean not) {
-        if (op != QueryLangParser.EQ) {
+        if (op != QueryLangParser.EQ && op != QueryLangParser.NEQ) {
             throw new UnsupportedOperationException("Operator is not available for id comparison");
+        }
+        if (op == QueryLangParser.NEQ) {
+            not = !not;
         }
 
         Predicate predicate = qObjectId.eq(objectId);
@@ -218,6 +221,9 @@ public class SearchUtils {
         switch (op) {
             case QueryLangParser.EQ:
                 predicate = stringPath.eq(string);
+                break;
+            case QueryLangParser.NEQ:
+                predicate = stringPath.ne(string);
                 break;
             case QueryLangParser.CONTAINS:
                 predicate = stringPath.contains(string);
@@ -272,6 +278,9 @@ public class SearchUtils {
         switch (op) {
             case QueryLangParser.EQ:
                 predicate = qVersion.eq(new Version(major, minor, patch));
+                break;
+            case QueryLangParser.NEQ:
+                predicate = qVersion.ne(new Version(major, minor, patch));
                 break;
             case QueryLangParser.GT:
                 predicate = qVersion.major.gt(major)
@@ -336,6 +345,9 @@ public class SearchUtils {
             case QueryLangParser.EQ:
                 predicate = dateTimePath.eq(localDateTime);
                 break;
+            case QueryLangParser.NEQ:
+                predicate = dateTimePath.ne(localDateTime);
+                break;
             case QueryLangParser.LT:
                 predicate = dateTimePath.lt(localDateTime);
                 break;
@@ -381,6 +393,10 @@ public class SearchUtils {
             case QueryLangParser.EQ:
             case QueryLangParser.IN:
                 query = attribute + ":" + value;
+                break;
+            case QueryLangParser.NEQ:
+                query = attribute + ":" + value;
+                not = !not;
                 break;
             case QueryLangParser.LT:
                 query = attribute + ":<" + value;
