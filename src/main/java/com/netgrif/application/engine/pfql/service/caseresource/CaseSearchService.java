@@ -216,7 +216,7 @@ public class CaseSearchService implements IResourceSearchService<Case> {
         }
     }
 
-    private Long countCasesElastic(String elasticQuery) {
+    private long countCasesElastic(String elasticQuery) {
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest();
         caseSearchRequest.query = elasticQuery;
         return elasticCaseService.count(List.of(caseSearchRequest), userService.getLoggedOrSystem().transformToLoggedUser(),

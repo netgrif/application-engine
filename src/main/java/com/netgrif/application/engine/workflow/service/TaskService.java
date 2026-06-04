@@ -691,6 +691,18 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    public long count(com.querydsl.core.types.Predicate predicate) {
+        // todo 2443 logged user permissions
+        return predicate != null ? taskRepository.count(predicate) : 0;
+    }
+
+    @Override
+    public boolean exists(com.querydsl.core.types.Predicate predicate) {
+        // todo 2443 logged user permissions
+        return predicate != null && taskRepository.exists(predicate);
+    }
+
+    @Override
     public Page<Task> findByCases(Pageable pageable, List<String> cases) {
         return loadUsers(taskRepository.findByCaseIdIn(pageable, cases));
     }
@@ -733,15 +745,19 @@ public class TaskService implements ITaskService {
 
     @Override
     public Page<Task> search(com.querydsl.core.types.Predicate predicate, Pageable pageable) {
+        // todo 2443 logged user permissions
         Page<Task> tasks = taskRepository.findAll(predicate, pageable);
         return loadUsers(tasks);
     }
 
     @Override
     public Task searchOne(com.querydsl.core.types.Predicate predicate) {
+        // todo 2443 logged user permissions
         Page<Task> tasks = taskRepository.findAll(predicate, PageRequest.of(0, 1));
-        if (tasks.getTotalElements() > 0)
+        if (tasks.getTotalElements() > 0) {
+            loadUsers(tasks);
             return tasks.getContent().get(0);
+        }
         return null;
     }
 

@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -87,11 +88,11 @@ public class QueryLangTest {
         log.info("Case with boolean_0 == true: {}", ((Case)case_5).getTitle());
 
         cases = searchService.search("cases: processIdentifier eq 'query_test' and data.boolean_0.value == true");
-        assert ((List<Case>)cases).size() == 5;
+        assert ((Page<Case>)cases).getTotalElements() == 5;
 
         // TODO: release/8.0.0 add 'neq'/'!=', simplify 'not' requires ()
         cases = searchService.search("cases: processIdentifier eq 'query_test'    and data.boolean_0.value == true and not (data.text_0.value == '4')");
-        assert ((List<Case>)cases).size() == 4;
+        assert ((Page<Case>)cases).getTotalElements() == 4;
     }
 
     @Test
