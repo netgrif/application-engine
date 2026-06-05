@@ -234,7 +234,7 @@ class DataSearchRequestTest {
 
             log.info(String.format("Testing %s == %s", testCase.getKey(), testCase.getValue()))
 
-            Page<Case> result = searchService.search([request] as List, mockService.mockLoggedUser(), PageRequest.of(0, 100), null, false)
+            Page<Case> result = searchService.search([request] as List, superCreator.getLoggedSuper(), PageRequest.of(0, 100), null, false)
             assert result
             assert result.size() == 1
         }
