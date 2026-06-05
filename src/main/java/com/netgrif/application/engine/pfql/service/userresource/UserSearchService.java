@@ -34,7 +34,7 @@ public class UserSearchService implements IResourceSearchService<IUser> {
     @Override
     public IUser searchOne(QueryLangEvaluator evaluator) {
         checkEvaluatorNotNull(evaluator);
-        checkEvaluatorMultiplicity(evaluator);
+        checkEvaluatorIsSingle(evaluator);
         checkEvaluatorResourceType(evaluator);
 
         log.debug("Searching for single user using MongoDB");
@@ -53,7 +53,7 @@ public class UserSearchService implements IResourceSearchService<IUser> {
     @Override
     public Page<IUser> searchAll(QueryLangEvaluator evaluator) {
         checkEvaluatorNotNull(evaluator);
-        checkEvaluatorMultiplicity(evaluator);
+        checkEvaluatorIsMultiple(evaluator);
         checkEvaluatorResourceType(evaluator);
         updateWithDefaultPageableIfMissing(evaluator, log);
 

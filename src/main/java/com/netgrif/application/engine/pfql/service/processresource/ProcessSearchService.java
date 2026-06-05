@@ -64,7 +64,7 @@ public class ProcessSearchService implements IResourceSearchService<PetriNet> {
     @Override
     public PetriNet searchOne(QueryLangEvaluator evaluator) {
         checkEvaluatorNotNull(evaluator);
-        checkEvaluatorMultiplicity(evaluator);
+        checkEvaluatorIsSingle(evaluator);
         checkEvaluatorResourceType(evaluator);
         
         // todo implement Elasticsearch search (service layer and evaluator layer)
@@ -108,7 +108,7 @@ public class ProcessSearchService implements IResourceSearchService<PetriNet> {
     @Override
     public Page<PetriNet> searchAll(QueryLangEvaluator evaluator) {
         checkEvaluatorNotNull(evaluator);
-        checkEvaluatorMultiplicity(evaluator);
+        checkEvaluatorIsMultiple(evaluator);
         checkEvaluatorResourceType(evaluator);
         updateWithDefaultPageableIfMissing(evaluator, log);
 

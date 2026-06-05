@@ -68,7 +68,7 @@ public class CaseSearchService implements IResourceSearchService<Case> {
     @Override
     public Case searchOne(QueryLangEvaluator evaluator) {
         checkEvaluatorNotNull(evaluator);
-        checkEvaluatorMultiplicity(evaluator);
+        checkEvaluatorIsSingle(evaluator);
         checkEvaluatorResourceType(evaluator);
 
         log.debug("Searching for single case using {}", evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB");
@@ -111,7 +111,7 @@ public class CaseSearchService implements IResourceSearchService<Case> {
     @Override
     public Page<Case> searchAll(QueryLangEvaluator evaluator) {
         checkEvaluatorNotNull(evaluator);
-        checkEvaluatorMultiplicity(evaluator);
+        checkEvaluatorIsMultiple(evaluator);
         checkEvaluatorResourceType(evaluator);
         updateWithDefaultPageableIfMissing(evaluator, log);
 

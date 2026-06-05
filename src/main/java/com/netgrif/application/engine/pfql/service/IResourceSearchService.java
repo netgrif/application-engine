@@ -61,7 +61,14 @@ public interface IResourceSearchService<Resource> {
     }
 
     // todo 2443 javadoc
-    default void checkEvaluatorMultiplicity(QueryLangEvaluator evaluator) {
+    default void checkEvaluatorIsMultiple(QueryLangEvaluator evaluator) {
+        if (!evaluator.getMultiple()) {
+            throw new IllegalArgumentException("Cannot use searchAll() with a query that expects single result. Use searchOne() instead.");
+        }
+    }
+
+    // todo 2443 javadoc
+    default void checkEvaluatorIsSingle(QueryLangEvaluator evaluator) {
         if (evaluator.getMultiple()) {
             throw new IllegalArgumentException("Cannot use searchOne() with a query that expects multiple results. Use searchAll() instead.");
         }

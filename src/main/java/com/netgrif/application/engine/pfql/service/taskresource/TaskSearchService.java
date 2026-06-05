@@ -75,7 +75,7 @@ public class TaskSearchService implements IResourceSearchService<Task> {
     @Override
     public Task searchOne(QueryLangEvaluator evaluator) {
         checkEvaluatorNotNull(evaluator);
-        checkEvaluatorMultiplicity(evaluator);
+        checkEvaluatorIsSingle(evaluator);
         checkEvaluatorResourceType(evaluator);
 
         log.debug("Searching for single task using {}", evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB");
@@ -120,7 +120,7 @@ public class TaskSearchService implements IResourceSearchService<Task> {
     @Override
     public Page<Task> searchAll(QueryLangEvaluator evaluator) {
         checkEvaluatorNotNull(evaluator);
-        checkEvaluatorMultiplicity(evaluator);
+        checkEvaluatorIsMultiple(evaluator);
         checkEvaluatorResourceType(evaluator);
         updateWithDefaultPageableIfMissing(evaluator, log);
 
