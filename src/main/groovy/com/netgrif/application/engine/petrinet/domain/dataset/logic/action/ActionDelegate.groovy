@@ -54,6 +54,7 @@ import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.DataField
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
@@ -62,6 +63,8 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
@@ -915,9 +918,192 @@ class ActionDelegate {
         return result.content
     }
 
+    /**
+     * Finds cases referenced by a field in its value.
+     *
+     * Use this overload when working on a case from the current action context. For working with fields from out of the
+     * current action context see other overloads of this action.
+     *
+     * <p>If the field value is {@code null}, this method returns an empty list.</p>
+     * <p>If the value cannot be converted to case IDs, this method returns an empty list.</p>
+     *
+     * @param caseRef field whose value contains case IDs, may be of types
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#CASE_REF},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
+     * @return list of matching cases, or an empty list when the field value is {@code null}
+     * @see ActionDelegate#findCases(DataField)
+     * @see ActionDelegate#findCases(List)
+     * @see ActionDelegate#findCases(Closure)
+     * @see ActionDelegate#findCases(Closure, Pageable)
+     */
+    List<Case> findCases(Field caseRef) {
+        if(caseRef.value == null) {
+            log.debug("[findCases(Field)]: Value of field with id [${caseRef.importId}] is null, returning empty list.")
+            return []
+        }
+        try {
+            return this.findCases([caseRef.value].flatten() as List<String>)
+        } catch (ClassCastException e) {
+            log.error("Method cannot be used with field with id [${caseRef.importId}].", e)
+            return []
+        }
+    }
+
+    /**
+     * Finds cases referenced by a dataField in its value.
+     *
+     * Use this overload when working on a case not from the current action context. For working with fields from the current
+     * action context see other overloads of this action.
+     *
+     * <p>If the field value is {@code null}, this method returns an empty list.</p>
+     * <p>If the value cannot be converted to case IDs, this method returns an empty list.</p>
+     *
+     * @param caseRef field whose value contains case IDs, may be of types
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#CASE_REF},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
+     * @return list of matching cases, or an empty list when the field value is {@code null}
+     * @see ActionDelegate#findCases(Field)
+     * @see ActionDelegate#findCases(List)
+     * @see ActionDelegate#findCases(Closure)
+     * @see ActionDelegate#findCases(Closure, Pageable)
+     */
+    List<Case> findCases(DataField caseRef) {
+        if(caseRef.value == null) {
+            log.debug("[findCases(DataField]: Value of field is null, returning empty list.")
+            return []
+        }
+        try {
+            return this.findCases([caseRef.value].flatten() as List<String>)
+        } catch (ClassCastException e) {
+            log.error("Method cannot be used with field.", e)
+            return []
+        }
+    }
+
+
+    /**
+     * Finds cases by their MongoDB IDs.
+     *
+     * @param mongoIds list of case IDs
+     * @return list of matching cases, or an empty list when the input is {@code null} or {@code empty}
+     * @see ActionDelegate#findCases(Field)
+     * @see ActionDelegate#findCases(DataField)
+     * @see ActionDelegate#findCases(Closure)
+     * @see ActionDelegate#findCases(Closure, Pageable)
+     */
+    List<Case> findCases(List<String> mongoIds) {
+        if(mongoIds == null || mongoIds.empty) {
+            log.debug("[findCases(List<String>)]: Null value detected, returning empty list.")
+            return []
+        }
+        return workflowService.findAllById(mongoIds)
+    }
+
     Case findCase(Closure<Predicate> predicate) {
         QCase qCase = new QCase("case")
         return workflowService.searchOne(predicate(qCase))
+    }
+
+
+
+    /**
+     * Finds the first case referenced by a field in its value.
+     *
+     * Use this overload when working on a case from current action context. For working with fields from out of the
+     * current action context see other overloads of this action.
+     *
+     * <p>If the field value is {@code null}, this method returns {@code null}.</p>
+     * <p>If the value cannot be converted to case IDs, this method returns {@code null}.</p>
+     *
+     * @param caseRef field whose value contains case IDs, may be of types
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#CASE_REF},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
+     * @return referenced case, or {@code null} when the field value is invalid
+     * @see ActionDelegate#findCase(DataField)
+     * @see ActionDelegate#findCase(String)
+     * @see ActionDelegate#findCase(Closure)
+     */
+    Case findCase(Field caseRef) {
+        if(caseRef.value == null) {
+            log.debug("[findCase(Field]: Value of field with id [${caseRef.importId}] is null, returning null.")
+            return null
+        }
+        try {
+            List<String> castValue = [caseRef.value].flatten() as List<String>
+            if(castValue.size() == 0) {
+                log.debug("[findCase(Field]: Value of field with id [${caseRef.importId}] does not contain at least one element, returning null.")
+                return null
+            }
+            return this.findCase(castValue[0])
+        } catch (ClassCastException e) {
+            log.error("Method cannot be used with field with id [${caseRef.importId}].", e)
+            return null
+        }
+    }
+
+
+    /**
+     * Finds the first case referenced by a dataField in its value.
+     *
+     * Use this overload when working on a case from out of current action context. For working with fields from the current
+     * action context see other overloads of this action.
+     *
+     * <p>If the field value is {@code null}, this method returns {@code null}.</p>
+     * <p>If the value cannot be converted to case IDs, this method returns {@code null}.</p>
+     *
+     * @param caseRef field whose value contains case IDs, may be of types
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#CASE_REF},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
+     * @return referenced case, or {@code null} when the dataField value is invalid
+     * @see ActionDelegate#findCase(Field)
+     * @see ActionDelegate#findCase(String)
+     * @see ActionDelegate#findCase(Closure)
+     */
+    Case findCase(DataField caseRef) {
+        if(caseRef.value == null) {
+            log.debug("[findCase(DataField)]: Value of field is null, returning null.")
+            return null
+        }
+        try {
+            List<String> castValue = [caseRef.value].flatten() as List<String>
+            if(castValue.size() == 0) {
+                log.debug("[findCase(DataField)]: Value of field does not contain at least one element, returning null.")
+                return null
+            }
+            return this.findCase(castValue[0])
+        } catch (ClassCastException e) {
+            log.error("Method cannot be used with field.", e)
+            return null
+        }
+    }
+
+    /**
+     * Finds case by its MongoDB ID.
+     *
+     * @param mongoId case IDs
+     * @return resulting case
+     * @see ActionDelegate#findCase(Field)
+     * @see ActionDelegate#findCase(DataField)
+     * @see ActionDelegate#findCase(Closure)
+     */
+    Case findCase(String mongoId) {
+        return workflowService.findOne(mongoId)
     }
 
     Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
@@ -930,19 +1116,70 @@ class ActionDelegate {
         return outcome.getCase()
     }
 
+    /**
+     * Deletes a case by its MongoDB ID.
+     *
+     * @param mongoId case identifier
+     * @return deleted case, or {@code null} when the input is {@code null}
+     */
+    Case deleteCase(String mongoId) {
+        if(mongoId == null){
+            log.debug("[deleteCase(String)]: Null value detected, returning null.")
+            return null
+        }
+        return this.deleteCase(workflowService.findOne(mongoId))
+    }
+
+    /**
+     * Deletes the provided case.
+     *
+     * @param toDelete case to delete
+     * @return deleted case, or {@code null} when the input is {@code null}
+     */
+    Case deleteCase(Case toDelete) {
+        if(toDelete == null){
+            log.debug("[deleteCase(Case)]: Null value detected, returning null.")
+            return null
+        }
+        return workflowService.deleteCase(toDelete).case
+    }
+
     Task assignTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        AssignTaskEventOutcome outcome = taskService.assignTask(user.transformToLoggedUser(), taskId, params)
-        this.outcomes.add(outcome)
-        return outcome.getTask()
+        return addTaskOutcomeAndReturnTask(taskService.assignTask(user.transformToLoggedUser(), taskId, params))
     }
 
     Task assignTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         return addTaskOutcomeAndReturnTask(taskService.assignTask(task, user, params))
     }
 
-    void assignTasks(List<Task> tasks, IUser assignee = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        this.outcomes.addAll(taskService.assignTasks(tasks, assignee, params))
+    /**
+     * Assigns tasks for all transitions in the provided list and returns the assigned tasks.
+     *
+     * @param transitionIds transition identifiers whose tasks should be assigned
+     * @param aCase case used to resolve the tasks, defaults to the current case
+     * @param user user to assign the tasks to, defaults to the logged or system user
+     * @param params additional parameters
+     * @return assigned tasks
+     */
+    List<Task> assignTasksByTransitions(List<String> transitionIds, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        List<String> taskIds = getTaskIds(transitionIds, aCase)
+        List<Task> tasks = taskService.findAllById(taskIds)
+        return assignTasks(tasks, user, params)
+    }
+
+    /**
+     * Assigns the provided tasks and returns the assigned tasks.
+     *
+     * @param tasks tasks to assign
+     * @param assignee user to assign the tasks to, defaults to the logged or system user
+     * @param params additional parameters
+     * @return assigned tasks
+     */
+    List<Task> assignTasks(List<Task> tasks, IUser assignee = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        List<AssignTaskEventOutcome> outcomes = taskService.assignTasks(tasks, assignee, params)
+        this.outcomes.addAll(outcomes)
+        return outcomes.collect { it.task }
     }
 
     Task cancelTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
@@ -954,8 +1191,34 @@ class ActionDelegate {
         return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, user, params))
     }
 
-    void cancelTasks(List<Task> tasks, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        this.outcomes.addAll(taskService.cancelTasks(tasks, user, params))
+
+    /**
+     * Cancels tasks for all transitions in the provided list and returns the canceled tasks.
+     *
+     * @param transitionIds transition identifiers whose tasks should be canceled
+     * @param aCase case used to resolve the tasks, defaults to the current case
+     * @param user user performing the cancellation, defaults to the logged or system user
+     * @param params additional parameters
+     * @return canceled tasks
+     */
+    List<Task> cancelTasksByTransitions(List<String> transitionIds, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        List<String> taskIds = getTaskIds(transitionIds, aCase)
+        List<Task> tasks = taskService.findAllById(taskIds)
+        return cancelTasks(tasks, user, params)
+    }
+
+    /**
+     * Cancels the provided tasks and returns the canceled tasks.
+     *
+     * @param tasks tasks to cancel
+     * @param user user performing the cancellation, defaults to the logged or system user
+     * @param params additional parameters
+     * @return canceled tasks
+     */
+    List<Task> cancelTasks(List<Task> tasks, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        List<CancelTaskEventOutcome> outcomes = taskService.cancelTasks(tasks, user, params)
+        this.outcomes.addAll(outcomes)
+        return outcomes.collect { it.task }
     }
 
     private Task addTaskOutcomeAndReturnTask(TaskEventOutcome outcome) {
@@ -963,17 +1226,42 @@ class ActionDelegate {
         return outcome.getTask()
     }
 
-    void finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    Task finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        addTaskOutcomeAndReturnTask(taskService.finishTask(user.transformToLoggedUser(), taskId, params))
+        return addTaskOutcomeAndReturnTask(taskService.finishTask(user.transformToLoggedUser(), taskId, params))
     }
 
-    void finishTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        addTaskOutcomeAndReturnTask(taskService.finishTask(task, user, params))
+    Task finishTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        return addTaskOutcomeAndReturnTask(taskService.finishTask(task, user, params))
     }
 
-    void finishTasks(List<Task> tasks, IUser finisher = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        this.outcomes.addAll(taskService.finishTasks(tasks, finisher, params))
+    /**
+     * Finishes tasks for all transitions in the provided list and returns the finished tasks.
+     *
+     * @param transitionIds transition identifiers whose tasks should be finished
+     * @param aCase case used to resolve the tasks, defaults to the current case
+     * @param user user performing the finish operation, defaults to the logged or system user
+     * @param params additional parameters
+     * @return finished tasks
+     */
+    List<Task> finishTasksByTransitions(List<String> transitionIds, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        List<String> taskIds = getTaskIds(transitionIds, aCase)
+        List<Task> tasks = taskService.findAllById(taskIds)
+        return finishTasks(tasks, user, params)
+    }
+
+    /**
+     * Finishes the provided tasks and returns the finished tasks.
+     *
+     * @param tasks tasks to finish
+     * @param finisher user performing the finish operation, defaults to the logged or system user
+     * @param params additional parameters
+     * @return finished tasks
+     */
+    List<Task> finishTasks(List<Task> tasks, IUser finisher = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        List<FinishTaskEventOutcome> outcomes = taskService.finishTasks(tasks, finisher, params)
+        this.outcomes.addAll(outcomes)
+        return outcomes.collect { it.task }
     }
 
     List<Task> findTasks(Closure<Predicate> predicate) {
@@ -988,18 +1276,279 @@ class ActionDelegate {
         return result.content
     }
 
+    /**
+     * Finds tasks referenced by a field in its value.
+     *
+     * Use this overload when working on a case from current action context. For working with fields from out of the
+     * current action context see other overloads of this action.
+     *
+     * <p>If the field value is {@code null}, this method returns an empty list.</p>
+     * <p>If the value cannot be converted to task IDs, this method returns an empty list.</p>
+     *
+     * @param taskRef field whose value contains task IDs
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TASK_REF},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
+     * @return list of matching tasks, or an empty list when the field value is {@code null}
+     * @see ActionDelegate#findTasks(DataField)
+     * @see ActionDelegate#findTasks(List<String>)
+     */
+    List<Task> findTasks(Field taskRef) {
+        if(taskRef.value == null) {
+            log.debug("[findTasks(Field)]: Value of field with id [${taskRef.importId}] is null, returning empty list.")
+            return []
+        }
+        try {
+            return this.findTasks([taskRef.value].flatten() as List<String>)
+        } catch (ClassCastException e) {
+            log.error("Method cannot be used with field with id [${taskRef.importId}].", e)
+            return []
+        }
+    }
+    
+    /**
+     * Finds tasks referenced by a dataField in its value.
+     *
+     * Use this overload when working on a case not from the current action context. For working with fields from out of the
+     * current action context see other overloads of this action.
+     *
+     * <p>If the field value is {@code null}, this method returns an empty list.</p>
+     * <p>If the value cannot be converted to task IDs, this method returns an empty list.</p>
+     *
+     * @param taskRef field whose value contains task IDs
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TASK_REF},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
+     * @return list of matching tasks, or an empty list when the field value is {@code null}
+     * @see ActionDelegate#findTasks(Field)
+     * @see ActionDelegate#findTasks(List<String>)
+     */
+    List<Task> findTasks(DataField taskRef) {
+        if(taskRef.value == null) {
+            log.debug("[findTasks(DataField)]: Value of field is null, returning empty list.")
+            return []
+        }
+        try {
+            return this.findTasks([taskRef.value].flatten() as List<String>)
+        } catch (ClassCastException e) {
+            log.error("Method cannot be used with field.", e)
+            return []
+        }
+    }
+
+    /**
+     * Finds tasks by their MongoDB IDs.
+     *
+     * @param mongoIds task identifiers
+     * @return list of matching tasks, or an empty list when the input is {@code null} or {@code empty}
+     * @see ActionDelegate#findTasks(Field)
+     * @see ActionDelegate#findTasks(DataField)
+     */
+    List<Task> findTasks(List<String> mongoIds) {
+        if(mongoIds == null || mongoIds.empty) {
+            log.debug("[findTasks(List<String>)]: Null value detected, returning empty list.")
+            return []
+        }
+        return taskService.findAllById(mongoIds)
+    }
+
     Task findTask(Closure<Predicate> predicate) {
         QTask qTask = new QTask("task")
         return taskService.searchOne(predicate(qTask))
     }
 
     Task findTask(String mongoId) {
-        return taskService.searchOne(QTask.task._id.eq(new ObjectId(mongoId)))
+        return taskService.findOne(mongoId)
+    }
+
+    /**
+     * Finds the first task referenced by a field in its value.
+     *
+     * Use this overload when working on a case from the current action context. For working with fields from out of the
+     * current action context see other overloads of this action.
+     *
+     * <p>If the field value is {@code null}, this method returns {@code null}.</p>
+     * <p>If the field contains no value or the value cannot be converted to a task ID, this method returns
+     * {@code null}.</p>
+     *
+     * @param taskRef field whose value contains a task ID
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TASK_REF},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
+     * @return referenced task, or {@code null} when the field value is invalid
+     * @see ActionDelegate#findTask(DataField)
+     * @see ActionDelegate#findTask(String)
+     * @see ActionDelegate#findTask(Closure)
+     */
+    Task findTask(Field taskRef) {
+        if(taskRef.value == null) {
+            log.debug("[findTask(Field)]: Value of field with id [${taskRef.importId}] is null, returning null")
+            return null
+        }
+        try {
+            List<String> castValue = [taskRef.value].flatten() as List<String>
+            if(castValue.size() == 0) {
+                log.debug("[findTask(Field)]: Value of field with id [${taskRef.importId}] does not contain at least one element, returning null.")
+                return null
+            }
+            return this.findTask(castValue[0])
+        } catch (ClassCastException e) {
+            log.error("Method cannot be used with field with id [${taskRef.importId}].", e)
+            return null
+        }
+    }
+
+    /**
+     * Finds the first task referenced by a dataField in its value.
+     *
+     * Use this overload when working on a case not from the current action context. For working with fields from out of the
+     * current action context see other overloads of this action.
+     *
+     * <p>If the field value is {@code null}, this method returns {@code null}.</p>
+     * <p>If the field contains no value or the value cannot be converted to a task ID, this method returns
+     * {@code null}.</p>
+     *
+     * @param taskRef field whose value contains a task ID
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TASK_REF},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
+     * @return referenced task, or {@code null} when the field value is invalid
+     * @see ActionDelegate#findTask(Field)
+     * @see ActionDelegate#findTask(String)
+     * @see ActionDelegate#findTask(Closure)
+     */
+    Task findTask(DataField taskRef) {
+        if(taskRef.value == null) {
+            log.debug("[findTask(DataField)]: Value of field is null, returning null")
+            return null
+        }
+        try {
+            List<String> castValue = [taskRef.value].flatten() as List<String>
+            if(castValue.size() == 0) {
+                log.debug("[findTask(DataField)]: Value of field does not contain at least one element, returning null.")
+                return null
+            }
+            return this.findTask(castValue[0])
+        } catch (ClassCastException e) {
+            log.error("Method cannot be used with field.", e)
+            return null
+        }
+    }
+
+    /**
+     * Finds a Petri net by its MongoDB ID.
+     *
+     * @param mongoId Petri net identifier
+     * @return matching Petri net, or {@code null} when the input is {@code null}
+     */
+    PetriNet findPetriNet(String mongoId) {
+        if(mongoId == null){
+            log.debug("[findPetriNet(String)]: Null value detected, returning null.")
+            return null
+        }
+        return petriNetService.getPetriNet(mongoId)
+    }
+
+    /**
+     * Finds a Petri net by its {@link ObjectId}.
+     *
+     * @param objectId Petri net object identifier
+     * @return matching Petri net, or {@code null} when the input is {@code null}
+     */
+    PetriNet findPetriNet(ObjectId objectId) {
+        if(objectId == null){
+            log.debug("[findPetriNet(ObjectId)]: Null value detected, returning null.")
+            return null
+        }
+        return petriNetService.get(objectId)
+    }
+
+    /**
+     * Finds Petri nets by their MongoDB IDs.
+     *
+     * @param mongoIds list of Petri net identifiers
+     * @return matching Petri nets, or an empty list when the input is {@code null} or {@code empty}
+     */
+    List<PetriNet> findPetriNets(List<String> mongoIds) {
+        if(mongoIds == null || mongoIds.empty){
+            log.debug("[findPetriNets(List<String>)]: Null value detected, returning empty list.")
+            return []
+        }
+        return petriNetService.findAllById(mongoIds)
+    }
+
+    /**
+     * Finds Petri nets by their {@link ObjectId} values.
+     *
+     * @param objectIds list of Petri net object identifiers
+     * @return matching Petri nets, or an empty list when the input is {@code null} or {@code empty}
+     */
+    List<PetriNet> findPetriNetsByObjectIds(List<ObjectId> objectIds) {
+        if(objectIds == null || objectIds.empty){
+            log.debug("[findPetriNetsByObjectIds(List<ObjectId>)]: Null value detected, returning empty list.")
+            return []
+        }
+        return petriNetService.get(objectIds as Collection<ObjectId>)
+    }
+
+    /**
+     * Finds a Petri net by its identifier and optional version.
+     *
+     * If the version is not provided, the newest available version is returned.
+     *
+     * @param identifier Petri net identifier
+     * @param version requested version, or {@code null} for the newest version
+     * @return matching Petri net, or {@code null} when the identifier is {@code null}
+     */
+    PetriNet findPetriNetByIdentifier(String identifier, Version version = null) {
+        if(identifier == null) {
+            log.debug("[findPetriNetByIdentifier(String, Version)]: Null identifier value detected, returning null.")
+            return null
+        }
+        return version == null ? petriNetService.getNewestVersionByIdentifier(identifier) : petriNetService.getPetriNet(identifier, version)
+    }
+
+    /**
+     * Converts cases to a map of option keys and translated option values.
+     *
+     * @param casesToTransform cases to convert
+     * @param valueTransformation transformation used to derive the option label from a case, case title is used if not specified otherwise
+     * @param keyTransformation transformation used to derive the option key from a case, case stringId is used if not specified otherwise
+     * @return map of option keys and translated values
+     */
+    Map<String, I18nString> casesToOptions(List<Case> casesToTransform, Closure<String> valueTransformation = { return it.title }, Closure<String> keyTransformation = { return it.stringId }) {
+        return casesToTransform.collectEntries {
+            [(keyTransformation(it)): new I18nString(valueTransformation(it))]
+        }
     }
 
     String getTaskId(String transitionId, Case aCase = useCase) {
         List<TaskReference> refs = taskService.findAllByCase(aCase.stringId, null)
-        refs.find { it.transitionId == transitionId }.stringId
+        return refs.find { it.transitionId == transitionId }.stringId
+    }
+
+    /**
+     * Returns task identifiers for tasks belonging to the provided transitions in the given case.
+     *
+     * @param transitionIds transition identifiers
+     * @param aCase case whose tasks should be inspected, defaults to the current case
+     * @return list of matching task identifiers
+     */
+    List<String> getTaskIds(List<String> transitionIds, Case aCase = useCase) {
+        List<TaskReference> refs = taskService.findAllByCase(aCase.stringId, null)
+        return refs.findAll { transitionIds.contains(it.transitionId) }.collect { it.stringId}
     }
 
     IUser assignRole(String roleMongoId, IUser user = userService.loggedUser) {
@@ -1526,8 +2075,8 @@ class ActionDelegate {
     }
 
     /**
-     * Action API case search function using Elasticsearch database
-     * @param requests the CaseSearchRequest list
+     * Action API task search function using Elasticsearch database
+     * @param requests the @link{ElasticTaskSearchRequest} list
      * @param loggedUser the user who is searching for the requests
      * @param page the order of page to return. by default it returns the first page
      * @param pageable the page configuration that will contain the requests
@@ -1535,13 +2084,13 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Task> findTasks(List<ElasticTaskSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Task> findTasksElastic(List<ElasticTaskSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
                          int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         return elasticTaskService.search(requests, loggedUser, PageRequest.of(page, pageSize), locale, isIntersection)
     }
 
     /**
-     * Action API case search function using Elasticsearch database
+     * Action API task search function using Elasticsearch database
      * @param request case search request
      * @param loggedUser the user who is searching for the requests
      * @param page the order of page to return. by default it returns the first page
@@ -1550,10 +2099,10 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Task> findTasks(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Task> findTasksElastic(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
                          int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         List<ElasticTaskSearchRequest> requests = Collections.singletonList(new ElasticTaskSearchRequest(request))
-        return findTasks(requests, loggedUser, page, pageSize, locale, isIntersection)
+        return findTasksElastic(requests, loggedUser, page, pageSize, locale, isIntersection)
     }
 
     List<Case> findDefaultFilters() {
