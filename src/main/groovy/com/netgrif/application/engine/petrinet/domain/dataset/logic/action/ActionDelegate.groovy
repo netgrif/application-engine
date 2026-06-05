@@ -675,7 +675,7 @@ class ActionDelegate {
              saveChangedChoices(field, targetCase, targetTask)
          },
          allowedNets        : { cl ->
-             if (!(field instanceof CaseField)) // TODO make this work with FilterField as well
+             if (!(field instanceof CaseField))
                  return
 
              def allowedNets = cl()
@@ -2120,7 +2120,6 @@ class ActionDelegate {
      * @param icon filter case icon
      * @param allowedNets List of process identifiers
      * @param visibility Possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
-     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
      *
      * @return created {@link Case} instance of filter
      */
@@ -2138,7 +2137,6 @@ class ActionDelegate {
      * @param icon filter case icon
      * @param allowedNets List of process identifiers
      * @param visibility Possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
-     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
      *
      * @return created {@link Case} instance of filter
      */
@@ -2157,7 +2155,6 @@ class ActionDelegate {
      * @param icon filter case icon
      * @param allowedNets List of process identifiers
      * @param visibility Possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
-     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
      *
      * @return created {@link Case} instance of filter
      */
@@ -2209,26 +2206,6 @@ class ActionDelegate {
                      (DefaultFiltersRunner.FILTER_VISIBILITY_FIELD_ID): [
                              "type" : "enumeration_map",
                              "value": cl() as String
-                     ]
-             ])
-         },
-         allowedNets   : { cl ->
-             String currentQuery = workflowService.findOne(filter.stringId).dataSet[DefaultFiltersRunner.FILTER_FIELD_ID].value
-             updateFilter(filter, [
-                     (DefaultFiltersRunner.FILTER_FIELD_ID): [
-                             "type"       : "filter",
-                             "value"      : currentQuery,
-                             "allowedNets": cl() as List<String>
-                     ]
-             ])
-         },
-         filterMetadata: { cl ->
-             String currentQuery = workflowService.findOne(filter.stringId).dataSet[DefaultFiltersRunner.FILTER_FIELD_ID].value
-             updateFilter(filter, [
-                     (DefaultFiltersRunner.FILTER_FIELD_ID): [
-                             "type"          : "filter",
-                             "value"         : currentQuery,
-                             "filterMetadata": cl() as Map<String, Object>
                      ]
              ])
          },
@@ -2592,7 +2569,6 @@ class ActionDelegate {
      * identifier where the role exists
      * @param itemCaseDefaultHeaders List of headers displayed in case view
      * @param itemTaskDefaultHeaders List of headers displayed in task view
-     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
      *
      * @return created {@link Case} instance of menu_item
      * */
@@ -2626,7 +2602,6 @@ class ActionDelegate {
      * @param filterVisibility possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or
      * {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
      * @param filterAllowedNets List of allowed nets. Element of list is process identifier
-     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
      *
      * @return created {@link Case} instance of menu_item
      * */
@@ -3019,7 +2994,6 @@ class ActionDelegate {
      * identifier where the role exists
      * @param itemCaseDefaultHeaders List of headers displayed in case view
      * @param itemTaskDefaultHeaders List of headers displayed in task view
-     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
      *
      * @return created or updated menu item instance along with the actual filter
      * */
@@ -3070,7 +3044,6 @@ class ActionDelegate {
      * @param filterVisibility possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or
      * {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
      * @param filterAllowedNets List of allowed nets. Element of list is process identifier
-     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
      *
      * @return created or updated menu item instance along with the actual filter
      * */
@@ -3083,10 +3056,7 @@ class ActionDelegate {
         filterBody.setTitle(body.getMenuName())
         filterBody.setQuery(filterQuery)
         filterBody.setType(filterType)
-        filterBody.setAllowedNets(filterAllowedNets)
-        filterBody.setIcon(body.getMenuIcon())
         filterBody.setVisibility(filterVisibility)
-        filterBody.setMetadata(filterMetadata as Map<String, Object>)
         body.setView(createLegacyMenuItemViews(filterBody))
 
         return menuItemService.createOrUpdateMenuItem(body)
@@ -3120,10 +3090,7 @@ class ActionDelegate {
         filterBody.setTitle(body.getMenuName())
         filterBody.setQuery(filterQuery)
         filterBody.setType(filterType)
-        filterBody.setAllowedNets(filterAllowedNets)
-        filterBody.setIcon(body.getMenuIcon())
         filterBody.setVisibility(filterVisibility)
-        filterBody.setMetadata(filterMetadata as Map<String, Object>)
 
         body.setView(createLegacyMenuItemViews(filterBody))
 
@@ -3140,10 +3107,6 @@ class ActionDelegate {
      * */
     Case updateMenuItem(Case item, MenuItemBody body) {
         return menuItemService.updateMenuItem(item, body)
-    }
-
-    static Map defaultFilterMetadata(String type) {
-        return FilterBody.getDefaultMetadata(type)
     }
 
     void removeChildItemFromParent(String folderId, Case childItem) {

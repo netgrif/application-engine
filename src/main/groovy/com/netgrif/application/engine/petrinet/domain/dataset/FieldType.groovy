@@ -21,7 +21,9 @@ enum FieldType {
     DATETIME("dateTime"),
     BUTTON("button"),
     TASK_REF("taskRef"),
-    FILTER("filter"),
+    CASE_FILTER("caseFilter"),
+    TASK_FILTER("taskFilter"),
+    PROCESS_FILTER("processFilter"),
     I18N("i18n"),
     STRING_COLLECTION("stringCollection")
 
