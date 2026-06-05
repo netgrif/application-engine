@@ -20,14 +20,12 @@ import groovy.util.logging.Slf4j
 import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
-import org.springframework.stereotype.Component
 /**
  * Helper class for migrating cases, tasks and Petri net models.
  * Provides convenience methods for updating existing data and models during system migrations.
  * This class delegates migration operations to specialized helper classes for cases, tasks, and Petri nets.
  */
 @Slf4j
-@Component
 class MigrationHelper {
 
     /**
