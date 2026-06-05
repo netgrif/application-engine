@@ -44,7 +44,7 @@ public class TaskSearchService implements IResourceSearchService<Task> {
      * @return {@link QueryType#TASK} indicating this service handles task queries
      */
     @Override
-    public QueryType getQueryType() {
+    public QueryType getQueryResourceType() {
         return QueryType.TASK;
     }
 
@@ -74,12 +74,9 @@ public class TaskSearchService implements IResourceSearchService<Task> {
      */
     @Override
     public Task searchOne(QueryLangEvaluator evaluator) {
-        if (evaluator == null) {
-            throw new IllegalArgumentException("Query cannot be null");
-        }
-        if (evaluator.getMultiple()) {
-            throw new IllegalArgumentException("Cannot use searchOne() with a query that expects multiple results. Use searchAll() instead.");
-        }
+        checkEvaluatorNotNull(evaluator);
+        checkEvaluatorMultiplicity(evaluator);
+        checkEvaluatorResourceType(evaluator);
 
         log.debug("Searching for single task using {}", evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB");
         if (evaluator.getSearchWithElastic()) {
@@ -122,12 +119,9 @@ public class TaskSearchService implements IResourceSearchService<Task> {
      */
     @Override
     public Page<Task> searchAll(QueryLangEvaluator evaluator) {
-        if (evaluator == null) {
-            throw new IllegalArgumentException("Query cannot be null");
-        }
-        if (!evaluator.getMultiple()) {
-            throw new IllegalArgumentException("Cannot use searchAll() with a query that expects single result. Use searchOne() instead.");
-        }
+        checkEvaluatorNotNull(evaluator);
+        checkEvaluatorMultiplicity(evaluator);
+        checkEvaluatorResourceType(evaluator);
 
         log.debug("Searching for all tasks using {}", evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB");
         if (evaluator.getSearchWithElastic()) {
@@ -168,9 +162,9 @@ public class TaskSearchService implements IResourceSearchService<Task> {
      */
     @Override
     public long count(QueryLangEvaluator evaluator) {
-        if (evaluator == null) {
-            throw new IllegalArgumentException("Query cannot be null");
-        }
+        checkEvaluatorNotNull(evaluator);
+        checkEvaluatorResourceType(evaluator);
+
         log.debug("Counting tasks using {}", evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB");
         if (evaluator.getSearchWithElastic()) {
             log.trace("Executing Elasticsearch count query: {}", evaluator.getFullElasticQuery());
@@ -210,9 +204,9 @@ public class TaskSearchService implements IResourceSearchService<Task> {
      */
     @Override
     public boolean exists(QueryLangEvaluator evaluator) {
-        if (evaluator == null) {
-            throw new IllegalArgumentException("Query cannot be null");
-        }
+        checkEvaluatorNotNull(evaluator);
+        checkEvaluatorResourceType(evaluator);
+
         log.debug("Checking existence of tasks using {}", evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB");
         if (evaluator.getSearchWithElastic()) {
             log.trace("Executing Elasticsearch exists query: {}", evaluator.getFullElasticQuery());

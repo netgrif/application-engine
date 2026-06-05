@@ -17,7 +17,7 @@ public class UserSearchService implements IResourceSearchService<IUser> {
     // todo 2443 logging
 
     @Override
-    public QueryType getQueryType() {
+    public QueryType getQueryResourceType() {
         return QueryType.USER;
     }
 

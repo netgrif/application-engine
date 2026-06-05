@@ -48,6 +48,10 @@ import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
+import com.netgrif.application.engine.pfql.service.ISearchService
+import com.netgrif.application.engine.pfql.service.caseresource.CaseSearchService
+import com.netgrif.application.engine.pfql.service.processresource.ProcessSearchService
+import com.netgrif.application.engine.pfql.service.taskresource.TaskSearchService
 import com.netgrif.application.engine.rules.domain.RuleRepository
 import com.netgrif.application.engine.startup.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.FilterRunner
@@ -206,6 +210,18 @@ class ActionDelegate {
 
     @Autowired
     DashboardItemService dashboardItemService
+
+    @Autowired
+    ISearchService searchService
+
+    @Autowired
+    CaseSearchService caseSearchService
+
+    @Autowired
+    TaskSearchService taskSearchService
+
+    @Autowired
+    ProcessSearchService processSearchService
 
     FrontendActionOutcome Frontend
 
@@ -2672,5 +2688,83 @@ class ActionDelegate {
         Task task = taskService.findOne(taskId)
         Case taskCase = workflowService.findOne(task.caseId)
         return taskCase.getPetriNet().getDataSet().get(fieldId)
+    }
+
+    // todo 2443 javadoc with examples for search methods
+
+    Case searchCase(String query) {
+        return caseSearchService.searchOne(query)
+    }
+
+    Page<Case> pagedSearchCases(String query) {
+        return caseSearchService.searchAll(query)
+    }
+
+    List<Case> searchCases(String query) {
+        return pagedSearchCases(query).content
+    }
+
+    long countCases(String query) {
+        return caseSearchService.count(query)
+    }
+
+    boolean existsCase(String query) {
+        return caseSearchService.exists(query)
+    }
+
+    Task searchTask(String query) {
+        return taskSearchService.searchOne(query)
+    }
+
+    Page<Task> pagedSearchTasks(String query) {
+        return taskSearchService.searchAll(query)
+    }
+
+    List<Task> searchTasks(String query) {
+        return pagedSearchTasks(query).content
+    }
+
+    long countTasks(String query) {
+        return taskSearchService.count(query)
+    }
+
+    boolean existsTask(String query) {
+        return taskSearchService.exists(query)
+    }
+
+    PetriNet searchProcess(String query) {
+        return processSearchService.searchOne(query)
+    }
+
+    Page<PetriNet> pagedSearchProcesses(String query) {
+        return processSearchService.searchAll(query)
+    }
+
+    List<PetriNet> searchProcesses(String query) {
+        return pagedSearchProcesses(query).content
+    }
+
+    long countProcesses(String query) {
+        return processSearchService.count(query)
+    }
+
+    boolean existsProcess(String query) {
+        return processSearchService.exists(query)
+    }
+
+    Object search(String query) {
+        Object result = searchService.search(query)
+        if (result instanceof Page<?>) {
+            return result.content
+        }
+        return result
+    }
+
+    long count(String query) {
+        return searchService.count(query)
+    }
+
+    boolean exists(String query) {
+        return searchService.exists(query)
     }
 }

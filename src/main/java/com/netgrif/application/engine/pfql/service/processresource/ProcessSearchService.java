@@ -28,7 +28,7 @@ public class ProcessSearchService implements IResourceSearchService<PetriNet> {
      * @return {@link QueryType#PROCESS} indicating this service handles process queries
      */
     @Override
-    public QueryType getQueryType() {
+    public QueryType getQueryResourceType() {
         return QueryType.PROCESS;
     }
 
@@ -63,12 +63,9 @@ public class ProcessSearchService implements IResourceSearchService<PetriNet> {
      */
     @Override
     public PetriNet searchOne(QueryLangEvaluator evaluator) {
-        if (evaluator == null) {
-            throw new IllegalArgumentException("Query cannot be null");
-        }
-        if (evaluator.getMultiple()) {
-            throw new IllegalArgumentException("Cannot use searchOne() with a query that expects multiple results. Use searchAll() instead.");
-        }
+        checkEvaluatorNotNull(evaluator);
+        checkEvaluatorMultiplicity(evaluator);
+        checkEvaluatorResourceType(evaluator);
         
         // todo implement Elasticsearch search (service layer and evaluator layer)
         
@@ -111,12 +108,9 @@ public class ProcessSearchService implements IResourceSearchService<PetriNet> {
      */
     @Override
     public Page<PetriNet> searchAll(QueryLangEvaluator evaluator) {
-        if (evaluator == null) {
-            throw new IllegalArgumentException("Query cannot be null");
-        }
-        if (!evaluator.getMultiple()) {
-            throw new IllegalArgumentException("Cannot use searchAll() with a query that expects single result. Use searchOne() instead.");
-        }
+        checkEvaluatorNotNull(evaluator);
+        checkEvaluatorMultiplicity(evaluator);
+        checkEvaluatorResourceType(evaluator);
         
         // todo implement Elasticsearch search (service layer and evaluator layer)
 
@@ -157,9 +151,8 @@ public class ProcessSearchService implements IResourceSearchService<PetriNet> {
      */
     @Override
     public long count(QueryLangEvaluator evaluator) {
-        if (evaluator == null) {
-            throw new IllegalArgumentException("Query cannot be null");
-        }
+        checkEvaluatorNotNull(evaluator);
+        checkEvaluatorResourceType(evaluator);
 
         // todo implement Elasticsearch search (service layer and evaluator layer)
         
@@ -201,9 +194,8 @@ public class ProcessSearchService implements IResourceSearchService<PetriNet> {
      */
     @Override
     public boolean exists(QueryLangEvaluator evaluator) {
-        if (evaluator == null) {
-            throw new IllegalArgumentException("Query cannot be null");
-        }
+        checkEvaluatorNotNull(evaluator);
+        checkEvaluatorResourceType(evaluator);
 
         // todo implement Elasticsearch search (service layer and evaluator layer)
         

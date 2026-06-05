@@ -42,7 +42,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     private final ParseTreeProperty<Predicate> mongoQuery = new ParseTreeProperty<>();
 
     @Getter
-    private QueryType type;
+    private QueryType resourceType;
     @Getter
     private Boolean multiple;
     @Getter
@@ -140,7 +140,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void enterProcessQuery(QueryLangParser.ProcessQueryContext ctx) {
-        type = QueryType.PROCESS;
+        resourceType = QueryType.PROCESS;
         multiple = ctx.resource.getType() == QueryLangParser.PROCESSES;
     }
 
@@ -154,7 +154,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void enterCaseQuery(QueryLangParser.CaseQueryContext ctx) {
-        type = QueryType.CASE;
+        resourceType = QueryType.CASE;
         multiple = ctx.resource.getType() == QueryLangParser.CASES;
     }
 
@@ -168,7 +168,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void enterTaskQuery(QueryLangParser.TaskQueryContext ctx) {
-        type = QueryType.TASK;
+        resourceType = QueryType.TASK;
         multiple = ctx.resource.getType() == QueryLangParser.TASKS;
     }
 
@@ -182,7 +182,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void enterUserQuery(QueryLangParser.UserQueryContext ctx) {
-        type = QueryType.USER;
+        resourceType = QueryType.USER;
         multiple = ctx.resource.getType() == QueryLangParser.USERS;
     }
 
@@ -374,7 +374,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         checkOp(ComparisonType.ID, op);
         ObjectId objectId = getObjectIdValue(ctx.objectIdComparison().STRING().getText());
 
-        switch (type) {
+        switch (resourceType) {
             case PROCESS:
                 qObjectId = QPetriNet.petriNet._id;
                 break;
@@ -389,7 +389,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 qObjectId = QUser.user._id;
                 break;
             default:
-                throw new IllegalArgumentException("Unknown query type: " + type);
+                throw new IllegalArgumentException("Unknown query type: " + resourceType);
         }
 
         setMongoQuery(ctx, buildObjectIdPredicate(qObjectId, op.getType(), objectId, not));
@@ -408,7 +408,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 .map(node -> getStringValue(node.getText()))
                 .collect(Collectors.toList());
 
-        switch (type) {
+        switch (resourceType) {
             case PROCESS:
                 qObjectId = QPetriNet.petriNet._id;
                 break;
@@ -423,7 +423,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 qObjectId = QUser.user._id;
                 break;
             default:
-                throw new IllegalArgumentException("Unknown query type: " + type);
+                throw new IllegalArgumentException("Unknown query type: " + resourceType);
         }
 
         setMongoQuery(ctx, buildObjectIdPredicateInList(qObjectId, objectIdList, not));
@@ -436,7 +436,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        switch (type) {
+        switch (resourceType) {
             case PROCESS:
                 stringPath = QPetriNet.petriNet.title.defaultValue;
                 break;
@@ -448,7 +448,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 stringPath = QTask.task.title.defaultValue;
                 break;
             default:
-                throw new IllegalArgumentException("Unknown query type: " + type);
+                throw new IllegalArgumentException("Unknown query type: " + resourceType);
         }
 
         setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
@@ -460,7 +460,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         boolean not = ctx.inListStringComparison().NOT() != null;
         List<String> stringList = ctx.inListStringComparison().stringList().STRING().stream().map(node -> getStringValue(node.getText())).collect(Collectors.toList());
 
-        switch (type) {
+        switch (resourceType) {
             case PROCESS:
                 stringPath = QPetriNet.petriNet.title.defaultValue;
                 break;
@@ -472,7 +472,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 stringPath = QTask.task.title.defaultValue;
                 break;
             default:
-                throw new IllegalArgumentException("Unknown query type: " + type);
+                throw new IllegalArgumentException("Unknown query type: " + resourceType);
         }
 
         setMongoQuery(ctx, buildStringPredicateInList(stringPath, stringList, not));
@@ -487,7 +487,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
         String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
 
-        switch (type) {
+        switch (resourceType) {
             case PROCESS:
                 stringPath = QPetriNet.petriNet.title.defaultValue;
                 break;
@@ -499,7 +499,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 stringPath = QTask.task.title.defaultValue;
                 break;
             default:
-                throw new IllegalArgumentException("Unknown query type: " + type);
+                throw new IllegalArgumentException("Unknown query type: " + resourceType);
         }
 
         setMongoQuery(ctx, buildStringPredicateInRange(stringPath, leftString, leftEndpointOpen, rightString, rightEndpointOpen, not));
@@ -571,7 +571,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         boolean not = ctx.dateComparison().NOT() != null;
         LocalDateTime localDateTime = toDateTime(ctx.dateComparison().DATE().getText());
 
-        switch (type) {
+        switch (resourceType) {
             case PROCESS:
                 dateTimePath = QPetriNet.petriNet.creationDate;
                 break;
@@ -580,7 +580,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 setElasticQuery(ctx, buildElasticQuery("creationDateSortable", op.getType(), String.valueOf(Timestamp.valueOf(localDateTime).getTime()), not));
                 break;
             default:
-                throw new IllegalArgumentException("Unknown query type: " + type);
+                throw new IllegalArgumentException("Unknown query type: " + resourceType);
         }
 
         setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op.getType(), localDateTime, not));
@@ -593,7 +593,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         boolean not = ctx.dateTimeComparison().NOT() != null;
         LocalDateTime localDateTime = toDateTime(ctx.dateTimeComparison().DATETIME().getText());
 
-        switch (type) {
+        switch (resourceType) {
             case PROCESS:
                 dateTimePath = QPetriNet.petriNet.creationDate;
                 break;
@@ -602,7 +602,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 setElasticQuery(ctx, buildElasticQuery("creationDateSortable", op.getType(), String.valueOf(Timestamp.valueOf(localDateTime).getTime()), not));
                 break;
             default:
-                throw new IllegalArgumentException("Unknown query type: " + type);
+                throw new IllegalArgumentException("Unknown query type: " + resourceType);
         }
 
         setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op.getType(), localDateTime, not));
@@ -615,7 +615,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         List<TerminalNode> terminalNodeList = ctx.inListDateComparison().dateList() != null ? ctx.inListDateComparison().dateList().DATE() : ctx.inListDateComparison().dateTimeList().DATETIME() ;
         List<String> stringDateList = terminalNodeList.stream().map(TerminalNode::getText).collect(Collectors.toList());
 
-        switch (type) {
+        switch (resourceType) {
             case PROCESS:
                 dateTimePath = QPetriNet.petriNet.creationDate;
                 break;
@@ -628,7 +628,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 setElasticQuery(ctx, buildElasticQueryInList("creationDateSortable", timestampStringList, not));
                 break;
             default:
-                throw new IllegalArgumentException("Unknown query type: " + type);
+                throw new IllegalArgumentException("Unknown query type: " + resourceType);
         }
 
         setMongoQuery(ctx, buildDateTimePredicateInList(dateTimePath, stringDateList, not));
@@ -655,7 +655,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         }
 
 
-        switch (type) {
+        switch (resourceType) {
             case PROCESS:
                 dateTimePath = QPetriNet.petriNet.creationDate;
                 break;
@@ -664,7 +664,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 setElasticQuery(ctx, buildElasticQueryInRange("creationDateSortable", String.valueOf(Timestamp.valueOf(leftDateTime).getTime()), leftEndpointOpen, String.valueOf(Timestamp.valueOf(rightDateTime).getTime()), rightEndpointOpen, not));
                 break;
             default:
-                throw new IllegalArgumentException("Unknown query type: " + type);
+                throw new IllegalArgumentException("Unknown query type: " + resourceType);
         }
 
         setMongoQuery(ctx, buildDateTimePredicateInRange(dateTimePath, leftDateTime, leftEndpointOpen, rightDateTime, rightEndpointOpen, not));

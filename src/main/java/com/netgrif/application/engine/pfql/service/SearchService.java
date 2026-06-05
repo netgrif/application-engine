@@ -20,7 +20,7 @@ public class SearchService implements ISearchService {
 
     public SearchService(List<IResourceSearchService<?>> services) {
         this.serviceRegistry = services.stream()
-                .collect(Collectors.toMap(IResourceSearchService::getQueryType, Function.identity()));
+                .collect(Collectors.toMap(IResourceSearchService::getQueryResourceType, Function.identity()));
 
     }
 
@@ -50,8 +50,8 @@ public class SearchService implements ISearchService {
     public Object search(String input) {
         log.debug("Executing search with query: {}", input);
         QueryLangEvaluator evaluator = evaluateQuery(input);
-        log.trace("Evaluated query type: {}, multiple: {}", evaluator.getType(), evaluator.getMultiple());
-        IResourceSearchService<?> service = this.serviceRegistry.get(evaluator.getType());
+        log.trace("Evaluated query type: {}, multiple: {}", evaluator.getResourceType(), evaluator.getMultiple());
+        IResourceSearchService<?> service = this.serviceRegistry.get(evaluator.getResourceType());
         Object result = evaluator.getMultiple() ? service.searchAll(evaluator) : service.searchOne(evaluator);
         log.debug("Search completed, returning {} result", evaluator.getMultiple() ? "multiple" : "single");
         return result;
@@ -67,8 +67,8 @@ public class SearchService implements ISearchService {
     public long count(String input) {
         log.debug("Counting resources with query: {}", input);
         QueryLangEvaluator evaluator = evaluateQuery(input);
-        log.trace("Evaluated query type for count: {}", evaluator.getType());
-        IResourceSearchService<?> service = this.serviceRegistry.get(evaluator.getType());
+        log.trace("Evaluated query type for count: {}", evaluator.getResourceType());
+        IResourceSearchService<?> service = this.serviceRegistry.get(evaluator.getResourceType());
         long count = service.count(evaluator);
         log.debug("Count completed, result: {}", count);
         return count;
@@ -84,8 +84,8 @@ public class SearchService implements ISearchService {
     public boolean exists(String input) {
         log.debug("Checking existence with query: {}", input);
         QueryLangEvaluator evaluator = evaluateQuery(input);
-        log.trace("Evaluated query type for exists: {}", evaluator.getType());
-        IResourceSearchService<?> service = this.serviceRegistry.get(evaluator.getType());
+        log.trace("Evaluated query type for exists: {}", evaluator.getResourceType());
+        IResourceSearchService<?> service = this.serviceRegistry.get(evaluator.getResourceType());
         boolean exists = service.exists(evaluator);
         log.debug("Existence check completed, result: {}", exists);
         return exists;

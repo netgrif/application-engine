@@ -22,7 +22,7 @@ import org.springframework.data.domain.Page;
  */
 public interface IResourceSearchService<Resource> {
 
-    QueryType getQueryType();
+    QueryType getQueryResourceType();
 
     Resource searchOne(String queryString);
     Resource searchOne(QueryLangEvaluator evaluator);
@@ -35,4 +35,26 @@ public interface IResourceSearchService<Resource> {
 
     boolean exists(String queryString);
     boolean exists(QueryLangEvaluator evaluator);
+
+    // todo 2443 javadoc
+    default void checkEvaluatorNotNull(QueryLangEvaluator evaluator) {
+        if (evaluator == null) {
+            throw new IllegalArgumentException("Query cannot be null");
+        }
+    }
+
+    // todo 2443 javadoc
+    default void checkEvaluatorMultiplicity(QueryLangEvaluator evaluator) {
+        if (evaluator.getMultiple()) {
+            throw new IllegalArgumentException("Cannot use searchOne() with a query that expects multiple results. Use searchAll() instead.");
+        }
+    }
+
+    // todo 2443 javadoc
+    default void checkEvaluatorResourceType(QueryLangEvaluator evaluator) {
+        if (evaluator.getResourceType() != getQueryResourceType()) {
+            throw new IllegalArgumentException(String.format("Wrong query resource type. Should be: %s, was: %s",
+                    getQueryResourceType(), evaluator.getResourceType()));
+        }
+    }
 }

@@ -40,7 +40,7 @@ public class CaseSearchService implements IResourceSearchService<Case> {
      * @return the QueryType.CASE indicating this service handles case queries
      */
     @Override
-    public QueryType getQueryType() {
+    public QueryType getQueryResourceType() {
         return QueryType.CASE;
     }
 
@@ -67,12 +67,9 @@ public class CaseSearchService implements IResourceSearchService<Case> {
      */
     @Override
     public Case searchOne(QueryLangEvaluator evaluator) {
-        if (evaluator == null) {
-            throw new IllegalArgumentException("Query cannot be null");
-        }
-        if (evaluator.getMultiple()) {
-            throw new IllegalArgumentException("Cannot use searchOne() with a query that expects multiple results. Use searchAll() instead.");
-        }
+        checkEvaluatorNotNull(evaluator);
+        checkEvaluatorMultiplicity(evaluator);
+        checkEvaluatorResourceType(evaluator);
 
         log.debug("Searching for single case using {}", evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB");
         if (evaluator.getSearchWithElastic()) {
@@ -113,12 +110,9 @@ public class CaseSearchService implements IResourceSearchService<Case> {
      */
     @Override
     public Page<Case> searchAll(QueryLangEvaluator evaluator) {
-        if (evaluator == null) {
-            throw new IllegalArgumentException("Query cannot be null");
-        }
-        if (!evaluator.getMultiple()) {
-            throw new IllegalArgumentException("Cannot use searchAll() with a query that expects single result. Use searchOne() instead.");
-        }
+        checkEvaluatorNotNull(evaluator);
+        checkEvaluatorMultiplicity(evaluator);
+        checkEvaluatorResourceType(evaluator);
 
         log.debug("Searching for all cases using {} with pagination: page={}, size={}",
                 evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB",
@@ -159,9 +153,9 @@ public class CaseSearchService implements IResourceSearchService<Case> {
      */
     @Override
     public long count(QueryLangEvaluator evaluator) {
-        if (evaluator == null) {
-            throw new IllegalArgumentException("Query cannot be null");
-        }
+        checkEvaluatorNotNull(evaluator);
+        checkEvaluatorResourceType(evaluator);
+
         log.debug("Counting cases using {}", evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB");
         if (evaluator.getSearchWithElastic()) {
             log.trace("Executing Elasticsearch count query: {}", evaluator.getFullElasticQuery());
@@ -199,9 +193,9 @@ public class CaseSearchService implements IResourceSearchService<Case> {
      */
     @Override
     public boolean exists(QueryLangEvaluator evaluator) {
-        if (evaluator == null) {
-            throw new IllegalArgumentException("Query cannot be null");
-        }
+        checkEvaluatorNotNull(evaluator);
+        checkEvaluatorResourceType(evaluator);
+
         log.debug("Checking existence of cases using {}", evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB");
         if (evaluator.getSearchWithElastic()) {
             log.trace("Executing Elasticsearch exists query: {}", evaluator.getFullElasticQuery());
