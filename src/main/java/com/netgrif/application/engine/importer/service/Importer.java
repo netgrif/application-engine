@@ -1156,11 +1156,10 @@ public class Importer {
                 return;
             }
         }
-        // Don't add if positive roles or triggers or positive user refs
-        if ((importTransition.getRoleRef() != null && importTransition.getRoleRef().stream().anyMatch(this::hasPositivePermission))
-                || (importTransition.getTrigger() != null && !importTransition.getTrigger().isEmpty())
-                || (importTransition.getUsersRef() != null && importTransition.getUsersRef().stream().anyMatch(this::hasPositivePermission))
-                || (importTransition.getUserRef() != null && importTransition.getUserRef().stream().anyMatch(this::hasPositivePermission))) {
+
+        if ((importTransition.getRoleRef() != null && !importTransition.getRoleRef().isEmpty()) ||
+                (importTransition.getUsersRef() != null && !importTransition.getUsersRef().isEmpty()) ||
+                (importTransition.getUserRef() != null && !importTransition.getUserRef().isEmpty())) {
             return;
         }
 
@@ -1168,20 +1167,9 @@ public class Importer {
         addAnonymousRole(transition);
     }
 
-    protected boolean hasPositivePermission(PermissionRef permissionRef) {
-        return (permissionRef.getLogic().isPerform() != null && permissionRef.getLogic().isPerform())
-                || (permissionRef.getLogic().isCancel() != null && permissionRef.getLogic().isCancel())
-                || (permissionRef.getLogic().isView() != null && permissionRef.getLogic().isView())
-                || (permissionRef.getLogic().isAssign() != null && permissionRef.getLogic().isAssign())
-                || (permissionRef.getLogic().isAssigned() != null && permissionRef.getLogic().isAssigned())
-                || (permissionRef.getLogic().isFinish() != null && permissionRef.getLogic().isFinish())
-                || (permissionRef.getLogic().isDelegate() != null && permissionRef.getLogic().isDelegate());
-    }
-
     protected void addPredefinedRolesWithDefaultPermissions() {
         // only if no positive role associations and no positive user ref associations
-        if (net.getPermissions().values().stream().anyMatch(perms -> perms.containsValue(true))
-                || net.getUserRefs().values().stream().anyMatch(perms -> perms.containsValue(true))) {
+        if (!net.getPermissions().isEmpty() || !net.getUserRefs().isEmpty()) {
             return;
         }
 
