@@ -1,4 +1,4 @@
-// todo 2443 generate this with plugin
+// todo generate this with plugin
 grammar QueryLang;
 
 query: resource=(PROCESS | PROCESSES) delimeter processConditions (paging)? (processSorting)? EOF # processQuery

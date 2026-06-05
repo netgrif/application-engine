@@ -15,10 +15,7 @@ import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
-import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
@@ -38,6 +35,8 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutc
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -525,32 +524,44 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public Page<PetriNet> search(Predicate predicate, Pageable pageable) {
+        if (predicate == null) {
+            return Page.empty();
+        }
         if (pageable == null) {
             pageable = Pageable.unpaged();
         }
-        if (predicate != null) {
-            // todo 2443 logged user permissions
-            return repository.findAll(predicate, pageable);
+        Predicate permissionConstraint = getProcessRolesPredicate(userService.getLoggedOrSystem().transformToLoggedUser());
+        Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraint);
+        return repository.findAll(finalPredicate, pageable);
+    }
+
+    @Override
+    public PetriNet searchOne(Predicate predicate) {
+        Page<PetriNet> processAsPage = search(predicate, PageRequest.of(0, 1));
+        if (processAsPage.getTotalElements() > 0) {
+            return processAsPage.getContent().get(0);
         }
-        return Page.empty();
+        return null;
     }
 
     @Override
     public long count(Predicate predicate) {
-        if (predicate != null) {
-            // todo 2443 logged user permissions
-            return repository.count(predicate);
+        if (predicate == null) {
+            return 0;
         }
-        return 0;
+        Predicate permissionConstraint = getProcessRolesPredicate(userService.getLoggedOrSystem().transformToLoggedUser());
+        Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraint);
+        return repository.count(finalPredicate);
     }
 
     @Override
     public boolean exists(Predicate predicate) {
-        if (predicate != null) {
-            // todo 2443 logged user permissions
-            return repository.exists(predicate);
+        if (predicate == null) {
+            return false;
         }
-        return false;
+        Predicate permissionConstraint = getProcessRolesPredicate(userService.getLoggedOrSystem().transformToLoggedUser());
+        Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraint);
+        return repository.exists(finalPredicate);
     }
 
     private void addValueCriteria(Query query, Query queryTotal, Criteria criteria) {
@@ -562,7 +573,7 @@ public class PetriNetService implements IPetriNetService {
     @Transactional
     public void deletePetriNet(String processId, LoggedUser loggedUser) {
         Optional<PetriNet> petriNetOptional = repository.findById(processId);
-        if (!petriNetOptional.isPresent()) {
+        if (petriNetOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find process with id [" + processId + "]");
         }
 
@@ -592,6 +603,14 @@ public class PetriNetService implements IPetriNetService {
     private Criteria getProcessRolesCriteria(LoggedUser user) {
         return new Criteria().orOperator(user.getProcessRoles().stream()
                 .map(role -> Criteria.where("permissions." + role).exists(true)).toArray(Criteria[]::new));
+    }
+
+    private Predicate getProcessRolesPredicate(LoggedUser user) {
+        BooleanBuilder result = new BooleanBuilder();
+        user.getProcessRoles().forEach(role -> {
+            result.or(QPetriNet.petriNet.permissions.containsKey(role));
+        });
+        return result;
     }
 
     @Override

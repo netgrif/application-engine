@@ -45,12 +45,16 @@ public class LegacyTaskSearchService extends MongoSearchService<Task> {
         constraints.or(buildUserRefQueryConstraint(loggedOrImpersonated));
         builder.and(constraints);
 
+        builder.and(buildPermissionConstraints(loggedOrImpersonated));
+        return builder;
+    }
+
+    public BooleanBuilder buildPermissionConstraints(LoggedUser loggedOrImpersonated) {
         BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated));
         permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
         permissionConstraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
         permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
-        builder.and(permissionConstraints);
-        return builder;
+        return permissionConstraints;
     }
 
     protected Predicate buildRolesQueryConstraint(LoggedUser user) {

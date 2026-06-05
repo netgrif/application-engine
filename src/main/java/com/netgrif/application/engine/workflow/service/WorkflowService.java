@@ -30,6 +30,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -185,7 +186,12 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> search(Predicate predicate, Pageable pageable) {
-        Page<Case> page = repository.findAll(predicate, pageable);
+        if (predicate == null) {
+            return Page.empty();
+        }
+        Predicate permissionConstraints = searchService.buildPermissionConstraints(userService.getLoggedOrSystem().transformToLoggedUser());
+        Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraints);
+        Page<Case> page = repository.findAll(finalPredicate, pageable);
         page.getContent().forEach(this::setPetriNet);
         decryptDataSets(page.getContent());
         return setImmediateDataFields(page);
@@ -217,22 +223,24 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public long count(Predicate predicate) {
-        // todo 2443 logged user permissions
-        if (predicate != null) {
-            return repository.count(predicate);
-        } else {
+        if (predicate == null) {
             return 0;
         }
+
+        Predicate permissionConstraints = searchService.buildPermissionConstraints(userService.getLoggedOrSystem().transformToLoggedUser());
+        Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraints);
+        return repository.count(finalPredicate);
     }
 
     @Override
     public boolean exists(Predicate predicate) {
-        // todo 2443 logged user permissions
-        if (predicate != null) {
-            return repository.exists(predicate);
-        } else {
+        if (predicate == null) {
             return false;
         }
+
+        Predicate permissionConstraints = searchService.buildPermissionConstraints(userService.getLoggedOrSystem().transformToLoggedUser());
+        Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraints);
+        return repository.exists(finalPredicate);
     }
 
     @Override

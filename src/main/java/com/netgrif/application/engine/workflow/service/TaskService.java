@@ -44,6 +44,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
+import com.querydsl.core.types.ExpressionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -692,14 +693,25 @@ public class TaskService implements ITaskService {
 
     @Override
     public long count(com.querydsl.core.types.Predicate predicate) {
-        // todo 2443 logged user permissions
-        return predicate != null ? taskRepository.count(predicate) : 0;
+        if (predicate == null) {
+            return 0;
+        }
+
+        com.querydsl.core.types.Predicate permissionConstraints = searchService.buildPermissionConstraints(
+                userService.getLoggedOrSystem().transformToLoggedUser());
+        com.querydsl.core.types.Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraints);
+        return taskRepository.count(finalPredicate);
     }
 
     @Override
     public boolean exists(com.querydsl.core.types.Predicate predicate) {
-        // todo 2443 logged user permissions
-        return predicate != null && taskRepository.exists(predicate);
+        if (predicate == null) {
+            return false;
+        }
+        com.querydsl.core.types.Predicate permissionConstraints = searchService.buildPermissionConstraints(
+                userService.getLoggedOrSystem().transformToLoggedUser());
+        com.querydsl.core.types.Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraints);
+        return taskRepository.exists(finalPredicate);
     }
 
     @Override
@@ -745,15 +757,19 @@ public class TaskService implements ITaskService {
 
     @Override
     public Page<Task> search(com.querydsl.core.types.Predicate predicate, Pageable pageable) {
-        // todo 2443 logged user permissions
-        Page<Task> tasks = taskRepository.findAll(predicate, pageable);
+        if (predicate == null) {
+            return Page.empty();
+        }
+        com.querydsl.core.types.Predicate permissionConstraints = searchService.buildPermissionConstraints(
+                userService.getLoggedOrSystem().transformToLoggedUser());
+        com.querydsl.core.types.Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraints);
+        Page<Task> tasks = taskRepository.findAll(finalPredicate, pageable);
         return loadUsers(tasks);
     }
 
     @Override
     public Task searchOne(com.querydsl.core.types.Predicate predicate) {
-        // todo 2443 logged user permissions
-        Page<Task> tasks = taskRepository.findAll(predicate, PageRequest.of(0, 1));
+        Page<Task> tasks = search(predicate, PageRequest.of(0, 1));
         if (tasks.getTotalElements() > 0) {
             loadUsers(tasks);
             return tasks.getContent().get(0);

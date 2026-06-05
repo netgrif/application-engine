@@ -71,10 +71,9 @@ public class ProcessSearchService implements IResourceSearchService<PetriNet> {
         
         log.debug("Searching for single process using MongoDB");
         log.trace("Executing MongoDB query: {}", evaluator.getFullMongoQuery());
-        Page<PetriNet> processAsPage = petriNetService.search(evaluator.getFullMongoQuery(), PageRequest.of(0, 1));
-        Optional<PetriNet> processOpt = processAsPage.getContent().stream().findFirst();
-        log.trace("MongoDB search one result: {}", processOpt.isPresent() ? processOpt.get().getStringId() : "null");
-        return processOpt.orElse(null);
+        PetriNet result = petriNetService.searchOne(evaluator.getFullMongoQuery());
+        log.trace("MongoDB search one result: {}", result != null ? result.getStringId() : "null");
+        return result;
     }
 
     /**
@@ -111,7 +110,8 @@ public class ProcessSearchService implements IResourceSearchService<PetriNet> {
         checkEvaluatorNotNull(evaluator);
         checkEvaluatorMultiplicity(evaluator);
         checkEvaluatorResourceType(evaluator);
-        
+        updateWithDefaultPageableIfMissing(evaluator, log);
+
         // todo implement Elasticsearch search (service layer and evaluator layer)
 
         log.debug("Searching for all processes using MongoDB");

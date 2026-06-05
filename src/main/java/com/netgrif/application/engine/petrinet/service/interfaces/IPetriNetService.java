@@ -94,6 +94,8 @@ public interface IPetriNetService {
 
     Page<PetriNet> search(Predicate predicate, Pageable pageable);
 
+    PetriNet searchOne(Predicate predicate);
+
     long count(Predicate predicate);
 
     boolean exists(Predicate predicate);

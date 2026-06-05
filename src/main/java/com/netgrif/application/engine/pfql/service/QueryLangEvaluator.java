@@ -35,8 +35,7 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.*;
 
 public class QueryLangEvaluator extends QueryLangBaseListener {
 
-    // todo 2443 review
-    // todo 2443 split code into dedicated evaluators
+    // todo code encapsulation by resource type
 
     private final ParseTreeProperty<String> elasticQuery = new ParseTreeProperty<>();
     private final ParseTreeProperty<Predicate> mongoQuery = new ParseTreeProperty<>();
@@ -53,6 +52,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     @Getter
     private String fullElasticQuery;
     @Getter
+    @Setter
     private Pageable pageable;
 
     private int pageNumber = 0;

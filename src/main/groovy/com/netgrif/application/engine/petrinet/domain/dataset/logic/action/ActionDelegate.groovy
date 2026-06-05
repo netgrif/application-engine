@@ -52,6 +52,7 @@ import com.netgrif.application.engine.pfql.service.ISearchService
 import com.netgrif.application.engine.pfql.service.caseresource.CaseSearchService
 import com.netgrif.application.engine.pfql.service.processresource.ProcessSearchService
 import com.netgrif.application.engine.pfql.service.taskresource.TaskSearchService
+import com.netgrif.application.engine.pfql.service.userresource.UserSearchService
 import com.netgrif.application.engine.rules.domain.RuleRepository
 import com.netgrif.application.engine.startup.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.FilterRunner
@@ -222,6 +223,9 @@ class ActionDelegate {
 
     @Autowired
     ProcessSearchService processSearchService
+
+    @Autowired
+    UserSearchService userSearchService
 
     FrontendActionOutcome Frontend
 
@@ -2750,6 +2754,26 @@ class ActionDelegate {
 
     boolean existsProcess(String query) {
         return processSearchService.exists(query)
+    }
+
+    IUser searchUser(String query) {
+        return userSearchService.searchOne(query)
+    }
+
+    Page<IUser> pagedSearchUsers(String query) {
+        return userSearchService.searchAll(query)
+    }
+
+    List<IUser> searchUsers(String query) {
+        return pagedSearchUsers(query).content
+    }
+
+    long countUsers(String query) {
+        return userSearchService.count(query)
+    }
+
+    boolean existsUser(String query) {
+        return userSearchService.exists(query)
     }
 
     Object search(String query) {
