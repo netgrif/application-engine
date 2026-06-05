@@ -44,9 +44,6 @@ public class DataField implements Referencable, Serializable {
     private List<Validation> validations;
 
     @Getter
-    private Map<String, Object> filterMetadata;
-
-    @Getter
     @Setter
     @JsonIgnore
     private String encryption;
@@ -112,11 +109,6 @@ public class DataField implements Referencable, Serializable {
 
     public void setAllowedNets(List<String> allowedNets) {
         this.allowedNets = allowedNets;
-        update();
-    }
-
-    public void setFilterMetadata(Map<String, Object> filterMetadata) {
-        this.filterMetadata = filterMetadata;
         update();
     }
 

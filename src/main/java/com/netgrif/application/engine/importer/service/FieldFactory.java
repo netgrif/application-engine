@@ -197,8 +197,8 @@ public final class FieldFactory {
     }
 
     // TODO: refactor this shit
-    Field getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
-        Field field;
+    Field<?> getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
+        Field<?> field;
         switch (data.getType()) {
             case TEXT:
                 field = buildTextField(data);
@@ -248,8 +248,15 @@ public final class FieldFactory {
             case MULTICHOICE_MAP:
                 field = buildMultichoiceMapField(data, importer);
                 break;
-            case FILTER:
-                field = buildFilterField(data);
+            case FILTER: // "FILTER" is deprecated
+            case CASE_FILTER:
+                field = buildCaseFilterField(data);
+                break;
+            case TASK_FILTER:
+                field = buildTaskFilterField(data);
+                break;
+            case PROCESS_FILTER:
+                field = buildProcessFilterField(data);
                 break;
             case I_18_N:
                 field = buildI18nField(data, importer);
@@ -549,13 +556,22 @@ public final class FieldFactory {
         return fileListField;
     }
 
-    private FilterField buildFilterField(Data data) {
-        AllowedNets nets = data.getAllowedNets();
-        if (nets == null) {
-            return new FilterField();
-        } else {
-            return new FilterField(new ArrayList<>(nets.getAllowedNet()));
-        }
+    private CaseFilterField buildCaseFilterField(Data data) {
+        CaseFilterField field = new CaseFilterField();
+        setDefaultValue(field, data, field::setDefaultValue);
+        return field;
+    }
+
+    private TaskFilterField buildTaskFilterField(Data data) {
+        TaskFilterField field = new TaskFilterField();
+        setDefaultValue(field, data, field::setDefaultValue);
+        return field;
+    }
+
+    private ProcessFilterField buildProcessFilterField(Data data) {
+        ProcessFilterField field = new ProcessFilterField();
+        setDefaultValue(field, data, field::setDefaultValue);
+        return field;
     }
 
     private I18nField buildI18nField(Data data, Importer importer) {
@@ -611,8 +627,6 @@ public final class FieldFactory {
             resolveMapOptions((MapOptionsField) field, useCase);
         if (field instanceof FieldWithAllowedNets)
             resolveAllowedNets((FieldWithAllowedNets) field, useCase);
-        if (field instanceof FilterField)
-            resolveFilterMetadata((FilterField) field, useCase);
         if (withValidation)
             resolveValidations(field, useCase);
         return field;
@@ -659,13 +673,6 @@ public final class FieldFactory {
         if (allowedNets == null)
             return;
         field.setAllowedNets(allowedNets);
-    }
-
-    private void resolveFilterMetadata(FilterField field, Case useCase) {
-        Map<String, Object> metadata = useCase.getDataField(field.getImportId()).getFilterMetadata();
-        if (metadata == null)
-            return;
-        field.setFilterMetadata(metadata);
     }
 
     public Field buildImmediateField(Case useCase, String fieldId) {
@@ -788,13 +795,9 @@ public final class FieldFactory {
 
     private void resolveAttributeValues(Field field, Case useCase, String fieldId) {
         DataField dataField = useCase.getDataSet().get(fieldId);
-        if (field.getType().equals(FieldType.CASE_REF) || field.getType().equals(FieldType.FILTER)) {
+        if (field.getType().equals(FieldType.CASE_REF)) {
             List<String> allowedNets = new ArrayList<>(dataField.getAllowedNets());
             ((FieldWithAllowedNets) field).setAllowedNets(allowedNets);
-        }
-        if (field.getType().equals(FieldType.FILTER)) {
-            Map<String, Object> filterMetadata = new HashMap<>(dataField.getFilterMetadata());
-            ((FilterField) field).setFilterMetadata(filterMetadata);
         }
     }
 
