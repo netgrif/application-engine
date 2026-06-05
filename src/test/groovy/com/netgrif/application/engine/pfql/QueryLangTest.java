@@ -104,7 +104,7 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery(String.format("process: id in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
+        actual = evaluateQuery(String.format("process: id in('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QPetriNet.petriNet._id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
 
         compareMongoQueries(mongoDbUtils, actual, expected);
@@ -149,17 +149,17 @@ public class QueryLangTest {
         Version v1 = new Version(1, 1, 1);
         Version v2 = new Version(2, 2, 2);
         Version v3 = new Version(3, 3, 3);
-        actual = evaluateQuery("process: version in (1.1.1, 2.2.2, 3.3.3)").getFullMongoQuery();
+        actual = evaluateQuery("process: version in(1.1.1, 2.2.2, 3.3.3)").getFullMongoQuery();
         expected = QPetriNet.petriNet.version.in(List.of(v1, v2, v3));
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery("process: version not in (1.1.1, 2.2.2, 3.3.3)").getFullMongoQuery();
+        actual = evaluateQuery("process: version not in     (1.1.1, 2.2.2, 3.3.3)").getFullMongoQuery();
         expected = QPetriNet.petriNet.version.in(List.of(v1, v2, v3)).not();
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery("process: version in (1.1.1 : 2.2.2)").getFullMongoQuery();
+        actual = evaluateQuery("process: version in(1.1.1:2.2.2)").getFullMongoQuery();
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(QPetriNet.petriNet.version.major.gt(1)
                 .or(QPetriNet.petriNet.version.major.eq(1L).and(QPetriNet.petriNet.version.minor.gt(1)))
@@ -171,7 +171,7 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery("process: version in [1.1.1 : 2.2.2]").getFullMongoQuery();
+        actual = evaluateQuery("process: version in[1.1.1 :2.2.2]").getFullMongoQuery();
         builder = new BooleanBuilder();
         builder.and(QPetriNet.petriNet.version.major.goe(1)
                 .or(QPetriNet.petriNet.version.major.eq(1L).and(QPetriNet.petriNet.version.minor.goe(1)))

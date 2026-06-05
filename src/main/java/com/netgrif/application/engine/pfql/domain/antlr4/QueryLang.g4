@@ -231,14 +231,14 @@ dateTimeComparison: (NOT SPACE?)? op=(EQ | NEQ | LT | GT | LTE | GTE) SPACE DATE
 booleanComparison: (NOT SPACE?)? op=(EQ | NEQ) SPACE BOOLEAN ;
 
 // in list/in range comparisons
-inListStringComparison: (NOT SPACE?)? op=IN SPACE stringList ;
-inListNumberComparison: (NOT SPACE?)? op=IN SPACE (intList | doubleList) ;
-inListDateComparison: (NOT SPACE?)? op=IN SPACE (dateList | dateTimeList) ;
-inListVersionComparison: (NOT SPACE?)? op=IN SPACE versionList ;
-inRangeStringComparison: (NOT SPACE?)? op=IN SPACE stringRange ;
-inRangeNumberComparison: (NOT SPACE?)? op=IN SPACE (intRange | doubleRange) ;
-inRangeDateComparison: (NOT SPACE?)? op=IN SPACE (dateRange | dateTimeRange) ;
-inRangeVersionComparison: (NOT SPACE?)? op=IN SPACE versionRange ;
+inListStringComparison: (NOT SPACE?)? op=IN SPACE? stringList ;
+inListNumberComparison: (NOT SPACE?)? op=IN SPACE? (intList | doubleList) ;
+inListDateComparison: (NOT SPACE?)? op=IN SPACE? (dateList | dateTimeList) ;
+inListVersionComparison: (NOT SPACE?)? op=IN SPACE? versionList ;
+inRangeStringComparison: (NOT SPACE?)? op=IN SPACE? stringRange ;
+inRangeNumberComparison: (NOT SPACE?)? op=IN SPACE? (intRange | doubleRange) ;
+inRangeDateComparison: (NOT SPACE?)? op=IN SPACE? (dateRange | dateTimeRange) ;
+inRangeVersionComparison: (NOT SPACE?)? op=IN SPACE? versionRange ;
 
 // special attribute rules
 dataValue: DATA '.' fieldId=JAVA_ID '.' VALUE ;
