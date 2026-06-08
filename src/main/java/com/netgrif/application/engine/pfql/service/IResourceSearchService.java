@@ -40,23 +40,10 @@ public interface IResourceSearchService<Resource> {
     boolean exists(String queryString);
     boolean exists(QueryLangEvaluator evaluator);
 
-    static Pageable getDefaultPageable() {
-        return PageRequest.ofSize(100);
-    }
-
     // todo 2443 javadoc
     default void checkEvaluatorNotNull(QueryLangEvaluator evaluator) {
         if (evaluator == null) {
             throw new IllegalArgumentException("Query cannot be null");
-        }
-    }
-
-    // todo 2443 javadoc
-    default void updateWithDefaultPageableIfMissing(QueryLangEvaluator evaluator, Logger logger) {
-        if (evaluator.getPageable() == null) {
-            Pageable pageable = getDefaultPageable();
-            logger.debug("Pageable was missing. Using default pageable: {}", pageable);
-            evaluator.setPageable(getDefaultPageable());
         }
     }
 

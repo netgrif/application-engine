@@ -113,7 +113,6 @@ public class CaseSearchService implements IResourceSearchService<Case> {
         checkEvaluatorNotNull(evaluator);
         checkEvaluatorIsMultiple(evaluator);
         checkEvaluatorResourceType(evaluator);
-        updateWithDefaultPageableIfMissing(evaluator, log);
 
         log.debug("Searching for all cases using {} with pagination: page={}, size={}",
                 evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB",

@@ -110,7 +110,6 @@ public class ProcessSearchService implements IResourceSearchService<PetriNet> {
         checkEvaluatorNotNull(evaluator);
         checkEvaluatorIsMultiple(evaluator);
         checkEvaluatorResourceType(evaluator);
-        updateWithDefaultPageableIfMissing(evaluator, log);
 
         // todo implement Elasticsearch search (service layer and evaluator layer)
 

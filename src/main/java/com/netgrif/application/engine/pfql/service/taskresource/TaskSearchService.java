@@ -122,7 +122,6 @@ public class TaskSearchService implements IResourceSearchService<Task> {
         checkEvaluatorNotNull(evaluator);
         checkEvaluatorIsMultiple(evaluator);
         checkEvaluatorResourceType(evaluator);
-        updateWithDefaultPageableIfMissing(evaluator, log);
 
         log.debug("Searching for all tasks using {}", evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB");
         if (evaluator.getSearchWithElastic()) {

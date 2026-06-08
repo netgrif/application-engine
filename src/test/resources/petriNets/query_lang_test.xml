@@ -7,7 +7,7 @@
 	<anonymousRole>false</anonymousRole>
 	<transitionRole>false</transitionRole>
 
-	<data type="text">
+	<data type="text" immediate="true">
 		<id>input_query</id>
 		<title/>
 	</data>
