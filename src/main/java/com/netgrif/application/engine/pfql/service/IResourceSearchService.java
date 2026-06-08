@@ -2,10 +2,7 @@ package com.netgrif.application.engine.pfql.service;
 
 
 import com.netgrif.application.engine.pfql.domain.enums.QueryType;
-import org.slf4j.Logger;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 
 /**
@@ -40,28 +37,48 @@ public interface IResourceSearchService<Resource> {
     boolean exists(String queryString);
     boolean exists(QueryLangEvaluator evaluator);
 
-    // todo 2443 javadoc
+    /**
+     * Validates that the query evaluator is not null.
+     *
+     * @param evaluator the query evaluator to validate
+     * @throws IllegalArgumentException if the evaluator is null
+     */
     default void checkEvaluatorNotNull(QueryLangEvaluator evaluator) {
         if (evaluator == null) {
             throw new IllegalArgumentException("Query cannot be null");
         }
     }
 
-    // todo 2443 javadoc
+    /**
+     * Validates that the query evaluator expects multiple results.
+     *
+     * @param evaluator the query evaluator to validate
+     * @throws IllegalArgumentException if the evaluator expects a single result
+     */
     default void checkEvaluatorIsMultiple(QueryLangEvaluator evaluator) {
         if (!evaluator.getMultiple()) {
             throw new IllegalArgumentException("Cannot use searchAll() with a query that expects single result. Use searchOne() instead.");
         }
     }
 
-    // todo 2443 javadoc
+    /**
+     * Validates that the query evaluator expects a single result.
+     *
+     * @param evaluator the query evaluator to validate
+     * @throws IllegalArgumentException if the evaluator expects multiple results
+     */
     default void checkEvaluatorIsSingle(QueryLangEvaluator evaluator) {
         if (evaluator.getMultiple()) {
             throw new IllegalArgumentException("Cannot use searchOne() with a query that expects multiple results. Use searchAll() instead.");
         }
     }
 
-    // todo 2443 javadoc
+    /**
+     * Validates that the query evaluator's resource type matches the expected type.
+     *
+     * @param evaluator the query evaluator to validate
+     * @throws IllegalArgumentException if the resource type does not match
+     */
     default void checkEvaluatorResourceType(QueryLangEvaluator evaluator) {
         if (evaluator.getResourceType() != getQueryResourceType()) {
             throw new IllegalArgumentException(String.format("Wrong query resource type. Should be: %s, was: %s",

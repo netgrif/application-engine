@@ -10,6 +10,10 @@ import com.netgrif.application.engine.pfql.domain.enums.ComparisonType;
 import com.netgrif.application.engine.pfql.service.QueryLangErrorListener;
 import com.netgrif.application.engine.pfql.service.QueryLangEvaluator;
 import com.netgrif.application.engine.pfql.service.QueryLangExplainEvaluator;
+import com.netgrif.application.engine.pfql.service.caseresource.CaseSearchService;
+import com.netgrif.application.engine.pfql.service.processresource.ProcessSearchService;
+import com.netgrif.application.engine.pfql.service.taskresource.TaskSearchService;
+import com.netgrif.application.engine.pfql.service.userresource.UserSearchService;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -29,10 +33,18 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class SearchUtils {
+
+    private static final Set<String> queryPrefixes = Set.of(
+            CaseSearchService.QUERY_SINGLE_PREFIX, CaseSearchService.QUERY_MULTIPLE_PREFIX,
+            TaskSearchService.QUERY_SINGLE_PREFIX, TaskSearchService.QUERY_MULTIPLE_PREFIX,
+            ProcessSearchService.QUERY_SINGLE_PREFIX, ProcessSearchService.QUERY_MULTIPLE_PREFIX,
+            UserSearchService.QUERY_SINGLE_PREFIX, UserSearchService.QUERY_MULTIPLE_PREFIX
+    );
 
     public static final Map<ComparisonType, List<Integer>> comparisonOperators = Map.of(
             ComparisonType.ID, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.IN),
@@ -437,5 +449,46 @@ public class SearchUtils {
                 + buildElasticQuery(attribute, rightEndpointOpen ? QueryLangParser.LT : QueryLangParser.LTE, rightValue, false)
                 + ")";
         return not ? "NOT " + query : query;
+    }
+
+    public static String ensureStartsWithCase(String query) {
+        return ensureStartsWithPrefix(query, CaseSearchService.QUERY_SINGLE_PREFIX);
+    }
+
+    public static String ensureStartsWithCases(String query) {
+        return ensureStartsWithPrefix(query, CaseSearchService.QUERY_MULTIPLE_PREFIX);
+    }
+
+    public static String ensureStartsWithTask(String query) {
+        return ensureStartsWithPrefix(query, TaskSearchService.QUERY_SINGLE_PREFIX);
+    }
+
+    public static String ensureStartsWithTasks(String query) {
+        return ensureStartsWithPrefix(query, TaskSearchService.QUERY_MULTIPLE_PREFIX);
+    }
+
+    public static String ensureStartsWithProcess(String query) {
+        return ensureStartsWithPrefix(query, ProcessSearchService.QUERY_SINGLE_PREFIX);
+    }
+
+    public static String ensureStartsWithProcesses(String query) {
+        return ensureStartsWithPrefix(query, ProcessSearchService.QUERY_MULTIPLE_PREFIX);
+    }
+
+    public static String ensureStartsWithUser(String query) {
+        return ensureStartsWithPrefix(query, UserSearchService.QUERY_SINGLE_PREFIX);
+    }
+
+    public static String ensureStartsWithUsers(String query) {
+        return ensureStartsWithPrefix(query, UserSearchService.QUERY_MULTIPLE_PREFIX);
+    }
+
+    private static String ensureStartsWithPrefix(String query, String prefix) {
+        if (query == null) {
+            return null;
+        }
+        boolean hasValidPrefix = queryPrefixes.stream()
+                .anyMatch(validPrefix -> query.toLowerCase().startsWith(validPrefix.trim().toLowerCase()));
+        return hasValidPrefix ? query : prefix + query;
     }
 }

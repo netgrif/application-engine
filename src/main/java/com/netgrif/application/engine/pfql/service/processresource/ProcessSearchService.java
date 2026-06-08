@@ -20,6 +20,9 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.eval
 @RequiredArgsConstructor
 public class ProcessSearchService implements IResourceSearchService<PetriNet> {
 
+    public static final String QUERY_SINGLE_PREFIX = "process: ";
+    public static final String QUERY_MULTIPLE_PREFIX = "processes: ";
+
     private final IPetriNetService petriNetService;
 
     /**

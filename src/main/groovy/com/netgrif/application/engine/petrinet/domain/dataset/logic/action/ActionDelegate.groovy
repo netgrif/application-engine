@@ -53,6 +53,7 @@ import com.netgrif.application.engine.pfql.service.caseresource.CaseSearchServic
 import com.netgrif.application.engine.pfql.service.processresource.ProcessSearchService
 import com.netgrif.application.engine.pfql.service.taskresource.TaskSearchService
 import com.netgrif.application.engine.pfql.service.userresource.UserSearchService
+import com.netgrif.application.engine.pfql.service.utils.SearchUtils
 import com.netgrif.application.engine.rules.domain.RuleRepository
 import com.netgrif.application.engine.startup.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.FilterRunner
@@ -2694,88 +2695,433 @@ class ActionDelegate {
         return taskCase.getPetriNet().getDataSet().get(fieldId)
     }
 
-    // todo 2443 javadoc with examples for search methods
-
+    /**
+     * Searches for a single {@link Case} matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code case} (singular).
+     * </p>
+     * Example:
+     * <pre>
+     *     searchCase("case: processIdentifier eq 'query_test' and data.number_0.value == 3")
+     *     searchCase("case: id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     *     searchCase("id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code case:}
+     * @return matching {@link Case} or {@code null} if none is found
+     */
     Case searchCase(String query) {
+        query = SearchUtils.ensureStartsWithCase(query)
         return caseSearchService.searchOne(query)
     }
 
+    /**
+     * Searches for all {@link Case} instances matching the given query and returns a paged result.
+     * <p>
+     * The query must start with the resource keyword {@code cases} (plural) and may contain
+     * paging and sorting clauses.
+     * </p>
+     * Example:
+     * <pre>
+     *     pagedSearchCases("cases: processIdentifier eq 'query_test' page 1 size 5 sort by title desc")
+     *     pagedSearchCases("cases: author eq 'user@mail.com' and creationDate gt 2020-03-03")
+     *     pagedSearchCases("author eq 'user@mail.com' and creationDate gt 2020-03-03")
+     * </pre>
+     *
+     * @param query query language string starting with {@code cases:}
+     * @return {@link Page} of matching cases
+     */
     Page<Case> pagedSearchCases(String query) {
+        query = SearchUtils.ensureStartsWithCases(query)
         return caseSearchService.searchAll(query)
     }
 
+    /**
+     * Searches for all {@link Case} instances matching the given query and returns them as a list.
+     * <p>
+     * The query must start with the resource keyword {@code cases} (plural). This is a convenience
+     * method returning only the content of {@link #pagedSearchCases(String)}.
+     * </p>
+     * Example:
+     * <pre>
+     *     searchCases("cases: processIdentifier eq 'query_test' and data.boolean_0.value == true")
+     *     searchCases("cases: title contains 'Test' sort by creationDate desc")
+     *     searchCases("title contains 'Test' sort by creationDate desc")
+     * </pre>
+     *
+     * @param query query language string starting with {@code cases:}
+     * @return list of matching cases
+     */
     List<Case> searchCases(String query) {
+        query = SearchUtils.ensureStartsWithCases(query)
         return pagedSearchCases(query).content
     }
 
+    /**
+     * Counts the number of {@link Case} instances matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code cases} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     countCases("cases: processIdentifier eq 'query_test'")
+     *     countCases("cases: data.boolean_0.value == true and data.text_0.value != '4'")
+     *     countCases("data.boolean_0.value == true and data.text_0.value != '4'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code cases:}
+     * @return number of matching cases
+     */
     long countCases(String query) {
+        query = SearchUtils.ensureStartsWithCases(query)
         return caseSearchService.count(query)
     }
 
+    /**
+     * Checks whether at least one {@link Case} matching the given query exists.
+     * <p>
+     * The query must start with the resource keyword {@code cases} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     existsCase("cases: processIdentifier eq 'query_test'")
+     *     existsCase("cases: id in ('5f9b1c2d3e4f5a6b7c8d9e0f', '5f9b1c2d3e4f5a6b7c8d9e10')")
+     *     existsCase("id in ('5f9b1c2d3e4f5a6b7c8d9e0f', '5f9b1c2d3e4f5a6b7c8d9e10')")
+     * </pre>
+     *
+     * @param query query language string starting with {@code cases:}
+     * @return {@code true} if a matching case exists, {@code false} otherwise
+     */
     boolean existsCase(String query) {
+        query = SearchUtils.ensureStartsWithCases(query)
         return caseSearchService.exists(query)
     }
 
+    /**
+     * Searches for a single {@link Task} matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code task} (singular).
+     * </p>
+     * Example:
+     * <pre>
+     *     searchTask("task: transitionId eq 't1' and caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     *     searchTask("task: id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     *     searchTask("id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code task:}
+     * @return matching {@link Task} or {@code null} if none is found
+     */
     Task searchTask(String query) {
+        query = SearchUtils.ensureStartsWithTask(query)
         return taskSearchService.searchOne(query)
     }
 
+    /**
+     * Searches for all {@link Task} instances matching the given query and returns a paged result.
+     * <p>
+     * The query must start with the resource keyword {@code tasks} (plural) and may contain
+     * paging and sorting clauses.
+     * </p>
+     * Example:
+     * <pre>
+     *     pagedSearchTasks("tasks: title eq 'test' page 0 size 10 sort by lastFinish desc")
+     *     pagedSearchTasks("tasks: userId eq 'user1' and state eq enabled")
+     *     pagedSearchTasks("userId eq 'user1' and state eq enabled")
+     * </pre>
+     *
+     * @param query query language string starting with {@code tasks:}
+     * @return {@link Page} of matching tasks
+     */
     Page<Task> pagedSearchTasks(String query) {
+        query = SearchUtils.ensureStartsWithTasks(query)
         return taskSearchService.searchAll(query)
     }
 
+    /**
+     * Searches for all {@link Task} instances matching the given query and returns them as a list.
+     * <p>
+     * The query must start with the resource keyword {@code tasks} (plural). This is a convenience
+     * method returning only the content of {@link #pagedSearchTasks(String)}.
+     * </p>
+     * Example:
+     * <pre>
+     *     searchTasks("tasks: processId eq 'my_process' and userId in ('user1', 'user2')")
+     *     searchTasks("tasks: title contains 'Approve' sort by title asc")
+     *     searchTasks("title contains 'Approve' sort by title asc")
+     * </pre>
+     *
+     * @param query query language string starting with {@code tasks:}
+     * @return list of matching tasks
+     */
     List<Task> searchTasks(String query) {
+        query = SearchUtils.ensureStartsWithTasks(query)
         return pagedSearchTasks(query).content
     }
 
+    /**
+     * Counts the number of {@link Task} instances matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code tasks} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     countTasks("tasks: caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     *     countTasks("tasks: transitionId eq 't1' and userId eq 'user1'")
+     *     countTasks("transitionId eq 't1' and userId eq 'user1'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code tasks:}
+     * @return number of matching tasks
+     */
     long countTasks(String query) {
+        query = SearchUtils.ensureStartsWithTasks(query)
         return taskSearchService.count(query)
     }
 
+    /**
+     * Checks whether at least one {@link Task} matching the given query exists.
+     * <p>
+     * The query must start with the resource keyword {@code tasks} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     existsTask("tasks: caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     *     existsTask("tasks: transitionId eq 't1' and userId not eq 'user1'")
+     *     existsTask("transitionId eq 't1' and userId not eq 'user1'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code tasks:}
+     * @return {@code true} if a matching task exists, {@code false} otherwise
+     */
     boolean existsTask(String query) {
+        query = SearchUtils.ensureStartsWithTasks(query)
         return taskSearchService.exists(query)
     }
 
+    /**
+     * Searches for a single {@link PetriNet} (process) matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code process} (singular).
+     * </p>
+     * Example:
+     * <pre>
+     *     searchProcess("process: identifier == 'query_test'")
+     *     searchProcess("process: identifier eq 'my_process' and version eq 1.0.0")
+     *     searchProcess("identifier eq 'my_process' and version eq 1.0.0")
+     * </pre>
+     *
+     * @param query query language string starting with {@code process:}
+     * @return matching {@link PetriNet} or {@code null} if none is found
+     */
     PetriNet searchProcess(String query) {
+        query = SearchUtils.ensureStartsWithProcess(query)
         return processSearchService.searchOne(query)
     }
 
+    /**
+     * Searches for all {@link PetriNet} (process) instances matching the given query and returns a paged result.
+     * <p>
+     * The query must start with the resource keyword {@code processes} (plural) and may contain
+     * paging and sorting clauses.
+     * </p>
+     * Example:
+     * <pre>
+     *     pagedSearchProcesses("processes: identifier eq 'my_process' page 0 size 10 sort by version desc")
+     *     pagedSearchProcesses("processes: version in (1.0.0 : 2.0.0)")
+     *     pagedSearchProcesses("version in (1.0.0 : 2.0.0)")
+     * </pre>
+     *
+     * @param query query language string starting with {@code processes:}
+     * @return {@link Page} of matching processes
+     */
     Page<PetriNet> pagedSearchProcesses(String query) {
+        query = SearchUtils.ensureStartsWithProcesses(query)
         return processSearchService.searchAll(query)
     }
 
+    /**
+     * Searches for all {@link PetriNet} (process) instances matching the given query and returns them as a list.
+     * <p>
+     * The query must start with the resource keyword {@code processes} (plural). This is a convenience
+     * method returning only the content of {@link #pagedSearchProcesses(String)}.
+     * </p>
+     * Example:
+     * <pre>
+     *     searchProcesses("processes: title contains 'Test' sort by identifier asc")
+     *     searchProcesses("processes: identifier in ('process_a', 'process_b')")
+     *     searchProcesses("identifier in ('process_a', 'process_b')")
+     * </pre>
+     *
+     * @param query query language string starting with {@code processes:}
+     * @return list of matching processes
+     */
     List<PetriNet> searchProcesses(String query) {
+        query = SearchUtils.ensureStartsWithProcesses(query)
         return pagedSearchProcesses(query).content
     }
 
+    /**
+     * Counts the number of {@link PetriNet} (process) instances matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code processes} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     countProcesses("processes: identifier eq 'my_process'")
+     *     countProcesses("processes: version gte 1.0.0")
+     *     countProcesses("version gte 1.0.0")
+     * </pre>
+     *
+     * @param query query language string starting with {@code processes:}
+     * @return number of matching processes
+     */
     long countProcesses(String query) {
+        query = SearchUtils.ensureStartsWithProcesses(query)
         return processSearchService.count(query)
     }
 
+    /**
+     * Checks whether at least one {@link PetriNet} (process) matching the given query exists.
+     * <p>
+     * The query must start with the resource keyword {@code processes} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     existsProcess("processes: identifier eq 'my_process'")
+     *     existsProcess("processes: version eq 1.0.0")
+     *     existsProcess("version eq 1.0.0")
+     * </pre>
+     *
+     * @param query query language string starting with {@code processes:}
+     * @return {@code true} if a matching process exists, {@code false} otherwise
+     */
     boolean existsProcess(String query) {
+        query = SearchUtils.ensureStartsWithProcesses(query)
         return processSearchService.exists(query)
     }
 
+    /**
+     * Searches for a single {@link IUser} matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code user} (singular).
+     * </p>
+     * Example:
+     * <pre>
+     *     searchUser("user: email eq 'user@mail.com'")
+     *     searchUser("user: name eq 'John' and surname eq 'Doe'")
+     *     searchUser("name eq 'John' and surname eq 'Doe'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code user:}
+     * @return matching {@link IUser} or {@code null} if none is found
+     */
     IUser searchUser(String query) {
+        query = SearchUtils.ensureStartsWithUser(query)
         return userSearchService.searchOne(query)
     }
 
+    /**
+     * Searches for all {@link IUser} instances matching the given query and returns a paged result.
+     * <p>
+     * The query must start with the resource keyword {@code users} (plural) and may contain
+     * paging and sorting clauses.
+     * </p>
+     * Example:
+     * <pre>
+     *     pagedSearchUsers("users: name eq 'John' page 0 size 25 sort by surname asc")
+     *     pagedSearchUsers("users: email contains '@company.com'")
+     *     pagedSearchUsers("email contains '@company.com'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code users:}
+     * @return {@link Page} of matching users
+     */
     Page<IUser> pagedSearchUsers(String query) {
+        query = SearchUtils.ensureStartsWithUsers(query)
         return userSearchService.searchAll(query)
     }
 
+    /**
+     * Searches for all {@link IUser} instances matching the given query and returns them as a list.
+     * <p>
+     * The query must start with the resource keyword {@code users} (plural). This is a convenience
+     * method returning only the content of {@link #pagedSearchUsers(String)}.
+     * </p>
+     * Example:
+     * <pre>
+     *     searchUsers("users: surname eq 'Doe' sort by name asc")
+     *     searchUsers("users: email in ('a@mail.com', 'b@mail.com')")
+     *     searchUsers("email in ('a@mail.com', 'b@mail.com')")
+     * </pre>
+     *
+     * @param query query language string starting with {@code users:}
+     * @return list of matching users
+     */
     List<IUser> searchUsers(String query) {
+        query = SearchUtils.ensureStartsWithUsers(query)
         return pagedSearchUsers(query).content
     }
 
+    /**
+     * Counts the number of {@link IUser} instances matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code users} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     countUsers("users: email contains '@company.com'")
+     *     countUsers("users: name eq 'John'")
+     *     countUsers("name eq 'John'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code users:}
+     * @return number of matching users
+     */
     long countUsers(String query) {
+        query = SearchUtils.ensureStartsWithUsers(query)
         return userSearchService.count(query)
     }
 
+    /**
+     * Checks whether at least one {@link IUser} matching the given query exists.
+     * <p>
+     * The query must start with the resource keyword {@code users} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     existsUser("users: email eq 'user@mail.com'")
+     *     existsUser("users: name eq 'John' and surname eq 'Doe'")
+     *     existsUser("name eq 'John' and surname eq 'Doe'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code users:}
+     * @return {@code true} if a matching user exists, {@code false} otherwise
+     */
     boolean existsUser(String query) {
+        query = SearchUtils.ensureStartsWithUsers(query)
         return userSearchService.exists(query)
     }
 
+    /**
+     * Generic search that resolves the resource type from the query itself and executes the search.
+     * <p>
+     * The query must start with one of the resource keywords: {@code process}/{@code processes},
+     * {@code case}/{@code cases}, {@code task}/{@code tasks} or {@code user}/{@code users}.
+     * When the singular form is used, a single matching instance is returned. When the plural form
+     * is used, the content (a {@link List}) of the resulting {@link Page} is returned.
+     * </p>
+     * Example:
+     * <pre>
+     *     search("case: processIdentifier eq 'query_test' and data.number_0.value == 3")
+     *     search("cases: processIdentifier eq 'query_test' page 1 size 5 sort by title desc")
+     *     search("process: identifier == 'query_test'")
+     * </pre>
+     *
+     * @param query query language string starting with a resource keyword
+     * @return a single resource instance (singular form), a {@link List} of instances (plural form),
+     *         or {@code null} if nothing matches
+     */
     Object search(String query) {
         Object result = searchService.search(query)
         if (result instanceof Page<?>) {
@@ -2784,10 +3130,40 @@ class ActionDelegate {
         return result
     }
 
+    /**
+     * Generic count that resolves the resource type from the query itself and counts matching instances.
+     * <p>
+     * The query must start with one of the resource keywords: {@code processes}, {@code cases},
+     * {@code tasks} or {@code users} (plural form).
+     * </p>
+     * Example:
+     * <pre>
+     *     count("cases: processIdentifier eq 'query_test' and data.boolean_0.value == true")
+     *     count("users: email contains '@company.com'")
+     * </pre>
+     *
+     * @param query query language string starting with a resource keyword
+     * @return number of matching instances
+     */
     long count(String query) {
         return searchService.count(query)
     }
 
+    /**
+     * Generic existence check that resolves the resource type from the query itself.
+     * <p>
+     * The query must start with one of the resource keywords: {@code processes}, {@code cases},
+     * {@code tasks} or {@code users} (plural form).
+     * </p>
+     * Example:
+     * <pre>
+     *     exists("cases: processIdentifier eq 'query_test'")
+     *     exists("tasks: transitionId eq 't1' and userId eq 'user1'")
+     * </pre>
+     *
+     * @param query query language string starting with a resource keyword
+     * @return {@code true} if a matching instance exists, {@code false} otherwise
+     */
     boolean exists(String query) {
         return searchService.exists(query)
     }

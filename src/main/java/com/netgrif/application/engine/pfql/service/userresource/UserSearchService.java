@@ -29,6 +29,9 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.eval
 @RequiredArgsConstructor
 public class UserSearchService implements IResourceSearchService<IUser> {
 
+    public static final String QUERY_SINGLE_PREFIX = "user: ";
+    public static final String QUERY_MULTIPLE_PREFIX = "users: ";
+
     private final IUserService userService;
 
     /**

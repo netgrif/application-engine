@@ -34,6 +34,9 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.eval
 @RequiredArgsConstructor
 public class TaskSearchService implements IResourceSearchService<Task> {
 
+    public static final String QUERY_SINGLE_PREFIX = "task: ";
+    public static final String QUERY_MULTIPLE_PREFIX = "tasks: ";
+
     private final ITaskService taskService;
     private final IElasticTaskService elasticTaskService;
     private final IUserService userService;

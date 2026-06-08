@@ -30,6 +30,9 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.eval
 @RequiredArgsConstructor
 public class CaseSearchService implements IResourceSearchService<Case> {
 
+    public static final String QUERY_SINGLE_PREFIX = "case: ";
+    public static final String QUERY_MULTIPLE_PREFIX = "cases: ";
+
     private final IWorkflowService workflowService;
     private final IElasticCaseService elasticCaseService;
     private final IUserService userService;
