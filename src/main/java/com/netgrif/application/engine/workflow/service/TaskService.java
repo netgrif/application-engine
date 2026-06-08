@@ -812,12 +812,9 @@ public class TaskService implements ITaskService {
     @Override
     public Task resolveUserRef(Task task, Case useCase) {
         task.getUsers().clear();
-        task.getNegativeViewUsers().clear();
         task.getUserRefs().forEach((id, permission) -> {
             List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(id).getValue());
-            if (userIds != null && !userIds.isEmpty() && permission.containsKey("view") && !permission.get("view")) {
-                task.getNegativeViewUsers().addAll(userIds);
-            } else if (userIds != null && !userIds.isEmpty()) {
+            if (userIds != null && !userIds.isEmpty()) {
                 task.addUsers(new HashSet<>(userIds), permission);
             }
         });

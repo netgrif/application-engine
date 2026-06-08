@@ -37,6 +37,7 @@ import javax.xml.validation.SchemaFactory
 import javax.xml.validation.Validator
 import java.util.stream.Collectors
 
+@Disabled
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest

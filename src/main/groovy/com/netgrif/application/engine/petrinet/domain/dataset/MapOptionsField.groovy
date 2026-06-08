@@ -40,4 +40,8 @@ abstract class MapOptionsField<T, U> extends Field<U> {
     boolean isDynamic() {
         return this.optionsExpression != null
     }
+
+    T getOption(String key) {
+        return this.options.get(key)
+    }
 }

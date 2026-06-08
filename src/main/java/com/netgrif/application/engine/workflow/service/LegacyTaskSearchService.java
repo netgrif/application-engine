@@ -41,12 +41,17 @@ public class LegacyTaskSearchService extends MongoSearchService<Task> {
 
         BooleanBuilder builder = constructPredicateTree(singleQueries, isIntersection ? BooleanBuilder::and : BooleanBuilder::or);
 
-        BooleanBuilder constraints = new BooleanBuilder(buildRolesQueryConstraint(loggedOrImpersonated));
-        constraints.or(buildUserRefQueryConstraint(loggedOrImpersonated));
-        builder.and(constraints);
+        //        (Rp!=0 & Rn = 0)
+        BooleanBuilder constraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated))
+                .andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
 
-        builder.and(buildPermissionConstraints(loggedOrImpersonated));
-        return builder;
+        //        ((Rp!=0 & Rn = 0) or Up!=0)
+        constraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
+
+        //        (((Rp!=0 & Rn = 0) or Up!=0) & Un=0) == 1
+        constraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
+
+        return builder.and(constraints);
     }
 
     public BooleanBuilder buildPermissionConstraints(LoggedUser loggedOrImpersonated) {
@@ -73,7 +78,7 @@ public class LegacyTaskSearchService extends MongoSearchService<Task> {
     }
 
     public Predicate viewRoleQuery(String role) {
-        return QTask.task.viewUserRefs.isEmpty().and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewRoles.contains(role));
+        return QTask.task.viewRoles.contains(role);
     }
 
     protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
@@ -82,7 +87,7 @@ public class LegacyTaskSearchService extends MongoSearchService<Task> {
     }
 
     public Predicate viewUsersQuery(String userId) {
-        return QTask.task.negativeViewRoles.isEmpty().and(QTask.task.viewUserRefs.isEmpty()).and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewUsers.contains(userId));
+        return QTask.task.viewUsers.contains(userId);
     }
 
     protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {
