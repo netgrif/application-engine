@@ -33,7 +33,7 @@ public class LegacyTaskSearchService extends MongoSearchService<Task> {
             return null;
         } else if (!isIntersection) {
             singleQueries = singleQueries.stream().filter(Objects::nonNull).collect(Collectors.toList());
-            if (singleQueries.size() == 0) {
+            if (singleQueries.isEmpty()) {
                 // all queries result in an empty set => the entire result is an empty set
                 return null;
             }
@@ -41,6 +41,10 @@ public class LegacyTaskSearchService extends MongoSearchService<Task> {
 
         BooleanBuilder builder = constructPredicateTree(singleQueries, isIntersection ? BooleanBuilder::and : BooleanBuilder::or);
 
+        return builder.and(buildPermissionConstraints(loggedOrImpersonated));
+    }
+
+    public BooleanBuilder buildPermissionConstraints(LoggedUser loggedOrImpersonated) {
         //        (Rp!=0 & Rn = 0)
         BooleanBuilder constraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated))
                 .andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
@@ -51,25 +55,7 @@ public class LegacyTaskSearchService extends MongoSearchService<Task> {
         //        (((Rp!=0 & Rn = 0) or Up!=0) & Un=0) == 1
         constraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
 
-        return builder.and(constraints);
-    }
-
-    public BooleanBuilder buildPermissionConstraints(LoggedUser loggedOrImpersonated) {
-        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
-        return permissionConstraints;
-    }
-
-    protected Predicate buildRolesQueryConstraint(LoggedUser user) {
-        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::roleQuery).collect(Collectors.toList());
-        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
-    }
-
-    protected Predicate buildUserRefQueryConstraint(LoggedUser user) {
-        Predicate userRefConstraints = userRefQuery(user.getId());
-        return constructPredicateTree(Collections.singletonList(userRefConstraints), BooleanBuilder::or);
+        return constraints;
     }
 
     protected Predicate buildViewRoleQueryConstraint(LoggedUser user) {
