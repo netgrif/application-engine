@@ -89,11 +89,13 @@ public class LegacyCaseSearchService extends MongoSearchService<Case> {
                 return null;
             }
         }
+        // todo: move latest logic to method buildPermissionConstraints
         builder.and(buildPermissionConstraints(loggedOrImpersonated));
         return builder;
     }
 
     public BooleanBuilder buildPermissionConstraints(LoggedUser loggedOrImpersonated) {
+        // todo: update with latest logic, that Samo has introduced
         BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated));
         permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
         permissionConstraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
