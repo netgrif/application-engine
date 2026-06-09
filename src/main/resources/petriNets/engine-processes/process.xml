@@ -1,0 +1,700 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>process</id>
+	<version>1.0.0</version>
+	<initials>PRO</initials>
+	<title>Process</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<data type="text">
+		<id>copy_version</id>
+		<title>Version of the copy</title>
+	</data>
+	<data type="taskRef">
+		<id>form_ref</id>
+		<title/>
+		<inits>
+			<init>t8</init>
+		</inits>
+	</data>
+	<data type="text">
+		<id>icon</id>
+		<title>Icon</title>
+		<init>device_hub</init>
+	</data>
+	<data type="text">
+		<id>id</id>
+		<title>ID</title>
+		<init>new_process</init>
+	</data>
+	<data type="text">
+		<id>log_archive</id>
+		<title>Log</title>
+	</data>
+	<data type="text">
+		<id>log_delete</id>
+		<title>Log</title>
+		<component>
+			<name>textarea</name>
+		</component>
+	</data>
+	<data type="text">
+		<id>message_archive</id>
+		<title/>
+		<init>This process version will be archived, existing instances will continue their execution, new instances could not be created.</init>
+		<component>
+			<name>richtextarea</name>
+		</component>
+	</data>
+	<data type="text">
+		<id>message_copy</id>
+		<title/>
+		<init>Finishing this task will create a copy of this process with increased version.</init>
+	</data>
+	<data type="text">
+		<id>mongo_id</id>
+		<title>Mongo ID</title>
+	</data>
+	<data type="text">
+		<id>text_0</id>
+		<title/>
+		<init>This will permanently delete this process version and all its instances and tasks.</init>
+		<component>
+			<name>richtextarea</name>
+		</component>
+	</data>
+	<data type="text">
+		<id>title</id>
+		<title>Title</title>
+		<init>New Process</init>
+	</data>
+	<data type="text">
+		<id>version</id>
+		<title>Version</title>
+		<valid>regex ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$</valid>
+		<init>1.0.0</init>
+	</data>
+	<data type="enumeration_map">
+		<id>version_increment</id>
+		<title>Version increment</title>
+		<options>
+			<option key="MAJOR">Major</option>
+			<option key="MINOR">Minor</option>
+			<option key="PATCH">Patch</option>
+		</options>
+		<event type="set">
+			<id>version_increment_set</id>
+			<actions phase="post">
+				<action id="action7">
+					<![CDATA[
+					version_increment: f.version_increment,
+					copy_version: f.copy_version,
+					version: f.version;
+				 	try {
+                        def parts = version.value.tokenize(".")
+                        def newVersion = new Version(parts[0] as int, parts[1] as int, parts[2] as int)
+                        newVersion.increment(version_increment.value as VersionType)
+                        change copy_version value { newVersion as String }
+                    } catch (Exception e) {
+                        log.error("Failed to calculate new version", e)
+                    }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="file">
+		<id>xml_file</id>
+		<title>XML file</title>
+	</data>
+	<data type="text">
+		<id>xml_text</id>
+		<title>XML Text</title>
+	</data>
+	<transition>
+		<id>t1</id>
+		<x>80</x>
+		<y>80</y>
+		<label>Edit</label>
+		<icon>edit</icon>
+		<dataGroup>
+			<id>t1_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>form_ref</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>xml_text</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+				</component>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t10</id>
+		<x>368</x>
+		<y>208</y>
+		<label>Delete with cases</label>
+		<icon>delete_forever</icon>
+		<dataGroup>
+			<id>t10_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_0</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>log_delete</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>delete_with_cases_finish</id>
+			<actions phase="pre">
+				<action id="action_0">
+					<![CDATA[
+					mongo_id: f.mongo_id,
+					log_delete: f.log_delete;
+					try {
+				   		petriNetService.deletePetriNet(mongo_id.value, loggedUser())
+				   	} catch (Exception e) {
+						String message = "Error deleting Petri net with ObjectId(${mongo_id.value}): ${e.message}" as String
+						log.error(message, e)
+						change log_delete value { message }
+				   	}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>368</x>
+		<y>144</y>
+		<label>View</label>
+		<icon>remove_red_eye</icon>
+		<dataGroup>
+			<id>t2_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>form_ref</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t3</id>
+		<x>176</x>
+		<y>272</y>
+		<label>Back to Draft</label>
+		<icon>delete_outline</icon>
+		<event type="finish">
+			<id>t3_finish</id>
+			<actions phase="pre">
+				<action id="action4">
+					<![CDATA[
+					// TODO: delete all cases, undeploy process
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t4</id>
+		<x>368</x>
+		<y>80</y>
+		<label>New version</label>
+		<icon>plus_one</icon>
+		<dataGroup>
+			<id>t4_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>message_copy</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>richtextarea</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>version_increment</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>copy_version</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t4_finish</id>
+			<actions phase="pre">
+				<action id="action3">
+					<![CDATA[
+					// TODO: create duplicate case with version +1 if possible
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t5</id>
+		<x>176</x>
+		<y>176</y>
+		<label>Deploy</label>
+		<icon>upload_file</icon>
+		<event type="finish">
+			<id>t5_finish</id>
+			<actions phase="pre">
+				<action id="action1">
+					<![CDATA[
+					// TODO: move xml text to file field, deploy using Importer, make file field visible on form
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t6</id>
+		<x>80</x>
+		<y>272</y>
+		<label>Delete</label>
+		<icon>delete_forever</icon>
+		<dataGroup>
+			<id>t6_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_0</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>richtextarea</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>log_delete</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+				</component>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t6_finish</id>
+			<actions phase="pre">
+				<action id="action2">
+					<![CDATA[
+					// TODO: delete all cases, delete process, delete self
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t8</id>
+		<x>176</x>
+		<y>80</y>
+		<label>Form</label>
+		<icon>format_align_justify</icon>
+		<roleRef>
+			<id>anonymous</id>
+			<logic>
+				<perform>false</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>default</id>
+			<logic>
+				<perform>false</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t1_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>id</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>title</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>version</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>icon</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>xml_file</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t9</id>
+		<x>368</x>
+		<y>272</y>
+		<label>Archive</label>
+		<icon>folder</icon>
+		<dataGroup>
+			<id>t9_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>message_archive</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>log_archive</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+				</component>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t9_finish</id>
+			<actions phase="pre">
+				<action id="action5">
+					<![CDATA[
+					// TODO: prepinac freeze - ci sa mozu casey dorobit
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>80</x>
+		<y>176</y>
+		<label>draft</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>272</x>
+		<y>272</y>
+		<label>deployed</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p5</id>
+		<x>464</x>
+		<y>272</y>
+		<label>archived</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p7</id>
+		<x>272</x>
+		<y>112</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p8</id>
+		<x>464</x>
+		<y>208</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a10</id>
+		<type>regular</type>
+		<sourceId>t1</sourceId>
+		<destinationId>p1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a13</id>
+		<type>regular</type>
+		<sourceId>t9</sourceId>
+		<destinationId>p5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a14</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t9</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a16</id>
+		<type>regular</type>
+		<sourceId>t3</sourceId>
+		<destinationId>p1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a17</id>
+		<type>regular</type>
+		<sourceId>t5</sourceId>
+		<destinationId>p7</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a18</id>
+		<type>read</type>
+		<sourceId>p7</sourceId>
+		<destinationId>t4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a19</id>
+		<type>read</type>
+		<sourceId>p7</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a20</id>
+		<type>regular</type>
+		<sourceId>p7</sourceId>
+		<destinationId>t3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a21</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t10</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a22</id>
+		<type>regular</type>
+		<sourceId>p7</sourceId>
+		<destinationId>t10</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a23</id>
+		<type>regular</type>
+		<sourceId>t10</sourceId>
+		<destinationId>p8</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>t5</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a9</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t6</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

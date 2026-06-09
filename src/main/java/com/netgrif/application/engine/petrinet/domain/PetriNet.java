@@ -75,6 +75,10 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
+    private DeploymentState deploymentState;
+
+    @Getter
+    @Setter
     private Author author;
 
     @org.springframework.data.mongodb.core.mapping.Field("places")
