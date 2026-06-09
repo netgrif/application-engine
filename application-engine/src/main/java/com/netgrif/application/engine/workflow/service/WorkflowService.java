@@ -252,6 +252,16 @@ public class WorkflowService implements IWorkflowService {
         return useCase;
     }
 
+    @Override
+    public void updateCaseFromDb(Case useCase) {
+        Case actual = findOne(useCase.getStringId());
+        actual.getDataSet().forEach((id, dataField) -> {
+            if (dataField.isNewerThen(useCase.getDataField(id))) {
+                useCase.getDataSet().put(id, dataField);
+            }
+        });
+    }
+
     /**
      * Resolves actor permissions for the useCase based on the actor list data field.
      *

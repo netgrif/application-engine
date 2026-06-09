@@ -111,7 +111,7 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
-    public SetDataEventOutcome setData(String taskId, Map<String, Map<String, String>> dataSet, Map<String, String> params) throws JsonProcessingException {
+    public SetDataEventOutcome setData(String taskId, Map<String, Map<String, Object>> dataSet, Map<String, String> params) throws JsonProcessingException {
         log.debug("Setting data for task [{}] with params: [{}]", taskId, params == null ? "null" : params.toString());
         ObjectMapper mapper = new ObjectMapper(); 
         String json = mapper.writeValueAsString(dataSet);
