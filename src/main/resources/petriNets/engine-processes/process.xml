@@ -113,13 +113,13 @@
 		<title>XML Text</title>
 	</data>
 	<transition>
-		<id>t1</id>
+		<id>edit</id>
 		<x>80</x>
 		<y>80</y>
 		<label>Edit</label>
 		<icon>edit</icon>
 		<dataGroup>
-			<id>t1_0</id>
+			<id>edit_0</id>
 			<cols>4</cols>
 			<layout>grid</layout>
 			<dataRef>
@@ -317,7 +317,39 @@
 			<actions phase="pre">
 				<action id="action3">
 					<![CDATA[
-					// TODO: create duplicate case with version +1 if possible
+					xml_text: f.xml_text,
+					icon: f.icon,
+					copy_version: f.copy_version,
+					version: f.version,
+					id: f.id,
+					title: f.title;
+
+					def updatedXml = xml_text.value.replace("<version>${version.value}</version>", "<version>${copy_version.value}</version>") as String
+					def newProcess = createCase("process", title.value)
+					def editTask = assignTask("edit", newProcess)
+					setData(editTask, [
+							"id": [
+							        "type": "text",
+									"value": id.value
+							],
+							"version": [
+							        "type": "text",
+									"value": copy_version.value
+							],
+							"title": [
+							        "type": "text",
+									"value": title.value
+							],
+							"icon": [
+							        "type": "text",
+									"value": icon.value
+							],
+							"xml_text": [
+							        "type":"text",
+									"value": updatedXml
+							]
+					])
+					finishTask(editTask)
 					]]>
 				</action>
 			</actions>
@@ -334,7 +366,7 @@
 			<actions phase="pre">
 				<action id="action1">
 					<![CDATA[
-					// TODO: move xml text to file field, deploy using Importer, make file field visible on form
+					// TODO: move xml text to file field, deploy using Importer, make file field visible on form, if assigned unassign edit
 					]]>
 				</action>
 			</actions>
@@ -415,7 +447,7 @@
 			</logic>
 		</roleRef>
 		<dataGroup>
-			<id>t1_0</id>
+			<id>t8_0</id>
 			<cols>4</cols>
 			<layout>grid</layout>
 			<dataRef>
@@ -587,16 +619,9 @@
 	</place>
 	<arc>
 		<id>a1</id>
-		<type>regular</type>
+		<type>read</type>
 		<sourceId>p1</sourceId>
-		<destinationId>t1</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>a10</id>
-		<type>regular</type>
-		<sourceId>t1</sourceId>
-		<destinationId>p1</destinationId>
+		<destinationId>edit</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
