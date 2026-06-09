@@ -348,6 +348,9 @@ public class QueryLangTest {
         actual = evaluateQuery("case: data.field1.value eq 'test'").getFullMongoQuery();
         assertNull(actual);
 
+        actual = evaluateQuery("case: data.name.value eq 'test'").getFullMongoQuery(); // name is a reserved keyword
+        assertNull(actual);
+
         actual = evaluateQuery("case: data.field1.value contains 'test'").getFullMongoQuery();
         assertNull(actual);
 

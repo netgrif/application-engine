@@ -48,22 +48,15 @@ import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
+import com.netgrif.application.engine.pfql.service.IResourceSearchService
 import com.netgrif.application.engine.pfql.service.ISearchService
-import com.netgrif.application.engine.pfql.service.caseresource.CaseSearchService
-import com.netgrif.application.engine.pfql.service.processresource.ProcessSearchService
-import com.netgrif.application.engine.pfql.service.taskresource.TaskSearchService
-import com.netgrif.application.engine.pfql.service.userresource.UserSearchService
 import com.netgrif.application.engine.pfql.service.utils.SearchUtils
 import com.netgrif.application.engine.rules.domain.RuleRepository
 import com.netgrif.application.engine.startup.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
-import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.DataField
-import com.netgrif.application.engine.workflow.domain.QCase
-import com.netgrif.application.engine.workflow.domain.QTask
-import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.*
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome
@@ -94,7 +87,6 @@ import org.springframework.data.domain.Pageable
 
 import java.time.ZoneId
 import java.util.stream.Collectors
-
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -220,16 +212,16 @@ class ActionDelegate {
     ISearchService searchService
 
     @Autowired
-    CaseSearchService caseSearchService
+    IResourceSearchService<Case> caseSearchService
 
     @Autowired
-    TaskSearchService taskSearchService
+    IResourceSearchService<Task> taskSearchService
 
     @Autowired
-    ProcessSearchService processSearchService
+    IResourceSearchService<PetriNet> processSearchService
 
     @Autowired
-    UserSearchService userSearchService
+    IResourceSearchService<IUser> userSearchService
 
     FrontendActionOutcome Frontend
 
@@ -3265,7 +3257,6 @@ class ActionDelegate {
      * @return list of matching cases
      */
     List<Case> searchCases(String query) {
-        query = SearchUtils.ensureStartsWithCases(query)
         return pagedSearchCases(query).content
     }
 

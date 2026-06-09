@@ -241,11 +241,25 @@ inRangeDateComparison: (NOT SPACE?)? op=IN SPACE? (dateRange | dateTimeRange) ;
 inRangeVersionComparison: (NOT SPACE?)? op=IN SPACE? versionRange ;
 
 // special attribute rules
-dataValue: DATA '.' fieldId=JAVA_ID '.' VALUE ;
-dataOptions: DATA '.' fieldId=JAVA_ID '.' OPTIONS ;
-places: PLACES '.' placeId=JAVA_ID '.' MARKING ;
-tasksState: TASKS '.' taskId=JAVA_ID '.' STATE ;
-tasksUserId: TASKS '.' taskId=JAVA_ID '.' USER_ID ;
+dataValue: DATA '.' fieldId=javaId '.' VALUE ;
+dataOptions: DATA '.' fieldId=javaId '.' OPTIONS ;
+places: PLACES '.' placeId=javaId '.' MARKING ;
+tasksState: TASKS '.' taskId=javaId '.' STATE ;
+tasksUserId: TASKS '.' taskId=javaId '.' USER_ID ;
+
+// identifier that also accepts reserved words as plain identifiers
+javaId: JAVA_ID
+      | ID | TITLE | IDENTIFIER | VERSION | CREATION_DATE
+      | PROCESS_ID | PROCESS_IDENTIFIER | AUTHOR | PLACES
+      | TRANSITION_ID | STATE | USER_ID | CASE_ID
+      | LAST_ASSIGN | LAST_FINISH
+      | NAME | SURNAME | EMAIL
+      | DATA | VALUE | OPTIONS | MARKING
+      | ENABLED | DISABLED
+      | PAGE | SIZE | ASC | DESC
+      | CASE | CASES | TASK | TASKS
+      | USER | USERS | PROCESS | PROCESSES
+      ;
 
 // operators
 AND: A N D | '&' ;

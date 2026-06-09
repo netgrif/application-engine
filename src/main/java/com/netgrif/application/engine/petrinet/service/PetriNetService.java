@@ -530,9 +530,7 @@ public class PetriNetService implements IPetriNetService {
         if (pageable == null) {
             pageable = Pageable.unpaged();
         }
-        Predicate permissionConstraint = getProcessRolesPredicate(userService.getLoggedOrSystem().transformToLoggedUser());
-        Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraint);
-        return repository.findAll(finalPredicate, pageable);
+        return repository.findAll(predicate, pageable);
     }
 
     @Override
@@ -549,9 +547,7 @@ public class PetriNetService implements IPetriNetService {
         if (predicate == null) {
             return 0;
         }
-        Predicate permissionConstraint = getProcessRolesPredicate(userService.getLoggedOrSystem().transformToLoggedUser());
-        Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraint);
-        return repository.count(finalPredicate);
+        return repository.count(predicate);
     }
 
     @Override
@@ -559,9 +555,7 @@ public class PetriNetService implements IPetriNetService {
         if (predicate == null) {
             return false;
         }
-        Predicate permissionConstraint = getProcessRolesPredicate(userService.getLoggedOrSystem().transformToLoggedUser());
-        Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraint);
-        return repository.exists(finalPredicate);
+        return repository.exists(predicate);
     }
 
     private void addValueCriteria(Query query, Query queryTotal, Criteria criteria) {
@@ -603,14 +597,6 @@ public class PetriNetService implements IPetriNetService {
     private Criteria getProcessRolesCriteria(LoggedUser user) {
         return new Criteria().orOperator(user.getProcessRoles().stream()
                 .map(role -> Criteria.where("permissions." + role).exists(true)).toArray(Criteria[]::new));
-    }
-
-    private Predicate getProcessRolesPredicate(LoggedUser user) {
-        BooleanBuilder result = new BooleanBuilder();
-        user.getProcessRoles().forEach(role -> {
-            result.or(QPetriNet.petriNet.permissions.containsKey(role));
-        });
-        return result;
     }
 
     @Override

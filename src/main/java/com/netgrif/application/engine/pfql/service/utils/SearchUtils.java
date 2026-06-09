@@ -126,7 +126,7 @@ public class SearchUtils {
             try {
                 return LocalDate.parse(dateTimeString, DateTimeFormatter.ISO_LOCAL_DATE).atTime(12, 0, 0);
             } catch (DateTimeParseException e) {
-                throw new IllegalArgumentException("Invalid date/datetime format");
+                throw new IllegalArgumentException("Invalid date/datetime format", e);
             }
         }
     }
@@ -138,7 +138,7 @@ public class SearchUtils {
             try {
                 return LocalDateTime.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toLocalDate();
             } catch (DateTimeParseException e) {
-                throw new IllegalArgumentException("Invalid date/datetime format");
+                throw new IllegalArgumentException("Invalid date/datetime format", e);
             }
         }
     }
@@ -280,9 +280,17 @@ public class SearchUtils {
 
     public static Predicate buildVersionPredicate(int op, String versionString, boolean not) {
         String[] versionNumber = versionString.split("\\.");
-        long major = Long.parseLong(versionNumber[0]);
-        long minor = Long.parseLong(versionNumber[1]);
-        long patch = Long.parseLong(versionNumber[2]);
+        if (versionNumber.length != 3) {
+            throw new IllegalArgumentException("Version must be in format major.minor.patch: " + versionString);
+        }
+        long major, minor, patch;
+        try {
+            major = Long.parseLong(versionNumber[0]);
+            minor = Long.parseLong(versionNumber[1]);
+            patch = Long.parseLong(versionNumber[2]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid version number format: " + versionString, e);
+        }
 
         QVersion qVersion = QPetriNet.petriNet.version;
 

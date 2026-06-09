@@ -771,7 +771,6 @@ public class TaskService implements ITaskService {
     public Task searchOne(com.querydsl.core.types.Predicate predicate) {
         Page<Task> tasks = search(predicate, PageRequest.of(0, 1));
         if (tasks.getTotalElements() > 0) {
-            loadUsers(tasks);
             return tasks.getContent().get(0);
         }
         return null;

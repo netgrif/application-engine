@@ -807,6 +807,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitStateComparison(QueryLangParser.StateComparisonContext ctx) {
+        // todo implement task states
 //        switch (ctx.state.getType()) {
 //            case QueryLangParser.ENABLED:
 //                setMongoQuery(ctx, QTask.task.state.eq(State.ENABLED));
@@ -861,6 +862,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitLaDateBasic(QueryLangParser.LaDateBasicContext ctx) {
+        // todo implement lastAssigned
 //        DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastAssigned;
 //        Token op = ctx.dateComparison().op;
 //        boolean not = ctx.dateComparison().NOT() != null;
@@ -871,6 +873,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitLaDateTimeBasic(QueryLangParser.LaDateTimeBasicContext ctx) {
+        // todo implement lastAssigned
 //        DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastAssigned;
 //        Token op = ctx.dateTimeComparison().op;
 //        boolean not = ctx.dateTimeComparison().NOT() != null;
@@ -881,6 +884,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitLaDateList(QueryLangParser.LaDateListContext ctx) {
+        // todo implement lastAssigned
 //        DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastAssigned;
 //        boolean not = ctx.inListDateComparison().NOT() != null;
 //        List<TerminalNode> terminalNodeList = ctx.inListDateComparison().dateList() != null ? ctx.inListDateComparison().dateList().DATE() : ctx.inListDateComparison().dateTimeList().DATETIME() ;
@@ -891,6 +895,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitLaDateRange(QueryLangParser.LaDateRangeContext ctx) {
+        // todo implement lastAssigned
 //        DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastAssigned;
 //        boolean not = ctx.inRangeDateComparison().NOT() != null;
 //        boolean leftEndpointOpen;
@@ -914,6 +919,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitLfDateBasic(QueryLangParser.LfDateBasicContext ctx) {
+        // todo implement lastFinished
 //        DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastFinished;
 //        Token op = ctx.dateComparison().op;
 //        boolean not = ctx.dateComparison().NOT() != null;
@@ -924,6 +930,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitLfDateTimeBasic(QueryLangParser.LfDateTimeBasicContext ctx) {
+        // todo implement lastFinished
 //        DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastFinished;
 //        Token op = ctx.dateTimeComparison().op;
 //        boolean not = ctx.dateTimeComparison().NOT() != null;
@@ -934,6 +941,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitLfDateList(QueryLangParser.LfDateListContext ctx) {
+        // todo implement lastFinished
 //        DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastFinished;
 //        boolean not = ctx.inListDateComparison().NOT() != null;
 //        List<TerminalNode> terminalNodeList = ctx.inListDateComparison().dateList() != null ? ctx.inListDateComparison().dateList().DATE() : ctx.inListDateComparison().dateTimeList().DATETIME() ;
@@ -944,6 +952,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitLfDateRange(QueryLangParser.LfDateRangeContext ctx) {
+        // todo implement lastFinished
 //        DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastFinished;
 //        boolean not = ctx.inRangeDateComparison().NOT() != null;
 //        boolean leftEndpointOpen;
@@ -1315,6 +1324,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitTasksStateComparison(QueryLangParser.TasksStateComparisonContext ctx) {
+        // todo implement task states
 //        String taskId = ctx.tasksState().taskId.getText();
 //        Token op = ctx.op;
 //        checkOp(ComparisonType.STRING, op);
@@ -1367,7 +1377,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
             Sort.Direction dir = attrOrd.ordering != null ? Sort.Direction.fromString(attrOrd.ordering.getText()) : Sort.Direction.ASC;
             String prop;
             if (searchWithElastic) {
-                // todo NAE-1997: sorting by data value, options
+                // todo: sorting by data value, options
                 if (attrOrd.caseAttribute().places() != null) {
                     prop = "places." + attrOrd.caseAttribute().places().placeId.getText() + ".marking";
                 } else if (attrOrd.caseAttribute().tasksState() != null) {

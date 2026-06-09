@@ -447,7 +447,7 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
             Sort.Direction dir = attrOrd.ordering != null ? Sort.Direction.fromString(attrOrd.ordering.getText()) : Sort.Direction.ASC;
             String prop;
             if (searchWithElastic) {
-                // todo NAE-1997: sorting by data value, options
+                // todo: sorting by data value, options
                 if (attrOrd.caseAttribute().places() != null) {
                     prop = "places." + attrOrd.caseAttribute().places().placeId.getText() + ".marking";
                 } else if (attrOrd.caseAttribute().tasksState() != null) {
@@ -463,6 +463,7 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
 
             if (prop == null) {
                 sortOrders.add("Invalid attribute: " + attrOrd.caseAttribute().getText());
+                return;
             }
             sortOrders.add("attribute: " + prop + ", ordering: " + dir);
         });

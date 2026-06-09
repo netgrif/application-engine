@@ -52,6 +52,9 @@ public class SearchService implements ISearchService {
         QueryLangEvaluator evaluator = evaluateQuery(input);
         log.trace("Evaluated query type: {}, multiple: {}", evaluator.getResourceType(), evaluator.getMultiple());
         IResourceSearchService<?> service = this.serviceRegistry.get(evaluator.getResourceType());
+        if (service == null) {
+            throw new IllegalStateException("No PFQL search service registered for query type: " + evaluator.getResourceType());
+        }
         Object result = evaluator.getMultiple() ? service.searchAll(evaluator) : service.searchOne(evaluator);
         log.debug("Search completed, returning {} result", evaluator.getMultiple() ? "multiple" : "single");
         return result;
@@ -69,6 +72,9 @@ public class SearchService implements ISearchService {
         QueryLangEvaluator evaluator = evaluateQuery(input);
         log.trace("Evaluated query type for count: {}", evaluator.getResourceType());
         IResourceSearchService<?> service = this.serviceRegistry.get(evaluator.getResourceType());
+        if (service == null) {
+            throw new IllegalStateException("No PFQL search service registered for query type: " + evaluator.getResourceType());
+        }
         long count = service.count(evaluator);
         log.debug("Count completed, result: {}", count);
         return count;
@@ -86,6 +92,9 @@ public class SearchService implements ISearchService {
         QueryLangEvaluator evaluator = evaluateQuery(input);
         log.trace("Evaluated query type for exists: {}", evaluator.getResourceType());
         IResourceSearchService<?> service = this.serviceRegistry.get(evaluator.getResourceType());
+        if (service == null) {
+            throw new IllegalStateException("No PFQL search service registered for query type: " + evaluator.getResourceType());
+        }
         boolean exists = service.exists(evaluator);
         log.debug("Existence check completed, result: {}", exists);
         return exists;

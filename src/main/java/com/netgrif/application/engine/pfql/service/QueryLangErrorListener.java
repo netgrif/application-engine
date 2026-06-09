@@ -27,6 +27,9 @@ public class QueryLangErrorListener extends BaseErrorListener {
         CommonTokenStream tokens = (CommonTokenStream) recognizer.getInputStream();
         String input = tokens.getTokenSource().getInputStream().toString();
         String[] lines = input.split("\n");
+        if (line < 1 || line > lines.length) {
+            return underlineErrorMsg;
+        }
         String errorLine = lines[line - 1];
         underlineErrorMsg += errorLine + "\n";
         underlineErrorMsg += " ".repeat(charPositionInLine) + "^".repeat(stop - start + 1) + "\n";

@@ -40,7 +40,9 @@ public class SearchTestUtils {
                 .map(getId)
                 .collect(Collectors.toList());
 
-        assert actualIds.containsAll(expectedIds);
+        actualIds.sort(String::compareTo);
+        expectedIds.sort(String::compareTo);
+        assert actualIds.equals(expectedIds);
     }
 
     public static <T> void compareByIdInOrder(List<T> actual, List<T> expected, Function<T, String> getId) {
