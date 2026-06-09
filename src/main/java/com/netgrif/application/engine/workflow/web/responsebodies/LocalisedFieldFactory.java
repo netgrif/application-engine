@@ -35,8 +35,12 @@ public class LocalisedFieldFactory {
             return fromCase((CaseField) field, locale);
         } else if (field instanceof FileListField) {
             return fromFileList((FileListField) field, locale);
-        } else if (field instanceof FilterField) {
-            return fromFilter((FilterField) field, locale);
+        } else if (field instanceof CaseFilterField) {
+            return fromCaseFilter((CaseFilterField) field, locale);
+        }  else if (field instanceof TaskFilterField) {
+            return fromTaskFilter((TaskFilterField) field, locale);
+        }  else if (field instanceof ProcessFilterField) {
+            return fromProcessFilter((ProcessFilterField) field, locale);
         } else if (field instanceof I18nField) {
             return fromI18n((I18nField) field, locale);
         } else {
@@ -100,8 +104,16 @@ public class LocalisedFieldFactory {
         return new LocalisedFileListField(field, locale);
     }
 
-    public static LocalisedField fromFilter(FilterField field, Locale locale) {
-        return new LocalisedFilterField(field, locale);
+    public static LocalisedField fromCaseFilter(CaseFilterField field, Locale locale) {
+        return new LocalisedCaseFilterField(field, locale);
+    }
+
+    public static LocalisedField fromTaskFilter(TaskFilterField field, Locale locale) {
+        return new LocalisedTaskFilterField(field, locale);
+    }
+
+    public static LocalisedField fromProcessFilter(ProcessFilterField field, Locale locale) {
+        return new LocalisedProcessFilterField(field, locale);
     }
 
     public static LocalisedField fromI18n(I18nField field, Locale locale) {

@@ -30,5 +30,4 @@ public interface IFilterImportExportService {
 
     void createFilterExport(IUser author);
 
-    void changeFilterField(Collection<String> filterFields);
 }

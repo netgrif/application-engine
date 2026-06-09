@@ -1,0 +1,10 @@
+Transition ID,Transition title,roleRef,userRef,No permissions,Has role,Is in userList,Has role and is in userList
+t_007,role=true user=true,TRUE,TRUE,FALSE,TRUE,TRUE,TRUE
+t_008,role=true user=false,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE
+t_009,role=true user=undefined,TRUE,undefined,FALSE,TRUE,FALSE,TRUE
+t_016,role=false user=true,FALSE,TRUE,FALSE,FALSE,TRUE,TRUE
+t_017,role=false user=false,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE
+t_018,role=false user=undefined,FALSE,undefined,FALSE,FALSE,FALSE,FALSE
+t_025,role=undefined user=true,undefined,TRUE,FALSE,FALSE,TRUE,TRUE
+t_026,role=undefined user=false,undefined,FALSE,FALSE,FALSE,FALSE,FALSE
+t_027,role=undefined user=undefined,undefined,undefined,FALSE,FALSE,FALSE,FALSE

@@ -58,7 +58,6 @@ public class MenuItemService implements IMenuItemService {
     public Case createFilter(FilterBody body) throws TransitionNotExecutableException {
         IUser loggedUser = userService.getLoggedOrSystem();
         Case filterCase = createCase(FilterRunner.FILTER_PETRI_NET_IDENTIFIER, body.getTitle().getDefaultValue(), loggedUser.transformToLoggedUser());
-        filterCase.setIcon(body.getIcon());
         filterCase = workflowService.save(filterCase);
         ToDataSetOutcome dataSetOutcome = body.toDataSet();
         filterCase = setDataWithExecute(filterCase, DefaultFiltersRunner.AUTO_CREATE_TRANSITION, dataSetOutcome.getDataSet());
@@ -76,8 +75,6 @@ public class MenuItemService implements IMenuItemService {
      * */
     @Override
     public Case updateFilter(Case filterCase, FilterBody body) {
-        filterCase.setIcon(body.getIcon());
-        filterCase = workflowService.save(filterCase);
         ToDataSetOutcome dataSetOutcome = body.toDataSet();
         filterCase = setData(filterCase, DefaultFiltersRunner.DETAILS_TRANSITION, dataSetOutcome.getDataSet());
         log.trace("Updated filter case [{}][{}]", filterCase.getStringId(), body.getTitle().getDefaultValue());
