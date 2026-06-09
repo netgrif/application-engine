@@ -17,6 +17,9 @@ import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearc
 import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
+import com.netgrif.application.engine.files.IStorageResolverService
+import com.netgrif.application.engine.files.StorageResolverService
+import com.netgrif.application.engine.files.interfaces.IStorageService
 import com.netgrif.application.engine.history.service.IHistoryService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.importer.service.FieldFactory
@@ -86,6 +89,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 
+import java.nio.file.Files
 import java.time.ZoneId
 import java.util.stream.Collectors
 
@@ -209,6 +213,9 @@ class ActionDelegate {
 
     @Autowired
     DashboardItemService dashboardItemService
+
+    @Autowired
+    IStorageResolverService storageResolver
 
     FrontendActionOutcome Frontend
 
@@ -3184,5 +3191,11 @@ class ActionDelegate {
         Task task = taskService.findOne(taskId)
         Case taskCase = workflowService.findOne(task.caseId)
         return taskCase.getPetriNet().getDataSet().get(fieldId)
+    }
+
+    PetriNet importPetriNet(String xmlText) {
+        InputStream xmlStream = new ByteArrayInputStream(xmlText.bytes)
+        def outcome = petriNetService.importPetriNet(xmlStream, loggedUser().transformToLoggedUser())
+        return outcome.getNet()
     }
 }

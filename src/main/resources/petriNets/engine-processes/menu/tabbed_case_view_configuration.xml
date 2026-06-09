@@ -1,5 +1,6 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
     <id>tabbed_case_view_configuration</id>
+    <version>1.0.0</version>
     <initials>TCV</initials>
     <title>Tabbed case view configuration</title>
     <icon>check_box_outline_blank</icon>

@@ -7,6 +7,23 @@
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
 	<transitionRole>false</transitionRole>
+	<function scope="process" name="deleteWithCases">
+		<![CDATA[
+		{ mongo_id, log_delete ->
+		    try {
+		        petriNetService.deletePetriNet(mongo_id.value, loggedUser().transformToLoggedUser())
+//				TODO: delete self
+//				async.run {
+//					deleteCase(useCase)
+//				}
+		    } catch (Exception e) {
+		        String message = "Error deleting Petri net with ObjectId(${mongo_id.value}): ${e.message}" as String
+		        log.error(message, e)
+		        change log_delete value { message }
+		    }
+		}
+		]]>
+	</function>
 	<data type="text">
 		<id>copy_version</id>
 		<title>Version of the copy</title>
@@ -15,7 +32,7 @@
 		<id>form_ref</id>
 		<title/>
 		<inits>
-			<init>t8</init>
+			<init>form</init>
 		</inits>
 	</data>
 	<data type="text">
@@ -72,7 +89,11 @@
 	<data type="text">
 		<id>version</id>
 		<title>Version</title>
-		<valid>regex ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$</valid>
+		<validations>
+			<validation>
+				<expression>regex ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$</expression>
+			</validation>
+		</validations>
 		<init>1.0.0</init>
 	</data>
 	<data type="enumeration_map">
@@ -92,8 +113,7 @@
 					copy_version: f.copy_version,
 					version: f.version;
 				 	try {
-                        def parts = version.value.tokenize(".")
-                        def newVersion = new Version(parts[0] as int, parts[1] as int, parts[2] as int)
+                        def newVersion = Version.from(version.value)
                         newVersion.increment(version_increment.value as VersionType)
                         change copy_version value { newVersion as String }
                     } catch (Exception e) {
@@ -201,26 +221,21 @@
 					<![CDATA[
 					mongo_id: f.mongo_id,
 					log_delete: f.log_delete;
-					try {
-				   		petriNetService.deletePetriNet(mongo_id.value, loggedUser())
-				   	} catch (Exception e) {
-						String message = "Error deleting Petri net with ObjectId(${mongo_id.value}): ${e.message}" as String
-						log.error(message, e)
-						change log_delete value { message }
-				   	}
+
+					deleteWithCases(mongo_id, log_delete)
 					]]>
 				</action>
 			</actions>
 		</event>
 	</transition>
 	<transition>
-		<id>t2</id>
+		<id>view</id>
 		<x>368</x>
 		<y>144</y>
 		<label>View</label>
 		<icon>remove_red_eye</icon>
 		<dataGroup>
-			<id>t2_0</id>
+			<id>view_0</id>
 			<cols>4</cols>
 			<layout>grid</layout>
 			<dataRef>
@@ -250,7 +265,11 @@
 			<actions phase="pre">
 				<action id="action4">
 					<![CDATA[
-					// TODO: delete all cases, undeploy process
+					mongo_id: f.mongo_id;
+
+					def net = findPetriNet(mongo_id.value)
+					workflowService.deleteInstancesOfPetriNet(net)
+					petriNetService.undeploy(net, loggedUser())
 					]]>
 				</action>
 			</actions>
@@ -356,17 +375,33 @@
 		</event>
 	</transition>
 	<transition>
-		<id>t5</id>
+		<id>deploy</id>
 		<x>176</x>
 		<y>176</y>
 		<label>Deploy</label>
 		<icon>upload_file</icon>
 		<event type="finish">
-			<id>t5_finish</id>
+			<id>deploy_finish</id>
 			<actions phase="pre">
 				<action id="action1">
 					<![CDATA[
-					// TODO: move xml text to file field, deploy using Importer, make file field visible on form, if assigned unassign edit
+					title: f.title,
+					version: f.version,
+					mongo_id: f.mongo_id,
+					xml_text: f.xml_text,
+					xml_file: f.xml_file,
+					form: t.form;
+
+					def editIsAssigned = useCase.tasks.any {it.transition == "edit"}
+					if (editIsAssigned) {
+                        cancelTask("edit")
+                    }
+					// TODO: move xml text to file field
+					def net = importPetriNet(xml_text.value as String)
+					change mongo_id value { net.stringId }
+					make mongo_id,visible on form when { true }
+					make xml_file,visible on form when { true }
+					changeCaseProperty "title" about { "${title.value} ${version.value}" as String }
 					]]>
 				</action>
 			</actions>
@@ -422,14 +457,17 @@
 			<actions phase="pre">
 				<action id="action2">
 					<![CDATA[
-					// TODO: delete all cases, delete process, delete self
+					mongo_id: f.mongo_id,
+					log_delete: f.log_delete;
+
+					deleteWithCases(mongo_id, log_delete)
 					]]>
 				</action>
 			</actions>
 		</event>
 	</transition>
 	<transition>
-		<id>t8</id>
+		<id>form</id>
 		<x>176</x>
 		<y>80</y>
 		<label>Form</label>
@@ -447,7 +485,7 @@
 			</logic>
 		</roleRef>
 		<dataGroup>
-			<id>t8_0</id>
+			<id>form_0</id>
 			<cols>4</cols>
 			<layout>grid</layout>
 			<dataRef>
@@ -511,13 +549,27 @@
 				</layout>
 			</dataRef>
 			<dataRef>
+				<id>mongo_id</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
 				<id>xml_file</id>
 				<logic>
 					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>2</y>
+					<y>3</y>
 					<rows>1</rows>
 					<cols>4</cols>
 					<template>material</template>
@@ -574,6 +626,8 @@
 				<action id="action5">
 					<![CDATA[
 					// TODO: prepinac freeze - ci sa mozu casey dorobit
+					def net = findPetriNet(mongo_id.value)
+					petriNetService.archive(net, loggedUser())
 					]]>
 				</action>
 			</actions>
@@ -648,7 +702,7 @@
 	<arc>
 		<id>a17</id>
 		<type>regular</type>
-		<sourceId>t5</sourceId>
+		<sourceId>deploy</sourceId>
 		<destinationId>p7</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
@@ -663,14 +717,14 @@
 		<id>a19</id>
 		<type>read</type>
 		<sourceId>p7</sourceId>
-		<destinationId>t2</destinationId>
+		<destinationId>view</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a2</id>
 		<type>regular</type>
 		<sourceId>p1</sourceId>
-		<destinationId>t5</destinationId>
+		<destinationId>deploy</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
@@ -704,7 +758,7 @@
 	<arc>
 		<id>a3</id>
 		<type>regular</type>
-		<sourceId>t5</sourceId>
+		<sourceId>deploy</sourceId>
 		<destinationId>p2</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>

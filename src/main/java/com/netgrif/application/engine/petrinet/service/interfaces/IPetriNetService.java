@@ -110,4 +110,15 @@ public interface IPetriNetService {
     List<String> getExistingPetriNetIdentifiersFromIdentifiersList(List<String> identifiers);
 
     PetriNetImportReference getNetFromCase(String caseId);
+
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+
+    boolean exists(String identifier, Version version);
+
+    PetriNet deploy(PetriNet net, LoggedUser user);
+
+    PetriNet undeploy(PetriNet net, LoggedUser user);
+
+    PetriNet archive(PetriNet net, LoggedUser user);
+
 }

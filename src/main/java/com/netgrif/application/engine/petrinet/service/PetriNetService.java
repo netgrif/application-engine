@@ -15,10 +15,7 @@ import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
-import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
@@ -223,6 +220,7 @@ public class PetriNetService implements IPetriNetService {
         }
         PetriNet net = imported.get();
         net.setUriNodeId(uriNodeId);
+        net.setDeploymentState(DeploymentState.DEPLOYED);
 
         PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
         if (existingNet != null) {
@@ -366,6 +364,73 @@ public class PetriNetService implements IPetriNetService {
         pn.getFinishedTasks().addAll(historyService.findAllFinishTaskEventLogsByCaseId(caseId)
                 .stream().map(TaskEventLog::getTransitionId).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
         return pn;
+    }
+
+    @Override
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+        ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
+        ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
+        IOUtils.copy(xmlFile, xmlCopy);
+        Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(xmlCopy.toByteArray()));
+        if (imported.isEmpty()) {
+            return outcome;
+        }
+        Map<String, String> params = new HashMap<>();
+        String uriNodeId = uriService.getRoot().getStringId();
+        PetriNet net = imported.get();
+        net.setUriNodeId(uriNodeId);
+        net.setDeploymentState(DeploymentState.DEPLOYED);
+
+        if (exists(net.getIdentifier(), net.getVersion())) {
+            throw new IllegalArgumentException("Petri net with identifier " + net.getIdentifier() + " and version " + net.getVersion() + " already exists.");
+        }
+        processRoleService.saveAll(net.getRoles().values());
+        net.setAuthor(author.transformToAuthor());
+        functionCacheService.cachePetriNetFunctions(net);
+        Path savedPath = getImporter().saveNetFile(net, new ByteArrayInputStream(xmlCopy.toByteArray()));
+        xmlCopy.close();
+        log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully and saved in a folder: " + savedPath.toString());
+
+        outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
+        evaluateRules(net, EventPhase.PRE);
+        historyService.save(new ImportPetriNetEventLog(null, EventPhase.PRE, net.getObjectId()));
+        save(net);
+        outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params));
+        evaluateRules(net, EventPhase.POST);
+        historyService.save(new ImportPetriNetEventLog(null, EventPhase.POST, net.getObjectId()));
+        addMessageToOutcome(net, ProcessEventType.UPLOAD, outcome);
+        outcome.setNet(imported.get());
+        return outcome;
+    }
+
+    @Override
+    public boolean exists(String identifier, Version version) {
+        return repository.existsByIdentifierAndVersion(identifier, version);
+    }
+
+    @Override
+    public PetriNet deploy(PetriNet net, LoggedUser user) {
+        return changeDeployment(net, DeploymentState.DEPLOYED, user);
+    }
+
+    @Override
+    public PetriNet undeploy(PetriNet net, LoggedUser user) {
+        return changeDeployment(net, DeploymentState.DRAFT, user);
+    }
+
+    @Override
+    public PetriNet archive(PetriNet net, LoggedUser user) {
+        return changeDeployment(net, DeploymentState.ARCHIVED, user);
+    }
+
+    private PetriNet changeDeployment(PetriNet net, DeploymentState newState, LoggedUser user) {
+        net.setDeploymentState(newState);
+        Optional<PetriNet> saved = save(net);
+        if (saved.isEmpty()) {
+            log.error("Petri net {} ({}) deployment could not be changed to {}", net.getIdentifier(), net.getVersion().toString(), newState);
+            throw new IllegalStateException("Petri net deployment could not be changed");
+        }
+        return saved.get();
     }
 
     @Override
