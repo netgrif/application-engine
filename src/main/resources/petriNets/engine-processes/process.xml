@@ -7,15 +7,16 @@
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
 	<transitionRole>false</transitionRole>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
 	<function scope="process" name="deleteWithCases">
 		<![CDATA[
 		{ mongo_id, log_delete ->
 		    try {
 		        petriNetService.deletePetriNet(mongo_id.value, loggedUser().transformToLoggedUser())
-//				TODO: delete self
-//				async.run {
-//					deleteCase(useCase)
-//				}
+				change log_delete value { "Petri net deleted successfully" }
 		    } catch (Exception e) {
 		        String message = "Error deleting Petri net with ObjectId(${mongo_id.value}): ${e.message}" as String
 		        log.error(message, e)
@@ -40,9 +41,9 @@
 		<title>Icon</title>
 		<init>device_hub</init>
 	</data>
-	<data type="text">
+	<data type="text" immediate="true">
 		<id>id</id>
-		<title>ID</title>
+		<title>Identifier</title>
 		<init>new_process</init>
 	</data>
 	<data type="text">
@@ -55,6 +56,10 @@
 		<component>
 			<name>textarea</name>
 		</component>
+	</data>
+	<data type="text">
+		<id>log_deploy</id>
+		<title>Deploy Log</title>
 	</data>
 	<data type="text">
 		<id>message_archive</id>
@@ -70,11 +75,7 @@
 		<init>Finishing this task will create a copy of this process with increased version.</init>
 	</data>
 	<data type="text">
-		<id>mongo_id</id>
-		<title>Mongo ID</title>
-	</data>
-	<data type="text">
-		<id>text_0</id>
+		<id>message_delete</id>
 		<title/>
 		<init>This will permanently delete this process version and all its instances and tasks.</init>
 		<component>
@@ -82,11 +83,31 @@
 		</component>
 	</data>
 	<data type="text">
+		<id>message_deploy</id>
+		<title/>
+		<init>Finishing this task will deploy the process and enable creating new instances of this process.</init>
+	</data>
+	<data type="text">
+		<id>mongo_id</id>
+		<title>Mongo ID</title>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>state</id>
+		<title>State</title>
+		<options>
+			<option key="draft">Draft</option>
+			<option key="deployed">Deployed</option>
+			<option key="archived">Archived</option>
+			<option key="trash">In Trash</option>
+		</options>
+		<init>draft</init>
+	</data>
+	<data type="text" immediate="true">
 		<id>title</id>
 		<title>Title</title>
 		<init>New Process</init>
 	</data>
-	<data type="text">
+	<data type="text" immediate="true">
 		<id>version</id>
 		<title>Version</title>
 		<validations>
@@ -133,11 +154,142 @@
 		<title>XML Text</title>
 	</data>
 	<transition>
+		<id>deploy</id>
+		<x>176</x>
+		<y>176</y>
+		<label>Deploy</label>
+		<icon>upload_file</icon>
+		<dataGroup>
+			<id>deploy_0</id>
+			<cols>6</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>message_deploy</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>6</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>richtextarea</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>title</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>id</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>version</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>log_deploy</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>2</rows>
+					<cols>6</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+				</component>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>deploy_finish</id>
+			<title>Deploy</title>
+			<actions phase="pre">
+				<action id="action1">
+					<![CDATA[
+					state: f.state,
+					title: f.title,
+					version: f.version,
+					mongo_id: f.mongo_id,
+					xml_text: f.xml_text,
+					xml_file: f.xml_file,
+					form: t.form;
+
+					def editIsAssigned = useCase.tasks.any {it.transition == "edit"}
+					if (editIsAssigned) {
+						cancelTask("edit")
+					}
+					// TODO: move xml text to file field
+					def net = importPetriNet(xml_text.value as String)
+					change state value { "deployed" }
+					change mongo_id value { net.stringId }
+					make mongo_id,visible on form when { true }
+					make xml_file,visible on form when { true }
+					changeCaseProperty "title" about { "${title.value} ${version.value}" as String }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
 		<id>edit</id>
 		<x>80</x>
 		<y>80</y>
 		<label>Edit</label>
 		<icon>edit</icon>
+		<roleRef>
+			<id>default</id>
+			<logic>
+				<view>false</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>edit_0</id>
 			<cols>4</cols>
@@ -176,9 +328,141 @@
 		</dataGroup>
 	</transition>
 	<transition>
+		<id>form</id>
+		<x>176</x>
+		<y>80</y>
+		<label>Form</label>
+		<icon>format_align_justify</icon>
+		<roleRef>
+			<id>anonymous</id>
+			<logic>
+				<perform>false</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>default</id>
+			<logic>
+				<perform>false</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>form_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>id</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>title</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>version</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>icon</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>mongo_id</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>state</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>xml_file</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
 		<id>t10</id>
 		<x>368</x>
-		<y>208</y>
+		<y>272</y>
 		<label>Delete with cases</label>
 		<icon>delete_forever</icon>
 		<dataGroup>
@@ -186,7 +470,7 @@
 			<cols>4</cols>
 			<layout>grid</layout>
 			<dataRef>
-				<id>text_0</id>
+				<id>message_delete</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
@@ -207,7 +491,7 @@
 				<layout>
 					<x>0</x>
 					<y>1</y>
-					<rows>1</rows>
+					<rows>2</rows>
 					<cols>4</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
@@ -229,17 +513,17 @@
 		</event>
 	</transition>
 	<transition>
-		<id>view</id>
-		<x>368</x>
-		<y>144</y>
-		<label>View</label>
-		<icon>remove_red_eye</icon>
+		<id>t11</id>
+		<x>464</x>
+		<y>272</y>
+		<label>Delete</label>
+		<icon>delete_forever</icon>
 		<dataGroup>
-			<id>view_0</id>
+			<id>t11_0</id>
 			<cols>4</cols>
 			<layout>grid</layout>
 			<dataRef>
-				<id>form_ref</id>
+				<id>message_delete</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
@@ -251,8 +535,40 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
+				<component>
+					<name>richtextarea</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>log_delete</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+				</component>
 			</dataRef>
 		</dataGroup>
+		<event type="finish">
+			<id>t11_finish</id>
+			<actions phase="pre">
+				<action id="action8">
+					<![CDATA[
+					mongo_id: f.mongo_id,
+					log_delete: f.log_delete;
+					deleteWithCases(mongo_id, log_delete)
+					]]>
+				</action>
+			</actions>
+		</event>
 	</transition>
 	<transition>
 		<id>t3</id>
@@ -375,39 +691,6 @@
 		</event>
 	</transition>
 	<transition>
-		<id>deploy</id>
-		<x>176</x>
-		<y>176</y>
-		<label>Deploy</label>
-		<icon>upload_file</icon>
-		<event type="finish">
-			<id>deploy_finish</id>
-			<actions phase="pre">
-				<action id="action1">
-					<![CDATA[
-					title: f.title,
-					version: f.version,
-					mongo_id: f.mongo_id,
-					xml_text: f.xml_text,
-					xml_file: f.xml_file,
-					form: t.form;
-
-					def editIsAssigned = useCase.tasks.any {it.transition == "edit"}
-					if (editIsAssigned) {
-                        cancelTask("edit")
-                    }
-					// TODO: move xml text to file field
-					def net = importPetriNet(xml_text.value as String)
-					change mongo_id value { net.stringId }
-					make mongo_id,visible on form when { true }
-					make xml_file,visible on form when { true }
-					changeCaseProperty "title" about { "${title.value} ${version.value}" as String }
-					]]>
-				</action>
-			</actions>
-		</event>
-	</transition>
-	<transition>
 		<id>t6</id>
 		<x>80</x>
 		<y>272</y>
@@ -418,7 +701,7 @@
 			<cols>4</cols>
 			<layout>grid</layout>
 			<dataRef>
-				<id>text_0</id>
+				<id>message_delete</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
@@ -437,7 +720,7 @@
 			<dataRef>
 				<id>log_delete</id>
 				<logic>
-					<behavior>editable</behavior>
+					<behavior>visible</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -467,121 +750,9 @@
 		</event>
 	</transition>
 	<transition>
-		<id>form</id>
-		<x>176</x>
-		<y>80</y>
-		<label>Form</label>
-		<icon>format_align_justify</icon>
-		<roleRef>
-			<id>anonymous</id>
-			<logic>
-				<perform>false</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>default</id>
-			<logic>
-				<perform>false</perform>
-			</logic>
-		</roleRef>
-		<dataGroup>
-			<id>form_0</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-			<dataRef>
-				<id>id</id>
-				<logic>
-					<behavior>editable</behavior>
-					<behavior>required</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>title</id>
-				<logic>
-					<behavior>editable</behavior>
-					<behavior>required</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>version</id>
-				<logic>
-					<behavior>editable</behavior>
-					<behavior>required</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>icon</id>
-				<logic>
-					<behavior>editable</behavior>
-					<behavior>required</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>mongo_id</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>xml_file</id>
-				<logic>
-					<behavior>hidden</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>3</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-	</transition>
-	<transition>
 		<id>t9</id>
 		<x>368</x>
-		<y>272</y>
+		<y>208</y>
 		<label>Archive</label>
 		<icon>folder</icon>
 		<dataGroup>
@@ -633,6 +804,32 @@
 			</actions>
 		</event>
 	</transition>
+	<transition>
+		<id>view</id>
+		<x>368</x>
+		<y>144</y>
+		<label>View</label>
+		<icon>remove_red_eye</icon>
+		<dataGroup>
+			<id>view_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>form_ref</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
 	<place>
 		<id>p1</id>
 		<x>80</x>
@@ -652,7 +849,7 @@
 	<place>
 		<id>p5</id>
 		<x>464</x>
-		<y>272</y>
+		<y>208</y>
 		<label>archived</label>
 		<tokens>0</tokens>
 		<static>false</static>
@@ -667,7 +864,8 @@
 	<place>
 		<id>p8</id>
 		<x>464</x>
-		<y>208</y>
+		<y>368</y>
+		<label>trash</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -753,6 +951,34 @@
 		<type>regular</type>
 		<sourceId>t10</sourceId>
 		<destinationId>p8</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a24</id>
+		<type>regular</type>
+		<sourceId>p5</sourceId>
+		<destinationId>t11</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a25</id>
+		<type>regular</type>
+		<sourceId>t11</sourceId>
+		<destinationId>p8</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a26</id>
+		<type>regular</type>
+		<sourceId>t6</sourceId>
+		<destinationId>p8</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a27</id>
+		<type>regular</type>
+		<sourceId>p7</sourceId>
+		<destinationId>t11</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
