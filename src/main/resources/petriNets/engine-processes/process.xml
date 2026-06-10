@@ -662,6 +662,7 @@
 					def updatedXml = xml_text.value.replace("<version>${version.value}</version>", "<version>${copy_version.value}</version>") as String
 					def newProcess = createCase("process", title.value)
 					def editTask = assignTask("edit", newProcess)
+					// TODO: extract metadata from xml_text and only set xml_text
 					setData(editTask, [
 							"id": [
 							        "type": "text",
