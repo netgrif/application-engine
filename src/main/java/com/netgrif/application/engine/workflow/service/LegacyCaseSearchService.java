@@ -31,9 +31,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class CaseSearchService extends MongoSearchService<Case> {
+public class LegacyCaseSearchService extends MongoSearchService<Case> {
 
-    private static final Logger log = LoggerFactory.getLogger(CaseSearchService.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(LegacyCaseSearchService.class.getName());
 
     public static final String ROLE = "role";
     public static final String DATA = "data";
@@ -89,12 +89,18 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 return null;
             }
         }
+        // todo: move latest logic to method buildPermissionConstraints
+        builder.and(buildPermissionConstraints(loggedOrImpersonated));
+        return builder;
+    }
+
+    public BooleanBuilder buildPermissionConstraints(LoggedUser loggedOrImpersonated) {
+        // todo: update with latest logic, that Samo has introduced
         BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated));
         permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
         permissionConstraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
         permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
-        builder.and(permissionConstraints);
-        return builder;
+        return permissionConstraints;
     }
 
     protected Predicate buildViewRoleQueryConstraint(LoggedUser user) {

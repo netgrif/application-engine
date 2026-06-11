@@ -5,7 +5,6 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventLog;
 import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
@@ -31,6 +30,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -75,7 +75,7 @@ public class WorkflowService implements IWorkflowService {
     protected ITaskService taskService;
 
     @Autowired
-    protected CaseSearchService searchService;
+    protected LegacyCaseSearchService searchService;
 
     @Autowired
     protected ApplicationEventPublisher publisher;
@@ -186,8 +186,14 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> search(Predicate predicate, Pageable pageable) {
-        Page<Case> page = repository.findAll(predicate, pageable);
+        if (predicate == null) {
+            return Page.empty();
+        }
+        Predicate permissionConstraints = searchService.buildPermissionConstraints(userService.getLoggedOrSystem().transformToLoggedUser());
+        Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraints);
+        Page<Case> page = repository.findAll(finalPredicate, pageable);
         page.getContent().forEach(this::setPetriNet);
+        decryptDataSets(page.getContent());
         return setImmediateDataFields(page);
     }
 
@@ -213,6 +219,28 @@ public class WorkflowService implements IWorkflowService {
         } else {
             return 0;
         }
+    }
+
+    @Override
+    public long count(Predicate predicate) {
+        if (predicate == null) {
+            return 0;
+        }
+
+        Predicate permissionConstraints = searchService.buildPermissionConstraints(userService.getLoggedOrSystem().transformToLoggedUser());
+        Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraints);
+        return repository.count(finalPredicate);
+    }
+
+    @Override
+    public boolean exists(Predicate predicate) {
+        if (predicate == null) {
+            return false;
+        }
+
+        Predicate permissionConstraints = searchService.buildPermissionConstraints(userService.getLoggedOrSystem().transformToLoggedUser());
+        Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraints);
+        return repository.exists(finalPredicate);
     }
 
     @Override

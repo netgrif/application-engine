@@ -180,12 +180,12 @@ class ImportHelper {
         return user
     }
 
-    Case createCase(String title, PetriNet net, LoggedUser user) {
-        return workflowService.createCase(net.getStringId(), title, "", user).getCase()
+    Case createCase(String title, PetriNet net, LoggedUser user, Map<String, String> params = [:]) {
+        return workflowService.createCase(net.getStringId(), title, "", user, params).getCase()
     }
 
-    Case createCase(String title, PetriNet net) {
-        return createCase(title, net, userService.getSystem().transformToLoggedUser())
+    Case createCase(String title, PetriNet net, Map<String, String> params = [:]) {
+        return createCase(title, net, userService.getSystem().transformToLoggedUser(), params)
     }
 
     Case createCaseAsSuper(String title, PetriNet net) {

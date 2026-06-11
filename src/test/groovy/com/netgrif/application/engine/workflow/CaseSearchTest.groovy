@@ -9,7 +9,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.service.CaseSearchService
+import com.netgrif.application.engine.workflow.service.LegacyCaseSearchService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -179,10 +179,10 @@ class CaseSearchTest {
 
     String buildRequestBody(String fullText) {
         def map = [
-                (CaseSearchService.PETRINET): [
-                        (CaseSearchService.PETRINET_IDENTIFIER): "case_search_test.xml"
+                (LegacyCaseSearchService.PETRINET): [
+                        (LegacyCaseSearchService.PETRINET_IDENTIFIER): "case_search_test.xml"
                 ],
-                (CaseSearchService.FULLTEXT): fullText
+                (LegacyCaseSearchService.FULLTEXT): fullText
         ]
 
         ObjectMapper mapper = new ObjectMapper()

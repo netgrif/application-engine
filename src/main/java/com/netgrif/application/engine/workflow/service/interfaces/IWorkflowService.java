@@ -75,6 +75,10 @@ public interface IWorkflowService {
 
     long count(Map<String, Object> request, LoggedUser user, Locale locale);
 
+    long count(Predicate predicate);
+
+    boolean exists(Predicate predicate);
+
 //    List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId);
 
     boolean removeTasksFromCase(List<Task> tasks, String caseId);
