@@ -34,6 +34,7 @@ import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -238,6 +239,7 @@ public class PetriNetService implements IPetriNetService {
         evaluateRules(net, EventPhase.PRE);
         historyService.save(new ImportPetriNetEventLog(null, EventPhase.PRE, net.getObjectId()));
         save(net);
+        createProcessCase(net, author);
         outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params));
         evaluateRules(net, EventPhase.POST);
         historyService.save(new ImportPetriNetEventLog(null, EventPhase.POST, net.getObjectId()));
@@ -421,6 +423,11 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public PetriNet archive(PetriNet net, LoggedUser user) {
         return changeDeployment(net, DeploymentState.ARCHIVED, user);
+    }
+
+    @Override
+    public boolean isDeployed(String netId) {
+        return repository.existsBy_idAndDeploymentState(new ObjectId(netId), DeploymentState.DEPLOYED);
     }
 
     private PetriNet changeDeployment(PetriNet net, DeploymentState newState, LoggedUser user) {
@@ -645,5 +652,10 @@ public class PetriNetService implements IPetriNetService {
             throw new NullPointerException();
         }
         return obj;
+    }
+
+    protected void createProcessCase(PetriNet net, LoggedUser author) {
+        // TODO: NAE-2447 map net to case
+        Case procesCase = workflowService.createCaseByIdentifier("process", net.getTitle().getDefaultValue(), "", author).getCase();
     }
 }

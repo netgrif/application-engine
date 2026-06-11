@@ -16,6 +16,7 @@ class RunnerController {
             SystemUserRunner,
             UriRunner,
             FunctionsCacheRunner,
+            ProcessRunner,
             FilterRunner,
             GroupRunner,
             DefaultFiltersRunner,

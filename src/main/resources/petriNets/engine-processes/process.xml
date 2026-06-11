@@ -279,7 +279,9 @@
 		<roleRef>
 			<id>default</id>
 			<logic>
-				<view>false</view>
+				<!--TODO: after builder merge-->
+				<!--<view>false</view>-->
+				<view>true</view>
 				<cancel>true</cancel>
 				<assign>true</assign>
 			</logic>
@@ -342,7 +344,9 @@
 		<roleRef>
 			<id>default</id>
 			<logic>
-				<perform>false</perform>
+				<view>false</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
 			</logic>
 		</roleRef>
 		<roleRef>

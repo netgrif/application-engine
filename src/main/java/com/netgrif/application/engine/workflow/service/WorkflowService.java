@@ -304,8 +304,12 @@ public class WorkflowService implements IWorkflowService {
     }
 
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user, Map<String, String> params) {
+        if (!petriNetService.isDeployed(netId)) {
+            throw new IllegalArgumentException("Petri net with id [" + netId + "] is not deployed.");
+        }
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
+
         int rulesExecuted;
         Case useCase = new Case(petriNet);
         useCase.populateDataSet(initValueExpressionEvaluator, params);

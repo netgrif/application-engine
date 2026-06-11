@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 @Document
 public class PetriNet extends PetriNetObject {
 
-
     @Getter
     @Setter
     private String identifier; //combination of identifier and version must be unique ... maybe use @CompoundIndex?
@@ -453,6 +452,11 @@ public class PetriNet extends PetriNetObject {
         this.getNegativeViewRoles().forEach(clone::addNegativeViewRole);
         this.getFunctions().forEach(clone::addFunction);
         clone.setTags(new HashMap<>(this.tags));
+        clone.setDeploymentState(this.deploymentState);
         return clone;
+    }
+
+    public boolean isDeployed() {
+        return DeploymentState.DEPLOYED.equals(this.deploymentState);
     }
 }

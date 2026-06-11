@@ -121,4 +121,5 @@ public interface IPetriNetService {
 
     PetriNet archive(PetriNet net, LoggedUser user);
 
+    boolean isDeployed(String netId);
 }
