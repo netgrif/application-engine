@@ -5,6 +5,7 @@ import com.netgrif.application.engine.business.orsr.IOrsrService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.objects.event.events.event.ActionStartEvent
 import com.netgrif.application.engine.objects.event.events.event.ActionStopEvent
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.functions.FunctionExpando
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import com.netgrif.application.engine.objects.petrinet.domain.Function
 import com.netgrif.application.engine.objects.workflow.domain.Case
@@ -79,14 +80,14 @@ abstract class FieldActionsRunner {
         def actionDelegate = getActionDelegate()
 
         actionsCacheService.getCachedFunctions(functions).each {
-            actionDelegate.metaClass."${it.function.name}" << it.code
+            actionDelegate."${it.function.name}" = it.code
         }
         actionsCacheService.getGlobalFunctionsCache().each { entry ->
-            def globalFunctions = [:]
+            def functionExpando = new FunctionExpando(actionDelegate)
             entry.getValue().each {
-                globalFunctions["${it.function.name}"] = prepareCode(it.code, actionDelegate)
+                functionExpando."${it.function.name}" = it.code
             }
-            actionDelegate.metaClass."${entry.key}" = globalFunctions
+            actionDelegate."${entry.key}" = functionExpando
         }
         return prepareCode(code, actionDelegate)
     }
