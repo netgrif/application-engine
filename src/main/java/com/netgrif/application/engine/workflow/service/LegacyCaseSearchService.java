@@ -31,9 +31,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class CaseSearchService extends MongoSearchService<Case> {
+public class LegacyCaseSearchService extends MongoSearchService<Case> {
 
-    private static final Logger log = LoggerFactory.getLogger(CaseSearchService.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(LegacyCaseSearchService.class.getName());
 
     public static final String ROLE = "role";
     public static final String DATA = "data";

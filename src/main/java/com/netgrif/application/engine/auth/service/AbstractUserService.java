@@ -9,9 +9,11 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
+import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -121,6 +123,45 @@ public abstract class AbstractUserService implements IUserService {
             repository.save(system);
         }
         return system;
+    }
+
+    @Override
+    public Page<IUser> search(Predicate predicate, Pageable pageable) {
+        if (predicate == null) {
+            return Page.empty();
+        }
+        if (pageable == null) {
+            pageable = Pageable.unpaged();
+        }
+        return repository.findAll(predicate, pageable).map(IUser.class::cast);
+    }
+
+    @Override
+    public IUser searchOne(Predicate predicate) {
+        if (predicate == null) {
+            return null;
+        }
+        Page<User> userAsPage = repository.findAll(predicate, PageRequest.of(0, 1));
+        if (userAsPage.getTotalElements() > 0) {
+            return userAsPage.getContent().get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public long count(Predicate predicate) {
+        if (predicate == null) {
+            return 0;
+        }
+        return repository.count(predicate);
+    }
+
+    @Override
+    public boolean exists(Predicate predicate) {
+        if (predicate == null) {
+            return false;
+        }
+        return repository.exists(predicate);
     }
 
     public <T> Page<IUser> changeType(Page<T> users, Pageable pageable) {

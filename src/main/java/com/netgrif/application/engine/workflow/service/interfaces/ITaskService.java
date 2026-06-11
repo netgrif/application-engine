@@ -33,6 +33,10 @@ public interface ITaskService {
 
     long count(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection);
 
+    long count(com.querydsl.core.types.Predicate predicate);
+
+    boolean exists(com.querydsl.core.types.Predicate predicate);
+
     Page<Task> findByCases(Pageable pageable, List<String> cases);
 
     List<Task> findAllById(List<String> ids);

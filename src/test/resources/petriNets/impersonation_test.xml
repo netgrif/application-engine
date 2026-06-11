@@ -15,6 +15,12 @@
 			<view>true</view>
 		</caseLogic>
 	</roleRef>
+	<roleRef>
+		<id>default</id>
+		<caseLogic>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
 	<role>
 		<id>test_role</id>
 		<title>TEST</title>
