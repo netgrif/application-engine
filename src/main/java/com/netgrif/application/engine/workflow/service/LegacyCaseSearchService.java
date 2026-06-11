@@ -88,20 +88,19 @@ public class LegacyCaseSearchService extends MongoSearchService<Case> {
                 return null;
             }
         }
-
         BooleanBuilder builder = constructPredicateTree(singleQueries, BooleanBuilder::or);
+        return builder.and(buildPermissionConstraints(loggedOrImpersonated));
+    }
 
+    public BooleanBuilder buildPermissionConstraints(LoggedUser loggedOrImpersonated) {
         //        (Rp!=0 & Rn = 0)
         BooleanBuilder constraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated))
                 .andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
-
         //        ((Rp!=0 & Rn = 0) or Up!=0)
         constraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
-
         //        (((Rp!=0 & Rn = 0) or Up!=0) & Un=0) == 1
         constraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
-
-        return builder.and(constraints);
+        return constraints;
     }
 
     protected Predicate buildViewRoleQueryConstraint(LoggedUser user) {
