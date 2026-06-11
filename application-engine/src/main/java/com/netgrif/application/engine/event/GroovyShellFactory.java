@@ -19,16 +19,21 @@ public class GroovyShellFactory implements IGroovyShellFactory {
     @Autowired
     private CompilerConfiguration configuration;
 
+    private GroovyShell shell;
+
     @Override
     public GroovyShell getGroovyShell() {
-        ImportCustomizer importCustomizer = new ImportCustomizer();
+        if (shell == null) {
+            ImportCustomizer importCustomizer = new ImportCustomizer();
 
-        Set<String> classNames = findAllClassesUsingClassLoader("com.netgrif.application.engine.workflow.domain");
-        importCustomizer.addImports(classNames.toArray(new String[0]));
+            Set<String> classNames = findAllClassesUsingClassLoader("com.netgrif.application.engine.workflow.domain");
+            importCustomizer.addImports(classNames.toArray(new String[0]));
 
-        configuration.addCompilationCustomizers(importCustomizer);
+            configuration.addCompilationCustomizers(importCustomizer);
 
-        return new GroovyShell(this.getClass().getClassLoader(), new groovy.lang.Binding(), this.configuration);
+            shell = new GroovyShell(this.getClass().getClassLoader(), new groovy.lang.Binding(), this.configuration);
+        }
+        return shell;
     }
 
     private Set<String> findAllClassesUsingClassLoader(String packageName) {

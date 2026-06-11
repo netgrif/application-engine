@@ -249,6 +249,23 @@ class ActionDelegate {
         this.Plugin = new PluginHolder()
     }
 
+    void clearAfterExecution() {
+        this.action = null
+        this.useCase = null
+        this.task = null
+        this.actionsRunner = null
+
+        this.map?.clear()
+        this.map = null
+
+        this.outcomes?.clear()
+        this.outcomes = null
+
+        this.Frontend = null
+        this.NaeModule = null
+        this.Plugin = null
+    }
+
     def initFieldsMap(Map<String, String> fieldIds) {
         fieldIds.each { name, id ->
             set(name, fieldFactory.buildFieldWithoutValidation(useCase, id, null))
