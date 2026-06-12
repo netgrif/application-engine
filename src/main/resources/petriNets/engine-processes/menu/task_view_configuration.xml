@@ -699,7 +699,7 @@
         <y>10</y>
         <label>All menu data</label>
         <roleRef>
-            <id>system</id>
+            <id>default</id>
             <logic>
                 <view>true</view>
             </logic>

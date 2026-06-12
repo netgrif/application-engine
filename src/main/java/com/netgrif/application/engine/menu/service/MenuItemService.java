@@ -8,7 +8,6 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import com.netgrif.application.engine.menu.domain.*;
 import com.netgrif.application.engine.menu.domain.configurations.ViewBody;
 import com.netgrif.application.engine.menu.domain.configurations.ViewConstants;
-import com.netgrif.application.engine.menu.domain.templates.Template;
 import com.netgrif.application.engine.menu.service.interfaces.IMenuItemService;
 import com.netgrif.application.engine.menu.utils.MenuItemUtils;
 import com.netgrif.application.engine.petrinet.domain.*;
@@ -424,20 +423,6 @@ public class MenuItemService implements IMenuItemService {
         parentFolder.getDataField(MenuItemConstants.FIELD_CHILD_ITEM_IDS).setValue(childIds);
         parentFolder.getDataField(MenuItemConstants.FIELD_HAS_CHILDREN).setValue(MenuItemUtils.hasFolderChildren(parentFolder));
         return workflowService.save(parentFolder);
-    }
-
-    /**
-     * Retrieves menu item data groups for the specified case and locale.
-     *
-     * @param caseId identifier of the menu item case
-     * @param locale locale to use for retrieving localized data
-     * @return list of data groups from the menu item case
-     */
-    @Override
-    public List<DataGroup> getMenuItemData(String caseId, Locale locale) {
-        Case menuItemCase = workflowService.findOne(caseId);
-        String taskId = MenuItemUtils.findTaskIdInCase(menuItemCase, MenuItemConstants.TRANS_ALL_MENU_DATA);
-        return dataService.getDataGroups(taskId, locale).getData();
     }
 
     /**
