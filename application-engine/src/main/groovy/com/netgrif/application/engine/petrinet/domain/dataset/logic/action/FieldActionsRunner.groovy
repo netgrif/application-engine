@@ -5,7 +5,7 @@ import com.netgrif.application.engine.business.orsr.IOrsrService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.objects.event.events.event.ActionStartEvent
 import com.netgrif.application.engine.objects.event.events.event.ActionStopEvent
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.functions.FunctionExpando
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.expando.FunctionExpando
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import com.netgrif.application.engine.objects.petrinet.domain.Function
 import com.netgrif.application.engine.objects.workflow.domain.Case
