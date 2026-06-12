@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>view_case_role_true_user_true</id>
+    <version>1.0.0</version>
+    <initials>DCP</initials>
+    <title>View Case Role true User true</title>
+    <defaultRole>false</defaultRole>
+
+    <role>
+        <id>process_role</id>
+        <title>Process Role</title>
+    </role>
+
+    <data type="userList">
+        <id>users</id>
+        <title>Users</title>
+    </data>
+
+    <roleRef>
+        <id>process_role</id>
+        <caseLogic>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <userRef>
+        <id>users</id>
+        <caseLogic>
+            <view>true</view>
+        </caseLogic>
+    </userRef>
+    <transition>
+        <id>t_001</id>
+        <x>200</x>
+        <y>200</y>
+        <label>default transition</label>
+    </transition>
+</document>

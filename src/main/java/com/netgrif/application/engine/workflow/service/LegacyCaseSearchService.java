@@ -54,53 +54,53 @@ public class LegacyCaseSearchService extends MongoSearchService<Case> {
     private IPetriNetService petriNetService;
 
     public Predicate buildQuery(Map<String, Object> requestQuery, LoggedUser user, Locale locale) {
-        BooleanBuilder builder = new BooleanBuilder();
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-
+        List<Predicate> singleQueries = new ArrayList<>();
         if (requestQuery.containsKey(PETRINET)) {
-            builder.and(petriNet(requestQuery.get(PETRINET), loggedOrImpersonated, locale));
+            singleQueries.add(petriNet(requestQuery.get(PETRINET), loggedOrImpersonated, locale));
         }
         if (requestQuery.containsKey(AUTHOR)) {
-            builder.and(author(requestQuery.get(AUTHOR)));
+            singleQueries.add(author(requestQuery.get(AUTHOR)));
         }
         if (requestQuery.containsKey(TRANSITION)) {
-            builder.and(transition(requestQuery.get(TRANSITION)));
+            singleQueries.add(transition(requestQuery.get(TRANSITION)));
         }
         if (requestQuery.containsKey(FULLTEXT)) {
-            builder.and(fullText(requestQuery.getOrDefault(PETRINET, null), (String) requestQuery.get(FULLTEXT)));
+            singleQueries.add(fullText(requestQuery.getOrDefault(PETRINET, null), (String) requestQuery.get(FULLTEXT)));
         }
         if (requestQuery.containsKey(ROLE)) {
-            builder.and(role(requestQuery.get(ROLE)));
+            singleQueries.add(role(requestQuery.get(ROLE)));
         }
         if (requestQuery.containsKey(DATA)) {
-            builder.and(data(requestQuery.get(DATA)));
+            singleQueries.add(data(requestQuery.get(DATA)));
         }
         if (requestQuery.containsKey(TAGS)) {
-            builder.and(tags(requestQuery.get(TAGS)));
+            singleQueries.add(tags(requestQuery.get(TAGS)));
         }
         if (requestQuery.containsKey(CASE_ID)) {
-            builder.and(caseId(requestQuery.get(CASE_ID)));
+            singleQueries.add(caseId(requestQuery.get(CASE_ID)));
         }
         if (requestQuery.containsKey(GROUP)) {
             Predicate groupPredicate = group(requestQuery.get(GROUP), loggedOrImpersonated, locale);
             if (groupPredicate != null) {
-                builder.and(groupPredicate);
+                singleQueries.add(groupPredicate);
             } else {
                 return null;
             }
         }
-        // todo: move latest logic to method buildPermissionConstraints
-        builder.and(buildPermissionConstraints(loggedOrImpersonated));
-        return builder;
+        BooleanBuilder builder = constructPredicateTree(singleQueries, BooleanBuilder::or);
+        return builder.and(buildPermissionConstraints(loggedOrImpersonated));
     }
 
     public BooleanBuilder buildPermissionConstraints(LoggedUser loggedOrImpersonated) {
-        // todo: update with latest logic, that Samo has introduced
-        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
-        return permissionConstraints;
+        //        (Rp!=0 & Rn = 0)
+        BooleanBuilder constraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated))
+                .andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
+        //        ((Rp!=0 & Rn = 0) or Up!=0)
+        constraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
+        //        (((Rp!=0 & Rn = 0) or Up!=0) & Un=0) == 1
+        constraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
+        return constraints;
     }
 
     protected Predicate buildViewRoleQueryConstraint(LoggedUser user) {
@@ -109,7 +109,7 @@ public class LegacyCaseSearchService extends MongoSearchService<Case> {
     }
 
     public Predicate viewRoleQuery(String role) {
-        return QCase.case$.viewUserRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewRoles.contains(role));
+        return QCase.case$.viewRoles.contains(role);
     }
 
     protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
@@ -118,7 +118,7 @@ public class LegacyCaseSearchService extends MongoSearchService<Case> {
     }
 
     public Predicate viewUserQuery(String userId) {
-        return QCase.case$.viewUserRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewUsers.contains(userId));
+        return QCase.case$.viewUsers.contains(userId);
     }
 
     protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {
@@ -140,22 +140,19 @@ public class LegacyCaseSearchService extends MongoSearchService<Case> {
     }
 
     public Predicate petriNet(Object query, LoggedUser user, Locale locale) {
-        List<PetriNetReference> allowedNets = petriNetService.getReferencesByUsersProcessRoles(user, locale);
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
-            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof HashMap).map(q -> petriNetObject((HashMap<String, String>) q, allowedNets)).collect(Collectors.toList());
+            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof HashMap).map(q -> petriNetObject((HashMap<String, String>) q)).collect(Collectors.toList());
             expressions.forEach(builder::or);
             return builder;
         } else if (query instanceof HashMap) {
-            return petriNetObject((HashMap<String, String>) query, allowedNets);
+            return petriNetObject((HashMap<String, String>) query);
         }
         return null;
     }
 
-    private static BooleanExpression petriNetObject(HashMap<String, String> query, List<PetriNetReference> allowedNets) {
-        if (query.containsKey(PETRINET_IDENTIFIER) && allowedNets.stream().anyMatch(net -> net.getIdentifier().equalsIgnoreCase(query.get(PETRINET_IDENTIFIER))))
-            return QCase.case$.processIdentifier.equalsIgnoreCase(query.get(PETRINET_IDENTIFIER));
-        return null;
+    private static BooleanExpression petriNetObject(HashMap<String, String> query) {
+        return QCase.case$.processIdentifier.equalsIgnoreCase(query.get(PETRINET_IDENTIFIER));
     }
 
     public Predicate author(Object query) {
