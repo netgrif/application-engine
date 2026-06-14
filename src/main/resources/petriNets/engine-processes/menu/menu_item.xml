@@ -164,13 +164,6 @@
 		<component>
 			<name>autocomplete</name>
 		</component>
-		<action trigger="get">
-			moveDestUri: f.move_dest_uri;
-
-			String uriNodeId = elasticCaseService.findUriNodeId(useCase)
-			def node = uriService.findById(uriNodeId)
-			updateMultichoiceWithCurrentNode(moveDestUri, node)
-		</action>
 		<action trigger="set">
 			prevDestUri: f.move_previous_dest_uri,
 			moveDestUri: f.move_dest_uri;
@@ -925,6 +918,18 @@
 				</layout>
 			</dataRef>
 		</dataGroup>
+		<event type="assign">
+			<id>assign</id>
+			<actions phase="pre">
+				<action>
+					moveDestUri: f.move_dest_uri;
+
+					String uriNodeId = elasticCaseService.findUriNodeId(useCase)
+					def node = uriService.findById(uriNodeId)
+					updateMultichoiceWithCurrentNode(moveDestUri, node)
+				</action>
+			</actions>
+		</event>
 		<event type="finish">
 			<id>finish</id>
 			<actions phase="pre">
@@ -1199,6 +1204,18 @@
 				</layout>
 			</dataRef>
 		</dataGroup>
+		<event type="assign">
+			<id>assign</id>
+			<actions phase="pre">
+				<action>
+					moveDestUri: f.move_dest_uri;
+
+					String uriNodeId = elasticCaseService.findUriNodeId(useCase)
+					def node = uriService.findById(uriNodeId)
+					updateMultichoiceWithCurrentNode(moveDestUri, node)
+				</action>
+			</actions>
+		</event>
 		<event type="finish">
 			<id>finish</id>
 			<actions phase="pre">
