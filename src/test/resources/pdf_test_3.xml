@@ -6,6 +6,7 @@
     <initials>PER</initials>
     <title>Personal Information</title>
     <icon>contacts</icon>
+    <defaultRole>true</defaultRole>
     <i18n locale="en">
         <i18nString name="surName">Surname</i18nString>
         <i18nString name="question">Question</i18nString>

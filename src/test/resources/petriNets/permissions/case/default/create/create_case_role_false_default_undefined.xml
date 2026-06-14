@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>create_case_role_false_default_undefined</id>
+    <initials>CDFDU</initials>
+    <title>Create Case Role False Default Undefined</title>
+    <icon>assignment</icon>
+    <defaultRole>true</defaultRole>
+
+    <role>
+        <id>process_role</id>
+        <title>Process Role</title>
+    </role>
+
+    <roleRef>
+        <id>process_role</id>
+        <caseLogic>
+            <create>false</create>
+        </caseLogic>
+    </roleRef>
+</document>
