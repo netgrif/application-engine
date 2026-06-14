@@ -606,18 +606,6 @@ public class MenuItemServiceTest {
     }
 
     @Test
-    public void getMenuItemDataTest() throws TransitionNotExecutableException {
-        assertThrows(IllegalArgumentException.class, () -> menuItemService.getMenuItemData("wrongCaseId", Locale.getDefault()));
-
-        Case menuItemCase = createDefaultMenuItem("my_menu_item",
-                new I18nString("This is name", Map.of("sk", "Toto je nazov")));
-
-        login();
-        List<DataGroup> result = menuItemService.getMenuItemData(menuItemCase.getStringId(), Locale.getDefault());
-        assertTrue(result != null && !result.isEmpty());
-    }
-
-    @Test
     @SuppressWarnings("unchecked")
     public void handleConfigurationTemplateTest() throws TransitionNotExecutableException {
         Case menuItemCase = workflowService.createCaseByIdentifier(MenuItemConstants.PROCESS_IDENTIFIER, "", "",

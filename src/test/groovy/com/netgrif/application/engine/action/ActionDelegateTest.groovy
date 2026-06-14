@@ -254,9 +254,9 @@ class ActionDelegateTest {
         assertEquals(foundNet.identifier, netIdentifier)
         foundNet = null
 
-        PetriNet filterNet = petriNetService.getByIdentifier("filter")[0]
-        String mongoId2 = filterNet.stringId
-        ObjectId objectId3 = filterNet.objectId
+        PetriNet menuItemNet = petriNetService.getByIdentifier("menu_item")[0]
+        String mongoId2 = menuItemNet.stringId
+        ObjectId objectId3 = menuItemNet.objectId
 
         def searchTargets = [mongoId, mongoId2]
         List<PetriNet> searchResults = actionDelegate.findPetriNets(searchTargets as List<String>)
