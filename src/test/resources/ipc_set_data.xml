@@ -4,6 +4,7 @@
     <id>test</id>
     <initials>TST</initials>
     <title>Test</title>
+    <defaultRole>true</defaultRole>
     <!-- DATA -->
     <data type="text">
         <id>data_text</id>

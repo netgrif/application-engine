@@ -1,0 +1,246 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>query_lang_test</id>
+	<initials>QLT</initials>
+	<title>query_lang_test</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+
+	<data type="text" immediate="true">
+		<id>input_query</id>
+		<title/>
+	</data>
+
+	<data type="text">
+		<id>result_class</id>
+		<title/>
+	</data>
+
+	<data type="text">
+		<id>result</id>
+		<title/>
+	</data>
+
+	<data type="button">
+		<id>general_search</id>
+		<title/>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					input_query: f.input_query,
+					result_class: f.result_class;
+
+					change result_class value { search(input_query.value)?.class?.toString() }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>general_count</id>
+		<title/>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					input_query: f.input_query,
+					result: f.result;
+
+					change result value { count(input_query.value) }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>general_exists</id>
+		<title/>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					input_query: f.input_query,
+					result: f.result;
+
+					change result value { exists(input_query.value) }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>user_search_one</id>
+		<title/>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					input_query: f.input_query,
+					result_class: f.result_class;
+
+					change result_class value { searchUser(input_query.value)?.class?.toString() }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>user_search</id>
+		<title/>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					input_query: f.input_query,
+					result_class: f.result_class;
+
+					change result_class value { searchUsers(input_query.value)?.class?.toString()}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>user_paged_search</id>
+		<title/>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					input_query: f.input_query,
+					result_class: f.result_class;
+
+					change result_class value { pagedSearchUsers(input_query.value)?.class?.toString() }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>task_search_one</id>
+		<title/>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					input_query: f.input_query,
+					result_class: f.result_class;
+
+					change result_class value { searchTask(input_query.value)?.class?.toString() }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>task_search</id>
+		<title/>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					input_query: f.input_query,
+					result_class: f.result_class;
+
+					change result_class value { searchTasks(input_query.value)?.class?.toString() }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>task_paged_search</id>
+		<title/>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					input_query: f.input_query,
+					result_class: f.result_class;
+
+					change result_class value { pagedSearchTasks(input_query.value)?.class?.toString() }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>process_search_one</id>
+		<title/>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					input_query: f.input_query,
+					result_class: f.result_class;
+
+					change result_class value { searchProcess(input_query.value)?.class?.toString() }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>process_search</id>
+		<title/>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					input_query: f.input_query,
+					result_class: f.result_class;
+
+					change result_class value { searchProcesses(input_query.value)?.class?.toString() }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>process_paged_search</id>
+		<title/>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					input_query: f.input_query,
+					result_class: f.result_class;
+
+					change result_class value { pagedSearchProcesses(input_query.value)?.class?.toString() }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>case_search_one</id>
+		<title/>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					input_query: f.input_query,
+					result_class: f.result_class;
+
+					change result_class value { searchCase(input_query.value)?.class?.toString() }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>case_search</id>
+		<title/>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					input_query: f.input_query,
+					result_class: f.result_class;
+
+					change result_class value { searchCases(input_query.value)?.class?.toString() }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>case_paged_search</id>
+		<title/>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					input_query: f.input_query,
+					result_class: f.result_class;
+
+					change result_class value { pagedSearchCases(input_query.value)?.class?.toString() }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<transition>
+		<id>t1</id>
+		<x>700</x>
+		<y>180</y>
+		<label>TEST API</label>
+	</transition>
+</document>

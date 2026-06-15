@@ -256,9 +256,6 @@ public class Case implements Serializable {
             if (field instanceof FieldWithAllowedNets) {
                 this.dataSet.get(key).setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());
             }
-            if (field instanceof FilterField) {
-                this.dataSet.get(key).setFilterMetadata(((FilterField) field).getFilterMetadata());
-            }
             if (field instanceof MapOptionsField && ((MapOptionsField) field).isDynamic()) {
                 dynamicOptionsFields.add((MapOptionsField<I18nString, ?>) field);
             }
@@ -359,9 +356,16 @@ public class Case implements Serializable {
     public void resolveViewUsers() {
         getViewUsers();
         this.viewUsers.clear();
+        this.negativeViewUsers.clear();
         this.users.forEach((user, perms) -> {
-            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
+            if (!perms.containsKey(RolePermission.VIEW.getValue())) {
+                return;
+            }
+            boolean viewPermission = perms.get(RolePermission.VIEW.getValue());
+            if(viewPermission){
                 viewUsers.add(user);
+            } else {
+                negativeViewUsers.add(user);
             }
         });
     }

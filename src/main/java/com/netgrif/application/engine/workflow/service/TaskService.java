@@ -44,6 +44,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
+import com.querydsl.core.types.ExpressionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -82,7 +83,7 @@ public class TaskService implements ITaskService {
     protected MongoTemplate mongoTemplate;
 
     @Autowired
-    protected TaskSearchService searchService;
+    protected LegacyTaskSearchService searchService;
 
     @Autowired
     @Qualifier("taskScheduler")
@@ -692,6 +693,29 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    public long count(com.querydsl.core.types.Predicate predicate) {
+        if (predicate == null) {
+            return 0;
+        }
+
+        com.querydsl.core.types.Predicate permissionConstraints = searchService.buildPermissionConstraints(
+                userService.getLoggedOrSystem().transformToLoggedUser());
+        com.querydsl.core.types.Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraints);
+        return taskRepository.count(finalPredicate);
+    }
+
+    @Override
+    public boolean exists(com.querydsl.core.types.Predicate predicate) {
+        if (predicate == null) {
+            return false;
+        }
+        com.querydsl.core.types.Predicate permissionConstraints = searchService.buildPermissionConstraints(
+                userService.getLoggedOrSystem().transformToLoggedUser());
+        com.querydsl.core.types.Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraints);
+        return taskRepository.exists(finalPredicate);
+    }
+
+    @Override
     public Page<Task> findByCases(Pageable pageable, List<String> cases) {
         return loadUsers(taskRepository.findByCaseIdIn(pageable, cases));
     }
@@ -734,15 +758,22 @@ public class TaskService implements ITaskService {
 
     @Override
     public Page<Task> search(com.querydsl.core.types.Predicate predicate, Pageable pageable) {
-        Page<Task> tasks = taskRepository.findAll(predicate, pageable);
+        if (predicate == null) {
+            return Page.empty();
+        }
+        com.querydsl.core.types.Predicate permissionConstraints = searchService.buildPermissionConstraints(
+                userService.getLoggedOrSystem().transformToLoggedUser());
+        com.querydsl.core.types.Predicate finalPredicate = ExpressionUtils.and(predicate, permissionConstraints);
+        Page<Task> tasks = taskRepository.findAll(finalPredicate, pageable);
         return loadUsers(tasks);
     }
 
     @Override
     public Task searchOne(com.querydsl.core.types.Predicate predicate) {
-        Page<Task> tasks = taskRepository.findAll(predicate, PageRequest.of(0, 1));
-        if (tasks.getTotalElements() > 0)
+        Page<Task> tasks = search(predicate, PageRequest.of(0, 1));
+        if (tasks.getTotalElements() > 0) {
             return tasks.getContent().get(0);
+        }
         return null;
     }
 
@@ -781,12 +812,9 @@ public class TaskService implements ITaskService {
     @Override
     public Task resolveUserRef(Task task, Case useCase) {
         task.getUsers().clear();
-        task.getNegativeViewUsers().clear();
         task.getUserRefs().forEach((id, permission) -> {
             List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(id).getValue());
-            if (userIds != null && !userIds.isEmpty() && permission.containsKey("view") && !permission.get("view")) {
-                task.getNegativeViewUsers().addAll(userIds);
-            } else if (userIds != null && !userIds.isEmpty()) {
+            if (userIds != null && !userIds.isEmpty()) {
                 task.addUsers(new HashSet<>(userIds), permission);
             }
         });

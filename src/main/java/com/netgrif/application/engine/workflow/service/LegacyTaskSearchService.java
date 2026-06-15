@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class TaskSearchService extends MongoSearchService<Task> {
+public class LegacyTaskSearchService extends MongoSearchService<Task> {
 
     @Autowired
     private IPetriNetService petriNetService;
@@ -33,7 +33,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
             return null;
         } else if (!isIntersection) {
             singleQueries = singleQueries.stream().filter(Objects::nonNull).collect(Collectors.toList());
-            if (singleQueries.size() == 0) {
+            if (singleQueries.isEmpty()) {
                 // all queries result in an empty set => the entire result is an empty set
                 return null;
             }
@@ -41,26 +41,21 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
         BooleanBuilder builder = constructPredicateTree(singleQueries, isIntersection ? BooleanBuilder::and : BooleanBuilder::or);
 
-        BooleanBuilder constraints = new BooleanBuilder(buildRolesQueryConstraint(loggedOrImpersonated));
-        constraints.or(buildUserRefQueryConstraint(loggedOrImpersonated));
-        builder.and(constraints);
-
-        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
-        builder.and(permissionConstraints);
-        return builder;
+        return builder.and(buildPermissionConstraints(loggedOrImpersonated));
     }
 
-    protected Predicate buildRolesQueryConstraint(LoggedUser user) {
-        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::roleQuery).collect(Collectors.toList());
-        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
-    }
+    public BooleanBuilder buildPermissionConstraints(LoggedUser loggedOrImpersonated) {
+        //        (Rp!=0 & Rn = 0)
+        BooleanBuilder constraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated))
+                .andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
 
-    protected Predicate buildUserRefQueryConstraint(LoggedUser user) {
-        Predicate userRefConstraints = userRefQuery(user.getId());
-        return constructPredicateTree(Collections.singletonList(userRefConstraints), BooleanBuilder::or);
+        //        ((Rp!=0 & Rn = 0) or Up!=0)
+        constraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
+
+        //        (((Rp!=0 & Rn = 0) or Up!=0) & Un=0) == 1
+        constraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
+
+        return constraints;
     }
 
     protected Predicate buildViewRoleQueryConstraint(LoggedUser user) {
@@ -69,7 +64,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     public Predicate viewRoleQuery(String role) {
-        return QTask.task.viewUserRefs.isEmpty().and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewRoles.contains(role));
+        return QTask.task.viewRoles.contains(role);
     }
 
     protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
@@ -78,7 +73,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     public Predicate viewUsersQuery(String userId) {
-        return QTask.task.negativeViewRoles.isEmpty().and(QTask.task.viewUserRefs.isEmpty()).and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewUsers.contains(userId));
+        return QTask.task.viewUsers.contains(userId);
     }
 
     protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {

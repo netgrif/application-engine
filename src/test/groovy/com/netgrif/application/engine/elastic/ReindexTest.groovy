@@ -35,13 +35,13 @@ class ReindexTest {
     private SuperCreator superCreator
 
     @Autowired
-    protected IElasticCaseService elasticCaseService
+    private IElasticCaseService elasticCaseService
 
     @Autowired
     private ReindexingTask reindexingTask
 
     @Autowired
-    TestHelper testHelper
+    private TestHelper testHelper
 
     @BeforeEach
     void before() {

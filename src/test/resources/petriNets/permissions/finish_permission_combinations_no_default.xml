@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>finish_permission_combinations_no_default</id>
+    <version>1.0.0</version>
+    <initials>FPC</initials>
+    <title>Finish Permission Combinations With Default Role Disabled</title>
+    <defaultRole>false</defaultRole>
+
+    <role>
+        <id>process_role</id>
+        <title>Process Role</title>
+    </role>
+
+    <data type="userList">
+        <id>users</id>
+        <title>Users</title>
+    </data>
+
+    <transition>
+        <id>t_007</id>
+        <x>1300</x>
+        <y>100</y>
+        <label>role=true user=true</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <finish>true</finish>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <finish>true</finish>
+                <assign>true</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_008</id>
+        <x>1500</x>
+        <y>100</y>
+        <label>role=true user=false</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <finish>true</finish>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <finish>false</finish>
+                <assign>true</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_009</id>
+        <x>1700</x>
+        <y>100</y>
+        <label>role=true user=undefined</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <finish>true</finish>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+    </transition>
+
+    <transition>
+        <id>t_016</id>
+        <x>1300</x>
+        <y>300</y>
+        <label>role=false user=true</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <finish>false</finish>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <finish>true</finish>
+                <assign>true</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_017</id>
+        <x>1500</x>
+        <y>300</y>
+        <label>role=false user=false</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <finish>false</finish>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <finish>false</finish>
+                <assign>true</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_018</id>
+        <x>1700</x>
+        <y>300</y>
+        <label>role=false user=undefined</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <finish>false</finish>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+    </transition>
+
+    <transition>
+        <id>t_025</id>
+        <x>1300</x>
+        <y>500</y>
+        <label>role=undefined user=true</label>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <finish>true</finish>
+                <assign>true</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_026</id>
+        <x>1500</x>
+        <y>500</y>
+        <label>role=undefined user=false</label>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <finish>false</finish>
+                <assign>true</assign>
+            </logic>
+        </userRef>
+    </transition>
+
+    <transition>
+        <id>t_027</id>
+        <x>1700</x>
+        <y>500</y>
+        <label>role=undefined user=undefined</label>
+        <roleRef>
+            <id>process_role</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>users</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </userRef>
+    </transition>
+</document>

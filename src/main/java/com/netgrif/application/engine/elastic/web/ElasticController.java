@@ -4,7 +4,7 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.ReindexingTask;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import com.netgrif.application.engine.elastic.web.requestbodies.IndexParams;
-import com.netgrif.application.engine.workflow.service.CaseSearchService;
+import com.netgrif.application.engine.workflow.service.LegacyCaseSearchService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.querydsl.core.types.Predicate;
@@ -43,7 +43,7 @@ public class ElasticController {
     private IWorkflowService workflowService;
 
     @Autowired
-    private CaseSearchService searchService;
+    private LegacyCaseSearchService searchService;
 
     @Autowired
     private ReindexingTask reindexingTask;
