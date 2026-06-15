@@ -1072,152 +1072,343 @@
         </roleRef>
         <dataGroup>
             <id>all_menu_data_0</id>
-            <layout>flow</layout>
-            <alignment>start</alignment>
-            <stretch>true</stretch>
+            <cols>1</cols>
+            <layout>grid</layout>
             <dataRef>
                 <id>case_filter</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>case_view_search_type</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>show_create_case_button</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>case_show_more_menu</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>case_empty_content_text</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>case_empty_content_icon</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>5</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>case_empty_content_icon_preview</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>6</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>case_all_allowed_nets</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>7</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>case_allowed_nets</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>8</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>case_inherit_allowed_nets</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>9</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>create_case_button_title</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>10</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>create_case_button_icon</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>11</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>create_case_button_icon_preview</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>12</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>require_title_in_creation</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>13</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>banned_nets_in_creation</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>14</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>case_is_header_mode_changeable</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>15</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>case_allow_header_table_mode</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>16</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>case_headers_mode</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>17</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>case_headers_default_mode</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>18</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>use_case_default_headers</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>19</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>case_default_headers</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>20</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>view_configuration_type</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>21</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>view_configuration_all_data_form</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>22</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>case_allow_export</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>23</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
         </dataGroup>
     </transition>

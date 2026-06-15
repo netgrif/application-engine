@@ -264,26 +264,49 @@
         </roleRef>
         <dataGroup>
             <id>all_menu_data_0</id>
-            <layout>flow</layout>
-            <alignment>start</alignment>
-            <stretch>true</stretch>
+            <cols>1</cols>
+            <layout>grid</layout>
             <dataRef>
                 <id>show_page_header</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>show_page_footer</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>task_filter</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
         </dataGroup>
     </transition>

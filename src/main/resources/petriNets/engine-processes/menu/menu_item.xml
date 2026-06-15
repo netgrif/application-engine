@@ -1801,152 +1801,343 @@
 		</roleRef>
 		<dataGroup>
 			<id>all_menu_data_0</id>
-			<layout>flow</layout>
-			<alignment>start</alignment>
-			<stretch>true</stretch>
+			<cols>1</cols>
+			<layout>grid</layout>
 			<dataRef>
 				<id>menu_item_identifier</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>nodePath</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>menu_name</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>menu_icon</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>menu_icon_preview</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>hasChildren</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>5</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>is_auto_select</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>6</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>processes_available</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>7</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>roles_available</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>8</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>add_allowed_roles</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>9</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>allowed_roles</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>10</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>remove_allowed_roles</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>11</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>add_banned_roles</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>12</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>banned_roles</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>13</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>remove_banned_roles</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>14</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>use_custom_view</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>15</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>custom_view_selector</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>16</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>use_tabbed_view</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>17</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>tab_name</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>18</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>use_tab_icon</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>19</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>tab_icon</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>20</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>tab_icon_preview</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>21</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>view_configuration_type</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>22</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 			<dataRef>
 				<id>view_configuration_all_data_form</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>23</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 		</dataGroup>
 	</transition>
