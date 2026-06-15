@@ -138,7 +138,11 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitProcessQuery(QueryLangParser.ProcessQueryContext ctx) {
-        root = createTreeNode("process query", List.of(getQueryLangTreeNode(ctx.processConditions())), getErrorsFromChildren(ctx.children));
+        List<QueryLangTreeNode> children = new ArrayList<>();
+        if (ctx.processConditionsAndPaging() != null && ctx.processConditionsAndPaging().processConditions() != null) {
+            children.add(getQueryLangTreeNode(ctx.processConditionsAndPaging().processConditions()));
+        }
+        root = createTreeNode("process query", children, getErrorsFromChildren(ctx.children));
     }
 
     @Override
@@ -149,8 +153,11 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitCaseQuery(QueryLangParser.CaseQueryContext ctx) {
-        QueryLangTreeNode childTreeNode = getQueryLangTreeNode(ctx.caseConditions());
-        root = createTreeNode("case query", List.of(childTreeNode), getErrorsFromChildren(ctx.children));
+        List<QueryLangTreeNode> children = new ArrayList<>();
+        if (ctx.caseConditionsAndPaging() != null && ctx.caseConditionsAndPaging().caseConditions() != null) {
+            children.add(getQueryLangTreeNode(ctx.caseConditionsAndPaging().caseConditions()));
+        }
+        root = createTreeNode("case query", children, getErrorsFromChildren(ctx.children));
     }
 
     @Override
@@ -161,7 +168,11 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitTaskQuery(QueryLangParser.TaskQueryContext ctx) {
-        root = createTreeNode("task query", List.of(getQueryLangTreeNode(ctx.taskConditions())), getErrorsFromChildren(ctx.children));
+        List<QueryLangTreeNode> children = new ArrayList<>();
+        if (ctx.taskConditionsAndPaging() != null && ctx.taskConditionsAndPaging().taskConditions() != null) {
+            children.add(getQueryLangTreeNode(ctx.taskConditionsAndPaging().taskConditions()));
+        }
+        root = createTreeNode("task query", children, getErrorsFromChildren(ctx.children));
     }
 
     @Override
@@ -172,7 +183,11 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitUserQuery(QueryLangParser.UserQueryContext ctx) {
-        root = createTreeNode("user query", List.of(getQueryLangTreeNode(ctx.userConditions())), getErrorsFromChildren(ctx.children));
+        List<QueryLangTreeNode> children = new ArrayList<>();
+        if (ctx.userConditionsAndPaging() != null && ctx.userConditionsAndPaging().userConditions() != null) {
+            children.add(getQueryLangTreeNode(ctx.userConditionsAndPaging().userConditions()));
+        }
+        root = createTreeNode("user query", children, getErrorsFromChildren(ctx.children));
     }
 
     @Override

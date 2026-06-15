@@ -5,6 +5,9 @@ import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
+import com.netgrif.application.engine.pfql.service.caseresource.CaseSearchService;
+import com.netgrif.application.engine.utils.throwable.BadRequestException;
+import com.netgrif.application.engine.utils.throwable.InternalServerErrorException;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
@@ -17,15 +20,13 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.application.engine.workflow.web.responsebodies.*;
-import com.querydsl.core.types.Predicate;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.InputStreamResource;
@@ -33,7 +34,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -55,29 +55,23 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
 
-@RestController()
+@Slf4j
+@RestController
+@Tag(name = "Workflow")
+@RequiredArgsConstructor
 @RequestMapping("/api/workflow")
 @ConditionalOnProperty(
         value = "nae.case.web.enabled",
         havingValue = "true",
         matchIfMissing = true
 )
-@Tag(name = "Workflow")
 public class WorkflowController {
 
-    private static final Logger log = LoggerFactory.getLogger(WorkflowController.class.getName());
-
-    @Autowired
-    private IWorkflowService workflowService;
-
-    @Autowired
-    private ITaskService taskService;
-
-    @Autowired
-    private IElasticCaseService elasticCaseService;
-
-    @Autowired
-    private IDataService dataService;
+    private final IWorkflowService workflowService;
+    private final ITaskService taskService;
+    private final IElasticCaseService elasticCaseService;
+    private final IDataService dataService;
+    private final CaseSearchService caseSearchService;
 
 
     @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
@@ -118,6 +112,29 @@ public class WorkflowController {
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, ElasticCase.class, selfLink.getRel().toString());
         return resources;
+    }
+
+    @Operation(summary = "PFQL case search", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PostMapping(value = "/case/search_pfql", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public PagedModel<CaseResource> searchPfql(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
+        if (searchBody.getList().isEmpty()) {
+            throw new BadRequestException("Bad request: missing request body");
+        }
+        try {
+            String query = searchBody.getList().get(0).query;
+            log.trace("Searching cases with query: {}", query);
+            Page<Case> cases = caseSearchService.searchAll(query);
+            Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
+                    .searchPfql(searchBody, operation, pageable, assembler, auth, locale)).withRel("search_pfql");
+            PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
+            ResourceLinkAssembler.addLinks(resources, ElasticCase.class, selfLink.getRel().toString());
+            return resources;
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Bad request: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("Something went wrong while searching cases by PFQL", e);
+            throw new InternalServerErrorException("Something went wrong");
+        }
     }
 
     @Operation(summary = "Get count of the cases", security = {@SecurityRequirement(name = "BasicAuth")})

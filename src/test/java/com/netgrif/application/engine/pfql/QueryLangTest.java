@@ -111,9 +111,15 @@ public class QueryLangTest {
     public void testSimpleMongodbProcessQuery() {
         MongoDbUtils<PetriNet> mongoDbUtils = new MongoDbUtils<>(mongoOperations, PetriNet.class);
 
+        // without comparison
+        Predicate actual = evaluateQuery("processes").getFullMongoQuery();
+        Predicate expected = new BooleanBuilder();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // id comparison
-        Predicate actual = evaluateQuery(String.format("process: id eq '%s'", GENERIC_OBJECT_ID)).getFullMongoQuery();
-        Predicate expected = QPetriNet.petriNet._id.eq(GENERIC_OBJECT_ID);
+        actual = evaluateQuery(String.format("process: id eq '%s'", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QPetriNet.petriNet._id.eq(GENERIC_OBJECT_ID);
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -284,9 +290,15 @@ public class QueryLangTest {
     public void testSimpleMongodbCaseQuery() {
         MongoDbUtils<Case> mongoDbUtils = new MongoDbUtils<>(mongoOperations, Case.class);
 
+        // without comparison
+        Predicate actual = evaluateQuery("cases").getFullMongoQuery();
+        Predicate expected = new BooleanBuilder();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // id comparison
-        Predicate actual = evaluateQuery(String.format("case: id eq '%s'", GENERIC_OBJECT_ID)).getFullMongoQuery();
-        Predicate expected = QCase.case$._id.eq(GENERIC_OBJECT_ID);
+        actual = evaluateQuery(String.format("case: id eq '%s'", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QCase.case$._id.eq(GENERIC_OBJECT_ID);
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -463,9 +475,15 @@ public class QueryLangTest {
     public void testSimpleMongodbTaskQuery() {
         MongoDbUtils<Task> mongoDbUtils = new MongoDbUtils<>(mongoOperations, Task.class);
 
+        // without comparison
+        Predicate actual = evaluateQuery("tasks").getFullMongoQuery();
+        Predicate expected = new BooleanBuilder();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // id comparison
-        Predicate actual = evaluateQuery(String.format("task: id eq '%s'", GENERIC_OBJECT_ID)).getFullMongoQuery();
-        Predicate expected = QTask.task._id.eq(GENERIC_OBJECT_ID);
+        actual = evaluateQuery(String.format("task: id eq '%s'", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QTask.task._id.eq(GENERIC_OBJECT_ID);
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -622,9 +640,15 @@ public class QueryLangTest {
     public void testSimpleMongodbUserQuery() {
         MongoDbUtils<User> mongoDbUtils = new MongoDbUtils<>(mongoOperations, User.class);
 
+        // without comparison
+        Predicate actual = evaluateQuery("users").getFullMongoQuery();
+        Predicate expected = new BooleanBuilder();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // id comparison
-        Predicate actual = evaluateQuery(String.format("user: id eq '%s'", GENERIC_OBJECT_ID)).getFullMongoQuery();
-        Predicate expected = QUser.user._id.eq(GENERIC_OBJECT_ID);
+        actual = evaluateQuery(String.format("user: id eq '%s'", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QUser.user._id.eq(GENERIC_OBJECT_ID);
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -715,9 +739,13 @@ public class QueryLangTest {
 
     @Test
     public void testSimpleElasticProcessQuery() {
+        // without comparison
+        String actual = evaluateQuery("processes").getFullElasticQuery();
+        assertEquals("*", actual);
+
         // elastic query should be always null
         // id comparison
-        String actual = evaluateQuery(String.format("process: id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        actual = evaluateQuery(String.format("process: id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assertNull(actual);
 
         // identifier comparison
@@ -825,9 +853,14 @@ public class QueryLangTest {
 
     @Test
     public void testSimpleElasticCaseQuery() {
+        // without comparison
+        String actual = evaluateQuery("cases").getFullElasticQuery();
+        String expected = "*";
+        assertEquals(expected, actual);
+
         // id comparison
-        String actual = evaluateQuery(String.format("case: id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        String expected = String.format("stringId:%s", GENERIC_OBJECT_ID);
+        actual = evaluateQuery(String.format("case: id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("stringId:%s", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
         actual = evaluateQuery(String.format("case: id in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullElasticQuery();
@@ -961,9 +994,13 @@ public class QueryLangTest {
 
     @Test
     public void testSimpleElasticTaskQuery() {
+        // without comparison
+        String actual = evaluateQuery("tasks").getFullElasticQuery();
+        assertEquals("*", actual);
+
         // elastic query should be always null
         // id comparison
-        String actual = evaluateQuery(String.format("task: id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        actual = evaluateQuery(String.format("task: id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assertNull(actual);
 
         // transitionId comparison
@@ -1088,9 +1125,13 @@ public class QueryLangTest {
 
     @Test
     public void testSimpleElasticUserQuery() {
+        // without comparison
+        String actual = evaluateQuery("users").getFullElasticQuery();
+        assertEquals("*", actual);
+
         // elastic query should be always null
         // id comparison
-        String actual = evaluateQuery(String.format("user: id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        actual = evaluateQuery(String.format("user: id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assertNull(actual);
 
         // name comparison
@@ -1173,6 +1214,10 @@ public class QueryLangTest {
         pageable = evaluateQuery("cases: processIdentifier eq 'test' page 2 size 4").getPageable();
         assertEquals(2, pageable.getPageNumber());
         assertEquals(4, pageable.getPageSize());
+
+        pageable = evaluateQuery("cases: page 2 size 4").getPageable();
+        assertEquals(2, pageable.getPageNumber());
+        assertEquals(4, pageable.getPageSize());
     }
 
     @Test
@@ -1238,6 +1283,16 @@ public class QueryLangTest {
 
         // complex default ordering
         actual = evaluateQuery("processes: identifier eq 'test' sort by id asc, title").getPageable();
+        assertTrue(actual.getSort().isSorted());
+        orders = actual.getSort().toList();
+        assertEquals(2, orders.size());
+        assertEquals("id", orders.get(0).getProperty());
+        assertEquals(Sort.Direction.ASC, orders.get(0).getDirection());
+        assertEquals("title.defaultValue", orders.get(1).getProperty());
+        assertEquals(Sort.Direction.ASC, orders.get(1).getDirection());
+
+        // complex default ordering
+        actual = evaluateQuery("processes: sort by id asc, title").getPageable();
         assertTrue(actual.getSort().isSorted());
         orders = actual.getSort().toList();
         assertEquals(2, orders.size());
@@ -1318,6 +1373,16 @@ public class QueryLangTest {
 
         // complex default ordering
         actual = evaluateQuery("cases: processIdentifier eq 'test' sort by id asc, title").getPageable();
+        assertTrue(actual.getSort().isSorted());
+        orders = actual.getSort().toList();
+        assertEquals(2, orders.size());
+        assertEquals("id", orders.get(0).getProperty());
+        assertEquals(Sort.Direction.ASC, orders.get(0).getDirection());
+        assertEquals("title", orders.get(1).getProperty());
+        assertEquals(Sort.Direction.ASC, orders.get(1).getDirection());
+
+        // complex default ordering
+        actual = evaluateQuery("cases: sort by id asc, title").getPageable();
         assertTrue(actual.getSort().isSorted());
         orders = actual.getSort().toList();
         assertEquals(2, orders.size());
@@ -1519,6 +1584,16 @@ public class QueryLangTest {
         assertEquals(Sort.Direction.ASC, orders.get(0).getDirection());
         assertEquals("title.defaultValue", orders.get(1).getProperty());
         assertEquals(Sort.Direction.ASC, orders.get(1).getDirection());
+
+        // complex default ordering
+        actual = evaluateQuery("tasks: sort by id asc, title").getPageable();
+        assertTrue(actual.getSort().isSorted());
+        orders = actual.getSort().toList();
+        assertEquals(2, orders.size());
+        assertEquals("id", orders.get(0).getProperty());
+        assertEquals(Sort.Direction.ASC, orders.get(0).getDirection());
+        assertEquals("title.defaultValue", orders.get(1).getProperty());
+        assertEquals(Sort.Direction.ASC, orders.get(1).getDirection());
     }
 
     @Test
@@ -1584,6 +1659,16 @@ public class QueryLangTest {
         assertEquals(Sort.Direction.ASC, orders.get(0).getDirection());
         assertEquals("name", orders.get(1).getProperty());
         assertEquals(Sort.Direction.ASC, orders.get(1).getDirection());
+
+        // complex default ordering
+        actual = evaluateQuery("users: sort by id asc, name").getPageable();
+        assertTrue(actual.getSort().isSorted());
+        orders = actual.getSort().toList();
+        assertEquals(2, orders.size());
+        assertEquals("id", orders.get(0).getProperty());
+        assertEquals(Sort.Direction.ASC, orders.get(0).getDirection());
+        assertEquals("name", orders.get(1).getProperty());
+        assertEquals(Sort.Direction.ASC, orders.get(1).getDirection());
     }
 
     @Test
@@ -1606,6 +1691,9 @@ public class QueryLangTest {
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("process: name eq 'test'"));
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("process: surname eq 'test'"));
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("process: email eq 'test'"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("process email eq 'test'"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("process page 2"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("process:"));
     }
 
     @Test
@@ -1622,6 +1710,9 @@ public class QueryLangTest {
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case: name eq 'test'"));
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case: surname eq 'test'"));
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case: email eq 'test'"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case email eq 'test'"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case page 2"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case:"));
     }
 
     @Test
@@ -1639,6 +1730,9 @@ public class QueryLangTest {
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("task: name eq 'test'"));
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("task: surname eq 'test'"));
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("task: email eq 'test'"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("task email eq 'test'"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("task page 2"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("task:"));
     }
 
     @Test
@@ -1661,6 +1755,9 @@ public class QueryLangTest {
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("user: caseId eq 'test'"));
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("user: lastAssign eq 2020-03-03"));
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("user: lastFinish eq 2020-03-03"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("user lastFinish eq 2020-03-03"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("user page 2"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("user:"));
     }
 
     @Test

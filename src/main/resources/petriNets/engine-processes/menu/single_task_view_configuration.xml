@@ -65,8 +65,8 @@
     <data type="taskFilter">
         <id>task_filter</id>
         <title name="task_filter">Filter</title>
-        <desc name="task_filter_desc">Use Elasticsearch string query</desc>
-        <init>*</init>
+        <desc name="task_filter_desc">Use PFQL query</desc>
+        <init>task</init>
     </data>
 
     <!-- I18NS -->
@@ -76,7 +76,7 @@
         <i18nString name="show_page_header">Zobraziť hlavičku stránky</i18nString>
         <i18nString name="show_page_footer">Zobraziť pätu stránky</i18nString>
         <i18nString name="task_filter">Filter</i18nString>
-        <i18nString name="task_filter_desc">Použi Elasticsearch string query</i18nString>
+        <i18nString name="task_filter_desc">Použi PFQL query</i18nString>
         <i18nString name="filter_settings">Filter</i18nString>
     </i18n>
     <i18n locale="de">
@@ -85,7 +85,7 @@
         <i18nString name="show_page_header">Seitenkopf anzeigen</i18nString>
         <i18nString name="show_page_footer">Seitenfuß anzeigen</i18nString>
         <i18nString name="task_filter">Filter</i18nString>
-        <i18nString name="task_filter_desc">Elasticsearch-String-Abfrage verwenden</i18nString>
+        <i18nString name="task_filter_desc">Verwenden Sie PFQL Query</i18nString>
         <i18nString name="filter_settings">Filter</i18nString>
     </i18n>
 
