@@ -66,7 +66,8 @@ abstract class FieldActionsRunner {
             publisher.publishEvent(new ActionStopEvent(action, actionStart, false))
             throw e
         } finally {
-            outcomes = new ArrayList<>(((ActionDelegate) code.delegate).outcomes)
+            ActionDelegate delegate = (code?.delegate instanceof ActionDelegate) ? (ActionDelegate) code.delegate : null
+            outcomes = (delegate?.outcomes != null) ? new ArrayList<>(delegate.outcomes) : new ArrayList<>()
             cleanUp(code)
         }
         return outcomes

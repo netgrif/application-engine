@@ -117,7 +117,10 @@ class FunctionExpando extends DelegateExpando {
     def methodMissing(String name, args) {
         try {
             return super.methodMissing(name, args)  // try own functions first
-        } catch (MissingMethodException ignored) {
+            } catch (MissingMethodException ex) {
+                if (ex.method != name || ex.type != this.class) {
+                    throw ex
+                }
             return parentDelegate.invokeMethod(name, args)  // fallback to delegate
         }
     }

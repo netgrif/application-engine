@@ -47,7 +47,15 @@ public class ClosureSignatureMatcher {
             if (params.length != args.length) continue;
             boolean allMatch = true;
             for (int i = 0; i < params.length; i++) {
-                if (args[i] != null && !params[i].isAssignableFrom(args[i].getClass())) {
+                Class<?> paramType = wrapPrimitive(params[i]);
+                if (args[i] == null) {
+                        if (params[i].isPrimitive()) {
+                                allMatch = false;
+                                break;
+                            }
+                        continue;
+                    }
+                if (!paramType.isAssignableFrom(args[i].getClass())) {
                     allMatch = false;
                     break;
                 }
@@ -55,5 +63,18 @@ public class ClosureSignatureMatcher {
             if (allMatch) return true;
         }
         return false;
+    }
+
+    private static Class<?> wrapPrimitive(Class<?> type) {
+        if (!type.isPrimitive()) return type;
+        if (type == int.class) return Integer.class;
+        if (type == long.class) return Long.class;
+        if (type == boolean.class) return Boolean.class;
+        if (type == double.class) return Double.class;
+        if (type == float.class) return Float.class;
+        if (type == char.class) return Character.class;
+        if (type == byte.class) return Byte.class;
+        if (type == short.class) return Short.class;
+        return type;
     }
 }
