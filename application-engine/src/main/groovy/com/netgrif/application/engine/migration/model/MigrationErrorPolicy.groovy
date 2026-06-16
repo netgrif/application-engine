@@ -98,8 +98,8 @@ class MigrationErrorPolicy {
      * @return a new MigrationErrorPolicy configured to throw after reaching the error limit
      */
     static MigrationErrorPolicy throwAfterLimit(int maxErrors) {
-        if (maxErrors <= 0) {
-            throw new IllegalArgumentException("maxErrors must be > 0 for THROW_AFTER_LIMIT")
+        if (maxErrors < 0) {
+            throw new IllegalArgumentException("maxErrors must be >= 0 for THROW_AFTER_LIMIT")
         }
         return new MigrationErrorPolicy(
                 mode: MigrationErrorHandlingMode.THROW_AFTER_LIMIT,

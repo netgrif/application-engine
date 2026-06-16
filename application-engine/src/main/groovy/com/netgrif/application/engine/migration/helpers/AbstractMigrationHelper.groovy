@@ -212,64 +212,66 @@ abstract class AbstractMigrationHelper<T> {
         }
 
         long count = mongoTemplate.count(query, type)
-        if (count > 0) {
-            long numOfPages = Math.ceil(count / pageSize) as long
-            log.info("Processing ${type.getSimpleName()} documents with filter ${query.toString()}: $numOfPages pages")
+        if (count <= 0) {
+            return
+        }
+        long numOfPages = Math.ceil(count / pageSize) as long
+        log.info("Processing ${type.getSimpleName()} documents with filter ${query.toString()}: $numOfPages pages")
 
-            long page = 1, currentBatchSize = 0, currentBulkOpsSize = 0
-            query.cursorBatchSize(pageSize)
-            BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, type)
+        long page = 1, currentBatchSize = 0, currentBulkOpsSize = 0
+        query.cursorBatchSize(pageSize)
+        BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, type)
 
-            try (Stream<T> cursorStream = mongoTemplate.stream(query, type)) {
-                Iterator<T> cursor = cursorStream.iterator()
-                while (cursor.hasNext()) {
-                    T document = cursor.next()
+        try (Stream<T> cursorStream = mongoTemplate.stream(query, type)) {
+            Iterator<T> cursor = cursorStream.iterator()
+            while (cursor.hasNext()) {
+                T document = cursor.next()
+
+                try {
+                    prepareOperations(document, update, bulkOps)
+                    currentBulkOpsSize++
+                } catch (Exception e) {
+                    String entityId = resolveId(document)
+                    String message = "Failed to prepare migration operation for ${type.simpleName} ${entityId}"
+                    log.error(message, e)
+                    handleMigrationError(errorPolicy, "iterate", type, entityId, message, e)
+                }
+
+                if (++currentBatchSize == pageSize as long || !cursor.hasNext()) {
+                    log.debug("Processed ${type.getSimpleName()} document page {} / {}", page, numOfPages)
 
                     try {
-                        prepareOperations(document, update, bulkOps)
-                        currentBulkOpsSize++
+                        if (currentBulkOpsSize > 0) {
+                            effectiveProcessOperations(bulkOps, type)
+                        }
                     } catch (Exception e) {
-                        String entityId = resolveId(document)
-                        String message = "Failed to prepare migration operation for ${type.simpleName} ${entityId}"
+                        String message = "Failed to process ${type.simpleName} bulk operations on page ${page}"
                         log.error(message, e)
-                        handleMigrationError(errorPolicy, "iterate", type, entityId, message, e)
+                        handleMigrationError(errorPolicy, "bulkWrite", type, null, message, e)
                     }
 
-                    if (++currentBatchSize == pageSize as long || !cursor.hasNext()) {
-                        log.debug("Processed ${type.getSimpleName()} document page {} / {}", page, numOfPages)
-
-                        try {
-                            if (currentBulkOpsSize > 0) {
-                                effectiveProcessOperations(bulkOps, type)
-                            }
-                        } catch (Exception e) {
-                            String message = "Failed to process ${type.simpleName} bulk operations on page ${page}"
-                            log.error(message, e)
-                            handleMigrationError(errorPolicy, "bulkWrite", type, null, message, e)
-                        }
-
-                        bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, type)
-                        currentBatchSize = 0
-                        currentBulkOpsSize = 0
-                        page++
-                        if (sleepFor > 0) {
-                            log.debug("Pausing migration for ${sleepFor} milliseconds")
-                            sleep(sleepFor)
-                        }
+                    bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, type)
+                    currentBatchSize = 0
+                    currentBulkOpsSize = 0
+                    page++
+                    if (sleepFor > 0) {
+                        log.debug("Pausing migration for ${sleepFor} milliseconds")
+                        sleep(sleepFor)
                     }
                 }
-            } catch (Exception e) {
-                if (e instanceof MigrationErrorException) {
-                    throw e
-                }
-                String message = "Failed to iterate ${type.simpleName} documents with filter ${query}"
-                log.error(message, e)
-                handleMigrationError(errorPolicy, "iterate", type, null, message, e)
-                throw e
-            } finally {
-                finishMigrationErrorPolicy(errorPolicy)
             }
+        } catch (Exception e) {
+            if (e instanceof MigrationErrorException) {
+                throw e
+            }
+            String message = "Failed to iterate ${type.simpleName} documents with filter ${query}"
+            log.error(message, e)
+            handleMigrationError(errorPolicy, "iterate", type, null, message, e)
+            throw e
+        } finally {
+            finishMigrationErrorPolicy(errorPolicy)
         }
+
     }
 
     /**
@@ -365,7 +367,7 @@ abstract class AbstractMigrationHelper<T> {
      * @throws MigrationErrorException if the policy requires throwing after processing and errors exist
      */
     protected void finishMigrationErrorPolicy(MigrationErrorPolicy policy) {
-        if ((policy.mode == MigrationErrorHandlingMode.THROW_AFTER_PROCESSING || (policy.mode == MigrationErrorHandlingMode.THROW_AFTER_LIMIT && policy.maxErrors <= 0)) && hasErrors()) {
+        if ((policy.mode == MigrationErrorHandlingMode.THROW_AFTER_PROCESSING || (policy.mode == MigrationErrorHandlingMode.THROW_AFTER_LIMIT && policy.maxErrors == 0)) && hasErrors()) {
             throw new MigrationErrorException(
                     "Migration finished with ${getErrors().size()} errors",
                     getErrors()

@@ -6,6 +6,7 @@ import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.Transition
+import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorField
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldType
@@ -14,6 +15,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.events.EventType
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import groovy.util.logging.Slf4j
 import org.apache.tomcat.util.http.fileupload.IOUtils
@@ -139,7 +141,11 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      */
     void updateNetIgnoreRoles(String identifier, Resource resource, List<Closure<PetriNet>> customUpdates = null) {
         log.debug("Starting updateNetIgnoreRoles for identifier: {} with Resource", identifier)
-        PetriNet reimported = petriNetService.importPetriNet(resource.inputStream, VersionType.MAJOR, userService.getSystem().transformToLoggedUser()).getNet()
+        PetriNet reimported = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(resource.inputStream)
+                .author(userService.getSystem())
+                .releaseType(VersionType.MAJOR)
+                .build()).getNet()
         updateNetIgnoreRoles(petriNetService.getDefaultVersionByIdentifier(identifier), reimported, customUpdates)
     }
 
@@ -174,7 +180,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
         Map<String, ProcessRole> oldProcessRoles = currentNet.roles
         Map<String, ProcessRole> newProcessRoles = reimported.roles
 
-        reimported = replaceUserFieldRoleReferences(currentNet, reimported)
+        reimported = replaceActorFieldRoleReferences(currentNet, reimported)
 
         ProcessRole defaultRole = processRoleRepository.findAllByName_DefaultValue(ProcessRole.DEFAULT_ROLE, Pageable.ofSize(1)).first()
         ProcessRole anonymousRole = processRoleRepository.findAllByName_DefaultValue(ProcessRole.ANONYMOUS_ROLE, Pageable.ofSize(1)).first()
@@ -325,7 +331,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
         PetriNet reimported = getImporter().importPetriNet(inputStream)
                 .orElseThrow { new IllegalStateException("Failed to import Petri Net from file: $fileName") }
 
-        reimported = replaceUserFieldRoleReferences(existing, reimported)
+        reimported = replaceActorFieldRoleReferences(existing, reimported)
 
         existing.dataSet = reimported.dataSet
 
@@ -376,7 +382,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param reimportedNet New version of Petri Net object, its values will be applied to currentNet
      * @return the updated reimported Petri Net with replaced role references
      */
-    private static PetriNet replaceUserFieldRoleReferences(PetriNet originalNet, PetriNet reimportedNet) {
+    private static PetriNet replaceActorFieldRoleReferences(PetriNet originalNet, PetriNet reimportedNet) {
         Map<String, ProcessRole> originalNetRoles = [:] // importId: processRole
         originalNet.roles.forEach { name, role ->
             originalNetRoles.put(role.importId, role)
@@ -387,7 +393,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
 
         }.forEach { entry ->
             log.trace("Processing user field role references for field: {}", entry.key)
-            ActorField field = (reimportedNet.dataSet[entry.key] as ActorField)
+            ActorField field = entry.value as ActorField
             field.roles = field.roles.collect { roleId ->
                 Optional<ProcessRole> roleOpt = Optional.ofNullable(reimportedNet.roles[roleId])
                 if (roleOpt.isPresent()) {
