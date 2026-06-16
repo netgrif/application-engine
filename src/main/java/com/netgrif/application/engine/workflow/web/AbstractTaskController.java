@@ -7,7 +7,9 @@ import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.Sin
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.application.engine.pfql.service.QueryLangEvaluator;
 import com.netgrif.application.engine.pfql.service.taskresource.TaskSearchService;
+import com.netgrif.application.engine.pfql.service.utils.SearchUtils;
 import com.netgrif.application.engine.utils.throwable.BadRequestException;
 import com.netgrif.application.engine.utils.throwable.InternalServerErrorException;
 import com.netgrif.application.engine.workflow.domain.IllegalArgumentWithChangedFieldsException;
@@ -184,14 +186,18 @@ public abstract class AbstractTaskController {
         return resources;
     }
 
-    public PagedModel<LocalisedTaskResource> searchPfql(Authentication auth, Pageable pageable, SingleTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        if (searchBody.getList().isEmpty()) {
-            throw new BadRequestException("Bad request: missing request body");
-        }
+    public PagedModel<LocalisedTaskResource> searchPfql(Authentication auth, Pageable pageable, SingleElasticTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
         try {
-            Page<Task> tasks = taskSearchService.searchAll(searchBody.getList().get(0).query);
+            searchBody.getList().forEach((request) -> {
+                if (request.query == null || request.query.isEmpty()) {
+                    return;
+                }
+                QueryLangEvaluator evaluator = SearchUtils.evaluateQuery(request.query);
+                request.query = evaluator.getFullElasticQuery();
+            });
+            Page<Task> tasks = elasticTaskService.search(searchBody.getList(), (LoggedUser) auth.getPrincipal(), pageable, locale, operation == MergeFilterOperation.AND);
             Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                    .searchPfql(auth, pageable, searchBody, operation, assembler, locale)).withRel("search_pfql");
+                    .searchElastic(auth, pageable, searchBody, operation, assembler, locale)).withRel("search_es");
             PagedModel<LocalisedTaskResource> resources = assembler.toModel(tasks, new TaskResourceAssembler(locale), selfLink);
             ResourceLinkAssembler.addLinks(resources, Task.class, selfLink.getRel().toString());
             return resources;

@@ -171,7 +171,7 @@ public class TaskController extends AbstractTaskController {
     @Override
     @Operation(summary = "PFQL task search", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search_pfql", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> searchPfql(Authentication auth, Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
+    public PagedModel<LocalisedTaskResource> searchPfql(Authentication auth, Pageable pageable, @RequestBody SingleElasticTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
         return super.searchPfql(auth, pageable, searchBody, operation, assembler, locale);
     }
 

@@ -35,8 +35,6 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.*;
 
 public class QueryLangEvaluator extends QueryLangBaseListener {
 
-    // todo code encapsulation by resource type
-
     private final ParseTreeProperty<String> elasticQuery = new ParseTreeProperty<>();
     private final ParseTreeProperty<Predicate> mongoQuery = new ParseTreeProperty<>();
 

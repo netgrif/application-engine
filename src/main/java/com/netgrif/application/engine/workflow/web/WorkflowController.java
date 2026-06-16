@@ -5,7 +5,8 @@ import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
-import com.netgrif.application.engine.pfql.service.caseresource.CaseSearchService;
+import com.netgrif.application.engine.pfql.service.QueryLangEvaluator;
+import com.netgrif.application.engine.pfql.service.utils.SearchUtils;
 import com.netgrif.application.engine.utils.throwable.BadRequestException;
 import com.netgrif.application.engine.utils.throwable.InternalServerErrorException;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -71,7 +72,6 @@ public class WorkflowController {
     private final ITaskService taskService;
     private final IElasticCaseService elasticCaseService;
     private final IDataService dataService;
-    private final CaseSearchService caseSearchService;
 
 
     @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
@@ -117,15 +117,20 @@ public class WorkflowController {
     @Operation(summary = "PFQL case search", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/search_pfql", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> searchPfql(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
-        if (searchBody.getList().isEmpty()) {
-            throw new BadRequestException("Bad request: missing request body");
-        }
         try {
-            String query = searchBody.getList().get(0).query;
-            log.trace("Searching cases with query: {}", query);
-            Page<Case> cases = caseSearchService.searchAll(query);
+            LoggedUser user = (LoggedUser) auth.getPrincipal();
+            searchBody.getList().forEach((request) -> {
+                if (request.query == null || request.query.isEmpty()) {
+                    return;
+                }
+                QueryLangEvaluator evaluator = SearchUtils.evaluateQuery(request.query);
+                request.query = evaluator.getFullElasticQuery();
+            });
+            Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, locale, operation == MergeFilterOperation.AND);
+
             Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                     .searchPfql(searchBody, operation, pageable, assembler, auth, locale)).withRel("search_pfql");
+
             PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
             ResourceLinkAssembler.addLinks(resources, ElasticCase.class, selfLink.getRel().toString());
             return resources;
