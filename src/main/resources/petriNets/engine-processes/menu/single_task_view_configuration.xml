@@ -1,0 +1,357 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>single_task_view_configuration</id>
+    <initials>TST</initials>
+    <title>Single task view configuration</title>
+    <icon>check_box_outline_blank</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <transitionRole>false</transitionRole>
+    <roleRef>
+        <id>system</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>admin</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>default</id>
+        <caseLogic>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <role>
+        <id>system</id>
+        <title>System</title>
+    </role>
+    <role>
+        <id>admin</id>
+        <title>Admin</title>
+    </role>
+
+    <function scope="process" name="initializeAdvancedForm">
+        { ->
+            def advancedContentFormField = useCase.getField("advanced_content_form")
+            change advancedContentFormField value { [useCase.tasks.find { taskPair -> taskPair.transition == "filter_settings"}.task] }
+        }
+    </function>
+
+    <data type="taskRef">
+        <id>advanced_content_form</id>
+        <title/>
+        <component>
+            <name>task-list</name>
+            <property key="headers">meta-title</property>
+        </component>
+    </data>
+    <data type="boolean">
+        <id>show_page_header</id>
+        <title name="show_page_header">Show page header</title>
+        <init>true</init>
+    </data>
+    <data type="boolean">
+        <id>show_page_footer</id>
+        <title name="show_page_footer">Show page footer</title>
+        <init>false</init>
+    </data>
+    <data type="taskFilter">
+        <id>task_filter</id>
+        <title name="task_filter">Filter</title>
+        <desc name="task_filter_desc">Use Elasticsearch string query</desc>
+        <init>*</init>
+    </data>
+
+    <!-- I18NS -->
+    <i18n locale="sk">
+        <i18nString name="view_configuration_type">Vybrať zobrazenie</i18nString>
+        <i18nString name="settings">Nastavenie</i18nString>
+        <i18nString name="show_page_header">Zobraziť hlavičku stránky</i18nString>
+        <i18nString name="show_page_footer">Zobraziť pätu stránky</i18nString>
+        <i18nString name="task_filter">Filter</i18nString>
+        <i18nString name="task_filter_desc">Použi Elasticsearch string query</i18nString>
+        <i18nString name="filter_settings">Filter</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
+        <i18nString name="settings">Einstellungen</i18nString>
+        <i18nString name="show_page_header">Seitenkopf anzeigen</i18nString>
+        <i18nString name="show_page_footer">Seitenfuß anzeigen</i18nString>
+        <i18nString name="task_filter">Filter</i18nString>
+        <i18nString name="task_filter_desc">Elasticsearch-String-Abfrage verwenden</i18nString>
+        <i18nString name="filter_settings">Filter</i18nString>
+    </i18n>
+
+    <transition>
+        <id>initialize</id>
+        <x>368</x>
+        <y>208</y>
+        <label>initialize [await sync]</label>
+        <icon>hourglass_empty</icon>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <event type="finish">
+            <id>finish</id>
+            <actions phase="post">
+                <action>
+                    initializeAdvancedForm()
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>data_sync</id>
+        <x>368</x>
+        <y>328</y>
+        <label>Data sync</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>settings</id>
+        <x>496</x>
+        <y>112</y>
+        <label name="settings">Settings</label>
+        <icon>settings</icon>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>view_dataGroup</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>show_page_header</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>show_page_footer</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>advanced_content_form</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>assign_0</id>
+            <title/>
+        </event>
+        <event type="finish">
+            <id>finish_0</id>
+            <title/>
+        </event>
+    </transition>
+    <transition>
+        <id>filter_settings</id>
+        <x>432</x>
+        <y>48</y>
+        <label name="filter_settings">Filter</label>
+        <icon>filter_alt</icon>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>filter_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>task_filter</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>assign</id>
+            <title/>
+        </event>
+        <event type="cancel">
+            <id>cancel</id>
+            <title/>
+        </event>
+        <event type="finish">
+            <id>finish_0</id>
+            <title/>
+        </event>
+        <event type="delegate">
+            <id>delegate</id>
+            <title/>
+        </event>
+    </transition>
+    <transition>
+        <id>all_menu_data</id>
+        <x>10</x>
+        <y>10</y>
+        <label>All menu data</label>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>all_menu_data_0</id>
+            <cols>1</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>show_page_header</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>show_page_footer</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <place>
+        <id>initialized</id>
+        <x>496</x>
+        <y>208</y>
+        <label>initialized</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>uninitialized</id>
+        <x>240</x>
+        <y>208</y>
+        <label>uninitialized</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <arc>
+        <id>a1</id>
+        <type>read</type>
+        <sourceId>initialized</sourceId>
+        <destinationId>settings</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>regular</type>
+        <sourceId>uninitialized</sourceId>
+        <destinationId>initialize</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a3</id>
+        <type>regular</type>
+        <sourceId>initialize</sourceId>
+        <destinationId>initialized</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a4</id>
+        <type>read</type>
+        <sourceId>initialized</sourceId>
+        <destinationId>filter_settings</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>

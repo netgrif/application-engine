@@ -3,6 +3,7 @@
     <id>variable_arc_test.xml</id>
     <initials>TST</initials>
     <title>Test</title>
+    <defaultRole>true</defaultRole>
     <!-- TRANSACTIONS -->
     <!-- ROLES -->
     <!-- PROCESS ROLE REFS -->

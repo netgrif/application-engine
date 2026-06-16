@@ -1,0 +1,97 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>query_test</id>
+    <version>1.0.0</version>
+    <initials>NEW</initials>
+    <title>New Model</title>
+    <icon>device_hub</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>true</anonymousRole>
+    <transitionRole>false</transitionRole>
+    <data type="boolean" immediate="true">
+        <id>boolean_0</id>
+        <title>Boolean</title>
+        <init dynamic="true">(params["id"] as int) % 2 == 0</init>
+    </data>
+    <data type="dateTime" immediate="true">
+        <id>dateTime_0</id>
+        <title>Date Time</title>
+        <init dynamic="true">java.time.LocalDateTime.now().plusYears(params["id"] as int)</init>
+    </data>
+    <data type="number" immediate="true">
+        <id>number_0</id>
+        <title>Number</title>
+        <init dynamic="true">params["id"] as int</init>
+    </data>
+    <data type="text" immediate="true">
+        <id>text_0</id>
+        <title>Text</title>
+        <init dynamic="true">params["id"]</init>
+    </data>
+    <transition>
+        <id>t1</id>
+        <x>176</x>
+        <y>112</y>
+        <label>Task</label>
+        <dataGroup>
+            <id>t1_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>text_0</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>number_0</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>boolean_0</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>dateTime_0</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>

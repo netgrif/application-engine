@@ -26,8 +26,6 @@
     <roleRef>
         <id>default</id>
         <caseLogic>
-            <create>false</create>
-            <delete>false</delete>
             <view>true</view>
         </caseLogic>
     </roleRef>
@@ -50,30 +48,10 @@
         <title>Admin</title>
     </role>
 
-    <function scope="process" name="updateFilterAutocompleteOptions">
-        {
-            com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
-            com.netgrif.application.engine.petrinet.domain.dataset.TaskField previewTaskRef,
-            com.netgrif.application.engine.petrinet.domain.dataset.CaseField selectedFilterRef,
-            com.netgrif.application.engine.petrinet.domain.dataset.ButtonField updateBtn,
-            com.netgrif.application.engine.petrinet.domain.Transition trans
-                ->
-                if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
-                    change previewTaskRef value {
-                        return [findTask({it.caseId.eq(filterAutocomplete.value).and(it.transitionId.eq("view_filter"))}).stringId]
-                    }
-                    make updateBtn,editable on trans when { true }
-                } else {
-                    change filterAutocomplete options {
-                        def findAllPredicate = { filterCase -> !selectedFilterRef.value.contains(filterCase.stringId)
-                                &amp;&amp; filterCase.dataSet["filter_type"].value == "Case" }
-                        return findFilters(filterAutocomplete.value != null ? filterAutocomplete.value : "")
-                                .findAll(findAllPredicate)
-                                .collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
-                    }
-                    change previewTaskRef value { [] }
-                    make updateBtn,visible on trans when { true }
-                }
+    <function scope="process" name="initializeAdvancedForm">
+        { ->
+            def advancedContentFormField = useCase.getField("advanced_content_form")
+            change advancedContentFormField value { [useCase.tasks.find { taskPair -> taskPair.transition == "next_view_settings"}.task] }
         }
     </function>
     <function scope="process" name="removeViewCase">
@@ -90,114 +68,10 @@
         }
     </function>
 
-    <!-- FILTER configuration data -->
-    <data type="taskRef">
-        <id>selected_filter_preview</id>
-        <title/>
-    </data>
-    <data type="taskRef">
-        <id>current_filter_preview</id>
-        <title/>
-    </data>
-    <data type="i18n">
-        <id>filter_header</id>
-        <title/>
-        <init name="filter_header">Current filter</init>
-        <component>
-            <name>divider</name>
-        </component>
-    </data>
-    <data type="text">
-        <id>new_filter_id</id>
-        <title/>
-    </data>
-    <data type="boolean" immediate="true">
-        <id>contains_filter</id>
-        <title/>
-        <init>false</init>
-    </data>
-    <data type="enumeration_map">
-        <id>filter_autocomplete_selection</id>
-        <title name="filter_autocomplete_selection">Select new filter</title>
-        <component>
-            <name>autocomplete_dynamic</name>
-        </component>
-        <action trigger="set">
-            trans: t.settings,
-            filterAutocomplete: f.this,
-            filter_case: f.filter_case,
-            update_filter: f.update_filter,
-            previewTaskRef: f.selected_filter_preview;
-
-            updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans)
-        </action>
-        <action trigger="get">
-            trans: t.settings,
-            filterAutocomplete: f.this,
-            filter_case: f.filter_case,
-            update_filter: f.update_filter,
-            previewTaskRef: f.selected_filter_preview;
-
-            updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans)
-        </action>
-    </data>
-    <data type="button">
-        <id>update_filter</id>
-        <title/>
-        <placeholder name="update_filter">Update view with selected filter</placeholder>
-        <component>
-            <name>raised</name>
-        </component>
-        <action trigger="set">
-            trans: t.settings,
-            update_filter: f.update_filter,
-            contains_filter: f.contains_filter,
-            filter_case: f.filter_case,
-            filterAutocomplete: f.filter_autocomplete_selection;
-
-            boolean containsFilter = filterAutocomplete.value != null &amp;&amp; filterAutocomplete.value != ""
-            if (containsFilter) {
-                def filterCase = findCase({it._id.eq(filterAutocomplete.value)})
-                if (filterCase.dataSet["filter_type"].value != "Case") {
-                    throw new IllegalArgumentException("Filter is of wrong type. Only filter of Case type allowed.")
-                }
-            }
-
-            change contains_filter value { containsFilter }
-            change filter_case value { [filterAutocomplete.value] }
-            change filterAutocomplete value { "" }
-            make update_filter,visible on trans when { true }
-        </action>
-    </data>
-    <data type="caseRef">
-        <id>filter_case</id>
-        <title/>
-        <action trigger="set">
-            filterTaskRef: f.current_filter_preview,
-            contains_filter: f.contains_filter,
-            filterCaseRef: f.filter_case;
-
-            if (filterCaseRef.value == null || filterCaseRef.value == []) {
-                change filterTaskRef value { [] }
-                change contains_filter value { false }
-                return
-            }
-
-            def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
-            change filterTaskRef value {
-                return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]
-            }
-            change contains_filter value { true }
-        </action>
-        <allowedNets>
-            <allowedNet>filter</allowedNet>
-        </allowedNets>
-    </data>
-
     <!-- ASSOCIATED VIEW: this section can be removed if needed -->
     <data type="enumeration_map" immediate="true">
         <id>view_configuration_type</id>
-        <title name="view_configuration_type">Pick view type</title>
+        <title name="view_configuration_type">View type</title>
         <options>
             <init dynamic="true">menuItemService.getAvailableViewsAsOptions(true, useCase.processIdentifier)</init>
         </options>
@@ -213,46 +87,40 @@
         <id>view_configuration_id</id>
         <title/>
         <allowedNets>
-            <allowedNet>tabbed_single_task_view_configuration</allowedNet>
+            <allowedNet>single_task_view_configuration</allowedNet>
         </allowedNets>
     </data>
     <data type="taskRef">
         <id>view_configuration_form</id>
         <title/>
     </data>
+    <data type="taskRef">
+        <id>view_configuration_all_data_form</id>
+        <title/>
+    </data>
     <!-- END OF ASSOCIATED VIEW -->
 
     <!-- VIEW CONFIGURATION DATA -->
-    <data type="i18n">
-        <id>view_header</id>
+    <data type="taskRef">
+        <id>advanced_content_form</id>
         <title/>
-        <init name="view_header">Ticket view</init>
         <component>
-            <name>divider</name>
+            <name>task-list</name>
+            <property key="headers">meta-title</property>
         </component>
     </data>
     <!-- END OF VIEW CONFIGURATION DATA -->
 
     <!-- I18NS -->
     <i18n locale="sk">
-        <i18nString name="filter_autocomplete_selection">Zvoľte nový filter</i18nString>
-        <i18nString name="update_filter">Aktualizovať zobrazenie s vybraným filtrom</i18nString>
-        <i18nString name="filter_update_title">Filter</i18nString>
-        <i18nString name="filter_header">Súčasný filter</i18nString>
-        <i18nString name="view_configuration_type">Vybrať zobrazenie</i18nString>
+        <i18nString name="view_configuration_type">Zobrazenie</i18nString>
         <i18nString name="settings">Nastavenie</i18nString>
-        <i18nString name="associated_view">Asociované zobrazenie</i18nString>
-        <i18nString name="view_header">Tiketové zobrazenie</i18nString>
+        <i18nString name="next_view_settings">Ďalšie zobrazenie</i18nString>
     </i18n>
     <i18n locale="de">
-        <i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
-        <i18nString name="filter_update_title">Filter</i18nString>
-        <i18nString name="filter_header">Aktueller Filter</i18nString>
-        <i18nString name="update_filter">Aktualisiere die Ansicht mit dem ausgewählten Filter</i18nString>
-        <i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
+        <i18nString name="view_configuration_type">Der Ansichtstyp</i18nString>
         <i18nString name="settings">Einstellungen</i18nString>
-        <i18nString name="associated_view">zugehörige Ansicht</i18nString>
-        <i18nString name="view_header">Ticketansicht</i18nString>
+        <i18nString name="next_view_settings">Nächste Ansicht</i18nString>
     </i18n>
 
     <transition>
@@ -261,12 +129,32 @@
         <y>208</y>
         <label>initialize [await sync]</label>
         <icon>hourglass_empty</icon>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <event type="finish">
+            <id>finish</id>
+            <actions phase="post">
+                <action>
+                    initializeAdvancedForm()
+                </action>
+            </actions>
+        </event>
     </transition>
     <transition>
         <id>data_sync</id>
         <x>368</x>
         <y>328</y>
         <label>Data sync</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>settings</id>
@@ -278,37 +166,20 @@
             <id>admin</id>
             <logic>
                 <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
                 <view>true</view>
-                <cancel>true</cancel>
-                <assign>true</assign>
             </logic>
         </roleRef>
         <dataGroup>
-            <id>form_title</id>
+            <id>settings_0</id>
             <cols>4</cols>
             <layout>grid</layout>
             <dataRef>
-                <id>view_header</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>associated_view</id>
-            <cols>4</cols>
-            <layout>grid</layout>
-            <title name="associated_view">Associated view</title>
-            <dataRef>
-                <id>view_configuration_type</id>
+                <id>advanced_content_form</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -321,33 +192,54 @@
                     <template>material</template>
                     <appearance>outline</appearance>
                 </layout>
-                <event type="set">
-                    <id>0</id>
-                    <actions phase="post">
-                        <action>
-                            view_configuration_type: f.view_configuration_type,
-                            view_configuration_form: f.view_configuration_form,
-                            view_configuration_id: f.view_configuration_id;
-
-                            if (view_configuration_id.value != null &amp;&amp; !view_configuration_id.value.isEmpty()) {
-                                workflowService.deleteCase(view_configuration_id.value[0])
-                            }
-
-                            if (view_configuration_type.value == null || view_configuration_type.value == "") {
-                                change view_configuration_id value { [] }
-                                change view_configuration_form value { [] }
-                                return
-                            }
-
-                            def configurationCase = createCase(view_configuration_type.value + "_configuration")
-                            def initTask = assignTask("initialize", configurationCase)
-                            finishTask(initTask)
-                            change view_configuration_id value { [configurationCase.stringId] }
-                            configurationCase = workflowService.findOne(configurationCase.stringId)
-                            change view_configuration_form value { [configurationCase.tasks.find { it.transition == "settings" }.task] }
-                        </action>
-                    </actions>
-                </event>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>assign_0</id>
+            <title/>
+        </event>
+        <event type="finish">
+            <id>finish_0</id>
+            <title/>
+        </event>
+    </transition>
+    <transition>
+        <id>next_view_settings</id>
+        <x>400</x>
+        <y>48</y>
+        <label name="next_view_settings">Next view</label>
+        <icon>queue_play_next</icon>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>associated_view</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>view_configuration_type</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>view_configuration_form</id>
@@ -360,6 +252,67 @@
                     <rows>1</rows>
                     <cols>4</cols>
                     <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>assign</id>
+            <title/>
+        </event>
+        <event type="cancel">
+            <id>cancel</id>
+            <title/>
+        </event>
+        <event type="finish">
+            <id>finish_0</id>
+            <title/>
+        </event>
+        <event type="delegate">
+            <id>delegate</id>
+            <title/>
+        </event>
+    </transition>
+    <transition>
+        <id>all_menu_data</id>
+        <x>10</x>
+        <y>10</y>
+        <label>All menu data</label>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>all_menu_data_0</id>
+            <cols>1</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>view_configuration_type</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>view_configuration_all_data_form</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
                     <template>material</template>
                     <appearance>outline</appearance>
                 </layout>
@@ -401,6 +354,13 @@
         <type>regular</type>
         <sourceId>initialize</sourceId>
         <destinationId>initialized</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a4</id>
+        <type>read</type>
+        <sourceId>initialized</sourceId>
+        <destinationId>next_view_settings</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>

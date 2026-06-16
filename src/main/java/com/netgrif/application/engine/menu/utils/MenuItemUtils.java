@@ -1,9 +1,10 @@
 package com.netgrif.application.engine.menu.utils;
 
 import com.netgrif.application.engine.menu.domain.MenuItemConstants;
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.TaskPair;
-import com.netgrif.application.engine.menu.services.interfaces.IMenuItemService;
+import com.netgrif.application.engine.menu.service.interfaces.IMenuItemService;
 
 import java.text.Normalizer;
 import java.util.List;
@@ -27,6 +28,33 @@ public class MenuItemUtils {
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
                 .replaceAll("[\\W-]+", "-")
                 .toLowerCase();
+    }
+
+    /**
+     * Sanitizes each segment of a URI path by removing diacritical marks, replacing special characters with
+     * delimiters, and converting to lowercase. The URI is split by the separator defined in the provided
+     * {@link IUriService}, each segment is sanitized individually, and then the segments are concatenated back
+     * together.
+     *
+     * @param uri the URI string to be sanitized
+     * @param uriService the service providing the URI separator configuration
+     *
+     * @return sanitized URI string with all segments processed, or null if input URI is null
+     * */
+    public static String sanitizeUriSegments(String uri, IUriService uriService) {
+        if (uri == null) {
+            return null;
+        }
+        String[] uriSegments = uri.split(uriService.getUriSeparator());
+        if (uriSegments.length == 0) {
+            return uriService.getRoot().getUriPath();
+        }
+        StringBuilder sanitizedUriBuilder = new StringBuilder();
+        for (String uriSegment : uriSegments) {
+            sanitizedUriBuilder.append(uriService.getUriSeparator());
+            sanitizedUriBuilder.append(MenuItemUtils.sanitize(uriSegment));
+        }
+        return sanitizedUriBuilder.toString().replaceAll("//", uriService.getUriSeparator());
     }
 
     /**
@@ -64,7 +92,7 @@ public class MenuItemUtils {
      * */
     public static boolean isCyclicNodePath(Case folderItem, String destUri) {
         String oldNodePath = (String) folderItem.getFieldValue(MenuItemConstants.FIELD_NODE_PATH);
-        return destUri.contains(oldNodePath);
+        return oldNodePath != null && destUri.contains(oldNodePath);
     }
 
     /**

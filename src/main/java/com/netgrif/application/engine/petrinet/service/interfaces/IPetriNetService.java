@@ -15,6 +15,7 @@ import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetImport
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.querydsl.core.types.Predicate;
 import org.bson.types.ObjectId;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
@@ -90,6 +91,14 @@ public interface IPetriNetService {
     List<DataFieldReference> getDataFieldReferences(List<TransitionReference> transitions, Locale locale);
 
     Page<PetriNetReference> search(PetriNetSearch criteria, LoggedUser user, Pageable pageable, Locale locale);
+
+    Page<PetriNet> search(Predicate predicate, Pageable pageable);
+
+    PetriNet searchOne(Predicate predicate);
+
+    long count(Predicate predicate);
+
+    boolean exists(Predicate predicate);
 
     Optional<PetriNet> findByImportId(String id);
 

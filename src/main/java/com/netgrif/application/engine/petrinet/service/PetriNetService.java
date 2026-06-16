@@ -36,6 +36,9 @@ import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
@@ -594,6 +597,42 @@ public class PetriNetService implements IPetriNetService {
         return new PageImpl<>(nets.stream().map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()), pageable, mongoTemplate.count(queryTotal, PetriNet.class));
     }
 
+    @Override
+    public Page<PetriNet> search(Predicate predicate, Pageable pageable) {
+        if (predicate == null) {
+            return Page.empty();
+        }
+        if (pageable == null) {
+            pageable = Pageable.unpaged();
+        }
+        return repository.findAll(predicate, pageable);
+    }
+
+    @Override
+    public PetriNet searchOne(Predicate predicate) {
+        Page<PetriNet> processAsPage = search(predicate, PageRequest.of(0, 1));
+        if (processAsPage.getTotalElements() > 0) {
+            return processAsPage.getContent().get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public long count(Predicate predicate) {
+        if (predicate == null) {
+            return 0;
+        }
+        return repository.count(predicate);
+    }
+
+    @Override
+    public boolean exists(Predicate predicate) {
+        if (predicate == null) {
+            return false;
+        }
+        return repository.exists(predicate);
+    }
+
     private void addValueCriteria(Query query, Query queryTotal, Criteria criteria) {
         query.addCriteria(criteria);
         queryTotal.addCriteria(criteria);
@@ -603,7 +642,7 @@ public class PetriNetService implements IPetriNetService {
     @Transactional
     public void deletePetriNet(String processId, LoggedUser loggedUser) {
         Optional<PetriNet> petriNetOptional = repository.findById(processId);
-        if (!petriNetOptional.isPresent()) {
+        if (petriNetOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find process with id [" + processId + "]");
         }
 

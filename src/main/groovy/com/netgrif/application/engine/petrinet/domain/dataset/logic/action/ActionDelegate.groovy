@@ -29,14 +29,14 @@ import com.netgrif.application.engine.mail.interfaces.IMailService
 import com.netgrif.application.engine.menu.domain.FilterBody
 import com.netgrif.application.engine.menu.domain.MenuItemBody
 import com.netgrif.application.engine.menu.domain.MenuItemConstants
-import com.netgrif.application.engine.menu.domain.configurations.TabbedCaseViewBody
-import com.netgrif.application.engine.menu.domain.configurations.TabbedTaskViewBody
+import com.netgrif.application.engine.menu.domain.configurations.CaseViewBody
+import com.netgrif.application.engine.menu.domain.configurations.TaskViewBody
 import com.netgrif.application.engine.menu.domain.configurations.ViewBody
 import com.netgrif.application.engine.menu.domain.dashboard.DashboardItemBody
 import com.netgrif.application.engine.menu.domain.dashboard.DashboardManagementBody
-import com.netgrif.application.engine.menu.services.interfaces.DashboardItemService
-import com.netgrif.application.engine.menu.services.interfaces.DashboardManagementService
-import com.netgrif.application.engine.menu.services.interfaces.IMenuItemService
+import com.netgrif.application.engine.menu.service.interfaces.DashboardItemService
+import com.netgrif.application.engine.menu.service.interfaces.DashboardManagementService
+import com.netgrif.application.engine.menu.service.interfaces.IMenuItemService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
@@ -51,16 +51,13 @@ import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
+import com.netgrif.application.engine.pfql.service.IResourceSearchService
+import com.netgrif.application.engine.pfql.service.ISearchService
+import com.netgrif.application.engine.pfql.service.utils.SearchUtils
 import com.netgrif.application.engine.rules.domain.RuleRepository
-import com.netgrif.application.engine.startup.DefaultFiltersRunner
-import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
-import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.DataField
-import com.netgrif.application.engine.workflow.domain.QCase
-import com.netgrif.application.engine.workflow.domain.QTask
-import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.*
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome
@@ -92,7 +89,6 @@ import org.springframework.data.domain.Pageable
 import java.nio.file.Files
 import java.time.ZoneId
 import java.util.stream.Collectors
-
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -170,16 +166,7 @@ class ActionDelegate {
     Scheduler scheduler
 
     @Autowired
-    IUserFilterSearchService filterSearchService
-
-    @Autowired
     IConfigurableMenuService configurableMenuService
-
-    @Autowired
-    IMenuImportExportService menuImportExportService
-
-    @Autowired
-    IFilterImportExportService filterImportExportService
 
     @Autowired
     IExportService exportService
@@ -216,6 +203,21 @@ class ActionDelegate {
 
     @Autowired
     IStorageResolverService storageResolver
+
+    @Autowired
+    ISearchService searchService
+
+    @Autowired
+    IResourceSearchService<Case> caseSearchService
+
+    @Autowired
+    IResourceSearchService<Task> taskSearchService
+
+    @Autowired
+    IResourceSearchService<PetriNet> processSearchService
+
+    @Autowired
+    IResourceSearchService<IUser> userSearchService
 
     FrontendActionOutcome Frontend
 
@@ -1951,25 +1953,6 @@ class ActionDelegate {
         return new DynamicValidation(rule, message)
     }
 
-    List<Case> findFilters(String userInput) {
-        return filterSearchService.autocompleteFindFilters(userInput)
-    }
-
-    List<Case> findAllFilters() {
-        return filterSearchService.autocompleteFindFilters("")
-    }
-
-    FileFieldValue exportFilters(Collection<String> filtersToExport) {
-        if (filtersToExport.isEmpty()) {
-            return null
-        }
-        return filterImportExportService.exportFiltersToFile(filtersToExport)
-    }
-
-    List<String> importFilters() {
-        return filterImportExportService.importFilters()
-    }
-
     File exportCasesToFile(Closure<Predicate> predicate, String pathName, ExportDataConfig config = null,
                            int pageSize = exportConfiguration.getMongoPageSize()) {
         File exportFile = new File(pathName)
@@ -2112,295 +2095,6 @@ class ActionDelegate {
         return findTasksElastic(requests, loggedUser, page, pageSize, locale, isIntersection)
     }
 
-    List<Case> findDefaultFilters() {
-        if (!createDefaultFilters) {
-            return []
-        }
-        return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.id.eq(userService.system.stringId)) })
-    }
-
-    /**
-     * Creates filter instance of type {@value DefaultFiltersRunner#FILTER_TYPE_CASE}
-     *
-     * @param title filter case title
-     * @param query elastic query for the view
-     * @param icon filter case icon
-     * @param allowedNets List of process identifiers
-     * @param visibility Possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
-     *
-     * @return created {@link Case} instance of filter
-     */
-    @NamedVariant
-    Case createCaseFilter(def title, String query, List<String> allowedNets,
-                          String icon = "", String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, def filterMetadata = null) {
-        return createFilter(title, query, DefaultFiltersRunner.FILTER_TYPE_CASE, allowedNets, icon, visibility, filterMetadata)
-    }
-
-    /**
-     * Creates filter instance of type {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
-     *
-     * @param title filter case title
-     * @param query elastic query for the view
-     * @param icon filter case icon
-     * @param allowedNets List of process identifiers
-     * @param visibility Possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
-     *
-     * @return created {@link Case} instance of filter
-     */
-    @NamedVariant
-    Case createTaskFilter(def title, String query, List<String> allowedNets,
-                          String icon = "", String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, def filterMetadata = null) {
-        return createFilter(title, query, DefaultFiltersRunner.FILTER_TYPE_TASK, allowedNets, icon, visibility, filterMetadata)
-    }
-
-    /**
-     * Creates filter instance.
-     *
-     * @param title filter case title
-     * @param query elastic query for the view
-     * @param type Filter type. Possible values: {@value DefaultFiltersRunner#FILTER_TYPE_CASE} or {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
-     * @param icon filter case icon
-     * @param allowedNets List of process identifiers
-     * @param visibility Possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
-     *
-     * @return created {@link Case} instance of filter
-     */
-    @NamedVariant
-    Case createFilter(def title, String query, String type, List<String> allowedNets,
-                      String icon, String visibility, def filterMetadata) {
-        FilterBody body = new FilterBody()
-        body.setTitle((title instanceof I18nString) ? title : new I18nString(title as String))
-        body.setQuery(query)
-        body.setType(type)
-        body.setAllowedNets(allowedNets)
-        body.setIcon(icon)
-        body.setVisibility(visibility)
-        body.setMetadata(filterMetadata)
-        return menuItemService.createFilter(body)
-    }
-
-    /**
-     * Changes data of provided filter instance. These attributes can be changed:
-     * <ul>
-     * <li> <code>changeFilter filter query { "processIdentifier:"my_process_id" }</code>
-     * <li> <code>changeFilter filter visibility { "private" }</code>
-     * <li> <code>changeFilter filter allowedNets { ["my_process_id1","my_process_id2"] }</code>
-     * <li> <pre>changeFilter filter filterMetadata { [
-     "searchCategories"       : [],
-     "predicateMetadata"      : [],
-     "filterType"             : "Case",
-     "defaultSearchCategories": true,
-     "inheritAllowedNets"     : false
-     ] }</pre>
-     * <li> <code>changeFilter filter title { new I18nString("New title") }</code>
-     * <li> <code>changeFilter filter title { "New title" }</code>
-     * <li> <code>changeFilter filter icon { "filter_alt" }</code>
-     * <li> <code>changeFilter filter uri { "/my_node1/my_node2" }</code>
-     * </ul>
-     * @param filter {@link Case} instance of filter
-     */
-    def changeFilter(Case filter) {
-        [query         : { cl ->
-            updateFilter(filter, [
-                    (DefaultFiltersRunner.FILTER_FIELD_ID): [
-                            "type" : "enumeration_map",
-                            "value": cl() as String
-                    ]
-            ])
-        },
-         visibility    : { cl ->
-             updateFilter(filter, [
-                     (DefaultFiltersRunner.FILTER_VISIBILITY_FIELD_ID): [
-                             "type" : "enumeration_map",
-                             "value": cl() as String
-                     ]
-             ])
-         },
-         title         : { cl ->
-             filter = workflowService.findOne(filter.stringId)
-             def value = cl()
-             filter.setTitle(value as String)
-             filter.dataSet[DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID].value = (value instanceof I18nString) ? value : new I18nString(value as String)
-             workflowService.save(filter)
-         },
-         icon          : { cl ->
-             filter = workflowService.findOne(filter.stringId)
-             def icon = cl() as String
-             filter.setIcon(icon)
-             workflowService.save(filter)
-         },
-         uri           : { cl ->
-             filter = workflowService.findOne(filter.stringId)
-             def uri = cl() as String
-             filter.setUriNodeId(uriService.findByUri(uri).stringId)
-             workflowService.save(filter)
-         }]
-    }
-
-    /**
-     * deletes filter instance
-     * Note: do not call this method if given instance is referenced in any menu_item instance
-     * @param filter
-     * @return
-     */
-    def deleteFilter(Case filter) {
-        workflowService.deleteCase(filter.stringId)
-    }
-
-    /**
-     * create menu item for given filter instance
-     * @param uri
-     * @param identifier - unique item identifier
-     * @param filter
-     * @param groupName
-     * @param allowedRoles ["role_import_id": "net_import_id"]
-     * @param bannedRoles ["role_import_id": "net_import_id"]
-     * @return
-     */
-    @Deprecated
-    Case createMenuItem(String uri, String identifier, Case filter, String groupName, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
-        MenuItemBody body = new MenuItemBody(
-                uri,
-                identifier,
-                filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
-                null
-        )
-        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
-        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
-        body.setUseCustomView(false)
-        body.setUseTabbedView(true)
-
-        body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
-
-        return menuItemService.createMenuItem(body)
-    }
-
-    /**
-     * create menu item for given filter instance
-     * @param uri
-     * @param identifier - unique item identifier
-     * @param filter
-     * @param groupName
-     * @param allowedRoles
-     * @param bannedRoles
-     * @return
-     */
-    @Deprecated
-    Case createMenuItem(String uri, String identifier, Case filter, String groupName, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
-        MenuItemBody body = new MenuItemBody(
-                uri,
-                identifier,
-                filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
-                null
-        )
-
-        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
-        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
-        body.setUseCustomView(false)
-        body.setUseTabbedView(true)
-
-        body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
-
-        return menuItemService.createMenuItem(body)
-    }
-
-    /**
-     * create menu item for given filter instance
-     * @param uri
-     * @param identifier - unique item identifier
-     * @param filter
-     * @param groupName
-     * @param allowedRoles ["role_import_id": "net_import_id"]
-     * @param bannedRoles ["role_import_id": "net_import_id"]
-     * @param group - if null, default group is used
-     * @return
-     */
-    @Deprecated
-    Case createMenuItem(String uri, String identifier, Case filter, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], Case group = null, List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
-        MenuItemBody body = new MenuItemBody(
-                uri,
-                identifier,
-                filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
-                null
-        )
-
-        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
-        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
-        body.setUseCustomView(false)
-        body.setUseTabbedView(true)
-
-        body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
-
-        return menuItemService.createMenuItem(body)
-    }
-
-    /**
-     * create menu item for given filter instance
-     * @param uri
-     * @param identifier - unique item identifier
-     * @param filter
-     * @param allowedRoles
-     * @param bannedRoles
-     * @param group - if null, default group is used
-     * @return
-     */
-    @Deprecated
-    Case createMenuItem(String uri, String identifier, Case filter, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], Case group = null, List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
-        MenuItemBody body = new MenuItemBody(
-                uri,
-                identifier,
-                filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
-                null
-        )
-
-        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
-        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
-        body.setUseCustomView(false)
-        body.setUseTabbedView(true)
-
-        body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
-
-        return menuItemService.createMenuItem(body)
-    }
-
-    /**
-     * Creates item in menu with given parameters
-     *
-     * @param uri resource where the item is located in
-     * @param identifier unique identifier of item
-     * @param name displayed label in menu and tab
-     * @param icon displayed icon in menu and tab
-     * @param filter Case instance of filter.xml
-     * @param allowedRoles Map of roles, which have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param bannedRoles Map of roles, which don't have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param caseDefaultHeaders List of headers displayed in case view
-     * @param taskDefaultHeaders List of headers displayed in task view
-     *
-     * @return created Case of menu_item
-     * */
-    @NamedVariant
-    Case createMenuItem(String uri, String identifier, def name, String icon = "filter_none", Case filter = null,
-                        Map<String, String> allowedRoles = [:], Map<String, String> bannedRoles = [:],
-                        List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
-        MenuItemBody body = new MenuItemBody(
-                uri,
-                identifier,
-                (name instanceof I18nString) ? name : new I18nString(name as String),
-                icon
-        )
-
-        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
-        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
-        body.setUseCustomView(false)
-        body.setUseTabbedView(true)
-
-        body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
-
-        return menuItemService.createMenuItem(body)
-    }
-
     /**
      * Changes data of provided menu_item instance. These attributes can be changed:
      * <ul>
@@ -2432,31 +2126,31 @@ class ActionDelegate {
          title             : { cl ->
              def value = cl()
              I18nString newName = (value instanceof I18nString) ? value : new I18nString(value as String)
-             setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
+             setData(MenuItemConstants.TRANS_SYNC_ID, item, [
                      (MenuItemConstants.FIELD_MENU_NAME): ["type": "i18n", "value": newName]
              ])
          },
          menuIcon          : { cl ->
              def value = cl()
-             setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
+             setData(MenuItemConstants.TRANS_SYNC_ID, item, [
                      (MenuItemConstants.FIELD_MENU_ICON): ["type": "text", "value": value]
              ])
          },
          tabIcon           : { cl ->
              def value = cl()
-             setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
+             setData(MenuItemConstants.TRANS_SYNC_ID, item, [
                      (MenuItemConstants.FIELD_TAB_ICON): ["type": "text", "value": value]
              ])
          },
          useCustomView     : { cl ->
              def value = cl()
-             setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
+             setData(MenuItemConstants.TRANS_SYNC_ID, item, [
                      (MenuItemConstants.FIELD_USE_CUSTOM_VIEW): ["type": "boolean", "value": value]
              ])
          },
          customViewSelector: { cl ->
              def value = cl()
-             setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
+             setData(MenuItemConstants.TRANS_SYNC_ID, item, [
                      (MenuItemConstants.FIELD_CUSTOM_VIEW_SELECTOR): ["type": "text", "value": value]
              ])
          }]
@@ -2486,176 +2180,25 @@ class ActionDelegate {
         }
     }
 
-    /**
-     * simplifies the process of creating a filter, menu item
-     * @param uri
-     * @param identifier - unique identifier of menu item
-     * @param title
-     * @param query
-     * @param icon
-     * @param type - "Case" or "Task"
-     * @param allowedNets
-     * @param groupName - name of group to add menu item to
-     * @param allowedRoles
-     * @param bannedRoles
-     * @param visibility - "private" or "public"
-     * @return
-     */
-    @Deprecated
-    Case createFilterInMenu(String uri, String identifier, def title, String query, String type,
-                            List<String> allowedNets,
-                            String groupName,
-                            Map<String, String> allowedRoles = [:],
-                            Map<String, String> bannedRoles = [:],
-                            List<String> defaultHeaders = [],
-                            String icon = "",
-                            String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE) {
-        FilterBody filterBody = new FilterBody()
-        filterBody.setTitle((title instanceof I18nString) ? title : new I18nString(title as String))
-        filterBody.setQuery(query)
-        filterBody.setType(type)
-        filterBody.setAllowedNets(allowedNets)
-        filterBody.setIcon(icon)
-        filterBody.setVisibility(visibility)
-        Case filter = menuItemService.createFilter(filterBody)
-        Case menuItem = createMenuItem(uri, identifier, filter, groupName, allowedRoles, bannedRoles, defaultHeaders)
-        return menuItem
-    }
-
-    /**
-     * simplifies the process of creating a filter, menu item
-     * @param uri
-     * @param identifier - unique identifier of menu item
-     * @param title
-     * @param query
-     * @param icon
-     * @param type - "Case" or "Task"
-     * @param allowedNets
-     * @param allowedRoles
-     * @param bannedRoles
-     * @param visibility - "private" or "public"
-     * @param orgGroup - group to add item to, if null default group is used
-     * @return
-     */
-    @Deprecated
-    Case createFilterInMenu(String uri, String identifier, def title, String query, String type, List<String> allowedNets,
-                            Map<String, String> allowedRoles = [:],
-                            Map<String, String> bannedRoles = [:],
-                            List<String> defaultHeaders,
-                            String icon = "",
-                            String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE,
-                            Case orgGroup = null) {
-        FilterBody filterBody = new FilterBody()
-        filterBody.setTitle((title instanceof I18nString) ? title : new I18nString(title as String))
-        filterBody.setQuery(query)
-        filterBody.setType(type)
-        filterBody.setAllowedNets(allowedNets)
-        filterBody.setIcon(icon)
-        filterBody.setVisibility(visibility)
-        Case filter = menuItemService.createFilter(filterBody)
-        Case menuItem = createMenuItem(uri, identifier, filter, allowedRoles, bannedRoles, orgGroup, defaultHeaders)
-        return menuItem
-    }
-
-    /**
-     * Creates filter and menu_item instances with given parameters.
-     *
-     * @param uri resource where the item is located in
-     * @param itemIdentifier unique identifier of item
-     * @param itemAndFilterName displayed label in menu and tab
-     * @param filterQuery elastic query for filter
-     * @param filterType type of filter. Possible values: {@value DefaultFiltersRunner#FILTER_TYPE_CASE} or
-     * {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
-     * @param filterVisibility possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or
-     * {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
-     * @param filterAllowedNets List of allowed nets. Element of list is process identifier
-     * @param itemAndFilterIcon displayed icon in menu and tab
-     * @param itemAllowedRoles Map of roles, which have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param itemBannedRoles Map of roles, which don't have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param itemCaseDefaultHeaders List of headers displayed in case view
-     * @param itemTaskDefaultHeaders List of headers displayed in task view
-     *
-     * @return created {@link Case} instance of menu_item
-     * */
-    @NamedVariant
-    Case createFilterInMenu(String uri, String itemIdentifier, def itemAndFilterName, String filterQuery,
-                            String filterType, String filterVisibility, List<String> filterAllowedNets = [],
-                            String itemAndFilterIcon = "filter_none", Map<String, String> itemAllowedRoles = [:],
-                            Map<String, String> itemBannedRoles = [:], List<String> itemCaseDefaultHeaders = [],
-                            List<String> itemTaskDefaultHeaders = [], def filterMetadata = null) {
-        FilterBody filterBody = new FilterBody()
-        filterBody.setTitle((itemAndFilterName instanceof I18nString) ? itemAndFilterName : new I18nString(itemAndFilterName as String))
-        filterBody.setQuery(filterQuery)
-        filterBody.setType(filterType)
-        filterBody.setAllowedNets(filterAllowedNets)
-        filterBody.setIcon(itemAndFilterIcon)
-        filterBody.setVisibility(filterVisibility)
-        filterBody.setMetadata(filterMetadata as Map<String, Object>)
-        Case filter = menuItemService.createFilter(filterBody)
-        Case menuItem = createMenuItem(uri, itemIdentifier, itemAndFilterName, itemAndFilterIcon, filter, itemAllowedRoles,
-                itemBannedRoles, itemCaseDefaultHeaders, itemTaskDefaultHeaders)
-        return menuItem
-    }
-
-    /**
-     * Creates filter and menu_item instances with given parameters.
-     *
-     * @param body configuration class for menu item creation
-     * @param filterQuery elastic query for filter
-     * @param filterType type of filter. Possible values: {@value DefaultFiltersRunner#FILTER_TYPE_CASE} or
-     * {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
-     * @param filterVisibility possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or
-     * {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
-     * @param filterAllowedNets List of allowed nets. Element of list is process identifier
-     *
-     * @return created {@link Case} instance of menu_item
-     * */
-    Case createFilterInMenu(MenuItemBody body, String filterQuery, String filterType, String filterVisibility,
-                            List<String> filterAllowedNets = [], def filterMetadata = null) {
-        FilterBody filterBody = new FilterBody()
-        filterBody.setTitle(body.menuName)
-        filterBody.setQuery(filterQuery)
-        filterBody.setType(filterType)
-        filterBody.setAllowedNets(filterAllowedNets)
-        filterBody.setIcon(body.menuIcon)
-        filterBody.setVisibility(filterVisibility)
-        filterBody.setMetadata(filterMetadata as Map<String, Object>)
-
-        body.setView(createLegacyMenuItemViews(filterBody))
-        body.setUseTabbedView(true)
-
-        Case menuItem = createMenuItem(body)
-        return menuItem
-    }
-
     Case createMenuItem(MenuItemBody body) {
         return menuItemService.createMenuItem(body)
-    }
-
-    protected ViewBody createLegacyMenuItemViews(Case filterCase, List<String> caseDefaultHeaders = null,
-                                                 List<String> taskDefaultHeaders = null) {
-        FilterBody body = new FilterBody(filterCase)
-        body.setType((String) filterCase?.getFieldValue("filter_type"))
-        return createLegacyMenuItemViews(body, caseDefaultHeaders, taskDefaultHeaders)
     }
 
     protected ViewBody createLegacyMenuItemViews(FilterBody filterBody, List<String> caseDefaultHeaders = null,
                                                  List<String> taskDefaultHeaders = null) {
         if (filterBody.getType() == "Case") {
-            ViewBody caseView = new TabbedCaseViewBody()
+            ViewBody caseView = new CaseViewBody()
             caseView.setFilterBody(filterBody)
             caseView.setDefaultHeaders(caseDefaultHeaders)
             caseView.setRequireTitleInCreation(true)
 
-            ViewBody taskView = new TabbedTaskViewBody()
+            ViewBody taskView = new TaskViewBody()
             taskView.setDefaultHeaders(taskDefaultHeaders)
             caseView.setChainedView(taskView)
 
             return caseView
         } else if (filterBody.getType() == "Task") {
-            ViewBody taskView = new TabbedTaskViewBody()
+            ViewBody taskView = new TaskViewBody()
             taskView.setFilterBody(filterBody)
             taskView.setDefaultHeaders(taskDefaultHeaders)
             return taskView
@@ -2691,17 +2234,6 @@ class ActionDelegate {
      * */
     Case duplicateMenuItem(Case originItem, I18nString newTitle, String newIdentifier) {
         return menuItemService.duplicateItem(originItem, newTitle, newIdentifier)
-    }
-
-    /**
-     * Finds filter by name
-     *
-     * @param name Title of the filter
-     *
-     * @return found filter instance. Can be null
-     */
-    Case findFilter(String name) {
-        return findCaseElastic("processIdentifier:$FilterRunner.FILTER_PETRI_NET_IDENTIFIER AND title.keyword:\"$name\"" as String)
     }
 
     /**
@@ -2877,155 +2409,8 @@ class ActionDelegate {
         } as Map<String, I18nString>
     }
 
-    private void updateFilter(Case filter, Map dataSet) {
-        setData(DefaultFiltersRunner.DETAILS_TRANSITION, filter, dataSet)
-    }
-
     I18nString i18n(String value, Map<String, String> translations) {
         return new I18nString(value, translations)
-    }
-
-    @Deprecated
-    Map<String, Case> createMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles, Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
-        if (existsMenuItem(id)) {
-            log.info("$id menu exists")
-            return null
-        }
-        Case filter = createCaseFilter(title, query, allowedNets, icon, DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE)
-        Case menu = createMenuItem(uri, id, filter, roles, bannedRoles, group, defaultHeaders)
-        return [
-                "filter"  : filter,
-                "menuItem": menu
-        ]
-    }
-
-    @Deprecated
-    Map<String, Case> createTaskMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles, Case group = null, List<String> defaultHeaders = []) {
-        if (existsMenuItem(id)) {
-            log.info("$id menu exists")
-            return null
-        }
-        Case filter = createTaskFilter(title, query, allowedNets, icon, DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE)
-        Case menu = createMenuItem(uri, id, filter, roles, [:], group, defaultHeaders)
-        return [
-                "filter"  : filter,
-                "menuItem": menu
-        ]
-    }
-
-    @Deprecated
-    Case createOrUpdateCaseMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles = [:], Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
-        return createOrUpdateMenuItemAndFilter(uri, id, title, query, DefaultFiltersRunner.FILTER_TYPE_CASE,
-                DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, allowedNets, icon, roles, bannedRoles, defaultHeaders)
-    }
-
-    @Deprecated
-    Case createOrUpdateTaskMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles = [:], Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
-        return createOrUpdateMenuItemAndFilter(uri, id, title, query, DefaultFiltersRunner.FILTER_TYPE_TASK,
-                DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, allowedNets, icon, roles, bannedRoles, defaultHeaders)
-    }
-
-    @Deprecated
-    Case createOrUpdateMenuItem(String id, String uri, String type, String query, String icon, String title, List<String> allowedNets,
-                                Map<String, String> roles = [:], Map<String, String> bannedRoles = [:], Case group = null,
-                                List<String> defaultHeaders = []) {
-        MenuItemBody body = new MenuItemBody(uri, id, title, icon)
-        body.setAllowedRoles(collectRolesForPreferenceItem(roles))
-        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
-        body.setUseTabbedView(true)
-
-        FilterBody filterBody = new FilterBody()
-        filterBody.setTitle(new I18nString(title as String))
-        filterBody.setQuery(query)
-        filterBody.setType(type)
-        filterBody.setAllowedNets(allowedNets)
-        filterBody.setIcon(icon)
-        filterBody.setVisibility(DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE)
-
-        body.setView(createLegacyMenuItemViews(filterBody, defaultHeaders))
-        return menuItemService.createOrUpdateMenuItem(body)
-    }
-
-    /**
-     * Creates or updates menu item with given identifier.
-     *
-     * @param uri resource where the item is located in
-     * @param identifier unique identifier of item
-     * @param name displayed label in menu and tab
-     * @param icon displayed icon in menu and tab
-     * @param filter Case instance of filter.xml
-     * @param allowedRoles Map of roles, which have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param bannedRoles Map of roles, which don't have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param caseDefaultHeaders List of headers displayed in case view
-     * @param taskDefaultHeaders List of headers displayed in task view
-     *
-     * @return created or updated menu item instance
-     * */
-    @Deprecated(since = "6.5.0")
-    Case createOrUpdateMenuItem(String uri, String identifier, def name, String icon = "filter_none", Case filter = null,
-                                Map<String, String> allowedRoles = [:], Map<String, String> bannedRoles = [:],
-                                List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
-        MenuItemBody body = new MenuItemBody(uri, identifier, name, icon)
-        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
-        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
-        body.setUseTabbedView(true)
-        if (filter == null) {
-            body.setView(createLegacyMenuItemViews(new FilterBody(null), caseDefaultHeaders, taskDefaultHeaders))
-        } else {
-            body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
-        }
-
-        return createOrUpdateMenuItem(body)
-    }
-
-    /**
-     * Creates or updates menu item with given identifier along with the filter instance. It's safe to use on existing
-     * menu item instance, that doesn't contain filter. In such case, missing filter will be created with provided
-     * parameters.
-     *
-     * @param uri resource where the item is located in
-     * @param itemIdentifier unique identifier of item
-     * @param itemAndFilterName displayed label in menu and tab
-     * @param filterQuery elastic query for filter
-     * @param filterType type of filter. Possible values: {@value DefaultFiltersRunner#FILTER_TYPE_CASE} or
-     * {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
-     * @param filterVisibility possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or
-     * {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
-     * @param filterAllowedNets List of allowed nets. Element of list is process identifier
-     * @param itemAndFilterIcon displayed icon in menu and tab
-     * @param itemAllowedRoles Map of roles, which have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param itemBannedRoles Map of roles, which don't have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param itemCaseDefaultHeaders List of headers displayed in case view
-     * @param itemTaskDefaultHeaders List of headers displayed in task view
-     *
-     * @return created or updated menu item instance along with the actual filter
-     * */
-    @Deprecated(since = "6.5.0")
-    Case createOrUpdateMenuItemAndFilter(String uri, String itemIdentifier, def itemAndFilterName, String filterQuery,
-                                         String filterType, String filterVisibility, List<String> filterAllowedNets = [],
-                                         String itemAndFilterIcon = "filter_none", Map<String, String> itemAllowedRoles = [:],
-                                         Map<String, String> itemBannedRoles = [:], List<String> itemCaseDefaultHeaders = [],
-                                         List<String> itemTaskDefaultHeaders = [], def filterMetadata = null) {
-        MenuItemBody body = new MenuItemBody(uri, itemIdentifier, itemAndFilterName, itemAndFilterIcon)
-        body.allowedRoles = collectRolesForPreferenceItem(itemAllowedRoles)
-        body.bannedRoles = collectRolesForPreferenceItem(itemBannedRoles)
-        body.setUseTabbedView(true)
-
-        FilterBody filterBody = new FilterBody()
-        filterBody.setTitle((itemAndFilterName instanceof I18nString) ? itemAndFilterName : new I18nString(itemAndFilterName as String))
-        filterBody.setQuery(filterQuery)
-        filterBody.setType(filterType)
-        filterBody.setAllowedNets(filterAllowedNets)
-        filterBody.setIcon(itemAndFilterIcon)
-        filterBody.setVisibility(filterVisibility)
-        filterBody.setMetadata(filterMetadata as Map<String, Object>)
-        body.setView(createLegacyMenuItemViews(filterBody, itemCaseDefaultHeaders, itemTaskDefaultHeaders))
-
-        return menuItemService.createOrUpdateMenuItem(body)
     }
 
     /**
@@ -3040,36 +2425,6 @@ class ActionDelegate {
     }
 
     /**
-     * Creates or updates menu item with given identifier along with the filter instance. It's safe to use on existing
-     * menu item instance, that doesn't contain filter. In such case, missing filter will be created with provided
-     * parameters.
-     *
-     * @param body data for menu item
-     * @param filterQuery elastic query for filter
-     * @param filterType type of filter. Possible values: {@value DefaultFiltersRunner#FILTER_TYPE_CASE} or
-     * {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
-     * @param filterVisibility possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or
-     * {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
-     * @param filterAllowedNets List of allowed nets. Element of list is process identifier
-     *
-     * @return created or updated menu item instance along with the actual filter
-     * */
-    @Deprecated(since = "6.5.0")
-    Case createOrUpdateMenuItemAndFilter(MenuItemBody body, String filterQuery, String filterType, String filterVisibility,
-                                         List<String> filterAllowedNets = [], def filterMetadata = null) {
-        body.setUseTabbedView(true)
-
-        FilterBody filterBody = new FilterBody()
-        filterBody.setTitle(body.getMenuName())
-        filterBody.setQuery(filterQuery)
-        filterBody.setType(filterType)
-        filterBody.setVisibility(filterVisibility)
-        body.setView(createLegacyMenuItemViews(filterBody))
-
-        return menuItemService.createOrUpdateMenuItem(body)
-    }
-
-    /**
      * Creates menu item or ignores it if already exists
      *
      * @param body configuration class for menu item
@@ -3077,30 +2432,6 @@ class ActionDelegate {
      * @return created or existing menu item instance
      * */
     Case createOrIgnoreMenuItem(MenuItemBody body) {
-        return menuItemService.createOrIgnoreMenuItem(body)
-    }
-
-    /**
-     * Creates menu item or ignores it if already exists. If existing item does not contain filter, the filter instance
-     * is created by provided parameters.
-     *
-     * @param body configuration class for menu item
-     *
-     * @return created or existing menu item instance
-     * */
-    @Deprecated(since = "6.5.0")
-    Case createOrIgnoreMenuItemAndFilter(MenuItemBody body, String filterQuery, String filterType, String filterVisibility,
-                                         List<String> filterAllowedNets = [], def filterMetadata = null) {
-        body.setUseTabbedView(true)
-
-        FilterBody filterBody = new FilterBody()
-        filterBody.setTitle(body.getMenuName())
-        filterBody.setQuery(filterQuery)
-        filterBody.setType(filterType)
-        filterBody.setVisibility(filterVisibility)
-
-        body.setView(createLegacyMenuItemViews(filterBody))
-
         return menuItemService.createOrIgnoreMenuItem(body)
     }
 
@@ -3197,5 +2528,477 @@ class ActionDelegate {
         InputStream xmlStream = new ByteArrayInputStream(xmlText.bytes)
         def outcome = petriNetService.importPetriNet(xmlStream, loggedUser().transformToLoggedUser())
         return outcome.getNet()
+    }
+
+    /**
+     * Searches for a single {@link Case} matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code case} (singular).
+     * </p>
+     * Example:
+     * <pre>
+     *     searchCase("case: processIdentifier eq 'query_test' and data.number_0.value == 3")
+     *     searchCase("case: id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     *     searchCase("id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code case:}
+     * @return matching {@link Case} or {@code null} if none is found
+     */
+    Case searchCase(String query) {
+        query = SearchUtils.ensureStartsWithCase(query)
+        return caseSearchService.searchOne(query)
+    }
+
+    /**
+     * Searches for all {@link Case} instances matching the given query and returns a paged result.
+     * <p>
+     * The query must start with the resource keyword {@code cases} (plural) and may contain
+     * paging and sorting clauses.
+     * </p>
+     * Example:
+     * <pre>
+     *     pagedSearchCases("cases: processIdentifier eq 'query_test' page 1 size 5 sort by title desc")
+     *     pagedSearchCases("cases: author eq 'user@mail.com' and creationDate gt 2020-03-03")
+     *     pagedSearchCases("author eq 'user@mail.com' and creationDate gt 2020-03-03")
+     * </pre>
+     *
+     * @param query query language string starting with {@code cases:}
+     * @return {@link Page} of matching cases
+     */
+    Page<Case> pagedSearchCases(String query) {
+        query = SearchUtils.ensureStartsWithCases(query)
+        return caseSearchService.searchAll(query)
+    }
+
+    /**
+     * Searches for all {@link Case} instances matching the given query and returns them as a list.
+     * <p>
+     * The query must start with the resource keyword {@code cases} (plural). This is a convenience
+     * method returning only the content of {@link #pagedSearchCases(String)}.
+     * </p>
+     * Example:
+     * <pre>
+     *     searchCases("cases: processIdentifier eq 'query_test' and data.boolean_0.value == true")
+     *     searchCases("cases: title contains 'Test' sort by creationDate desc")
+     *     searchCases("title contains 'Test' sort by creationDate desc")
+     * </pre>
+     *
+     * @param query query language string starting with {@code cases:}
+     * @return list of matching cases
+     */
+    List<Case> searchCases(String query) {
+        return pagedSearchCases(query).content
+    }
+
+    /**
+     * Counts the number of {@link Case} instances matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code cases} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     countCases("cases: processIdentifier eq 'query_test'")
+     *     countCases("cases: data.boolean_0.value == true and data.text_0.value != '4'")
+     *     countCases("data.boolean_0.value == true and data.text_0.value != '4'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code cases:}
+     * @return number of matching cases
+     */
+    long countCases(String query) {
+        query = SearchUtils.ensureStartsWithCases(query)
+        return caseSearchService.count(query)
+    }
+
+    /**
+     * Checks whether at least one {@link Case} matching the given query exists.
+     * <p>
+     * The query must start with the resource keyword {@code cases} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     existsCase("cases: processIdentifier eq 'query_test'")
+     *     existsCase("cases: id in ('5f9b1c2d3e4f5a6b7c8d9e0f', '5f9b1c2d3e4f5a6b7c8d9e10')")
+     *     existsCase("id in ('5f9b1c2d3e4f5a6b7c8d9e0f', '5f9b1c2d3e4f5a6b7c8d9e10')")
+     * </pre>
+     *
+     * @param query query language string starting with {@code cases:}
+     * @return {@code true} if a matching case exists, {@code false} otherwise
+     */
+    boolean existsCase(String query) {
+        query = SearchUtils.ensureStartsWithCases(query)
+        return caseSearchService.exists(query)
+    }
+
+    /**
+     * Searches for a single {@link Task} matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code task} (singular).
+     * </p>
+     * Example:
+     * <pre>
+     *     searchTask("task: transitionId eq 't1' and caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     *     searchTask("task: id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     *     searchTask("id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code task:}
+     * @return matching {@link Task} or {@code null} if none is found
+     */
+    Task searchTask(String query) {
+        query = SearchUtils.ensureStartsWithTask(query)
+        return taskSearchService.searchOne(query)
+    }
+
+    /**
+     * Searches for all {@link Task} instances matching the given query and returns a paged result.
+     * <p>
+     * The query must start with the resource keyword {@code tasks} (plural) and may contain
+     * paging and sorting clauses.
+     * </p>
+     * Example:
+     * <pre>
+     *     pagedSearchTasks("tasks: title eq 'test' page 0 size 10 sort by lastFinish desc")
+     *     pagedSearchTasks("tasks: userId eq 'user1' and state eq enabled")
+     *     pagedSearchTasks("userId eq 'user1' and state eq enabled")
+     * </pre>
+     *
+     * @param query query language string starting with {@code tasks:}
+     * @return {@link Page} of matching tasks
+     */
+    Page<Task> pagedSearchTasks(String query) {
+        query = SearchUtils.ensureStartsWithTasks(query)
+        return taskSearchService.searchAll(query)
+    }
+
+    /**
+     * Searches for all {@link Task} instances matching the given query and returns them as a list.
+     * <p>
+     * The query must start with the resource keyword {@code tasks} (plural). This is a convenience
+     * method returning only the content of {@link #pagedSearchTasks(String)}.
+     * </p>
+     * Example:
+     * <pre>
+     *     searchTasks("tasks: processId eq 'my_process' and userId in ('user1', 'user2')")
+     *     searchTasks("tasks: title contains 'Approve' sort by title asc")
+     *     searchTasks("title contains 'Approve' sort by title asc")
+     * </pre>
+     *
+     * @param query query language string starting with {@code tasks:}
+     * @return list of matching tasks
+     */
+    List<Task> searchTasks(String query) {
+        query = SearchUtils.ensureStartsWithTasks(query)
+        return pagedSearchTasks(query).content
+    }
+
+    /**
+     * Counts the number of {@link Task} instances matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code tasks} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     countTasks("tasks: caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     *     countTasks("tasks: transitionId eq 't1' and userId eq 'user1'")
+     *     countTasks("transitionId eq 't1' and userId eq 'user1'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code tasks:}
+     * @return number of matching tasks
+     */
+    long countTasks(String query) {
+        query = SearchUtils.ensureStartsWithTasks(query)
+        return taskSearchService.count(query)
+    }
+
+    /**
+     * Checks whether at least one {@link Task} matching the given query exists.
+     * <p>
+     * The query must start with the resource keyword {@code tasks} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     existsTask("tasks: caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     *     existsTask("tasks: transitionId eq 't1' and userId not eq 'user1'")
+     *     existsTask("transitionId eq 't1' and userId not eq 'user1'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code tasks:}
+     * @return {@code true} if a matching task exists, {@code false} otherwise
+     */
+    boolean existsTask(String query) {
+        query = SearchUtils.ensureStartsWithTasks(query)
+        return taskSearchService.exists(query)
+    }
+
+    /**
+     * Searches for a single {@link PetriNet} (process) matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code process} (singular).
+     * </p>
+     * Example:
+     * <pre>
+     *     searchProcess("process: identifier == 'query_test'")
+     *     searchProcess("process: identifier eq 'my_process' and version eq 1.0.0")
+     *     searchProcess("identifier eq 'my_process' and version eq 1.0.0")
+     * </pre>
+     *
+     * @param query query language string starting with {@code process:}
+     * @return matching {@link PetriNet} or {@code null} if none is found
+     */
+    PetriNet searchProcess(String query) {
+        query = SearchUtils.ensureStartsWithProcess(query)
+        return processSearchService.searchOne(query)
+    }
+
+    /**
+     * Searches for all {@link PetriNet} (process) instances matching the given query and returns a paged result.
+     * <p>
+     * The query must start with the resource keyword {@code processes} (plural) and may contain
+     * paging and sorting clauses.
+     * </p>
+     * Example:
+     * <pre>
+     *     pagedSearchProcesses("processes: identifier eq 'my_process' page 0 size 10 sort by version desc")
+     *     pagedSearchProcesses("processes: version in (1.0.0 : 2.0.0)")
+     *     pagedSearchProcesses("version in (1.0.0 : 2.0.0)")
+     * </pre>
+     *
+     * @param query query language string starting with {@code processes:}
+     * @return {@link Page} of matching processes
+     */
+    Page<PetriNet> pagedSearchProcesses(String query) {
+        query = SearchUtils.ensureStartsWithProcesses(query)
+        return processSearchService.searchAll(query)
+    }
+
+    /**
+     * Searches for all {@link PetriNet} (process) instances matching the given query and returns them as a list.
+     * <p>
+     * The query must start with the resource keyword {@code processes} (plural). This is a convenience
+     * method returning only the content of {@link #pagedSearchProcesses(String)}.
+     * </p>
+     * Example:
+     * <pre>
+     *     searchProcesses("processes: title contains 'Test' sort by identifier asc")
+     *     searchProcesses("processes: identifier in ('process_a', 'process_b')")
+     *     searchProcesses("identifier in ('process_a', 'process_b')")
+     * </pre>
+     *
+     * @param query query language string starting with {@code processes:}
+     * @return list of matching processes
+     */
+    List<PetriNet> searchProcesses(String query) {
+        query = SearchUtils.ensureStartsWithProcesses(query)
+        return pagedSearchProcesses(query).content
+    }
+
+    /**
+     * Counts the number of {@link PetriNet} (process) instances matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code processes} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     countProcesses("processes: identifier eq 'my_process'")
+     *     countProcesses("processes: version gte 1.0.0")
+     *     countProcesses("version gte 1.0.0")
+     * </pre>
+     *
+     * @param query query language string starting with {@code processes:}
+     * @return number of matching processes
+     */
+    long countProcesses(String query) {
+        query = SearchUtils.ensureStartsWithProcesses(query)
+        return processSearchService.count(query)
+    }
+
+    /**
+     * Checks whether at least one {@link PetriNet} (process) matching the given query exists.
+     * <p>
+     * The query must start with the resource keyword {@code processes} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     existsProcess("processes: identifier eq 'my_process'")
+     *     existsProcess("processes: version eq 1.0.0")
+     *     existsProcess("version eq 1.0.0")
+     * </pre>
+     *
+     * @param query query language string starting with {@code processes:}
+     * @return {@code true} if a matching process exists, {@code false} otherwise
+     */
+    boolean existsProcess(String query) {
+        query = SearchUtils.ensureStartsWithProcesses(query)
+        return processSearchService.exists(query)
+    }
+
+    /**
+     * Searches for a single {@link IUser} matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code user} (singular).
+     * </p>
+     * Example:
+     * <pre>
+     *     searchUser("user: email eq 'user@mail.com'")
+     *     searchUser("user: name eq 'John' and surname eq 'Doe'")
+     *     searchUser("name eq 'John' and surname eq 'Doe'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code user:}
+     * @return matching {@link IUser} or {@code null} if none is found
+     */
+    IUser searchUser(String query) {
+        query = SearchUtils.ensureStartsWithUser(query)
+        return userSearchService.searchOne(query)
+    }
+
+    /**
+     * Searches for all {@link IUser} instances matching the given query and returns a paged result.
+     * <p>
+     * The query must start with the resource keyword {@code users} (plural) and may contain
+     * paging and sorting clauses.
+     * </p>
+     * Example:
+     * <pre>
+     *     pagedSearchUsers("users: name eq 'John' page 0 size 25 sort by surname asc")
+     *     pagedSearchUsers("users: email contains '@company.com'")
+     *     pagedSearchUsers("email contains '@company.com'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code users:}
+     * @return {@link Page} of matching users
+     */
+    Page<IUser> pagedSearchUsers(String query) {
+        query = SearchUtils.ensureStartsWithUsers(query)
+        return userSearchService.searchAll(query)
+    }
+
+    /**
+     * Searches for all {@link IUser} instances matching the given query and returns them as a list.
+     * <p>
+     * The query must start with the resource keyword {@code users} (plural). This is a convenience
+     * method returning only the content of {@link #pagedSearchUsers(String)}.
+     * </p>
+     * Example:
+     * <pre>
+     *     searchUsers("users: surname eq 'Doe' sort by name asc")
+     *     searchUsers("users: email in ('a@mail.com', 'b@mail.com')")
+     *     searchUsers("email in ('a@mail.com', 'b@mail.com')")
+     * </pre>
+     *
+     * @param query query language string starting with {@code users:}
+     * @return list of matching users
+     */
+    List<IUser> searchUsers(String query) {
+        query = SearchUtils.ensureStartsWithUsers(query)
+        return pagedSearchUsers(query).content
+    }
+
+    /**
+     * Counts the number of {@link IUser} instances matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code users} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     countUsers("users: email contains '@company.com'")
+     *     countUsers("users: name eq 'John'")
+     *     countUsers("name eq 'John'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code users:}
+     * @return number of matching users
+     */
+    long countUsers(String query) {
+        query = SearchUtils.ensureStartsWithUsers(query)
+        return userSearchService.count(query)
+    }
+
+    /**
+     * Checks whether at least one {@link IUser} matching the given query exists.
+     * <p>
+     * The query must start with the resource keyword {@code users} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     existsUser("users: email eq 'user@mail.com'")
+     *     existsUser("users: name eq 'John' and surname eq 'Doe'")
+     *     existsUser("name eq 'John' and surname eq 'Doe'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code users:}
+     * @return {@code true} if a matching user exists, {@code false} otherwise
+     */
+    boolean existsUser(String query) {
+        query = SearchUtils.ensureStartsWithUsers(query)
+        return userSearchService.exists(query)
+    }
+
+    /**
+     * Generic search that resolves the resource type from the query itself and executes the search.
+     * <p>
+     * The query must start with one of the resource keywords: {@code process}/{@code processes},
+     * {@code case}/{@code cases}, {@code task}/{@code tasks} or {@code user}/{@code users}.
+     * When the singular form is used, a single matching instance is returned. When the plural form
+     * is used, the content (a {@link List}) of the resulting {@link Page} is returned.
+     * </p>
+     * Example:
+     * <pre>
+     *     search("case: processIdentifier eq 'query_test' and data.number_0.value == 3")
+     *     search("cases: processIdentifier eq 'query_test' page 1 size 5 sort by title desc")
+     *     search("process: identifier == 'query_test'")
+     * </pre>
+     *
+     * @param query query language string starting with a resource keyword
+     * @return a single resource instance (singular form), a {@link List} of instances (plural form),
+     *         or {@code null} if nothing matches
+     */
+    Object search(String query) {
+        Object result = searchService.search(query)
+        if (result instanceof Page<?>) {
+            return result.content
+        }
+        return result
+    }
+
+    /**
+     * Generic count that resolves the resource type from the query itself and counts matching instances.
+     * <p>
+     * The query must start with one of the resource keywords: {@code processes}, {@code cases},
+     * {@code tasks} or {@code users} (plural form).
+     * </p>
+     * Example:
+     * <pre>
+     *     count("cases: processIdentifier eq 'query_test' and data.boolean_0.value == true")
+     *     count("users: email contains '@company.com'")
+     * </pre>
+     *
+     * @param query query language string starting with a resource keyword
+     * @return number of matching instances
+     */
+    long count(String query) {
+        return searchService.count(query)
+    }
+
+    /**
+     * Generic existence check that resolves the resource type from the query itself.
+     * <p>
+     * The query must start with one of the resource keywords: {@code processes}, {@code cases},
+     * {@code tasks} or {@code users} (plural form).
+     * </p>
+     * Example:
+     * <pre>
+     *     exists("cases: processIdentifier eq 'query_test'")
+     *     exists("tasks: transitionId eq 't1' and userId eq 'user1'")
+     * </pre>
+     *
+     * @param query query language string starting with a resource keyword
+     * @return {@code true} if a matching instance exists, {@code false} otherwise
+     */
+    boolean exists(String query) {
+        return searchService.exists(query)
     }
 }

@@ -17,6 +17,8 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -25,10 +27,29 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.hateoas.MediaTypes
+import org.springframework.http.MediaType
+import org.springframework.mock.web.MockHttpServletRequest
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
+import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.MvcResult
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.web.context.WebApplicationContext
 
+import java.nio.charset.StandardCharsets
 import java.util.stream.Collectors
+
+import static org.junit.jupiter.api.Assertions.assertFalse
+import static org.junit.jupiter.api.Assertions.assertTrue
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 
 @SpringBootTest
 @ActiveProfiles(["test"])
@@ -59,14 +80,36 @@ class TaskPermissionsTest {
     @Autowired
     private TestHelper testHelper
 
-    private static final String TEST_NET = "view_permission_combinations.xml"
-    private static final String TEST_NET_NO_DEFAULT = "view_permission_combinations_no_default.xml"
+    @Autowired
+    private WebApplicationContext wac
+
+    private MockMvc mvc
+
+    private static final String VIEW_TEST_NET = "view_permission_combinations.xml"
+    private static final String VIEW_TEST_NET_NO_DEFAULT = "view_permission_combinations_no_default.xml"
+
+    private static final String ASSIGN_TEST_NET = "assign_permission_combinations.xml"
+    private static final String ASSIGN_TEST_NET_NO_DEFAULT = "assign_permission_combinations_no_default.xml"
+
+    private static final String FINISH_TEST_NET = "finish_permission_combinations.xml"
+    private static final String FINISH_TEST_NET_NO_DEFAULT = "finish_permission_combinations_no_default.xml"
+
+    private static final String CANCEL_TEST_NET = "cancel_permission_combinations.xml"
+    private static final String CANCEL_TEST_NET_NO_DEFAULT = "cancel_permission_combinations_no_default.xml"
+
     private static final String CORRECT_PERMISSIONS_CSV_FILEPATH = "src/test/resources/csv/permissions - correct.csv"
     private static final String CORRECT_PERMISSIONS_DEFAULT_DISABLED_CSV_FILEPATH = "src/test/resources/csv/permissions - correct default disabled.csv"
-    private static Case testCase
-    private static Case testCaseNoDefault
+
     private static Map<String, IUser> testUsers = [:]
+    private static List<IUser> withRoles = []
+    private static List<String> inUserRef = []
     private static Map<String, Map<String, List<String>>> correctResults = new HashMap<>()
+
+    private static final Closure<String> TASK_ASSIGN_URL = { id -> "/api/task/assign/$id" as String }
+    private static final Closure<String> TASK_FINISH_URL = { id -> "/api/task/finish/$id" as String }
+    private static final Closure<String> TASK_CANCEL_URL = { id -> "/api/task/cancel/$id" as String }
+    private static final String TASK_SEARCH_URL = "/api/task/search?sort=priority"
+    private static final String ELASTIC_TASK_SEARCH_URL = "/api/task/search_es?sort=priority"
 
     @BeforeEach()
     void init() {
@@ -74,14 +117,10 @@ class TaskPermissionsTest {
         actionDelegate.outcomes = []
         testUsers.clear()
         correctResults.clear()
-        testCase = null
-        testCaseNoDefault = null
-
-        PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/" + TEST_NET), VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
-        PetriNet netNoDefault = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/" + TEST_NET_NO_DEFAULT), VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
-
-        testCase = workflowService.createCaseByIdentifier(net.identifier, "Test case", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
-        testCaseNoDefault = workflowService.createCaseByIdentifier(netNoDefault.identifier, "Test case with no default", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+        mvc = MockMvcBuilders
+                .webAppContextSetup(wac)
+                .apply(springSecurity())
+                .build()
 
         [
                 new User("no_permissions@mail.com", "password", "No", "Permissions"),
@@ -93,29 +132,219 @@ class TaskPermissionsTest {
             testUsers.put(it.getEmail(), userService.saveNew(it))
         }
 
-        List<IUser> withRoles = [testUsers.get("has_role@mail.com"), testUsers.get("both_permissions@mail.com")]
-        List<String> inUserRef = [testUsers.get("in_userRef@mail.com").stringId, testUsers.get("both_permissions@mail.com").stringId]
-
-        withRoles.forEach {
-            testUsers.put(it.getEmail(), userService.addRole(testUsers.get(it.getEmail()), net.roles.values().find { role -> role.importId == "process_role" }.stringId))
-            testUsers.put(it.getEmail(), userService.addRole(testUsers.get(it.getEmail()), netNoDefault.roles.values().find { role -> role.importId == "process_role" }.stringId))
-        }
-
-        testCase = actionDelegate.setData("t_001", testCase, [
-                "users": [
-                        "type" : "userList",
-                        "value": inUserRef
-                ]
-        ]).getCase()
-
-        testCaseNoDefault = actionDelegate.setData("t_007", testCaseNoDefault, [
-                "users": [
-                        "type" : "userList",
-                        "value": inUserRef
-                ]
-        ]).getCase()
+        withRoles = [testUsers.get("has_role@mail.com"), testUsers.get("both_permissions@mail.com")]
+        inUserRef = [testUsers.get("in_userRef@mail.com").stringId, testUsers.get("both_permissions@mail.com").stringId]
 
         correctResults = permissionsCsvToExpectedMap()
+    }
+
+    @Test
+    void testViewPermissions() {
+        Case testCase = prepareTestCase("src/test/resources/petriNets/permissions/" + VIEW_TEST_NET, "t_001")
+        Case testCaseNoDefault = prepareTestCase("src/test/resources/petriNets/permissions/" + VIEW_TEST_NET_NO_DEFAULT, "t_007")
+
+        Thread.sleep(1000)
+
+        def mapElastic = [:]
+        def mapMongo = [:]
+        ElasticTaskSearchRequest request = new ElasticTaskSearchRequest()
+        request.useCase = [new TaskSearchCaseRequest(testCase.stringId, testCase.title)]
+
+        ElasticTaskSearchRequest request2 = new ElasticTaskSearchRequest()
+        request2.useCase = [new TaskSearchCaseRequest(testCaseNoDefault.stringId, testCaseNoDefault.title)]
+
+        testUsers.forEach((key, value) -> {
+//            Elastic task search
+            Page<Task> tasks = elasticTaskService.search([request],
+                    value.transformToLoggedUser(),
+                    Pageable.unpaged(), LocaleContextHolder.getLocale(), false)
+            List<String> list = new ArrayList<>(tasks.content).stream().map(task -> task.transitionId).collect(Collectors.toList()).sort()
+
+
+            Page<Task> tasks2 = elasticTaskService.search([request2],
+                    value.transformToLoggedUser(),
+                    Pageable.unpaged(), LocaleContextHolder.getLocale(), false)
+            List<String> list2 = new ArrayList<>(tasks2.content).stream().map(task -> task.transitionId).collect(Collectors.toList()).sort()
+
+//            Mongo task search
+            Page<Task> mongoTasksDefault = taskService.search([request], Pageable.unpaged(), value.transformToLoggedUser(), LocaleContextHolder.getLocale(), false)
+            List<String> mongoListDefault = new ArrayList<>(mongoTasksDefault.content).stream().map(task -> task.transitionId).collect(Collectors.toList()).sort()
+            Page<Task> mongoTasksNoDefault = taskService.search([request2], Pageable.unpaged(), value.transformToLoggedUser(), LocaleContextHolder.getLocale(), false)
+            List<String> mongoListNoDefault = new ArrayList<>(mongoTasksNoDefault.content).stream().map(task -> task.transitionId).collect(Collectors.toList()).sort()
+
+            mapElastic.put(key, [
+                    "Default enabled" : list,
+                    "Default DISabled": list2
+            ])
+
+            mapMongo.put(key, [
+                    "Default enabled" : mongoListDefault,
+                    "Default DISabled": mongoListNoDefault
+            ])
+        })
+        compareTestResultsToExpected(mapElastic, "Elastic search", "View")
+        compareTestResultsToExpected(mapMongo, "Mongo search", "View")
+    }
+
+    @Test
+    void testViewPermissionsMVC() {
+        Case testCase = prepareTestCase("src/test/resources/petriNets/permissions/" + VIEW_TEST_NET, "t_001")
+        Case testCaseNoDefault = prepareTestCase("src/test/resources/petriNets/permissions/" + VIEW_TEST_NET_NO_DEFAULT, "t_007")
+
+        Thread.sleep(1000)
+
+        def mapElastic = [:]
+        def mapMongo = [:]
+
+        def content1 = JsonOutput.toJson([
+                case: [
+                        id: testCase.stringId
+                ]
+        ])
+        def content2 = JsonOutput.toJson([
+                case: [
+                        id: testCaseNoDefault.stringId
+                ]
+        ])
+
+        testUsers.forEach((key, value) -> {
+            Authentication auth = new UsernamePasswordAuthenticationToken(key, "password")
+            auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
+//            Elastic task search
+            mapElastic.put(key, [
+                    "Default enabled" : performSearch(ELASTIC_TASK_SEARCH_URL, content1, auth),
+                    "Default DISabled": performSearch(ELASTIC_TASK_SEARCH_URL, content2, auth)
+            ])
+
+//            Mongo task search
+            mapMongo.put(key, [
+                    "Default enabled" : performSearch(TASK_SEARCH_URL, content1, auth),
+                    "Default DISabled": performSearch(TASK_SEARCH_URL, content2, auth)
+            ])
+        })
+        compareTestResultsToExpected(mapElastic, "Elastic search MVC", "View")
+        compareTestResultsToExpected(mapMongo, "Mongo search MVC", "View")
+    }
+
+    @Test
+    void testAssignPermission() {
+        Case testCase = prepareTestCase("src/test/resources/petriNets/permissions/" + ASSIGN_TEST_NET, "t_001")
+        Case testCaseNoDefault = prepareTestCase("src/test/resources/petriNets/permissions/" + ASSIGN_TEST_NET_NO_DEFAULT, "t_007")
+
+        Thread.sleep(1000)
+
+        def resultMap = [:]
+
+        testUsers.forEach((key, value) -> {
+
+            Authentication auth = new UsernamePasswordAuthenticationToken(key, "password")
+            auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
+
+            resultMap.put(key, [
+                    "Default enabled" : performRequest(testCase, TASK_ASSIGN_URL, auth),
+                    "Default DISabled": performRequest(testCaseNoDefault, TASK_ASSIGN_URL, auth)
+            ])
+        })
+        compareTestResultsToExpected(resultMap, "MockMvc", "Assign")
+    }
+
+    @Test
+    void testFinishPermission() {
+        Case testCase = prepareTestCase("src/test/resources/petriNets/permissions/" + FINISH_TEST_NET, "t_001")
+        Case testCaseNoDefault = prepareTestCase("src/test/resources/petriNets/permissions/" + FINISH_TEST_NET_NO_DEFAULT, "t_007")
+
+        Thread.sleep(1000)
+
+        def resultMap = [:]
+
+        testUsers.forEach((key, value) -> {
+
+            Authentication auth = new UsernamePasswordAuthenticationToken(key, "password")
+            auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
+
+            performRequest(testCase, TASK_ASSIGN_URL, auth)
+            performRequest(testCaseNoDefault, TASK_ASSIGN_URL, auth)
+
+            resultMap.put(key, [
+                    "Default enabled" : performRequest(testCase, TASK_FINISH_URL, auth),
+                    "Default DISabled": performRequest(testCaseNoDefault, TASK_FINISH_URL, auth)
+            ])
+        })
+        compareTestResultsToExpected(resultMap, "MockMvc", "FINISH")
+    }
+
+    @Test
+    void testCancelPermission() {
+        Case testCase = prepareTestCase("src/test/resources/petriNets/permissions/" + CANCEL_TEST_NET, "t_001")
+        Case testCaseNoDefault = prepareTestCase("src/test/resources/petriNets/permissions/" + CANCEL_TEST_NET_NO_DEFAULT, "t_007")
+
+        Thread.sleep(1000)
+
+        def resultMap = [:]
+
+        testUsers.forEach((key, value) -> {
+
+            Authentication auth = new UsernamePasswordAuthenticationToken(key, "password")
+            auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
+
+            performRequest(testCase, TASK_ASSIGN_URL, auth)
+            performRequest(testCaseNoDefault, TASK_ASSIGN_URL, auth)
+
+            resultMap.put(key, [
+                    "Default enabled" : performRequest(testCase, TASK_CANCEL_URL, auth),
+                    "Default DISabled": performRequest(testCaseNoDefault, TASK_CANCEL_URL, auth)
+            ])
+        })
+        compareTestResultsToExpected(resultMap, "MockMvc", "CANCEL")
+    }
+
+    List<String> performSearch(String searchUrl, String content, Authentication auth) {
+        List<String> list = []
+        MvcResult result = mvc.perform(post(searchUrl)
+                .content(content)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaTypes.HAL_JSON_VALUE)
+                .locale(LocaleContextHolder.getLocale())
+                .with(csrf().asHeader())
+                .with(authentication(auth)))
+                .andReturn()
+        if (result.getResponse().getStatus() == 200) {
+            def parsedResult = parseResult(result)._embedded
+            parsedResult == null ?: list.addAll(parsedResult.tasks?.collect { it.transitionId }.sort())
+        }
+        return list
+    }
+
+    List<String> performRequest(Case testCase, Closure<String> request, Authentication auth) {
+        List<String> resultTransitions = []
+        testCase.tasks.forEach((taskPair) -> {
+            MvcResult result = mvc.perform(get(request(taskPair.getTask()))
+                    .accept(MediaTypes.HAL_JSON_VALUE)
+                    .locale(LocaleContextHolder.getLocale())
+                    .with(csrf().asHeader())
+                    .with(authentication(auth)))
+                    .andReturn()
+            if (result.getResponse().getStatus() != 200) {
+                return
+            }
+            resultTransitions.add(taskPair.getTransition())
+        })
+        return resultTransitions.sort()
+    }
+
+    Case prepareTestCase(String netFilePath, String transId) {
+        PetriNet net = petriNetService.importPetriNet(new FileInputStream(netFilePath), VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+        Case testCase = workflowService.createCaseByIdentifier(net.identifier, "Test case", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+        withRoles.forEach {
+            testUsers.put(it.getEmail(), userService.addRole(testUsers.get(it.getEmail()), net.roles.values().find { role -> role.importId == "process_role" }.stringId))
+        }
+        testCase = actionDelegate.setData(transId, testCase, [
+                "users": [
+                        "type" : "userList",
+                        "value": inUserRef
+                ]
+        ]).getCase()
+        return testCase
     }
 
     static Map<String, Map<String, List<String>>> permissionsCsvToExpectedMap() {
@@ -143,11 +372,11 @@ class TaskPermissionsTest {
         Map<String, String> userColumns = userColumns()
 
         List<String> lines = csvFile.readLines("UTF-8").findAll { it?.trim() }
-        assert !lines.isEmpty(): "CSV file is empty: ${csvFilePath}"
+        assertFalse(lines.isEmpty(), "CSV file is empty: ${csvFilePath}")
         List<String> header = lines.first().split(",", -1)*.trim()
 
         int transitionIdIndex = header.indexOf("Transition ID")
-        assert transitionIdIndex >= 0: "Missing required column 'Transition ID' in ${csvFilePath}"
+        assertTrue(transitionIdIndex >= 0, "Missing required column 'Transition ID' in ${csvFilePath}")
 
         lines.tail().each { line ->
             List<String> columns = line.split(",", -1)*.trim()
@@ -155,7 +384,7 @@ class TaskPermissionsTest {
 
             userColumns.each { csvColumnName, userEmail ->
                 int permissionIndex = header.indexOf(csvColumnName)
-                assert permissionIndex >= 0: "Missing required column '${csvColumnName}' in ${csvFilePath}"
+                assertTrue(permissionIndex >= 0, "Missing required column '${csvColumnName}' in ${csvFilePath}")
 
                 String permissionValue = columns[permissionIndex]
                         .replace(".", "")
@@ -194,52 +423,8 @@ class TaskPermissionsTest {
         ]
     }
 
-    @Test
-    void testViewPermissions() {
-        def mapElastic = [:]
-        def mapMongo = [:]
-//        todo test for both mongo and elastic
-        ElasticTaskSearchRequest request = new ElasticTaskSearchRequest()
-        request.useCase = [new TaskSearchCaseRequest(testCase.stringId, testCase.title)]
-
-        ElasticTaskSearchRequest request2 = new ElasticTaskSearchRequest()
-        request2.useCase = [new TaskSearchCaseRequest(testCaseNoDefault.stringId, testCaseNoDefault.title)]
-
-        testUsers.forEach((key, value) -> {
-//            Elastic task search
-            Page<Task> tasks = elasticTaskService.search([request],
-                    value.transformToLoggedUser(),
-                    Pageable.unpaged(), LocaleContextHolder.getLocale(), false)
-            List<String> list = new ArrayList<>(tasks.content).stream().map(task -> task.transitionId).collect(Collectors.toList()).sort()
-
-
-            Page<Task> tasks2 = elasticTaskService.search([request2],
-                    value.transformToLoggedUser(),
-                    Pageable.unpaged(), LocaleContextHolder.getLocale(), false)
-            List<String> list2 = new ArrayList<>(tasks2.content).stream().map(task -> task.transitionId).collect(Collectors.toList()).sort()
-
-//            Mongo task search
-            Page<Task> mongoTasksDefault = taskService.search([request], Pageable.unpaged(), value.transformToLoggedUser(), LocaleContextHolder.getLocale(), false)
-            List<String> mongoListDefault = new ArrayList<>(mongoTasksDefault.content).stream().map(task -> task.transitionId).collect(Collectors.toList()).sort()
-            Page<Task> mongoTasksNoDefault = taskService.search([request2], Pageable.unpaged(), value.transformToLoggedUser(), LocaleContextHolder.getLocale(), false)
-            List<String> mongoListNoDefault = new ArrayList<>(mongoTasksNoDefault.content).stream().map(task -> task.transitionId).collect(Collectors.toList()).sort()
-
-            mapElastic.put(key, [
-                    "Default enabled" : list,
-                    "Default DISabled": list2
-            ])
-
-            mapMongo.put(key, [
-                    "Default enabled" : mongoListDefault,
-                    "Default DISabled": mongoListNoDefault
-            ])
-        })
-        compareTestResultsToExpected(mapElastic, "Elastic search")
-        compareTestResultsToExpected(mapMongo, "Mongo search")
-    }
-
-    static void compareTestResultsToExpected(Map<String, Map<String, List<String>>> testResultMap, String searchType) {
-        println("\n========== ${searchType} - View permissions comparison ==========")
+    static void compareTestResultsToExpected(Map<String, Map<String, List<String>>> testResultMap, String searchType, String permissionType) {
+        println("\n========== ${searchType} - ${permissionType} permissions comparison ==========")
 
         testUsers.keySet().each { String userEmail ->
             println("\nUser: ${userEmail}")
@@ -267,10 +452,15 @@ class TaskPermissionsTest {
                 println("Present only in test results (${presentOnlyInMap.size()}): ${presentOnlyInMap}")
                 println("Present only in correct results (${presentOnlyInCorrectResultsWithDefaultRoleMap.size()}): ${presentOnlyInCorrectResultsWithDefaultRoleMap}")
 
-                assert presentInBoth.size() == actualTransitionIds.size() && presentInBoth.size() == expectedTransitionIds.size()
+                assertTrue(presentInBoth.size() == actualTransitionIds.size() && presentInBoth.size() == expectedTransitionIds.size())
             }
         }
 
         println("\n=================================================")
+    }
+
+    @SuppressWarnings("GrMethodMayBeStatic")
+    private def parseResult(MvcResult result) {
+        return (new JsonSlurper()).parseText(result.response.getContentAsString(StandardCharsets.UTF_8))
     }
 }

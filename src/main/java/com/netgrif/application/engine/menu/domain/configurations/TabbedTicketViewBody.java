@@ -1,7 +1,8 @@
 package com.netgrif.application.engine.menu.domain.configurations;
 
-import com.netgrif.application.engine.menu.domain.MenuItemView;
+import com.netgrif.application.engine.menu.domain.MenuItemViewType;
 import com.netgrif.application.engine.menu.domain.ToDataSetOutcome;
+import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -19,8 +20,18 @@ public class TabbedTicketViewBody extends ViewBody {
     }
 
     @Override
-    public MenuItemView getViewType() {
-        return MenuItemView.TABBED_TICKET_VIEW;
+    public MenuItemViewType getViewType() {
+        return MenuItemViewType.TABBED_TICKET_VIEW;
+    }
+
+    @Override
+    public String getFilterFieldId() {
+        return "";
+    }
+
+    @Override
+    public FieldType getFilterType() {
+        return null;
     }
 
     @Override
