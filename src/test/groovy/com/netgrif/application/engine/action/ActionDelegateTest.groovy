@@ -18,11 +18,9 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.DataField
 import com.netgrif.application.engine.workflow.domain.Task
-import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -47,9 +45,6 @@ class ActionDelegateTest {
     private ActionDelegate actionDelegate
 
     @Autowired
-    private IFilterImportExportService importExportService
-
-    @Autowired
     private IUserService userService
 
     @Autowired
@@ -67,14 +62,6 @@ class ActionDelegateTest {
     void before() {
         testHelper.truncateDbs()
         actionDelegate.outcomes = []
-    }
-
-    @Test
-    @Disabled("Context user")
-    void importFiltersTest() {
-        List<String> actionDelegateList = actionDelegate.importFilters()
-        List<String> importedTasksIds = importExportService.importFilters()
-        assert actionDelegateList.size() == importedTasksIds.size()
     }
 
     @Test
@@ -267,9 +254,9 @@ class ActionDelegateTest {
         assertEquals(foundNet.identifier, netIdentifier)
         foundNet = null
 
-        PetriNet filterNet = petriNetService.getByIdentifier("filter")[0]
-        String mongoId2 = filterNet.stringId
-        ObjectId objectId3 = filterNet.objectId
+        PetriNet menuItemNet = petriNetService.getByIdentifier("menu_item")[0]
+        String mongoId2 = menuItemNet.stringId
+        ObjectId objectId3 = menuItemNet.objectId
 
         def searchTargets = [mongoId, mongoId2]
         List<PetriNet> searchResults = actionDelegate.findPetriNets(searchTargets as List<String>)

@@ -27,7 +27,7 @@
                             filterBody.getTitle(),
                             filterBody.getIcon()
                     )
-                    def singleTaskViewBody = new com.netgrif.application.engine.menu.domain.configurations.TabbedSingleTaskViewBody()
+                    def singleTaskViewBody = new com.netgrif.application.engine.menu.domain.configurations.SingleTaskViewBody()
                     def ticketViewBody = new com.netgrif.application.engine.menu.domain.configurations.TabbedTicketViewBody()
                     ticketViewBody.setChainedView(singleTaskViewBody)
                     menuItemBody.setAutoSelect(true)

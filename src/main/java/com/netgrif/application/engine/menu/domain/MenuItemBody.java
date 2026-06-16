@@ -22,6 +22,7 @@ import java.util.Map;
 public class MenuItemBody {
     private String uri;
     private String identifier;
+    private String configurationTemplateIdentifier;
 
     private String menuIcon = "filter_none";
     private I18nString menuName;
@@ -31,7 +32,7 @@ public class MenuItemBody {
     private String customViewSelector;
     private boolean isAutoSelect = false;
 
-    private boolean useTabbedView;
+    private boolean useTabbedView = true;
     private String tabIcon;
     private boolean useTabIcon = true;
     private I18nString tabName;
@@ -108,8 +109,14 @@ public class MenuItemBody {
     }
 
     public void setView(ViewBody viewBody) {
-        this.view = viewBody;
-        this.useTabbedView = viewBody == null || viewBody.getViewType().isTabbed();
+        if (viewBody != null) {
+            this.view = viewBody;
+            MenuItemViewType viewType = viewBody.getViewType();
+            if (viewType.isTabbed() != viewType.isUntabbed()) {
+                // if isTabbed == isUntabbed we cannot determine the result value
+                this.useTabbedView = viewType.isTabbed();
+            }
+        }
     }
 
     /**
@@ -157,10 +164,16 @@ public class MenuItemBody {
         if (nodePath != null) {
             outcome.putDataSetEntry(MenuItemConstants.FIELD_NODE_PATH, FieldType.TEXT, nodePath);
         }
-        outcome.putDataSetEntry(MenuItemConstants.FIELD_MENU_NAME, FieldType.I18N, this.menuName);
+        if (this.menuName == null) {
+            outcome.putDataSetEntry(MenuItemConstants.FIELD_MENU_NAME, FieldType.I18N, new I18nString(this.identifier));
+        } else {
+            outcome.putDataSetEntry(MenuItemConstants.FIELD_MENU_NAME, FieldType.I18N, this.menuName);
+        }
         outcome.putDataSetEntry(MenuItemConstants.FIELD_MENU_ICON, FieldType.TEXT, this.menuIcon);
         outcome.putDataSetEntry(MenuItemConstants.FIELD_USE_TABBED_VIEW, FieldType.BOOLEAN, this.useTabbedView);
-        outcome.putDataSetEntry(MenuItemConstants.FIELD_TAB_NAME, FieldType.I18N, this.tabName);
+        if (this.tabName != null) {
+            outcome.putDataSetEntry(MenuItemConstants.FIELD_TAB_NAME, FieldType.I18N, this.tabName);
+        }
         outcome.putDataSetEntry(MenuItemConstants.FIELD_TAB_ICON, FieldType.TEXT, this.tabIcon);
         if (this.identifier != null) {
             outcome.putDataSetEntry(MenuItemConstants.FIELD_IDENTIFIER, FieldType.TEXT, this.getIdentifier());
@@ -173,7 +186,27 @@ public class MenuItemBody {
         outcome.putDataSetEntry(MenuItemConstants.FIELD_IS_AUTO_SELECT, FieldType.BOOLEAN, this.isAutoSelect);
         outcome.putDataSetEntryOptions(MenuItemConstants.FIELD_ALLOWED_ROLES, FieldType.MULTICHOICE_MAP, this.allowedRoles);
         outcome.putDataSetEntryOptions(MenuItemConstants.FIELD_BANNED_ROLES, FieldType.MULTICHOICE_MAP, this.bannedRoles);
+        outcome.putDataSetEntry(MenuItemConstants.FIELD_CONFIGURATION_TEMPLATES, FieldType.ENUMERATION_MAP, this.configurationTemplateIdentifier);
 
+        outcome = toDataSetWithView(viewCase, outcome);
+
+        return outcome;
+    }
+
+    /**
+     * Transforms minimal attributes into dataSet for view configuration by template.
+     *
+     * @param viewCase case instance of view
+     * @return {@link ToDataSetOutcome} object with dataSet containing only view-related fields
+     */
+    public ToDataSetOutcome toDataSetByConfigTemplate(Case viewCase) {
+        ToDataSetOutcome outcome = new ToDataSetOutcome();
+        outcome.putDataSetEntry(MenuItemConstants.FIELD_USE_TABBED_VIEW, FieldType.BOOLEAN, this.useTabbedView);
+        outcome.putDataSetEntry(MenuItemConstants.FIELD_USE_CUSTOM_VIEW, FieldType.BOOLEAN, this.useCustomView);
+        return toDataSetWithView(viewCase, outcome);
+    }
+
+    protected ToDataSetOutcome toDataSetWithView(Case viewCase, ToDataSetOutcome outcome) {
         if (viewCase != null) {
             outcome.putDataSetEntry(MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE, FieldType.ENUMERATION_MAP,
                     this.view.getViewType().getIdentifier());
@@ -181,8 +214,9 @@ public class MenuItemBody {
                     List.of(viewCase.getStringId()));
             String taskId = MenuItemUtils.findTaskIdInCase(viewCase, ViewConstants.TRANS_SETTINGS_ID);
             outcome.putDataSetEntry(MenuItemConstants.FIELD_VIEW_CONFIGURATION_FORM, FieldType.TASK_REF, List.of(taskId));
+            String allDataTaskId = MenuItemUtils.findTaskIdInCase(viewCase, ViewConstants.TRANS_ALL_MENU_DATA_ID);
+            outcome.putDataSetEntry(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ALL_DATA_FORM, FieldType.TASK_REF, List.of(allDataTaskId));
         }
-
         return outcome;
     }
 }

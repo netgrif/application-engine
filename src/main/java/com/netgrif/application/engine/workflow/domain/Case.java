@@ -104,7 +104,7 @@ public class Case implements Serializable {
     @Getter
     @Setter
     @Transient
-    private List<Field> immediateData;
+    private List<Field<?>> immediateData;
 
     @Getter
     @Setter

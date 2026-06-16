@@ -1,0 +1,95 @@
+package com.netgrif.application.engine.menu.domain;
+
+import com.netgrif.application.engine.petrinet.domain.I18nString;
+import lombok.Getter;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+
+/**
+ * Here is listed and configured every configuration process available for menu items.
+ * */
+@Getter
+public enum MenuItemViewType {
+    CASE_VIEW(new I18nString("Case view",
+            Map.of("sk", "Zobrazenie prípadov", "de", "Fallansicht")),
+            "case_view", List.of("task_view"), true, true, true),
+    TASK_VIEW(new I18nString("Task view",
+            Map.of("sk", "Zobrazenie úloh", "de", "Aufgabenansicht")),
+            "task_view", List.of(), true, true, true),
+    TABBED_TICKET_VIEW(new I18nString("Tabbed ticket view",
+            Map.of("sk", "Tiketové zobrazenie v taboch", "de", "Ticketansicht mit Registerkarten")),
+            "tabbed_ticket_view", List.of("single_task_view"), true, false, true),
+    SINGLE_TASK_VIEW(new I18nString("Single task view",
+            Map.of("sk", "Zobrazenie jednej úlohy", "de", "Einzelaufgabenansicht")),
+            "single_task_view", List.of(), true, true, true);
+
+    private final I18nString name;
+    private final String identifier;
+    /**
+     * List of view identifiers of views, that can be associated with the view
+     * */
+    private final List<String> allowedAssociatedViews;
+    private final boolean isTabbed;
+    private final boolean isUntabbed;
+    /**
+     * if false, the view cannot be used as first configuration of the menu_item, but can be used as secondary
+     * (associated to another view)
+     * */
+    private final boolean isPrimary;
+
+    MenuItemViewType(I18nString name, String identifier, List<String> allowedAssociatedViews, boolean isTabbed,
+                     boolean isUntabbed, boolean isPrimary) {
+        this.name = name;
+        this.identifier = identifier;
+        this.allowedAssociatedViews = allowedAssociatedViews;
+        this.isTabbed = isTabbed;
+        this.isUntabbed = isUntabbed;
+        this.isPrimary = isPrimary;
+    }
+
+    /**
+     * Builds enum value by the view identifier
+     * */
+    public static MenuItemViewType fromIdentifier(String identifier) {
+        for (MenuItemViewType view : MenuItemViewType.values()) {
+            if (view.identifier.equals(identifier)) {
+                return view;
+            }
+        }
+        throw new IllegalArgumentException(identifier);
+    }
+
+    /**
+     * Finds all enum values, that are tabbed or non-tabbed
+     *
+     * @param isTabbed if true, only tabbed values will be returned
+     * @param isPrimary if true, only views accessible directly from the menu_item will be returned
+     *
+     * @return List of views based on {@link #isTabbed}
+     * */
+    public static List<MenuItemViewType> findAllByIsTabbedAndIsPrimary(boolean isTabbed, boolean isPrimary) {
+        return Arrays.stream(MenuItemViewType.values())
+                .filter(view -> (view.isTabbed == isTabbed || view.isUntabbed != isTabbed) && view.isPrimary == isPrimary)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Finds all enum values, that are tabbed or non-tabbed and are defined in parent view as {@link #allowedAssociatedViews}
+     *
+     * @param isTabbed if true, set of views is reduced to only tabbed views
+     * @param parentIdentifier identifier of the view, that contains returned views in {@link #allowedAssociatedViews}
+     *
+     * @return List of views based on {@link #isTabbed} and {@link #allowedAssociatedViews}
+     * */
+    public static List<MenuItemViewType> findAllByIsTabbedAndParentIdentifier(boolean isTabbed, String parentIdentifier) {
+        MenuItemViewType parentView = fromIdentifier(parentIdentifier);
+        return Arrays.stream(MenuItemViewType.values())
+                .filter(view -> (view.isTabbed == isTabbed || view.isUntabbed != isTabbed)
+                        && parentView.getAllowedAssociatedViews().contains(view.identifier))
+                .collect(Collectors.toList());
+    }
+}

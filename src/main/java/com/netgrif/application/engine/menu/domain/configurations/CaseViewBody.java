@@ -1,0 +1,114 @@
+package com.netgrif.application.engine.menu.domain.configurations;
+
+import com.netgrif.application.engine.menu.domain.MenuItemViewType;
+import com.netgrif.application.engine.menu.domain.ToDataSetOutcome;
+import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class CaseViewBody extends ViewBody {
+    private String viewSearchType = "fulltext_advanced";
+    private I18nString createCaseButtonTitle;
+    private String createCaseButtonIcon = "add";
+    private boolean requireTitleInCreation = true;
+    private boolean showCreateCaseButton = true;
+    private String bannedNetsInCreation;
+    private boolean showMoreMenu = false;
+    private boolean allowHeaderTableMode = true;
+    private List<String> headersMode = new ArrayList<>(List.of("sort", "edit", "search"));
+    private String headersDefaultMode = "sort";
+    private List<String> defaultHeaders;
+    private boolean headerModeChangeable = true;
+    private boolean useDefaultHeaders = true;
+    private I18nString emptyContentText;
+    private String emptyContentIcon;
+    private boolean allowExport;
+    private boolean allAllowedNets = true;
+    private List<String> allowedNets;
+    private boolean inheritAllowedNets = true;
+
+    private ViewBody chainedView;
+
+    @Override
+    public ViewBody getAssociatedViewBody() {
+        return this.chainedView;
+    }
+
+    @Override
+    public MenuItemViewType getViewType() {
+        return MenuItemViewType.CASE_VIEW;
+    }
+
+    @Override
+    public String getFilterFieldId() {
+        return CaseViewConstants.FIELD_FILTER;
+    }
+
+    @Override
+    public FieldType getFilterType() {
+        return FieldType.CASE_FILTER;
+    }
+
+    @Override
+    protected ToDataSetOutcome toDataSetInternal(ToDataSetOutcome outcome) {
+
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_VIEW_SEARCH_TYPE, FieldType.ENUMERATION_MAP,
+                this.viewSearchType);
+        if (this.createCaseButtonTitle != null) {
+            outcome.putDataSetEntry(CaseViewConstants.FIELD_CREATE_CASE_BUTTON_TITLE, FieldType.I18N,
+                    this.createCaseButtonTitle);
+        }
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_CREATE_CASE_BUTTON_ICON, FieldType.TEXT,
+                this.createCaseButtonIcon);
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_REQUIRE_TITLE_IN_CREATION, FieldType.BOOLEAN,
+                this.requireTitleInCreation);
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_SHOW_CREATE_CASE_BUTTON, FieldType.BOOLEAN,
+                this.showCreateCaseButton);
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_BANNED_NETS_IN_CREATION, FieldType.TEXT,
+                this.bannedNetsInCreation);
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_SHOW_MORE_MENU, FieldType.BOOLEAN,
+                this.showMoreMenu);
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_ALLOW_HEADER_TABLE_MODE, FieldType.BOOLEAN,
+                this.allowHeaderTableMode);
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_HEADERS_MODE, FieldType.MULTICHOICE_MAP,
+                this.headersMode == null ? new ArrayList<>() : this.headersMode);
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_HEADERS_DEFAULT_MODE, FieldType.ENUMERATION_MAP,
+                this.headersDefaultMode);
+        if (this.defaultHeaders != null) {
+            outcome.putDataSetEntry(CaseViewConstants.FIELD_DEFAULT_HEADERS, FieldType.STRING_COLLECTION,
+                    this.defaultHeaders);
+        }
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_IS_HEADER_MODE_CHANGEABLE, FieldType.BOOLEAN,
+                this.headerModeChangeable);
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_USE_DEFAULT_HEADERS, FieldType.BOOLEAN,
+                this.useDefaultHeaders);
+        if (this.emptyContentText != null) {
+            outcome.putDataSetEntry(CaseViewConstants.FIELD_EMPTY_CONTENT_TEXT, FieldType.I18N,
+                    this.emptyContentText);
+        }
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_EMPTY_CONTENT_ICON, FieldType.TEXT,
+                this.emptyContentIcon);
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_ALLOW_EXPORT, FieldType.BOOLEAN,
+                this.allowExport);
+
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_ALL_ALLOWED_NETS, FieldType.BOOLEAN,
+                this.allAllowedNets);
+        if (this.allowedNets != null) {
+            outcome.putDataSetEntry(CaseViewConstants.FIELD_ALLOWED_NETS, FieldType.STRING_COLLECTION,
+                    this.allowedNets);
+        }
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_INHERIT_ALLOWED_NETS, FieldType.BOOLEAN,
+                this.inheritAllowedNets);
+
+        return outcome;
+    }
+}
+
