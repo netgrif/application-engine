@@ -69,6 +69,7 @@ import com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.Das
 import com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.DashboardManagementBody
 import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.expando.DelegateExpando
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.plugin.meta.PluginHolder
 import com.netgrif.application.engine.startup.ImportHelper
@@ -107,7 +108,7 @@ import java.util.stream.Collectors
  * ActionDelegate class contains Actions API methods.
  */
 @SuppressWarnings(["GrMethodMayBeStatic", "GroovyUnusedDeclaration"])
-class ActionDelegate {
+class ActionDelegate extends DelegateExpando {
 
     static final Logger log = LoggerFactory.getLogger(ActionDelegate)
 
@@ -247,6 +248,23 @@ class ActionDelegate {
         this.Frontend = new FrontendActionOutcome(this.useCase, this.task, this.outcomes)
         this.NaeModule = new ModuleHolder()
         this.Plugin = new PluginHolder()
+    }
+
+    void clearAfterExecution() {
+        this.action = null
+        this.useCase = null
+        this.task = null
+        this.actionsRunner = null
+
+        this.map?.clear()
+        this.map = null
+
+        this.outcomes?.clear()
+        this.outcomes = null
+
+        this.Frontend = null
+        this.NaeModule = null
+        this.Plugin = null
     }
 
     def initFieldsMap(Map<String, String> fieldIds) {
