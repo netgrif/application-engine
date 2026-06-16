@@ -129,7 +129,11 @@ abstract class FieldActionsRunner {
     }
 
     private void cleanUp(Closure code) {
-        ((ActionDelegate) code.delegate).clearAfterExecution()
-        clearGroovyMetaClass(code)
+        if (code?.delegate instanceof ActionDelegate) {
+            ((ActionDelegate) code.delegate).clearAfterExecution()
+            clearGroovyMetaClass(code)
+        } else {
+            log.warn("Code delegate is not instance of ActionDelegate")
+        }
     }
 }
