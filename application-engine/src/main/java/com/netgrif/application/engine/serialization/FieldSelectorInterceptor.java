@@ -16,8 +16,7 @@ public class FieldSelectorInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, @NonNull HttpServletResponse response,
-                             @NonNull Object handler) {
+    public boolean preHandle(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
         String fields = request.getParameter("fields");
         holder.setSelector(FieldSelector.parse(fields));
         return true;

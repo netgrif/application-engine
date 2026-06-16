@@ -13,16 +13,64 @@ import com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.
 
 import java.io.IOException;
 
+/**
+ * Custom JSON serializer for {@link LocalisedEventOutcome} objects that provides selective field serialization
+ * based on a {@link FieldSelector} configuration.
+ * <p>
+ * This serializer handles various types of localized event outcomes including:
+ * <ul>
+ *   <li>{@link LocalisedPetriNetEventOutcome} - outcomes related to Petri nets</li>
+ *   <li>{@link LocalisedCaseEventOutcome} - outcomes related to cases</li>
+ *   <li>{@link LocalisedTaskEventOutcome} - outcomes related to tasks</li>
+ *   <li>{@link LocalisedGetDataEventOutcome} - outcomes for data retrieval operations</li>
+ *   <li>{@link LocalisedGetDataGroupsEventOutcome} - outcomes for data groups retrieval</li>
+ *   <li>{@link LocalisedSetDataEventOutcome} - outcomes for data modification operations</li>
+ * </ul>
+ * The serializer uses a {@link DynamicFieldSerializer} to handle nested object serialization with field selection support.
+ * </p>
+ *
+ * @see LocalisedEventOutcome
+ * @see FieldSelector
+ * @see DynamicFieldSerializer
+ */
 public class LocalizedEventOutcomeSerializer extends JsonSerializer<LocalisedEventOutcome> {
 
+    /**
+     * Holder containing the {@link FieldSelector} that determines which fields should be included
+     * in the serialized JSON output.
+     */
     private final FieldSelectorHolder selectorHolder;
+
+    /**
+     * Serializer used for dynamic field serialization of nested objects with field selection support.
+     */
     private final DynamicFieldSerializer dynamicSerializer;
 
+    /**
+     * Constructs a new LocalizedEventOutcomeSerializer with the specified field selector holder.
+     *
+     * @param selectorHolder the holder containing the field selector configuration for controlling
+     *                       which fields are included in the serialized output
+     */
     public LocalizedEventOutcomeSerializer(FieldSelectorHolder selectorHolder) {
         this.selectorHolder = selectorHolder;
         this.dynamicSerializer = new DynamicFieldSerializer(selectorHolder);
     }
 
+    /**
+     * Serializes a {@link LocalisedEventOutcome} object to JSON format with selective field inclusion
+     * based on the configured {@link FieldSelector}.
+     * <p>
+     * The method handles serialization of common fields (message, frontActions, outcomes) and type-specific
+     * fields based on the actual runtime type of the outcome object. Nested objects are serialized using
+     * the {@link DynamicFieldSerializer} with their corresponding nested field selectors.
+     * </p>
+     *
+     * @param outcome  the localized event outcome object to serialize
+     * @param gen      the JSON generator used to write JSON content
+     * @param provider the serializer provider for accessing additional serializers
+     * @throws IOException if an I/O error occurs during serialization
+     */
     @Override
     public void serialize(LocalisedEventOutcome outcome, JsonGenerator gen, SerializerProvider provider)
             throws IOException {
