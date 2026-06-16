@@ -16,9 +16,11 @@ import java.io.IOException;
 public class ChangeRecordSerializer extends JsonSerializer<LocalisedEventOutcome> {
 
     private final FieldSelectorHolder selectorHolder;
+    private final DynamicFieldSerializer dynamicSerializer;
 
     public ChangeRecordSerializer(FieldSelectorHolder selectorHolder) {
         this.selectorHolder = selectorHolder;
+        this.dynamicSerializer = new DynamicFieldSerializer(selectorHolder);
     }
 
     @Override
@@ -42,22 +44,28 @@ public class ChangeRecordSerializer extends JsonSerializer<LocalisedEventOutcome
             gen.writeEndArray();
         }
         if (outcome instanceof LocalisedPetriNetEventOutcome specificOutcome && selector.includes("net") && specificOutcome.getNet() != null) {
-            gen.writeObjectField("net", specificOutcome.getNet());
+            gen.writeFieldName("net");
+            dynamicSerializer.serializeWithSelector(specificOutcome.getNet(), gen, provider, selector.nested("net"));
         }
         if (outcome instanceof LocalisedCaseEventOutcome specificOutcome && selector.includes("case") && specificOutcome.getaCase() != null) {
-            gen.writeObjectField("aCase", specificOutcome.getaCase());
+            gen.writeFieldName("aCase");
+            dynamicSerializer.serializeWithSelector(specificOutcome.getaCase(), gen, provider, selector.nested("case"));
         }
         if (outcome instanceof LocalisedTaskEventOutcome specificOutcome && selector.includes("task") && specificOutcome.getTask() != null) {
-            gen.writeObjectField("task", specificOutcome.getaCase());
+            gen.writeFieldName("task");
+            dynamicSerializer.serializeWithSelector(specificOutcome.getTask(), gen, provider, selector.nested("task"));
         }
         if (outcome instanceof LocalisedGetDataEventOutcome specificOutcome && selector.includes("data") && specificOutcome.getData() != null) {
-            gen.writeObjectField("data", specificOutcome.getData());
+            gen.writeFieldName("data");
+            dynamicSerializer.serializeWithSelector(specificOutcome.getData(), gen, provider, selector.nested("data"));
         }
         if (outcome instanceof LocalisedGetDataGroupsEventOutcome specificOutcome && selector.includes("data") && specificOutcome.getData() != null) {
-            gen.writeObjectField("data", specificOutcome.getData());
+            gen.writeFieldName("data");
+            dynamicSerializer.serializeWithSelector(specificOutcome.getData(), gen, provider, selector.nested("data"));
         }
         if (outcome instanceof LocalisedSetDataEventOutcome specificOutcome && selector.includes("changedFields") && specificOutcome.getChangedFields() != null) {
-            gen.writeObjectField("changedFields", specificOutcome.getChangedFields());
+            gen.writeFieldName("changedFields");
+            dynamicSerializer.serializeWithSelector(specificOutcome.getChangedFields(), gen, provider, selector.nested("changedFields"));
         }
 
         gen.writeEndObject();

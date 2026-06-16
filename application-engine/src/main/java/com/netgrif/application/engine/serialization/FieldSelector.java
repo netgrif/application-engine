@@ -47,7 +47,13 @@ public final class FieldSelector {
     }
 
     public boolean includes(String field) {
-        return fields == null || fields.contains(field);
+        if (fields == null) return true;
+        if (fields.contains(field)) return true;
+        return nested != null && nested.containsKey(field);
+    }
+
+    public boolean includeAll() {
+        return fields == null;
     }
 
     public FieldSelector nested(String field) {
