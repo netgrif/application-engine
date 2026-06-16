@@ -20,12 +20,15 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
+import com.netgrif.application.engine.workflow.service.LegacyTaskSearchService;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.web.responsebodies.*;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -56,7 +59,7 @@ public abstract class AbstractTaskController {
     private final IDataService dataService;
     private final IWorkflowService workflowService;
     private final IElasticTaskService elasticTaskService;
-    private final TaskSearchService taskSearchService;
+    private final LegacyTaskSearchService searchService;
 
     public PagedModel<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
@@ -186,18 +189,21 @@ public abstract class AbstractTaskController {
         return resources;
     }
 
-    public PagedModel<LocalisedTaskResource> searchPfql(Authentication auth, Pageable pageable, SingleElasticTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
+    public PagedModel<LocalisedTaskResource> searchPfql(Authentication auth, Pageable pageable, SingleTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
         try {
+            List<Predicate> predicates = new ArrayList<>();
             searchBody.getList().forEach((request) -> {
                 if (request.query == null || request.query.isEmpty()) {
-                    return;
+                    predicates.add(searchService.buildSingleQuery(request, (LoggedUser) auth.getPrincipal(), locale));
+                } else {
+                    QueryLangEvaluator evaluator = SearchUtils.evaluateQuery(request.query);
+                    predicates.add(evaluator.getFullMongoQuery());
                 }
-                QueryLangEvaluator evaluator = SearchUtils.evaluateQuery(request.query);
-                request.query = evaluator.getFullElasticQuery();
             });
-            Page<Task> tasks = elasticTaskService.search(searchBody.getList(), (LoggedUser) auth.getPrincipal(), pageable, locale, operation == MergeFilterOperation.AND);
+            Predicate completePredicate = predicates.stream().reduce(ExpressionUtils::and).orElse(null);
+            Page<Task> tasks = taskService.search(completePredicate, pageable);
             Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                    .searchElastic(auth, pageable, searchBody, operation, assembler, locale)).withRel("search_es");
+                    .searchPfql(auth, pageable, searchBody, operation, assembler, locale)).withRel("search_pfql");
             PagedModel<LocalisedTaskResource> resources = assembler.toModel(tasks, new TaskResourceAssembler(locale), selfLink);
             ResourceLinkAssembler.addLinks(resources, Task.class, selfLink.getRel().toString());
             return resources;

@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
-import com.netgrif.application.engine.pfql.service.taskresource.TaskSearchService;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
+import com.netgrif.application.engine.workflow.service.LegacyTaskSearchService;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -52,8 +52,8 @@ import java.util.Locale;
 public class TaskController extends AbstractTaskController {
 
     public TaskController(ITaskService taskService, IDataService dataService, IWorkflowService workflowService,
-                          IElasticTaskService elasticTaskService, TaskSearchService taskSearchService) {
-        super(taskService, dataService, workflowService, elasticTaskService, taskSearchService);
+                          IElasticTaskService elasticTaskService, LegacyTaskSearchService searchService) {
+        super(taskService, dataService, workflowService, elasticTaskService, searchService);
     }
 
     @Override
@@ -171,7 +171,7 @@ public class TaskController extends AbstractTaskController {
     @Override
     @Operation(summary = "PFQL task search", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search_pfql", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> searchPfql(Authentication auth, Pageable pageable, @RequestBody SingleElasticTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
+    public PagedModel<LocalisedTaskResource> searchPfql(Authentication auth, Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
         return super.searchPfql(auth, pageable, searchBody, operation, assembler, locale);
     }
 
