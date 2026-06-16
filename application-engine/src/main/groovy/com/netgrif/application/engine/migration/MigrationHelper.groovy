@@ -593,11 +593,12 @@ class MigrationHelper {
 
     /**
      * Runs migration code with a clean error cache and returns errors collected during execution.
-     * Any exception thrown by {`@code` migrationCode} is caught, logged, and included in the returned list
-     * as a {`@link` MigrationError} — this method never throws.
+     * Any {@link Exception} thrown by {@code migrationCode} is caught, logged, and included in the returned list
+     * as a {@link MigrationError}. JVM {@link Error}s and cleanup failures still propagate.
+
      *
-     * `@param` migrationCode migration logic to execute
-     * `@return` errors collected during migrationCode execution, including any caught runtime exception
+     * @param migrationCode migration logic to execute
+     * @return errors collected during migrationCode execution, including any caught runtime exception
      */
     List<MigrationError> collectErrors(Closure migrationCode) {
         clearErrors()
