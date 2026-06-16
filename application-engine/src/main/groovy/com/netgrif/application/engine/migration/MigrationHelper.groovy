@@ -593,16 +593,23 @@ class MigrationHelper {
 
     /**
      * Runs migration code with a clean error cache and returns errors collected during execution.
+     * Any exception thrown by {`@code` migrationCode} is caught, logged, and included in the returned list
+     * as a {`@link` MigrationError} — this method never throws.
      *
-     * @param migrationCode migration logic to execute
-     * @return errors collected during migrationCode execution
+     * `@param` migrationCode migration logic to execute
+     * `@return` errors collected during migrationCode execution, including any caught runtime exception
      */
     List<MigrationError> collectErrors(Closure migrationCode) {
         clearErrors()
+        List<MigrationError> errors = new ArrayList<>()
         try {
             migrationCode.call()
+        } catch (Exception e) {
+            log.error("Failed to execute migrationCode", e)
+            errors.addAll(MigrationError.of(this.class.simpleName, "call", null, null, "Failed to execute migration code", e))
         } finally {
+            errors.addAll(popErrors())
         }
-        return popErrors()
+        return errors
     }
 }
