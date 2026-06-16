@@ -13,12 +13,12 @@ import com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.
 
 import java.io.IOException;
 
-public class ChangeRecordSerializer extends JsonSerializer<LocalisedEventOutcome> {
+public class LocalizedEventOutcomeSerializer extends JsonSerializer<LocalisedEventOutcome> {
 
     private final FieldSelectorHolder selectorHolder;
     private final DynamicFieldSerializer dynamicSerializer;
 
-    public ChangeRecordSerializer(FieldSelectorHolder selectorHolder) {
+    public LocalizedEventOutcomeSerializer(FieldSelectorHolder selectorHolder) {
         this.selectorHolder = selectorHolder;
         this.dynamicSerializer = new DynamicFieldSerializer(selectorHolder);
     }

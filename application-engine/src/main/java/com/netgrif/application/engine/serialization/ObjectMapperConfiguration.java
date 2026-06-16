@@ -12,6 +12,6 @@ public class ObjectMapperConfiguration {
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jsonCustomizer(FieldSelectorHolder holder) {
         return builder -> builder.serializationInclusion(JsonInclude.Include.NON_NULL)
-                .serializerByType(LocalisedEventOutcome.class, new ChangeRecordSerializer(holder));
+                .serializerByType(LocalisedEventOutcome.class, new LocalizedEventOutcomeSerializer(holder));
     }
 }
