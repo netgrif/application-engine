@@ -83,12 +83,12 @@ public final class FieldSelector {
      * @throws IllegalArgumentException if the specification contains unmatched parentheses
      */
     public static FieldSelector parse(String spec) {
+        if (spec == null || spec.isBlank()) {
+            return new FieldSelector(null, null);
+        }
+
         Set<String> fields = new HashSet<>();
         Map<String, FieldSelector> nested = new HashMap<>();
-
-        if (spec == null || spec.isBlank()) {
-            return new FieldSelector();
-        }
 
         int i = 0;
         while (i < spec.length()) {
@@ -96,14 +96,16 @@ public final class FieldSelector {
             int parenthesisIdx = spec.indexOf('(', i);
 
             if (parenthesisIdx != -1 && parenthesisIdx < commaIdx) {
-                String name = spec.substring(i, parenthesisIdx);
+                String name = spec.substring(i, parenthesisIdx).trim();
                 int closeParenthesisIdx = findMatchingParen(spec, parenthesisIdx);
                 String inner = spec.substring(parenthesisIdx + 1, closeParenthesisIdx);
+                fields.add(name);
                 nested.put(name, parse(inner));
                 i = closeParenthesisIdx + 1;
                 if (i < spec.length() && spec.charAt(i) == ',') i++;
             } else {
-                fields.add(spec.substring(i, commaIdx));
+                String name = spec.substring(i, commaIdx).trim();
+                if (!name.isEmpty()) fields.add(name);
                 i = commaIdx + 1;
             }
         }
