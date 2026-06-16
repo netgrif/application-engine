@@ -507,10 +507,12 @@
 			<actions phase="pre">
 				<action id="action_0">
 					<![CDATA[
+					state: f.state,
 					mongo_id: f.mongo_id,
 					log_delete: f.log_delete;
 
 					deleteWithCases(mongo_id, log_delete)
+					change state value { "trash" }
 					]]>
 				</action>
 			</actions>
@@ -566,30 +568,11 @@
 			<actions phase="pre">
 				<action id="action8">
 					<![CDATA[
+					state: f.state,
 					mongo_id: f.mongo_id,
 					log_delete: f.log_delete;
 					deleteWithCases(mongo_id, log_delete)
-					]]>
-				</action>
-			</actions>
-		</event>
-	</transition>
-	<transition>
-		<id>t3</id>
-		<x>176</x>
-		<y>272</y>
-		<label>Back to Draft</label>
-		<icon>delete_outline</icon>
-		<event type="finish">
-			<id>t3_finish</id>
-			<actions phase="pre">
-				<action id="action4">
-					<![CDATA[
-					mongo_id: f.mongo_id;
-
-					def net = findPetriNet(mongo_id.value)
-					workflowService.deleteInstancesOfPetriNet(net)
-					petriNetService.undeploy(net, loggedUser())
+					change state value { "trash" }
 					]]>
 				</action>
 			</actions>
@@ -745,10 +728,12 @@
 			<actions phase="pre">
 				<action id="action2">
 					<![CDATA[
+					state: f.state,
 					mongo_id: f.mongo_id,
 					log_delete: f.log_delete;
 
 					deleteWithCases(mongo_id, log_delete)
+					change state value { "trash" }
 					]]>
 				</action>
 			</actions>
@@ -801,9 +786,11 @@
 			<actions phase="pre">
 				<action id="action5">
 					<![CDATA[
+					state: f.state;
 					// TODO: prepinac freeze - ci sa mozu casey dorobit
 					def net = findPetriNet(mongo_id.value)
 					petriNetService.archive(net, loggedUser())
+					change state value { "archived" }
 					]]>
 				</action>
 			</actions>
@@ -896,13 +883,6 @@
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
-		<id>a16</id>
-		<type>regular</type>
-		<sourceId>t3</sourceId>
-		<destinationId>p1</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
 		<id>a17</id>
 		<type>regular</type>
 		<sourceId>deploy</sourceId>
@@ -928,13 +908,6 @@
 		<type>regular</type>
 		<sourceId>p1</sourceId>
 		<destinationId>deploy</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>a20</id>
-		<type>regular</type>
-		<sourceId>p7</sourceId>
-		<destinationId>t3</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
@@ -991,13 +964,6 @@
 		<type>regular</type>
 		<sourceId>deploy</sourceId>
 		<destinationId>p2</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>a5</id>
-		<type>regular</type>
-		<sourceId>p2</sourceId>
-		<destinationId>t3</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
