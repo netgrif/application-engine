@@ -1264,7 +1264,7 @@ public class Importer {
             missingMetaData.add("<version>");
         }
         if (!missingMetaData.isEmpty()) {
-            throw new MissingPetriNetMetaDataException(missingMetaData);
+            throw new MissingPetriNetMetaDataException(missingMetaData, net.getIdentifier());
         }
     }
 

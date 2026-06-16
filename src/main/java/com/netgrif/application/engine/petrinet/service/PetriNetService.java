@@ -22,6 +22,7 @@ import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
@@ -31,13 +32,13 @@ import com.netgrif.application.engine.rules.domain.facts.NetImportedFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
+import com.netgrif.application.engine.workflow.domain.TaskPair;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.application.engine.workflow.service.TaskService;
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -65,6 +66,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -132,6 +134,10 @@ public class PetriNetService implements IPetriNetService {
     private IUriService uriService;
 
     private IElasticPetriNetService elasticPetriNetService;
+    @Autowired
+    private TaskService taskService;
+    @Autowired
+    private IDataService iDataService;
 
     @Autowired
     public void setElasticPetriNetService(IElasticPetriNetService elasticPetriNetService) {
@@ -215,39 +221,20 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author, String uriNodeId, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
-        ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
-        IOUtils.copy(xmlFile, xmlCopy);
-        Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(xmlCopy.toByteArray()));
-        if (imported.isEmpty()) {
-            return outcome;
+        ImportPetriNetEventOutcome outcome = importPetriNet(xmlFile, author, uriNodeId, params, net -> {
+            PetriNet existingNet = self.getNewestVersionByIdentifier(net.getIdentifier());
+            if (existingNet != null) {
+                net.setVersion(existingNet.getVersion());
+                net.incrementVersion(releaseType);
+            }
+            return net;
+        });
+        try {
+            createProcessCase(outcome.getNet(), author);
+        } catch (Exception e) {
+            // TODO: NAE-2447 undeploy
+            log.error("Creating process case failed", e);
         }
-        PetriNet net = imported.get();
-        net.setUriNodeId(uriNodeId);
-        net.setDeploymentState(DeploymentState.DEPLOYED);
-
-        PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
-        if (existingNet != null) {
-            net.setVersion(existingNet.getVersion());
-            net.incrementVersion(releaseType);
-        }
-        processRoleService.saveAll(net.getRoles().values());
-        net.setAuthor(author.transformToAuthor());
-        functionCacheService.cachePetriNetFunctions(net);
-        Path savedPath = getImporter().saveNetFile(net, new ByteArrayInputStream(xmlCopy.toByteArray()));
-        xmlCopy.close();
-        log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully and saved in a folder: " + savedPath.toString());
-
-        outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
-        evaluateRules(net, EventPhase.PRE);
-        historyService.save(new ImportPetriNetEventLog(null, EventPhase.PRE, net.getObjectId()));
-        save(net);
-        createProcessCase(net, author);
-        outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params));
-        evaluateRules(net, EventPhase.POST);
-        historyService.save(new ImportPetriNetEventLog(null, EventPhase.POST, net.getObjectId()));
-        addMessageToOutcome(net, ProcessEventType.UPLOAD, outcome);
-        outcome.setNet(imported.get());
         return outcome;
     }
 
@@ -373,39 +360,12 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
-        ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
-        IOUtils.copy(xmlFile, xmlCopy);
-        Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(xmlCopy.toByteArray()));
-        if (imported.isEmpty()) {
-            return outcome;
-        }
-        Map<String, String> params = new HashMap<>();
-        String uriNodeId = uriService.getRoot().getStringId();
-        PetriNet net = imported.get();
-        net.setUriNodeId(uriNodeId);
-        net.setDeploymentState(DeploymentState.DEPLOYED);
-
-        if (exists(net.getIdentifier(), net.getVersion())) {
-            throw new IllegalArgumentException("Petri net with identifier " + net.getIdentifier() + " and version " + net.getVersion() + " already exists.");
-        }
-        processRoleService.saveAll(net.getRoles().values());
-        net.setAuthor(author.transformToAuthor());
-        functionCacheService.cachePetriNetFunctions(net);
-        Path savedPath = getImporter().saveNetFile(net, new ByteArrayInputStream(xmlCopy.toByteArray()));
-        xmlCopy.close();
-        log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully and saved in a folder: " + savedPath.toString());
-
-        outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
-        evaluateRules(net, EventPhase.PRE);
-        historyService.save(new ImportPetriNetEventLog(null, EventPhase.PRE, net.getObjectId()));
-        save(net);
-        outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params));
-        evaluateRules(net, EventPhase.POST);
-        historyService.save(new ImportPetriNetEventLog(null, EventPhase.POST, net.getObjectId()));
-        addMessageToOutcome(net, ProcessEventType.UPLOAD, outcome);
-        outcome.setNet(imported.get());
-        return outcome;
+        return importPetriNet(xmlFile, author, uriService.getRoot().getStringId(), new HashMap<>(), net -> {
+            if (exists(net.getIdentifier(), net.getVersion())) {
+                throw new IllegalArgumentException("Petri net with identifier " + net.getIdentifier() + " and version " + net.getVersion() + " already exists.");
+            }
+            return net;
+        });
     }
 
     @Override
@@ -660,7 +620,6 @@ public class PetriNetService implements IPetriNetService {
             log.error("LdapGroup", ex);
         }
 
-
         log.info("[" + processId + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
         this.repository.deleteBy_id(petriNet.getObjectId());
         this.evictCache(petriNet);
@@ -693,8 +652,54 @@ public class PetriNetService implements IPetriNetService {
         return obj;
     }
 
+    /**
+     * Creates a case of the Process process and set it to deployed state.
+     */
     protected void createProcessCase(PetriNet net, LoggedUser author) {
-        // TODO: NAE-2447 map net to case
+        // TODO: NAE-2447 replace with case import in later releases
         Case procesCase = workflowService.createCaseByIdentifier("process", net.getTitle().getDefaultValue(), "", author).getCase();
+        procesCase.getDataSet().get("state").setValue("deployed");
+        procesCase.getDataSet().get("id").setValue(net.getIdentifier());
+        procesCase.getDataSet().get("title").setValue(net.getTitle().getDefaultValue());
+        procesCase.getDataSet().get("version").setValue(net.getVersion().toString());
+        procesCase.getDataSet().get("icon").setValue(net.getIcon());
+        procesCase.getDataSet().get("mongo_id").setValue(net.getStringId());
+        procesCase.setActivePlaces(Map.of("p2", 1, "p7", 1));
+        workflowService.save(procesCase);
+        procesCase = workflowService.findOne(procesCase.getStringId());
+        taskService.reloadTasks(procesCase);
+    }
+
+    protected ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, LoggedUser author, String uriNodeId, Map<String, String> params, Function<PetriNet, PetriNet> existenceCheck) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+        ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
+        ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
+        IOUtils.copy(xmlFile, xmlCopy);
+        Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(xmlCopy.toByteArray()));
+        if (imported.isEmpty()) {
+            return outcome;
+        }
+        PetriNet net = imported.get();
+        net.setUriNodeId(uriNodeId);
+        net.setDeploymentState(DeploymentState.DEPLOYED);
+
+        net = existenceCheck.apply(net);
+
+        processRoleService.saveAll(net.getRoles().values());
+        net.setAuthor(author.transformToAuthor());
+        functionCacheService.cachePetriNetFunctions(net);
+        Path savedPath = getImporter().saveNetFile(net, new ByteArrayInputStream(xmlCopy.toByteArray()));
+        xmlCopy.close();
+        log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully and saved in a folder: " + savedPath.toString());
+
+        outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
+        evaluateRules(net, EventPhase.PRE);
+        historyService.save(new ImportPetriNetEventLog(null, EventPhase.PRE, net.getObjectId()));
+        save(net);
+        outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params));
+        evaluateRules(net, EventPhase.POST);
+        historyService.save(new ImportPetriNetEventLog(null, EventPhase.POST, net.getObjectId()));
+        addMessageToOutcome(net, ProcessEventType.UPLOAD, outcome);
+        outcome.setNet(imported.get());
+        return outcome;
     }
 }

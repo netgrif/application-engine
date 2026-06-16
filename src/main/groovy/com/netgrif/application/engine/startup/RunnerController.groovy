@@ -18,7 +18,6 @@ class RunnerController {
             FunctionsCacheRunner,
             ProcessRunner,
             MenuRunner,
-            FilterRunner,
             GroupRunner,
             ImpersonationRunner,
             DashboardRunner,
