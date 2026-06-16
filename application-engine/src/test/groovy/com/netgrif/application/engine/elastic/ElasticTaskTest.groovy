@@ -40,7 +40,6 @@ import java.util.concurrent.TimeUnit
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = ApplicationEngine.class
 )
 @AutoConfigureMockMvc
