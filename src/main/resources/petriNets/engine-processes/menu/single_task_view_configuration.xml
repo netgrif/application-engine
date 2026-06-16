@@ -1,7 +1,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-    <id>tabbed_ticket_view_configuration</id>
-    <initials>TVC</initials>
-    <title>Tabbed ticket view configuration</title>
+    <id>single_task_view_configuration</id>
+    <initials>TST</initials>
+    <title>Single task view configuration</title>
     <icon>check_box_outline_blank</icon>
     <defaultRole>true</defaultRole>
     <anonymousRole>false</anonymousRole>
@@ -28,16 +28,6 @@
             <view>true</view>
         </caseLogic>
     </roleRef>
-    <caseEvents>
-        <event type="delete">
-            <id>view_delete</id>
-            <actions phase="pre">
-                <action id="0">
-                    removeViewCase()
-                </action>
-            </actions>
-        </event>
-    </caseEvents>
     <role>
         <id>system</id>
         <title>System</title>
@@ -50,56 +40,10 @@
     <function scope="process" name="initializeAdvancedForm">
         { ->
             def advancedContentFormField = useCase.getField("advanced_content_form")
-            change advancedContentFormField value { [useCase.tasks.find { taskPair -> taskPair.transition == "next_view_settings"}.task] }
-        }
-    </function>
-    <function scope="process" name="removeViewCase">
-        { ->
-
-            def viewIdAsList = useCase.dataSet['view_configuration_id'].value
-            if (viewIdAsList == null || viewIdAsList.isEmpty()) {
-                return
-            }
-
-            async.run {
-                workflowService.deleteCase(viewIdAsList[0])
-            }
+            change advancedContentFormField value { [useCase.tasks.find { taskPair -> taskPair.transition == "filter_settings"}.task] }
         }
     </function>
 
-    <!-- ASSOCIATED VIEW: this section can be removed if needed -->
-    <data type="enumeration_map" immediate="true">
-        <id>view_configuration_type</id>
-        <title name="view_configuration_type">View type</title>
-        <options>
-            <init dynamic="true">menuItemService.getAvailableViewsAsOptions(true, useCase.processIdentifier)</init>
-        </options>
-        <action trigger="set">
-            view_configuration_type: f.view_configuration_type;
-
-            if (view_configuration_type.options == null || view_configuration_type.options.isEmpty()) {
-                change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(true, useCase.processIdentifier) }
-            }
-        </action>
-    </data>
-    <data type="caseRef">
-        <id>view_configuration_id</id>
-        <title/>
-        <allowedNets>
-            <allowedNet>single_task_view_configuration</allowedNet>
-        </allowedNets>
-    </data>
-    <data type="taskRef">
-        <id>view_configuration_form</id>
-        <title/>
-    </data>
-    <data type="taskRef">
-        <id>view_configuration_all_data_form</id>
-        <title/>
-    </data>
-    <!-- END OF ASSOCIATED VIEW -->
-
-    <!-- VIEW CONFIGURATION DATA -->
     <data type="taskRef">
         <id>advanced_content_form</id>
         <title/>
@@ -108,18 +52,41 @@
             <property key="headers">meta-title</property>
         </component>
     </data>
-    <!-- END OF VIEW CONFIGURATION DATA -->
+    <data type="boolean">
+        <id>show_page_header</id>
+        <title name="show_page_header">Show page header</title>
+        <init>true</init>
+    </data>
+    <data type="boolean">
+        <id>show_page_footer</id>
+        <title name="show_page_footer">Show page footer</title>
+        <init>false</init>
+    </data>
+    <data type="taskFilter">
+        <id>task_filter</id>
+        <title name="task_filter">Filter</title>
+        <desc name="task_filter_desc">Use Elasticsearch string query</desc>
+        <init>*</init>
+    </data>
 
     <!-- I18NS -->
     <i18n locale="sk">
-        <i18nString name="view_configuration_type">Zobrazenie</i18nString>
+        <i18nString name="view_configuration_type">Vybrať zobrazenie</i18nString>
         <i18nString name="settings">Nastavenie</i18nString>
-        <i18nString name="next_view_settings">Ďalšie zobrazenie</i18nString>
+        <i18nString name="show_page_header">Zobraziť hlavičku stránky</i18nString>
+        <i18nString name="show_page_footer">Zobraziť pätu stránky</i18nString>
+        <i18nString name="task_filter">Filter</i18nString>
+        <i18nString name="task_filter_desc">Použi Elasticsearch string query</i18nString>
+        <i18nString name="filter_settings">Filter</i18nString>
     </i18n>
     <i18n locale="de">
-        <i18nString name="view_configuration_type">Der Ansichtstyp</i18nString>
+        <i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
         <i18nString name="settings">Einstellungen</i18nString>
-        <i18nString name="next_view_settings">Nächste Ansicht</i18nString>
+        <i18nString name="show_page_header">Seitenkopf anzeigen</i18nString>
+        <i18nString name="show_page_footer">Seitenfuß anzeigen</i18nString>
+        <i18nString name="task_filter">Filter</i18nString>
+        <i18nString name="task_filter_desc">Elasticsearch-String-Abfrage verwenden</i18nString>
+        <i18nString name="filter_settings">Filter</i18nString>
     </i18n>
 
     <transition>
@@ -174,11 +141,11 @@
             </logic>
         </roleRef>
         <dataGroup>
-            <id>settings_0</id>
+            <id>view_dataGroup</id>
             <cols>4</cols>
             <layout>grid</layout>
             <dataRef>
-                <id>advanced_content_form</id>
+                <id>show_page_header</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -186,8 +153,35 @@
                     <x>0</x>
                     <y>0</y>
                     <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>show_page_footer</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>advanced_content_form</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
                     <cols>4</cols>
-                    <offset>0</offset>
                     <template>material</template>
                     <appearance>outline</appearance>
                 </layout>
@@ -203,11 +197,11 @@
         </event>
     </transition>
     <transition>
-        <id>next_view_settings</id>
-        <x>400</x>
+        <id>filter_settings</id>
+        <x>432</x>
         <y>48</y>
-        <label name="next_view_settings">Next view</label>
-        <icon>queue_play_next</icon>
+        <label name="filter_settings">Filter</label>
+        <icon>filter_alt</icon>
         <assignPolicy>auto</assignPolicy>
         <roleRef>
             <id>admin</id>
@@ -222,35 +216,19 @@
             </logic>
         </roleRef>
         <dataGroup>
-            <id>associated_view</id>
+            <id>filter_0</id>
             <cols>4</cols>
             <layout>grid</layout>
             <dataRef>
-                <id>view_configuration_type</id>
+                <id>task_filter</id>
                 <logic>
-                    <behavior>visible</behavior>
+                    <behavior>editable</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
                     <y>0</y>
                     <rows>1</rows>
                     <cols>4</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>view_configuration_form</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <offset>0</offset>
                     <template>material</template>
                     <appearance>outline</appearance>
                 </layout>
@@ -289,7 +267,7 @@
             <cols>1</cols>
             <layout>grid</layout>
             <dataRef>
-                <id>view_configuration_type</id>
+                <id>show_page_header</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
@@ -303,13 +281,27 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>view_configuration_all_data_form</id>
+                <id>show_page_footer</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
                     <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>
@@ -359,7 +351,7 @@
         <id>a4</id>
         <type>read</type>
         <sourceId>initialized</sourceId>
-        <destinationId>next_view_settings</destinationId>
+        <destinationId>filter_settings</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>

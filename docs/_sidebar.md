@@ -7,8 +7,6 @@
     * [Event queue](events/event_queue.md)
 * [Search]()
     * [Elastic](search/elastic_mapping.md)
-    * [Filter](search/filter.md)
-    * [Import / Export](search/filter_import_export.md)
 * [Permissions]()
     * [User list](roles/userlist.md)
     * [Permissions](roles/permissions.md)
