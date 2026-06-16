@@ -602,7 +602,7 @@ class MigrationHelper {
         try {
             migrationCode.call()
         } finally {
-            return popErrors()
         }
+        return popErrors()
     }
 }
