@@ -340,7 +340,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
     /**
      * Removes choices from enumeration or multichoice field
      * @param useCase Instance of Case
-     * @param toAdd Map<field id, list of choices to add into data field>
+     * @param toRemove Map<field id, list of choices to remove from data field>
      */
     static void removeChoices(Case useCase, Map<String, List<String>> toRemove) {
         log.debug("Starting removeChoices for case: ${useCase.stringId}, fields: ${toRemove.keySet()}")

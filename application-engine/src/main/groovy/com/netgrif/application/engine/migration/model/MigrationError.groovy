@@ -129,7 +129,7 @@ class MigrationError {
      *
      * @return the entity type
      */
-    String getEntityType() {
+    Class<?> getEntityType() {
         return entityType
     }
 
