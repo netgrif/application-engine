@@ -20,14 +20,12 @@ import groovy.util.logging.Slf4j
 import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
-import org.springframework.stereotype.Component
 /**
  * Helper class for migrating cases, tasks and Petri net models.
  * Provides convenience methods for updating existing data and models during system migrations.
  * This class delegates migration operations to specialized helper classes for cases, tasks, and Petri nets.
  */
 @Slf4j
-@Component
 class MigrationHelper {
 
     /**
@@ -595,16 +593,24 @@ class MigrationHelper {
 
     /**
      * Runs migration code with a clean error cache and returns errors collected during execution.
+     * Any {@link Exception} thrown by {@code migrationCode} is caught, logged, and included in the returned list
+     * as a {@link MigrationError}. JVM {@link Error}s and cleanup failures still propagate.
+
      *
      * @param migrationCode migration logic to execute
-     * @return errors collected during migrationCode execution
+     * @return errors collected during migrationCode execution, including any caught runtime exception
      */
     List<MigrationError> collectErrors(Closure migrationCode) {
         clearErrors()
+        List<MigrationError> errors = new ArrayList<>()
         try {
             migrationCode.call()
+        } catch (Exception e) {
+            log.error("Failed to execute migrationCode", e)
+            errors.addAll(MigrationError.of(this.class.simpleName, "call", null, null, "Failed to execute migration code", e))
         } finally {
-            return popErrors()
+            errors.addAll(popErrors())
         }
+        return errors
     }
 }
