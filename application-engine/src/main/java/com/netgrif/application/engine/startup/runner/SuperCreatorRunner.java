@@ -52,12 +52,12 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
         authorities.add(adminAuthority);
         authorities.add(systemAuthority);
 
-        Optional<AbstractUser> superUser = userService.findUserByUsername(UserConstants.ADMIN_USER_USERNAME, null);
+        Optional<AbstractUser> superUser = userService.findUserByUsername(UserConstants.ADMIN_USER_EMAIL, null);
         if (superUser.isEmpty()) {
             User user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
             user.setFirstName(UserConstants.ADMIN_USER_FIRST_NAME);
             user.setLastName(UserConstants.ADMIN_USER_LAST_NAME);
-            user.setUsername(UserConstants.ADMIN_USER_USERNAME); // TODO: set email ? IDK
+            user.setUsername(UserConstants.ADMIN_USER_EMAIL); // TODO: set ADMIN_USER_EMAIL or ADMIN_USER_USERNAME ? IDK
             user.setEmail(UserConstants.ADMIN_USER_EMAIL);
             PasswordCredential passwordCredential = new PasswordCredential(securityProperties.getAuth().getAdminPassword(), 0, true);
             user.setCredential("password", passwordCredential);
