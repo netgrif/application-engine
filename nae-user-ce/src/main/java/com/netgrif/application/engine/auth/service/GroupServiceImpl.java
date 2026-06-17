@@ -141,6 +141,7 @@ public class GroupServiceImpl implements GroupService {
     public void removeAllByRealmIdIn(Collection<String> realmIds) {
         if (realmIds == null || realmIds.isEmpty()) {
             this.removeAllGroups();
+            return;
         }
         Pageable groupPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
         Page<Group> groups = groupRepository.findAllByRealmIdIn(realmIds, groupPageable);

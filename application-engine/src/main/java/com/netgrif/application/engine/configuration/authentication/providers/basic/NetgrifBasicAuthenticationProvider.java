@@ -58,7 +58,7 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
         AbstractUser user = userOptional.get();
-        if (user instanceof User && !((User) user).isActive()) {
+        if (user instanceof User concreteUser && !concreteUser.isActive()) {
             log.debug("User is not active");
             loginAttemptService.loginFailed(key);
             throw new BadCredentialsException(this.messages

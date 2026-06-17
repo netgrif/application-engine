@@ -1,4 +1,3 @@
-management.endpoints.web.exposure.include: "*"
 netgrif:
   engine:
     main:
@@ -86,8 +85,8 @@ netgrif:
         expiration: 900000
         algorithm: RSA
         private-key: file:src/main/resources/certificates/private.der
-      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/api/public/**,/v3/api-docs/public,/manage/**
-      anonymous-exceptions: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/manage/**
+      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/api/public/**,/v3/api-docs/public,/manage/health
+      anonymous-exceptions: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/manage/health
       providers: NetgrifBasicAuthenticationProvider
     swagger:
       enabled: false
@@ -115,23 +114,13 @@ netgrif:
       endpoints:
         web:
           base-path: /manage
-          path-mapping:
-            prometheus: metric
           exposure:
-            exclude: shutdown
-            include: health,info
+            include: "health,info,metrics,loggers,env,beans,threaddump,heapdump,mappings,conditions,configprops,scheduledtasks,caches,flyway,liquibase,prometheus"
       endpoint:
         health:
           show-details: when_authorized
-          probes:
-            enabled: 'true'
-        log-file:
-          external-file: log/nae.log
-      info:
-        build:
-          enabled: 'false'
-        env:
-          enabled: 'true'
+          show-components: when_authorized
+          roles: ADMIN
       health:
         elasticsearch:
           enabled: 'false'

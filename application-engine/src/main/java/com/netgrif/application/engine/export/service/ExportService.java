@@ -160,8 +160,9 @@ public class ExportService implements IExportService {
     }
 
     private void writeTaskCsvPage(PrintWriter writer, Set<String> csvHeader, List<Task> exportTasks) {
+        Map<String, Case> caseCache = new HashMap<>();
         for (Task exportTask : exportTasks) {
-            Case taskCase = workflowService.findOne(exportTask.getCaseId());
+            Case taskCase = caseCache.computeIfAbsent(exportTask.getCaseId(), workflowService::findOne);
             writer.println(String.join(",", buildRecord(csvHeader, taskCase)).replace("\n", "\\n"));
         }
     }

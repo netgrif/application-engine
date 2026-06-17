@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
@@ -97,7 +96,11 @@ public class ElasticController {
             if (count == 0) {
                 log.info("No cases to reindex");
             } else {
-                long numOfPages = Math.max(1, Math.ceilDiv(count, (long) elasticsearchProperties.getReindexExecutor().getSize()));
+                int pageSize = elasticsearchProperties.getReindexExecutor().getSize();
+                if (pageSize <= 0) {
+                    throw new IllegalStateException("Reindex executor size must be greater than 0");
+                }
+                long numOfPages = Math.ceilDiv(count, (long) pageSize);
                 log.info("Reindexing cases: " + numOfPages + " pages");
 
                 for (int page = 0; page < numOfPages; page++) {

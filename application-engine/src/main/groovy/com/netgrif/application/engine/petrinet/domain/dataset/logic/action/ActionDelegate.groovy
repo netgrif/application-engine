@@ -1500,6 +1500,7 @@ class ActionDelegate extends DelegateExpando {
                 aCase.setAuthor(ActorTransformer.anonymizedActorRef())
                 workflowService.save(aCase)
             })
+            casesAuthoredByUserPage = workflowService.search(qCase.author.eq(ActorTransformer.toActorRef(user)), pageable)
         }
         userService.deleteUser(user)
     }

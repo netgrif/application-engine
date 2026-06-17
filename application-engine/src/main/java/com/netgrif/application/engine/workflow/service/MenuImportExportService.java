@@ -157,7 +157,14 @@ public class MenuImportExportService implements IMenuImportExportService {
             Map<String, Map<String, String>> caseToRemoveData = new HashMap<>();
             Map<String, String> removeBtnData = new HashMap<>();
             removeBtnData.put("type", "button");
-            removeBtnData.put("value", String.valueOf((Integer) caseToRemove.getFieldValue("remove_option") + 1));
+            Object removeOption = caseToRemove.getFieldValue("remove_option");
+            int nextRemoveOption = 1;
+            if (removeOption instanceof Number number) {
+                nextRemoveOption = number.intValue() + 1;
+            } else if (removeOption instanceof String value && value.matches("-?\\d+")) {
+                nextRemoveOption = Integer.parseInt(value) + 1;
+            }
+            removeBtnData.put("value", String.valueOf(nextRemoveOption));
             caseToRemoveData.put("remove_option", removeBtnData);
 
             QTask qTask = new QTask("task");

@@ -59,11 +59,18 @@ public class ReindexingTask {
         this.caseMappingService = caseMappingService;
         this.taskMappingService = taskMappingService;
         this.workflowService = workflowService;
-        this.pageSize = elasticsearchProperties.getReindexExecutor().getSize();
+        int configuredPageSize = elasticsearchProperties.getReindexExecutor().getSize();
+        if (configuredPageSize <= 0) {
+            throw new IllegalArgumentException("netgrif.engine.data.elasticsearch.reindex-executor.size must be > 0");
+        }
+        this.pageSize = configuredPageSize;
         this.elasticIndexService = elasticIndexService;
 
         lastRun = LocalDateTime.now();
         if (elasticsearchProperties.getReindexFrom() != null) {
+            if (elasticsearchProperties.getReindexFrom().isNegative()) {
+                throw new IllegalArgumentException("netgrif.engine.data.elasticsearch.reindex-from must be non-negative");
+            }
             lastRun = lastRun.minus(elasticsearchProperties.getReindexFrom());
         }
     }

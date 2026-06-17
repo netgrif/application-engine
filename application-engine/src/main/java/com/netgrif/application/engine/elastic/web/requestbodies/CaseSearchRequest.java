@@ -72,14 +72,24 @@ public class CaseSearchRequest implements Serializable {
             List<Map<String, String>> authors = (List<Map<String, String>>) request.get("author");
             this.author = authors.stream().map(map -> {
                 Author authorRequest = new Author();
-                if (map.containsKey("id"))
+                if (map.containsKey("id")) {
                     authorRequest.id = map.get("id");
-                if (map.containsKey("name"))
+                }
+                if (map.containsKey("name")) {
                     authorRequest.name = map.get("name");
-                if (map.containsKey("username"))
+                }
+                if (map.containsKey("username")) {
                     authorRequest.username = map.get("username");
-                if (map.containsKey("realm"))
+                }
+                if (map.containsKey("realm")) {
                     authorRequest.realm = map.get("realm");
+                }
+                if (authorRequest.id == null
+                            && authorRequest.name == null
+                            && authorRequest.username == null
+                            && authorRequest.realm == null) {
+                    throw new IllegalArgumentException("Author filter must contain at least one of: id, name, username, realm");
+                }
                 return authorRequest;
             }).collect(Collectors.toList());
         }
