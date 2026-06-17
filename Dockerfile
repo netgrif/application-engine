@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM eclipse-temurin:21-jre-jammy
+FROM eclipse-temurin:21-jre
 
 ARG VERSION="7.0.0"
 
