@@ -1615,8 +1615,7 @@ class ActionDelegate {
     }
 
     SetDataEventOutcome setData(String transitionId, Case useCase, Map dataSet, Map<String, String> params = [:]) {
-        def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
-        def task = taskService.searchOne(predicate)
+        Task task = taskService.findOne(useCase.tasks.find { it.transition == transitionId }.task)
         return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet), params))
     }
 
