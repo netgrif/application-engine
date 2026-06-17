@@ -80,7 +80,7 @@ class ExportServiceTest {
     @Order(2)
     void testCaseMongoExport() {
         String exportTask = mainCase.tasks.find { it.transition == "t1" }.task
-        taskService.assignTask(new TaskParams(exportTask, ActorTransformer.toLoggedUser(userService.findUserByUsername(UserConstants.ADMIN_USER_USERNAME, null).get())))
+        taskService.assignTask(new TaskParams(exportTask, ActorTransformer.toLoggedUser(userService.findByEmail(UserConstants.ADMIN_USER_EMAIL, null))))
         File csvFile = new File("src/test/resources/csv/case_mongo_export.csv")
         assert csvFile.readLines().size() == 11
         String[] headerSplit = csvFile.readLines()[0].split(",")
