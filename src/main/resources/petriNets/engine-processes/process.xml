@@ -238,7 +238,7 @@
 			<dataRef>
 				<id>log_deploy</id>
 				<logic>
-					<behavior>editable</behavior>
+					<behavior>visible</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -779,7 +779,7 @@
 			<dataRef>
 				<id>log_archive</id>
 				<logic>
-					<behavior>editable</behavior>
+					<behavior>visible</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -829,6 +829,20 @@
 					<x>0</x>
 					<y>0</y>
 					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>xml_text</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>2</rows>
 					<cols>4</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
