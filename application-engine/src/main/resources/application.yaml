@@ -98,7 +98,7 @@ netgrif:
       enabled: ${NETGRIF_ENGINE_IMPERSONATION_ENABLED:true}
     pdf:
       resources:
-        output-folder: storage
+        output-folder: ${NETGRIF_ENGINE_PDF_OUTPUT_FOLDER:storage}
         output-default-name: generated_pdf.pdf
         template-resource: file:src/main/resources/pdfGenerator/header_template5.pdf
         font-title-resource: file:src/main/resources/pdfGenerator/fonts/Roboto-Light.ttf
@@ -110,6 +110,11 @@ netgrif:
         radio-un-checked-resource: file:src/main/resources/pdfGenerator/img/radio_unchecked.svg
         boolean-checked-resource: file:src/main/resources/pdfGenerator/img/radio_checked.svg
         boolean-unchecked-resource: file:src/main/resources/pdfGenerator/img/radio_unchecked.svg
+    storage:
+      path: ${NETGRIF_ENGINE_STORAGE_PATH:storage}
+      archived-path: ${NETGRIF_ENGINE_STORAGE_ARCHIVED_PATH:storage/uploadedModels/}
+      clean: ${NETGRIF_ENGINE_STORAGE_CLEAN:false}
+      default-type: ${NETGRIF_ENGINE_STORAGE_DEFAULT_TYPE:local}
     management:
       endpoints:
         web:
@@ -121,12 +126,21 @@ netgrif:
           show-details: when_authorized
           show-components: when_authorized
           roles: ADMIN
+          probes:
+            enabled: 'true'
+        log-file:
+          external-file: ${NETGRIF_ENGINE_MANAGEMENT_LOG_FILE:log/nae.log}
+      info:
+        build:
+          enabled: 'false'
+        env:
+          enabled: 'true'
       health:
         elasticsearch:
           enabled: 'false'
     logging:
       file:
-        path: log
+        path: ${NETGRIF_ENGINE_LOGGING_FILE_PATH:log}
       endpoints: 'true'
       level:
         org:
