@@ -191,16 +191,16 @@ public abstract class AbstractTaskController {
 
     public PagedModel<LocalisedTaskResource> searchPfql(Authentication auth, Pageable pageable, SingleTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
         try {
-            List<Predicate> predicates = new ArrayList<>();
-            searchBody.getList().forEach((request) -> {
-                if (request.query == null || request.query.isEmpty()) {
-                    predicates.add(searchService.buildSingleQuery(request, (LoggedUser) auth.getPrincipal(), locale));
-                } else {
-                    QueryLangEvaluator evaluator = SearchUtils.evaluateQuery(request.query);
-                    predicates.add(evaluator.getFullMongoQuery());
-                }
-            });
-            Predicate completePredicate = predicates.stream().reduce(ExpressionUtils::and).orElse(null);
+            Predicate completePredicate = searchBody.getList().stream()
+                    .map((request) -> {
+                        if (request.query == null || request.query.isEmpty()) {
+                            return searchService.buildSingleQuery(request, (LoggedUser) auth.getPrincipal(), locale);
+                        } else {
+                            QueryLangEvaluator evaluator = SearchUtils.evaluateQuery(request.query);
+                            return evaluator.getFullMongoQuery();
+                        }
+                    })
+                    .reduce(ExpressionUtils::and).orElse(null);
             Page<Task> tasks = taskService.search(completePredicate, pageable);
             Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                     .searchPfql(auth, pageable, searchBody, operation, assembler, locale)).withRel("search_pfql");
