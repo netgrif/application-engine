@@ -67,7 +67,7 @@ netgrif:
         token-validity-period: 3
         minimal-password-length: 8
         enable-profile-edit: true
-        admin-password: ${NETGRIF_ENGINE_SECURITY_AUTH_ADMIN_PASSWORD:password}
+        admin-password: ${NETGRIF_ENGINE_SECURITY_AUTH_ADMIN_PASSWORD:}
       static:
         enabled: false
       headers:
@@ -85,8 +85,8 @@ netgrif:
         expiration: 900000
         algorithm: RSA
         private-key: file:src/main/resources/certificates/private.der
-      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/api/public/**,/v3/api-docs/public,/manage/**
-      anonymous-exceptions: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/manage/**
+      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/api/public/**,/v3/api-docs/public,/manage/health
+      anonymous-exceptions: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/manage/health
       providers: NetgrifBasicAuthenticationProvider
     swagger:
       enabled: false
@@ -119,14 +119,13 @@ netgrif:
       endpoints:
         web:
           base-path: /manage
-          path-mapping:
-            prometheus: metric
           exposure:
-            exclude: shutdown
-            include: "*"
+            include: "health,info,metrics,loggers,env,beans,threaddump,heapdump,mappings,conditions,configprops,scheduledtasks,caches,flyway,liquibase,prometheus"
       endpoint:
         health:
           show-details: when_authorized
+          show-components: when_authorized
+          roles: ADMIN
           probes:
             enabled: 'true'
         log-file:

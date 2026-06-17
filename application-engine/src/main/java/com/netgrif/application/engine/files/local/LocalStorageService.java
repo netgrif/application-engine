@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 
 @Slf4j
 @Service
@@ -85,12 +87,56 @@ public class LocalStorageService implements IStorageService {
 
     @Override
     public String getPreviewPath(String caseId, String fieldId, String name) {
-        return fileStorageConfiguration.getPath() + "/file_preview/" + caseId + "/" + fieldId + "-" + name;
+        return resolveStoragePath("file_preview", caseId, getStorageFileName(fieldId, name));
     }
 
     @Override
     public String getPath(String caseId, String fieldId, String name) {
-        return fileStorageConfiguration.getPath() + "/" + caseId + "/" + fieldId + "-" + name;
+        return resolveStoragePath(caseId, getStorageFileName(fieldId, name));
+    }
+
+    private String getStorageFileName(String fieldId, String name) {
+        validatePathElement(fieldId);
+        validatePathElement(name);
+        return fieldId + "-" + name;
+    }
+
+    private String resolveStoragePath(String... pathElements) {
+        Path storageRoot;
+        try {
+            storageRoot = Path.of(fileStorageConfiguration.getPath()).normalize();
+        } catch (InvalidPathException e) {
+            throw new IllegalArgumentException("Invalid local storage path", e);
+        }
+
+        Path resolvedPath = storageRoot;
+        for (String pathElement : pathElements) {
+            validatePathElement(pathElement);
+            resolvedPath = resolvedPath.resolve(pathElement);
+        }
+
+        Path normalizedPath = resolvedPath.normalize();
+        Path absoluteStorageRoot = storageRoot.toAbsolutePath().normalize();
+        if (!normalizedPath.toAbsolutePath().normalize().startsWith(absoluteStorageRoot)) {
+            throw new IllegalArgumentException("Resolved path is outside of the local storage directory");
+        }
+        return normalizedPath.toString();
+    }
+
+    private void validatePathElement(String pathElement) {
+        if (pathElement == null || pathElement.isBlank()
+                || pathElement.equals(".") || pathElement.equals("..")
+                || pathElement.indexOf('/') >= 0 || pathElement.indexOf('\\') >= 0) {
+            throw new IllegalArgumentException("Invalid local storage path element");
+        }
+
+        try {
+            if (Path.of(pathElement).isAbsolute()) {
+                throw new IllegalArgumentException("Absolute paths are not allowed in local storage path elements");
+            }
+        } catch (InvalidPathException e) {
+            throw new IllegalArgumentException("Invalid local storage path element", e);
+        }
     }
 
 }

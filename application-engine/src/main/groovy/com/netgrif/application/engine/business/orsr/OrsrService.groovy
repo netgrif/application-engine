@@ -9,6 +9,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
+@Deprecated(since = "7.0.0")
 @Service
 @SuppressWarnings("GrMethodMayBeStatic")
 class OrsrService implements IOrsrService {

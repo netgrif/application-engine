@@ -1,5 +1,5 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+          xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
     <id>valid_number</id>
     <initials>VN1</initials>
     <title>Validacia NumberFieldu</title>

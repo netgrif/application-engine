@@ -4,10 +4,8 @@ import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleN
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleNotGlobalException;
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleReferencedException;
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
-import com.netgrif.application.engine.auth.service.GroupService;
+import com.netgrif.application.engine.auth.service.*;
 import com.netgrif.application.engine.objects.auth.domain.*;
-import com.netgrif.application.engine.auth.service.RealmService;
-import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.event.events.user.UserRoleChangeEvent;
 import com.netgrif.application.engine.objects.importer.model.EventPhaseType;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
@@ -20,8 +18,8 @@ import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepos
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
+import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.Getter;
@@ -413,16 +411,16 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         Set<String> deletedRoleStringIds = deletedRoleIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet());
 
         Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Pageable usersPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+
         Page<Realm> realms;
         do {
             realms = realmService.getSmallRealm(realmPageable);
 
             realms.forEach(realm -> {
-                Pageable usersPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
                 Page<AbstractUser> users;
-                do {
-                    users = this.userService.findAllByProcessRoles(new HashSet<>(deletedRoleIds), realm.getName(), usersPageable);
-
+                users = this.userService.findAllByProcessRoles(new HashSet<>(deletedRoleIds), realm.getName(), usersPageable);
+                while (users.hasContent()) {
                     for (AbstractUser user : users) {
                         log.info("[{}]: Removing deleted roles of Petri net {} version {} from user {} with id {}",
                                 net.getStringId(), net.getIdentifier(), net.getVersion().toString(), user.getFullName(), user.getStringId());
@@ -437,9 +435,8 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
                                 .collect(Collectors.toSet());
                         this.assignRolesToUser(user, newRoles, loggedUser);
                     }
-
-                    usersPageable = usersPageable.next();
-                } while (users.hasNext());
+                    users = this.userService.findAllByProcessRoles(new HashSet<>(deletedRoleIds), realm.getName(), usersPageable);
+                }
             });
 
             realmPageable = realmPageable.next();
