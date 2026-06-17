@@ -14,7 +14,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
-import com.netgrif.application.engine.auth.service.SecurityContextService
+import com.netgrif.application.engine.security.service.ISecurityContextService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId
 import org.junit.jupiter.api.BeforeEach
@@ -27,7 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-import java.util.stream.Collectors;
+import java.util.stream.Collectors
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 class SecurityContextTest {
 
     @Autowired
-    private SecurityContextService securityContextService
+    private ISecurityContextService securityContextService
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService
