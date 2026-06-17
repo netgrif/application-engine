@@ -8,6 +8,7 @@ import com.netgrif.application.engine.configuration.properties.SecurityConfigura
 import com.netgrif.application.engine.objects.auth.constants.UserConstants;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
+import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.Getter;
@@ -43,6 +44,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     public void run(ApplicationArguments strings) {
         log.info("Creating Super user");
         createSuperUser();
+        createDummyUser();
     }
 
     private AbstractUser createSuperUser() {
@@ -52,12 +54,12 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
         authorities.add(adminAuthority);
         authorities.add(systemAuthority);
 
-        Optional<AbstractUser> superUser = userService.findUserByUsername(UserConstants.ADMIN_USER_EMAIL, null);
+        Optional<AbstractUser> superUser = userService.findUserByUsername(UserConstants.ADMIN_USER_USERNAME, null);
         if (superUser.isEmpty()) {
             User user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
             user.setFirstName(UserConstants.ADMIN_USER_FIRST_NAME);
             user.setLastName(UserConstants.ADMIN_USER_LAST_NAME);
-            user.setUsername(UserConstants.ADMIN_USER_EMAIL); // TODO: set ADMIN_USER_EMAIL or ADMIN_USER_USERNAME ? IDK
+            user.setUsername(UserConstants.ADMIN_USER_USERNAME); // TODO: set ADMIN_USER_EMAIL or ADMIN_USER_USERNAME ? IDK
             user.setEmail(UserConstants.ADMIN_USER_EMAIL);
             PasswordCredential passwordCredential = new PasswordCredential(securityProperties.getAuth().getAdminPassword(), 0, true);
             user.setCredential("password", passwordCredential);
@@ -72,6 +74,30 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
         }
 
         return this.superUser;
+    }
+
+    private void createDummyUser() {
+        Authority userAuthority = authorityService.getOrCreate(Authority.user);
+        Set<Authority> authorities = new HashSet<>();
+        authorities.add(userAuthority);
+
+        Optional<AbstractUser> superUser = userService.findUserByUsername("dummy", null);
+        if (superUser.isEmpty()) {
+            User user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
+            user.setFirstName("Dummy");
+            user.setLastName("User");
+            user.setUsername("dummy");
+            user.setEmail("dummy@netgrif.com");
+            PasswordCredential passwordCredential = new PasswordCredential(securityProperties.getAuth().getAdminPassword(), 0, true);
+            user.setCredential("password", passwordCredential);
+            user.setState(UserState.ACTIVE);
+            user.setAuthoritySet(authorities);
+            Set<ProcessRole> processRoles = new HashSet<>();
+            processRoles.add(processRoleService.getDefaultRole());
+            user.setProcessRoles(processRoles);
+           userService.createUser(user, null);
+            log.info("Dummy user created");
+        }
     }
 
     public void setAllToSuperUser() {

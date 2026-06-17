@@ -18,6 +18,9 @@ import org.springframework.beans.factory.annotation.Lookup
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
+
 @Component
 @SuppressWarnings("GrMethodMayBeStatic")
 abstract class FieldActionsRunner {
@@ -43,15 +46,13 @@ abstract class FieldActionsRunner {
     @Autowired
     private ApplicationEventPublisher publisher
 
-    private Map<String, Object> actionsCache = new HashMap<>()
+    private ConcurrentMap<String, Object> actionsCache = new ConcurrentHashMap<>()
 
     List<EventOutcome> run(com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action action, Case useCase, Map<String, String> params, List<Function> functions = []) {
         return run(action, useCase, Optional.empty(), params, functions)
     }
 
     List<EventOutcome> run(com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action action, Case useCase, Optional<Task> task, Map<String, String> params, List<Function> functions = []) {
-        if (!actionsCache)
-            actionsCache = new HashMap<>()
 
         log.debug("Action: $action")
         def code = getActionCode(action, functions)

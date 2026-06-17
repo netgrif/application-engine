@@ -28,17 +28,16 @@ public class ReindexingTask {
 
     private static final Logger log = LoggerFactory.getLogger(ReindexingTask.class);
 
-    private int pageSize;
-    private TaskRepository taskRepository;
-    private ElasticCaseRepository elasticCaseRepository;
-    private IElasticCaseService elasticCaseService;
-    private IElasticTaskService elasticTaskService;
-    private IElasticCaseMappingService caseMappingService;
-    private IElasticTaskMappingService taskMappingService;
-    private IWorkflowService workflowService;
-    private DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
+    private final int pageSize;
+    private final TaskRepository taskRepository;
+    private final ElasticCaseRepository elasticCaseRepository;
+    private final IElasticCaseService elasticCaseService;
+    private final IElasticTaskService elasticTaskService;
+    private final IElasticCaseMappingService caseMappingService;
+    private final IElasticTaskMappingService taskMappingService;
+    private final IWorkflowService workflowService;
     private LocalDateTime lastRun;
-    private IElasticIndexService elasticIndexService;
+    private final IElasticIndexService elasticIndexService;
 
     @Autowired
     public ReindexingTask(
@@ -60,13 +59,12 @@ public class ReindexingTask {
         this.caseMappingService = caseMappingService;
         this.taskMappingService = taskMappingService;
         this.workflowService = workflowService;
-        this.elasticsearchProperties = elasticsearchProperties;
         this.pageSize = elasticsearchProperties.getReindexExecutor().getSize();
         this.elasticIndexService = elasticIndexService;
 
         lastRun = LocalDateTime.now();
-        if (this.elasticsearchProperties.getReindexFrom() != null) {
-            lastRun = lastRun.minus(this.elasticsearchProperties.getReindexFrom());
+        if (elasticsearchProperties.getReindexFrom() != null) {
+            lastRun = lastRun.minus(elasticsearchProperties.getReindexFrom());
         }
     }
 

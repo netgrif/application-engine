@@ -609,7 +609,7 @@ class ActionDelegate extends DelegateExpando {
     }
 
     def close = { Transition[] transitions ->
-        def service = ApplicationContextProvider.getBean("taskService")
+        ITaskService service = (ITaskService) ApplicationContextProvider.getBean("taskService")
         if (!service) {
             log.error("Could not find task service")
             return
@@ -1208,6 +1208,7 @@ class ActionDelegate extends DelegateExpando {
         return outcome
     }
 
+    @Deprecated(since = "7.0.0")
     Map<String, ChangedField> makeDataSetIntoChangedFields(Map<String, Map<String, String>> map, Case caze, Task task) {
         return map.collect { fieldAttributes ->
             ChangedField changedField = new ChangedField(fieldAttributes.key)

@@ -283,9 +283,9 @@ public class UserController {
             userService.assignAuthority(userId, realmId, authorityId);
         } catch (IllegalArgumentException e) {
             log.error("Assigning authority to user [{}] has failed!", userId, e);
-            return ResponseEntity.badRequest().body(ResponseMessage.createSuccessMessage("Assigning authority to user " + userId + " has failed!"));
+            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Assigning authority to user " + userId + " has failed!"));
         }
-        return ResponseEntity.ok(ResponseMessage.createErrorMessage("Authority was assigned to user successfully"));
+        return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Authority was assigned to user successfully"));
     }
 
     @Operation(summary = "Get logged user's preferences", security = {@SecurityRequirement(name = "X-Auth-Token")})
