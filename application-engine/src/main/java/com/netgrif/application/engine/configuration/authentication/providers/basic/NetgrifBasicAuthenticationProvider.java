@@ -23,6 +23,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import java.util.Optional;
+
 @Slf4j
 @Component
 public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationProvider {
@@ -48,13 +50,14 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
         String name = authentication.getName();
-        AbstractUser user = userService.findByEmail(name, null);
-        if (user == null) {
+        Optional<AbstractUser> userOptional = userService.findUserByUsername(name, null);
+        if (userOptional.isEmpty()) {
             log.debug("User not found");
             loginAttemptService.loginFailed(key);
             throw new BadCredentialsException(this.messages
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
+        AbstractUser user = userOptional.get();
         if (user instanceof User && !((User) user).isActive()) {
             log.debug("User is not active");
             loginAttemptService.loginFailed(key);

@@ -139,7 +139,6 @@ public class AuthenticationController {
     @Operation(summary = "Login to the system", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/login", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<?> login(Authentication auth, Locale locale) {
-        log.info("login");
         log.debug("locale: {}", locale);
         log.debug("auth: {}", auth);
 
@@ -191,29 +190,50 @@ public class AuthenticationController {
     @Operation(summary = "Set a new password", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource changePassword(Authentication auth, @RequestBody ChangePasswordRequest request) {
+        if (auth == null || !(auth.getPrincipal() instanceof LoggedUser loggedUser)) {
+            return MessageResource.errorMessage( "Unauthorized!");
+        }
+        if (request == null || request.login == null || request.newPassword == null) {
+            return MessageResource.errorMessage("Invalid request!");
+        }
+
         try {
-            Optional<AbstractUser> user = userService.findUserByUsername(request.login, null);
-            if (user.isEmpty() || request.password == null || request.newPassword == null) {
+            Optional<AbstractUser> user = userService.findUserByUsername(request.login, loggedUser.getRealmId());
+            if (user.isEmpty()) {
                 return MessageResource.errorMessage("Incorrect login!");
             }
 
-            String newPassword = new String(Base64.getDecoder().decode(request.newPassword));
+            AbstractUser targetUser = user.get();
+            boolean selfChange = Objects.equals(loggedUser.getStringId(), targetUser.getStringId());
+            if (!loggedUser.isAdmin() && !selfChange) {
+                return MessageResource.errorMessage("You can change only your own password!");
+            }
+
+            String newPassword = new String(Base64.getDecoder().decode(request.newPassword), StandardCharsets.UTF_8);
             if (!registrationService.isPasswordSufficient(newPassword)) {
                 return MessageResource.errorMessage("Insufficient password!");
             }
 
-            String password = new String(Base64.getDecoder().decode(request.password));
-            if (registrationService.stringMatchesUserPassword(user.get(), password)) {
-                registrationService.changePassword((user.get()), newPassword);
-                securityContextService.saveToken(((LoggedUser) auth.getPrincipal()).getStringId());
-                securityContextService.reloadSecurityContext((LoggedUser) auth.getPrincipal());
-            } else {
-                return MessageResource.errorMessage("Incorrect password!");
+            if (selfChange) {
+                if (request.password == null) {
+                    return MessageResource.errorMessage("Incorrect password!");
+                }
+                String password = new String(Base64.getDecoder().decode(request.password), StandardCharsets.UTF_8);
+                if (!registrationService.stringMatchesUserPassword(targetUser, password)) {
+                    return MessageResource.errorMessage("Incorrect password!");
+                }
             }
 
+            registrationService.changePassword(targetUser, newPassword);
+            securityContextService.saveToken(targetUser.getStringId());
+            if (selfChange) {
+                securityContextService.reloadSecurityContext(loggedUser);
+            }
+
+            log.info("User [{}] changed password for user [{}]", loggedUser.getStringId(), targetUser.getStringId());
             return MessageResource.successMessage("Password is successfully changed.");
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("Password change failed", e);
             return MessageResource.errorMessage("There has been a problem!");
         }
     }

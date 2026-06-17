@@ -91,8 +91,8 @@ public class RegistrationService implements IRegistrationService {
     public void changePassword(AbstractUser user, String newPassword) {
         user.setPassword(newPassword);
         encodeUserPassword(user);
-        userService.saveUser(user, null);
-        log.info("Changed password for user {}.", user.getEmail());
+        userService.saveUser(user, user.getRealmId());
+        log.info("Changed password for user [{}] in realm [{}].", user.getStringId(), user.getRealmId());
     }
 
     @Override

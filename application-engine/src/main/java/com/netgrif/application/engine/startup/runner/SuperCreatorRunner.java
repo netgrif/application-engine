@@ -30,7 +30,6 @@ import java.util.Set;
 @ConditionalOnProperty(value = "netgrif.engine.security.auth.create-super", matchIfMissing = true)
 public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
 
-    public static final String SUPER_ADMIN_EMAIL = "super@netgrif.com";
     private final SecurityConfigurationProperties securityProperties;
     private final AuthorityService authorityService;
     private final UserService userService;
@@ -58,7 +57,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
             User user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
             user.setFirstName(UserConstants.ADMIN_USER_FIRST_NAME);
             user.setLastName(UserConstants.ADMIN_USER_LAST_NAME);
-            user.setUsername(UserConstants.ADMIN_USER_USERNAME);
+            user.setUsername(UserConstants.ADMIN_USER_USERNAME); // TODO: set email ? IDK
             user.setEmail(UserConstants.ADMIN_USER_EMAIL);
             PasswordCredential passwordCredential = new PasswordCredential(securityProperties.getAuth().getAdminPassword(), 0, true);
             user.setCredential("password", passwordCredential);
