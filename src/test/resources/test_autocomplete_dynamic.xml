@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
     <id>test_autocomplete_dynamic</id>
-    <version>1.0.0.</version>
-    <initials>Autocomplete Dynamic Net</title>
+    <version>1.0.0</version>
     <initials>ADN</initials>
+    <title>Autocomplete Dynamic Net</title>
+    <defaultRole>true</defaultRole>
     <!-- ROLES -->
     <!-- DATA -->
     <data type="enumeration">

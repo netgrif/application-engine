@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
 	<id>task_events_test</id>
-    <version>1.0.0.</version>
+    <version>1.0.0</version>
     <initials>TTT</initials>
 	<title>Task events test</title>
 	<defaultRole>true</defaultRole>

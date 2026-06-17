@@ -1,6 +1,6 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
     <id>task_view_configuration</id>
-    <version>1.0.0.</version>
+    <version>1.0.0</version>
     <initials>TTV</initials>
     <title>Task view configuration</title>
     <icon>check_box_outline_blank</icon>

@@ -2,7 +2,7 @@
 <!-- version 1.0.0 -->
 <document>
     <id>test</id>
-    <version>1.0.0.</version>
+    <version>1.0.0</version>
     <initials>TST</initials>
     <title>Test</title>
     <defaultRole>false</defaultRole>

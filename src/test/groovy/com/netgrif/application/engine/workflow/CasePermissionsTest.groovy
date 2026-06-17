@@ -147,6 +147,7 @@ class CasePermissionsTest {
         Map<String, PetriNet> testNets = importTestNets(DELETE_CASE_PERMISSION_DIRECTORY)
         Map<String, PetriNet> testNetsNoDefault = importTestNets(DELETE_CASE_PERMISSION_DEFAULT_DISABLED_DIRECTORY)
         Map<String, Map<String, List<String>>> results = [:]
+        // TODO: NAE-2447 fix
         testUsers.forEach((email, user) -> {
 
             results.put(email, [
@@ -159,6 +160,7 @@ class CasePermissionsTest {
 
     @Test
     void testViewCasePermission() {
+        // TODO: NAE-2447 fix
         Map<String, PetriNet> testNets = importTestNets(VIEW_CASE_PERMISSION_DIRECTORY)
         createTestCases(testNets)
         Map<String, PetriNet> testNetsNoDefault = importTestNets(VIEW_CASE_PERMISSION_DEFAULT_DISABLED_DIRECTORY)

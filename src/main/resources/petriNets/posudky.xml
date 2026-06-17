@@ -2,8 +2,8 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
     <id>management/posudky</id>
-    <version>1.0.0.</version>
-    <initials>Posudky</title>
+    <version>1.0.0</version>
+    <title>Posudky</title>
     <initials>PSD</initials>
     <caseName>Posudok</caseName>
     <!-- TRANSACTIONS -->

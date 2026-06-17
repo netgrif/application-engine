@@ -2,7 +2,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
     <id>create_case_role_true_default_undefined</id>
-    <version>1.0.0.</version>
+    <version>1.0.0</version>
     <initials>CDTDU</initials>
     <title>Create Case Role True Default Undefined</title>
     <icon>assignment</icon>

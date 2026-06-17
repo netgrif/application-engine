@@ -1,8 +1,8 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
     <id>dynamic_choices</id>
-    <version>1.0.0.</version>
-    <initials>dynamic_choices</title>
+    <version>1.0.0</version>
+    <title>dynamic_choices</title>
     <defaultRole>true</defaultRole>
     <initials>DVT</initials>
     <!-- ROLES -->

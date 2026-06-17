@@ -1,7 +1,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
     <id>valid_number</id>
-    <version>1.0.0.</version>
+    <version>1.0.0</version>
     <initials>VN1</initials>
     <title>Validacia NumberFieldu</title>
     <icon>check_circle</icon>

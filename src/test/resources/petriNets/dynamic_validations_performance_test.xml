@@ -1,8 +1,8 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
     <id>dynamic_validations_performance</id>
-    <version>1.0.0.</version>
-    <initials>dynamic_validations_performance</title>
+    <version>1.0.0</version>
+    <title>dynamic_validations_performance</title>
     <defaultRole>true</defaultRole>
     <initials>DVT</initials>
     <!-- ROLES -->

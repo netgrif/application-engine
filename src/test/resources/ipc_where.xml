@@ -2,7 +2,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
     <id>test</id>
-    <version>1.0.0.</version>
+    <version>1.0.0</version>
     <initials>TST</initials>
     <title>Test</title>
     <defaultRole>true</defaultRole>
@@ -33,7 +33,7 @@
                     <!-- @formatter:off -->
                     field: f.field;
                     execute "synchronized" where {
-                    it.title.eq("Case 1")
+                    it.title.eq("CaseApiTestCase 1")
                     } with ([
                     "field": [
                     value: 69.0,
@@ -46,7 +46,7 @@
                     <!-- @formatter:off -->
                     field: f.field;
                     change field about {
-                    findCase({it.title.eq("Case 1")});
+                    findCase({it.title.eq("CaseApiTestCase 1")});
                     return 0 as Double;
                     }
                     <!-- @formatter:on -->
@@ -55,7 +55,7 @@
                     <!-- @formatter:off -->
                     field: f.count;
 
-                    def cases = findCases({it.title.startsWith("Case ")});
+                    def cases = findCases({it.title.startsWith("CaseApiTestCase ")});
 
                     change field value { return cases.size(); }
                     <!-- @formatter:on -->
@@ -64,7 +64,7 @@
                     <!-- @formatter:off -->
                     field: f.paged;
 
-                    def cases = findCases({ it.title.startsWith("Case ")}, org.springframework.data.domain.PageRequest.of(1, 4));
+                    def cases = findCases({ it.title.startsWith("CaseApiTestCase ")}, org.springframework.data.domain.PageRequest.of(1, 4));
                     change field value { return cases.size(); }
                     <!-- @formatter:on -->
                 </action>

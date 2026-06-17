@@ -1,6 +1,6 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
 	<id>invalid_data_ref_layout</id>
-    <version>1.0.0.</version>
+    <version>1.0.0</version>
     <initials>IDR</initials>
 	<title>Invalid data ref in grid layout</title>
 	<icon>device_hub</icon>
