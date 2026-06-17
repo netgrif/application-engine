@@ -5,7 +5,204 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-- Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.5.0](https://github.com/netgrif/application-engine/commits/v6.5.0)
+- Full Changelog: [https://github.com/netgrif/application-engine/commits/v7.0.0](https://github.com/netgrif/application-engine/commits/v7.0.0)
+
+## [7.0.0](https://github.com/netgrif/application-engine/releases/tag/v7.0.0) (2024-11-22)
+
+### Added
+- [NAE-1859] User reference in events
+- [NAE-1567] Global event system
+- [NAE-1988] Extend Id of processes resource for better resolution
+- [NAE-1975] NAE nodes gRPC communication
+- [NAE-2093] Remove dependency on plugin-core
+- [NAE-2070] Admin create/edit endpoints
+- [NAE-2076] Usage metrics
+- [NAE-2090] Publish module services to actions
+- [NAE-2092] User and Auth endpoints refactor
+- [NAE-2125] Remove URI service usage from admin and menu items
+- [NAE-2096] Cluster-wide configuration
+- [NAE-2097] Event log fixes
+
+### Changed
+- [NAE-1858] Task states
+- [NAE-1862] Frontend update
+- [NAE-1972] Framework upgrade
+- [NAE-1989] RunnerController refactor
+- [NAE-2009] Update actions for v7.0.0
+* [NAE-1836] Actions cache is broken (for multiple versions of the same process) 
+* [NAE-1864] Deleting process version removes instances of all versions of the same process 
+* [NAE-1870] Indeterministic order in multichoice and multichoice map values 
+* [NAE-1807] Reference in Arc is not cloned properly 
+* [NAE-1891] Make URL function 
+* [NAE-1497] Frontend actions 
+* [NAE-1908] NAE-1906 Improvements
+* [NAE-1916] Serializable core objects 
+* [NAE-1918] Tags on process resources 
+* [NAE-1910] Event log is missing change in case's active places 
+* [NAE-1930] Modify Annotation in LdapUser Class for Indexing 
+* [NAE-1932] Enhancement of Redis Connector to Support Authentication 
+* [NAE-1929] Data field type list of strings 
+* [NAE-1934] Remove devtools dependency 
+* [NAE-1931] Implementation of Index Re-Creation after MongoDB Database Drop 
+* [NAE-1938] Slow Indexing of Elastic Tasks 
+* [NAE-1937] Fix the problem with empty string in filter 
+* [NAE-1936] Disable create case button using menu items 
+* [NAE-1942] Authorization Bypass Process Download 
+* [NAE-1876] Process URI v2 
+* [NAE-1882] Filter folder process 
+* [NAE-1901] Taskref rendering update 
+* [NAE-1908] switch UriNode to MongoDB 
+* [NAE-1947] HistoryService findAllSetDataEventLogs is not working 
+* [NAE-1684] Frontend component for data field caseRef 
+* [NAE-1944] Server-side JavaScript Code Injection (SSJI) 
+* [NAE-1654] Find actions for Elasticsearch 
+* [NAE-1884] Improve execution of auto trigger tasks 
+* [NAE-1813] Field id as path variable in TaskController 
+* [NAE-1956] setData fails on setting allowedNets without value key 
+* [NAE-1955] Update setData to handle options / choices 
+* [NAE-1959] Indexing enumerationMap field fails when no options exist 
+* [NAE-1960] Enumeration Map does not propagate changes when selecting 
+* [NAE-1958] Make component properties changeable 
+* [NAE-1962] Event properties 
+* [NAE-1967] Elasticsearch disable dynamic field mapping 
+* [NAE-1958] Make component properties changeable 
+* [NAE-1972] Framework upgrade 
+* [NAE-1988] Extend Id of processes resource for better resolution 
+* [NAE-1979] Optimize Maven Resources Plugin Configuration for Correct File Filtering and Copying 
+* [NAE-1962] Event properties 
+* [NAE-1983] Public view file handling 
+* [NAE-2006] WorkflowService.deleteInstancesOfPetriNet does not remove … 
+* [NAE-2007] Vulnerabilities fix 
+* [NAE-1946] Remote file connector to S3 
+* [NAE-1945] External resource loader 
+* [NAE-1927] Shared Roles 
+* [NAE-1952] Fix Loading Issue for Duplicate TaskRef Entries 
+* [NAE-2008] Serialisation of classes 
+* [NAE-1946] Remote file connector to S3 
+* [NAE-1989] RunnerController refactor 
+* [NAE-1975] NAE nodes gRPC communication 
+* [NAE-1567] Global event system 
+* [NAE-2009] Update actions for v7.0.0 
+* [NAE-2014] Mismatch in PublicTaskController and TaskController endpoint 
+* [NAE-2016] Global roles for menu items permissions 
+* [NAE-2034] Open first view 
+* [NAE-2033] Welcome dashboard 
+* [NAE-2051] Implement configurable view in menu items 
+* [NAE-2039] Search in workflow view  
+* [NAE-2052] Integrate ticket view with menu items 
+* [NAE-2063] Action API 6.5.0 
+* [NAE-2093] Remove dependency on plugin-core 
+* [NAE-2070] Admin create/edit endpoints 
+* [NAE-2076] Usage metrics 
+* [NAE-2090] Publish module services to actions 
+* [NAE-2092] User and Auth endpoints refactor 
+* [NAE-2099] MenuItemService.appendChildCaseIdInDataSet not setting hasChildren correctly 
+* Refactor QueryDSL dependencies and package structure 
+* [NAE-2108] Implement actuator for listing registered modules with manifest details 
+* [NAE-2115] Task search on Search Node 
+* [NAE-2119] Fix menuItem 
+* [NAE-2129] Inject Plugin JAR into Community Edition 
+* [NAE-2125] Remove URI service usage from admin and menu items 
+* [NAE-2096] Cluster-wide configuration 
+* [NAE-2097] Event log fixes 
+* [NAE-2139] Pagination and full-text search in Admin views 
+* [NAE-2126] Admin - Assign & Manage Roles 
+* [NAE-2122] Implement Structured and Efficient Pagination in gRPC 
+* [NAE-2124] Improve consistency of configuration properties 
+* [NAE-2085] Refactor User 
+* Fix/manual version setting 
+* [NAE-2151] Process role global flag on user info 
+* [NAE-2158] Update user lookup to include realm ID in TaskService 
+* [NAE-2153] Mongo indexation 
+* [NAE-2152] Realm name as ID 
+* [NAE-2118] Implement OpenID Connector Auth for Admin node  
+* [NAE-2127] Implement DelegatingContextFilter for Multi-Realm Support 
+* [NAE-2171] Removing expired unactivated invited users" throws NullPointerException 
+* [NAE-2170] FileField and FileListField does not work 
+* [NAE-2161] Optimize ElasticCaseService queries to eliminate maxClauseCount error 
+* [NAE-2168] Optimize bulk index for elasticsearch in v7 
+* Refactor case search to replace `stringId` with `id`. 
+* [NAE-2185] Align plugin property handling and metadata registration with architecture standards 
+* [NAE-2184] Nullable object as serializable alternative to Optional 
+* [NAE-2200] Elastic TaskPair maps incorrect task ID 
+* [NAE-2201] Dashboard management missing permissions 
+* [NAE-2177] New method to build FieldType from name 
+* [NAE-2199] Force delete of processes 
+* [NAE-2192] Serializer update for null check 
+* [NAE-2193] Assign all roles to admin users 
+* [NAE-2194] Global role creation fix 
+* [NAE-2176] MongoDB Eventlog connector 
+* [NAE-2186] PetriNet objects gRPC serialization 
+* [NAE-2173] Password change 
+* [NAE-2197] Elastic Mapping Fixes 
+* [NAE-2204] Plugin EntryPoint class cannot resolve annotation when proxyed by Spring 
+* [NAE-2202] Post test fixes 
+* [NAE-2211] Fix partial update for SecretString 
+* [NAE-2214] Add configuration option to disable plugin health check 
+* [NAE-2213] Delete global role 
+* [NAE-2224] Title in optional text in case creation button as I18nString 
+* [NAE-2228] Invalid arguments for collectRolesForPreferenceItem 
+* [NAE-2227] MenuItem default headers not working 
+* [NAE-2217] Single Task View 
+* [NAE-2237] Configurable Connection Properties for MongoDB and Elasticsearch 
+* [NAE-2227] Fix dashboard menu 
+* [NAE-2252] MongoClient ClusterConnectionMode 
+* [NAE-2245] Fix role preference menu item mapping caused by removed ne… 
+* [NAE-2250] Optimize Elasticsearch reindexing and bulk operations for performance and reliability 
+* [NAE-2246] Enable Redis TLS & Configure Redis Sentinel 
+* [NAE-2251] Map field options are not translated 
+* [NAE-2044] MDC color converter for Logback 
+* [NAE-2275] Fix logging system for correctly loading logback config 
+* [NAE-2288] Delete of process retains global role from user 
+* [NAE-2295] DataService::parseFieldsValues support for fileList 
+* [NAE-2292] Make force delete of petriNets non-transactional 
+* [NAE-2239] Method calls not updated after Pageable was added 
+* [NAE-2229] Action API 
+* [NAE-2293] Upgrade vulnerable and deprecated dependencies 
+* [NAE-2301] Error in TaskSearchService when stringId is empty string 
+* [NAE-2282] Couldn't parse large taskRef value from Elasticsearch 
+* [NAE-2303] TaskRef Security Improvements 
+* [NAE-2265] Force reindex for worker 
+* [NAE-2267] For some mongo collections there are no indexes 
+* [NAE-2302] Check for process plugin dependencies on deploy 
+* [NAE-2310] Elasticsearch fulltext query input sanitation 
+* [NAE-2266] Introduce active version of process 
+* [NAE-2212] Cluster scope process function caches 
+* [NAE-2316] Case permissions are not propagated correctly in cloud deployment 
+* [NAE-2182] Clearing actions cache 
+* [NAE-2359] SetData endpoint no longer calls getData event on dataGrou… 
+* [NAE-2235] Improve Efficiency of Database Reads and Saves 
+* [NAE-2369] Remove global functions of cache 
+* [NAE-2355] CreateCaseEvent is published twice per creation 
+* [NAE-2371] Automatic collection creation after drop 
+* Ensure process ID and identifier are non-empty in case creation. 
+* Cache Petri net functions after import 
+* [NAE-2354] Include assignee userRealmId in task response 
+* [NAE-2285] Group as a value of userlists 
+* Add LocalisedChangeCasePropertyOutcome class 
+* [NAE-2381] Log in RestResponseExceptionHandler 
+* [NAE-2382] Elastic bulk index fails if option fields have empty string 
+* Fix/unused workflow controller return types 
+* [NAE-2387] Fix permission evaluation order between ActorRef and proce… 
+* [NAE-2405] QRService dependency rework 
+* [NAE-2385] MenuItem None value 
+* [NAE-2389] Actor ref resolution does not includes realmId 
+* [NAE-2400] Prevent Caching of Null Results in Process Cache 
+* [NAE-2409] Implement Plugin save/get file over gRPC for worker 
+* [NAE-2419] Tasks with auto triggers fail to execute if they contain an assign event PRE action 
+* [NAE-2406] S3 storage bucket alias 
+* [NAE-2418] Verify @Transient handling across persistence layers in nae-spring-core-adapter 
+* [NAE-2423] Extend Action API with wrapper support 
+* Refactor package structure for LoggedUserConfiguration 
+* [NAE-2440] Fix PluginActionApi bean creation in Spring context 
+* [NAE-2442] Fix dataset update from database and action handling 
+* [NAE-2446] Migration for NAE v7 phase 1 
+* [NAE-2449] ActionDelegate memory leak causes OOM 
+* [NAE-2448] Migration for NAE v7 phase 2 
+
+### Removed
+
+[NAE-1854] Remove deprecated services
 
 ## [6.5.0](https://github.com/netgrif/application-engine/releases/tag/v6.5.0) (2025-02-18)
 
@@ -19,28 +216,6 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - [NAE-2052] Integrate ticket view with menu items
 
 - Full Changelog: [https://github.com/netgrif/application-engine/commits/v7.0.0](https://github.com/netgrif/application-engine/commits/v7.0.0)
-
-## [7.0.0](https://github.com/netgrif/application-engine/releases/tag/v7.0.0) (2024-11-22)
-
-### Fixed
-
-### Added
-- [NAE-1859] User reference in events
-- [NAE-1567] Global event system
-- [NAE-1988] Extend Id of processes resource for better resolution
-- [NAE-1975] NAE nodes gRPC communication
-
-### Changed
-- [NAE-1844] PDF Builder
-- [NAE-1858] Task states
-- [NAE-1862] Frontend update
-- [NAE-1972] Framework upgrade
-- [NAE-1989] RunnerController refactor
-- [NAE-2009] Update actions for v7.0.0
-
-### Removed
-
-[NAE-1854] Remove deprecated services
 
 
 ## [6.4.0](https://github.com/netgrif/application-engine/releases/tag/v6.4.0) (2024-12-24)
