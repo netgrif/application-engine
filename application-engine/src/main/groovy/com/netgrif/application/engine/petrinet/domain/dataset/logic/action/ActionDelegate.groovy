@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.AsyncRunner
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
+import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
 import com.netgrif.application.engine.auth.service.GroupService
@@ -218,6 +219,9 @@ class ActionDelegate extends DelegateExpando {
 
     @Autowired
     IStorageResolverService storageResolverService
+
+    @Autowired
+    PaginationProperties paginationProperties
 
     FrontendActionOutcome Frontend
 
@@ -1481,15 +1485,21 @@ class ActionDelegate extends DelegateExpando {
     }
 
     void deleteUser(AbstractUser user) {
-        List<Task> tasks = taskService.findByUser(new FullPageRequest(), user).toList()
-        if (tasks != null && tasks.size() > 0)
-            taskService.cancelTasks(tasks, user)
+        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize())
+        Page<Task> tasksAssignedToUserPage = taskService.findByUser(pageable, user)
+        while (tasksAssignedToUserPage.hasContent()) {
+            taskService.cancelTasks(tasksAssignedToUserPage.getContent(), user)
+            tasksAssignedToUserPage = taskService.findByUser(pageable, user)
+        }
 
         QCase qCase = new QCase("case")
-        List<Case> cases = workflowService.searchAll(qCase.author.eq(ActorTransformer.toActorRef(user))).toList()
-        if (cases != null)
-            cases.forEach({ aCase -> aCase.setAuthor(ActorTransformer.anonymizedActorRef()) })
-
+        Page<Case> casesAuthoredByUserPage = workflowService.search(qCase.author.eq(ActorTransformer.toActorRef(user)), pageable)
+        while (casesAuthoredByUserPage.hasContent()) {
+            casesAuthoredByUserPage.forEach({ aCase ->
+                aCase.setAuthor(ActorTransformer.anonymizedActorRef())
+                workflowService.save(aCase)
+            })
+        }
         userService.deleteUser(user)
     }
 
