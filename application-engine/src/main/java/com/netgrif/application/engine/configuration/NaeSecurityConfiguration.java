@@ -11,7 +11,7 @@ import com.netgrif.application.engine.configuration.security.SecurityContextFilt
 import com.netgrif.application.engine.configuration.security.filter.HostValidationRequestFilter;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
-import com.netgrif.application.engine.auth.service.SecurityContextService;
+import com.netgrif.application.engine.security.service.ISecurityContextService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -71,7 +71,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     private SecurityConfigurationProperties properties;
 
     @Autowired
-    private SecurityContextService securityContextService;
+    private ISecurityContextService securityContextService;
 
     @Autowired
     protected IImpersonationService impersonationService;

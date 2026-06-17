@@ -19,6 +19,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
+import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.Getter;
@@ -45,7 +46,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     private final ApplicationEventPublisher publisher;
     private final RoleActionsRunner roleActionsRunner;
     private final IPetriNetService petriNetService;
-    private final SecurityContextService securityContextService;
+    private final ISecurityContextService securityContextService;
     private final GroupService groupService;
     private final RealmService realmService;
     @Getter
@@ -61,7 +62,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     public ProcessRoleService(ProcessRoleRepository processRoleRepository,
                               PetriNetRepository netRepository,
                               ApplicationEventPublisher publisher, RoleActionsRunner roleActionsRunner,
-                              @Lazy IPetriNetService petriNetService, @Lazy UserService userService, SecurityContextService securityContextService, @Lazy GroupService groupService,
+                              @Lazy IPetriNetService petriNetService, @Lazy UserService userService, ISecurityContextService securityContextService, @Lazy GroupService groupService,
                               @Lazy RealmService realmService, @Lazy PaginationProperties paginationProperties, @Lazy IWorkflowService workflowService, @Lazy ITaskService taskService) {
         this.processRoleRepository = processRoleRepository;
         this.netRepository = netRepository;

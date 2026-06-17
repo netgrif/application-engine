@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.configuration.security;
 
-import com.netgrif.application.engine.auth.service.SecurityContextService;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.security.service.ISecurityContextService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,9 +21,9 @@ public class SecurityContextFilter extends OncePerRequestFilter {
     /**
      * Security context service for managing user tokens
      */
-    private final SecurityContextService securityContextService;
+    private final ISecurityContextService securityContextService;
 
-    public SecurityContextFilter(SecurityContextService securityContextService) {
+    public SecurityContextFilter(ISecurityContextService securityContextService) {
         this.securityContextService = securityContextService;
     }
 
