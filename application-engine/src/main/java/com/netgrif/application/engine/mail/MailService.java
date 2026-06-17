@@ -30,6 +30,7 @@ import java.util.*;
 
 @Slf4j
 @Service
+@Deprecated(since = "7.0.0")
 public class MailService implements IMailService {
 
     public static final String TOKEN = "token";

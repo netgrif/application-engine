@@ -7,6 +7,7 @@ import jakarta.mail.MessagingException;
 
 import java.io.IOException;
 
+@Deprecated(since = "7.0.0")
 public interface IMailService {
 
     void sendRegistrationEmail(AbstractUser user) throws IOException, TemplateException, MessagingException;
