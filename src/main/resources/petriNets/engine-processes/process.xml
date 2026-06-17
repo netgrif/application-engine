@@ -786,8 +786,9 @@
 			<actions phase="pre">
 				<action id="action5">
 					<![CDATA[
+					mongo_id: f.mongo_id,
 					state: f.state;
-					// TODO: prepinac freeze - ci sa mozu casey dorobit
+					// TODO: NAE-2447 boolean freeze - allow cases to finish execution
 					def net = findPetriNet(mongo_id.value)
 					petriNetService.archive(net, loggedUser())
 					change state value { "archived" }

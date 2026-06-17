@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.startup
 
+import com.netgrif.application.engine.petrinet.service.PetriNetExistsException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,12 +25,11 @@ class ProcessRunner extends AbstractOrderedCommandLineRunner {
     @Override
     void run(String... args) throws Exception {
         log.info("Import of system process Process started")
-        InputStream netStream = new ClassPathResource("petriNets/engine-processes/$PROCESS_XML_FILENAME" as String).inputStream
-        try {
+        try(InputStream netStream = new ClassPathResource("petriNets/engine-processes/$PROCESS_XML_FILENAME" as String).inputStream) {
             def outcome = petriNetService.importPetriNet(netStream, systemUserRunner.loggedSystem)
             assert outcome.net
             log.info("Process Process imported")
-        } catch (IllegalArgumentException ignored) {
+        } catch (PetriNetExistsException ignored) {
             log.info("Process Process already exists")
         }
         log.info("Import of system process Process ended")

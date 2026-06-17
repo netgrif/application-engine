@@ -352,10 +352,10 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException, PetriNetExistsException {
         return importPetriNet(xmlFile, author, uriService.getRoot().getStringId(), new HashMap<>(), net -> {
             if (exists(net.getIdentifier(), net.getVersion())) {
-                throw new IllegalArgumentException("Petri net with identifier " + net.getIdentifier() + " and version " + net.getVersion() + " already exists.");
+                throw new PetriNetExistsException(net);
             }
             return net;
         });

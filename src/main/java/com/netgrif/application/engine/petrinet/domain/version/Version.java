@@ -72,8 +72,8 @@ public class Version implements Serializable {
             version.setPatch(Long.parseLong(split[2]));
             return version;
         } catch (Exception e) {
-            log.error("Could not parse version " + stringVersion + " caused by:", e);
-            throw new IllegalArgumentException("Could not parse version " + stringVersion);
+            log.error("Could not parse version {} caused by:", stringVersion, e);
+            throw new IllegalArgumentException("Could not parse version " + stringVersion, e);
         }
     }
 }
