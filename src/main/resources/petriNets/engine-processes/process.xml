@@ -165,6 +165,9 @@
 	<data type="text">
 		<id>xml_text</id>
 		<title>XML Text</title>
+		<component>
+			<name>textarea</name>
+		</component>
 	</data>
 	<transition>
 		<id>deploy</id>
@@ -336,9 +339,6 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
-				<component>
-					<name>textarea</name>
-				</component>
 			</dataRef>
 		</dataGroup>
 	</transition>
