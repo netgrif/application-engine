@@ -1,8 +1,8 @@
-package com.netgrif.application.engine.security.service;
+package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 
-public interface ISecurityContextService {
+public interface SecurityContextService {
 
     void saveToken(String token);
 

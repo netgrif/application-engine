@@ -5,6 +5,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 //@Service
+@Deprecated(since = "7.0.0")
 class PostalCodePostRequestService {
 
     private static final Logger log = LoggerFactory.getLogger(PostalCodePostRequestService.class.name)

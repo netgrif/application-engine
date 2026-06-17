@@ -97,7 +97,7 @@ public class ElasticController {
             if (count == 0) {
                 log.info("No cases to reindex");
             } else {
-                long numOfPages = (count / elasticsearchProperties.getReindexExecutor().getSize()) + 1;
+                long numOfPages = Math.max(1, Math.ceilDiv(count, (long) elasticsearchProperties.getReindexExecutor().getSize()));
                 log.info("Reindexing cases: " + numOfPages + " pages");
 
                 for (int page = 0; page < numOfPages; page++) {

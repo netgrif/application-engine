@@ -1,3 +1,4 @@
+management.endpoints.web.exposure.include: "*"
 netgrif:
   engine:
     main:
@@ -118,7 +119,7 @@ netgrif:
             prometheus: metric
           exposure:
             exclude: shutdown
-            include: "*"
+            include: health,info
       endpoint:
         health:
           show-details: when_authorized

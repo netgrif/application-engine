@@ -129,7 +129,12 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void removeAllByRealmId(String realmId) {
-        this.groupRepository.removeAllByRealmId(realmId);
+        Pageable groupPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<Group> groups = groupRepository.findAllByRealmId(realmId, groupPageable);
+        while (groups.hasContent()) {
+            groups.forEach(this::delete);
+            groups = groupRepository.findAllByRealmId(realmId, groupPageable);
+        }
     }
 
     @Override
@@ -137,12 +142,22 @@ public class GroupServiceImpl implements GroupService {
         if (realmIds == null || realmIds.isEmpty()) {
             this.removeAllGroups();
         }
-        this.groupRepository.removeAllByRealmIdIn(realmIds);
+        Pageable groupPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<Group> groups = groupRepository.findAllByRealmIdIn(realmIds, groupPageable);
+        while (groups.hasContent()) {
+            groups.forEach(this::delete);
+            groups = groupRepository.findAllByRealmIdIn(realmIds, groupPageable);
+        }
     }
 
     @Override
     public void removeAllGroups() {
-        this.groupRepository.deleteAll();
+        Pageable groupPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<Group> groups = groupRepository.findAll(groupPageable);
+        while (groups.hasContent()) {
+            groups.forEach(this::delete);
+            groups = groupRepository.findAll(groupPageable);
+        }
     }
 
     @Override

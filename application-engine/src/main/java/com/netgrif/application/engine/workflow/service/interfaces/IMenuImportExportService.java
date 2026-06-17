@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Interface which provides methods for menu import and export.
  */
-
+@Deprecated(since = "7.0.0")
 public interface IMenuImportExportService {
 
     Map<String, I18nString> createAvailableEntriesChoices(List<Case> menuItemCases);

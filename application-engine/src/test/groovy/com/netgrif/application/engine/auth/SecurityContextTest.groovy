@@ -2,7 +2,6 @@ package com.netgrif.application.engine.auth
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.objects.auth.domain.PasswordCredential
@@ -15,7 +14,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
-import com.netgrif.application.engine.security.service.ISecurityContextService
+import com.netgrif.application.engine.auth.service.SecurityContextService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId
 import org.junit.jupiter.api.BeforeEach
@@ -36,7 +35,7 @@ import java.util.stream.Collectors;
 class SecurityContextTest {
 
     @Autowired
-    private ISecurityContextService securityContextService
+    private SecurityContextService securityContextService
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService

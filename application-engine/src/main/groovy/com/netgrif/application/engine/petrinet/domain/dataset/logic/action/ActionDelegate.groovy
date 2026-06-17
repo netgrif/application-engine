@@ -948,6 +948,7 @@ class ActionDelegate extends DelegateExpando {
         return null
     }
 
+    @Deprecated(since = "7.0.0")
     def byIco = { String ico ->
         return actionsRunner.orsrService.findByIco(ico)
     }

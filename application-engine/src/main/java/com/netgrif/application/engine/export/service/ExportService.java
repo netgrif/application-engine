@@ -23,7 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -81,6 +83,90 @@ public class ExportService implements IExportService {
     }
 
     @Override
+    public Set<String> buildDefaultCsvCaseHeader(Predicate predicate, int pageSize) {
+        Set<String> header = new LinkedHashSet<>();
+
+        Page<Case> page;
+        Pageable pageable = PageRequest.of(0, pageSize);
+        do {
+            page = workflowService.search(predicate, pageable);
+            page.getContent().forEach(exportCase -> header.addAll(exportCase.getImmediateDataFields()));
+            pageable = pageable.next();
+        } while (page.hasNext());
+
+        return header;
+    }
+
+    @Override
+    public Set<String> buildDefaultCsvCaseHeader(List<CaseSearchRequest> requests, LoggedUser user, int pageSize,
+                                                 Locale locale, Boolean isIntersection) {
+        Set<String> header = new LinkedHashSet<>();
+
+        Page<Case> page;
+        Pageable pageable = PageRequest.of(0, pageSize);
+        do {
+            page = elasticCaseService.search(requests, user, pageable, locale, isIntersection);
+            page.getContent().forEach(exportCase -> header.addAll(exportCase.getImmediateDataFields()));
+            pageable = pageable.next();
+        } while (page.hasNext());
+
+        return header;
+    }
+
+    @Override
+    public Set<String> buildDefaultCsvTaskHeader(Predicate predicate, int pageSize) {
+        Set<String> header = new LinkedHashSet<>();
+
+        Page<Task> page;
+        Pageable pageable = PageRequest.of(0, pageSize);
+        do {
+            page = taskService.search(predicate, pageable);
+            page.getContent().forEach(exportTask -> header.addAll(exportTask.getImmediateDataFields()));
+            pageable = pageable.next();
+        } while (page.hasNext());
+
+        return header;
+    }
+
+    @Override
+    public Set<String> buildDefaultCsvTaskHeader(List<ElasticTaskSearchRequest> requests, LoggedUser user, int pageSize,
+                                                 Locale locale, Boolean isIntersection) {
+        Set<String> header = new LinkedHashSet<>();
+
+        Page<Task> page;
+        Pageable pageable = PageRequest.of(0, pageSize);
+        do {
+            page = elasticTaskService.search(requests, user, pageable, locale, isIntersection);
+            page.getContent().forEach(exportTask -> header.addAll(exportTask.getImmediateDataFields()));
+            pageable = pageable.next();
+        } while (page.hasNext());
+
+        return header;
+    }
+
+    @Override
+    public PrintWriter createPrintWriter(OutputStream outStream, ExportDataConfig config) {
+        if (config == null || config.getStandardCharsets() == null) {
+            return new PrintWriter(outStream, true, StandardCharsets.UTF_8);
+        }
+        return new PrintWriter(outStream, true, config.getStandardCharsets());
+    }
+
+    @Override
+    public void writeCaseCsvPage(PrintWriter writer, Set<String> csvHeader, List<Case> exportCases) {
+        for (Case exportCase : exportCases) {
+            writer.println(String.join(",", buildRecord(csvHeader, exportCase)).replace("\n", "\\n"));
+        }
+    }
+
+    private void writeTaskCsvPage(PrintWriter writer, Set<String> csvHeader, List<Task> exportTasks) {
+        for (Task exportTask : exportTasks) {
+            Case taskCase = workflowService.findOne(exportTask.getCaseId());
+            writer.println(String.join(",", buildRecord(csvHeader, taskCase)).replace("\n", "\\n"));
+        }
+    }
+
+    @Override
     public OutputStream fillCsvCaseData(Predicate predicate, File outFile) throws FileNotFoundException {
         return fillCsvCaseData(predicate, outFile, null, exportConfiguration.getMongoPageSize());
     }
@@ -92,12 +178,22 @@ public class ExportService implements IExportService {
 
     @Override
     public OutputStream fillCsvCaseData(Predicate predicate, File outFile, ExportDataConfig config, int pageSize) throws FileNotFoundException {
-        int numOfPages = (int) (((caseRepository.count(predicate)) / pageSize) + 1);
-        List<Case> exportCases = new ArrayList<>();
-        for (int i = 0; i < numOfPages; i++) {
-            exportCases.addAll(workflowService.search(predicate, PageRequest.of(i, pageSize)).getContent());
+        Set<String> csvHeader = config == null ? buildDefaultCsvCaseHeader(predicate, pageSize) : config.getDataToExport();
+
+        OutputStream outStream = new FileOutputStream(outFile, false);
+        try (PrintWriter writer = createPrintWriter(outStream, config)) {
+            writer.println(String.join(",", csvHeader));
+
+            Page<Case> page;
+            Pageable pageable = PageRequest.of(0, pageSize);
+            do {
+                page = workflowService.search(predicate, pageable);
+                writeCaseCsvPage(writer, csvHeader, page.getContent());
+                pageable = pageable.next();
+            } while (page.hasNext());
         }
-        return buildCaseCsv(exportCases, config, outFile);
+
+        return outStream;
     }
 
     @Override
@@ -131,12 +227,24 @@ public class ExportService implements IExportService {
     @Override
     public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config,
                                         LoggedUser user, int pageSize, Locale locale, Boolean isIntersection) throws FileNotFoundException {
-        int numOfPages = (int) ((elasticCaseService.count(requests, user, locale, isIntersection) / pageSize) + 1);
-        List<Case> exportCases = new ArrayList<>();
-        for (int i = 0; i < numOfPages; i++) {
-            exportCases.addAll(elasticCaseService.search(requests, user, PageRequest.of(i, pageSize), locale, isIntersection).toList());
+        Set<String> csvHeader = config == null
+                ? buildDefaultCsvCaseHeader(requests, user, pageSize, locale, isIntersection)
+                : config.getDataToExport();
+
+        OutputStream outStream = new FileOutputStream(outFile, false);
+        try (PrintWriter writer = createPrintWriter(outStream, config)) {
+            writer.println(String.join(",", csvHeader));
+
+            Page<Case> page;
+            Pageable pageable = PageRequest.of(0, pageSize);
+            do {
+                page = elasticCaseService.search(requests, user, pageable, locale, isIntersection);
+                writeCaseCsvPage(writer, csvHeader, page.getContent());
+                pageable = pageable.next();
+            } while (page.hasNext());
         }
-        return buildCaseCsv(exportCases, config, outFile);
+
+        return outStream;
     }
 
     @Override
@@ -188,13 +296,24 @@ public class ExportService implements IExportService {
     @Override
     public OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config,
                                         LoggedUser user, int pageSize, Locale locale, Boolean isIntersection) throws FileNotFoundException {
-        int numberOfTasks = (int) ((elasticTaskService.count(requests, user, locale, isIntersection) / pageSize) + 1);
-        List<Task> exportTasks = new ArrayList<>();
+        Set<String> csvHeader = config == null
+                ? buildDefaultCsvTaskHeader(requests, user, pageSize, locale, isIntersection)
+                : config.getDataToExport();
 
-        for (int i = 0; i < numberOfTasks; i++) {
-            exportTasks.addAll(elasticTaskService.search(requests, user, PageRequest.of(0, pageSize), locale, isIntersection).toList());
+        OutputStream outStream = new FileOutputStream(outFile, false);
+        try (PrintWriter writer = createPrintWriter(outStream, config)) {
+            writer.println(String.join(",", csvHeader));
+
+            Page<Task> page;
+            Pageable pageable = PageRequest.of(0, pageSize);
+            do {
+                page = elasticTaskService.search(requests, user, pageable, locale, isIntersection);
+                writeTaskCsvPage(writer, csvHeader, page.getContent());
+                pageable = pageable.next();
+            } while (page.hasNext());
         }
-        return buildTaskCsv(exportTasks, config, outFile);
+
+        return outStream;
     }
 
     @Override
@@ -209,12 +328,24 @@ public class ExportService implements IExportService {
 
     @Override
     public OutputStream fillCsvTaskData(Predicate predicate, File outFile, ExportDataConfig config, int pageSize) throws FileNotFoundException {
-        int numberOfTasks = (int) taskRepository.count(predicate);
-        List<Task> exportTasks = new ArrayList<>();
-        for (int i = 0; i < numberOfTasks; i++) {
-            exportTasks.addAll(taskService.search(predicate, PageRequest.of(i, pageSize)).getContent());
+        Set<String> csvHeader = config == null
+                ? buildDefaultCsvTaskHeader(predicate, pageSize)
+                : config.getDataToExport();
+
+        OutputStream outStream = new FileOutputStream(outFile, false);
+        try (PrintWriter writer = createPrintWriter(outStream, config)) {
+            writer.println(String.join(",", csvHeader));
+
+            Page<Task> page;
+            Pageable pageable = PageRequest.of(0, pageSize);
+            do {
+                page = taskService.search(predicate, pageable);
+                writeTaskCsvPage(writer, csvHeader, page.getContent());
+                pageable = pageable.next();
+            } while (page.hasNext());
         }
-        return buildTaskCsv(exportTasks, config, outFile);
+
+        return outStream;
     }
 
     @Override

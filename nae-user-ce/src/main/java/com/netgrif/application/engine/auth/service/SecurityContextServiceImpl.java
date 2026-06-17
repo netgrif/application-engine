@@ -1,43 +1,50 @@
-package com.netgrif.application.engine.security.service;
+package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.Collection;
+import javax.validation.constraints.NotNull;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 
 /**
  * Service for managing security context object, like user resource
  */
 @Slf4j
 @Service
-public class SecurityContextService implements ISecurityContextService {
+public class SecurityContextServiceImpl implements SecurityContextService {
 
     /**
      * List containing user IDs that's state was changed during an action
      */
     private final Set<String> cachedTokens;
 
-    protected UserService userService;
+    private UserService userService;
 
-    protected SecurityContextService() {
+    private final SecurityContextRepository securityContextRepository;
+
+    protected SecurityContextServiceImpl() {
         this.cachedTokens = ConcurrentHashMap.newKeySet();
-    }
-
-    @Autowired
-    @Lazy
-    public void setUserService(UserService userService) {
-        this.userService = userService;
+        this.securityContextRepository = new HttpSessionSecurityContextRepository();
     }
 
     /**
@@ -71,14 +78,33 @@ public class SecurityContextService implements ISecurityContextService {
     }
 
     private void reloadSecurityContext(LoggedUser loggedUser, boolean forceRefresh) {
-        if (isUserLogged(loggedUser) && cachedTokens.contains(loggedUser.getStringId())) {
+        if ((isUserLogged(loggedUser) && cachedTokens.contains(loggedUser.getStringId())) || forceRefresh) {
             if (forceRefresh) {
-                loggedUser = ActorTransformer.toLoggedUser(userService.findById(loggedUser.getStringId(), null));
+                AbstractUser user = userService.findUserByUsername(loggedUser.getUsername(), loggedUser.getRealmId()).orElseThrow(() -> new NoSuchElementException("User not found"));
+                loggedUser = ActorTransformer.toLoggedUser(user);
             }
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), ((LoggedUserImpl) loggedUser).getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(token);
+            SecurityContext context = getSecurityContext(loggedUser);
+            securityContextRepository.saveContext(context, getServletRequest(), getServletResponse());
             clearToken(loggedUser.getStringId());
         }
+    }
+
+    @NotNull
+    private SecurityContext getSecurityContext(LoggedUser loggedUser) {
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), ((LoggedUserImpl) loggedUser).getAuthorities());
+        SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
+        SecurityContext context = securityContextHolderStrategy.createEmptyContext();
+        context.setAuthentication(authentication);
+        securityContextHolderStrategy.setContext(context);
+        return context;
+    }
+
+    private HttpServletRequest getServletRequest() {
+        return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
+    }
+
+    private HttpServletResponse getServletResponse() {
+        return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getResponse();
     }
 
     /**
@@ -112,5 +138,11 @@ public class SecurityContextService implements ISecurityContextService {
             return ((LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId().equals(loggedUser.getId());
         else
             return false;
+    }
+
+    @Autowired
+    @Lazy
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 }

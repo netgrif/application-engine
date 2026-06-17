@@ -6,6 +6,9 @@ import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.auth.domain.User;
+import com.netgrif.application.engine.objects.event.events.user.UserLoginEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.MessageSourceAccessor;
@@ -52,6 +55,13 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
             throw new BadCredentialsException(this.messages
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
+        if (user instanceof User && !((User) user).isActive()) {
+            log.debug("User is not active");
+            loginAttemptService.loginFailed(key);
+            throw new BadCredentialsException(this.messages
+                    .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
+        }
+
         String presentedPassword = authentication.getCredentials().toString();
         if (!this.passwordEncoder.matches(presentedPassword, user.getPassword())) {
             log.debug("Failed to authenticate since password does not match stored value");
@@ -65,6 +75,7 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
         UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(userDetails, presentedPassword, userDetails.getAuthorities());
         result.setDetails(authentication.getDetails());
         loginAttemptService.loginSucceeded(user.getStringId());
+        publisher.publishEvent(new UserLoginEvent((LoggedUser) userDetails));
         return result;
     }
 

@@ -28,6 +28,7 @@ abstract class FieldActionsRunner {
     abstract ActionDelegate getActionDelegate()
 
     @Autowired
+    @Deprecated(since = "7.0.0")
     private IOrsrService orsrService
 
     @Autowired
@@ -109,6 +110,7 @@ abstract class FieldActionsRunner {
         return postalCodeService
     }
 
+    @Deprecated(since = "7.0.0")
     IOrsrService getOrsrService() {
         return orsrService
     }

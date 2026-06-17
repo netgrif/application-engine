@@ -54,6 +54,7 @@ public class UserController {
     private final RealmService realmService;
     private final UserFactory userFactory;
 
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Create a new user", description = "Creates a new user in the realm specified by id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User successfully created"),
@@ -208,6 +209,7 @@ public class UserController {
 //        Page<IUser> page = userService.findAllActiveByProcessRoles(roleResourceIds, pageable);
 //        return ResponseEntity.ok();
 //    }
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Assign roles to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @PutMapping(value = "/{realmId}/{id}/roles", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {

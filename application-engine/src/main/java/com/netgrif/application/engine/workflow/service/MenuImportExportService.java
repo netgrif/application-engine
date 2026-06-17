@@ -48,6 +48,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Service
+@Deprecated(since = "7.0.0")
 public class MenuImportExportService implements IMenuImportExportService {
 
     private static final Logger log = LoggerFactory.getLogger(MenuImportExportService.class);
@@ -152,13 +153,13 @@ public class MenuImportExportService implements IMenuImportExportService {
 
         //Change remove_option button value to trigger its SET action
         if (!menuItemIdsToReplace.isEmpty()) menuItemIdsToReplace.forEach(id -> {
+            Case caseToRemove = workflowService.findOne(id);
             Map<String, Map<String, String>> caseToRemoveData = new HashMap<>();
             Map<String, String> removeBtnData = new HashMap<>();
             removeBtnData.put("type", "button");
-            removeBtnData.put("value", "removed");
+            removeBtnData.put("value", String.valueOf((Integer) caseToRemove.getFieldValue("remove_option") + 1));
             caseToRemoveData.put("remove_option", removeBtnData);
 
-            Case caseToRemove = workflowService.findOne(id);
             QTask qTask = new QTask("task");
             Task task = taskService.searchOne(qTask.transitionId.eq("view").and(qTask.caseId.eq(caseToRemove.getStringId())));
             dataService.setData(task, ImportHelper.populateDataset(caseToRemoveData));

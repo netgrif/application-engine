@@ -76,8 +76,10 @@ public class CaseSearchRequest implements Serializable {
                     authorRequest.id = map.get("id");
                 if (map.containsKey("name"))
                     authorRequest.name = map.get("name");
-                if (map.containsKey("email"))
-                    authorRequest.email = map.get("email");
+                if (map.containsKey("username"))
+                    authorRequest.username = map.get("username");
+                if (map.containsKey("realm"))
+                    authorRequest.realm = map.get("realm");
                 return authorRequest;
             }).collect(Collectors.toList());
         }
@@ -134,6 +136,8 @@ public class CaseSearchRequest implements Serializable {
 
         public String name;
 
-        public String email;
+        public String username;
+
+        public String realm;
     }
 }
