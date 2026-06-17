@@ -7,6 +7,7 @@
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
 	<transitionRole>false</transitionRole>
+	<caseName>New Process</caseName>
 	<role>
 		<id>system</id>
 		<title>System</title>
@@ -106,6 +107,18 @@
 		<id>title</id>
 		<title>Title</title>
 		<init>New Process</init>
+		<event type="set">
+			<id>title_set</id>
+			<actions phase="post">
+				<action id="action9">
+					<![CDATA[
+					version: f.version,
+					title: f.title;
+					changeCaseProperty "title" about { "${title.value} ${version.value}" as String }
+					]]>
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="text" immediate="true">
 		<id>version</id>
@@ -790,7 +803,7 @@
 					state: f.state;
 					// TODO: NAE-2447 boolean freeze - allow cases to finish execution
 					def net = findPetriNet(mongo_id.value)
-					petriNetService.archive(net, loggedUser())
+					petriNetService.archive(net, loggedUser().transformToLoggedUser())
 					change state value { "archived" }
 					]]>
 				</action>

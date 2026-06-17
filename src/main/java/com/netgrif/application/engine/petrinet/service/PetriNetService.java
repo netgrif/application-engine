@@ -62,6 +62,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
@@ -227,7 +228,7 @@ public class PetriNetService implements IPetriNetService {
             }
             return net;
         });
-        createProcessCase(outcome.getNet(), author);
+        createProcessCase(outcome, author);
         return outcome;
     }
 
@@ -648,8 +649,9 @@ public class PetriNetService implements IPetriNetService {
     /**
      * Creates a case of the Process process and set it to deployed state.
      */
-    protected void createProcessCase(PetriNet net, LoggedUser author) {
+    protected void createProcessCase(ImportPetriNetEventOutcome outcome, LoggedUser author) {
         // TODO: NAE-2447 replace with case import in later releases
+        PetriNet net = outcome.getNet();
         Case procesCase = workflowService.createCaseByIdentifier("process", net.getTitle().getDefaultValue(), "", author).getCase();
         procesCase.getDataSet().get("state").setValue("deployed");
         procesCase.getDataSet().get("id").setValue(net.getIdentifier());
@@ -657,6 +659,7 @@ public class PetriNetService implements IPetriNetService {
         procesCase.getDataSet().get("version").setValue(net.getVersion().toString());
         procesCase.getDataSet().get("icon").setValue(net.getIcon());
         procesCase.getDataSet().get("mongo_id").setValue(net.getStringId());
+        procesCase.getDataSet().get("xml_text").setValue(outcome.getXmlContent());
         procesCase.setActivePlaces(Map.of("p2", 1, "p7", 1));
         workflowService.save(procesCase);
         procesCase = workflowService.findOne(procesCase.getStringId());
@@ -681,8 +684,9 @@ public class PetriNetService implements IPetriNetService {
         net.setAuthor(author.transformToAuthor());
         functionCacheService.cachePetriNetFunctions(net);
         Path savedPath = getImporter().saveNetFile(net, new ByteArrayInputStream(xmlCopy.toByteArray()));
+        outcome.setXmlContent(xmlCopy.toString(StandardCharsets.UTF_8));
         xmlCopy.close();
-        log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully and saved in a folder: " + savedPath.toString());
+        log.info("Petri net {} ({} v{}) imported successfully and saved in a folder: {}", net.getTitle(), net.getInitials(), net.getVersion(), savedPath.toString());
 
         outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
         evaluateRules(net, EventPhase.PRE);
