@@ -6,14 +6,16 @@ import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.constants.UserConstants;
-import com.netgrif.application.engine.objects.auth.domain.*;
-import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
-import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
+import com.netgrif.application.engine.objects.auth.domain.Authority;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +25,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.netgrif.application.engine.objects.auth.domain.Authority.admin;
 
 @Slf4j
 @Component
@@ -30,6 +33,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 @ConditionalOnProperty(value = "netgrif.engine.security.auth.create-super", matchIfMissing = true)
 public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
+
+    private static final int GENERATED_PASSWORD_LENGTH = 27;
 
     private final SecurityConfigurationProperties securityProperties;
     private final AuthorityService authorityService;
@@ -44,60 +49,55 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     public void run(ApplicationArguments strings) {
         log.info("Creating Super user");
         createSuperUser();
-        createDummyUser();
     }
 
     private AbstractUser createSuperUser() {
-        Authority adminAuthority = authorityService.getOrCreate(Authority.admin);
-        Authority systemAuthority = authorityService.getOrCreate(Authority.systemAdmin);
-        Set<Authority> authorities = new HashSet<>();
-        authorities.add(adminAuthority);
-        authorities.add(systemAuthority);
+        SecurityConfigurationProperties.AuthProperties authProperties = securityProperties.getAuth();
+        Optional<AbstractUser> existingUser = userService.findUserByUsername(authProperties.getUsername(), null);
 
-        Optional<AbstractUser> superUser = userService.findUserByUsername(UserConstants.ADMIN_USER_USERNAME, null);
-        if (superUser.isEmpty()) {
-            User user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
-            user.setFirstName(UserConstants.ADMIN_USER_FIRST_NAME);
-            user.setLastName(UserConstants.ADMIN_USER_LAST_NAME);
-            user.setUsername(UserConstants.ADMIN_USER_USERNAME); // TODO: set ADMIN_USER_EMAIL or ADMIN_USER_USERNAME ? IDK
-            user.setEmail(UserConstants.ADMIN_USER_EMAIL);
-            PasswordCredential passwordCredential = new PasswordCredential(securityProperties.getAuth().getAdminPassword(), 0, true);
-            user.setCredential("password", passwordCredential);
-            user.setState(UserState.ACTIVE);
-            user.setAuthoritySet(authorities);
-            user.setProcessRoles(new HashSet<>(processRoleService.findAll(Pageable.unpaged()).getContent()));
-            this.superUser = userService.createUser(user, null);
-            log.info("Super user created");
-        } else {
+        if (existingUser.isPresent()) {
             log.info("Super user detected");
-            this.superUser = superUser.get();
+            this.superUser = existingUser.get();
+            return this.superUser;
         }
 
+        AbstractUser user = userService.createUser(
+                authProperties.getUsername(),
+                authProperties.getEmail(),
+                UserConstants.ADMIN_USER_FIRST_NAME,
+                UserConstants.ADMIN_USER_LAST_NAME,
+                resolveAdminPassword(authProperties),
+                null
+        );
+        user.setAuthoritySet(createSuperUserAuthorities());
+        user.setProcessRoles(new HashSet<>(processRoleService.findAll(Pageable.unpaged()).getContent()));
+
+        this.superUser = userService.saveUser(user, null);
+        log.info("Super user created");
+        log.info("Login: {}", authProperties.getUsername());
         return this.superUser;
     }
 
-    private void createDummyUser() {
-        Authority userAuthority = authorityService.getOrCreate(Authority.user);
-        Set<Authority> authorities = new HashSet<>();
-        authorities.add(userAuthority);
-
-        Optional<AbstractUser> superUser = userService.findUserByUsername("dummy", null);
-        if (superUser.isEmpty()) {
-            User user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
-            user.setFirstName("Dummy");
-            user.setLastName("User");
-            user.setUsername("dummy");
-            user.setEmail("dummy@netgrif.com");
-            PasswordCredential passwordCredential = new PasswordCredential(securityProperties.getAuth().getAdminPassword(), 0, true);
-            user.setCredential("password", passwordCredential);
-            user.setState(UserState.ACTIVE);
-            user.setAuthoritySet(authorities);
-            Set<ProcessRole> processRoles = new HashSet<>();
-            processRoles.add(processRoleService.getDefaultRole());
-            user.setProcessRoles(processRoles);
-           userService.createUser(user, null);
-            log.info("Dummy user created");
+    String resolveAdminPassword(SecurityConfigurationProperties.AuthProperties authProperties) {
+        if (authProperties.getAdminPassword() != null && !authProperties.getAdminPassword().isBlank()) {
+            return authProperties.getAdminPassword();
         }
+
+        String generatedPassword = RandomStringUtils.secure().nextAlphanumeric(GENERATED_PASSWORD_LENGTH);
+        log.warn("!IMPORTANT!");
+        log.warn("------------------------------------------------");
+        log.warn("No password configured for super user. A random password was generated.");
+        log.warn("Login: {}", authProperties.getUsername());
+        log.warn("Password: {}", generatedPassword);
+        log.warn("------------------------------------------------");
+        return generatedPassword;
+    }
+
+    private Set<Authority> createSuperUserAuthorities() {
+        return Set.of(
+                authorityService.getOrCreate(admin),
+                authorityService.getOrCreate(Authority.systemAdmin)
+        );
     }
 
     public void setAllToSuperUser() {

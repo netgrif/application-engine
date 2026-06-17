@@ -35,6 +35,7 @@ netgrif:
         login-attempts: 3
         login-timeout: 3
         login-timeout-unit: seconds
+        admin-password: password
       web:
         public-web:
           url: test.public.url

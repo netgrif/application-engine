@@ -68,7 +68,7 @@ netgrif:
         token-validity-period: 3
         minimal-password-length: 8
         enable-profile-edit: true
-        admin-password: ${NETGRIF_ENGINE_SECURITY_AUTH_ADMIN_PASSWORD:password}
+        admin-password: ${NETGRIF_ENGINE_SECURITY_AUTH_ADMIN_PASSWORD:}
       static:
         enabled: false
       headers:
