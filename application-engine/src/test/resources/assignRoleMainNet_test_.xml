@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
+    <id>main</id>
+    <initials>ORG</initials>
+    <title>main</title>
+    <icon>business</icon>
+    <defaultRole>false</defaultRole>
+
+    <caseName>Nová organizácia</caseName>
+    <!-- ROLES -->
+    <role>
+        <id>admin_main</id>
+        <title>admin_main</title>
+        <event type="assign">
+            <id>1</id>
+            <actions phase="pre">
+                <action>
+                    assignRole("admin_secondary","secondary")
+                </action>
+            </actions>
+        </event>
+    </role>
+</document>

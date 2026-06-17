@@ -1,4 +1,5 @@
 name: Pull Request
+
 on:
   pull_request:
     types: [ opened, synchronize, reopened ]
@@ -8,22 +9,22 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 21
           distribution: 'temurin'
 
       - name: Cache Maven packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven
 
       - name: Build
         run: mvn clean verify -DskipTests=true
@@ -35,28 +36,37 @@ jobs:
     timeout-minutes: 200
     services:
       mongo:
-        image: mongo:7.0.9
+        image: mongodb/mongodb-community-server:8.0-ubi9
         ports:
           - 27017:27017
 
       redis:
-        image: redis
+        image: redis:8
         ports:
           - 6379:6379
 
       elasticsearch:
-        image: elasticsearch:8.10.4
+        image: elasticsearch:8.19.16
         ports:
           - 9200:9200
           - 9300:9300
-        options: -e="discovery.type=single-node" -e="xpack.security.enabled=false" --health-cmd="curl http://localhost:9200/_cluster/health" --health-interval=10s --health-timeout=5s --health-retries=10
+        options: >-
+          -e="discovery.type=single-node"
+          -e="xpack.security.enabled=false"
+          --health-cmd="curl http://localhost:9200/_cluster/health"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
 
       minio:
-        image: docker.io/bitnami/minio:2022
+        image: docker.io/bawix/minio:2022
         ports:
           - 9000:9000
           - 9001:9001
-        options: -e="MINIO_ROOT_USER=root" -e="MINIO_ROOT_PASSWORD=password" -e="MINIO_DEFAULT_BUCKETS=default"
+        options: >-
+          -e="MINIO_ROOT_USER=root"
+          -e="MINIO_ROOT_PASSWORD=password"
+          -e="MINIO_DEFAULT_BUCKETS=default"
 
     steps:
       - name: Test Database
@@ -66,48 +76,44 @@ jobs:
           echo $ELASTIC_SEARCH_URL
           curl -fsSL "$ELASTIC_SEARCH_URL/_cat/health?h=status"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 21
           distribution: 'temurin'
 
-#      - name: Cache SonarCloud packages
-#        uses: actions/cache@v3
-#        with:
-#          path: ~/.sonar/cache
-#          key: ${{ runner.os }}-sonar
-#          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
 
       - name: Cache Maven packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven
 
       - name: Generate certificates
-        run: cd src/main/resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../../../..
-
+        run: |
+          cd application-engine/src/main/resources/certificates
+          openssl genrsa -out keypair.pem 4096
+          openssl rsa -in keypair.pem -pubout -out public.crt
+          openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der
+          cd ../../../../..
 
       - name: Build
         run: mvn clean package install -DskipTests=true
 
-#       Upgrade Java
-#      - name: Build, test, and analyze
-#        timeout-minutes: 180
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-#        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=netgrif_application-engine
-
-      - name: Build, test
+      - name: Build, test, and analyze
         timeout-minutes: 180
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B test
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=netgrif_application-engine

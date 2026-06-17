@@ -1,0 +1,142 @@
+package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
+
+import com.netgrif.application.engine.business.IPostalCodeService
+import com.netgrif.application.engine.business.orsr.IOrsrService
+import com.netgrif.application.engine.importer.service.FieldFactory
+import com.netgrif.application.engine.objects.event.events.event.ActionStartEvent
+import com.netgrif.application.engine.objects.event.events.event.ActionStopEvent
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.expando.FunctionExpando
+import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
+import com.netgrif.application.engine.objects.petrinet.domain.Function
+import com.netgrif.application.engine.objects.workflow.domain.Case
+import com.netgrif.application.engine.objects.workflow.domain.Task
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Lookup
+import org.springframework.context.ApplicationEventPublisher
+import org.springframework.stereotype.Component
+
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
+
+@Component
+@SuppressWarnings("GrMethodMayBeStatic")
+abstract class FieldActionsRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(FieldActionsRunner.class)
+
+    @Lookup("actionDelegate")
+    abstract ActionDelegate getActionDelegate()
+
+    @Autowired
+    @Deprecated(since = "7.0.0")
+    private IOrsrService orsrService
+
+    @Autowired
+    private IPostalCodeService postalCodeService
+
+    @Autowired
+    private FieldFactory fieldFactory
+
+    @Autowired
+    private IFieldActionsCacheService actionsCacheService
+
+    @Autowired
+    private ApplicationEventPublisher publisher
+
+    private ConcurrentMap<String, Object> actionsCache = new ConcurrentHashMap<>()
+
+    List<EventOutcome> run(com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action action, Case useCase, Map<String, String> params, List<Function> functions = []) {
+        return run(action, useCase, Optional.empty(), params, functions)
+    }
+
+    List<EventOutcome> run(com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action action, Case useCase, Optional<Task> task, Map<String, String> params, List<Function> functions = []) {
+
+        log.debug("Action: $action")
+        def code = getActionCode(action, functions)
+        List<EventOutcome> outcomes
+        final ActionStartEvent actionStart = new ActionStartEvent(action)
+        try {
+            publisher.publishEvent(actionStart)
+            code.init(action, useCase, task, this, params)
+            code()
+            publisher.publishEvent(new ActionStopEvent(action, actionStart, true))
+        } catch (Exception e) {
+            log.error("Action: $action.definition")
+            publisher.publishEvent(new ActionStopEvent(action, actionStart, false))
+            throw e
+        } finally {
+            ActionDelegate delegate = (code?.delegate instanceof ActionDelegate) ? (ActionDelegate) code.delegate : null
+            outcomes = (delegate?.outcomes != null) ? new ArrayList<>(delegate.outcomes) : new ArrayList<>()
+            cleanUp(code)
+        }
+        return outcomes
+    }
+
+    Closure getActionCode(com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action action, List<Function> functions, boolean shouldRewriteCachedActions = false) {
+        return getActionCode(actionsCacheService.getCompiledAction(action, shouldRewriteCachedActions), functions)
+    }
+
+    Closure getActionCode(Closure code, List<Function> functions) {
+        def actionDelegate = getActionDelegate()
+
+        actionsCacheService.getCachedFunctions(functions).each {
+            actionDelegate."${it.function.name}" = it.code
+        }
+        actionsCacheService.getGlobalFunctionsCache().each { entry ->
+            def functionExpando = new FunctionExpando(actionDelegate)
+            entry.getValue().each {
+                functionExpando."${it.function.name}" = it.code
+            }
+            actionDelegate."${entry.key}" = functionExpando
+        }
+        return prepareCode(code, actionDelegate)
+    }
+
+    void addToCache(String key, Object value) {
+        this.actionsCache.put(key, value)
+    }
+
+    void removeFromCache(String key) {
+        this.actionsCache.remove(key)
+    }
+
+    def getFromCache(String key) {
+        return this.actionsCache.get(key)
+    }
+
+    IPostalCodeService getPostalCodeService() {
+        return postalCodeService
+    }
+
+    @Deprecated(since = "7.0.0")
+    IOrsrService getOrsrService() {
+        return orsrService
+    }
+
+    private void clearGroovyMetaClass(Object... targets) {
+        targets.each { target ->
+            if (target == null) {
+                return
+            }
+            GroovySystem.getMetaClassRegistry().removeMetaClass(target.getClass())
+        }
+    }
+
+    private Closure prepareCode(Closure closure, Object delegate) {
+        Closure hydratedClosure = closure.rehydrate(delegate, closure.owner, closure.thisObject)
+        hydratedClosure.setResolveStrategy(Closure.DELEGATE_FIRST)
+        return hydratedClosure
+    }
+
+    private void cleanUp(Closure code) {
+        if (code?.delegate instanceof ActionDelegate) {
+            ((ActionDelegate) code.delegate).clearAfterExecution()
+        } else {
+            log.warn("Code delegate is not instance of ActionDelegate")
+        }
+        clearGroovyMetaClass(code)
+    }
+}

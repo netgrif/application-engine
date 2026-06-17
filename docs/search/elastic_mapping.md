@@ -112,9 +112,9 @@ as _\[Dog, Hund, Pes\]_ in the index. This way, the fields value can be searched
 
 Base class for data field mapping. All indexed data variables have these attributes available.
 
-|index|type|value|
-|-----|----|-----|
-|`dataSet.<fieldID>.fulltextValue`|Text array|value depends on the field type:<br>**boolean**: textual representation of the value<br>**date** & **dateTime**: date formated as ISO-8601 basic local date format<br>**file** & **fileList**: names of the contained files<br>**number**: the value stored as decimal string<br>**text**: the value itself<br>**multichoice** & **enumeration**: all translations of the selected options<br>**multichoiceMap** & **enumerationMap**: all translated values of the selected key-value pairs<br>**user** & **userList**: full name followed by email as a single string for each selected user|
+|index|type| value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+|-----|----|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|`dataSet.<fieldID>.fulltextValue`|Text array| value depends on the field type:<br>**boolean**: textual representation of the value<br>**date** & **dateTime**: date formatted as ISO-8601 basic local date format<br>**file** & **fileList**: names of the contained files<br>**number**: the value stored as decimal string<br>**text**: the value itself<br>**multichoice** & **enumeration**: all translations of the selected options<br>**multichoiceMap** & **enumerationMap**: all translated values of the selected key-value pairs<br>**actor** & **actorList**: full name for each selected actor |
 
 ### BooleanField - boolean
 
@@ -157,10 +157,11 @@ its `toString()` value is stored.
 |-----|----|-----|
 |`dataSet.<fieldID>.keyValue`|Keyword array|the _key_ part of the selected key-value pairs (i.e. the part stored as the map field value)|
 
-### UserField - user, userList
+### ActorField - actor, actorList
 
-|index|type|value|
-|-----|----|-----|
-|`dataSet.<fieldID>.emailValue`|Text array|emails of the selected users|
-|`dataSet.<fieldID>.fullNameValue`|Text array|full names of the selected users|
-|`dataSet.<fieldID>.userIdValue`|Long array|IDs of the selected users|
+| index                                 |type| value                                |
+|---------------------------------------|----|--------------------------------------|
+| `dataSet.<fieldID>.usernameValue`     |Text array| usernames of the selected users      |
+| `dataSet.<fieldID>.fullNameValue`     |Text array| full names of the selected actors    |
+| `dataSet.<fieldID>.actorIdValue`      |Text array| IDs of the selected actors           |
+| `dataSet.<fieldID>.actorRealmIdValue` |Text array| IDs of realms of the selected actors |

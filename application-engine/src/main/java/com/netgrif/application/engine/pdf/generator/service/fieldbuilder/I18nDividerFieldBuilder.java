@@ -1,0 +1,25 @@
+package com.netgrif.application.engine.pdf.generator.service.fieldbuilder;
+
+import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
+import com.netgrif.application.engine.pdf.generator.domain.PdfField;
+import com.netgrif.application.engine.pdf.generator.domain.PdfI18nDividerField;
+import com.netgrif.application.engine.objects.petrinet.domain.DataGroup;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedI18nStringField;
+
+public class I18nDividerFieldBuilder extends FieldBuilder {
+
+    public I18nDividerFieldBuilder(PdfResourceConfigurationProperties resource) {
+        super(resource);
+    }
+
+    public PdfField buildField(DataGroup dataGroup, LocalisedI18nStringField field, int lastX, int lastY) {
+        this.lastX = lastX;
+        this.lastY = lastY;
+        String value = (String) field.getValue();
+        String translatedTitle = field.getName();
+        PdfField pdfField = new PdfI18nDividerField(field.getStringId(), dataGroup, field.getType(), translatedTitle, value, resource);
+        setFieldParams(dataGroup, field, pdfField);
+        setFieldPositions(pdfField, resource.getFontLabelSize());
+        return pdfField;
+    }
+}

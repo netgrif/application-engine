@@ -1,0 +1,96 @@
+package com.netgrif.application.engine.configuration.authentication.providers.basic;
+
+
+import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
+import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.auth.domain.User;
+import com.netgrif.application.engine.objects.event.events.user.UserLoginEvent;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.MessageSourceAccessor;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.SpringSecurityMessageSource;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
+
+import java.util.Optional;
+
+@Slf4j
+@Component
+public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationProvider {
+
+    @Autowired
+    protected UserService userService;
+
+    protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
+
+    protected PasswordEncoder passwordEncoder;
+
+
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
+        String key = details.getRemoteAddress();
+        if (key == null) {
+            throw new BadCredentialsException(this.messages
+                    .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
+        }
+        if (loginAttemptService.isBlocked(key)) {
+            throw new BadCredentialsException(this.messages
+                    .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
+        }
+        String name = authentication.getName();
+        Optional<AbstractUser> userOptional = userService.findUserByUsername(name, null);
+        if (userOptional.isEmpty()) {
+            log.debug("User not found");
+            loginAttemptService.loginFailed(key);
+            throw new BadCredentialsException(this.messages
+                    .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
+        }
+        AbstractUser user = userOptional.get();
+        if (user instanceof User concreteUser && !concreteUser.isActive()) {
+            log.debug("User is not active");
+            loginAttemptService.loginFailed(key);
+            throw new BadCredentialsException(this.messages
+                    .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
+        }
+
+        String presentedPassword = authentication.getCredentials().toString();
+        if (!this.passwordEncoder.matches(presentedPassword, user.getPassword())) {
+            log.debug("Failed to authenticate since password does not match stored value");
+            loginAttemptService.loginFailed(key);
+            throw new BadCredentialsException(this.messages
+                    .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
+        }
+
+        UserDetails userDetails = (LoggedUserImpl) ActorTransformer.toLoggedUser(user);
+
+        UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(userDetails, presentedPassword, userDetails.getAuthorities());
+        result.setDetails(authentication.getDetails());
+        loginAttemptService.loginSucceeded(user.getStringId());
+        publisher.publishEvent(new UserLoginEvent((LoggedUser) userDetails));
+        return result;
+    }
+
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return authentication.equals(UsernamePasswordAuthenticationToken.class);
+    }
+
+
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        Assert.notNull(passwordEncoder, "passwordEncoder cannot be null");
+        this.passwordEncoder = passwordEncoder;
+    }
+
+}

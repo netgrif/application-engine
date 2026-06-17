@@ -1,0 +1,35 @@
+package com.netgrif.application.engine.workflow.service.interfaces;
+
+import com.netgrif.application.engine.adapter.spring.workflow.service.FilterImportExportService;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.application.engine.objects.workflow.domain.filter.FilterImportExportList;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldValue;
+import com.netgrif.application.engine.objects.workflow.domain.IllegalFilterFileException;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * Interface which provides methods for filter import and export.
+ */
+
+public interface IFilterImportExportService extends FilterImportExportService {
+
+    FileFieldValue exportFiltersToFile(Collection<String> filtersToExport) throws IOException;
+
+    FilterImportExportList exportFilters(Collection<String> filtersToExport);
+
+    List<String> importFilters() throws IOException, IllegalFilterFileException, TransitionNotExecutableException;
+
+    Map<String, String> importFilters(FilterImportExportList filters) throws IOException, TransitionNotExecutableException;
+
+    void createFilterImport(AbstractUser author);
+
+    void createFilterExport(AbstractUser author);
+
+    void changeFilterField(Collection<String> filterFields);
+}

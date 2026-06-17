@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
+    <id>1</id>
+    <initials>TES</initials>
+    <title>Data test</title>
+    <defaultRole>true</defaultRole>
+    <!-- NUMBER -->
+    <data type="number">
+        <id>number</id>
+        <title>Number</title>
+        <placeholder>Number field placeholder</placeholder>
+        <desc>Number field description</desc>
+        <valid>inrange 0,inf</valid>
+        <validations>
+            <validation>
+                <expression>inrange 0,inf</expression>
+                <message>Number field validation message</message>
+            </validation>
+        </validations>
+        <init>10</init>
+    </data>
+    <!-- TEXT -->
+    <data type="text">
+        <id>text</id>
+        <title>Text</title>
+        <placeholder>Text field placeholder</placeholder>
+        <desc>Text field description</desc>
+        <valid>email</valid>
+        <validations>
+            <validation>
+                <expression>email</expression>
+                <message>Mail validation message</message>
+            </validation>
+        </validations>
+        <init>text</init>
+    </data>
+    <!-- ENUMERATION -->
+    <data type="enumeration">
+        <id>enumeration</id>
+        <title>Enumeration</title>
+        <placeholder>Enumeration field placeholder</placeholder>
+        <desc>Enumeration field description</desc>
+        <values>enumeration</values>
+        <values>enumeration2</values>
+        <values>enumeration3</values>
+        <init>enumeration</init>
+    </data>
+    <!-- MULTICHOICE -->
+    <data type="multichoice">
+        <id>multichoice</id>
+        <title>Multichoice</title>
+        <placeholder>Multichoice field placeholder</placeholder>
+        <desc>Multichoice field description</desc>
+        <values>multichoice</values>
+        <values>multichoice2</values>
+        <values>multichoice3</values>
+        <init>multichoice, multichoice2</init>
+    </data>
+    <!--  EMPTY MULTICHOICE  -->
+    <data type="multichoice">
+        <id>emptyMultichoice</id>
+        <title>empty multichoice</title>
+    </data>
+    <!-- BOOLEAN -->
+    <data type="boolean">
+        <id>boolean</id>
+        <title>Boolean</title>
+        <placeholder>Boolean field placeholder</placeholder>
+        <desc>Boolean field description</desc>
+        <valid>requiredTrue</valid>
+        <validations>
+            <validation>
+                <expression>requiredTrue</expression>
+                <message>Boolean field validation message</message>
+            </validation>
+        </validations>
+        <init>true</init>
+    </data>
+    <!-- DATE -->
+    <data type="date">
+        <id>date</id>
+        <title>Date</title>
+        <placeholder>Date field placeholder</placeholder>
+        <desc>Date field description</desc>
+        <valid>between today,future</valid>
+        <validations>
+            <validation>
+                <expression>between today,future</expression>
+                <message>Date field validation message</message>
+            </validation>
+            <validation>
+                <expression>between today,tommorow</expression>
+                <message>Date field validation message 2</message>
+            </validation>
+        </validations>
+    </data>
+    <!-- FILE -->
+    <data type="file">
+        <id>file</id>
+        <title>File</title>
+        <placeholder>File field placeholder</placeholder>
+        <desc>File field description</desc>
+    </data>
+    <!-- USER -->
+    <data type="actor">
+        <id>user</id>
+        <title>User</title>
+        <placeholder>User field placeholder</placeholder>
+        <desc>User field description</desc>
+    </data>
+    <!-- DATETIME -->
+    <data type="dateTime">
+        <id>dateTime</id>
+        <title>DateTime</title>
+        <placeholder>DateTime field placeholder</placeholder>
+        <desc>DateTime field description</desc>
+        <valid>between today,future</valid>
+        <validations>
+            <validation>
+                <expression>between today,future</expression>
+                <message>Date field validation message</message>
+            </validation>
+            <validation>
+                <expression>between today,future</expression>
+                <message>Date field validation message 2</message>
+            </validation>
+        </validations>
+    </data>
+    <!-- CASE REF -->
+    <data type="caseRef">
+        <id>caseRef</id>
+        <title>CaseRef</title>
+        <allowedNets>
+            <allowedNet>processId1</allowedNet>
+            <allowedNet>processId2</allowedNet>
+        </allowedNets>
+    </data>
+    <!--  ACTOR LIST  -->
+    <data type="actorList">
+        <id>emptyUserList</id>
+        <title>Empty user list</title>
+        <desc>User list description</desc>
+    </data>
+    <!--  TASK REF  -->
+    <data type="taskRef">
+        <id>emptyTaskRef</id>
+        <title>Empty task ref</title>
+    </data>
+    <!--  MULTICHOICE MAP  -->
+    <data type="multichoice_map">
+        <id>emptyMultichoiceMap</id>
+        <title>Empty multichoice map</title>
+        <desc>Multichoice map description</desc>
+        <placeholder>Multichoice map placeholder</placeholder>
+    </data>
+    <!-- I18N FIELD -->
+    <data type="i18n">
+        <id>i18n</id>
+        <title>Text I18n</title>
+        <placeholder>Text I18n field</placeholder>
+        <desc>This is I18n text field</desc>
+        <init name="i18n_text">Default i18n text value</init>
+        <validations>
+            <validation>
+                <expression>translationRequired sk,en</expression>
+                <message>Slovak and English language required</message>
+            </validation>
+            <validation>
+                <expression>translationOnly sk,en,cz,de</expression>
+                <message>Only Slovak, English, Czech and German languages allowed</message>
+            </validation>
+        </validations>
+    </data>
+    <!-- I18NS -->
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>1</id>
+        <x>1</x>
+        <y>1</y>
+        <label>Transition</label>
+        <dataRef>
+            <id>number</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>text</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>enumeration</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>multichoice</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>boolean</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>date</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>file</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>user</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>dateTime</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>caseRef</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>emptyUserList</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>emptyMultichoice</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>emptyTaskRef</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>emptyMultichoiceMap</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>i18n</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+</document>

@@ -111,7 +111,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <!-- ======== START OF CLASS DATA ======== -->
 <main role="main">
 <div class="header">
-<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">com.netgrif.application.engine.auth.domain.repositories</a></div>
+<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">com.netgrif.core.auth.domain.Authority;.repositories</a></div>
 <h2 title="Class UserRepositoryImpl" class="title">Class UserRepositoryImpl</h2>
 </div>
 <div class="contentContainer">
@@ -119,7 +119,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>com.netgrif.application.engine.auth.domain.repositories.UserRepositoryImpl</li>
+<li>com.netgrif.core.auth.domain.Authority;.repositories.UserRepositoryImpl</li>
 </ul>
 </li>
 </ul>
@@ -128,13 +128,13 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="UserRepository.html" title="interface in com.netgrif.application.engine.auth.domain.repositories">UserRepository</a></code>, <code>org.springframework.data.mongodb.repository.MongoRepository&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>,&#8203;java.lang.String&gt;</code>, <code>org.springframework.data.querydsl.binding.QuerydslBinderCustomizer&lt;<a href="../QUser.html" title="class in com.netgrif.application.engine.auth.domain">QUser</a>&gt;</code>, <code>org.springframework.data.querydsl.QuerydslPredicateExecutor&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;</code>, <code>org.springframework.data.repository.CrudRepository&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>,&#8203;java.lang.String&gt;</code>, <code>org.springframework.data.repository.PagingAndSortingRepository&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>,&#8203;java.lang.String&gt;</code>, <code>org.springframework.data.repository.query.QueryByExampleExecutor&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&gt;</code>, <code>org.springframework.data.repository.Repository&lt;<a href="../User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>,&#8203;java.lang.String&gt;</code></dd>
+<dd><code><a href="UserRepository.html" title="interface in com.netgrif.core.auth.domain.Authority;.repositories">UserRepository</a></code>, <code>org.springframework.data.mongodb.repository.MongoRepository&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>,&#8203;java.lang.String&gt;</code>, <code>org.springframework.data.querydsl.binding.QuerydslBinderCustomizer&lt;<a href="../QUser.html" title="class in com.netgrif.core.auth.domain.Authority;">QUser</a>&gt;</code>, <code>org.springframework.data.querydsl.QuerydslPredicateExecutor&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;</code>, <code>org.springframework.data.repository.CrudRepository&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>,&#8203;java.lang.String&gt;</code>, <code>org.springframework.data.repository.PagingAndSortingRepository&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>,&#8203;java.lang.String&gt;</code>, <code>org.springframework.data.repository.query.QueryByExampleExecutor&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&gt;</code>, <code>org.springframework.data.repository.Repository&lt;<a href="../User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>,&#8203;java.lang.String&gt;</code></dd>
 </dl>
 <hr>
 <pre>@Repository("userRepository")
 public abstract class <span class="typeNameLabel">UserRepositoryImpl</span>
 extends java.lang.Object
-implements <a href="UserRepository.html" title="interface in com.netgrif.application.engine.auth.domain.repositories">UserRepository</a></pre>
+implements <a href="UserRepository.html" title="interface in com.netgrif.core.auth.domain.Authority;.repositories">UserRepository</a></pre>
 </li>
 </ul>
 </div>
@@ -212,11 +212,11 @@ implements <a href="UserRepository.html" title="interface in com.netgrif.applica
 <code>count, exists, findAll, findAll, findAll, findAll, findAll, findBy, findOne</code></li>
 </ul>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.com.netgrif.application.engine.auth.domain.repositories.UserRepository">
+<li class="blockList"><a id="methods.inherited.from.class.com.netgrif.core.auth.domain.Authority;.repositories.UserRepository">
 <!--   -->
 </a>
-<h3>Methods inherited from interface&nbsp;com.netgrif.application.engine.auth.domain.repositories.<a href="UserRepository.html" title="interface in com.netgrif.application.engine.auth.domain.repositories">UserRepository</a></h3>
-<code><a href="UserRepository.html#customize(org.springframework.data.querydsl.binding.QuerydslBindings,com.netgrif.application.engine.auth.domain.QUser)">customize</a>, <a href="UserRepository.html#existsByEmail(java.lang.String)">existsByEmail</a>, <a href="UserRepository.html#findAllBy_idIn(java.util.Set)">findAllBy_idIn</a>, <a href="UserRepository.html#findAllBy_idInAndState(java.util.Set,com.netgrif.application.engine.auth.domain.UserState,org.springframework.data.domain.Pageable)">findAllBy_idInAndState</a>, <a href="UserRepository.html#findAllByIdIn(java.util.Set)">findAllByIdIn</a>, <a href="UserRepository.html#findAllByProcessRoles__idIn(java.util.List)">findAllByProcessRoles__idIn</a>, <a href="UserRepository.html#findAllByStateAndExpirationDateBefore(com.netgrif.application.engine.auth.domain.UserState,java.time.LocalDateTime)">findAllByStateAndExpirationDateBefore</a>, <a href="UserRepository.html#findByEmail(java.lang.String)">findByEmail</a>, <a href="UserRepository.html#findDistinctByStateAndProcessRoles__idIn(com.netgrif.application.engine.auth.domain.UserState,java.util.List,org.springframework.data.domain.Pageable)">findDistinctByStateAndProcessRoles__idIn</a>, <a href="UserRepository.html#removeAllByStateAndExpirationDateBefore(com.netgrif.application.engine.auth.domain.UserState,java.time.LocalDateTime)">removeAllByStateAndExpirationDateBefore</a></code></li>
+<h3>Methods inherited from interface&nbsp;com.netgrif.core.auth.domain.Authority;.repositories.<a href="UserRepository.html" title="interface in com.netgrif.core.auth.domain.Authority;.repositories">UserRepository</a></h3>
+<code><a href="UserRepository.html#customize(org.springframework.data.querydsl.binding.QuerydslBindings,com.netgrif.core.auth.domain.Authority;.QUser)">customize</a>, <a href="UserRepository.html#existsByEmail(java.lang.String)">existsByEmail</a>, <a href="UserRepository.html#findAllBy_idIn(java.util.Set)">findAllBy_idIn</a>, <a href="UserRepository.html#findAllBy_idInAndState(java.util.Set,com.netgrif.core.auth.domain.Authority;.UserState,org.springframework.data.domain.Pageable)">findAllBy_idInAndState</a>, <a href="UserRepository.html#findAllByIdIn(java.util.Set)">findAllByIdIn</a>, <a href="UserRepository.html#findAllByProcessRoles__idIn(java.util.List)">findAllByProcessRoles__idIn</a>, <a href="UserRepository.html#findAllByStateAndExpirationDateBefore(com.netgrif.core.auth.domain.Authority;.UserState,java.time.LocalDateTime)">findAllByStateAndExpirationDateBefore</a>, <a href="UserRepository.html#findByEmail(java.lang.String)">findByEmail</a>, <a href="UserRepository.html#findDistinctByStateAndProcessRoles__idIn(com.netgrif.core.auth.domain.Authority;.UserState,java.util.List,org.springframework.data.domain.Pageable)">findDistinctByStateAndProcessRoles__idIn</a>, <a href="UserRepository.html#removeAllByStateAndExpirationDateBefore(com.netgrif.core.auth.domain.Authority;.UserState,java.time.LocalDateTime)">removeAllByStateAndExpirationDateBefore</a></code></li>
 </ul>
 </li>
 </ul>

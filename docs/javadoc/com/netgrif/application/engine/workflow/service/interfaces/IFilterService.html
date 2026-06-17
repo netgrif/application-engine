@@ -156,26 +156,26 @@ public interface <span class="typeNameLabel">IFilterService</span></pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deleteFilter(java.lang.String,com.netgrif.application.engine.auth.domain.LoggedUser)">deleteFilter</a></span>&#8203;(java.lang.String&nbsp;filterId,
-            <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deleteFilter(java.lang.String,com.netgrif.core.auth.domain.Authority;.LoggedUser)">deleteFilter</a></span>&#8203;(java.lang.String&nbsp;filterId,
+            <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)</code></th>
 <td class="colLast">
 <div class="block"><span class="deprecatedLabel">Deprecated.</span></div>
 &nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../domain/Filter.html" title="class in com.netgrif.application.engine.workflow.domain">Filter</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#saveFilter(com.netgrif.application.engine.workflow.web.requestbodies.CreateFilterBody,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,com.netgrif.application.engine.auth.domain.LoggedUser)">saveFilter</a></span>&#8203;(<a href="../../web/requestbodies/CreateFilterBody.html" title="class in com.netgrif.application.engine.workflow.web.requestbodies">CreateFilterBody</a>&nbsp;newFilterBody,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#saveFilter(com.netgrif.application.engine.workflow.web.requestbodies.CreateFilterBody,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,com.netgrif.core.auth.domain.Authority;.LoggedUser)">saveFilter</a></span>&#8203;(<a href="../../web/requestbodies/CreateFilterBody.html" title="class in com.netgrif.application.engine.workflow.web.requestbodies">CreateFilterBody</a>&nbsp;newFilterBody,
           <a href="../../domain/MergeFilterOperation.html" title="enum in com.netgrif.application.engine.workflow.domain">MergeFilterOperation</a>&nbsp;operation,
-          <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)</code></th>
+          <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)</code></th>
 <td class="colLast">
 <div class="block"><span class="deprecatedLabel">Deprecated.</span></div>
 &nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../../domain/Filter.html" title="class in com.netgrif.application.engine.workflow.domain">Filter</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#search(java.util.Map,org.springframework.data.domain.Pageable,com.netgrif.application.engine.auth.domain.LoggedUser)">search</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.Object&gt;&nbsp;request,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#search(java.util.Map,org.springframework.data.domain.Pageable,com.netgrif.core.auth.domain.Authority;.LoggedUser)">search</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.Object&gt;&nbsp;request,
       org.springframework.data.domain.Pageable&nbsp;pageable,
-      <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)</code></th>
+      <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)</code></th>
 <td class="colLast">
 <div class="block"><span class="deprecatedLabel">Deprecated.</span></div>
 &nbsp;</td>
@@ -197,23 +197,23 @@ public interface <span class="typeNameLabel">IFilterService</span></pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="deleteFilter(java.lang.String,com.netgrif.application.engine.auth.domain.LoggedUser)">
+<a id="deleteFilter(java.lang.String,com.netgrif.core.auth.domain.Authority;.LoggedUser)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>deleteFilter</h4>
 <pre class="methodSignature">boolean&nbsp;deleteFilter&#8203;(java.lang.String&nbsp;filterId,
-                     <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)
-              throws <a href="../../../auth/domain/throwable/UnauthorisedRequestException.html" title="class in com.netgrif.application.engine.auth.domain.throwable">UnauthorisedRequestException</a></pre>
+                     <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)
+              throws <a href="../../../auth/domain/throwable/UnauthorisedRequestException.html" title="class in com.netgrif.core.auth.domain.Authority;.throwable">UnauthorisedRequestException</a></pre>
 <div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span></div>
 <dl>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../auth/domain/throwable/UnauthorisedRequestException.html" title="class in com.netgrif.application.engine.auth.domain.throwable">UnauthorisedRequestException</a></code></dd>
+<dd><code><a href="../../../auth/domain/throwable/UnauthorisedRequestException.html" title="class in com.netgrif.core.auth.domain.Authority;.throwable">UnauthorisedRequestException</a></code></dd>
 </dl>
 </li>
 </ul>
-<a id="saveFilter(com.netgrif.application.engine.workflow.web.requestbodies.CreateFilterBody,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,com.netgrif.application.engine.auth.domain.LoggedUser)">
+<a id="saveFilter(com.netgrif.application.engine.workflow.web.requestbodies.CreateFilterBody,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,com.netgrif.core.auth.domain.Authority;.LoggedUser)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -221,11 +221,11 @@ public interface <span class="typeNameLabel">IFilterService</span></pre>
 <h4>saveFilter</h4>
 <pre class="methodSignature"><a href="../../domain/Filter.html" title="class in com.netgrif.application.engine.workflow.domain">Filter</a>&nbsp;saveFilter&#8203;(<a href="../../web/requestbodies/CreateFilterBody.html" title="class in com.netgrif.application.engine.workflow.web.requestbodies">CreateFilterBody</a>&nbsp;newFilterBody,
                   <a href="../../domain/MergeFilterOperation.html" title="enum in com.netgrif.application.engine.workflow.domain">MergeFilterOperation</a>&nbsp;operation,
-                  <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)</pre>
+                  <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)</pre>
 <div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span></div>
 </li>
 </ul>
-<a id="search(java.util.Map,org.springframework.data.domain.Pageable,com.netgrif.application.engine.auth.domain.LoggedUser)">
+<a id="search(java.util.Map,org.springframework.data.domain.Pageable,com.netgrif.core.auth.domain.Authority;.LoggedUser)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -233,7 +233,7 @@ public interface <span class="typeNameLabel">IFilterService</span></pre>
 <h4>search</h4>
 <pre class="methodSignature">org.springframework.data.domain.Page&lt;<a href="../../domain/Filter.html" title="class in com.netgrif.application.engine.workflow.domain">Filter</a>&gt;&nbsp;search&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.Object&gt;&nbsp;request,
                                                     org.springframework.data.domain.Pageable&nbsp;pageable,
-                                                    <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)</pre>
+                                                    <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)</pre>
 <div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span></div>
 </li>
 </ul>

@@ -1,0 +1,41 @@
+package com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes;
+
+import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
+import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.util.List;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+public abstract class PetriNetEventOutcome extends EventOutcome {
+
+    private PetriNet net;
+
+    protected PetriNetEventOutcome() {
+    }
+
+    protected PetriNetEventOutcome(PetriNet net) {
+        this.net = net;
+    }
+
+    protected PetriNetEventOutcome(I18nString message, PetriNet net) {
+        super(message);
+        this.net = net;
+    }
+
+    protected PetriNetEventOutcome(I18nString message, List<EventOutcome> outcomes, PetriNet net) {
+        super(message, outcomes);
+        this.net = net;
+    }
+
+    public PetriNet getNet() {
+        return net;
+    }
+
+    public void setNet(PetriNet net) {
+        this.net = net;
+    }
+}
