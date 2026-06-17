@@ -1,7 +1,8 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
     <id>role_assign_remove_test</id>
-    <title>Role Assign And Remove</title>
+    <version>1.0.0.</version>
+    <initials>Role Assign And Remove</title>
     <initials>RAR</initials>
     <!-- ROLES -->
     <role>

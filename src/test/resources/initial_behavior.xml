@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
     <id>initial_behavior</id>
-    <title>Initial behavior</title>
+    <version>1.0.0.</version>
+    <initials>Initial behavior</title>
     <initials>IBH</initials>
     <defaultRole>true</defaultRole>
     <!-- DATA -->

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
     <id>variable_arc_test.xml</id>
+    <version>1.0.0.</version>
     <initials>TST</initials>
     <title>Test</title>
     <defaultRole>true</defaultRole>

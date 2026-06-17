@@ -3,6 +3,7 @@
           xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
     <!-- TRANSITIONS -->
     <id>arc_ref_invalid_test</id>
+    <version>1.0.0.</version>
     <initials>ARi</initials>
     <title>Arc ref invalid test</title>
     <transition>

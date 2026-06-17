@@ -22,7 +22,6 @@ import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
-import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
@@ -32,7 +31,6 @@ import com.netgrif.application.engine.rules.domain.facts.NetImportedFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
-import com.netgrif.application.engine.workflow.domain.TaskPair;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.service.TaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -229,12 +227,7 @@ public class PetriNetService implements IPetriNetService {
             }
             return net;
         });
-        try {
-            createProcessCase(outcome.getNet(), author);
-        } catch (Exception e) {
-            // TODO: NAE-2447 undeploy
-            log.error("Creating process case failed", e);
-        }
+        createProcessCase(outcome.getNet(), author);
         return outcome;
     }
 

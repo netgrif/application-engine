@@ -1,5 +1,6 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
     <id>export_test</id>
+    <version>1.0.0.</version>
     <initials>EXT</initials>
     <title>Export actions test</title>
     <defaultRole>true</defaultRole>

@@ -1,5 +1,6 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
     <id>NAE_1616</id>
+    <version>1.0.0.</version>
     <initials>NAE</initials>
     <title>NAE-1616 - Cannot upload process with action id</title>
     <icon>bug_report</icon>

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
 	<id>data/all_data</id>
-	<title>All Data</title>
+    <version>1.0.0.</version>
+    <initials>All Data</title>
 	<initials>ALL</initials>
     <caseName>All data test default case name</caseName>
     <!-- ROLES -->

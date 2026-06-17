@@ -1,6 +1,7 @@
  	<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
 	<id>valid_regex</id>
-	<initials>VR1</initials>
+    <version>1.0.0.</version>
+    <initials>VR1</initials>
 	<title>Validacia regexov</title>
 	<icon>check_circle</icon>
 	<defaultRole>true</defaultRole>
