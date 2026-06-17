@@ -270,10 +270,6 @@
 					xml_file: f.xml_file,
 					form: t.form;
 
-					def editIsAssigned = useCase.tasks.any {it.transition == "edit"}
-					if (editIsAssigned) {
-						cancelTask("edit")
-					}
 					// TODO: move xml text to file field
 					def net = importPetriNet(xml_text.value as String)
 					change state value { "deployed" }
@@ -281,6 +277,11 @@
 					make mongo_id,visible on form when { true }
 					make xml_file,visible on form when { true }
 					changeCaseProperty "title" about { "${title.value} ${version.value}" as String }
+
+					def editIsAssigned = useCase.tasks.any {it.transition == "edit"}
+					if (editIsAssigned) {
+						cancelTask("edit")
+					}
 					]]>
 				</action>
 			</actions>
