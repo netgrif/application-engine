@@ -75,6 +75,7 @@
         <grpc.version>1.69.1</grpc.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
         <sonar.organization>netgrif-oss</sonar.organization>
+        <sonar.project>netgrif_application-engine</sonar.project>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
