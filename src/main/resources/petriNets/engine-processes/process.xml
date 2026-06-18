@@ -129,6 +129,18 @@
 			</validation>
 		</validations>
 		<init>1.0.0</init>
+		<event type="set">
+			<id>version_set</id>
+			<actions phase="post">
+				<action id="version_set">
+					<![CDATA[
+					version: f.version,
+					title: f.title;
+					changeCaseProperty "title" about { "${title.value} ${version.value}" as String }
+					]]>
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="enumeration_map">
 		<id>version_increment</id>
