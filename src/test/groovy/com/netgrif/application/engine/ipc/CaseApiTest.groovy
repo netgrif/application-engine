@@ -77,17 +77,18 @@ class CaseApiTest {
         assert testNet.getNet() != null
 
         List<Case> cases = []
+        def caseTitle = "CaseApiTestCase "
         5.times { index ->
-            cases << importHelper.createCase("Case $index" as String, testNet.getNet())
+            cases << importHelper.createCase("CaseApiTestCase $index" as String, testNet.getNet())
         }
 
         importHelper.assignTaskToSuper("Task", cases[0].stringId)
         importHelper.finishTaskAsSuper("Task", cases[0].stringId)
 
         cases = caseRepository.findAll()
-        assert cases.find { it.title == "Case 1" }.dataSet["field"].value != 0
-        assert cases.findAll { it.title != "Case 1" && it.processIdentifier == "test" }.every { it.dataSet["field"].value == 0 }
-        assert cases.find { it.title == "Case 0" }.dataSet["count"].value == 5
-        assert cases.find { it.title == "Case 0" }.dataSet["paged"].value == 1
+        assert cases.find { it.title == "CaseApiTestCase 1" }.dataSet["field"].value != 0
+        assert cases.findAll { it.title != "CaseApiTestCase 1" && it.processIdentifier == "test" }.every { it.dataSet["field"].value == 0 }
+        assert cases.find { it.title == "CaseApiTestCase 0" }.dataSet["count"].value == 5
+        assert cases.find { it.title == "CaseApiTestCase 0" }.dataSet["paged"].value == 1
     }
 }

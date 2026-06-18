@@ -10,6 +10,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
+import com.netgrif.application.engine.petrinet.service.PetriNetExistsException;
 import com.netgrif.application.engine.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetImportReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
@@ -119,4 +120,16 @@ public interface IPetriNetService {
     List<String> getExistingPetriNetIdentifiersFromIdentifiersList(List<String> identifiers);
 
     PetriNetImportReference getNetFromCase(String caseId);
+
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException, PetriNetExistsException;
+
+    boolean exists(String identifier, Version version);
+
+    PetriNet deploy(PetriNet net, LoggedUser user);
+
+    PetriNet undeploy(PetriNet net, LoggedUser user);
+
+    PetriNet archive(PetriNet net, LoggedUser user);
+
+    boolean isDeployed(String netId);
 }

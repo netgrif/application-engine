@@ -29,6 +29,7 @@ import com.netgrif.application.engine.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.ArcFactory;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
@@ -1257,8 +1258,14 @@ public class Importer {
         } else {
             missingMetaData.add("<initials>");
         }
-        if (!missingMetaData.isEmpty())
-            throw new MissingPetriNetMetaDataException(missingMetaData);
+        if (document.getVersion() != null) {
+            net.setVersion(Version.from(document.getVersion()));
+        } else {
+            missingMetaData.add("<version>");
+        }
+        if (!missingMetaData.isEmpty()) {
+            throw new MissingPetriNetMetaDataException(missingMetaData, net.getIdentifier());
+        }
     }
 
     protected Map<String, String> buildTagsMap(List<Tag> tagsList) {

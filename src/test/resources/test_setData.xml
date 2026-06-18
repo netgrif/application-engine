@@ -1,6 +1,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
 	<id>test_setData</id>
-	<initials>TSD</initials>
+    <version>1.0.0</version>
+    <initials>TSD</initials>
 	<title>TestSetData</title>
 	<icon>device_hub</icon>
 	<defaultRole>true</defaultRole>

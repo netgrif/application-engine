@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.repositories;
 
+import com.netgrif.application.engine.petrinet.domain.DeploymentState;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import org.bson.types.ObjectId;
@@ -19,6 +20,10 @@ public interface PetriNetRepository extends MongoRepository<PetriNet, String>, Q
     List<PetriNet> findAllByIdentifier(String identifier);
 
     PetriNet findByIdentifierAndVersion(String identifier, Version version);
+
+    boolean existsByIdentifierAndVersion(String identifier, Version version);
+
+    boolean existsBy_idAndDeploymentState(ObjectId id, DeploymentState deploymentState);
 
     Page<PetriNet> findByIdentifier(String identifier, Pageable pageable);
 

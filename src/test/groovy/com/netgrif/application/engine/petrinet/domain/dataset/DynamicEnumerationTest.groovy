@@ -59,7 +59,7 @@ class DynamicEnumerationTest {
         assert optNet.getNet() != null;
         def net = optNet.getNet()
 
-        def aCase = importHelper.createCase("Case", net)
+        def aCase = importHelper.createCase("TestCase", net)
         assert aCase != null
 
         Task task = taskService.findByCases(new FullPageRequest(), Collections.singletonList(aCase.getStringId())).stream().collect(Collectors.toList()).get(0);
@@ -67,7 +67,7 @@ class DynamicEnumerationTest {
 
         dataService.setData(task.stringId, ImportHelper.populateDataset([
                 "autocomplete": [
-                        "value": "Case",
+                        "value": "TestCase",
                         "type" : "enumeration"
                 ]
         ]))
@@ -78,6 +78,6 @@ class DynamicEnumerationTest {
 
         def field = aCase.dataSet["autocomplete"]
         assert field.choices.size() == 1
-        assert field.choices.find { it.defaultValue == "Case" }
+        assert field.choices.find { it.defaultValue == "TestCase" }
     }
 }

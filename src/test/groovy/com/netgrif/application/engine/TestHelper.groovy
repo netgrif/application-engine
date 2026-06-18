@@ -57,6 +57,8 @@ class TestHelper {
     private IMenuItemService menuItemService
     @Autowired
     private MongoDbRunner mongoDbRunner
+    @Autowired
+    private ProcessRunner processRunner
 
     void truncateDbs() {
         template.db.drop()
@@ -76,6 +78,7 @@ class TestHelper {
         anonymousRoleRunner.run()
         systemUserRunner.run()
         uriRunner.run()
+        processRunner.run()
         groupRunner.run()
         filterRunner.run()
         impersonationRunner.run()

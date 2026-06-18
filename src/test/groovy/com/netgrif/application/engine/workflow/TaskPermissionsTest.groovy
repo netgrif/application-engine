@@ -228,6 +228,7 @@ class TaskPermissionsTest {
 
     @Test
     void testAssignPermission() {
+        // TODO: NAE-2447 fix
         Case testCase = prepareTestCase("src/test/resources/petriNets/permissions/" + ASSIGN_TEST_NET, "t_001")
         Case testCaseNoDefault = prepareTestCase("src/test/resources/petriNets/permissions/" + ASSIGN_TEST_NET_NO_DEFAULT, "t_007")
 
@@ -250,6 +251,7 @@ class TaskPermissionsTest {
 
     @Test
     void testFinishPermission() {
+        // TODO: NAE-2447 fix
         Case testCase = prepareTestCase("src/test/resources/petriNets/permissions/" + FINISH_TEST_NET, "t_001")
         Case testCaseNoDefault = prepareTestCase("src/test/resources/petriNets/permissions/" + FINISH_TEST_NET_NO_DEFAULT, "t_007")
 
@@ -275,6 +277,7 @@ class TaskPermissionsTest {
 
     @Test
     void testCancelPermission() {
+        // TODO: NAE-2447 fix
         Case testCase = prepareTestCase("src/test/resources/petriNets/permissions/" + CANCEL_TEST_NET, "t_001")
         Case testCaseNoDefault = prepareTestCase("src/test/resources/petriNets/permissions/" + CANCEL_TEST_NET_NO_DEFAULT, "t_007")
 

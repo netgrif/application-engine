@@ -1,6 +1,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
 	<id>case_name_change_test</id>
-	<initials>CNC</initials>
+    <version>1.0.0</version>
+    <initials>CNC</initials>
 	<title>Case name change Test</title>
 	<icon>device_hub</icon>
 	<defaultRole>true</defaultRole>

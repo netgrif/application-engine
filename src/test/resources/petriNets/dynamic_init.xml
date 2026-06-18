@@ -1,9 +1,10 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
     <id>dynamic_init</id>
+    <version>1.0.0</version>
+    <initials>DVT</initials>
     <title>dynamic_init</title>
     <defaultRole>true</defaultRole>
-    <initials>DVT</initials>
     <!-- ROLES -->
     <data type="text" immediate="true">
         <id>text</id>

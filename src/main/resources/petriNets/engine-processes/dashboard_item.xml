@@ -1,5 +1,6 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
     <id>dashboard_item</id>
+    <version>1.0.0</version>
     <initials>DBI</initials>
     <title>Dashboard item</title>
     <icon>crop_square</icon>
