@@ -572,8 +572,8 @@ public class UserServiceImpl implements UserService {
     public AbstractUser createSystemUser() {
         User system = (User) findByEmail(UserConstants.SYSTEM_USER_EMAIL, null);
         if (system == null) {
-            system = new User();
-            system.setUsername(UserConstants.SYSTEM_USER_EMAIL);
+            system = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
+            system.setUsername(UserConstants.SYSTEM_USER_USERNAME);
             system.setEmail(UserConstants.SYSTEM_USER_EMAIL);
             system.setPassword("n/a");
             system.setFirstName(UserConstants.SYSTEM_USER_NAME);
@@ -620,7 +620,7 @@ public class UserServiceImpl implements UserService {
 
     protected User initializeNewUser(String username, String email, String firstName, String lastName, String password, String realmId) {
         log.trace("Initializing new user [{}] in realm [{}]", username, realmId);
-        User user = new User();
+        User user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
         user.setRealmId(realmId);
         user.setUsername(username);
         user.setEmail(email);

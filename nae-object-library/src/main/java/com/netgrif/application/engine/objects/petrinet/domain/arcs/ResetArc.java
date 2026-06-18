@@ -10,7 +10,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.Place;
  * </ul>
  * <a href="https://books.google.sk/books?id=A45rCQAAQBAJ&dq=petri+net+read+arc&hl=sk">More info</a>
  */
-public class ResetArc extends PTArc {
+public abstract class ResetArc extends PTArc {
 
     public ResetArc() {
         super();

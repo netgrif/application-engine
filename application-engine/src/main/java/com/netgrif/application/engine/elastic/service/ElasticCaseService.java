@@ -291,9 +291,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         BoolQuery.Builder authorsQuery = new BoolQuery.Builder();
         for (CaseSearchRequest.Author author : request.author) {
             BoolQuery.Builder authorQuery = new BoolQuery.Builder();
-            if (author.email != null) {
-                authorQuery.must(termQuery("authorEmail", author.email)._toQuery());
-            }
             if (author.id != null) {
                 authorQuery.must(matchQuery("author", author.id, null, null)._toQuery());
             }
@@ -302,6 +299,12 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             }
             if (author.username != null) {
                 authorQuery.must(termQuery("authorUsername", author.username)._toQuery());
+            }
+            if (author.username != null) {
+                authorQuery.must(termQuery("authorUsername", author.username)._toQuery());
+            }
+            if (author.realm != null) {
+                authorQuery.must(termQuery("authorRealm", author.realm)._toQuery());
             }
             authorsQuery.should(authorQuery.build()._toQuery());
         }

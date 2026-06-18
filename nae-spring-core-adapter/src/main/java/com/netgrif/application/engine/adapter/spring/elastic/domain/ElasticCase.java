@@ -25,7 +25,11 @@ public class ElasticCase extends com.netgrif.application.engine.objects.elastic.
     }
 
     @Id
-    @Field(type = Keyword)
+    @MultiField(
+            mainField = @Field(type = Text),
+            otherFields = {
+                    @InnerField(suffix = "keyword", type = Keyword)
+            })
     public String getId() {
         return super.getId();
     }
@@ -39,7 +43,11 @@ public class ElasticCase extends com.netgrif.application.engine.objects.elastic.
         return super.getTitle();
     }
 
-    @Field(type = Keyword)
+    @MultiField(
+            mainField = @Field(type = Text),
+            otherFields = {
+                    @InnerField(suffix = "keyword", type = Keyword)
+            })
     public String getVisualId() {
         return super.getVisualId();
     }

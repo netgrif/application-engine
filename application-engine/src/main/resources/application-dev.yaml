@@ -30,10 +30,14 @@ netgrif:
             host: http://127.0.0.1:9000
             user: root
             password: password
+            bucket-aliases:
+              pistucket: uat-pistucket
     swagger:
       enabled: true
     security:
-      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/v3/api-docs,/v3/api-docs/**,/swagger-ui.html,/swagger-ui/**,/api/public/**,/manage/**
+      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/v3/api-docs,/v3/api-docs/**,/swagger-ui.html,/swagger-ui/**,/api/public/**,/manage/health
+      auth:
+        admin-password: password
     management:
       health:
         ldap:

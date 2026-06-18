@@ -67,7 +67,7 @@ netgrif:
         token-validity-period: 3
         minimal-password-length: 8
         enable-profile-edit: true
-        admin-password: ${NETGRIF_ENGINE_SECURITY_AUTH_ADMIN_PASSWORD:password}
+        admin-password: ${NETGRIF_ENGINE_SECURITY_AUTH_ADMIN_PASSWORD:}
       static:
         enabled: false
       headers:
@@ -85,8 +85,8 @@ netgrif:
         expiration: 900000
         algorithm: RSA
         private-key: file:src/main/resources/certificates/private.der
-      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/api/public/**,/v3/api-docs/public,/manage/**
-      anonymous-exceptions: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/manage/**
+      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/api/public/**,/v3/api-docs/public,/manage/health
+      anonymous-exceptions: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/manage/health
       providers: NetgrifBasicAuthenticationProvider
     swagger:
       enabled: false
@@ -98,7 +98,7 @@ netgrif:
       enabled: ${NETGRIF_ENGINE_IMPERSONATION_ENABLED:true}
     pdf:
       resources:
-        output-folder: storage
+        output-folder: ${NETGRIF_ENGINE_PDF_OUTPUT_FOLDER:storage}
         output-default-name: generated_pdf.pdf
         template-resource: file:src/main/resources/pdfGenerator/header_template5.pdf
         font-title-resource: file:src/main/resources/pdfGenerator/fonts/Roboto-Light.ttf
@@ -110,22 +110,26 @@ netgrif:
         radio-un-checked-resource: file:src/main/resources/pdfGenerator/img/radio_unchecked.svg
         boolean-checked-resource: file:src/main/resources/pdfGenerator/img/radio_checked.svg
         boolean-unchecked-resource: file:src/main/resources/pdfGenerator/img/radio_unchecked.svg
+    storage:
+      path: ${NETGRIF_ENGINE_STORAGE_PATH:storage}
+      archived-path: ${NETGRIF_ENGINE_STORAGE_ARCHIVED_PATH:storage/uploadedModels/}
+      clean: ${NETGRIF_ENGINE_STORAGE_CLEAN:false}
+      default-type: ${NETGRIF_ENGINE_STORAGE_DEFAULT_TYPE:local}
     management:
       endpoints:
         web:
           base-path: /manage
-          path-mapping:
-            prometheus: metric
           exposure:
-            exclude: shutdown
-            include: "*"
+            include: "health,info,metrics,loggers,env,beans,threaddump,heapdump,mappings,conditions,configprops,scheduledtasks,caches,flyway,liquibase,prometheus"
       endpoint:
         health:
           show-details: when_authorized
+          show-components: when_authorized
+          roles: ADMIN
           probes:
             enabled: 'true'
         log-file:
-          external-file: log/nae.log
+          external-file: ${NETGRIF_ENGINE_MANAGEMENT_LOG_FILE:log/nae.log}
       info:
         build:
           enabled: 'false'
@@ -136,7 +140,7 @@ netgrif:
           enabled: 'false'
     logging:
       file:
-        path: log
+        path: ${NETGRIF_ENGINE_LOGGING_FILE_PATH:log}
       endpoints: 'true'
       level:
         org:

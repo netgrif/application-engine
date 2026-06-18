@@ -8,7 +8,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.Place;
  * <b><i>m(p) &lt; w</i></b><br>
  * <a href="https://books.google.sk/books?id=A45rCQAAQBAJ&dq=petri+net+read+arc&hl=sk">More info</a>
  */
-public class InhibitorArc extends PTArc {
+public abstract class InhibitorArc extends PTArc {
 
     public InhibitorArc() {
         super();

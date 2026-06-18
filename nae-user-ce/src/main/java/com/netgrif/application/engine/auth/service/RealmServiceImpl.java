@@ -271,8 +271,13 @@ public class RealmServiceImpl implements RealmService {
 
     @Override
     public void deleteRealm(String realmId) {
-        if (!realmRepository.existsById(realmId)) {
+        Optional<Realm> realmOptional = getRealmById(realmId);
+        if (realmOptional.isEmpty()) {
             throw new IllegalArgumentException("Realm with id " + realmId + " not found");
+        }
+        Realm realm = realmOptional.get();
+        if (realm.isDefaultRealm()) {
+            throw new IllegalArgumentException("Cannot delete default realm. Mark a realm as default before deleting current default.");
         }
         realmRepository.deleteById(realmId);
     }

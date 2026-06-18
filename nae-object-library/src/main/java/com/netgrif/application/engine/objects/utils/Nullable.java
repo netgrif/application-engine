@@ -25,9 +25,12 @@ public final class Nullable<T> implements Serializable {
     private static final long serialVersionUID = 8683452581122892189L;
 
     private final T value;
+    
+    private final Class<T> type;
 
-    private Nullable(T value) {
+    private Nullable(T value, Class<T> type) {
         this.value = value;
+        this.type = type;
     }
 
     /**
@@ -40,13 +43,34 @@ public final class Nullable<T> implements Serializable {
     }
 
     /**
+     * Returns the runtime class type of the value that can be held by this {@code Nullable} instance.
+     *
+     * @return the {@code Class} object representing the type {@code T}, or {@code null} if no type was specified
+     */
+    public Class<T> getType() {
+        return type;
+    }
+
+    /**
      * Creates a new {@code Nullable} instance containing the given value.
      *
      * @param value the value to wrap in a {@code Nullable} instance, can be {@code null}
      * @return a {@code Nullable} instance wrapping the provided value
      */
     public static <T> Nullable<T> of(T value) {
-        return new Nullable<>(value);
+        return new Nullable<>(value, null);
+    }
+
+    /**
+     * Creates a new {@code Nullable} instance containing the given value and explicit type information.
+     *
+     * @param <T>   the type of the value to wrap
+     * @param value the value to wrap in a {@code Nullable} instance, can be {@code null}
+     * @param type  the {@code Class} object representing the type {@code T}, can be {@code null}
+     * @return a {@code Nullable} instance wrapping the provided value with type information
+     */
+    public static <T> Nullable<T> of(T value, Class<T> type) {
+        return new Nullable<>(value, type);
     }
 
     /**
@@ -56,7 +80,18 @@ public final class Nullable<T> implements Serializable {
      * @return an empty {@code Nullable} instance
      */
     public static <T> Nullable<T> empty() {
-        return new Nullable<>(null);
+        return new Nullable<>(null, null);
+    }
+
+    /**
+     * Returns an empty {@code Nullable} instance holding no value but with explicit type information.
+     *
+     * @param <T>  the type of the value that can be held by this {@code Nullable} instance
+     * @param type the {@code Class} object representing the type {@code T}, can be {@code null}
+     * @return an empty {@code Nullable} instance with type information
+     */
+    public static <T> Nullable<T> empty(Class<T> type) {
+        return new Nullable<>(null, type);
     }
 
     /**
@@ -125,7 +160,7 @@ public final class Nullable<T> implements Serializable {
         if (isEmpty()) {
             return this;
         } else {
-            return predicate.test(value) ? this : empty();
+            return predicate.test(value) ? this : empty(type);
         }
     }
 
@@ -276,7 +311,8 @@ public final class Nullable<T> implements Serializable {
         }
 
         return obj instanceof Nullable<?> other
-                && Objects.equals(value, other.value);
+            && Objects.equals(value, other.value)
+            && Objects.equals(type, other.type);
     }
 
     /**
@@ -287,7 +323,7 @@ public final class Nullable<T> implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hashCode(value);
+        return Objects.hash(value, type);
     }
 
     /**

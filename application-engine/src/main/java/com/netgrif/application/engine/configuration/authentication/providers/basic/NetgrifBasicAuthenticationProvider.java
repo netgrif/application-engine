@@ -6,6 +6,9 @@ import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.auth.domain.User;
+import com.netgrif.application.engine.objects.event.events.user.UserLoginEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.MessageSourceAccessor;
@@ -19,6 +22,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -45,13 +50,21 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
         String name = authentication.getName();
-        AbstractUser user = userService.findByEmail(name, null);
-        if (user == null) {
+        Optional<AbstractUser> userOptional = userService.findUserByUsername(name, null);
+        if (userOptional.isEmpty()) {
             log.debug("User not found");
             loginAttemptService.loginFailed(key);
             throw new BadCredentialsException(this.messages
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
+        AbstractUser user = userOptional.get();
+        if (user instanceof User concreteUser && !concreteUser.isActive()) {
+            log.debug("User is not active");
+            loginAttemptService.loginFailed(key);
+            throw new BadCredentialsException(this.messages
+                    .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
+        }
+
         String presentedPassword = authentication.getCredentials().toString();
         if (!this.passwordEncoder.matches(presentedPassword, user.getPassword())) {
             log.debug("Failed to authenticate since password does not match stored value");
@@ -65,6 +78,7 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
         UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(userDetails, presentedPassword, userDetails.getAuthorities());
         result.setDetails(authentication.getDetails());
         loginAttemptService.loginSucceeded(user.getStringId());
+        publisher.publishEvent(new UserLoginEvent((LoggedUser) userDetails));
         return result;
     }
 

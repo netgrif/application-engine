@@ -2,7 +2,6 @@ package com.netgrif.application.engine.auth
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.objects.auth.domain.PasswordCredential
@@ -28,7 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-import java.util.stream.Collectors;
+import java.util.stream.Collectors
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -67,7 +66,7 @@ class SecurityContextTest {
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
-        user = new User()
+        user = new com.netgrif.application.engine.adapter.spring.auth.domain.User()
         user.setUsername('test@email.com')
         user.setEmail('test@email.com')
         user.setCredential("password", new PasswordCredential('password', 0, true))

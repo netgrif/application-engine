@@ -1,0 +1,133 @@
+version: "3.8"
+
+services:
+#  eng:
+#    image: netgrif/application-engine:7.0.0-RC10.60
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      netgrif.engine.server.port: 8080
+#      NETGRIF_ENGINE_DATA_DATABASE_NAME: netgrif_nae_root
+#      NETGRIF_ENGINE_DATA_MONGODB_URI: mongodb://nae-mongodb
+#      NETGRIF_ENGINE_DATA_ELASTIC_URL: nae-elasticsearch
+#      NETGRIF_ENGINE_DATA_REDIS_HOST: nae-redis
+#      NETGRIF_WORKER_NODE_NAME: NETGRIF Root Worker
+#      NETGRIF_WORKER_NODE_HOST: nae-root-engine
+#      NETGRIF_WORKER_NODE_NODE_TYPE: ENGINE_ROOT
+#      netgrif.engine.data.redis.namespace: netgrif
+#      netgrif.engine.logging.file.path: log
+#      netgrif.engine.management.endpoints.web.exposure.include: "*"
+#      netgrif.engine.management.health.ldap.enabled: 'false'
+#      netgrif.engine.main.allow-bean-definition-overriding: 'true'
+#      netgrif.engine.management.health.mail.enabled: 'false'
+#      netgrif.engine.storage.min-io.enabled: 'true'
+#      netgrif.engine.storage.min-io.hosts.host_1.host: http://nae-minio:9000
+#      netgrif.engine.storage.min-io.hosts.host_1.user: root
+#      netgrif.engine.storage.min-io.hosts.host_1.password: password
+#      netgrif.engine.management.endpoint.health.show-details: always
+#      netgrif.engine.management.metrics.export.simple: enabled
+#      netgrif.engine.management.endpoints.web.base-path: /manage
+#      netgrif.engine.security.server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/v3/api-docs,/v3/api-docs/**,/swagger-ui.html,/swagger-ui/**,/api/public/**,/manage/**
+#      netgrif.engine.security.anonymous-exceptions: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/manage/**
+#    depends_on:
+#      nae-mongodb:
+#        condition: service_started
+#      nae-elasticsearch:
+#        condition: service_started
+#      nae-redis:
+#        condition: service_started
+#      nae-minio:
+#        condition: service_started
+#    networks:
+#      - netgrif-platformnet
+
+  nae-mongodb:
+    image: mongo:8.0.3
+    command: [ "--replSet", "rs0", "--bind_ip_all", "--port", "27017" ]
+    hostname: 127.0.0.1
+    healthcheck:
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'127.0.0.1:27017'}]}) }" | mongosh --port 27017 --quiet
+      interval: 5s
+      timeout: 30s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "2G"
+        reservations:
+          cpus: "0.5"
+          memory: "512M"
+    ports:
+      - "27017:27017"
+    networks:
+      - netgrif-platformnet
+
+  nae-elasticsearch:
+    image: elasticsearch:9.4.1
+#   image: elasticsearch:8.19.15
+    healthcheck:
+      test: [ "CMD", "curl", "-sf", "http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=1s" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    environment:
+      cluster.name: elasticsearch
+      discovery.type: single-node
+      http.host: 0.0.0.0
+      xpack.security.enabled: false
+      transport.host: 0.0.0.0
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 1500M
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - netgrif-platformnet
+
+  nae-redis:
+    image: redis:8
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  nae-minio:
+    image: bawix/minio:2022
+    healthcheck:
+      test: [ "CMD", "curl", "-sf", "http://localhost:9000/minio/health/ready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      MINIO_ROOT_USER: root
+      MINIO_ROOT_PASSWORD: password
+      MINIO_DEFAULT_BUCKETS: default
+    volumes:
+      - 'minio_data:/data'
+    networks:
+      - netgrif-platformnet
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:8.15.3
+#    environment:
+#      - ELASTICSEARCH_HOSTS=http://docker-elastic:9200
+#    depends_on:
+#      - docker-elastic
+#    ports:
+#      - "5601:5601"
+
+volumes:
+  minio_data:
+    driver: local
+
+networks:
+  netgrif-platformnet:
+    driver: bridge
+    name: netgrif-platformnet

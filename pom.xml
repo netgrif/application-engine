@@ -89,14 +89,15 @@
         <maven-failsafe-plugin.version>3.5.3</maven-failsafe-plugin.version>
 
         <sonar.organization>netgrif-oss</sonar.organization>
+        <sonar.project>netgrif_application-engine</sonar.project>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <repositories>
         <repository>
-            <id>oss.snapshots</id>
-            <name>OSSRH SNAPSHOT</name>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+            <name>Central Snapshots</name>
+            <id>central-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>

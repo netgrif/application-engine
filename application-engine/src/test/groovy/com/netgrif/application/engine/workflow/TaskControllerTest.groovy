@@ -102,7 +102,7 @@ class TaskControllerTest {
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
-        userService.saveUser(new User(
+        userService.saveUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(
                 firstName: "Dummy",
                 lastName: "Netgrif",
                 username: DUMMY_USER_MAIL,
@@ -124,9 +124,10 @@ class TaskControllerTest {
     @Test
     void testDeleteFile() {
         Case testCase = helper.createCase("My case", allDataNet)
-        String taskId = testCase.tasks.find {it.transition == "1"}.task
+        String taskId = testCase.tasks.find { it.transition == "1" }.task
 
-        dataService.saveFile(taskId, "file", new MockMultipartFile("test", new byte[] {}))
+        dataService.saveFile(taskId, "file", new MockMultipartFile("test", "test.txt", "text/plain", new byte[]{}))
+
         testCase = workflowService.findOne(testCase.stringId)
         assert testCase.dataSet["file"].value != null
 
@@ -138,9 +139,9 @@ class TaskControllerTest {
     @Test
     void testDeleteFileByName() {
         Case testCase = helper.createCase("My case", allDataNet)
-        String taskId = testCase.tasks.find {it.transition == "1"}.task
+        String taskId = testCase.tasks.find { it.transition == "1" }.task
 
-        dataService.saveFiles(taskId, "fileList", new MockMultipartFile[] {new MockMultipartFile("test", "test", null, new byte[] {})})
+        dataService.saveFiles(taskId, "fileList", new MockMultipartFile[]{new MockMultipartFile("test", "test", null, new byte[]{})})
         testCase = workflowService.findOne(testCase.stringId)
         assert testCase.dataSet["fileList"].value != null
 
@@ -154,13 +155,13 @@ class TaskControllerTest {
         Case testCase = helper.createCase("My case", setDataNet)
         String taskId = testCase.tasks.find { it.transition == "testSetDataFieldTypeRestriction" }.task
 
-        ObjectNode dataSet = populateNestedDataset([(taskId):["taskRef_0": ["type": "taskRef", "value": [taskId]]]])
+        ObjectNode dataSet = populateNestedDataset([(taskId): ["taskRef_0": ["type": "taskRef", "value": [taskId]]]])
         def response = taskController.setData(taskId, dataSet, Locale.default)
         assert response != null && response.content.outcome != null
         assert response.content.outcome.changedFields.changedFields.isEmpty()
         assert ((List<String>) workflowService.findOne(testCase.stringId).getDataField("taskRef_0").getValue()).isEmpty()
 
-        dataSet = populateNestedDataset([(taskId):["caseRef_0": ["type": "caseRef", "value": [testCase.stringId]]]])
+        dataSet = populateNestedDataset([(taskId): ["caseRef_0": ["type": "caseRef", "value": [testCase.stringId]]]])
         response = taskController.setData(taskId, dataSet, Locale.default)
         assert response != null && response.content.outcome != null
         assert response.content.outcome.changedFields.changedFields.isEmpty()
@@ -172,7 +173,7 @@ class TaskControllerTest {
         Case testCase = helper.createCase("My case", setDataNet)
         String taskId = testCase.tasks.find { it.transition == "data" }.task
 
-        ObjectNode dataSet = populateNestedDataset([(taskId):["text_1": ["type": "text", "value": "awd"]]])
+        ObjectNode dataSet = populateNestedDataset([(taskId): ["text_1": ["type": "text", "value": "awd"]]])
         def response = taskController.setData(taskId, dataSet, Locale.default)
         assert response != null && response.content.outcome == null
         assert response.content.error != null
@@ -196,14 +197,14 @@ class TaskControllerTest {
         workflowService.save(testCase2)
 
         String nestedOtherTaskId = testCase2.tasks.find { it.transition == "data" }.task
-        ObjectNode dataSet = populateNestedDataset([(nestedOtherTaskId):["text_0": ["type": "text", "value": "awd"]]])
+        ObjectNode dataSet = populateNestedDataset([(nestedOtherTaskId): ["text_0": ["type": "text", "value": "awd"]]])
         def response = taskController.setData(taskId, dataSet, Locale.default)
         assert response != null && response.content.outcome != null
         assert response.content.outcome.changedFields.changedFields.isEmpty()
         assert workflowService.findOne(testCase2.stringId).getDataField("text_0").getValue() == null
 
         String nestedTaskId = testCase3.tasks.find { it.transition == "data" }.task
-        dataSet = populateNestedDataset([(nestedTaskId):["text_0": ["type": "text", "value": "awd"]]])
+        dataSet = populateNestedDataset([(nestedTaskId): ["text_0": ["type": "text", "value": "awd"]]])
         response = taskController.setData(taskId, dataSet, Locale.default)
         assert response != null && response.content.outcome != null
         assert !response.content.outcome.changedFields.changedFields.isEmpty()
@@ -215,7 +216,7 @@ class TaskControllerTest {
         Case testCase = helper.createCase("My case", setDataNet)
         String taskId = testCase.tasks.find { it.transition == "testSetDataNonReferencedField" }.task
 
-        ObjectNode dataSet = populateNestedDataset([(taskId):["text_1": ["type": "text", "value": "awd"]]])
+        ObjectNode dataSet = populateNestedDataset([(taskId): ["text_1": ["type": "text", "value": "awd"]]])
         def response = taskController.setData(taskId, dataSet, Locale.default)
 
         assert response != null && response.content.outcome == null

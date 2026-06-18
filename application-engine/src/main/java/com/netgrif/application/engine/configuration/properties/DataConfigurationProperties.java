@@ -632,7 +632,8 @@ public class DataConfigurationProperties {
                     "title.keyword^2",
                     "authorName^1",
                     "authorEmail^1",
-                    "visualId.keyword^2"
+                    "visualId.keyword^2",
+                    "id.keyword^2"
             );
         }
 

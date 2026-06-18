@@ -4,6 +4,8 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.adapter.spring.actions.ActionApi;
 import com.netgrif.application.engine.adapter.spring.actions.ActionFileHolder;
+import com.netgrif.application.engine.adapter.spring.actions.ProcessAvailabilities;
+import com.netgrif.application.engine.adapter.spring.actions.ProcessAvailability;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
@@ -14,6 +16,7 @@ import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.dto.AuthPrincipalDto;
+import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
@@ -24,6 +27,7 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.data
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.params.DeleteCaseParams;
 import com.netgrif.application.engine.workflow.params.TaskParams;
@@ -39,12 +43,15 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
+@Component
 public class ActionApiImpl implements ActionApi {
 
     private UserService userService;
@@ -58,6 +65,8 @@ public class ActionApiImpl implements ActionApi {
     private IElasticCaseService elasticCaseService;
 
     private IElasticTaskService elasticTaskService;
+
+    private IPetriNetService petriNetService;
 
     @Autowired
     public void setDataService(IDataService dataService) {
@@ -89,6 +98,11 @@ public class ActionApiImpl implements ActionApi {
         this.elasticTaskService = elasticTaskService;
     }
 
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
+    }
+
     @Override
     public GetDataEventOutcome getData(String taskId, Map<String, String> params) {
         log.debug("Getting data for task [{}] with params: [{}]", taskId, params == null ? "null" : params.toString());
@@ -96,7 +110,7 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
-    public SetDataEventOutcome setData(String taskId, Map<String, Map<String, String>> dataSet, Map<String, String> params) {
+    public SetDataEventOutcome setData(String taskId, Map<String, Map<String, Object>> dataSet, Map<String, String> params) {
         log.debug("Setting data for task [{}] with params: [{}]", taskId, params == null ? "null" : params.toString());
         ObjectMapper mapper = new ObjectMapper(); 
         String json = mapper.writeValueAsString(dataSet);
@@ -107,12 +121,27 @@ public class ActionApiImpl implements ActionApi {
 
     @Override
     public Page<Case> searchCases(String processIdentifier, Predicate predicate, Pageable pageable) {
+        return searchCases(processIdentifier, predicate, pageable, new HashMap<>());
+    }
+
+    @Override
+    public Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection) {
+        return searchCases(elasticStringQueries, authPrincipalDto, pageable, isIntersection, new HashMap<>());
+    }
+
+    @Override
+    public Long countCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Boolean isIntersection) {
+        return countCases(elasticStringQueries, authPrincipalDto, isIntersection, new HashMap<>());
+    }
+
+    @Override
+    public Page<Case> searchCases(String processIdentifier, Predicate predicate, Pageable pageable, Map<String, String> params) {
         log.debug("Searching cases for process identifier [{}] with predicate [{}], pageable [{}]", processIdentifier, predicate, pageable);
         return workflowService.search(predicate, pageable);
     }
 
     @Override
-    public Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection) {
+    public Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection, Map<String, String> params) {
         log.debug("Searching cases for elastic queries [{}] with auth principal [{}], pageable [{}], intersect [{}]", elasticStringQueries, authPrincipalDto, pageable, isIntersection);
         boolean intersect = Boolean.TRUE.equals(isIntersection);
         List<CaseSearchRequest> caseSearchRequests = elasticStringQueries.stream().map(query -> CaseSearchRequest.builder().query(query).build()).toList();
@@ -123,7 +152,7 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
-    public Long countCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Boolean isIntersection) {
+    public Long countCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Boolean isIntersection, Map<String, String> params) {
         log.debug("Counting cases for elastic queries [{}] with auth principal [{}], intersect [{}]", elasticStringQueries, authPrincipalDto, isIntersection);
         boolean intersect = Boolean.TRUE.equals(isIntersection);
         List<CaseSearchRequest> caseSearchRequests = elasticStringQueries.stream().map(query -> CaseSearchRequest.builder().query(query).build()).toList();
@@ -158,12 +187,22 @@ public class ActionApiImpl implements ActionApi {
 
     @Override
     public Page<Task> searchTasks(String processIdentifier, Predicate predicate, Pageable pageable) {
+        return searchTasks(processIdentifier, predicate, pageable, new HashMap<>());
+    }
+
+    @Override
+    public Page<Task> searchTasks(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection) {
+        return searchTasks(elasticStringQueries, authPrincipalDto, pageable, isIntersection, new HashMap<>());
+    }
+
+    @Override
+    public Page<Task> searchTasks(String processIdentifier, Predicate predicate, Pageable pageable, Map<String, String> params) {
         log.debug("Searching tasks for process identifier [{}] with predicate [{}], pageable [{}]", processIdentifier, predicate, pageable);
         return taskService.search(predicate, pageable);
     }
 
     @Override
-    public Page<Task> searchTasks(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection) {
+    public Page<Task> searchTasks(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection, Map<String, String> params) {
         log.debug("Searching tasks for elastic queries [{}] with auth principal [{}], pageable [{}], intersect [{}]", elasticStringQueries, authPrincipalDto, pageable, isIntersection);
         boolean intersect = Boolean.TRUE.equals(isIntersection);
         List<ElasticTaskSearchRequest> taskSearchRequests = elasticStringQueries.stream().map(query -> ElasticTaskSearchRequest.builder().query(query).build()).toList();
@@ -171,6 +210,17 @@ public class ActionApiImpl implements ActionApi {
         Locale locale = LocaleContextHolder.getLocale();
         log.trace("Searching tasks for elastic queries [{}] with auth principal [{}], pageable [{}], intersect [{}], locale [{}]", elasticStringQueries, authPrincipalDto, pageable, isIntersection, locale);
         return elasticTaskService.search(taskSearchRequests, loggedUser, pageable, locale, intersect);
+    }
+
+    @Override
+    public Long countTasks(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Boolean isIntersection, Map<String, String> params) {
+        log.debug("Counting tasks for elastic queries [{}] with auth principal [{}], intersect [{}]", elasticStringQueries, authPrincipalDto, isIntersection);
+        boolean intersect = Boolean.TRUE.equals(isIntersection);
+        List<ElasticTaskSearchRequest> taskSearchRequests = elasticStringQueries.stream().map(query -> ElasticTaskSearchRequest.builder().query(query).build()).toList();
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
+        Locale locale = LocaleContextHolder.getLocale();
+        log.trace("Counting tasks for elastic queries [{}] with auth principal [{}], intersect [{}], locale [{}]", elasticStringQueries, authPrincipalDto, isIntersection, locale);
+        return elasticTaskService.count(taskSearchRequests, loggedUser, locale, intersect);
     }
 
     @Override
@@ -233,6 +283,12 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
+    public AuthPrincipalDto getSystemUserDto() {
+        AbstractUser systemUser = getSystemUser();
+        return new AuthPrincipalDto(systemUser.getUsername(), systemUser.getRealmId(), null);
+    }
+
+    @Override
     public SetDataEventOutcome saveFile(String taskId, String fieldId, ActionFileHolder file, Map<String, String> params) {
         log.debug("Saving file [{}] for task [{}] and field [{}] with params [{}]", file.getFileName(), taskId, fieldId, params);
         MultipartFile multipartFile = new MockMultipartFile(file.getFileName(), file.getFileName(), null, file.getFileContent());
@@ -288,11 +344,46 @@ public class ActionApiImpl implements ActionApi {
         }
     }
 
+    @Override
+    public boolean isProcessUp(String processIdentifier) {
+        return getProcessAvailability(processIdentifier).isUp();
+    }
+
+    @Override
+    public boolean isProcessDown(String processIdentifier) {
+        return getProcessAvailability(processIdentifier).isDown();
+    }
+
+    @Override
+    public ProcessAvailability getProcessAvailability(String processIdentifier) {
+        PetriNet petriNet = petriNetService.getDefaultVersionByIdentifier(processIdentifier);
+        if (petriNet == null) {
+                return ProcessAvailability.notFound(processIdentifier);
+            }
+        return ProcessAvailability.from(processIdentifier, true);
+    }
+
+    @Override
+    public ProcessAvailabilities getProcessAvailability(List<String> processIdentifiers) {
+        Objects.requireNonNull(processIdentifiers, "processIdentifiers cannot be null");
+        return new ProcessAvailabilities(processIdentifiers.stream()
+                .map(this::getProcessAvailability)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public ProcessAvailabilities getProcessAvailability(String... processIdentifiers) {
+        Objects.requireNonNull(processIdentifiers, "processIdentifiers cannot be null");
+        return new ProcessAvailabilities(Arrays.stream(processIdentifiers)
+                .map(this::getProcessAvailability)
+                .collect(Collectors.toList()));
+    }
+
     private AbstractUser resolveAbstractUser(AuthPrincipalDto authPrincipalDto) {
         if (authPrincipalDto == null) {
             throw new IllegalArgumentException("AuthPrincipalDto cannot be null.");
         }
-        Optional<AbstractUser> userOptional = userService.findUserByUsername(authPrincipalDto.getUsername(), authPrincipalDto.getRealmId());
-        return userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] and realm ID [%s] not found".formatted(authPrincipalDto.getUsername(), authPrincipalDto.getRealmId())));
+        Optional<AbstractUser> userOptional = userService.findUserByUsername(authPrincipalDto.username(), authPrincipalDto.realmId());
+        return userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] and realm ID [%s] not found".formatted(authPrincipalDto.username(), authPrincipalDto.realmId())));
     }
 }
