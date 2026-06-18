@@ -204,7 +204,7 @@ class ActionDelegate {
     IImpersonationService impersonationService
 
     @Autowired
-    SecurityConfigurationProperties.WebProperties webProperties
+    SecurityConfigurationProperties securityProperties
 
     @Autowired
     IMenuItemService menuItemService
@@ -2023,10 +2023,12 @@ class ActionDelegate {
         item = workflowService.findOne(item.stringId)
         def roles = cl()
         def dataField = item.dataSet[roleFieldId]
-        if (roles instanceof List<ProcessRole>) {
-            dataField.options = collectRolesForPreferenceItem(roles)
-        } else if (roles instanceof Map<String, String>) {
-            dataField.options = collectRolesForPreferenceItem(roles)
+        if (roles instanceof List) {
+            if (roles.isEmpty() || roles.every { it instanceof ProcessRole }) {
+                dataField.options = collectRolesForPreferenceItem(roles as List<ProcessRole>)
+            }
+        } else if (roles instanceof Map) {
+            dataField.options = collectRolesForPreferenceItem(roles as Map<String, String>)
         }
         workflowService.save(item)
     }
@@ -2798,8 +2800,12 @@ class ActionDelegate {
         menuItemService.removeChildItemFromParent(folderId, childItem)
     }
 
-    String makeUrl(String publicViewUrl = webProperties.publicWeb.url, String identifier) {
+    String makeUrl(String publicViewUrl, String identifier) {
         return "${publicViewUrl}/${Base64.getEncoder().encodeToString(identifier.bytes)}" as String
+    }
+
+    String makeUrl(String identifier) {
+        return makeUrl(securityProperties.web.publicWeb.url, identifier)
     }
 
     void updateMultichoiceWithCurrentNode(MultichoiceMapField field, String path) {

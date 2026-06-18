@@ -21,7 +21,6 @@ class OrsrTest {
     private IOrsrService service
 
     @Test
-    @Disabled
     void parseTest() {
         def ICO = 50_903_403 as String
         OrsrReference info = service.findByIco(ICO)
@@ -31,9 +30,9 @@ class OrsrTest {
     @SuppressWarnings("GrMethodMayBeStatic")
     private assertCorrectValidOrsrInfo(OrsrReference info) {
         assert info.name == "NETGRIF, s.r.o."
-        assert info.city == "Bratislava - Staré mesto"
-        assert info.postalCode == "811 02"
-        assert info.street == "Slávičie údolie"
-        assert info.streetNumber == "106"
+        assert info.city == "Bratislava - mestská časť Karlova Ves"
+        assert info.postalCode == "841 04"
+        assert info.street == "Dúbravská cesta"
+        assert info.streetNumber == "14"
     }
 }

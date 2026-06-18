@@ -33,7 +33,8 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
 
     def init(Action action, RoleContext roleContext, Map<String, String> params = [:]) {
         this.action = action
-        this.actionContext = actionContext
+        //this.actionContext = actionContext
+        this.actionContext = roleContext
         this.params = params
 
         this.processRole = roleContext.role

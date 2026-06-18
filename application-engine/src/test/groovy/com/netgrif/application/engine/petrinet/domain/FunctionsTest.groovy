@@ -88,9 +88,8 @@ class FunctionsTest {
     }
 
     @Test
-    @Disabled("MissingMethod No signature of method")
     void testNamespaceFunction() {
-        assert userService.findUserByUsername("test@test.com", null) == null
+        assert userService.findUserByUsername("test@test.com", null).isEmpty()
 
         def functionResNet = petriNetService.importPetriNet(ImportPetriNetParams.with()
                 .xmlFile(functionResNetResource.inputStream)

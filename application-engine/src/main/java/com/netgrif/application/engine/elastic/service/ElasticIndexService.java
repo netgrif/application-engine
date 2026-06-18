@@ -9,17 +9,12 @@ import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import co.elastic.clients.elasticsearch.indices.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticTask;
-import com.netgrif.application.engine.objects.elastic.serializer.LocalDateTimeJsonDeserializer;
-import com.netgrif.application.engine.objects.elastic.serializer.LocalDateTimeJsonSerializer;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -38,8 +33,8 @@ import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
+import org.springframework.util.Assert;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
@@ -59,7 +54,6 @@ public class ElasticIndexService implements IElasticIndexService {
     private final IElasticTaskMappingService taskMappingService;
     private final IPetriNetService petriNetService;
     private final DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
-    private final ObjectMapper objectMapper;
 
     public ElasticIndexService(ApplicationContext context,
                                ElasticsearchTemplate elasticsearchTemplate,
@@ -77,8 +71,6 @@ public class ElasticIndexService implements IElasticIndexService {
         this.taskMappingService = taskMappingService;
         this.petriNetService = petriNetService;
         this.elasticsearchProperties = elasticsearchProperties;
-        this.objectMapper = new ObjectMapper();
-        configureObjectMapper();
     }
 
     @Override
@@ -174,7 +166,7 @@ public class ElasticIndexService implements IElasticIndexService {
     }
 
     protected Map<String, Object> parseAnalysisSettings() {
-        ObjectMapper objectMapper = new ObjectMapper();
+        tools.jackson.databind.ObjectMapper objectMapper = new tools.jackson.databind.ObjectMapper();
         Resource resource = elasticsearchProperties.getAnalyzerPathFile();
 
         try (InputStream inputStream = resource.getInputStream()) {
@@ -618,12 +610,5 @@ public class ElasticIndexService implements IElasticIndexService {
         return indexName;
     }
 
-    private void configureObjectMapper() {
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeJsonSerializer());
-        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeJsonDeserializer());
-        objectMapper.registerModule(javaTimeModule);
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    }
 
 }

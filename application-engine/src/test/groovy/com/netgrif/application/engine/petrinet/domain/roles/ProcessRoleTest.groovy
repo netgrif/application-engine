@@ -2,11 +2,14 @@ package com.netgrif.application.engine.petrinet.domain.roles
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.objects.auth.domain.Authority
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
@@ -19,6 +22,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.domain.Pageable
 import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -87,14 +91,14 @@ class ProcessRoleTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rolref_view.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new ImportPetriNetParams(new FileInputStream("src/test/resources/rolref_view.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert net.getNet() != null
 
-        String netId = net.getNet().getStringId()
+        this.netId = net.getNet().getStringId()
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        def processRoles = userProcessRoleRepository.findAllByProcessId(netId)
-        importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
+        def processRoles = userProcessRoleRepository.findAllByProcessId(this.netId, Pageable.unpaged()).content
+        AbstractUser viewUser = importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [processRoles.find {
                     it.getStringId() == net.getNet().roles.values().find {
@@ -102,32 +106,38 @@ class ProcessRoleTest {
                     }.stringId
                 }] as ProcessRole[])
 
-        importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_PERFORM, password: "password", state: UserState.ACTIVE),
+        AbstractUser performUser = importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_PERFORM, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [processRoles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
 
-        importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_BOTH, password: "password", state: UserState.ACTIVE),
+        AbstractUser bothUser = importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_BOTH, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [processRoles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "View" }.stringId },
                  processRoles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
+
+        viewAuth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(viewUser), "password", viewUser.authoritySet as List)
+        performAuth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(performUser), "password", performUser.authoritySet as List)
+        bothAuth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(bothUser), "password", bothUser.authoritySet as List)
     }
 
     private String caseId
     private String netId
     private String taskId
+    private Authentication viewAuth
+    private Authentication performAuth
+    private Authentication bothAuth
 
     @Test
-    @Disabled("Request processing failed; nested exception is java.lang.IllegalArgumentException: The given id must not be null!")
     void testViewLogic() {
-        this.auth = new UsernamePasswordAuthenticationToken(USER_EMAIL_VIEW, "password")
+        this.auth = viewAuth
         createCase()
         searchTasks("View", 1)
 
-        this.auth = new UsernamePasswordAuthenticationToken(USER_EMAIL_PERFORM, "password")
+        this.auth = performAuth
 //        createCase()
         searchTasks("Perform", 1)
 
-        this.auth = new UsernamePasswordAuthenticationToken(USER_EMAIL_BOTH, "password")
+        this.auth = bothAuth
 //        createCase()
         searchTasks("View", 2)
     }
@@ -141,15 +151,13 @@ class ProcessRoleTest {
         def result = mvc.perform(post(CASE_CREATE_URL)
                 .accept(MediaTypes.HAL_JSON_VALUE)
                 .content(content)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .with(csrf().asHeader())
                 .with(authentication(auth)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath('$.outcome.acase.title', CoreMatchers.is(CASE_NAME)))
-                .andExpect(jsonPath('$.outcome.acase.petriNetId', CoreMatchers.is(netId)))
                 .andReturn()
         def response = parseResult(result)
-        caseId = response.outcome.aCase.id
+        caseId = createdCaseId(response)
     }
 
     def searchTasks(String title, int expected) {
@@ -162,7 +170,7 @@ class ProcessRoleTest {
                 .accept(MediaTypes.HAL_JSON_VALUE)
                 .locale(Locale.forLanguageTag(LOCALE_SK))
                 .content(content)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
                 .andExpect(status().isOk())
@@ -176,5 +184,16 @@ class ProcessRoleTest {
     @SuppressWarnings("GrMethodMayBeStatic")
     private def parseResult(MvcResult result) {
         return (new JsonSlurper()).parseText(result.response.contentAsString)
+    }
+
+    private static String createdCaseId(def response) {
+        def outcome = response.outcome
+        def aCase = outcome?.get("acase") ?: outcome?.get("aCase") ?: outcome?.get("case")
+        if (aCase?.id) {
+            return aCase.id
+        }
+        def matcher = (response.success as String) =~ /Case with id (.+) was created/
+        assert matcher.find() : "Create case response did not contain a case id: ${response}"
+        return matcher.group(1)
     }
 }

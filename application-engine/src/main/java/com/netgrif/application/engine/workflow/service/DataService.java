@@ -1,12 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
@@ -54,6 +48,14 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -256,14 +258,14 @@ public class DataService implements IDataService {
     /**
      * Updates the data field's attributes of the provided task.
      *
-     * @param task the task object of which the data are updated
-     * @param values information about how to update the data fields
-     * @param params additional information to be injected to the action delegate context
+     * @param task      the task object of which the data are updated
+     * @param values    information about how to update the data fields
+     * @param params    additional information to be injected to the action delegate context
      * @param runStrict if set to true, additional validations are going to be applied when updating the data fields. If
-     *                set to false, minimal restrictions are considered.
-     *
+     *                  set to false, minimal restrictions are considered.
      * @return outcome containing Case, Task and changes that have been made.
-     * */
+     *
+     */
     @Override
     public SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params, boolean runStrict) {
         Case useCase = workflowService.findOne(task.getCaseId());
@@ -274,8 +276,10 @@ public class DataService implements IDataService {
         if (task.getUserId() != null) {
             task.setUser(userService.findById(task.getUserId(), task.getUserRealmId()));
         }
+
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
-        values.fields().forEachRemaining(entry -> {
+
+        values.propertyStream().forEach(entry -> {
             String fieldId = entry.getKey();
             DataField dataField = useCase.getDataSet().get(fieldId);
             if (dataField == null) {
@@ -294,75 +298,104 @@ public class DataService implements IDataService {
                 }
             }
 
-            Field<?> field = useCase.getPetriNet().getField(fieldId).orElseThrow(() -> new IllegalStateException("Field with id [%s] is missing from process with id [%s]"
-                    .formatted(fieldId, useCase.getPetriNetId())));
+            Field<?> field = useCase.getPetriNet().getField(fieldId).orElseThrow(() ->
+                    new IllegalStateException("Field with id [%s] is missing from process with id [%s]"
+                            .formatted(fieldId, useCase.getPetriNetId()))
+            );
+
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task, params));
+
             if (outcome.getMessage() == null) {
-                if (field.getEvents().containsKey(DataEventType.SET) &&
-                        field.getEvents().get(DataEventType.SET).getMessage() != null) {
+                if (field.getEvents().containsKey(DataEventType.SET)
+                        && field.getEvents().get(DataEventType.SET).getMessage() != null) {
                     outcome.setMessage(field.getEvents().get(DataEventType.SET).getMessage());
                 } else {
-                    Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
+                    Map<String, DataFieldLogic> dataSet = useCase.getPetriNet()
+                            .getTransition(task.getTransitionId())
+                            .getDataSet();
+
                     DataFieldLogic dataRef = dataSet.get(fieldId);
-                    if (dataRef != null && dataRef.getEvents().containsKey(DataEventType.SET)
+                    if (dataRef != null
+                            && dataRef.getEvents().containsKey(DataEventType.SET)
                             && dataRef.getEvents().get(DataEventType.SET).getMessage() != null) {
                         outcome.setMessage(dataRef.getEvents().get(DataEventType.SET).getMessage());
                     }
                 }
             }
+
             boolean modified = false;
             ChangedField changedField = new ChangedField();
             changedField.setId(fieldId);
+
             Object newValue = parseFieldsValues(entry.getValue(), dataField, task.getStringId());
+
             if (entry.getValue().has("value") || getFieldTypeFromNode((ObjectNode) entry.getValue()).equals("button")) {
                 dataField.setValue(newValue);
                 changedField.addAttribute("value", newValue);
                 modified = true;
             }
+
             List<String> allowedNets = parseAllowedNetsValue(entry.getValue());
             if (allowedNets != null) {
                 dataField.setAllowedNets(allowedNets);
                 changedField.addAttribute("allowedNets", allowedNets);
                 modified = true;
             }
+
             String fieldType = getFieldTypeFromNode((ObjectNode) entry.getValue());
+
             Map<String, Object> filterMetadata = parseFilterMetadataValue((ObjectNode) entry.getValue(), fieldType);
             if (filterMetadata != null) {
                 dataField.setFilterMetadata(filterMetadata);
                 changedField.addAttribute("filterMetadata", filterMetadata);
                 modified = true;
             }
+
             Map<String, I18nString> options = parseOptionsNode(entry.getValue(), fieldType);
             if (options != null) {
                 setDataFieldOptions(options, dataField, changedField, fieldType);
                 modified = true;
             }
+
             Set<I18nString> choices = parseChoicesNode((ObjectNode) entry.getValue(), fieldType);
             if (choices != null) {
                 dataField.setChoices(choices);
-                changedField.addAttribute("choices", choices.stream().map(i18nString -> i18nString.getTranslation(LocaleContextHolder.getLocale())).collect(Collectors.toSet()));
+                changedField.addAttribute(
+                        "choices",
+                        choices.stream()
+                                .map(i18nString -> i18nString.getTranslation(LocaleContextHolder.getLocale()))
+                                .collect(Collectors.toSet())
+                );
                 modified = true;
             }
+
             Map<String, String> properties = parseProperties(entry.getValue());
             if (properties != null) {
                 outcome.addOutcome(this.changeComponentProperties(useCase, task, field.getStringId(), properties));
                 modified = true;
             }
+
             if (modified) {
                 dataField.setLastModified(LocalDateTime.now());
             }
+
             if (dataConfigurationProperties.getValidation().isSetDataEnabled()) {
                 validation.valid(field, dataField);
             }
+
             outcome.addChangedField(fieldId, changedField);
+
             workflowService.save(useCase);
             publisher.publishEvent(new SetDataEvent(outcome, EventPhase.PRE, user));
+
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, params));
             applyFieldConnectedChanges(useCase, field);
         });
+
         updateDataset(useCase);
         outcome.setCase(workflowService.save(useCase));
         publisher.publishEvent(new SetDataEvent(outcome));
+
         return outcome;
     }
 
@@ -1158,19 +1191,27 @@ public class DataService implements IDataService {
     }
 
     private I18nString parseI18nStringValues(ObjectNode node) {
-        String defaultValue = node.get("defaultValue") != null ? node.get("defaultValue").asText() : "";
+        String defaultValue = node.get("defaultValue") != null
+                ? node.get("defaultValue").asText()
+                : "";
+
         Map<String, String> translations = new HashMap<>();
-        if (node.get("translations") != null) {
-            node.get("translations").fields().forEachRemaining(entry ->
+
+        JsonNode translationsNode = node.get("translations");
+        if (translationsNode != null && translationsNode.isObject()) {
+            ((ObjectNode) translationsNode).properties().forEach(entry ->
                     translations.put(entry.getKey(), entry.getValue().asText())
             );
         }
+
         return new I18nString(defaultValue, translations);
     }
 
     private Map<String, I18nString> parseOptionsNode(JsonNode node, String fieldType) {
-        if (Objects.equals(fieldType, FieldType.ENUMERATION_MAP.getName()) || Objects.equals(fieldType, FieldType.MULTICHOICE_MAP.getName()) ||
-                Objects.equals(fieldType, FieldType.ENUMERATION.getName()) || Objects.equals(fieldType, FieldType.MULTICHOICE.getName())) {
+        if (Objects.equals(fieldType, FieldType.ENUMERATION_MAP.getName())
+                || Objects.equals(fieldType, FieldType.MULTICHOICE_MAP.getName())
+                || Objects.equals(fieldType, FieldType.ENUMERATION.getName())
+                || Objects.equals(fieldType, FieldType.MULTICHOICE.getName())) {
             return parseOptions(node);
         }
         return null;
@@ -1178,18 +1219,30 @@ public class DataService implements IDataService {
 
     private Map<String, I18nString> parseOptions(JsonNode node) {
         JsonNode optionsNode = node.get("options");
-        if (optionsNode == null) {
+        if (optionsNode == null || optionsNode.isNull()) {
             return null;
         }
-        ObjectMapper mapper = new ObjectMapper();
+
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(I18nString.class, new com.netgrif.application.engine.objects.petrinet.domain.I18nStringDeserializer());
-        mapper.registerModule(module);
-        Map<String, I18nString> optionsMapped = mapper.convertValue(optionsNode, new TypeReference<>() {
-        });
-        if (optionsMapped.isEmpty()) {
+        module.addDeserializer(
+                I18nString.class,
+                new com.netgrif.application.engine.objects.petrinet.domain.I18nStringDeserializer()
+        );
+
+        ObjectMapper mapper = JsonMapper.builder()
+                .addModule(module)
+                .build();
+
+        Map<String, I18nString> optionsMapped = mapper.convertValue(
+                optionsNode,
+                new TypeReference<Map<String, I18nString>>() {
+                }
+        );
+
+        if (optionsMapped == null || optionsMapped.isEmpty()) {
             return null;
         }
+
         return optionsMapped;
     }
 

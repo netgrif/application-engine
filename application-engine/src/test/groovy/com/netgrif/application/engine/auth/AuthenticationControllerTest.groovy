@@ -13,8 +13,11 @@ import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.mail.EmailType
+import com.netgrif.application.engine.configuration.properties.MailConfigurationProperties
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -26,7 +29,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.security.test.context.support.WithMockUser
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
@@ -38,7 +42,6 @@ import jakarta.mail.internet.MimeMultipart
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-@Disabled("ClassCast")
 class AuthenticationControllerTest {
 
     private static final String EMAIL = "tets@test.com"
@@ -73,9 +76,13 @@ class AuthenticationControllerTest {
     @Autowired
     private SuperCreatorRunner superCreator
 
+    @Autowired
+    private MailConfigurationProperties mailConfigurationProperties
+
     private GreenMail smtpServer
 
     private Map<String, ProcessRole> processRoles
+    private Authentication adminAuth
 
     @BeforeEach
     void before() {
@@ -83,18 +90,19 @@ class AuthenticationControllerTest {
         smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp")).withConfiguration(GreenMailConfiguration.aConfig().withDisabledAuthentication())
         smtpServer.start()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new ImportPetriNetParams(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert net.getNet() != null
         if (authorityService.findAll().size() == 0)
             importHelper.createAuthority(Authority.user)
+        def loggedSuper = superCreator.getLoggedSuper()
+        adminAuth = new UsernamePasswordAuthenticationToken(loggedSuper, null, loggedSuper.authorities)
 //        group = importHelper.createGroup(GROUP_NAME)
 //        processRoles = importHelper.getProcessRoles(net.getNet())
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void inviteTest() {
-        controller.invite(new NewUserRequest(email: EMAIL, groups: [], processRoles: []), null)
+        controller.invite(new NewUserRequest(email: EMAIL, groups: [], processRoles: []), adminAuth)
 
         MimeMessage[] messages = smtpServer.getReceivedMessages()
         assertMessageReceived(messages)
@@ -102,7 +110,7 @@ class AuthenticationControllerTest {
         String content = getTextFromMimeMultipart(messages[0].content as MimeMultipart)
         String token = content.substring(content.indexOf("/signup/") + "/signup/".length(), content.lastIndexOf(" This is"))
 
-        controller.signup(new RegistrationRequest(token: token, name: NAME, lastName: SURNAME, password: PASSWORD))
+        controller.signup(new RegistrationRequest(token: token, name: NAME, surname: SURNAME, password: PASSWORD))
 
         AbstractUser user = userService.findByEmail(EMAIL, null)
         assert user
@@ -119,7 +127,7 @@ class AuthenticationControllerTest {
 
         MimeMessage message = messages[0]
 
-        assert "noreply@netgrif.com".equalsIgnoreCase(message.getFrom()[0].toString())
+        assert mailConfigurationProperties.mailFrom.equalsIgnoreCase(message.getFrom()[0].toString())
         assert EmailType.REGISTRATION.getSubject().equalsIgnoreCase(message.getSubject())
     }
 

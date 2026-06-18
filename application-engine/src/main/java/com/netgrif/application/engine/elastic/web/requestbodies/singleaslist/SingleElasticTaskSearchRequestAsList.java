@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.elastic.web.requestbodies.singleaslist;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonDeserialize;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.application.engine.utils.SingleItemAsList;
 import com.netgrif.application.engine.workflow.utils.TaskSearchRequestSingleItemAsListDeserializer;

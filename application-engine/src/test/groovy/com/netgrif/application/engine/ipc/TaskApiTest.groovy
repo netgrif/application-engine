@@ -67,7 +67,6 @@ class TaskApiTest {
     public static final String TASK_SEARCH_NET_FILE = "ipc_task_search.xml"
 
     @Test
-    @Disabled("GroovyRuntime Could not find matching constructor")
     void testTaskSearch() {
         def netOptional = petriNetService.importPetriNet(ImportPetriNetParams.with()
                 .xmlFile(stream(TASK_SEARCH_NET_FILE))
@@ -102,7 +101,6 @@ class TaskApiTest {
     public static final String TASK_EVENTS_TASK = "Task"
 
     @Test
-    @Disabled()
     void testTaskEventActions() {
         def netOptional = petriNetService.importPetriNet(ImportPetriNetParams.with()
                 .xmlFile(stream(TASK_EVENTS_NET_FILE))
@@ -128,7 +126,6 @@ class TaskApiTest {
     public static final String LEASING_NET_TASK_EDIT_COST = "T2"
 
     @Test
-    @Disabled("spusta 2 krat")
     void testTaskExecution() {
         def limitsNetOptional = petriNetService.importPetriNet(ImportPetriNetParams.with()
                 .xmlFile(stream(LIMITS_NET_FILE))

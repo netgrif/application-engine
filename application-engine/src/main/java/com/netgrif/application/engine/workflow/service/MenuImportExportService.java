@@ -1,10 +1,8 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.module.SimpleModule;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.files.StorageResolverService;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
@@ -36,6 +34,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.dataformat.xml.XmlMapper;
+import tools.jackson.dataformat.xml.XmlWriteFeature;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
@@ -295,8 +295,14 @@ public class MenuImportExportService implements IMenuImportExportService {
     protected MenuAndFilters loadFromXML(FileFieldValue ffv) throws IOException, IllegalMenuFileException {
         File f = new File(ffv.getPath());
         validateFilterXML(new FileInputStream(f));
-        SimpleModule module = new SimpleModule().addDeserializer(Object.class, FilterDeserializer.getInstance());
-        XmlMapper xmlMapper = (XmlMapper) new XmlMapper().registerModule(module);
+
+        SimpleModule module = new SimpleModule()
+                .addDeserializer(Object.class, FilterDeserializer.getInstance());
+
+        XmlMapper xmlMapper = XmlMapper.builder()
+                .addModule(module)
+                .build();
+
         String xml = InputStreamToString.inputStreamToString(new FileInputStream(f));
         return xmlMapper.readValue(xml, MenuAndFilters.class);
     }
@@ -308,10 +314,13 @@ public class MenuImportExportService implements IMenuImportExportService {
             ffv.setName("menu_" + userService.getLoggedUser().getName().replaceAll("\\s+", "") + ".xml");
             ffv.setPath(storageResolverService.resolve(fileField.getStorageType()).getPath(parentId, fileField.getImportId(), ffv.getName()));
             File f = new File(ffv.getPath());
-            XmlMapper xmlMapper = new XmlMapper();
-            xmlMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-            xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
-            xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
+
+            XmlMapper xmlMapper = XmlMapper.builder()
+                    .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_EMPTY))
+                    .enable(SerializationFeature.INDENT_OUTPUT)
+                    .enable(XmlWriteFeature.WRITE_XML_DECLARATION)
+                    .build();
+
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             xmlMapper.writeValue(baos, menuAndFilters);
 

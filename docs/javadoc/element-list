@@ -1,5 +1,5 @@
-com.fasterxml.jackson.databind
-com.fasterxml.jackson.databind.node
+tools.jackson.databind
+tools.jackson.databind.node
 com.netgrif.application.engine
 com.netgrif.core.auth.domain.Authority;
 com.netgrif.core.auth.domain.Authority;.repositories

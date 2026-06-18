@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.petrinet.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
@@ -383,20 +381,27 @@ public class PetriNetService implements IPetriNetService {
      */
     @Override
     public List<String> getExistingPetriNetIdentifiersFromIdentifiersList(List<String> identifiers) {
-        Aggregation agg = Aggregation.newAggregation(
+        if (identifiers == null || identifiers.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("identifier").in(identifiers)),
                 Aggregation.group("identifier"),
-                Aggregation.project("identifier").and("identifier").previousOperation()
-        );
-        AggregationResults<?> groupResults = mongoTemplate.aggregate(
-                agg,
-                com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class,
-                TypeFactory.defaultInstance().constructType(new TypeReference<Map<String, String>>() {
-                }).getRawClass()
+                Aggregation.project()
+                        .and("_id").as("identifier")
         );
 
-        List<Map<String, String>> result = (List<Map<String, String>>) groupResults.getMappedResults();
-        return result.stream().flatMap(v -> v.values().stream()).collect(Collectors.toList());
+        AggregationResults<Document> results = mongoTemplate.aggregate(
+                aggregation,
+                com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet.class,
+                Document.class
+        );
+
+        return results.getMappedResults().stream()
+                .map(document -> document.getString("identifier"))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     @Override

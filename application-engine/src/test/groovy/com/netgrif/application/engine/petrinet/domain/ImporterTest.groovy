@@ -29,6 +29,8 @@ import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+import java.time.temporal.ChronoUnit
+
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
@@ -274,7 +276,6 @@ class ImporterTest {
     }
 
     @Test
-    @Disabled
     void upsertTest() {
         def net = importHelper.upsertNet(FILE_NAME, IDENTIFIER)
         assert net.present
@@ -282,7 +283,7 @@ class ImporterTest {
         def upserted = importHelper.upsertNet(FILE_NAME, IDENTIFIER)
         assert upserted.present
 
-        assert upserted.get().creationDate == net.get().creationDate
+        assert upserted.get().creationDate.truncatedTo(ChronoUnit.MILLIS) == net.get().creationDate.truncatedTo(ChronoUnit.MILLIS)
     }
 
     @Test

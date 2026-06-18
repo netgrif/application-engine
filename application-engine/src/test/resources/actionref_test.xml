@@ -18,22 +18,22 @@
             def a = "data_action_get";
         </action>
         <actionRef>
-            <id>data_action_set</id>
+            <id>actionref_test.xml-data_action_set</id>
         </actionRef>
         <actionRef>
-            <id>data_action_get</id>
+            <id>actionref_test.xml-data_action_get</id>
         </actionRef>
         <actionRef>
-            <id>dataref_action_set</id>
+            <id>actionref_test.xml-dataref_action_set</id>
         </actionRef>
         <actionRef>
-            <id>dataref_action_get</id>
+            <id>actionref_test.xml-dataref_action_get</id>
         </actionRef>
         <actionRef>
-            <id>event_action_pre</id>
+            <id>actionref_test.xml-event_action_pre</id>
         </actionRef>
         <actionRef>
-            <id>event_action_post</id>
+            <id>actionref_test.xml-event_action_post</id>
         </actionRef>
     </data>
     <!-- TRANSITIONS -->
@@ -54,22 +54,16 @@
                     def a = "dataref_action_set";
                 </action>
                 <actionRef>
-                    <id>data_action_set</id>
+                    <id>actionref_test.xml-data_action_set</id>
                 </actionRef>
                 <actionRef>
-                    <id>data_action_get</id>
+                    <id>actionref_test.xml-data_action_get</id>
                 </actionRef>
                 <actionRef>
-                    <id>dataref_action_set</id>
+                    <id>actionref_test.xml-dataref_action_set</id>
                 </actionRef>
                 <actionRef>
-                    <id>dataref_action_get</id>
-                </actionRef>
-                <actionRef>
-                    <id>event_action_pre</id>
-                </actionRef>
-                <actionRef>
-                    <id>event_action_post</id>
+                    <id>actionref_test.xml-dataref_action_get</id>
                 </actionRef>
             </logic>
         </dataRef>
@@ -81,22 +75,22 @@
                     def a = "event_action_pre";
                 </action>
                 <actionRef>
-                    <id>data_action_set</id>
+                    <id>actionref_test.xml-data_action_set</id>
                 </actionRef>
                 <actionRef>
-                    <id>data_action_get</id>
+                    <id>actionref_test.xml-data_action_get</id>
                 </actionRef>
                 <actionRef>
-                    <id>dataref_action_set</id>
+                    <id>actionref_test.xml-dataref_action_set</id>
                 </actionRef>
                 <actionRef>
-                    <id>dataref_action_get</id>
+                    <id>actionref_test.xml-dataref_action_get</id>
                 </actionRef>
                 <actionRef>
-                    <id>event_action_pre</id>
+                    <id>actionref_test.xml-event_action_pre</id>
                 </actionRef>
                 <actionRef>
-                    <id>event_action_post</id>
+                    <id>actionref_test.xml-event_action_post</id>
                 </actionRef>
             </actions>
             <actions phase="post">
@@ -105,22 +99,22 @@
                     def a = "event_action_post";
                 </action>
                 <actionRef>
-                    <id>data_action_set</id>
+                    <id>actionref_test.xml-data_action_set</id>
                 </actionRef>
                 <actionRef>
-                    <id>data_action_get</id>
+                    <id>actionref_test.xml-data_action_get</id>
                 </actionRef>
                 <actionRef>
-                    <id>dataref_action_set</id>
+                    <id>actionref_test.xml-dataref_action_set</id>
                 </actionRef>
                 <actionRef>
-                    <id>dataref_action_get</id>
+                    <id>actionref_test.xml-dataref_action_get</id>
                 </actionRef>
                 <actionRef>
-                    <id>event_action_pre</id>
+                    <id>actionref_test.xml-event_action_pre</id>
                 </actionRef>
                 <actionRef>
-                    <id>event_action_post</id>
+                    <id>actionref_test.xml-event_action_post</id>
                 </actionRef>
             </actions>
         </event>

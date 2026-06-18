@@ -5,6 +5,7 @@ import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRol
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.objects.auth.constants.UserConstants
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
 
 import com.netgrif.application.engine.objects.auth.domain.User
@@ -13,6 +14,7 @@ import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -24,6 +26,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
@@ -95,7 +98,7 @@ class RemoveActionTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/removeRole_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new ImportPetriNetParams(new FileInputStream("src/test/resources/removeRole_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert net.getNet() != null
 
         this.petriNet = net.getNet()
@@ -114,10 +117,10 @@ class RemoveActionTest {
     }
 
     @Test
-    @Disabled(" GroovyRuntime Could not find matching")
     void addAndRemoveRole() {
         AbstractUser user = userService.findByEmail(USER_EMAIL, null)
-        auth = new UsernamePasswordAuthenticationToken(UserConstants.ADMIN_USER_USERNAME, "password")
+        def loggedSuper = superCreator.getLoggedSuper()
+        auth = new UsernamePasswordAuthenticationToken(loggedSuper, "password", loggedSuper.authorities)
 
         String adminRoleId = petriNet.getRoles().find { it.value.name.defaultValue == "admin" }.key
 
@@ -126,7 +129,7 @@ class RemoveActionTest {
         String userId = user.getStringId()
 
         mvc.perform(put(ROLE_API.formatted(user.getRealmId(),userId))
-                .accept(MediaTypes.HAL_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
                 .content(content)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf().asHeader())
@@ -137,7 +140,7 @@ class RemoveActionTest {
         User updatedUser = userService.findByEmail(USER_EMAIL, null) as User
         Set<ProcessRole> roles = updatedUser.getProcessRoles()
 
-        String managerRoleId = processRoleService.findAllByDefaultName("manager")?.first()?.stringId
+        String managerRoleId = processRoleService.findAllByDefaultName("manager", Pageable.unpaged())?.stream()?.findFirst()?.orElse(null)?.stringId
 
         assert roles.find { it.getStringId() == adminRoleId }
         assert roles.find { it.getStringId() == managerRoleId }
@@ -147,7 +150,7 @@ class RemoveActionTest {
         content = JsonOutput.toJson([managerRoleId])
 
         mvc.perform(put(ROLE_API.formatted(user.getRealmId(), userId))
-                .accept(MediaTypes.HAL_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
                 .content(content)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf().asHeader())

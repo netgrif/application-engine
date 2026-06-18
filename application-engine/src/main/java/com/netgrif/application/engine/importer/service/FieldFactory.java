@@ -18,10 +18,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataValidatio
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
@@ -112,7 +109,12 @@ public final class FieldFactory {
         if (value == null)
             return null;
 
+        value = value.trim();
+        if (value.isEmpty())
+            return null;
+
         List<String> patterns = Arrays.asList("dd.MM.yyyy");
+
         try {
             return LocalDate.parse(value, DateTimeFormatter.BASIC_ISO_DATE);
         } catch (DateTimeParseException e) {
@@ -122,17 +124,37 @@ public final class FieldFactory {
                 for (String pattern : patterns) {
                     try {
                         return LocalDate.parse(value, DateTimeFormatter.ofPattern(pattern));
-                    } catch (DateTimeParseException | IllegalArgumentException exc) {
-                        continue;
+                    } catch (DateTimeParseException | IllegalArgumentException ignored) {
                     }
                 }
             }
         }
-        LocalDateTime dateTime = parseDateTimeFromString(value);
-        if (dateTime != null) {
-            return dateTime.toLocalDate();
+
+        if (value.matches("-?\\d{9,}")) {
+            try {
+                return Instant.ofEpochMilli(Long.parseLong(value))
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate();
+            } catch (NumberFormatException ignored) {
+            }
         }
-        return null;
+
+        try {
+            return Instant.parse(value)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+        } catch (DateTimeParseException ignored) {
+        }
+
+        try {
+            return OffsetDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME)
+                    .atZoneSameInstant(ZoneId.systemDefault())
+                    .toLocalDate();
+        } catch (DateTimeParseException ignored) {
+        }
+
+        LocalDateTime dateTime = parseDateTimeFromString(value);
+        return dateTime != null ? dateTime.toLocalDate() : null;
     }
 
     public static LocalDateTime parseDateTime(Object value) {

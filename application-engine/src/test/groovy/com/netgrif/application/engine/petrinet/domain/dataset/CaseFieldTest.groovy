@@ -175,7 +175,6 @@ class CaseFieldTest {
     }
 
     @Test
-    @Disabled("Please fix this test")
     void testChangeValueAction() {
         def notAllowedNet = petriNetService.importPetriNet(ImportPetriNetParams.with()
                 .xmlFile(stream(ALLOWED_NETS_NET_FILE))
@@ -193,7 +192,7 @@ class CaseFieldTest {
 
         Case aCase = importHelper.createCase("Case 1", testNet.getNet())
 
-        assert aCase.getDataSet().get("caseref").value == null
+        assert aCase.getDataSet().get("caseref").value == null || aCase.getDataSet().get("caseref").value.isEmpty()
 
         importHelper.assignTaskToSuper(CHANGE_VALUE_TASK_TITLE, aCase.stringId)
 

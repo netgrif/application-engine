@@ -1,13 +1,13 @@
 package com.netgrif.application.engine.workflow
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.node.ObjectNode
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.objects.petrinet.domain.DataGroup
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -95,7 +95,6 @@ class DataServiceTest {
     }
 
     @Test
-    @Disabled
     void testTaskrefedFileFieldAction() {
         def aCase = importHelper.createCase("Case", this.net)
         assert aCase != null
@@ -111,12 +110,15 @@ class DataServiceTest {
 
         MockMultipartFile file = new MockMultipartFile("data", "filename.txt", "text/plain", "hello world".getBytes())
 
-        ChangedFieldByFileFieldContainer changes = dataService.saveFile(taskId, fileField.stringId, file)
-        assert changes.changedFields.size() == 1
         LocalisedField textField = findField(datagroups, TEXT_FIELD_TITLE)
-        assert changes.changedFields.containsKey(textField.stringId)
-        assert changes.changedFields.get(textField.stringId).containsKey("value")
-        assert changes.changedFields.get(textField.stringId).get("value") == "OK"
+        SetDataEventOutcome changes = dataService.saveFile(fileField.parentTaskId, fileField.stringId, file)
+        SetDataEventOutcome changedOutcome = changes.outcomes.find { outcome ->
+            outcome instanceof SetDataEventOutcome && outcome.changedFields.containsKey(textField.stringId)
+        } as SetDataEventOutcome
+        assert changedOutcome != null
+        assert changedOutcome.changedFields.size() == 1
+        assert changedOutcome.changedFields.get(textField.stringId).attributes.containsKey("value")
+        assert changedOutcome.changedFields.get(textField.stringId).attributes.get("value") == "OK"
     }
 
     LocalisedField findField(List<DataGroup> datagroups, String fieldTitle) {

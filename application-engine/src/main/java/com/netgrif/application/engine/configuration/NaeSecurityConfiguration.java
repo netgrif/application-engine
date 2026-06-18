@@ -14,7 +14,6 @@ import com.netgrif.application.engine.impersonation.service.interfaces.IImperson
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -36,8 +35,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.ForwardedHeaderFilter;
+import org.springframework.boot.security.autoconfigure.web.servlet.SecurityFilterProperties;
 
-import java.util.HashSet;
 import java.util.List;
 
 import static org.springframework.http.HttpMethod.OPTIONS;
@@ -47,7 +46,7 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 @Controller
 @Configuration
 @EnableWebSecurity
-@Order(SecurityProperties.DEFAULT_FILTER_ORDER)
+@Order(SecurityFilterProperties.DEFAULT_FILTER_ORDER)
 public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired
@@ -130,8 +129,8 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)));
         http.authenticationProvider(authenticationProviders.getFirst());
         http.sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS));
-        configureFilters(http);
-        configureSession(http);
+        //configureFilters(http);
+       // configureSession(http);
         setHeaders(http);
         setCsrf(http);
         corsEnable(http);

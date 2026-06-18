@@ -1,35 +1,24 @@
 package com.netgrif.application.engine.configuration;
 
-import co.elastic.clients.json.JsonpMapper;
-import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
-import com.netgrif.application.engine.objects.elastic.serializer.LocalDateTimeJsonDeserializer;
-import com.netgrif.application.engine.objects.elastic.serializer.LocalDateTimeJsonSerializer;
 import com.netgrif.application.engine.workflow.service.CaseEventHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
-import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.nio.conn.NHttpClientConnectionManager;
 import org.apache.http.nio.reactor.IOReactorException;
-import org.elasticsearch.client.RestClientBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.*;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchClients;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.elasticsearch.support.HttpHeaders;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 
+import static co.elastic.clients.transport.rest5_client.low_level.Rest5ClientBuilder.*;
 import static org.apache.http.impl.nio.reactor.IOReactorConfig.Builder.getDefaultMaxIoThreadCount;
-import static org.elasticsearch.client.RestClientBuilder.*;
+import static org.springframework.data.elasticsearch.client.elc.rest5_client.Rest5Clients.DEFAULT_SOCKET_TIMEOUT_MILLIS;
 
 @Slf4j
 @Configuration
@@ -103,8 +92,8 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
             }
         }
 
-        clientBuilder.withClientConfigurer(ElasticsearchClients.ElasticsearchHttpClientConfigurationCallback.from(this::configureHttpAsyncClientBuilder))
-                .withClientConfigurer(ElasticsearchClients.ElasticsearchRestClientConfigurationCallback.from(this::configureRestClientBuilder));
+       // clientBuilder.withClientConfigurer(RestClients.ElasticsearchHttpClientConfigurationCallback.from(this::configureHttpAsyncClientBuilder))
+       //         .withClientConfigurer(RestClients.ElasticsearchRestClientConfigurationCallback.from(this::configureRestClientBuilder));
 
         long connectionTimeout = elasticsearchProperties.getConnectionTimeout();
         long socketTimeout = elasticsearchProperties.getSocketTimeout();
@@ -127,18 +116,17 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
         return clientBuilder.build();
     }
 
-    @NotNull
+ /**   @NotNull
     @Override
     public JsonpMapper jsonpMapper() {
         ObjectMapper mapper = new ObjectMapper();
         JavaTimeModule javaTimeModule = new JavaTimeModule();
-
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeJsonSerializer());
         javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeJsonDeserializer());
         mapper.registerModule(javaTimeModule);
         return new JacksonJsonpMapper(mapper);
-    }
+    }*/
 
     protected NHttpClientConnectionManager configureConnectionManager() throws IOReactorException {
         return null;
@@ -186,9 +174,7 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
         return httpAsyncClientBuilder;
     }
 
-    protected RestClientBuilder configureRestClientBuilder(RestClientBuilder restClientBuilder) {
-        return restClientBuilder;
-    }
+
 
     private boolean hasCredentials() {
         return elasticsearchProperties.getUsername() != null && !elasticsearchProperties.getUsername().isBlank() &&

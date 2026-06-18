@@ -96,13 +96,12 @@ class PetriNetServiceTest {
     void setup() {
         testHelper.truncateDbs()
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        importHelper.createUser(new User(firstName: "Customer", lastName: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new User(firstName: "Customer", lastName: "User", username: CUSTOMER_USER_MAIL, email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
     }
 
     @Test
-    @Disabled
     void processImportAndDelete() {
         long processRoleCount = processRoleRepository.count()
         long processCount = petriNetRepository.count()
@@ -131,7 +130,7 @@ class PetriNetServiceTest {
         assert user.get().processRoles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
 
-        petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
+        petriNetService.deletePetriNet(new DeletePetriNetParams(testNet.stringId, superCreator.getLoggedSuper()))
         assert petriNetRepository.count() == processCount
         Thread.sleep(5000)
         assert elasticPetriNetRepository.findById(testNet.stringId).isEmpty()
@@ -251,7 +250,6 @@ class PetriNetServiceTest {
     }
 
     @Test
-    @Disabled
     void processSearch() {
         long processCount = petriNetRepository.count()
 

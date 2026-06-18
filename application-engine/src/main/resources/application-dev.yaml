@@ -1,9 +1,14 @@
 netgrif:
   engine:
+    server:
+      port: 8089
     logging:
       endpoints: true
     data:
       database-name: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_dev
+      redis:
+        session:
+          namespace: ${NETGRIF_ENGINE_DATA_REDIS_SESSION_NAMESPACE:netgrif_dev}
       mongodb:
         drop: true
       elasticsearch:

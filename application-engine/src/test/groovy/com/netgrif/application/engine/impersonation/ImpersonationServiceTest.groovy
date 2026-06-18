@@ -255,7 +255,6 @@ class ImpersonationServiceTest {
 
 
     @Test
-    @Disabled("Disabled until user refactor is merged in v7.0.0")
     void testAuthMe() {
         def config = setup()
         def result = mvc.perform(get("/api/auth/login")

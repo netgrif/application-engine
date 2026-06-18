@@ -1,8 +1,7 @@
 package com.netgrif.application.engine.actions;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.adapter.spring.actions.ActionApi;
 import com.netgrif.application.engine.adapter.spring.actions.ActionFileHolder;
 import com.netgrif.application.engine.auth.service.UserService;
@@ -97,7 +96,7 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
-    public SetDataEventOutcome setData(String taskId, Map<String, Map<String, String>> dataSet, Map<String, String> params) throws JsonProcessingException {
+    public SetDataEventOutcome setData(String taskId, Map<String, Map<String, String>> dataSet, Map<String, String> params) {
         log.debug("Setting data for task [{}] with params: [{}]", taskId, params == null ? "null" : params.toString());
         ObjectMapper mapper = new ObjectMapper(); 
         String json = mapper.writeValueAsString(dataSet);
