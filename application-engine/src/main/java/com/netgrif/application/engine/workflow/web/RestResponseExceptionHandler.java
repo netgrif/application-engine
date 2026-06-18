@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonMappingException;   //TODO: jozi
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import org.slf4j.Logger;
