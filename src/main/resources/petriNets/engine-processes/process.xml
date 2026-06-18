@@ -315,7 +315,7 @@
 			<cols>4</cols>
 			<layout>grid</layout>
 			<dataRef>
-				<id>form_ref</id>
+				<id>icon</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -323,7 +323,49 @@
 					<x>0</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>4</cols>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>id</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>title</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>version</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
@@ -335,7 +377,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>1</y>
+					<y>2</y>
 					<rows>2</rows>
 					<cols>4</cols>
 					<template>material</template>
