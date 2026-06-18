@@ -175,6 +175,7 @@
 		<y>176</y>
 		<label>Deploy</label>
 		<icon>upload_file</icon>
+		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>deploy_0</id>
 			<cols>6</cols>
@@ -518,6 +519,7 @@
 		</dataGroup>
 		<event type="finish">
 			<id>delete_with_cases_finish</id>
+			<title>Delete</title>
 			<actions phase="pre">
 				<action id="action_0">
 					<![CDATA[
@@ -579,6 +581,7 @@
 		</dataGroup>
 		<event type="finish">
 			<id>t11_finish</id>
+			<title>Delete</title>
 			<actions phase="pre">
 				<action id="action8">
 					<![CDATA[
@@ -596,8 +599,9 @@
 		<id>t4</id>
 		<x>368</x>
 		<y>80</y>
-		<label>New version</label>
+		<label>Create new version</label>
 		<icon>plus_one</icon>
+		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>t4_0</id>
 			<cols>4</cols>
@@ -740,6 +744,7 @@
 		</dataGroup>
 		<event type="finish">
 			<id>t6_finish</id>
+			<title>Delete</title>
 			<actions phase="pre">
 				<action id="action2">
 					<![CDATA[
@@ -851,6 +856,10 @@
 				</layout>
 			</dataRef>
 		</dataGroup>
+		<event type="finish">
+			<id>view_finish</id>
+			<title>Create</title>
+		</event>
 	</transition>
 	<place>
 		<id>p1</id>
