@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
 	<id>permissions_test_default_8</id>
-	<initials>PTD</initials>
+    <version>1.0.0</version>
+    <initials>PTD</initials>
 	<title>Permissions test default 8</title>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->

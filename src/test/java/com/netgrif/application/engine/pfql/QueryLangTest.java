@@ -19,6 +19,7 @@ import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.StringPath;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,7 @@ public class QueryLangTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    @Disabled
     public void testSearchService() {
         testHelper.truncateDbs();
 

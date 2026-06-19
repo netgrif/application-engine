@@ -1,0 +1,1069 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>process</id>
+	<version>1.0.0</version>
+	<initials>PRO</initials>
+	<title>Process</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<caseName>New Process</caseName>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<function scope="process" name="deleteWithCases">
+		<![CDATA[
+		{ mongo_id, log_delete ->
+		    try {
+		        petriNetService.deletePetriNet(mongo_id.value, loggedUser().transformToLoggedUser())
+				change log_delete value { "Petri net deleted successfully" }
+		    } catch (Exception e) {
+		        String message = "Error deleting Petri net with ObjectId(${mongo_id.value}): ${e.message}" as String
+		        log.error(message, e)
+		        change log_delete value { message }
+		    }
+		}
+		]]>
+	</function>
+	<data type="text">
+		<id>copy_version</id>
+		<title>Version of the copy</title>
+	</data>
+	<data type="taskRef">
+		<id>form_ref</id>
+		<title/>
+		<inits>
+			<init>form</init>
+		</inits>
+	</data>
+	<data type="text">
+		<id>icon</id>
+		<title>Icon</title>
+		<init>device_hub</init>
+	</data>
+	<data type="text" immediate="true">
+		<id>id</id>
+		<title>Identifier</title>
+		<init>new_process</init>
+	</data>
+	<data type="text">
+		<id>log_archive</id>
+		<title>Log</title>
+	</data>
+	<data type="text">
+		<id>log_delete</id>
+		<title>Log</title>
+		<component>
+			<name>textarea</name>
+		</component>
+	</data>
+	<data type="text">
+		<id>log_deploy</id>
+		<title>Deploy Log</title>
+	</data>
+	<data type="text">
+		<id>message_archive</id>
+		<title/>
+		<init>This process version will be archived, existing instances will continue their execution, new instances could not be created.</init>
+		<component>
+			<name>richtextarea</name>
+		</component>
+	</data>
+	<data type="text">
+		<id>message_copy</id>
+		<title/>
+		<init>Finishing this task will create a copy of this process with increased version.</init>
+	</data>
+	<data type="text">
+		<id>message_delete</id>
+		<title/>
+		<init>This will permanently delete this process version and all its instances and tasks.</init>
+		<component>
+			<name>richtextarea</name>
+		</component>
+	</data>
+	<data type="text">
+		<id>message_deploy</id>
+		<title/>
+		<init>Finishing this task will deploy the process and enable creating new instances of this process.</init>
+	</data>
+	<data type="text">
+		<id>mongo_id</id>
+		<title>Mongo ID</title>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>state</id>
+		<title>State</title>
+		<options>
+			<option key="draft">Draft</option>
+			<option key="deployed">Deployed</option>
+			<option key="archived">Archived</option>
+			<option key="trash">In Trash</option>
+		</options>
+		<init>draft</init>
+	</data>
+	<data type="text" immediate="true">
+		<id>title</id>
+		<title>Title</title>
+		<init>New Process</init>
+		<event type="set">
+			<id>title_set</id>
+			<actions phase="post">
+				<action id="action9">
+					<![CDATA[
+					version: f.version,
+					title: f.title;
+					changeCaseProperty "title" about { "${title.value} ${version.value}" as String }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text" immediate="true">
+		<id>version</id>
+		<title>Version</title>
+		<validations>
+			<validation>
+				<expression>regex ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$</expression>
+			</validation>
+		</validations>
+		<init>1.0.0</init>
+		<event type="set">
+			<id>version_set</id>
+			<actions phase="post">
+				<action id="version_set">
+					<![CDATA[
+					version: f.version,
+					title: f.title;
+					changeCaseProperty "title" about { "${title.value} ${version.value}" as String }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="enumeration_map">
+		<id>version_increment</id>
+		<title>Version increment</title>
+		<options>
+			<option key="MAJOR">Major</option>
+			<option key="MINOR">Minor</option>
+			<option key="PATCH">Patch</option>
+		</options>
+		<event type="set">
+			<id>version_increment_set</id>
+			<actions phase="post">
+				<action id="action7">
+					<![CDATA[
+					version_increment: f.version_increment,
+					copy_version: f.copy_version,
+					version: f.version;
+				 	try {
+                        def newVersion = Version.from(version.value)
+                        newVersion.increment(version_increment.value as VersionType)
+                        change copy_version value { newVersion as String }
+                    } catch (Exception e) {
+                        log.error("Failed to calculate new version", e)
+                    }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="file">
+		<id>xml_file</id>
+		<title>XML file</title>
+	</data>
+	<data type="text">
+		<id>xml_text</id>
+		<title>XML Text</title>
+		<component>
+			<name>textarea</name>
+		</component>
+	</data>
+	<transition>
+		<id>deploy</id>
+		<x>176</x>
+		<y>176</y>
+		<label>Deploy</label>
+		<icon>upload_file</icon>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>deploy_0</id>
+			<cols>6</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>message_deploy</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>6</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>richtextarea</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>title</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>id</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>version</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>log_deploy</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>2</rows>
+					<cols>6</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+				</component>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>deploy_finish</id>
+			<title>Deploy</title>
+			<actions phase="pre">
+				<action id="action1">
+					<![CDATA[
+					state: f.state,
+					title: f.title,
+					version: f.version,
+					mongo_id: f.mongo_id,
+					xml_text: f.xml_text,
+					xml_file: f.xml_file,
+					form: t.form;
+
+					// TODO: move xml text to file field
+					def net = importPetriNet(xml_text.value as String)
+					change state value { "deployed" }
+					change mongo_id value { net.stringId }
+					make mongo_id,visible on form when { true }
+					make xml_file,visible on form when { true }
+					changeCaseProperty "title" about { "${title.value} ${version.value}" as String }
+
+					def editIsAssigned = useCase.tasks.any {it.transition == "edit"}
+					if (editIsAssigned) {
+						cancelTask("edit")
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>edit</id>
+		<x>80</x>
+		<y>80</y>
+		<label>Edit</label>
+		<icon>edit</icon>
+		<roleRef>
+			<id>default</id>
+			<logic>
+				<!--TODO: after builder merge-->
+				<!--<view>false</view>-->
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>edit_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>id</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>title</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>version</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>xml_text</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>form</id>
+		<x>176</x>
+		<y>80</y>
+		<label>Form</label>
+		<icon>format_align_justify</icon>
+		<roleRef>
+			<id>anonymous</id>
+			<logic>
+				<perform>false</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>default</id>
+			<logic>
+				<view>false</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>form_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>id</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>title</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>version</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>icon</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>mongo_id</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>state</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>xml_file</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t10</id>
+		<x>368</x>
+		<y>272</y>
+		<label>Delete with cases</label>
+		<icon>delete_forever</icon>
+		<dataGroup>
+			<id>t10_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>message_delete</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>log_delete</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>delete_with_cases_finish</id>
+			<title>Delete</title>
+			<actions phase="pre">
+				<action id="action_0">
+					<![CDATA[
+					state: f.state,
+					mongo_id: f.mongo_id,
+					log_delete: f.log_delete;
+
+					deleteWithCases(mongo_id, log_delete)
+					change state value { "trash" }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t11</id>
+		<x>464</x>
+		<y>272</y>
+		<label>Delete</label>
+		<icon>delete_forever</icon>
+		<dataGroup>
+			<id>t11_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>message_delete</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>richtextarea</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>log_delete</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+				</component>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t11_finish</id>
+			<title>Delete</title>
+			<actions phase="pre">
+				<action id="action8">
+					<![CDATA[
+					state: f.state,
+					mongo_id: f.mongo_id,
+					log_delete: f.log_delete;
+					deleteWithCases(mongo_id, log_delete)
+					change state value { "trash" }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t4</id>
+		<x>368</x>
+		<y>80</y>
+		<label>Create new version</label>
+		<icon>plus_one</icon>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>t4_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>message_copy</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>richtextarea</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>version_increment</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>copy_version</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t4_finish</id>
+			<actions phase="pre">
+				<action id="action3">
+					<![CDATA[
+					xml_text: f.xml_text,
+					icon: f.icon,
+					copy_version: f.copy_version,
+					version: f.version,
+					id: f.id,
+					title: f.title;
+
+					def updatedXml = xml_text.value.replace("<version>${version.value}</version>", "<version>${copy_version.value}</version>") as String
+					def newProcess = createCase("process", title.value)
+					def editTask = assignTask("edit", newProcess)
+					// TODO: extract metadata from xml_text and only set xml_text
+					setData(editTask, [
+							"id": [
+							        "type": "text",
+									"value": id.value
+							],
+							"version": [
+							        "type": "text",
+									"value": copy_version.value
+							],
+							"title": [
+							        "type": "text",
+									"value": title.value
+							],
+							"icon": [
+							        "type": "text",
+									"value": icon.value
+							],
+							"xml_text": [
+							        "type":"text",
+									"value": updatedXml
+							]
+					])
+					finishTask(editTask)
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t6</id>
+		<x>80</x>
+		<y>272</y>
+		<label>Delete</label>
+		<icon>delete_forever</icon>
+		<dataGroup>
+			<id>t6_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>message_delete</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>richtextarea</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>log_delete</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+				</component>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t6_finish</id>
+			<title>Delete</title>
+			<actions phase="pre">
+				<action id="action2">
+					<![CDATA[
+					state: f.state,
+					mongo_id: f.mongo_id,
+					log_delete: f.log_delete;
+
+					deleteWithCases(mongo_id, log_delete)
+					change state value { "trash" }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t9</id>
+		<x>368</x>
+		<y>208</y>
+		<label>Archive</label>
+		<icon>folder</icon>
+		<dataGroup>
+			<id>t9_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>message_archive</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>log_archive</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+				</component>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t9_finish</id>
+			<actions phase="pre">
+				<action id="action5">
+					<![CDATA[
+					mongo_id: f.mongo_id,
+					state: f.state;
+					// TODO: NAE-2447 boolean freeze - allow cases to finish execution
+					def net = findPetriNet(mongo_id.value)
+					petriNetService.archive(net, loggedUser().transformToLoggedUser())
+					change state value { "archived" }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>view</id>
+		<x>368</x>
+		<y>144</y>
+		<label>View</label>
+		<icon>remove_red_eye</icon>
+		<dataGroup>
+			<id>view_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>form_ref</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>xml_text</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>view_finish</id>
+			<title>Create</title>
+		</event>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>80</x>
+		<y>176</y>
+		<label>draft</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>272</x>
+		<y>272</y>
+		<label>deployed</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p5</id>
+		<x>464</x>
+		<y>208</y>
+		<label>archived</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p7</id>
+		<x>272</x>
+		<y>112</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p8</id>
+		<x>464</x>
+		<y>368</y>
+		<label>trash</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>read</type>
+		<sourceId>p1</sourceId>
+		<destinationId>edit</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a13</id>
+		<type>regular</type>
+		<sourceId>t9</sourceId>
+		<destinationId>p5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a14</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t9</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a17</id>
+		<type>regular</type>
+		<sourceId>deploy</sourceId>
+		<destinationId>p7</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a18</id>
+		<type>read</type>
+		<sourceId>p7</sourceId>
+		<destinationId>t4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a19</id>
+		<type>read</type>
+		<sourceId>p7</sourceId>
+		<destinationId>view</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>deploy</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a21</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t10</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a22</id>
+		<type>regular</type>
+		<sourceId>p7</sourceId>
+		<destinationId>t10</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a23</id>
+		<type>regular</type>
+		<sourceId>t10</sourceId>
+		<destinationId>p8</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a24</id>
+		<type>regular</type>
+		<sourceId>p5</sourceId>
+		<destinationId>t11</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a25</id>
+		<type>regular</type>
+		<sourceId>t11</sourceId>
+		<destinationId>p8</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a26</id>
+		<type>regular</type>
+		<sourceId>t6</sourceId>
+		<destinationId>p8</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a27</id>
+		<type>regular</type>
+		<sourceId>p7</sourceId>
+		<destinationId>t11</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>deploy</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a9</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t6</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

@@ -20,17 +20,6 @@ public class StringToVersionConverter implements Converter<String, Version> {
         if (NEWEST.equals(source) || LATEST.equals(source)) {
             return null;
         }
-
-        Version version = new Version();
-        try {
-            String[] split = source.split("\\.");
-            version.setMajor(Long.parseLong(split[0]));
-            version.setMinor(Long.parseLong(split[1]));
-            version.setPatch(Long.parseLong(split[2]));
-        } catch (Exception e) {
-            log.error("Could not parse version " + source + " caused by:", e);
-        }
-
-        return version;
+        return Version.from(source);
     }
 }
