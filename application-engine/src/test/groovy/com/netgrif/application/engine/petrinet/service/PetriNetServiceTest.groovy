@@ -6,6 +6,7 @@ import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.objects.auth.domain.*
+import com.netgrif.application.engine.adapter.spring.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
@@ -26,7 +27,6 @@ import com.netgrif.application.engine.workflow.domain.repositories.TaskRepositor
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired

@@ -174,6 +174,7 @@ class FilterImportExportTest {
             ]))
         })
         Task importTask = this.taskService.searchOne(QTask.task.caseId.eq(importCase.stringId).and(QTask.task.transitionId.eq("importFilter")))
+        this.taskService.assignTask(new TaskParams(importTask.getStringId(), dummyUser))
         this.dataService.setData(importTask, ImportHelper.populateDataset([
                 (IMPORTED_FILTERS_FIELD): [
                         "type" : "taskRef",
@@ -211,7 +212,12 @@ class FilterImportExportTest {
     }
 
     void reindexCases() {
-        reindexingTask.forceReindexPage(QCase.case$.lastModified.before(LocalDateTime.now()), 0, 1)
+        reindexingTask.forceReindexPage(
+                QCase.case$.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER)
+                        .and(QCase.case$.lastModified.before(LocalDateTime.now())),
+                0,
+                1
+        )
     }
 
     void waitForFilterCases(int expectedCount) {

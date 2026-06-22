@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import tools.jackson.databind.MapperFeature;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.module.SimpleModule;
 import com.netgrif.application.engine.auth.service.UserService;
@@ -324,6 +325,7 @@ public class MenuImportExportService implements IMenuImportExportService {
             File f = new File(ffv.getPath());
 
             XmlMapper xmlMapper = XmlMapper.builder()
+                    .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
                     .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_EMPTY))
                     .enable(SerializationFeature.INDENT_OUTPUT)
                     .enable(XmlWriteFeature.WRITE_XML_DECLARATION)

@@ -19,7 +19,6 @@ import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.auth.domain.Authority
 import com.netgrif.application.engine.objects.auth.domain.Group
-import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldValue
@@ -30,7 +29,7 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.data
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuAndFilters
 import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
+import com.netgrif.application.engine.adapter.spring.auth.domain.User
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired

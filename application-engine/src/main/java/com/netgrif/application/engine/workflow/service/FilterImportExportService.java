@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import tools.jackson.databind.MapperFeature;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.module.SimpleModule;
 import tools.jackson.dataformat.xml.XmlMapper;
@@ -365,6 +366,7 @@ public class FilterImportExportService implements IFilterImportExportService {
         }
 
         XmlMapper xmlMapper = XmlMapper.builder()
+                .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
                 .enable(SerializationFeature.INDENT_OUTPUT)
                 .enable(XmlWriteFeature.WRITE_XML_DECLARATION)
                 .changeDefaultPropertyInclusion(inclusion -> inclusion
@@ -425,6 +427,5 @@ public class FilterImportExportService implements IFilterImportExportService {
         }
     }
 }
-
 
 
