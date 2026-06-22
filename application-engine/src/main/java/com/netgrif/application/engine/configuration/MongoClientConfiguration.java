@@ -40,15 +40,15 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
                 .applyToSocketSettings(this::configureSocketSettings)
                 .applyToSslSettings(this::configureSslSettings)
                 .applyToServerSettings(this::configureServerSettings)
-                .applyToClusterSettings(this::configureClusterSettings);
-                //.applyToLoggerSettings(this::configureLoggerSettings);
+                .applyToClusterSettings(this::configureClusterSettings)
+                .applyToLoggerSettings(this::configureLoggerSettings);
     }
 
 
     protected void configureConnectionPoolSetting(ConnectionPoolSettings.Builder builder) {
         builder.maxSize(mongoProperties.getMaxConnections())
-                .minSize(mongoProperties.getMinConnections());
-               // .maxConnecting(mongoProperties.getMaxConnecting());
+                .minSize(mongoProperties.getMinConnections())
+                .maxConnecting(mongoProperties.getMaxConnecting());
 
         if (mongoProperties.getConnectionIdleTimeUnit() != null) {
             builder.maxConnectionIdleTime(mongoProperties.getConnectionIdleTime(), mongoProperties.getConnectionIdleTimeUnit());
@@ -65,7 +65,7 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
         if (mongoProperties.getSocketTimeoutUnit() != null) {
             builder.connectTimeout(mongoProperties.getSocketTimeout(), mongoProperties.getSocketTimeoutUnit());
         }
-        //builder.applyToProxySettings(this::configureProxySettings);
+        builder.applyToProxySettings(this::configureProxySettings);
     }
 
     protected void configureProxySettings(ProxySettings.Builder builder) {

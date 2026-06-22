@@ -26,7 +26,7 @@ netgrif:
           namespace: ${NETGRIF_ENGINE_DATA_REDIS_SESSION_NAMESPACE:netgrif}
         host: ${NETGRIF_ENGINE_DATA_REDIS_HOST:localhost}
         port: ${NETGRIF_ENGINE_DATA_REDIS_PORT:6379}
-    Jackson:
+    jackson:
       default-property-inclusion: non_null
       datatype:
         datetime:

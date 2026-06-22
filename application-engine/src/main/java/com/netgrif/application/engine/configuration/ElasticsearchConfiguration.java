@@ -3,10 +3,10 @@ package com.netgrif.application.engine.configuration;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.workflow.service.CaseEventHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.apache.http.impl.nio.reactor.IOReactorConfig;
-import org.apache.http.nio.conn.NHttpClientConnectionManager;
-import org.apache.http.nio.reactor.IOReactorException;
+import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
+import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
+import org.apache.hc.core5.reactor.IOReactorConfig;
+import org.apache.hc.core5.util.TimeValue;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.*;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
@@ -16,9 +16,12 @@ import org.springframework.data.elasticsearch.support.HttpHeaders;
 import java.time.Duration;
 import java.util.List;
 
-import static co.elastic.clients.transport.rest5_client.low_level.Rest5ClientBuilder.*;
-import static org.apache.http.impl.nio.reactor.IOReactorConfig.Builder.getDefaultMaxIoThreadCount;
+import static co.elastic.clients.transport.rest5_client.low_level.Rest5ClientBuilder.DEFAULT_CONNECT_TIMEOUT_MILLIS;
+import static co.elastic.clients.transport.rest5_client.low_level.Rest5ClientBuilder.DEFAULT_MAX_CONN_PER_ROUTE;
+import static co.elastic.clients.transport.rest5_client.low_level.Rest5ClientBuilder.DEFAULT_MAX_CONN_TOTAL;
 import static org.springframework.data.elasticsearch.client.elc.rest5_client.Rest5Clients.DEFAULT_SOCKET_TIMEOUT_MILLIS;
+import static org.springframework.data.elasticsearch.client.elc.rest5_client.Rest5Clients.ElasticsearchConnectionManagerCallback;
+import static org.springframework.data.elasticsearch.client.elc.rest5_client.Rest5Clients.ElasticsearchHttpClientConfigurationCallback;
 
 @Slf4j
 @Configuration
@@ -92,8 +95,8 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
             }
         }
 
-       // clientBuilder.withClientConfigurer(RestClients.ElasticsearchHttpClientConfigurationCallback.from(this::configureHttpAsyncClientBuilder))
-       //         .withClientConfigurer(RestClients.ElasticsearchRestClientConfigurationCallback.from(this::configureRestClientBuilder));
+        clientBuilder.withClientConfigurer(ElasticsearchHttpClientConfigurationCallback.from(this::configureHttpAsyncClientBuilder))
+                .withClientConfigurer(ElasticsearchConnectionManagerCallback.from(this::configureConnectionManager));
 
         long connectionTimeout = elasticsearchProperties.getConnectionTimeout();
         long socketTimeout = elasticsearchProperties.getSocketTimeout();
@@ -128,52 +131,37 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
         return new JacksonJsonpMapper(mapper);
     }*/
 
-    protected NHttpClientConnectionManager configureConnectionManager() throws IOReactorException {
-        return null;
-    }
-
     protected HttpAsyncClientBuilder configureHttpAsyncClientBuilder(HttpAsyncClientBuilder httpAsyncClientBuilder) {
-        NHttpClientConnectionManager connectionManager;
         int threadCount = elasticsearchProperties.getIoThreadCount();
-        int defaultMaxConnectionPerRoute = elasticsearchProperties.getDefaultMaxConnectionsPerHost();
-        int totalConnections = elasticsearchProperties.getMaxConnections();
-
-        try {
-            connectionManager = configureConnectionManager();
-        } catch (IOReactorException e) {
-            throw new IllegalStateException("Could not initialize IO reactor", e);
-        }
 
         if (threadCount <= 0) {
-            threadCount = getDefaultMaxIoThreadCount();
-        }
-
-        if (defaultMaxConnectionPerRoute <= 0) {
-            defaultMaxConnectionPerRoute = DEFAULT_MAX_CONN_PER_ROUTE;
-        }
-
-        if (totalConnections <= 0) {
-            totalConnections = DEFAULT_MAX_CONN_TOTAL;
+            threadCount = IOReactorConfig.DEFAULT.getIoThreadCount();
         }
 
         IOReactorConfig config = IOReactorConfig.custom()
                 .setIoThreadCount(threadCount)
                 .build();
 
-        httpAsyncClientBuilder
-                .setDefaultIOReactorConfig(config)
-                .setMaxConnPerRoute(defaultMaxConnectionPerRoute)
-                .setMaxConnTotal(totalConnections)
-                // these values are validated in PoolEntry PoolingNHttpClientConnectionManager respectively
-                .setConnectionTimeToLive(elasticsearchProperties.getConnectionTtl(), elasticsearchProperties.getConnectionTtlUnit());
-
-        if (connectionManager != null) {
-            httpAsyncClientBuilder.setConnectionManager(connectionManager);
-        }
-
-        return httpAsyncClientBuilder;
+        return httpAsyncClientBuilder.setIOReactorConfig(config);
     }
 
+    protected PoolingAsyncClientConnectionManagerBuilder configureConnectionManager(
+            PoolingAsyncClientConnectionManagerBuilder connectionManagerBuilder) {
+        int maxPerRoute = elasticsearchProperties.getDefaultMaxConnectionsPerHost();
+        int maxTotal = elasticsearchProperties.getMaxConnections();
+
+        connectionManagerBuilder
+                .setMaxConnPerRoute(maxPerRoute > 0 ? maxPerRoute : DEFAULT_MAX_CONN_PER_ROUTE)
+                .setMaxConnTotal(maxTotal > 0 ? maxTotal : DEFAULT_MAX_CONN_TOTAL);
+
+        if (elasticsearchProperties.getConnectionTtl() > 0 && elasticsearchProperties.getConnectionTtlUnit() != null) {
+            connectionManagerBuilder.setConnectionTimeToLive(TimeValue.of(
+                    elasticsearchProperties.getConnectionTtl(),
+                    elasticsearchProperties.getConnectionTtlUnit()));
+        }
+
+        return connectionManagerBuilder;
+    }
 
 
     private boolean hasCredentials() {
