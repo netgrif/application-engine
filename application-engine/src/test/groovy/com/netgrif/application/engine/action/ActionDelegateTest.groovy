@@ -4,6 +4,7 @@ import com.icegreen.greenmail.configuration.GreenMailConfiguration
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties
 import com.netgrif.application.engine.auth.service.UserService
@@ -73,7 +74,7 @@ class ActionDelegateTest {
         testHelper.truncateDbs()
         systemUser = userService.findByEmail(UserConstants.SYSTEM_USER_EMAIL, null)
         def loggedUser = ActorTransformer.toLoggedUser(systemUser)
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(loggedUser, null, loggedUser.authorities))
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(loggedUser, null, loggedUser.authoritySet as Set<AuthorityImpl>))
     }
 
     @Test

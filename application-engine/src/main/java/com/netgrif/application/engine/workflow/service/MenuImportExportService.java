@@ -141,7 +141,7 @@ public class MenuImportExportService implements IMenuImportExportService {
      */
     @Override
     public List<String> importMenu(List<Case> menuItemCases, FileFieldValue ffv, String parentId) throws IOException, IllegalMenuFileException, TransitionNotExecutableException {
-        StringBuilder resultMessage = new StringBuilder("");
+        StringBuilder resultMessage = new StringBuilder();
 
         List<String> importedEntryAndFilterCaseIds = new ArrayList<>();
         MenuAndFilters menuAndFilters = loadFromXML(ffv);

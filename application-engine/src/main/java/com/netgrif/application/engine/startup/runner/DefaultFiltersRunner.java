@@ -453,26 +453,26 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
                     .build());
 
             Map<String, Map<String, Object>> setDataMap = new LinkedHashMap<>();
-            setDataMap.put(FILTER_TYPE_FIELD_ID, Map.of(
-                    "type", "enumeration_map",
-                    "value", filterType
-            ));
-            setDataMap.put(FILTER_VISIBILITY_FIELD_ID, Map.of(
-                    "type", "enumeration_map",
-                    "value", filterVisibility
-            ));
-            setDataMap.put(FILTER_FIELD_ID, Map.of(
-                    "type", "filter",
-                    "value", filterQuery,
-                    "allowedNets", allowedNets,
-                    "filterMetadata", filterMetadata // TODO this is a map of <String, Object> that needs to be converted to string
-            ));
+            setDataMap.put(FILTER_TYPE_FIELD_ID, new LinkedHashMap<>() {{
+                put("type", "enumeration_map");
+                put("value", filterType);
+            }});
+            setDataMap.put(FILTER_VISIBILITY_FIELD_ID, new LinkedHashMap<>() {{
+                put("type", "enumeration_map");
+                put("value", filterVisibility);
+            }});
+            setDataMap.put(FILTER_FIELD_ID, new LinkedHashMap<>() {{
+                put("type", "filter");
+                put("value", filterQuery);
+                put("allowedNets", allowedNets);
+                put("filterMetadata", filterMetadata); // TODO this is a map of <String, Object> that needs to be converted to string
+            }});
 
             if (originId != null) {
-                setDataMap.put(viewOrigin ? FILTER_ORIGIN_VIEW_ID_FIELD_ID : FILTER_PARENT_CASE_ID_FIELD_ID, Map.of(
-                        "type", "text",
-                        "value", originId
-                ));
+                setDataMap.put(viewOrigin ? FILTER_ORIGIN_VIEW_ID_FIELD_ID : FILTER_PARENT_CASE_ID_FIELD_ID, new LinkedHashMap<>() {{
+                    put("type", "text");
+                    put("value", originId);
+                }});
             }
 
             this.dataService.setData(newFilterTask, ImportHelper.populateDatasetWithObject(setDataMap));
