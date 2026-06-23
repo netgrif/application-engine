@@ -291,11 +291,15 @@ public class MenuItemService implements IMenuItemService {
         if (MenuItemUtils.isCyclicNodePath(itemCase, destUri)) {
             throw new IllegalArgumentException(String.format("Cyclic path not supported. Destination path: %s", destUri));
         }
-        List<Case> casesToSave = new ArrayList<>();
-
-        List<String> oldParentIdAsList = MenuItemUtils.getCaseIdsFromCaseRef(itemCase, MenuItemConstants.FIELD_PARENT_ID);
 
         UriNode destNode = uriService.getOrCreate(destUri, UriContentType.CASE);
+        if (destNode.getStringId().equals(itemCase.getUriNodeId())) {
+            log.debug("Menu item case is already at URI: {}", destNode.getUriPath());
+            return;
+        }
+
+        List<Case> casesToSave = new ArrayList<>();
+        List<String> oldParentIdAsList = MenuItemUtils.getCaseIdsFromCaseRef(itemCase, MenuItemConstants.FIELD_PARENT_ID);
         Case newParent = getOrCreateFolderItem(destNode.getUriPath());
 
         if (oldParentIdAsList != null && !oldParentIdAsList.isEmpty()) {

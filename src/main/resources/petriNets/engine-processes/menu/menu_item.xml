@@ -40,6 +40,28 @@
 				</action>
 			</actions>
 		</event>
+		<event type="create">
+			<id>menu_item_create</id>
+			<actions phase="post">
+				<action id="1">
+					move_dest_uri: f.move_dest_uri,
+					initializeTrans: t.initialize;
+
+					String destUriPath = params["dest_uri_path"]
+					if (destUriPath == null || destUriPath.isEmpty()) {
+						return
+					}
+
+					def splitDestPathAsList = destUriPath.split(uriService.getUriSeparator()) as java.util.List
+					if (splitDestPathAsList.size() > 1) {
+						if (splitDestPathAsList.get(0).isEmpty()) {
+							splitDestPathAsList.set(0, uriService.getUriSeparator())
+						}
+						change move_dest_uri value { splitDestPathAsList }
+					}
+				</action>
+			</actions>
+		</event>
 	</caseEvents>
 	<role>
 		<id>system</id>
@@ -925,9 +947,17 @@
 				<action>
 					moveDestUri: f.move_dest_uri;
 
-					String uriNodeId = elasticCaseService.findUriNodeId(useCase)
-					def node = uriService.findById(uriNodeId)
-					updateMultichoiceWithCurrentNode(moveDestUri, node)
+					def node
+					if (moveDestUri.value != null &amp;&amp; !moveDestUri.value.isEmpty()) {
+						String uriPath = moveDestUri.value.join("/")
+						uriPath = uriPath.replace("//","/")
+						node = uriService.findByUri(uriPath)
+						change moveDestUri options { findOptionsBasedOnSelectedNode(node) }
+					} else {
+						String uriNodeId = elasticCaseService.findUriNodeId(useCase)
+						node = uriService.findById(uriNodeId)
+						updateMultichoiceWithCurrentNode(moveDestUri, node)
+					}
 				</action>
 			</actions>
 		</event>
@@ -974,6 +1004,7 @@
 					newUri = newUri.replace("//","/")
 
 					changeMenuItem useCase uri { newUri }
+					Frontend.reloadMenu()
 				</action>
 			</actions>
 			<title name="create_item_finish">Create</title>
@@ -1231,6 +1262,7 @@
 					newUri = newUri.replace("//","/")
 
 					changeMenuItem useCase uri { newUri }
+					Frontend.reloadMenu()
 				</action>
 			</actions>
 			<title name="move_item_finish">Move</title>
