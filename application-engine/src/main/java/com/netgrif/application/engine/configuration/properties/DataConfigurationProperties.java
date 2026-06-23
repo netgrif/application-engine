@@ -508,6 +508,12 @@ public class DataConfigurationProperties {
         private long connectionTtl;
 
         /**
+         * Forces generic JSON media type headers for Elasticsearch requests.
+         * This keeps the Elasticsearch Java 9 client usable against both Elasticsearch 8 and 9 nodes.
+         */
+        private boolean useGenericJsonMediaType = true;
+
+        /**
          * Specifies the time unit for connection TTL (Time-To-Live) in the application.
          * This determines the granularity of the connection TTL setting, such as
          * seconds, milliseconds, or another valid {@link TimeUnit}.

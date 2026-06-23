@@ -33,6 +33,10 @@ import static org.springframework.data.elasticsearch.client.elc.rest5_client.Res
 })
 public class ElasticsearchConfiguration extends org.springframework.data.elasticsearch.client.elc.ElasticsearchConfiguration {
 
+    private static final String ACCEPT_HEADER = "Accept";
+    private static final String CONTENT_TYPE_HEADER = "Content-Type";
+    private static final String GENERIC_JSON_MEDIA_TYPE = "application/json";
+
     private final DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
 
     public ElasticsearchConfiguration(DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties) {
@@ -142,7 +146,18 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
                 .setIoThreadCount(threadCount)
                 .build();
 
-        return httpAsyncClientBuilder.setIOReactorConfig(config);
+        httpAsyncClientBuilder.setIOReactorConfig(config);
+
+        if (elasticsearchProperties.isUseGenericJsonMediaType()) {
+            httpAsyncClientBuilder.addRequestInterceptorLast((request, entity, context) -> {
+                request.setHeader(ACCEPT_HEADER, GENERIC_JSON_MEDIA_TYPE);
+                if (entity != null || request.containsHeader(CONTENT_TYPE_HEADER)) {
+                    request.setHeader(CONTENT_TYPE_HEADER, GENERIC_JSON_MEDIA_TYPE);
+                }
+            });
+        }
+
+        return httpAsyncClientBuilder;
     }
 
     protected PoolingAsyncClientConnectionManagerBuilder configureConnectionManager(

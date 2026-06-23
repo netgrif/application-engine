@@ -97,8 +97,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-    ports:
-      - '6379:6379'
 
   nae-minio:
     image: bawix/minio:2022

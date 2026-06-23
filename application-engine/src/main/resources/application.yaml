@@ -16,6 +16,7 @@ netgrif:
         url: ${NETGRIF_ENGINE_DATA_ELASTIC_URL:localhost}
         port: ${NETGRIF_ENGINE_DATA_ELASTIC_PORT:9300}
         searchPort: ${NETGRIF_ENGINE_DATA_ELASTIC_SEARCH_PORT:9200}
+        use-generic-json-media-type: ${NETGRIF_ENGINE_DATA_ELASTIC_USE_GENERIC_JSON_MEDIA_TYPE:true}
         reindex: 0 0 * * * *
         index:
           petriNet: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_petrinet
