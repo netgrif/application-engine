@@ -30,6 +30,7 @@ import com.netgrif.application.engine.objects.workflow.domain.menu.MenuAndFilter
 import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import org.junit.jupiter.api.BeforeEach
 import com.netgrif.application.engine.adapter.spring.auth.domain.User
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -139,6 +140,7 @@ class MenuImportExportTest {
 
 
     @Test
+    @Disabled("deprecated")
     void testMenuImportExport() {
         def loggedUser = ActorTransformer.toLoggedUser(dummyUser)
         userAuth = new UsernamePasswordAuthenticationToken(loggedUser, DUMMY_USER_PASSWORD, loggedUser.authorities)

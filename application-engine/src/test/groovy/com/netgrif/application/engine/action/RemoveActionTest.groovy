@@ -1,16 +1,14 @@
 package com.netgrif.application.engine.action
 
-import com.netgrif.application.engine.auth.service.UserService
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.objects.auth.constants.UserConstants
+import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
+import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
-
 import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
-import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
@@ -21,14 +19,12 @@ import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import groovy.json.JsonOutput
 import org.junit.Assert
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.MongoTemplate
-import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -43,7 +39,6 @@ import static org.hamcrest.core.StringContains.containsString
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -105,7 +100,7 @@ class RemoveActionTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
-        importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Test", lastName : "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
+        importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Test", lastName : "Integration", username: USER_EMAIL, email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
     }
@@ -120,12 +115,13 @@ class RemoveActionTest {
     void addAndRemoveRole() {
         AbstractUser user = userService.findByEmail(USER_EMAIL, null)
         def loggedSuper = superCreator.getLoggedSuper()
-        auth = new UsernamePasswordAuthenticationToken(loggedSuper, "password", loggedSuper.authorities)
+        auth = new UsernamePasswordAuthenticationToken(loggedSuper, "password", loggedSuper.authoritySet as Collection<AuthorityImpl>)
 
         String adminRoleId = petriNet.getRoles().find { it.value.name.defaultValue == "admin" }.key
+        String managerRole = petriNet.getRoles().find { it.value.name.defaultValue == "manager" }.key
 
         //Has no role, we assign role admin
-        def content = JsonOutput.toJson([adminRoleId])
+        def content = JsonOutput.toJson([adminRoleId, managerRole])
         String userId = user.getStringId()
 
         mvc.perform(put(ROLE_API.formatted(user.getRealmId(),userId))

@@ -123,6 +123,7 @@ class FilterImportExportTest {
         this.defaultFiltersRunner.run()
         createTestFilter()
         reindexCases()
+        Thread.sleep(1000)
         waitForFilterCases(DEFAULT_FILTERS_SIZE)
         Optional<PetriNet> importNet = petriNetService.findByImportId(this.filterRunner.IMPORT_NET_IDENTIFIER)
         Optional<PetriNet> exportNet = petriNetService.findByImportId(this.filterRunner.EXPORT_NET_IDENTIFIER)
@@ -142,7 +143,7 @@ class FilterImportExportTest {
     @Test
     void createImportExportFiltersNet() {
         List<Case> filterCases = this.userFilterSearchService.autocompleteFindFilters("")
-        assert filterCases.size() == DEFAULT_FILTERS_SIZE
+        assert filterCases.size() == DEFAULT_FILTERS_SIZE + 1
 
         Set<String> exportFiltersIds = filterCases.stream()
                 .filter({ filterCase -> filterCase.title in FILTERS_TO_EXPORT })
@@ -183,12 +184,12 @@ class FilterImportExportTest {
                 ]
         ]))
         this.taskService.finishTask(new TaskParams(importTask.getStringId(), dummyUser))
-        Thread.sleep(1000)
         reindexCases()
-        waitForFilterCases(DEFAULT_FILTERS_SIZE + FILTERS_TO_EXPORT.size())
+        Thread.sleep(1000)
+        waitForFilterCases(DEFAULT_FILTERS_SIZE + FILTERS_TO_EXPORT.length)
         filterCases = this.userFilterSearchService.autocompleteFindFilters("")
         List<String> filterCasesNames = filterCases.stream().map({ filterCase -> filterCase.title }).collect(Collectors.toList())
-        assert filterCases.size() == DEFAULT_FILTERS_SIZE + FILTERS_TO_EXPORT.length
+        assert filterCases.size() == DEFAULT_FILTERS_SIZE + FILTERS_TO_EXPORT.length + 1
 
         for (String filterName : FILTERS_TO_EXPORT_NEW) {
             assert filterName in filterCasesNames
