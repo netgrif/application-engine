@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.filters
 
+import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
@@ -117,7 +118,7 @@ class FilterImportExportTest {
         this.testHelper.truncateDbs()
         dummyUser = createDummyUser()
         def loggedUser = ActorTransformer.toLoggedUser(dummyUser)
-        userAuth = new UsernamePasswordAuthenticationToken(loggedUser, DUMMY_USER_PASSWORD, loggedUser.authorities)
+        userAuth = new UsernamePasswordAuthenticationToken(loggedUser, DUMMY_USER_PASSWORD, loggedUser.authoritySet as Collection<AuthorityImpl>)
         SecurityContextHolder.getContext().setAuthentication(userAuth)
         this.defaultFiltersRunner.run()
         createTestFilter()
@@ -148,7 +149,7 @@ class FilterImportExportTest {
                 .map({ filterCase -> filterCase.stringId })
                 .collect(Collectors.toSet())
         exportFiltersIds.add(testFilter.stringId)
-        assert exportFiltersIds.size() == FILTERS_TO_EXPORT.size()
+        assert exportFiltersIds.size() == FILTERS_TO_EXPORT.length
 
         FileFieldValue exportedFiltersField = this.importExportService.exportFiltersToFile(exportFiltersIds)
         File exportedFiltersFile = new File(exportedFiltersField.getPath())
@@ -157,7 +158,7 @@ class FilterImportExportTest {
         importCase.dataSet.get(UPLOAD_FILE_FIELD).value = exportedFiltersField
         this.workflowService.save(importCase)
         List<String> importedTasksIds = this.importExportService.importFilters()
-        assert importedTasksIds.size() == FILTERS_TO_EXPORT.size()
+        assert importedTasksIds.size() == FILTERS_TO_EXPORT.length
 
         validateFilterXML(new FileInputStream(exportedFiltersField.getPath()))
         importedTasksIds.forEach({ taskId ->
@@ -187,7 +188,7 @@ class FilterImportExportTest {
         waitForFilterCases(DEFAULT_FILTERS_SIZE + FILTERS_TO_EXPORT.size())
         filterCases = this.userFilterSearchService.autocompleteFindFilters("")
         List<String> filterCasesNames = filterCases.stream().map({ filterCase -> filterCase.title }).collect(Collectors.toList())
-        assert filterCases.size() == DEFAULT_FILTERS_SIZE + FILTERS_TO_EXPORT.size()
+        assert filterCases.size() == DEFAULT_FILTERS_SIZE + FILTERS_TO_EXPORT.length
 
         for (String filterName : FILTERS_TO_EXPORT_NEW) {
             assert filterName in filterCasesNames
@@ -197,7 +198,7 @@ class FilterImportExportTest {
                 assert filterCase.dataSet.get(VISIBILITY_FIELD).value == FILTER_VISIBILITY_PRIVATE
             }
         }
-        for (int i = 0; i < FILTERS_TO_EXPORT.size(); i++) {
+        for (int i = 0; i < FILTERS_TO_EXPORT.length; i++) {
             Case filterCase1 = FILTERS_TO_EXPORT[i] == testFilter.title
                     ? testFilter
                     : filterCases.get(filterCasesNames.indexOf(FILTERS_TO_EXPORT[i]))

@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.actions;
 
+import com.netgrif.application.engine.adapter.spring.files.MultipartFileImpl;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.adapter.spring.actions.ActionApi;
@@ -42,7 +43,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -291,7 +291,7 @@ public class ActionApiImpl implements ActionApi {
     @Override
     public SetDataEventOutcome saveFile(String taskId, String fieldId, ActionFileHolder file, Map<String, String> params) {
         log.debug("Saving file [{}] for task [{}] and field [{}] with params [{}]", file.getFileName(), taskId, fieldId, params);
-        MultipartFile multipartFile = new MockMultipartFile(file.getFileName(), file.getFileName(), null, file.getFileContent());
+        MultipartFile multipartFile = new MultipartFileImpl(file.getFileName(), file.getFileName(), null, file.getFileContent());
         log.trace("Saving file [{}] for task [{}] and field [{}] with params [{}]", multipartFile.getOriginalFilename(), taskId, fieldId, params);
         return dataService.saveFile(taskId, fieldId, multipartFile, params);
     }
@@ -301,7 +301,7 @@ public class ActionApiImpl implements ActionApi {
         log.debug("Saving files [{}] for task [{}] and field [{}] with params [{}]", files.length, taskId, fieldId, params);
         MultipartFile[] multipartFiles = new MultipartFile[files.length];
         for (int i = 0; i < files.length; i++) {
-            multipartFiles[i] = new MockMultipartFile(files[i].getFileName(), files[i].getFileName(), null, files[i].getFileContent());
+            multipartFiles[i] = new MultipartFileImpl(files[i].getFileName(), files[i].getFileName(), null, files[i].getFileContent());
             log.trace("Saving file [{}] for task [{}] and field [{}] with params [{}]", multipartFiles[i].getOriginalFilename(), taskId, fieldId, params);
         }
         log.trace("Saving files [{}] for task [{}] and field [{}] with params [{}]", multipartFiles.length, taskId, fieldId, params);
