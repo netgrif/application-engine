@@ -38,10 +38,10 @@ import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldsReso
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedField;
 import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.i18n.LocaleContextHolder;
