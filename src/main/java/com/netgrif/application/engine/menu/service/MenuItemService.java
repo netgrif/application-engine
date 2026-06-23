@@ -293,10 +293,6 @@ public class MenuItemService implements IMenuItemService {
         }
 
         UriNode destNode = uriService.getOrCreate(destUri, UriContentType.CASE);
-        if (destNode.getStringId().equals(itemCase.getUriNodeId())) {
-            log.debug("Menu item case is already at URI: {}", destNode.getUriPath());
-            return;
-        }
 
         List<Case> casesToSave = new ArrayList<>();
         List<String> oldParentIdAsList = MenuItemUtils.getCaseIdsFromCaseRef(itemCase, MenuItemConstants.FIELD_PARENT_ID);
