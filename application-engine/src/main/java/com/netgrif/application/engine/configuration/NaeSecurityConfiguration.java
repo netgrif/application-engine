@@ -131,8 +131,8 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)));
         http.authenticationProvider(authenticationProviders.getFirst());
         http.sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS));
-        //configureFilters(http);
-       // configureSession(http);
+        configureFilters(http);
+        configureSession(http);
         setHeaders(http);
         setCsrf(http);
         corsEnable(http);

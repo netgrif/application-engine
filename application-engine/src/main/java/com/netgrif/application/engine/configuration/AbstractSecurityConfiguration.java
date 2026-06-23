@@ -219,7 +219,7 @@ public abstract class AbstractSecurityConfiguration {
         return patterns.toArray(new String[0]);
     }
 
-/*    protected void configureSession(HttpSecurity http) throws Exception {
+    protected void configureSession(HttpSecurity http) throws Exception {
         if (redisProperties.getSession().isEnabledLimitSession()) {
             http.sessionManagement(httpSecuritySessionManagementConfigurer -> {
                 httpSecuritySessionManagementConfigurer.maximumSessions(redisProperties.getSession().getMaxSession());
@@ -232,7 +232,7 @@ public abstract class AbstractSecurityConfiguration {
         if (redisProperties.getSession().isEnabledFilter()) {
 //            http.addFilterBefore(new LoginAttemptsFilter(), ChannelProcessingFilter.class);
         }
-    }*/
+    }
 
     protected boolean existConfigurationHeaders() {
         return getSecurityConfigProperties() != null && getSecurityConfigProperties().getHeaders() != null;
