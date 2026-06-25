@@ -1,7 +1,7 @@
 netgrif:
   engine:
     server:
-      port: 8089
+      port: 8080
     logging:
       endpoints: true
     data:
