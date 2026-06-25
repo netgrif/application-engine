@@ -37,7 +37,12 @@ public class NetgrifEnvironmentPostProcessor implements EnvironmentPostProcessor
                 Map<String, Object> map = ((MapPropertySource) propertySource).getSource();
                 map.keySet().stream()
                         .filter(key -> key.startsWith(customPrefix))
-                        .forEach(key -> override.put(originalPrefix + key.substring(customPrefix.length()), map.get(key)));
+                        .forEach(key -> {
+                            String property = environment.getProperty(key);
+                            if (property != null) {
+                                override.put(originalPrefix + key.substring(customPrefix.length()), property);
+                            }
+                        });
             }
         });
     }

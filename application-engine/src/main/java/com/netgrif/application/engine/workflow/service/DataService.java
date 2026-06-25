@@ -984,14 +984,14 @@ public class DataService implements IDataService {
         Object value;
         switch (getFieldTypeFromNode(node)) {
             case "date":
-                if (node.get("value") == null || node.get("value").isNull()) {
+                if (isEmptyOrNullValueNode(node.get("value"))) {
                     value = null;
                     break;
                 }
                 value = FieldFactory.parseDate(node.get("value").asText());
                 break;
             case "dateTime":
-                if (node.get("value") == null || node.get("value").isNull()) {
+                if (isEmptyOrNullValueNode(node.get("value"))) {
                     value = null;
                     break;
                 }
@@ -1001,28 +1001,32 @@ public class DataService implements IDataService {
                 value = !(node.get("value") == null || node.get("value").isNull()) && node.get("value").asBoolean();
                 break;
             case "multichoice":
-                value = parseMultichoiceFieldValues(node).stream().map(I18nString::new).collect(Collectors.toCollection(LinkedHashSet::new));
+                Set<String> multichoiceValues = parseMultichoiceFieldValues(node);
+                value = multichoiceValues == null
+                        ? null
+                        : multichoiceValues.stream().map(I18nString::new).collect(Collectors.toCollection(LinkedHashSet::new));
                 break;
             case "multichoice_map":
                 value = parseMultichoiceFieldValues(node);
                 break;
             case "enumeration":
-                if (node.get("value") == null || node.get("value").asText() == null || "null".equals(node.get("value").asText())) {
+                JsonNode enumerationValueNode = node.get("value");
+                if (isEmptyOrNullValueNode(enumerationValueNode)) {
                     value = null;
                     break;
                 }
-                value = parseI18nString(node.get("value"));
+                value = parseI18nString(enumerationValueNode);
                 break;
             case "user":
             case "actor":
-                if (node.get("value") == null || node.get("value").isNull()) {
+                if (isEmptyOrNullValueNode(node.get("value"))) {
                     value = null;
                     break;
                 }
                 value = makeActorFieldValue(node.get("value").asText());
                 break;
             case "number":
-                if (node.get("value") == null || node.get("value").isNull()) {
+                if (isEmptyOrNullValueNode(node.get("value"))) {
                     value = null;
                     break;
                 }
@@ -1061,7 +1065,7 @@ public class DataService implements IDataService {
                 break;
             case "userList":
             case "actorList":
-                if (node.get("value") == null) {
+                if (isEmptyOrNullValueNode(node.get("value"))) {
                     value = null;
                     break;
                 }
@@ -1098,7 +1102,11 @@ public class DataService implements IDataService {
     }
 
     private Set<String> parseMultichoiceFieldValues(ObjectNode node) {
-        ArrayNode arrayNode = (ArrayNode) node.get("value");
+        JsonNode valueNode = node.get("value");
+        if (isEmptyOrNullValueNode(valueNode)) {
+            return null;
+        }
+        ArrayNode arrayNode = (ArrayNode) valueNode;
         HashSet<String> set = new LinkedHashSet<>();
         arrayNode.forEach(item -> set.add(item.asText()));
         return set;
@@ -1145,10 +1153,11 @@ public class DataService implements IDataService {
     }
 
     private List<String> parseListString(ObjectNode node, String attributeKey) {
-        ArrayNode arrayNode = (ArrayNode) node.get(attributeKey);
-        if (arrayNode == null) {
+        JsonNode valueNode = node.get(attributeKey);
+        if (isEmptyOrNullValueNode(valueNode)) {
             return null;
         }
+        ArrayNode arrayNode = (ArrayNode) valueNode;
         ArrayList<String> list = new ArrayList<>();
         arrayNode.forEach(string -> list.add(string.asText()));
         return list;
@@ -1167,10 +1176,24 @@ public class DataService implements IDataService {
     }
 
     private I18nString parseI18nString(JsonNode node) {
+        if (isNullValueNode(node)) {
+            return null;
+        }
         if (node.isTextual()) {
             return new I18nString(node.asText());
         }
+        if (!node.isObject()) {
+            return new I18nString(node.asText());
+        }
         return parseI18nStringValues((ObjectNode) node);
+    }
+
+    private boolean isNullValueNode(JsonNode node) {
+        return node == null || node.isNull() || (node.isTextual() && "null".equalsIgnoreCase(node.asText()));
+    }
+
+    private boolean isEmptyOrNullValueNode(JsonNode node) {
+        return isNullValueNode(node) || (node.isTextual() && node.asText().isBlank());
     }
 
     private String getFieldTypeFromNode(ObjectNode node) {

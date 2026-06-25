@@ -4,6 +4,7 @@ import tools.jackson.databind.ObjectMapper
 import tools.jackson.databind.node.ObjectNode
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.AuthorityService
+import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
@@ -26,6 +27,7 @@ import com.netgrif.application.engine.workflow.service.TaskSearchService
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.web.TaskController
 import com.netgrif.application.engine.workflow.web.WorkflowController
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
@@ -88,6 +90,9 @@ class TaskControllerTest {
 
     @Autowired
     private TaskController taskController
+
+    @Autowired
+    private ObjectMapper objectMapper
 
     private PetriNet allDataNet
 
@@ -209,6 +214,37 @@ class TaskControllerTest {
         assert response != null && response.content.outcome != null
         assert !response.content.outcome.changedFields.changedFields.isEmpty()
         assert workflowService.findOne(testCase3.stringId).getDataField("text_0").getValue() == "awd"
+    }
+
+    @Test
+    void testSetDataOutcomeSerializesFrontendCaseProperty() {
+        Case testCase = helper.createCase("test set data outcome serializes frontend case property", setDataNet)
+        String taskId = testCase.tasks.find { it.transition == "data" }.task
+
+        ObjectNode dataSet = populateNestedDataset([(taskId): ["text_0": ["type": "text", "value": "frontend"]]])
+        def response = taskController.setData(taskId, dataSet, Locale.default)
+
+        def json = objectMapper.readTree(objectMapper.writeValueAsString(response.content))
+        assert json.at("/outcome/aCase/stringId").asText() == testCase.stringId
+        assert json.at("/outcome/task/stringId").asText() == taskId
+        assert json.at("/outcome/changedFields/changedFields/text_0/value").asText() == "frontend"
+        assert json.get("outcome").get("case") == null
+    }
+
+    @Test
+    void testCreateCaseOutcomeSerializesFrontendCaseProperty() {
+        def outcome = workflowService.createCase(CreateCaseParams.with()
+                .process(setDataNet)
+                .title("test create case outcome serializes frontend case property")
+                .author(superCreator.getLoggedSuper())
+                .locale(Locale.default)
+                .build())
+
+        def json = objectMapper.readTree(objectMapper.writeValueAsString(
+                LocalisedEventOutcomeFactory.from(outcome, Locale.default)))
+
+        assert json.at("/aCase/stringId").asText() == outcome.case.stringId
+        assert json.get("case") == null
     }
 
     @Test

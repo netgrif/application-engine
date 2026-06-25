@@ -224,6 +224,59 @@ class DataServiceTest {
     }
 
     @Test
+    void testSetDataEnumerationNullValue() {
+        def aCase = importHelper.createCase("test set data enumeration null value", setDataNet)
+
+        def taskId = importHelper.getTaskId("", aCase.stringId)
+        def caze = dataService.setData(taskId, ImportHelper.populateDataset([
+                "enumeration_0": [
+                        "type" : "enumeration",
+                        "value": null
+                ]
+        ] as Map)).getCase()
+
+        assert caze.getDataField("enumeration_0").getValue() == null
+    }
+
+    @Test
+    void testSetDataNumberEmptyStringAndNullValue() {
+        def aCase = importHelper.createCase("test set data number empty string and null value", setDataNet)
+
+        def taskId = importHelper.getTaskId("", aCase.stringId)
+        def caze = dataService.setData(taskId, ImportHelper.populateDatasetWithObject([
+                "number_0": [
+                        "type" : "number",
+                        "value": 12.34
+                ]
+        ] as Map)).getCase()
+        assert caze.getDataField("number_0").getValue() == 12.34d
+
+        caze = dataService.setData(taskId, ImportHelper.populateDataset([
+                "number_0": [
+                        "type" : "number",
+                        "value": ""
+                ]
+        ] as Map)).getCase()
+        assert caze.getDataField("number_0").getValue() == null
+
+        caze = dataService.setData(taskId, ImportHelper.populateDatasetWithObject([
+                "number_0": [
+                        "type" : "number",
+                        "value": 56.78
+                ]
+        ] as Map)).getCase()
+        assert caze.getDataField("number_0").getValue() == 56.78d
+
+        caze = dataService.setData(taskId, ImportHelper.populateDataset([
+                "number_0": [
+                        "type" : "number",
+                        "value": null
+                ]
+        ] as Map)).getCase()
+        assert caze.getDataField("number_0").getValue() == null
+    }
+
+    @Test
     void testSetDataProperties() {
         def aCase = importHelper.createCase("test set data properties", setDataNet)
 

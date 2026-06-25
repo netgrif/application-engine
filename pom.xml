@@ -76,13 +76,13 @@
         <bson.version>5.6.5</bson.version>
         <jackson.version>3.1.2</jackson.version>
         <jackson.version.jsr310>3.1.2</jackson.version.jsr310>
-        <spring.boot.version>4.0.6</spring.boot.version>
+        <spring.boot.version>4.1.0</spring.boot.version>
         <springdoc.version>3.0.3</springdoc.version>
 
         <mapstruct.version>1.6.3</mapstruct.version>
         <querydsl.version>5.1.0</querydsl.version>
         <protobuf.version>4.33.1</protobuf.version>
-        <grpc.version>1.69.1</grpc.version>
+        <grpc.version>1.80.0</grpc.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
 
         <sonar.organization>netgrif-oss</sonar.organization>
