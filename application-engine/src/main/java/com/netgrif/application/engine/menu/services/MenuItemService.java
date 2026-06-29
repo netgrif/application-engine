@@ -267,13 +267,12 @@ public class MenuItemService implements IMenuItemService {
         }
         List<Case> casesToSave = new ArrayList<>();
 
-        List<String> parentIdList = MenuItemUtils.getCaseIdsFromCaseRef(itemCase, MenuItemConstants.FIELD_PARENT_ID);
-        if (parentIdList != null && !parentIdList.isEmpty()) {
-            Case oldParent = removeChildItemFromParent(parentIdList.get(0), itemCase);
+        List<String> oldParentIdList = MenuItemUtils.getCaseIdsFromCaseRef(itemCase, MenuItemConstants.FIELD_PARENT_ID);
+        Case newParent = getOrCreateFolderItem(destUri);
+        if (oldParentIdList != null && !oldParentIdList.isEmpty()) {
+            Case oldParent = removeChildItemFromParent(oldParentIdList.get(0), itemCase);
             casesToSave.add(oldParent);
         }
-
-        Case newParent = getOrCreateFolderItem(destUri);
         if (newParent != null) {
             itemCase.getDataField(MenuItemConstants.FIELD_PARENT_ID).setValue(List.of(newParent.getStringId()));
             appendChildCaseIdInMemory(newParent, itemCase.getStringId());
