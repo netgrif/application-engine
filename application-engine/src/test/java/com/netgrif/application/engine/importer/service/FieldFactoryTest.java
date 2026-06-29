@@ -12,6 +12,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Date;
 
@@ -59,6 +60,18 @@ public class FieldFactoryTest {
     }
 
     @Test
+    public void parseDateFromStringUsesUtcForEpochMillisValues() {
+        long epochMillis = LocalDateTime.of(2026, 5, 29, 0, 30)
+                .toInstant(ZoneOffset.UTC)
+                .toEpochMilli();
+
+        assertEquals(
+                LocalDate.of(2026, 5, 29),
+                FieldFactory.parseDateFromString(String.valueOf(epochMillis))
+        );
+    }
+
+    @Test
     public void parseDateFromStringKeepsOffsetDateComponent() {
         assertEquals(
                 LocalDate.of(2026, 5, 29),
@@ -77,8 +90,9 @@ public class FieldFactoryTest {
     @Test
     public void parseDateHandlesDateStringLocalDateAndJavaDateValues() {
         Date javaDate = Date.from(LocalDate.of(2026, 5, 29)
-                .atStartOfDay()
-                .toInstant(ZoneOffset.UTC));
+                .atTime(LocalTime.NOON)
+                .atZone(ZoneId.systemDefault())
+                .toInstant());
 
         assertEquals(LocalDate.of(2026, 5, 29), FieldFactory.parseDate("2026-05-29"));
         assertEquals(LocalDate.of(2026, 5, 29), FieldFactory.parseDate(LocalDate.of(2026, 5, 29)));

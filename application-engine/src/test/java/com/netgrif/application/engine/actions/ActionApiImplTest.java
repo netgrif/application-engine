@@ -118,6 +118,10 @@ public class ActionApiImplTest {
         assertNotNull(deleted);
         assertNotNull(deleted.getCase());
         assertEquals(found.getStringId(), deleted.getCase().getStringId());
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> actionApi.findCase(found.getStringId())
+        );
     }
 
     @Test

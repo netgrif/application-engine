@@ -6,10 +6,12 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationWidget;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -61,6 +63,8 @@ public class PdfUtilsTest {
         assertNotNull(output);
         assertTrue(output.exists());
         assertTrue(output.length() > 0);
+        assertPdfContainsText(output, "Test value 1");
+        assertPdfContainsText(output, "Test address");
     }
 
     @Test
@@ -91,6 +95,8 @@ public class PdfUtilsTest {
         assertNotNull(output);
         assertTrue(output.exists());
         assertTrue(output.length() > 0);
+        assertPdfContainsText(output, "Test value 1");
+        assertPdfContainsText(output, "Test footer value");
     }
 
     @Test
@@ -129,6 +135,19 @@ public class PdfUtilsTest {
         assertNotNull(output);
         assertTrue(output.exists());
         assertTrue(output.length() > 0);
+        assertThrows(InvalidPasswordException.class, () -> PDDocument.load(output));
+
+        try (PDDocument document = PDDocument.load(output, "user")) {
+            assertTrue(document.isEncrypted());
+            assertFalse(document.getCurrentAccessPermission().canModify());
+        }
+    }
+
+    private void assertPdfContainsText(File pdf, String expectedText) throws Exception {
+        try (PDDocument document = PDDocument.load(pdf)) {
+            String text = new PDFTextStripper().getText(document);
+            assertTrue(text.contains(expectedText), "Expected PDF to contain text [" + expectedText + "]");
+        }
     }
 
     private File createTestPdfForm(Path output, List<String> fieldNames) throws Exception {
