@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ElasticTaskSearchRequest extends TaskSearchRequest {
-    public String query;
 
     public ElasticTaskSearchRequest(Map<String, Object> request) {
         if (request.containsKey("role") && request.get("role") instanceof List) {

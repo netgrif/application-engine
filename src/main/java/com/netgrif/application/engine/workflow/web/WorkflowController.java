@@ -138,7 +138,7 @@ public class WorkflowController {
             throw new BadRequestException("Bad request: " + e.getMessage());
         } catch (Exception e) {
             log.error("Something went wrong while searching cases by PFQL", e);
-            throw new InternalServerErrorException("Something went wrong");
+            throw new InternalServerErrorException("Something went wrong while searching cases by PFQL");
         }
     }
 
