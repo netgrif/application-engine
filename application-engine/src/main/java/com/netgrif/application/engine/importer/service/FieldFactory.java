@@ -141,14 +141,13 @@ public final class FieldFactory {
 
         try {
             return Instant.parse(value)
-                    .atZone(ZoneId.systemDefault())
+                    .atOffset(ZoneOffset.UTC)
                     .toLocalDate();
         } catch (DateTimeParseException ignored) {
         }
 
         try {
             return OffsetDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME)
-                    .atZoneSameInstant(ZoneId.systemDefault())
                     .toLocalDate();
         } catch (DateTimeParseException ignored) {
         }

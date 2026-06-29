@@ -5,13 +5,11 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
 import com.netgrif.application.engine.utils.SingleItemAsList;
 import com.netgrif.application.engine.utils.SingleItemAsListDeserializer;
-import lombok.extern.slf4j.Slf4j;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.BeanProperty;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.ValueDeserializer;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -27,22 +25,18 @@ import java.util.List;
  * It also provides a mechanism to dynamically determine the appropriate type
  * using the contextual information during deserialization.
  */
-@Slf4j
 public class CaseSearchRequestSingleItemAsListDeserializer extends SingleItemAsListDeserializer {
 
     public CaseSearchRequestSingleItemAsListDeserializer() {
         this(null);
-        log.info("Creating CaseSearchRequestSingleItemAsListDeserializer");
     }
 
     protected CaseSearchRequestSingleItemAsListDeserializer(Class<? extends SingleItemAsList> vc) {
         super(vc);
-        log.info("Creating CaseSearchRequestSingleItemAsListDeserializer with vc: {}", vc);
     }
 
     @Override
     public ValueDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) {
-        log.info("Creating contextual CaseSearchRequestSingleItemAsListDeserializer");
         return new CaseSearchRequestSingleItemAsListDeserializer(
                 (Class<? extends SingleItemAsList>) getItemClass(deserializationContext, beanProperty)
         );
@@ -63,13 +57,7 @@ public class CaseSearchRequestSingleItemAsListDeserializer extends SingleItemAsL
      */
     @Override
     public Object deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IllegalArgumentException {
-        log.info("Deserializing CaseSearchRequestSingleItemAsList");
-        log.info("Deserializing CaseSearchRequestSingleItemAsList with jsonParser: {}", jsonParser);
-
-        Object result = null;
-        result = super.deserialize(jsonParser, deserializationContext);
-
-        log.info("Deserializing CaseSearchRequestSingleItemAsList with result: {}", result);
+        Object result = super.deserialize(jsonParser, deserializationContext);
 
         if (isWrapperClass(result, SingleCaseSearchRequestAsList.class, CaseSearchRequest.class)) {
             List<CaseSearchRequest> list = ((SingleCaseSearchRequestAsList) result).getList();
@@ -80,7 +68,6 @@ public class CaseSearchRequestSingleItemAsListDeserializer extends SingleItemAsL
             });
         }
 
-        log.info("Deserializing CaseSearchRequestSingleItemAsList with result: {}", result);
         return result;
     }
 

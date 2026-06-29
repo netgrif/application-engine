@@ -16,9 +16,9 @@ public abstract class AbstractMultipartFile {
 
     public abstract long getSize();
 
-    public abstract byte[] getBytes();
+    public abstract byte[] getBytes() throws IOException;
 
-    public abstract InputStream getInputStream();
+    public abstract InputStream getInputStream() throws IOException;
 
     public abstract void transferTo(File dest) throws IOException, IllegalStateException;
 }

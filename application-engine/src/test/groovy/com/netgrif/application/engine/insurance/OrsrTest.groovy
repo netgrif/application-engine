@@ -21,6 +21,7 @@ class OrsrTest {
     private IOrsrService service
 
     @Test
+    @Disabled("External ORSR integration test depends on live registry data")
     void parseTest() {
         def ICO = 50_903_403 as String
         OrsrReference info = service.findByIco(ICO)

@@ -1227,7 +1227,12 @@ public class DataService implements IDataService {
             );
         }
 
-        return new I18nString(defaultValue, translations);
+        I18nString value = new I18nString(defaultValue, translations);
+        JsonNode keyNode = node.get("key");
+        if (keyNode != null && !keyNode.isNull()) {
+            value.setKey(keyNode.asText());
+        }
+        return value;
     }
 
     private Map<String, I18nString> parseOptionsNode(JsonNode node, String fieldType) {
@@ -1262,7 +1267,7 @@ public class DataService implements IDataService {
                 }
         );
 
-        if (optionsMapped == null || optionsMapped.isEmpty()) {
+        if (optionsMapped == null) {
             return null;
         }
 

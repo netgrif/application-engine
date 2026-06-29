@@ -377,6 +377,9 @@ class WorkflowAuthorizationServiceTest {
     private static String createdCaseId(def response) {
         def outcome = response.outcome
         def aCase = outcome?.get("acase") ?: outcome?.get("aCase") ?: outcome?.get("case")
+        if (aCase?.stringId) {
+            return aCase.stringId
+        }
         if (aCase?.id) {
             return aCase.id
         }

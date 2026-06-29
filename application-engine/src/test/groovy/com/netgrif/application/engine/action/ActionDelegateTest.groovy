@@ -20,6 +20,7 @@ import com.netgrif.application.engine.startup.runner.FilterRunner
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -75,6 +76,11 @@ class ActionDelegateTest {
         systemUser = userService.findByEmail(UserConstants.SYSTEM_USER_EMAIL, null)
         def loggedUser = ActorTransformer.toLoggedUser(systemUser)
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(loggedUser, null, loggedUser.authoritySet as Set<AuthorityImpl>))
+    }
+
+    @AfterEach
+    void after() {
+        SecurityContextHolder.clearContext()
     }
 
     @Test

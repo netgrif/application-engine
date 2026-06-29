@@ -12,7 +12,6 @@ import tools.jackson.databind.BeanProperty;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.ValueDeserializer;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -57,8 +56,7 @@ public class TaskSearchRequestSingleItemAsListDeserializer extends SingleItemAsL
      */
     @Override
     public Object deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IllegalArgumentException {
-        Object result = null;
-        result = super.deserialize(jsonParser, deserializationContext);
+        Object result = super.deserialize(jsonParser, deserializationContext);
 
         if (isWrapperClass(result, SingleTaskSearchRequestAsList.class, TaskSearchRequest.class) ||
                 isWrapperClass(result, SingleElasticTaskSearchRequestAsList.class, ElasticTaskSearchRequest.class)) {

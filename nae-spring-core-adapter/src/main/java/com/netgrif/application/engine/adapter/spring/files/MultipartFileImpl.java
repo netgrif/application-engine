@@ -16,6 +16,9 @@ public class MultipartFileImpl extends AbstractMultipartFile implements Multipar
     private byte[] content;
 
     public MultipartFileImpl(String name, String originalFilename, String contentType, byte[] content) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Name must not be null or empty");
+        }
         this.name = name;
         this.originalFilename = originalFilename;
         this.contentType = contentType;

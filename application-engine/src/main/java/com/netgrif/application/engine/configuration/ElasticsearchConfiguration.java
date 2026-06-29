@@ -36,6 +36,8 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
     private static final String ACCEPT_HEADER = "Accept";
     private static final String CONTENT_TYPE_HEADER = "Content-Type";
     private static final String GENERIC_JSON_MEDIA_TYPE = "application/json";
+    private static final String GENERIC_NDJSON_MEDIA_TYPE = "application/x-ndjson";
+    private static final String NDJSON_MEDIA_TYPE_SUFFIX = "x-ndjson";
 
     private final DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
 
@@ -123,18 +125,6 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
         return clientBuilder.build();
     }
 
- /**   @NotNull
-    @Override
-    public JsonpMapper jsonpMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeJsonSerializer());
-        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeJsonDeserializer());
-        mapper.registerModule(javaTimeModule);
-        return new JacksonJsonpMapper(mapper);
-    }*/
-
     protected HttpAsyncClientBuilder configureHttpAsyncClientBuilder(HttpAsyncClientBuilder httpAsyncClientBuilder) {
         int threadCount = elasticsearchProperties.getIoThreadCount();
 
@@ -151,7 +141,12 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
         if (elasticsearchProperties.isUseGenericJsonMediaType()) {
             httpAsyncClientBuilder.addRequestInterceptorLast((request, entity, context) -> {
                 request.setHeader(ACCEPT_HEADER, GENERIC_JSON_MEDIA_TYPE);
-                if (entity != null || request.containsHeader(CONTENT_TYPE_HEADER)) {
+                if (request.containsHeader(CONTENT_TYPE_HEADER)) {
+                    String contentType = request.getFirstHeader(CONTENT_TYPE_HEADER).getValue();
+                    request.setHeader(CONTENT_TYPE_HEADER, contentType.contains(NDJSON_MEDIA_TYPE_SUFFIX)
+                            ? GENERIC_NDJSON_MEDIA_TYPE
+                            : GENERIC_JSON_MEDIA_TYPE);
+                } else if (entity != null) {
                     request.setHeader(CONTENT_TYPE_HEADER, GENERIC_JSON_MEDIA_TYPE);
                 }
             });

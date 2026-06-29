@@ -118,9 +118,16 @@ class DynamicValidationTest {
     }
 
     def changedField(SetDataEventOutcome outcome, String fieldId) {
-        return outcome.changedFields[fieldId] ?: (outcome.outcomes.find {
-            it instanceof SetDataEventOutcome && (it as SetDataEventOutcome).changedFields.containsKey(fieldId)
-        } as SetDataEventOutcome)?.changedFields[fieldId]
+        if (outcome == null) {
+            return null
+        }
+        def direct = outcome.changedFields[fieldId]
+        if (direct != null) {
+            return direct
+        }
+        return outcome.outcomes.findResult { child ->
+            child instanceof SetDataEventOutcome ? changedField(child as SetDataEventOutcome, fieldId) : null
+        }
     }
 
     Task task(Case useCase) {

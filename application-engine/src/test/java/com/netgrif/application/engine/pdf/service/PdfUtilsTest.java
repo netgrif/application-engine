@@ -25,7 +25,10 @@ public class PdfUtilsTest {
         File input = new File("src/test/resources/pdf/test.pdf");
         File xml = new File("src/test/resources/pdf/test.xml");
 
-        File out = PdfUtils.fillPdfForm("target/test_out.pdf", new FileInputStream(preparePdfFormFonts(input)), Files.readString(xml.toPath(), StandardCharsets.UTF_8));
+        File out;
+        try (FileInputStream inputStream = new FileInputStream(preparePdfFormFonts(input))) {
+            out = PdfUtils.fillPdfForm("target/test_out.pdf", inputStream, Files.readString(xml.toPath(), StandardCharsets.UTF_8));
+        }
 
         assert out != null;
     }
@@ -35,7 +38,10 @@ public class PdfUtilsTest {
         File input = new File("src/test/resources/pdf/draft.pdf");
         File xml = new File("src/test/resources/pdf/draft.xml");
 
-        File out = PdfUtils.fillPdfForm("target/test_out_premiovebyvanie.pdf", new FileInputStream(preparePdfFormFonts(input)), Files.readString(xml.toPath(), StandardCharsets.UTF_8));
+        File out;
+        try (FileInputStream inputStream = new FileInputStream(preparePdfFormFonts(input))) {
+            out = PdfUtils.fillPdfForm("target/test_out_premiovebyvanie.pdf", inputStream, Files.readString(xml.toPath(), StandardCharsets.UTF_8));
+        }
 
         assert out != null;
     }

@@ -33,7 +33,7 @@ public class UserFilterSearchService implements IUserFilterSearchService {
                                 .query(
                                         String.format("(title:%s*) AND ((dataSet.visibility.keyValue:private AND authorUsername:%s) OR (dataSet.visibility.keyValue:public))",
                                                 userInput,
-                                                userService.getLoggedUser().getEmail())
+                                                userService.getLoggedUser().getUsername())
                                 )
                                 .transition(Collections.singletonList("view_filter"))
                                 .build()
