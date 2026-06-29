@@ -50,6 +50,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.*;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -352,11 +353,12 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Transactional
     protected FileFieldValue createXML(FilterImportExportList filters) throws IOException {
-        String filePath = fileStorageConfiguration.getPath()
-                + "/filterExport/"
-                + userService.getLoggedUser().getStringId()
-                + "/"
-                + filterProperties.getExport().getFileName();
+        String filePath = Path.of(
+                fileStorageConfiguration.getPath(),
+                "filterExport",
+                userService.getLoggedUser().getStringId(),
+                filterProperties.getExport().getFileName()
+        ).toString();
 
         File f = new File(filePath);
         File parent = f.getParentFile();
@@ -427,5 +429,4 @@ public class FilterImportExportService implements IFilterImportExportService {
         }
     }
 }
-
 

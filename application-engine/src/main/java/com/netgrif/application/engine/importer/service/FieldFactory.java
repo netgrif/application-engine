@@ -29,6 +29,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public final class FieldFactory {
 
+    private static final List<DateTimeFormatter> LOCAL_DATE_FORMATTERS = List.of(
+            DateTimeFormatter.BASIC_ISO_DATE,
+            DateTimeFormatter.ISO_DATE,
+            DateTimeFormatter.ofPattern("dd.MM.yyyy")
+    );
+
     @Autowired
     private StorageConfigurationProperties fileStorageConfiguration;
 
@@ -113,47 +119,67 @@ public final class FieldFactory {
         if (value.isEmpty())
             return null;
 
-        List<String> patterns = Arrays.asList("dd.MM.yyyy");
+        LocalDate localDate = parseLocalDate(value);
+        if (localDate != null)
+            return localDate;
 
+        LocalDate epochMillisDate = parseEpochMillisDate(value);
+        if (epochMillisDate != null)
+            return epochMillisDate;
+
+        LocalDate offsetDate = parseOffsetDate(value);
+        if (offsetDate != null)
+            return offsetDate;
+
+        LocalDate instantDate = parseInstantDate(value);
+        if (instantDate != null)
+            return instantDate;
+
+        LocalDateTime dateTime = parseDateTimeFromString(value);
+        return dateTime != null ? dateTime.toLocalDate() : null;
+    }
+
+    private static LocalDate parseLocalDate(String value) {
+        for (DateTimeFormatter formatter : LOCAL_DATE_FORMATTERS) {
+            try {
+                return LocalDate.parse(value, formatter);
+            } catch (DateTimeParseException ignored) {
+                // Try the next supported local date format.
+            }
+        }
+        return null;
+    }
+
+    private static LocalDate parseEpochMillisDate(String value) {
+        if (!value.matches("-?\\d{9,}")) {
+            return null;
+        }
         try {
-            return LocalDate.parse(value, DateTimeFormatter.BASIC_ISO_DATE);
-        } catch (DateTimeParseException e) {
-            try {
-                return LocalDate.parse(value, DateTimeFormatter.ISO_DATE);
-            } catch (DateTimeParseException ex) {
-                for (String pattern : patterns) {
-                    try {
-                        return LocalDate.parse(value, DateTimeFormatter.ofPattern(pattern));
-                    } catch (DateTimeParseException | IllegalArgumentException ignored) {
-                    }
-                }
-            }
+            return Instant.ofEpochMilli(Long.parseLong(value))
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+        } catch (NumberFormatException ignored) {
+            return null;
         }
+    }
 
-        if (value.matches("-?\\d{9,}")) {
-            try {
-                return Instant.ofEpochMilli(Long.parseLong(value))
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDate();
-            } catch (NumberFormatException ignored) {
-            }
-        }
-
+    private static LocalDate parseInstantDate(String value) {
         try {
             return Instant.parse(value)
                     .atOffset(ZoneOffset.UTC)
                     .toLocalDate();
         } catch (DateTimeParseException ignored) {
+            return null;
         }
+    }
 
+    private static LocalDate parseOffsetDate(String value) {
         try {
             return OffsetDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME)
                     .toLocalDate();
         } catch (DateTimeParseException ignored) {
+            return null;
         }
-
-        LocalDateTime dateTime = parseDateTimeFromString(value);
-        return dateTime != null ? dateTime.toLocalDate() : null;
     }
 
     public static LocalDateTime parseDateTime(Object value) {

@@ -72,6 +72,7 @@ import java.util.stream.LongStream;
 public class DataService implements IDataService {
 
     private static final Set<FieldType> setDataForbiddenFieldTypes = Set.of(FieldType.TASK_REF, FieldType.CASE_REF);
+    private static final String CHOICES_ATTRIBUTE = "choices";
 
     @Autowired
     protected ApplicationEventPublisher publisher;
@@ -361,7 +362,7 @@ public class DataService implements IDataService {
             if (choices != null) {
                 dataField.setChoices(choices);
                 changedField.addAttribute(
-                        "choices",
+                        CHOICES_ATTRIBUTE,
                         choices.stream()
                                 .map(i18nString -> i18nString.getTranslation(LocaleContextHolder.getLocale()))
                                 .collect(Collectors.toSet())
@@ -1285,7 +1286,7 @@ public class DataService implements IDataService {
             Set<I18nString> choices = new LinkedHashSet<>();
             options.forEach((key, value) -> choices.add(value));
             dataField.setChoices(choices);
-            changedField.addAttribute("choices", choices
+            changedField.addAttribute(CHOICES_ATTRIBUTE, choices
                     .stream()
                     .map(i18nString -> i18nString
                             .getTranslation(LocaleContextHolder.getLocale())).collect(Collectors.toSet()));
@@ -1294,7 +1295,7 @@ public class DataService implements IDataService {
 
     private Set<I18nString> parseChoicesNode(ObjectNode node, String fieldType) {
         if (Objects.equals(fieldType, FieldType.ENUMERATION.getName()) || Objects.equals(fieldType, FieldType.MULTICHOICE.getName())) {
-            List<I18nString> list = parseListI18nString(node, "choices");
+            List<I18nString> list = parseListI18nString(node, CHOICES_ATTRIBUTE);
             if (list != null) {
                 return new HashSet<>(list);
             }

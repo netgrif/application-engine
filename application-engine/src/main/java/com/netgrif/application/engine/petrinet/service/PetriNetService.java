@@ -401,7 +401,7 @@ public class PetriNetService implements IPetriNetService {
         return results.getMappedResults().stream()
                 .map(document -> document.getString("identifier"))
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

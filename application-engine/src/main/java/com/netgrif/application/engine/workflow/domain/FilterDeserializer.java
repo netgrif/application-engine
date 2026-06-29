@@ -11,8 +11,6 @@ import tools.jackson.databind.util.ClassUtil;
 
 import java.util.*;
 
-import static com.netgrif.application.engine.objects.utils.Serializer.deserialize;
-
 /**
  * Class that helps with deserialization of exported filter xml file in process of importing filters.
  */
