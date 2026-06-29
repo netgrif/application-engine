@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
 #  eng:
-#    image: netgrif/application-engine:7.0.0-RC10.60
+#    image: netgrif/application-engine:7.0.0-RC10.6
 #    ports:
 #      - "8080:8080"
 #    environment:
