@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
-@AllArgsConstructor
 public class ElasticTaskSearchRequest extends TaskSearchRequest {
 
     public ElasticTaskSearchRequest(Map<String, Object> request) {
