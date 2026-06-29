@@ -2,104 +2,230 @@ package com.netgrif.application.engine.pdf.service;
 
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationWidget;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
+import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.nio.file.Path;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PdfUtilsTest {
 
-    private static final Pattern KLAVIKA_FONT_PATTERN = Pattern.compile("/(KlavikaBasic-[^\\s]+)");
+    private static final String TEST_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <fields xmlns:xfdf="http://ns.adobe.com/xfdf-transition/">
+                <TextField143 xfdf:original="Text Field 143">Test value 1</TextField143>
+                <TextField50 xfdf:original="Text Field 50">+ľščťžýáíéúäňô§</TextField50>
+                <fxtag xfdf:original="1">Test value 2</fxtag>
+                <fxtag xfdf:original="21">Test address</fxtag>
+                <TextField153 xfdf:original="Text Field 153">Test footer value</TextField153>
+            </fields>
+            """;
+
+    @TempDir
+    Path tempDir;
 
     @Test
     public void fillPdfForm() throws Exception {
-        File input = new File("src/test/resources/pdf/test.pdf");
-        File xml = new File("src/test/resources/pdf/test.xml");
+        File input = createTestPdfForm(
+                tempDir.resolve("test-form.pdf"),
+                List.of(
+                        "Text Field 143",
+                        "Text Field 50",
+                        "1",
+                        "21",
+                        "Text Field 153"
+                )
+        );
 
-        File out;
-        try (FileInputStream inputStream = new FileInputStream(preparePdfFormFonts(input))) {
-            out = PdfUtils.fillPdfForm("target/test_out.pdf", inputStream, Files.readString(xml.toPath(), StandardCharsets.UTF_8));
+        File output;
+        try (FileInputStream inputStream = new FileInputStream(input)) {
+            output = PdfUtils.fillPdfForm(
+                    tempDir.resolve("test-out.pdf").toString(),
+                    inputStream,
+                    TEST_XML
+            );
         }
 
-        assert out != null;
+        assertNotNull(output);
+        assertTrue(output.exists());
+        assertTrue(output.length() > 0);
     }
 
     @Test
-    public void fillPdfFormPoisteniePremioveByvanie() throws Exception {
-        File input = new File("src/test/resources/pdf/draft.pdf");
-        File xml = new File("src/test/resources/pdf/draft.xml");
+    public void fillPdfFormWithMultipleFields() throws Exception {
+        File input = createTestPdfForm(
+                tempDir.resolve("test-form-multiple-fields.pdf"),
+                List.of(
+                        "Text Field 143",
+                        "Text Field 50",
+                        "1",
+                        "21",
+                        "22",
+                        "23",
+                        "24",
+                        "Text Field 153"
+                )
+        );
 
-        File out;
-        try (FileInputStream inputStream = new FileInputStream(preparePdfFormFonts(input))) {
-            out = PdfUtils.fillPdfForm("target/test_out_premiovebyvanie.pdf", inputStream, Files.readString(xml.toPath(), StandardCharsets.UTF_8));
+        File output;
+        try (FileInputStream inputStream = new FileInputStream(input)) {
+            output = PdfUtils.fillPdfForm(
+                    tempDir.resolve("test-out-multiple-fields.pdf").toString(),
+                    inputStream,
+                    TEST_XML
+            );
         }
 
-        assert out != null;
+        assertNotNull(output);
+        assertTrue(output.exists());
+        assertTrue(output.length() > 0);
     }
 
     @Test
-    public void mergePdf() {
-        File f1 = new File("src/test/resources/pdf/test.pdf");
-        File f2 = new File("src/test/resources/pdf/test.pdf");
-        File f3 = new File("src/test/resources/pdf/test.pdf");
+    public void mergePdf() throws Exception {
+        File f1 = createSimplePdf(tempDir.resolve("test-1.pdf"), "Test PDF 1");
+        File f2 = createSimplePdf(tempDir.resolve("test-2.pdf"), "Test PDF 2");
+        File f3 = createSimplePdf(tempDir.resolve("test-3.pdf"), "Test PDF 3");
 
-        File out = PdfUtils.mergePdfFiles("target/test_out_2.pdf", f1, f2, f3);
+        File output = PdfUtils.mergePdfFiles(
+                tempDir.resolve("test-merged.pdf").toString(),
+                f1,
+                f2,
+                f3
+        );
 
-        assert out != null;
+        assertNotNull(output);
+        assertTrue(output.exists());
+        assertTrue(output.length() > 0);
+
+        try (PDDocument document = PDDocument.load(output)) {
+            assertEquals(3, document.getNumberOfPages());
+        }
     }
 
     @Test
-    public void encryptPdf() {
-        File input = new File("src/test/resources/pdf/test.pdf");
+    public void encryptPdf() throws Exception {
+        File input = createSimplePdf(tempDir.resolve("test-encrypt-input.pdf"), "PDF to encrypt");
 
-        File output = PdfUtils.encryptPdfFile("target/test_encrypt.pdf", input, "owner", "user");
+        File output = PdfUtils.encryptPdfFile(
+                tempDir.resolve("test-encrypted.pdf").toString(),
+                input,
+                "owner",
+                "user"
+        );
 
-        assert output != null;
+        assertNotNull(output);
+        assertTrue(output.exists());
+        assertTrue(output.length() > 0);
     }
 
-    private File preparePdfFormFonts(File input) throws Exception {
-        File output = File.createTempFile("pdf-utils-test-", ".pdf", new File("target"));
+    private File createTestPdfForm(Path output, List<String> fieldNames) throws Exception {
         File fontFile = new File("src/main/resources/pdfGenerator/fonts/Roboto-Light.ttf");
-        try (PDDocument document = PDDocument.load(input);
+
+        try (PDDocument document = new PDDocument();
              FileInputStream fontInput = new FileInputStream(fontFile)) {
-            PDAcroForm acroForm = document.getDocumentCatalog().getAcroForm();
-            PDResources resources = acroForm.getDefaultResources();
-            if (resources == null) {
-                resources = new PDResources();
-            }
-            PDType0Font fallbackFont = PDType0Font.load(document, fontInput, true);
-            for (String fontName : findKlavikaFontNames(acroForm)) {
-                resources.put(COSName.getPDFName(fontName), fallbackFont);
-            }
+
+            PDPage page = new PDPage(PDRectangle.A4);
+            document.addPage(page);
+
+            PDType0Font font = PDType0Font.load(document, fontInput, true);
+
+            PDResources resources = new PDResources();
+            resources.put(COSName.getPDFName("Roboto"), font);
+
+            PDAcroForm acroForm = new PDAcroForm(document);
             acroForm.setDefaultResources(resources);
-            document.save(output);
+            acroForm.setDefaultAppearance("/Roboto 10 Tf 0 g");
+            acroForm.setNeedAppearances(true);
+
+            document.getDocumentCatalog().setAcroForm(acroForm);
+
+            float y = 750;
+            int index = 1;
+
+            for (String fieldName : fieldNames) {
+                addTextField(document, page, acroForm, fieldName, "Field " + index, 50, y);
+                y -= 35;
+                index++;
+            }
+
+            document.save(output.toFile());
         }
-        return output;
+
+        return output.toFile();
     }
 
-    private Set<String> findKlavikaFontNames(PDAcroForm acroForm) {
-        Set<String> names = new HashSet<>();
-        collectKlavikaFontNames(acroForm.getCOSObject().getString(COSName.DA), names);
-        acroForm.getFieldTree().forEach(field -> collectKlavikaFontNames(field.getCOSObject().getString(COSName.DA), names));
-        return names;
+    private void addTextField(
+            PDDocument document,
+            PDPage page,
+            PDAcroForm acroForm,
+            String fieldName,
+            String label,
+            float x,
+            float y
+    ) throws Exception {
+        PDResources resources = acroForm.getDefaultResources();
+        PDType0Font font = (PDType0Font) resources.getFont(COSName.getPDFName("Roboto"));
+
+        try (PDPageContentStream contentStream = new PDPageContentStream(
+                document,
+                page,
+                PDPageContentStream.AppendMode.APPEND,
+                true
+        )) {
+            contentStream.beginText();
+            contentStream.setFont(font, 10);
+            contentStream.newLineAtOffset(x, y + 5);
+            contentStream.showText(label);
+            contentStream.endText();
+        }
+
+        PDTextField field = new PDTextField(acroForm);
+        field.setPartialName(fieldName);
+        field.setDefaultAppearance("/Roboto 10 Tf 0 g");
+
+        PDAnnotationWidget widget = field.getWidgets().get(0);
+        widget.setRectangle(new PDRectangle(x + 100, y, 250, 20));
+        widget.setPage(page);
+
+        page.getAnnotations().add(widget);
+        acroForm.getFields().add(field);
     }
 
-    private void collectKlavikaFontNames(String defaultAppearance, Set<String> names) {
-        if (defaultAppearance == null) {
-            return;
+    private File createSimplePdf(Path output, String text) throws Exception {
+        File fontFile = new File("src/main/resources/pdfGenerator/fonts/Roboto-Light.ttf");
+
+        try (PDDocument document = new PDDocument();
+             FileInputStream fontInput = new FileInputStream(fontFile)) {
+
+            PDPage page = new PDPage(PDRectangle.A4);
+            document.addPage(page);
+
+            PDType0Font font = PDType0Font.load(document, fontInput, true);
+
+            try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
+                contentStream.beginText();
+                contentStream.setFont(font, 12);
+                contentStream.newLineAtOffset(50, 750);
+                contentStream.showText(text);
+                contentStream.endText();
+            }
+
+            document.save(output.toFile());
         }
-        Matcher matcher = KLAVIKA_FONT_PATTERN.matcher(defaultAppearance);
-        while (matcher.find()) {
-            names.add(matcher.group(1));
-        }
+
+        return output.toFile();
     }
 }
