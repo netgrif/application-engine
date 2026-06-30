@@ -2487,7 +2487,11 @@ class ActionDelegate {
         if (!childrenIds.isEmpty()) {
             for (String id : childrenIds) {
                 UriNode childNode = uriService.findById(id)
-                options.put(childNode.name, new I18nString(childNode.name))
+                Case folderCase = menuItemService.findFolderCase(childNode)
+                if (folderCase != null) {
+                    I18nString name = (I18nString) folderCase.getFieldValue(MenuItemConstants.FIELD_MENU_NAME)
+                    options.put(childNode.name, name)
+                }
             }
         }
 

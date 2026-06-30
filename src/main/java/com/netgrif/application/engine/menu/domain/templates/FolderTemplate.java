@@ -16,6 +16,7 @@ public class FolderTemplate implements Template {
         MenuItemBody menuItemBody = new MenuItemBody();
         menuItemBody.setConfigurationTemplateIdentifier(IDENTIFIER);
         menuItemBody.setUseTabbedView(false);
+        menuItemBody.setIsFolder(true);
         return menuItemBody;
     }
 

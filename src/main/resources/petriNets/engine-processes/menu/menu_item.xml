@@ -257,18 +257,15 @@
 		<title/>
 	</data>
 	<data type="boolean" immediate="true">
-		<id>hasChildren</id>
+		<id>is_folder</id>
 		<title/>
 	</data>
 	<data type="button">
 		<id>duplicate_reset_childItemIds</id>
 		<title/>
 		<action trigger="set">
-			hasChildren: f.hasChildren,
 			childItemIds: f.childItemIds;
-
 			change childItemIds value { [] }
-			change hasChildren value { false }
 		</action>
 	</data>
 	<data type="text" immediate="true">
@@ -1907,7 +1904,7 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>hasChildren</id>
+				<id>is_folder</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
