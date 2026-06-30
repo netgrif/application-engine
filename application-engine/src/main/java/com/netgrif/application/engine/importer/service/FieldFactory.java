@@ -176,6 +176,7 @@ public final class FieldFactory {
     private static LocalDate parseOffsetDate(String value) {
         try {
             return OffsetDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME)
+                    .atZoneSameInstant(ZoneId.systemDefault())
                     .toLocalDate();
         } catch (DateTimeParseException ignored) {
             return null;
