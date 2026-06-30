@@ -6,6 +6,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.objects.workflow.domain.Task
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
@@ -116,17 +117,17 @@ class DynamicValidationTest {
         return dataService.setData(task, ImportHelper.populateDataset(values))
     }
 
-    def changedField(SetDataEventOutcome outcome, String fieldId) {
+    def changedField(EventOutcome outcome, String fieldId) {
         if (outcome == null) {
             return null
         }
-        def direct = outcome.changedFields[fieldId]
-        if (direct != null) {
-            return direct
+        if (outcome instanceof SetDataEventOutcome) {
+            def direct = outcome.changedFields[fieldId]
+            if (direct != null) {
+                return direct
+            }
         }
-        return outcome.outcomes.findResult { child ->
-            child instanceof SetDataEventOutcome ? changedField(child as SetDataEventOutcome, fieldId) : null
-        }
+        return outcome.outcomes?.findResult { child -> changedField(child, fieldId) }
     }
 
     Task task(Case useCase) {

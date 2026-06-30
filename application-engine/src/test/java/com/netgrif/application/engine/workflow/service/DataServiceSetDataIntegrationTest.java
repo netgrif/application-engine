@@ -9,6 +9,7 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.case
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
+import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.workflow.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -27,7 +28,6 @@ import tools.jackson.databind.node.ObjectNode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
@@ -297,7 +297,7 @@ class DataServiceSetDataIntegrationTest {
             return;
         }
         Date actual = assertInstanceOf(Date.class, value);
-        assertEquals(expected, actual.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        assertEquals(DateUtils.localDateToDate(expected).toInstant(), actual.toInstant());
     }
 
     private void assertStoredDateTime(LocalDateTime expected, Object value) {
@@ -306,7 +306,7 @@ class DataServiceSetDataIntegrationTest {
             return;
         }
         Date actual = assertInstanceOf(Date.class, value);
-        assertEquals(expected, actual.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        assertEquals(DateUtils.localDateTimeToDate(expected).toInstant(), actual.toInstant());
     }
 
     private Set<String> multichoiceValues(Object value) {
