@@ -13,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 import javax.imageio.ImageIO
-import java.awt.*
+import java.awt.Color
 import java.awt.image.BufferedImage
 import java.nio.file.Path
 
