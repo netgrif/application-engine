@@ -65,6 +65,24 @@ class AuthMethodConfigDeserializerTest {
     }
 
     @Test
+    void rejectsMissingType() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                mapper.readValue("{\"realmId\":\"default\",\"configuration\":{}}", AuthMethodConfig.class)
+        );
+
+        assertEquals("Missing required field: type", exception.getMessage());
+    }
+
+    @Test
+    void rejectsMissingConfiguration() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                mapper.readValue("{\"realmId\":\"default\",\"type\":\"basic\"}", AuthMethodConfig.class)
+        );
+
+        assertEquals("Missing required field: configuration", exception.getMessage());
+    }
+
+    @Test
     void rejectsUnknownProviderType() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
                 mapper.readValue("{\"realmId\":\"default\",\"type\":\"unknown\",\"configuration\":{}}", AuthMethodConfig.class)

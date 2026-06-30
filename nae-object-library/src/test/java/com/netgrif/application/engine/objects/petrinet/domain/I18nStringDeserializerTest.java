@@ -51,6 +51,18 @@ class I18nStringDeserializerTest {
     }
 
     @Test
+    void ignoresNullKeyAndTranslationsObject() throws Exception {
+        I18nString value = mapper.readValue(
+                "{\"key\":null,\"defaultValue\":\"Title\",\"translations\":null}",
+                I18nString.class
+        );
+
+        assertNull(value.getKey());
+        assertEquals("Title", value.getDefaultValue());
+        assertTrue(value.getTranslations().isEmpty());
+    }
+
+    @Test
     void deserializesNullAsNull() throws Exception {
         assertNull(mapper.readValue("null", I18nString.class));
     }

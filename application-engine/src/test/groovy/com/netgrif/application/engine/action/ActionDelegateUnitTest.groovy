@@ -2,15 +2,20 @@ package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.objects.petrinet.domain.Transition
+import com.netgrif.application.engine.objects.petrinet.domain.DataFieldLogic
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.NumberField
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.runner.Expression
 import com.netgrif.application.engine.objects.workflow.domain.DataField
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner
+import com.netgrif.application.engine.workflow.service.InitValueExpressionEvaluator
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.Test
 
 import static org.junit.jupiter.api.Assertions.*
@@ -144,6 +149,81 @@ class ActionDelegateUnitTest {
         assertEquals([text: text], delegate.mapData([text]))
     }
 
+    @Test
+    void makeSingleFieldVisibleCopiesInitialBehaviorAndCreatesOutcome() {
+        def delegate = delegateWithDataService()
+        def useCase = caseWithNet()
+        def field = new TextField()
+        field.importId = "text"
+        def transition = transitionWithField("submit", field.stringId, [FieldBehavior.HIDDEN] as Set)
+        useCase.petriNet.transitions = [(transition.stringId): transition] as LinkedHashMap
+        useCase.dataSet.put(field.stringId, new DataField("old"))
+        delegate.@useCase = useCase
+
+        delegate.make(field, delegate.visible).on(transition).when { true }
+
+        assertTrue(useCase.dataSet.get(field.stringId).isVisible(transition.stringId))
+        assertEquals(1, delegate.outcomes.size())
+        assertTrue(delegate.outcomes.first().changedFields.containsKey(field.stringId))
+    }
+
+    @Test
+    void makeRejectsUnsupportedTransitionTarget() {
+        def delegate = delegateWithDataService()
+        def useCase = caseWithNet()
+        def field = new TextField()
+        field.importId = "text"
+        useCase.dataSet.put(field.stringId, new DataField("old"))
+        delegate.@useCase = useCase
+
+        def exception = assertThrows(IllegalArgumentException) {
+            delegate.make(field, delegate.visible).on("submit").when { true }
+        }
+
+        assertTrue(exception.message.contains("Invalid call of make method"))
+    }
+
+    @Test
+    void initValueOfFieldReturnsNullStaticAndDynamicDefaults() {
+        def delegate = new ActionDelegate()
+        def useCase = caseWithNet()
+        def evaluator = mock(InitValueExpressionEvaluator)
+        delegate.@useCase = useCase
+        delegate.@initValueExpressionEvaluator = evaluator
+
+        def noDefault = new TextField()
+        noDefault.importId = "empty"
+        assertNull(delegate.init(noDefault))
+
+        def staticDefault = new TextField()
+        staticDefault.importId = "static"
+        staticDefault.defaultValue = "fallback"
+        assertEquals("fallback", delegate.init(staticDefault))
+
+        def dynamicDefault = new TextField()
+        dynamicDefault.importId = "dynamic"
+        dynamicDefault.initExpression = new Expression("return 'dynamic'")
+        when(evaluator.evaluate(useCase, dynamicDefault, [source: "unit"])).thenReturn("dynamic")
+
+        assertEquals("dynamic", delegate.initValueOfField(dynamicDefault, [source: "unit"]))
+    }
+
+    @Test
+    void saveTargetCasePersistsOnlyDifferentCase() {
+        def delegate = new ActionDelegate()
+        def currentCase = caseWithNet()
+        def foreignCase = caseWithNet()
+        def workflowService = mock(IWorkflowService)
+        delegate.@useCase = currentCase
+        delegate.@workflowService = workflowService
+
+        delegate.saveTargetCase(currentCase)
+        delegate.saveTargetCase(foreignCase)
+
+        verify(workflowService).save(foreignCase)
+        verifyNoMoreInteractions(workflowService)
+    }
+
     private ActionDelegate delegateWithDataService() {
         def delegate = new ActionDelegate()
         delegate.@dataService = mock(IDataService, { invocation ->
@@ -155,6 +235,13 @@ class ActionDelegateUnitTest {
         delegate.@outcomes = []
         delegate.@task = Optional.empty()
         return delegate
+    }
+
+    private Transition transitionWithField(String id, String fieldId, Set<FieldBehavior> behavior) {
+        def transition = new Transition()
+        transition.importId = id
+        transition.dataSet = [(fieldId): new DataFieldLogic(behavior, null, null, null)] as LinkedHashMap
+        return transition
     }
 
     private com.netgrif.application.engine.adapter.spring.workflow.domain.Case caseWithNet() {

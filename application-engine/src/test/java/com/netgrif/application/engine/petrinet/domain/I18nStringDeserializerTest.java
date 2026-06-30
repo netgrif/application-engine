@@ -10,6 +10,7 @@ import tools.jackson.databind.module.SimpleModule;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class I18nStringDeserializerTest {
 
@@ -46,7 +47,20 @@ class I18nStringDeserializerTest {
                 I18nString.class
         );
 
+        assertTrue(value.getTranslations().containsKey("sk"));
         assertNull(value.getTranslations().get("sk"));
+    }
+
+    @Test
+    void ignoresNullKeyAndTranslationsObject() throws Exception {
+        I18nString value = mapper.readValue(
+                "{\"key\":null,\"defaultValue\":\"Title\",\"translations\":null}",
+                I18nString.class
+        );
+
+        assertNull(value.getKey());
+        assertEquals("Title", value.getDefaultValue());
+        assertTrue(value.getTranslations().isEmpty());
     }
 
     @Test

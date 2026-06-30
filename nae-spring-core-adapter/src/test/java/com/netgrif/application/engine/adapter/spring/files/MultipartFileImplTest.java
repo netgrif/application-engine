@@ -20,6 +20,17 @@ class MultipartFileImplTest {
     }
 
     @Test
+    void treatsNullContentAsEmptyFile() throws Exception {
+        MultipartFileImpl file = new MultipartFileImpl("file", null, null, null);
+
+        assertEquals("file", file.getName());
+        assertEquals(0, file.getSize());
+        assertTrue(file.isEmpty());
+        assertArrayEquals(new byte[0], file.getBytes());
+        assertArrayEquals(new byte[0], file.getInputStream().readAllBytes());
+    }
+
+    @Test
     void exposesDefensiveContentCopy() throws Exception {
         byte[] content = "hello".getBytes();
         MultipartFileImpl file = new MultipartFileImpl("file", "file.txt", "text/plain", content);

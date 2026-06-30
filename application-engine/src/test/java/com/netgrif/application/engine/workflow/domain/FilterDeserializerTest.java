@@ -28,6 +28,15 @@ class FilterDeserializerTest {
     }
 
     @Test
+    void mapsNestedNonListValuesToMap() throws Exception {
+        Object parsed = mapper.readValue("{\"title\":\"My filter\",\"metadata\":{\"owner\":\"admin\"}}", Object.class);
+
+        Map<?, ?> map = assertInstanceOf(Map.class, parsed);
+        Map<?, ?> metadata = assertInstanceOf(Map.class, map.get("metadata"));
+        assertEquals("admin", metadata.get("owner"));
+    }
+
+    @Test
     void mapsConfiguredListValuesToList() throws Exception {
         Object parsed = mapper.readValue("{\"filter\":{\"id\":\"f1\"},\"allowedNet\":\"invoice\"}", Object.class);
 

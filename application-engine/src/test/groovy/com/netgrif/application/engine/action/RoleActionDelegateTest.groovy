@@ -61,6 +61,20 @@ class RoleActionDelegateTest {
     }
 
     @Test
+    void assignRoleAcceptsProcessRoleInstance() {
+        def delegate = delegate()
+        def user = user()
+        def role = role("manager")
+        delegate.petriNet = petriNet(role)
+        when(delegate.userService.addRole(user, role.stringId)).thenReturn(user)
+
+        def result = delegate.assignRole(role, user)
+
+        assertSame(user, result)
+        verify(delegate.userService).addRole(user, role.stringId)
+    }
+
+    @Test
     void assignRoleUsesInitializedPetriNetAndAffectedUserByDefault() {
         def delegate = delegate()
         def user = user()
@@ -105,6 +119,34 @@ class RoleActionDelegateTest {
 
         assertSame(user, delegate.removeRole("manager", "process", user))
         verify(delegate.petriNetService).getDefaultVersionByIdentifier("process")
+    }
+
+    @Test
+    void removeRoleAcceptsProcessRoleInstance() {
+        def delegate = delegate()
+        def user = user()
+        def role = role("manager")
+        user.processRoles.add(role)
+        delegate.petriNet = petriNet(role)
+        when(delegate.userService.saveUser(user)).thenReturn(user)
+
+        def result = delegate.removeRole(role, user)
+
+        assertSame(user, result)
+        assertFalse(user.processRoles.contains(role))
+        verifyNoInteractions(delegate.processRoleService)
+        verify(delegate.userService).saveUser(user)
+    }
+
+    @Test
+    void removeRoleRejectsUnknownProcess() {
+        def delegate = delegate()
+
+        def exception = assertThrows(IllegalArgumentException) {
+            delegate.removeRole("manager", "missing", user())
+        }
+
+        assertEquals("The process with identifier [missing] could not be found", exception.message)
     }
 
     private RoleActionDelegate delegate() {
