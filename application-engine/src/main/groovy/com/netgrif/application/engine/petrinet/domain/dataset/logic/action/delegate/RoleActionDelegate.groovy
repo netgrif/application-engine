@@ -69,7 +69,7 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
     }
 
     AbstractUser removeRole(ProcessRole role, AbstractUser user = affectedUser) {
-        user.getProcessRoles().remove(role)
+        user.removeProcessRole(role)
         return userService.saveUser(user)
     }
 
@@ -94,7 +94,7 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
         String roleId = foundEntry.key
         ProcessRole role = processRoleService.findById(roleId)
 
-        user.getProcessRoles().remove(role)
+        user.removeProcessRole(role)
         return userService.saveUser(user)
     }
 }

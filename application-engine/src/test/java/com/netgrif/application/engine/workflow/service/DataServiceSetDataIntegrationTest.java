@@ -26,6 +26,7 @@ import tools.jackson.databind.node.ObjectNode;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -39,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
-public class DataServiceSetDataIntegrationTest {
+class DataServiceSetDataIntegrationTest {
 
     private static final String EDITABLE_TRANSITION = "1";
     private static final String NUMBER_CURRENCY_FIELD = "number_currency";
@@ -70,7 +71,7 @@ public class DataServiceSetDataIntegrationTest {
     private PetriNet net;
 
     @BeforeEach
-    public void before() {
+    void before() {
         testHelper.truncateDbs();
         Optional<PetriNet> importedNet = importHelper.createNet("all_data.xml");
         assertTrue(importedNet.isPresent());
@@ -78,7 +79,7 @@ public class DataServiceSetDataIntegrationTest {
     }
 
     @Test
-    public void setDataAcceptsEmptyNumberValueAndStoresNull() {
+    void setDataAcceptsEmptyNumberValueAndStoresNull() {
         Case useCase = createCase();
         Task task = findEditableTask(useCase);
 
@@ -94,7 +95,7 @@ public class DataServiceSetDataIntegrationTest {
     }
 
     @Test
-    public void setDataAcceptsNullEnumerationValueAndStoresNull() {
+    void setDataAcceptsNullEnumerationValueAndStoresNull() {
         Case useCase = createCase();
         Task task = findEditableTask(useCase);
 
@@ -110,7 +111,7 @@ public class DataServiceSetDataIntegrationTest {
     }
 
     @Test
-    public void setDataTreatsStringNullEnumerationValueAsNull() {
+    void setDataTreatsStringNullEnumerationValueAsNull() {
         Case useCase = createCase();
         Task task = findEditableTask(useCase);
 
@@ -124,7 +125,7 @@ public class DataServiceSetDataIntegrationTest {
     }
 
     @Test
-    public void setDataStoresValidNumberValue() {
+    void setDataStoresValidNumberValue() {
         Case useCase = createCase();
         Task task = findEditableTask(useCase);
 
@@ -138,7 +139,7 @@ public class DataServiceSetDataIntegrationTest {
     }
 
     @Test
-    public void setDataStoresValidEnumerationValue() {
+    void setDataStoresValidEnumerationValue() {
         Case useCase = createCase();
         Task task = findEditableTask(useCase);
 
@@ -152,7 +153,7 @@ public class DataServiceSetDataIntegrationTest {
     }
 
     @Test
-    public void setDataAcceptsBlankDateAndNullDateTimeValuesAndStoresNull() {
+    void setDataAcceptsBlankDateAndNullDateTimeValuesAndStoresNull() {
         Case useCase = createCase();
         Task task = findEditableTask(useCase);
 
@@ -171,7 +172,7 @@ public class DataServiceSetDataIntegrationTest {
     }
 
     @Test
-    public void setDataStoresDateAndDateTimeValues() {
+    void setDataStoresDateAndDateTimeValues() {
         Case useCase = createCase();
         Task task = findEditableTask(useCase);
 
@@ -180,12 +181,15 @@ public class DataServiceSetDataIntegrationTest {
 
         SetDataEventOutcome outcome = dataService.setData(task.getStringId(), dataSet);
 
-        assertEquals(LocalDate.of(2026, 5, 29), outcome.getCase().getFieldValue(DATE_FIELD));
-        assertEquals(LocalDateTime.of(2026, 5, 29, 13, 45, 10), outcome.getCase().getFieldValue(DATETIME_FIELD));
+        assertEquals(LocalDate.of(2026, Month.MAY, 29), outcome.getCase().getFieldValue(DATE_FIELD));
+        assertEquals(LocalDateTime.of(2026, Month.MAY, 29, 13, 45, 10), outcome.getCase().getFieldValue(DATETIME_FIELD));
+        Case persistedCase = workflowService.findOne(useCase.getStringId());
+        assertEquals(LocalDate.of(2026, Month.MAY, 29), persistedCase.getFieldValue(DATE_FIELD));
+        assertEquals(LocalDateTime.of(2026, Month.MAY, 29, 13, 45, 10), persistedCase.getFieldValue(DATETIME_FIELD));
     }
 
     @Test
-    public void setDataAcceptsStringNullMultichoiceValueAndStoresNull() {
+    void setDataAcceptsStringNullMultichoiceValueAndStoresNull() {
         Case useCase = createCase();
         Task task = findEditableTask(useCase);
 
@@ -199,7 +203,7 @@ public class DataServiceSetDataIntegrationTest {
     }
 
     @Test
-    public void setDataStoresMultichoiceArrayAsI18nStringSet() {
+    void setDataStoresMultichoiceArrayAsI18nStringSet() {
         Case useCase = createCase();
         Task task = findEditableTask(useCase);
 
@@ -215,10 +219,17 @@ public class DataServiceSetDataIntegrationTest {
                         .map(item -> ((I18nString) item).getDefaultValue())
                         .collect(Collectors.toSet())
         );
+        Set<?> persistedValue = assertInstanceOf(Set.class, workflowService.findOne(useCase.getStringId()).getFieldValue(MULTICHOICE_LIST_FIELD));
+        assertEquals(
+                Set.of("Alice", "Carol"),
+                persistedValue.stream()
+                        .map(item -> ((I18nString) item).getDefaultValue())
+                        .collect(Collectors.toSet())
+        );
     }
 
     @Test
-    public void setDataStoresTextValue() {
+    void setDataStoresTextValue() {
         Case useCase = createCase();
         Task task = findEditableTask(useCase);
 

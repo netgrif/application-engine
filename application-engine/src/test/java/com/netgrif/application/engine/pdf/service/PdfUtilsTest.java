@@ -22,7 +22,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PdfUtilsTest {
+class PdfUtilsTest {
 
     private static final String TEST_XML = """
             <?xml version="1.0" encoding="UTF-8"?>
@@ -39,7 +39,7 @@ public class PdfUtilsTest {
     Path tempDir;
 
     @Test
-    public void fillPdfForm() throws Exception {
+    void fillPdfForm() throws Exception {
         File input = createTestPdfForm(
                 tempDir.resolve("test-form.pdf"),
                 List.of(
@@ -68,7 +68,7 @@ public class PdfUtilsTest {
     }
 
     @Test
-    public void fillPdfFormWithMultipleFields() throws Exception {
+    void fillPdfFormWithMultipleFields() throws Exception {
         File input = createTestPdfForm(
                 tempDir.resolve("test-form-multiple-fields.pdf"),
                 List.of(
@@ -100,7 +100,7 @@ public class PdfUtilsTest {
     }
 
     @Test
-    public void mergePdf() throws Exception {
+    void mergePdf() throws Exception {
         File f1 = createSimplePdf(tempDir.resolve("test-1.pdf"), "Test PDF 1");
         File f2 = createSimplePdf(tempDir.resolve("test-2.pdf"), "Test PDF 2");
         File f3 = createSimplePdf(tempDir.resolve("test-3.pdf"), "Test PDF 3");
@@ -122,7 +122,7 @@ public class PdfUtilsTest {
     }
 
     @Test
-    public void encryptPdf() throws Exception {
+    void encryptPdf() throws Exception {
         File input = createSimplePdf(tempDir.resolve("test-encrypt-input.pdf"), "PDF to encrypt");
 
         File output = PdfUtils.encryptPdfFile(

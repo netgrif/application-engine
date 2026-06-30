@@ -69,11 +69,12 @@ class RegistrationServiceUtilityTest {
     @Test
     void rejectsInvalidTokens() {
         RegistrationService service = service();
+        String notEmailToken = service.encodeToken("not-email", "token");
 
         assertThrows(InvalidUserTokenException.class, () -> service.decodeToken(null));
         assertThrows(InvalidUserTokenException.class, () -> service.decodeToken(""));
         assertThrows(InvalidUserTokenException.class, () -> service.decodeToken("not-base64"));
-        assertThrows(InvalidUserTokenException.class, () -> service.decodeToken(service.encodeToken("not-email", "token")));
+        assertThrows(InvalidUserTokenException.class, () -> service.decodeToken(notEmailToken));
     }
 
     @Test
@@ -97,7 +98,7 @@ class RegistrationServiceUtilityTest {
     }
 
     @Test
-    void verifiesTokenAgainstPersistedUser() throws Exception {
+    void verifiesTokenAgainstPersistedUser() {
         RegistrationService service = wiredService();
         User user = user("user@example.com");
         user.setToken("token-key");
@@ -124,7 +125,8 @@ class RegistrationServiceUtilityTest {
 
         assertEquals("encoded", user.getPassword());
         assertTrue(service.stringMatchesUserPassword(user, "plain"));
-        assertThrows(IllegalArgumentException.class, () -> service.encodeUserPassword(user("empty@example.com")));
+        User emptyPasswordUser = user("empty@example.com");
+        assertThrows(IllegalArgumentException.class, () -> service.encodeUserPassword(emptyPasswordUser));
     }
 
     @Test
@@ -175,9 +177,35 @@ class RegistrationServiceUtilityTest {
     }
 
     @Test
+    void createNewUserClearsStaleRolesWhenRenewingInactiveUser() {
+        RegistrationService service = wiredService();
+        NewUserRequest request = new NewUserRequest();
+        request.email = "renew@example.com";
+        request.processRoles = Set.of("role-a");
+        User inactive = user("renew@example.com");
+        inactive.setState(UserState.INACTIVE);
+        ProcessRole staleRole = new com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.ProcessRole(new ProcessResourceId().toString());
+        ProcessRole defaultRole = new com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.ProcessRole(new ProcessResourceId().toString());
+        inactive.addProcessRole(staleRole);
+        when(userService.findByEmail("renew@example.com", null)).thenReturn(inactive);
+        when(processRoleService.getDefaultRole()).thenReturn(defaultRole);
+        when(userService.saveUser(inactive, null)).thenReturn(inactive);
+
+        AbstractUser result = service.createNewUser(request);
+
+        assertSame(inactive, result);
+        assertTrue(inactive.getProcessRoles().isEmpty());
+        assertTrue(inactive.getProcessRoleIds().isEmpty());
+        verify(userService).addRole(inactive, "role-a");
+        verify(userService).addRole(inactive, defaultRole.getStringId());
+    }
+
+    @Test
     void registerUserActivatesInvitedUser() throws Exception {
         RegistrationService service = wiredService();
         User user = user("user@example.com");
+        user.setToken("token-key");
+        user.setExpirationDate(LocalDateTime.now().plusHours(1));
         RegistrationRequest request = new RegistrationRequest();
         request.token = service.encodeToken("user@example.com", "token-key");
         request.name = "John";
@@ -196,6 +224,23 @@ class RegistrationServiceUtilityTest {
         assertEquals(UserState.ACTIVE, user.getState());
         verify(passwordEncoder).encode("secret");
         verify(userService).saveUser(user, null);
+    }
+
+    @Test
+    void registerUserRejectsMismatchedOrExpiredInvitationToken() throws Exception {
+        RegistrationService service = wiredService();
+        User user = user("user@example.com");
+        user.setToken("other-token");
+        user.setExpirationDate(LocalDateTime.now().plusHours(1));
+        RegistrationRequest request = new RegistrationRequest();
+        request.token = service.encodeToken("user@example.com", "token-key");
+        when(userService.findByEmail("user@example.com", null)).thenReturn(user);
+
+        assertThrows(InvalidUserTokenException.class, () -> service.registerUser(request));
+
+        user.setToken("token-key");
+        user.setExpirationDate(LocalDateTime.now().minusSeconds(1));
+        assertThrows(InvalidUserTokenException.class, () -> service.registerUser(request));
     }
 
     @Test

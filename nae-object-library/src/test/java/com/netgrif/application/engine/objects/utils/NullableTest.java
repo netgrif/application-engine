@@ -99,10 +99,11 @@ class NullableTest {
         assertEquals("value", Nullable.of("value").orElseGet(() -> "fallback"));
         assertEquals("fallback", Nullable.<String>empty().orElseGet(() -> "fallback"));
         assertEquals("value", Nullable.of("value").orElseThrow());
+        Nullable<Object> empty = Nullable.empty();
 
-        assertThrows(NoSuchElementException.class, () -> Nullable.empty().orElseThrow());
+        assertThrows(NoSuchElementException.class, empty::orElseThrow);
         assertThrows(IllegalStateException.class, () ->
-                Nullable.empty().orElseThrow(() -> new IllegalStateException("missing"))
+                empty.orElseThrow(() -> new IllegalStateException("missing"))
         );
     }
 

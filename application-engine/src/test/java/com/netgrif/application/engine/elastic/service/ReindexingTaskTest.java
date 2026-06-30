@@ -64,12 +64,16 @@ class ReindexingTaskTest {
 
     @Test
     void rejectsInvalidPageSize() {
-        assertThrows(IllegalArgumentException.class, () -> task(properties(0, null)));
+        DataConfigurationProperties.ElasticsearchProperties properties = properties(0, null);
+
+        assertThrows(IllegalArgumentException.class, () -> task(properties));
     }
 
     @Test
     void rejectsNegativeReindexWindow() {
-        assertThrows(IllegalArgumentException.class, () -> task(properties(10, Duration.ofSeconds(-1))));
+        DataConfigurationProperties.ElasticsearchProperties properties = properties(10, Duration.ofSeconds(-1));
+
+        assertThrows(IllegalArgumentException.class, () -> task(properties));
     }
 
     @Test

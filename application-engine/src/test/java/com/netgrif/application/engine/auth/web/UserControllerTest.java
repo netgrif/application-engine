@@ -188,12 +188,14 @@ class UserControllerTest {
         AbstractUser domainUser = domainUser("john");
         User responseUser = new User(domainUser);
         Pageable pageable = PageRequest.of(0, 10);
+        String roleId = new ProcessResourceId().toString();
+        String negativeRoleId = new ProcessResourceId().toString();
         UserSearchRequestBody query = new UserSearchRequestBody();
         query.setFulltext("jo");
-        query.setRoles(List.of(new ProcessResourceId().toString()));
-        query.setNegativeRoles(List.of(new ProcessResourceId().toString()));
+        query.setRoles(List.of(roleId));
+        query.setNegativeRoles(List.of(negativeRoleId));
         when(authentication.getPrincipal()).thenReturn(loggedUser);
-        when(userService.searchAllCoMembers(eq("jo"), anyProcessIds(), anyProcessIds(), eq(loggedUser), eq(pageable)))
+        when(userService.searchAllCoMembers(eq("jo"), processIds(roleId), processIds(negativeRoleId), eq(loggedUser), eq(pageable)))
                 .thenReturn(new PageImpl<>(List.of(domainUser), pageable, 1));
         when(userFactory.getUser(domainUser, Locale.ENGLISH)).thenReturn(responseUser);
 
@@ -228,11 +230,12 @@ class UserControllerTest {
     @Test
     void assignRolesAndAuthoritiesReturnSuccessOrBadRequest() {
         AbstractUser domainUser = domainUser("john");
+        String roleId = new ProcessResourceId().toString();
         when(authentication.getPrincipal()).thenReturn(loggedUser);
         when(userService.findById("john-id", "realm")).thenReturn(domainUser);
 
-        assertEquals(HttpStatus.OK, controller.assignRolesToUser("realm", "john-id", Set.of(new ProcessResourceId().toString()), authentication).getStatusCode());
-        verify(processRoleService).assignRolesToUser(eq(domainUser), anyProcessIds(), eq(loggedUser));
+        assertEquals(HttpStatus.OK, controller.assignRolesToUser("realm", "john-id", Set.of(roleId), authentication).getStatusCode());
+        verify(processRoleService).assignRolesToUser(eq(domainUser), processIds(roleId), eq(loggedUser));
 
         when(userService.findById("missing-id", "realm")).thenThrow(new IllegalArgumentException("missing"));
         assertEquals(HttpStatus.BAD_REQUEST, controller.assignRolesToUser("realm", "missing-id", Set.of(), authentication).getStatusCode());
@@ -280,7 +283,10 @@ class UserControllerTest {
         return new com.netgrif.application.engine.adapter.spring.auth.domain.Realm(id);
     }
 
-    private Collection<ProcessResourceId> anyProcessIds() {
-        return argThat(ids -> ids != null && !ids.isEmpty());
+    private Collection<ProcessResourceId> processIds(String... expectedIds) {
+        Set<String> expected = Set.of(expectedIds);
+        return argThat(ids -> ids != null
+                && ids.size() == expected.size()
+                && ids.stream().map(ProcessResourceId::toString).allMatch(expected::contains));
     }
 }

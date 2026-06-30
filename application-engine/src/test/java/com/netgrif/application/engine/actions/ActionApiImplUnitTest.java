@@ -28,6 +28,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -111,6 +112,13 @@ class ActionApiImplUnitTest {
         user.setLastName("Worker");
         user.setEmail("john@example.com");
         principal = new AuthPrincipalDto("john", "realm", null);
+    }
+
+    @AfterEach
+    void tearDown() {
+        ActorTransformer.setLoggedUserFactory(() -> {
+            throw new IllegalStateException("No LoggedUserFactory configured");
+        });
     }
 
     @Test
@@ -256,10 +264,12 @@ class ActionApiImplUnitTest {
         assertFalse(actionApi.getProcessAvailability("missing").isUp());
         assertTrue(actionApi.getProcessAvailability("missing").isNotFound());
         assertTrue(actionApi.getProcessAvailability("known", "missing").isAnyUp());
+        Map<String, String> emptyParams = Map.of();
+        List<String> queries = List.of("query");
         assertThrows(NullPointerException.class, () -> actionApi.getProcessAvailability((List<String>) null));
-        assertThrows(IllegalArgumentException.class, () -> actionApi.createCaseByIdentifier("process", "title", "red", null, Map.of()));
+        assertThrows(IllegalArgumentException.class, () -> actionApi.createCaseByIdentifier("process", "title", "red", null, emptyParams));
 
         when(userService.findUserByUsername("john", "realm")).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> actionApi.countCases(List.of("query"), principal, true));
+        assertThrows(IllegalArgumentException.class, () -> actionApi.countCases(queries, principal, true));
     }
 }

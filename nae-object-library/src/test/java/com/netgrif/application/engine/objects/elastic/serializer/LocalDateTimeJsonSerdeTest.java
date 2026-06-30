@@ -6,6 +6,7 @@ import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
 
 import java.time.LocalDateTime;
+import java.time.Month;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -20,7 +21,7 @@ class LocalDateTimeJsonSerdeTest {
 
     @Test
     void serializesLocalDateTimeWithMilliseconds() throws Exception {
-        DateTimeHolder holder = new DateTimeHolder(LocalDateTime.of(2026, 6, 29, 12, 3, 4, 5_000_000));
+        DateTimeHolder holder = new DateTimeHolder(LocalDateTime.of(2026, Month.JUNE, 29, 12, 3, 4, 5_000_000));
 
         assertEquals("{\"value\":\"2026-06-29T12:03:04.005\"}", mapper.writeValueAsString(holder));
     }
@@ -32,7 +33,7 @@ class LocalDateTimeJsonSerdeTest {
                 DateTimeHolder.class
         );
 
-        assertEquals(LocalDateTime.of(2026, 6, 29, 12, 3, 4), holder.value);
+        assertEquals(LocalDateTime.of(2026, Month.JUNE, 29, 12, 3, 4), holder.value);
     }
 
     @Test
@@ -41,13 +42,18 @@ class LocalDateTimeJsonSerdeTest {
                 "{\"value\":\"2026-06-29T12:03:04.5\"}",
                 DateTimeHolder.class
         );
+        DateTimeHolder twoDigits = mapper.readValue(
+                "{\"value\":\"2026-06-29T12:03:04.12\"}",
+                DateTimeHolder.class
+        );
         DateTimeHolder threeDigits = mapper.readValue(
                 "{\"value\":\"2026-06-29T12:03:04.123\"}",
                 DateTimeHolder.class
         );
 
-        assertEquals(LocalDateTime.of(2026, 6, 29, 12, 3, 4, 500_000_000), oneDigit.value);
-        assertEquals(LocalDateTime.of(2026, 6, 29, 12, 3, 4, 123_000_000), threeDigits.value);
+        assertEquals(LocalDateTime.of(2026, Month.JUNE, 29, 12, 3, 4, 500_000_000), oneDigit.value);
+        assertEquals(LocalDateTime.of(2026, Month.JUNE, 29, 12, 3, 4, 120_000_000), twoDigits.value);
+        assertEquals(LocalDateTime.of(2026, Month.JUNE, 29, 12, 3, 4, 123_000_000), threeDigits.value);
     }
 
     @Test

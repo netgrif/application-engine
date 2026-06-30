@@ -42,9 +42,11 @@ class CaseSearchRequestTest {
 
     @Test
     void rejectsAuthorFilterWithoutSupportedAttributes() {
+        Map<String, Object> request = Map.of("author", List.of(Map.of("unsupported", "value")));
+
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> new CaseSearchRequest(Map.of("author", List.of(Map.of("unsupported", "value"))))
+                () -> new CaseSearchRequest(request)
         );
 
         assertEquals("Author filter must contain at least one of: id, name, username, realm", exception.getMessage());

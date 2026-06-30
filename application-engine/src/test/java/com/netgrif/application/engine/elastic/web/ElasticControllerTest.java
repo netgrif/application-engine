@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Locale;
 import java.util.Map;
 
@@ -110,7 +111,7 @@ class ElasticControllerTest {
     @Test
     void bulkReindexDelegatesToIndexService() {
         IndexParams params = new IndexParams();
-        LocalDateTime lastRun = LocalDateTime.of(2026, 1, 2, 3, 4);
+        LocalDateTime lastRun = LocalDateTime.of(2026, Month.JANUARY, 2, 3, 4);
         params.setIndexAll(true);
         params.setLastRun(lastRun);
         params.setCaseBatchSize(10);

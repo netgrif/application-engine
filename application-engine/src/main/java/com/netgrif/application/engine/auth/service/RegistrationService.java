@@ -138,6 +138,7 @@ public class RegistrationService implements IRegistrationService {
         user.setExpirationDate(generateExpirationDate());
         user.setState(UserState.INACTIVE);
         userService.addDefaultAuthorities(user);
+        user.clearProcessRoles();
 
         if (newUser.processRoles != null && !newUser.processRoles.isEmpty()) {
             for (String role : newUser.processRoles) {
@@ -158,11 +159,17 @@ public class RegistrationService implements IRegistrationService {
 
     @Override
     public AbstractUser registerUser(RegistrationRequest registrationRequest) throws InvalidUserTokenException {
-        String email = decodeToken(registrationRequest.token)[0];
+        String[] tokenParts = decodeToken(registrationRequest.token);
+        String email = tokenParts[0];
         log.info("Registering user {}", email);
         User user = (User) userService.findByEmail(email, null);
         if (user == null) {
             return null;
+        }
+        if (!Objects.equals(user.getToken(), tokenParts[1])
+                || user.getExpirationDate() == null
+                || !user.getExpirationDate().isAfter(LocalDateTime.now())) {
+            throw new InvalidUserTokenException(registrationRequest.token);
         }
 
         user.setFirstName(registrationRequest.name);

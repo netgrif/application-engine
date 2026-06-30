@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
-public class FieldFactoryTest {
+class FieldFactoryTest {
 
     @Autowired
     private TestHelper testHelper;
@@ -28,19 +28,19 @@ public class FieldFactoryTest {
     private FieldFactory fieldFactory;
 
     @BeforeEach
-    public void before() {
+    void before() {
         testHelper.truncateDbs();
     }
 
     @Test
-    public void contextStartsAndFieldFactoryBeanIsAvailable() {
+    void contextStartsAndFieldFactoryBeanIsAvailable() {
         assertNotNull(testHelper);
         assertNotNull(fieldFactory);
     }
 
     @Test
-    public void parseDateFromStringSupportsExistingLocalDateFormats() {
-        LocalDate expected = LocalDate.of(2026, 5, 29);
+    void parseDateFromStringSupportsExistingLocalDateFormats() {
+        LocalDate expected = LocalDate.of(2026, Month.MAY, 29);
 
         assertEquals(expected, FieldFactory.parseDateFromString("20260529"));
         assertEquals(expected, FieldFactory.parseDateFromString("2026-05-29"));
@@ -48,8 +48,8 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void parseDateFromStringUsesLocalZoneForInstantValues() {
-        LocalDate expected = LocalDate.of(2026, 5, 29);
+    void parseDateFromStringUsesLocalZoneForInstantValues() {
+        LocalDate expected = LocalDate.of(2026, Month.MAY, 29);
         String serializedDate = Date.from(expected
                 .atStartOfDay(ZoneId.systemDefault())
                 .toInstant())
@@ -63,19 +63,19 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void parseDateFromStringUsesUtcForEpochMillisValues() {
-        long epochMillis = LocalDateTime.of(2026, 5, 29, 0, 30)
+    void parseDateFromStringUsesUtcForEpochMillisValues() {
+        long epochMillis = LocalDateTime.of(2026, Month.MAY, 29, 0, 30)
                 .toInstant(ZoneOffset.UTC)
                 .toEpochMilli();
 
         assertEquals(
-                LocalDate.of(2026, 5, 29),
+                LocalDate.of(2026, Month.MAY, 29),
                 FieldFactory.parseDateFromString(String.valueOf(epochMillis))
         );
     }
 
     @Test
-    public void parseDateFromStringUsesLocalZoneForOffsetValues() {
+    void parseDateFromStringUsesLocalZoneForOffsetValues() {
         String value = "2026-05-29T00:30:00+02:00";
         LocalDate expected = OffsetDateTime.parse(value)
                 .atZoneSameInstant(ZoneId.systemDefault())
@@ -88,7 +88,7 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void parseDateFromStringReturnsNullForBlankOrInvalidInput() {
+    void parseDateFromStringReturnsNullForBlankOrInvalidInput() {
         assertNull(FieldFactory.parseDateFromString(null));
         assertNull(FieldFactory.parseDateFromString(" "));
         assertNull(FieldFactory.parseDateFromString("totok"));
@@ -96,36 +96,36 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void parseDateHandlesDateStringLocalDateAndJavaDateValues() {
-        Date javaDate = Date.from(LocalDate.of(2026, 5, 29)
+    void parseDateHandlesDateStringLocalDateAndJavaDateValues() {
+        Date javaDate = Date.from(LocalDate.of(2026, Month.MAY, 29)
                 .atTime(LocalTime.NOON)
                 .atZone(ZoneId.systemDefault())
                 .toInstant());
 
-        assertEquals(LocalDate.of(2026, 5, 29), FieldFactory.parseDate("2026-05-29"));
-        assertEquals(LocalDate.of(2026, 5, 29), FieldFactory.parseDate(LocalDate.of(2026, 5, 29)));
-        assertEquals(LocalDate.of(2026, 5, 29), FieldFactory.parseDate(javaDate));
+        assertEquals(LocalDate.of(2026, Month.MAY, 29), FieldFactory.parseDate("2026-05-29"));
+        assertEquals(LocalDate.of(2026, Month.MAY, 29), FieldFactory.parseDate(LocalDate.of(2026, Month.MAY, 29)));
+        assertEquals(LocalDate.of(2026, Month.MAY, 29), FieldFactory.parseDate(javaDate));
         assertNull(FieldFactory.parseDate(123));
     }
 
     @Test
-    public void parseDateTimeHandlesLocalDateAndFormattedStrings() {
+    void parseDateTimeHandlesLocalDateAndFormattedStrings() {
         assertEquals(
-                LocalDateTime.of(LocalDate.of(2026, 5, 29), LocalTime.NOON),
-                FieldFactory.parseDateTime(LocalDate.of(2026, 5, 29))
+                LocalDateTime.of(LocalDate.of(2026, Month.MAY, 29), LocalTime.NOON),
+                FieldFactory.parseDateTime(LocalDate.of(2026, Month.MAY, 29))
         );
         assertEquals(
-                LocalDateTime.of(2026, 5, 29, 13, 45),
+                LocalDateTime.of(2026, Month.MAY, 29, 13, 45),
                 FieldFactory.parseDateTimeFromString("29.05.2026 13:45")
         );
         assertEquals(
-                LocalDateTime.of(2026, 5, 29, 13, 45, 10),
+                LocalDateTime.of(2026, Month.MAY, 29, 13, 45, 10),
                 FieldFactory.parseDateTimeFromString("29.05.2026 13:45:10")
         );
     }
 
     @Test
-    public void parseDoubleHandlesSupportedTypes() {
+    void parseDoubleHandlesSupportedTypes() {
         assertEquals(12.5D, FieldFactory.parseDouble("12.5"));
         assertEquals(12D, FieldFactory.parseDouble(12));
         assertEquals(12.5D, FieldFactory.parseDouble(12.5D));

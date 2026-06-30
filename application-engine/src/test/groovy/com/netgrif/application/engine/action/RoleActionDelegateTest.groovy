@@ -125,15 +125,17 @@ class RoleActionDelegateTest {
     void removeRoleAcceptsProcessRoleInstance() {
         def delegate = delegate()
         def user = user()
-        def role = role("manager")
-        user.processRoles.add(role)
-        delegate.petriNet = petriNet(role)
+        def processRole = role("manager")
+        def assignedRole = role("manager", processRole.stringId)
+        user.addProcessRole(assignedRole)
+        delegate.petriNet = petriNet(processRole)
         when(delegate.userService.saveUser(user)).thenReturn(user)
 
-        def result = delegate.removeRole(role, user)
+        def result = delegate.removeRole(processRole, user)
 
         assertSame(user, result)
-        assertFalse(user.processRoles.contains(role))
+        assertTrue(user.processRoles.every { it.stringId != processRole.stringId })
+        assertFalse(user.processRoleIds.contains(processRole.stringId))
         verifyNoInteractions(delegate.processRoleService)
         verify(delegate.userService).saveUser(user)
     }
@@ -168,7 +170,11 @@ class RoleActionDelegateTest {
     }
 
     private com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.ProcessRole role(String importId) {
-        def role = new com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.ProcessRole(new ProcessResourceId().toString())
+        return role(importId, new ProcessResourceId().toString())
+    }
+
+    private com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.ProcessRole role(String importId, String id) {
+        def role = new com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.ProcessRole(id)
         role.importId = importId
         role.name = "Manager"
         return role
