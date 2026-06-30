@@ -156,7 +156,7 @@ public final class FieldFactory {
         }
         try {
             return Instant.ofEpochMilli(Long.parseLong(value))
-                    .atZone(ZoneId.systemDefault())
+                    .atOffset(ZoneOffset.UTC)
                     .toLocalDate();
         } catch (NumberFormatException ignored) {
             return null;

@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.workflow.domain;
 
-import org.springframework.lang.Nullable;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.JsonToken;
