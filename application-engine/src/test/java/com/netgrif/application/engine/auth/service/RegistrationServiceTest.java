@@ -2,10 +2,10 @@ package com.netgrif.application.engine.auth.service;
 
 
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
+import com.netgrif.application.engine.objects.auth.domain.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

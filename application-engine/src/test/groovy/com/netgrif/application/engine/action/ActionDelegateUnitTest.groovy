@@ -1,11 +1,10 @@
 package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.importer.service.FieldFactory
-import com.netgrif.application.engine.objects.petrinet.domain.Transition
 import com.netgrif.application.engine.objects.petrinet.domain.DataFieldLogic
+import com.netgrif.application.engine.objects.petrinet.domain.Transition
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.NumberField
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.TextField
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.runner.Expression

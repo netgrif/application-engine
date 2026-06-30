@@ -1,23 +1,23 @@
 package com.netgrif.application.engine.filters
 
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.auth.service.UserService
-import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.elastic.service.ReindexingTask
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
-import com.netgrif.application.engine.objects.auth.domain.Authority;
+import com.netgrif.application.engine.objects.auth.domain.Authority
 import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldValue
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.service.PetriNetService
-import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
-import com.netgrif.application.engine.startup.runner.FilterRunner
-import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.objects.workflow.domain.*
 import com.netgrif.application.engine.objects.workflow.domain.filter.FilterImportExportList
+import com.netgrif.application.engine.petrinet.service.PetriNetService
+import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
+import com.netgrif.application.engine.startup.runner.FilterRunner
 import com.netgrif.application.engine.workflow.params.TaskParams
 import com.netgrif.application.engine.workflow.service.UserFilterSearchService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
@@ -25,7 +25,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportE
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired

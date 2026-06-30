@@ -2,11 +2,7 @@ package com.netgrif.application.engine.elastic.service;
 
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
+import com.netgrif.application.engine.elastic.service.interfaces.*;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
@@ -26,14 +22,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReindexingTaskTest {

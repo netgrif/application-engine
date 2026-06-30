@@ -1,15 +1,12 @@
 package com.netgrif.application.engine.workflow
 
-import tools.jackson.databind.ObjectMapper
-import tools.jackson.databind.node.ObjectNode
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.AuthorityService
-import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
+import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
@@ -23,11 +20,11 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.utils.FullPageRequest
+import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.TaskSearchService
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.web.TaskController
 import com.netgrif.application.engine.workflow.web.WorkflowController
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
@@ -41,6 +38,8 @@ import org.springframework.data.domain.Page
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.node.ObjectNode
 
 @SpringBootTest
 @ActiveProfiles(["test"])

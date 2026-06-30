@@ -1,20 +1,19 @@
 package com.netgrif.application.engine.ipc
 
+import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
 import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.importer.service.Importer
+import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
+import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
-import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
-import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
-import com.netgrif.application.engine.objects.petrinet.domain.VersionType
-import com.netgrif.application.engine.objects.workflow.domain.Case
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired

@@ -3,28 +3,30 @@ package com.netgrif.application.engine.auth
 import com.icegreen.greenmail.configuration.GreenMailConfiguration
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.auth.service.UserService
-import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser
-import com.netgrif.application.engine.objects.auth.domain.Authority
 import com.netgrif.application.engine.auth.web.AuthenticationController
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest
+import com.netgrif.application.engine.configuration.properties.MailConfigurationProperties
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.mail.EmailType
-import com.netgrif.application.engine.configuration.properties.MailConfigurationProperties
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser
+import com.netgrif.application.engine.objects.auth.domain.Authority
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
+import jakarta.mail.BodyPart
+import jakarta.mail.MessagingException
+import jakarta.mail.internet.MimeMessage
+import jakarta.mail.internet.MimeMultipart
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -33,11 +35,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-
-import jakarta.mail.BodyPart
-import jakarta.mail.MessagingException
-import jakarta.mail.internet.MimeMessage
-import jakarta.mail.internet.MimeMultipart
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])

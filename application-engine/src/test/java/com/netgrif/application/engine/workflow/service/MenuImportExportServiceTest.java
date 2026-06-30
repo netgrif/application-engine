@@ -5,24 +5,20 @@ import com.netgrif.application.engine.files.StorageResolverService;
 import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.EnumerationMapField;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileField;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldValue;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.MultichoiceMapField;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.Storage;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.DataField;
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuAndFilters;
-import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

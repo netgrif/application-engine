@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.manager.responseclass;
 
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.manager.web.body.response.AllLoggedUsersResponse;
 import com.netgrif.application.engine.manager.web.body.response.MessageLogoutResponse;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
