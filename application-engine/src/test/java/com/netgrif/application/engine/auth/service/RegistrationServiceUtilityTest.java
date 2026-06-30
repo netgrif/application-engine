@@ -227,7 +227,7 @@ class RegistrationServiceUtilityTest {
     }
 
     @Test
-    void registerUserRejectsMismatchedOrExpiredInvitationToken() throws Exception {
+    void registerUserRejectsMismatchedOrExpiredInvitationToken() {
         RegistrationService service = wiredService();
         User user = user("user@example.com");
         user.setToken("other-token");
