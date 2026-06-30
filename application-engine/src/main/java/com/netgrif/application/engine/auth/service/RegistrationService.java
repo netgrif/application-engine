@@ -23,7 +23,6 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
-import java.util.HashSet;
 import java.util.Objects;
 
 @Slf4j
@@ -37,9 +36,6 @@ public class RegistrationService implements IRegistrationService {
 
     @Autowired
     private GroupService groupService;
-
-    @Autowired
-    private ProcessRoleService processRole;
 
     @Autowired
     private SecurityConfigurationProperties.AuthProperties serverAuthProperties;
@@ -144,7 +140,9 @@ public class RegistrationService implements IRegistrationService {
         userService.addDefaultAuthorities(user);
 
         if (newUser.processRoles != null && !newUser.processRoles.isEmpty()) {
-            user.setProcessRoles(new HashSet<>(processRole.findByIds(newUser.processRoles)));
+            for (String role : newUser.processRoles) {
+                userService.addRole(user, role);
+            }
         }
         userService.addRole(user, processRoleService.getDefaultRole().getStringId());
         user = (User) userService.saveUser(user, null);

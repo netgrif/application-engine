@@ -30,7 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -49,9 +48,6 @@ class RegistrationServiceUtilityTest {
 
     @Mock
     private ProcessRoleService processRoleService;
-
-    @Mock
-    private ProcessRoleService processRoleLookupService;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -165,18 +161,15 @@ class RegistrationServiceUtilityTest {
         request.processRoles = Set.of("role-a");
         request.groups = Set.of("group-a");
         ProcessRole defaultRole = new com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.ProcessRole(new ProcessResourceId().toString());
-        ProcessRole requestedRole = new com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.ProcessRole(new ProcessResourceId().toString());
         User saved = user("new@example.com");
         when(processRoleService.getDefaultRole()).thenReturn(defaultRole);
-        when(processRoleLookupService.findByIds(request.processRoles)).thenReturn(List.of(requestedRole));
-        when(userService.saveUser(argThat(user ->
-                user != null && Set.of(requestedRole).equals(user.getProcessRoles())
-        ), eq(null))).thenReturn(saved);
+        when(userService.saveUser(any(AbstractUser.class), eq(null))).thenReturn(saved);
 
         AbstractUser result = service.createNewUser(request);
 
         assertSame(saved, result);
         verify(userService).addDefaultAuthorities(any(AbstractUser.class));
+        verify(userService).addRole(any(AbstractUser.class), eq("role-a"));
         verify(userService).addRole(any(AbstractUser.class), eq(defaultRole.getStringId()));
         verify(groupService).addUser(saved, "group-a");
     }
@@ -284,7 +277,6 @@ class RegistrationServiceUtilityTest {
         ReflectionTestUtils.setField(service, "passwordEncoder", passwordEncoder);
         ReflectionTestUtils.setField(service, "userService", userService);
         ReflectionTestUtils.setField(service, "groupService", groupService);
-        ReflectionTestUtils.setField(service, "processRole", processRoleLookupService);
         ReflectionTestUtils.setField(service, "processRoleService", processRoleService);
         ReflectionTestUtils.setField(service, "paginationProperties", paginationProperties);
         return service;
