@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EntryPoint {
-    @AliasFor("name")
+    @AliasFor(annotation = Service.class, attribute = "value")
     String value() default "";
     @AliasFor("value")
     String name() default "";
