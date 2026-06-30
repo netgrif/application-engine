@@ -27,7 +27,7 @@ import tools.jackson.databind.node.ObjectNode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
@@ -301,7 +301,7 @@ class DataServiceSetDataIntegrationTest {
             return;
         }
         Date actual = assertInstanceOf(Date.class, value);
-        assertEquals(expected, actual.toInstant().atZone(ZoneOffset.UTC).toLocalDate());
+        assertEquals(expected, actual.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
     }
 
     private void assertStoredDateTime(LocalDateTime expected, Object value) {
@@ -310,7 +310,7 @@ class DataServiceSetDataIntegrationTest {
             return;
         }
         Date actual = assertInstanceOf(Date.class, value);
-        assertEquals(expected, actual.toInstant().atZone(ZoneOffset.UTC).toLocalDateTime());
+        assertEquals(expected, actual.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
     }
 
     private Set<String> multichoiceValues(Object value) {
