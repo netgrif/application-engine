@@ -37,6 +37,11 @@ public class ActorTransformer {
         factory = f;
     }
 
+
+    public static LoggedUserFactory getLoggedUserFactory() {
+        return factory;
+    }
+
     /**
      * Transforms an AbstractUser into a LoggedUser by copying all relevant user information.
      * @param user the AbstractUser to transform

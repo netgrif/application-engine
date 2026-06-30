@@ -91,9 +91,11 @@ class ActionApiImplUnitTest {
     private ActionApiImpl actionApi;
     private AbstractUser user;
     private AuthPrincipalDto principal;
+    private ActorTransformer.LoggedUserFactory previousLoggedUserFactory;
 
     @BeforeEach
     void setUp() {
+        previousLoggedUserFactory = ActorTransformer.getLoggedUserFactory();
         ActorTransformer.setLoggedUserFactory(com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl::new);
 
         actionApi = new ActionApiImpl();
@@ -116,9 +118,7 @@ class ActionApiImplUnitTest {
 
     @AfterEach
     void tearDown() {
-        ActorTransformer.setLoggedUserFactory(() -> {
-            throw new IllegalStateException("No LoggedUserFactory configured");
-        });
+        ActorTransformer.setLoggedUserFactory(previousLoggedUserFactory);
     }
 
     @Test

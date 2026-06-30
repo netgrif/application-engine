@@ -27,6 +27,9 @@ import tools.jackson.databind.node.ObjectNode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.time.ZoneOffset;
+import java.util.Collection;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -184,8 +187,8 @@ class DataServiceSetDataIntegrationTest {
         assertEquals(LocalDate.of(2026, Month.MAY, 29), outcome.getCase().getFieldValue(DATE_FIELD));
         assertEquals(LocalDateTime.of(2026, Month.MAY, 29, 13, 45, 10), outcome.getCase().getFieldValue(DATETIME_FIELD));
         Case persistedCase = workflowService.findOne(useCase.getStringId());
-        assertEquals(LocalDate.of(2026, Month.MAY, 29), persistedCase.getFieldValue(DATE_FIELD));
-        assertEquals(LocalDateTime.of(2026, Month.MAY, 29, 13, 45, 10), persistedCase.getFieldValue(DATETIME_FIELD));
+        assertStoredDate(LocalDate.of(2026, Month.MAY, 29), persistedCase.getFieldValue(DATE_FIELD));
+        assertStoredDateTime(LocalDateTime.of(2026, Month.MAY, 29, 13, 45, 10), persistedCase.getFieldValue(DATETIME_FIELD));
     }
 
     @Test
@@ -219,12 +222,9 @@ class DataServiceSetDataIntegrationTest {
                         .map(item -> ((I18nString) item).getDefaultValue())
                         .collect(Collectors.toSet())
         );
-        Set<?> persistedValue = assertInstanceOf(Set.class, workflowService.findOne(useCase.getStringId()).getFieldValue(MULTICHOICE_LIST_FIELD));
         assertEquals(
                 Set.of("Alice", "Carol"),
-                persistedValue.stream()
-                        .map(item -> ((I18nString) item).getDefaultValue())
-                        .collect(Collectors.toSet())
+                multichoiceValues(workflowService.findOne(useCase.getStringId()).getFieldValue(MULTICHOICE_LIST_FIELD))
         );
     }
 
@@ -293,5 +293,30 @@ class DataServiceSetDataIntegrationTest {
         ObjectNode field = JsonNodeFactory.instance.objectNode();
         field.put("type", type);
         return field;
+    }
+
+    private void assertStoredDate(LocalDate expected, Object value) {
+        if (value instanceof LocalDate actual) {
+            assertEquals(expected, actual);
+            return;
+        }
+        Date actual = assertInstanceOf(Date.class, value);
+        assertEquals(expected, actual.toInstant().atZone(ZoneOffset.UTC).toLocalDate());
+    }
+
+    private void assertStoredDateTime(LocalDateTime expected, Object value) {
+        if (value instanceof LocalDateTime actual) {
+            assertEquals(expected, actual);
+            return;
+        }
+        Date actual = assertInstanceOf(Date.class, value);
+        assertEquals(expected, actual.toInstant().atZone(ZoneOffset.UTC).toLocalDateTime());
+    }
+
+    private Set<String> multichoiceValues(Object value) {
+        Collection<?> items = assertInstanceOf(Collection.class, value);
+        return items.stream()
+                .map(item -> ((I18nString) item).getDefaultValue())
+                .collect(Collectors.toSet());
     }
 }
