@@ -501,7 +501,7 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
     private Map<String, Object> filterFieldData(String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata) {
         Map<String, Object> fieldData = fieldData("filter", filterQuery);
         fieldData.put("allowedNets", allowedNets);
-        fieldData.put("filterMetadata", filterMetadata); // TODO this is a map of <String, Object> that needs to be converted to string
+        fieldData.put("filterMetadata", filterMetadata);
         return fieldData;
     }
 

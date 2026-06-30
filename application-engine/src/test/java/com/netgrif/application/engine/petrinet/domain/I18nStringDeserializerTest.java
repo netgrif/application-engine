@@ -1,5 +1,6 @@
-package com.netgrif.application.engine.objects.petrinet.domain;
+package com.netgrif.application.engine.petrinet.domain;
 
+import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import org.junit.jupiter.api.Test;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;

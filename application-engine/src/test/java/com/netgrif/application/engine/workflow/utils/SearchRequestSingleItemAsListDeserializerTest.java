@@ -60,4 +60,28 @@ class SearchRequestSingleItemAsListDeserializerTest {
         assertEquals("path\\/to\\/task", request.fullText);
         assertEquals("status:open", request.query);
     }
+
+    @Test
+    void caseSearchArrayCanContainNullItemsAndStillSanitizesRealRequests() throws Exception {
+        SingleCaseSearchRequestAsList wrapper = mapper.readValue(
+                "[null,{\"fullText\":\"case/title\"}]",
+                SingleCaseSearchRequestAsList.class
+        );
+
+        assertEquals(2, wrapper.getList().size());
+        assertNull(wrapper.getList().get(0));
+        assertEquals("case\\/title", wrapper.getList().get(1).fullText);
+    }
+
+    @Test
+    void taskSearchArrayCanContainNullItemsAndStillSanitizesRealRequests() throws Exception {
+        SingleTaskSearchRequestAsList wrapper = mapper.readValue(
+                "[null,{\"fullText\":\"task:title\"}]",
+                SingleTaskSearchRequestAsList.class
+        );
+
+        assertEquals(2, wrapper.getList().size());
+        assertNull(wrapper.getList().get(0));
+        assertEquals("task\\:title", wrapper.getList().get(1).fullText);
+    }
 }

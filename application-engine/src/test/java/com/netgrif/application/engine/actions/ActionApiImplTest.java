@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
-public class ActionApiImplTest {
+class ActionApiImplTest {
 
     private static final String PROCESS_IDENTIFIER = "data/all_data";
     private static final String MISSING_PROCESS_IDENTIFIER = "missing_process";
@@ -52,7 +52,7 @@ public class ActionApiImplTest {
     private AuthPrincipalDto superUserPrincipal;
 
     @BeforeEach
-    public void before() {
+    void before() {
         testHelper.truncateDbs();
         superUserPrincipal = new AuthPrincipalDto(
                 superCreator.getSuperUser().getUsername(),
@@ -62,7 +62,7 @@ public class ActionApiImplTest {
     }
 
     @Test
-    public void processAvailabilityReflectsImportedProcesses() {
+    void processAvailabilityReflectsImportedProcesses() {
         ProcessAvailability missingAvailability = actionApi.getProcessAvailability(PROCESS_IDENTIFIER);
 
         assertTrue(missingAvailability.isNotFound());
@@ -79,7 +79,7 @@ public class ActionApiImplTest {
     }
 
     @Test
-    public void processAvailabilityAggregatesMixedProcessState() {
+    void processAvailabilityAggregatesMixedProcessState() {
         importAllDataNet();
 
         ProcessAvailabilities availabilities = actionApi.getProcessAvailability(
@@ -94,7 +94,7 @@ public class ActionApiImplTest {
     }
 
     @Test
-    public void createFindAndDeleteCaseByActionApiUsesRealWorkflowServices() {
+    void createFindAndDeleteCaseByActionApiUsesRealWorkflowServices() {
         importAllDataNet();
 
         CreateCaseEventOutcome created = actionApi.createCaseByIdentifier(
@@ -118,14 +118,15 @@ public class ActionApiImplTest {
         assertNotNull(deleted);
         assertNotNull(deleted.getCase());
         assertEquals(found.getStringId(), deleted.getCase().getStringId());
+        String deletedCaseId = found.getStringId();
         assertThrows(
                 IllegalArgumentException.class,
-                () -> actionApi.findCase(found.getStringId())
+                () -> actionApi.findCase(deletedCaseId)
         );
     }
 
     @Test
-    public void getSystemUserDtoMatchesSystemUser() {
+    void getSystemUserDtoMatchesSystemUser() {
         AuthPrincipalDto systemUserDto = actionApi.getSystemUserDto();
 
         assertNotNull(actionApi.getSystemUser());
@@ -134,12 +135,13 @@ public class ActionApiImplTest {
     }
 
     @Test
-    public void createCaseRejectsMissingAuthPrincipal() {
+    void createCaseRejectsMissingAuthPrincipal() {
         importAllDataNet();
+        Map<String, String> params = Map.of();
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> actionApi.createCaseByIdentifier(PROCESS_IDENTIFIER, "Invalid", "red", null, Map.of())
+                () -> actionApi.createCaseByIdentifier(PROCESS_IDENTIFIER, "Invalid", "red", null, params)
         );
 
         assertEquals("AuthPrincipalDto cannot be null.", exception.getMessage());

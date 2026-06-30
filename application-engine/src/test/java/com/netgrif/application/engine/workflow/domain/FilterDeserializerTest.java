@@ -10,6 +10,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FilterDeserializerTest {
 
@@ -27,6 +28,15 @@ class FilterDeserializerTest {
     }
 
     @Test
+    void mapsNestedNonListValuesToMap() throws Exception {
+        Object parsed = mapper.readValue("{\"title\":\"My filter\",\"metadata\":{\"owner\":\"admin\"}}", Object.class);
+
+        Map<?, ?> map = assertInstanceOf(Map.class, parsed);
+        Map<?, ?> metadata = assertInstanceOf(Map.class, map.get("metadata"));
+        assertEquals("admin", metadata.get("owner"));
+    }
+
+    @Test
     void mapsConfiguredListValuesToList() throws Exception {
         Object parsed = mapper.readValue("{\"filter\":{\"id\":\"f1\"},\"allowedNet\":\"invoice\"}", Object.class);
 
@@ -34,5 +44,27 @@ class FilterDeserializerTest {
         assertEquals(2, list.size());
         assertEquals(Map.of("id", "f1"), list.get(0));
         assertEquals("invoice", list.get(1));
+    }
+
+    @Test
+    void mapsEmptyObjectToEmptyMap() throws Exception {
+        Object parsed = mapper.readValue("{}", Object.class);
+
+        Map<?, ?> map = assertInstanceOf(Map.class, parsed);
+        assertTrue(map.isEmpty());
+    }
+
+    @Test
+    void mapsNestedListKeysWithoutLosingOrder() throws Exception {
+        Object parsed = mapper.readValue(
+                "{\"filter\":{\"id\":\"f1\"},\"predicate\":{\"field\":\"title\"},\"stringValue\":\"invoice\"}",
+                Object.class
+        );
+
+        List<?> list = assertInstanceOf(List.class, parsed);
+        assertEquals(3, list.size());
+        assertEquals(Map.of("id", "f1"), list.get(0));
+        assertEquals(Map.of("field", "title"), list.get(1));
+        assertEquals("invoice", list.get(2));
     }
 }
