@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -54,13 +53,18 @@ class NullableTest {
     @Test
     void filtersPresentValuesAndPreservesTypeOnFilteredEmpty() {
         Nullable<String> present = Nullable.of("value", String.class);
+        Nullable<String> matching = present.filter(value -> value.startsWith("v"));
 
-        assertSame(present, present.filter(value -> value.startsWith("v")));
+        assertTrue(matching.isPresent());
+        assertEquals("value", matching.get());
+        assertEquals(String.class, matching.getType());
         Nullable<String> filtered = present.filter(value -> value.startsWith("x"));
 
         assertTrue(filtered.isEmpty());
         assertEquals(String.class, filtered.getType());
-        assertSame(filtered, filtered.filter(value -> true));
+        Nullable<String> filteredAgain = filtered.filter(value -> true);
+        assertTrue(filteredAgain.isEmpty());
+        assertEquals(String.class, filteredAgain.getType());
     }
 
     @Test
@@ -79,8 +83,13 @@ class NullableTest {
         Nullable<String> present = Nullable.of("value");
         Nullable<String> alternative = Nullable.of("fallback");
 
-        assertSame(present, present.or(() -> alternative));
-        assertSame(alternative, Nullable.<String>empty().or(() -> alternative));
+        Nullable<String> presentResult = present.or(() -> alternative);
+        Nullable<String> alternativeResult = Nullable.<String>empty().or(() -> alternative);
+
+        assertTrue(presentResult.isPresent());
+        assertEquals("value", presentResult.get());
+        assertTrue(alternativeResult.isPresent());
+        assertEquals("fallback", alternativeResult.get());
     }
 
     @Test

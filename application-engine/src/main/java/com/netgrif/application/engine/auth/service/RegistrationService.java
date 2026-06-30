@@ -170,6 +170,7 @@ public class RegistrationService implements IRegistrationService {
         user.setFirstName(registrationRequest.name);
         user.setLastName(registrationRequest.surname);
         user.setPassword(registrationRequest.password);
+        encodeUserPassword(user);
 
         user.setToken(StringUtils.EMPTY);
         user.setExpirationDate(null);

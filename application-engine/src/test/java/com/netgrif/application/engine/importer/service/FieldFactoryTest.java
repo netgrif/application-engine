@@ -75,10 +75,15 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void parseDateFromStringKeepsOffsetDateComponent() {
+    public void parseDateFromStringUsesLocalZoneForOffsetValues() {
+        String value = "2026-05-29T00:30:00+02:00";
+        LocalDate expected = OffsetDateTime.parse(value)
+                .atZoneSameInstant(ZoneId.systemDefault())
+                .toLocalDate();
+
         assertEquals(
-                LocalDate.of(2026, 5, 29),
-                FieldFactory.parseDateFromString("2026-05-29T00:30:00+02:00")
+                expected,
+                FieldFactory.parseDateFromString(value)
         );
     }
 

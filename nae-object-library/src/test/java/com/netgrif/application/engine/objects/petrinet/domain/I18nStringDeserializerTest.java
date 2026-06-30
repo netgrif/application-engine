@@ -9,6 +9,7 @@ import tools.jackson.databind.module.SimpleModule;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class I18nStringDeserializerTest {
 
@@ -45,6 +46,7 @@ class I18nStringDeserializerTest {
                 I18nString.class
         );
 
+        assertTrue(value.getTranslations().containsKey("sk"));
         assertNull(value.getTranslations().get("sk"));
     }
 

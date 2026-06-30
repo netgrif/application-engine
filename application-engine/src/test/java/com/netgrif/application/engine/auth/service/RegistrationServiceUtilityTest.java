@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -168,7 +169,9 @@ class RegistrationServiceUtilityTest {
         User saved = user("new@example.com");
         when(processRoleService.getDefaultRole()).thenReturn(defaultRole);
         when(processRoleLookupService.findByIds(request.processRoles)).thenReturn(List.of(requestedRole));
-        when(userService.saveUser(any(AbstractUser.class), eq(null))).thenReturn(saved);
+        when(userService.saveUser(argThat(user ->
+                user != null && Set.of(requestedRole).equals(user.getProcessRoles())
+        ), eq(null))).thenReturn(saved);
 
         AbstractUser result = service.createNewUser(request);
 
@@ -188,6 +191,7 @@ class RegistrationServiceUtilityTest {
         request.surname = "Registered";
         request.password = "secret";
         when(userService.findByEmail("user@example.com", null)).thenReturn(user);
+        when(passwordEncoder.encode("secret")).thenReturn("encoded-secret");
         when(userService.saveUser(user, null)).thenReturn(user);
 
         AbstractUser result = service.registerUser(request);
@@ -195,8 +199,9 @@ class RegistrationServiceUtilityTest {
         assertSame(user, result);
         assertEquals("John", user.getFirstName());
         assertEquals("Registered", user.getLastName());
-        assertEquals("secret", user.getPassword());
+        assertEquals("encoded-secret", user.getPassword());
         assertEquals(UserState.ACTIVE, user.getState());
+        verify(passwordEncoder).encode("secret");
         verify(userService).saveUser(user, null);
     }
 

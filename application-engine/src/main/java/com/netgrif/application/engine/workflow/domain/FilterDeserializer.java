@@ -37,6 +37,9 @@ public class FilterDeserializer extends UntypedObjectDeserializer {
         JsonToken token = parser.currentToken();
         if (token == JsonToken.START_OBJECT) {
             firstKey = parser.nextName();
+            if (firstKey == null) {
+                return Collections.emptyMap();
+            }
         } else if (token == JsonToken.PROPERTY_NAME) {
             firstKey = parser.currentName();
         } else {

@@ -5,6 +5,7 @@ import com.netgrif.application.engine.objects.workflow.domain.Case;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -12,6 +13,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import tools.jackson.core.JacksonException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -26,6 +28,7 @@ class RestResponseExceptionHandlerTest {
 
         assertNotNull(response);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertWritableFailureBody(response);
     }
 
     @Test
@@ -37,6 +40,7 @@ class RestResponseExceptionHandlerTest {
 
         assertNotNull(response);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertWritableFailureBody(response);
     }
 
     @Test
@@ -56,6 +60,13 @@ class RestResponseExceptionHandlerTest {
 
         assertNotNull(response);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertWritableFailureBody(response);
+    }
+
+    private static void assertWritableFailureBody(ResponseEntity<Object> response) {
+        ProblemDetail body = assertInstanceOf(ProblemDetail.class, response.getBody());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), body.getStatus());
+        assertEquals("Failed to write request", body.getDetail());
     }
 
     static class TestHandler extends RestResponseExceptionHandler {
