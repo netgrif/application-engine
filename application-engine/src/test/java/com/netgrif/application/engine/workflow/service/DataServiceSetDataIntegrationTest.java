@@ -21,9 +21,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -39,6 +44,10 @@ public class DataServiceSetDataIntegrationTest {
     private static final String EDITABLE_TRANSITION = "1";
     private static final String NUMBER_CURRENCY_FIELD = "number_currency";
     private static final String ENUMERATION_LIST_FIELD = "enumeration_list";
+    private static final String MULTICHOICE_LIST_FIELD = "multichoice_list";
+    private static final String DATE_FIELD = "date";
+    private static final String DATETIME_FIELD = "datetime";
+    private static final String TEXT_FIELD = "text";
 
     @Autowired
     private TestHelper testHelper;
@@ -142,6 +151,87 @@ public class DataServiceSetDataIntegrationTest {
         assertEquals("Alice", value.getDefaultValue());
     }
 
+    @Test
+    public void setDataAcceptsBlankDateAndNullDateTimeValuesAndStoresNull() {
+        Case useCase = createCase();
+        Task task = findEditableTask(useCase);
+
+        ObjectNode dataSet = dataSet(DATE_FIELD, fieldWithValue("date", ""));
+        dataSet.set(DATETIME_FIELD, fieldWithNullValue("dateTime"));
+
+        SetDataEventOutcome outcome = dataService.setData(task.getStringId(), dataSet);
+
+        assertTrue(outcome.getChangedFields().containsKey(DATE_FIELD));
+        assertTrue(outcome.getChangedFields().containsKey(DATETIME_FIELD));
+        assertNull(outcome.getCase().getFieldValue(DATE_FIELD));
+        assertNull(outcome.getCase().getFieldValue(DATETIME_FIELD));
+        Case persistedCase = workflowService.findOne(useCase.getStringId());
+        assertNull(persistedCase.getFieldValue(DATE_FIELD));
+        assertNull(persistedCase.getFieldValue(DATETIME_FIELD));
+    }
+
+    @Test
+    public void setDataStoresDateAndDateTimeValues() {
+        Case useCase = createCase();
+        Task task = findEditableTask(useCase);
+
+        ObjectNode dataSet = dataSet(DATE_FIELD, fieldWithValue("date", "29.05.2026"));
+        dataSet.set(DATETIME_FIELD, fieldWithValue("dateTime", "2026-05-29T13:45:10"));
+
+        SetDataEventOutcome outcome = dataService.setData(task.getStringId(), dataSet);
+
+        assertEquals(LocalDate.of(2026, 5, 29), outcome.getCase().getFieldValue(DATE_FIELD));
+        assertEquals(LocalDateTime.of(2026, 5, 29, 13, 45, 10), outcome.getCase().getFieldValue(DATETIME_FIELD));
+    }
+
+    @Test
+    public void setDataAcceptsStringNullMultichoiceValueAndStoresNull() {
+        Case useCase = createCase();
+        Task task = findEditableTask(useCase);
+
+        SetDataEventOutcome outcome = dataService.setData(task.getStringId(), dataSet(
+                MULTICHOICE_LIST_FIELD,
+                fieldWithValue("multichoice", "null")
+        ));
+
+        assertTrue(outcome.getChangedFields().containsKey(MULTICHOICE_LIST_FIELD));
+        assertNull(outcome.getCase().getFieldValue(MULTICHOICE_LIST_FIELD));
+    }
+
+    @Test
+    public void setDataStoresMultichoiceArrayAsI18nStringSet() {
+        Case useCase = createCase();
+        Task task = findEditableTask(useCase);
+
+        SetDataEventOutcome outcome = dataService.setData(task.getStringId(), dataSet(
+                MULTICHOICE_LIST_FIELD,
+                fieldWithArrayValue("multichoice", "Alice", "Carol")
+        ));
+
+        Set<?> value = assertInstanceOf(Set.class, outcome.getCase().getFieldValue(MULTICHOICE_LIST_FIELD));
+        assertEquals(
+                Set.of("Alice", "Carol"),
+                value.stream()
+                        .map(item -> ((I18nString) item).getDefaultValue())
+                        .collect(Collectors.toSet())
+        );
+    }
+
+    @Test
+    public void setDataStoresTextValue() {
+        Case useCase = createCase();
+        Task task = findEditableTask(useCase);
+
+        SetDataEventOutcome outcome = dataService.setData(task.getStringId(), dataSet(
+                TEXT_FIELD,
+                fieldWithValue("text", "Updated text")
+        ));
+
+        assertTrue(outcome.getChangedFields().containsKey(TEXT_FIELD));
+        assertEquals("Updated text", outcome.getCase().getFieldValue(TEXT_FIELD));
+        assertEquals("Updated text", workflowService.findOne(useCase.getStringId()).getFieldValue(TEXT_FIELD));
+    }
+
     private Case createCase() {
         CreateCaseEventOutcome outcome = workflowService.createCase(CreateCaseParams.with()
                 .process(net)
@@ -175,6 +265,16 @@ public class DataServiceSetDataIntegrationTest {
     private ObjectNode fieldWithNullValue(String type) {
         ObjectNode field = field(type);
         field.putNull("value");
+        return field;
+    }
+
+    private ObjectNode fieldWithArrayValue(String type, String... values) {
+        ObjectNode field = field(type);
+        ArrayNode array = JsonNodeFactory.instance.arrayNode();
+        for (String value : values) {
+            array.add(value);
+        }
+        field.set("value", array);
         return field;
     }
 

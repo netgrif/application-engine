@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.configuration.security;
 
-import com.netgrif.application.engine.configuration.properties.ManagementConfigurationProperties;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

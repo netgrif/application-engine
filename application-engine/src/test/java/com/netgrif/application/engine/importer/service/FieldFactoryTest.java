@@ -9,11 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,10 +48,17 @@ public class FieldFactoryTest {
     }
 
     @Test
-    public void parseDateFromStringUsesUtcForInstantValues() {
+    public void parseDateFromStringUsesLocalZoneForInstantValues() {
+        LocalDate expected = LocalDate.of(2026, 5, 29);
+        String serializedDate = Date.from(expected
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant())
+                .toInstant()
+                .toString();
+
         assertEquals(
-                LocalDate.of(2026, 5, 29),
-                FieldFactory.parseDateFromString("2026-05-29T00:30:00Z")
+                expected,
+                FieldFactory.parseDateFromString(serializedDate)
         );
     }
 
