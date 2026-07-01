@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
+import com.netgrif.application.engine.workflow.service.LegacyTaskSearchService;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -46,15 +47,13 @@ import java.util.Locale;
 @RequestMapping({"/api/public/task"})
 public class PublicTaskController extends AbstractTaskController {
 
-    final IUserService userService;
+    private final IUserService userService;
     private final ITaskService taskService;
-    private final IDataService dataService;
 
     public PublicTaskController(ITaskService taskService, IDataService dataService, IUserService userService,
-                                IWorkflowService workflowService) {
-        super(taskService, dataService, workflowService, null);
+                                IWorkflowService workflowService, LegacyTaskSearchService searchService) {
+        super(taskService, dataService, workflowService, null, searchService);
         this.taskService = taskService;
-        this.dataService = dataService;
         this.userService = userService;
     }
 

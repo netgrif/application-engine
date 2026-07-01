@@ -7,6 +7,7 @@ import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.Sin
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
+import com.netgrif.application.engine.workflow.service.LegacyTaskSearchService;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -20,8 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
@@ -40,21 +40,20 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Locale;
 
+@Slf4j
 @RestController
+@Tag(name = "Task")
 @RequestMapping("/api/task")
 @ConditionalOnProperty(
         value = "nae.task.web.enabled",
         havingValue = "true",
         matchIfMissing = true
 )
-@Tag(name = "Task")
 public class TaskController extends AbstractTaskController {
 
-    public static final Logger log = LoggerFactory.getLogger(TaskController.class);
-
     public TaskController(ITaskService taskService, IDataService dataService, IWorkflowService workflowService,
-                          IElasticTaskService searchService) {
-        super(taskService, dataService, workflowService, searchService);
+                          IElasticTaskService elasticTaskService, LegacyTaskSearchService searchService) {
+        super(taskService, dataService, workflowService, elasticTaskService, searchService);
     }
 
     @Override
@@ -167,6 +166,13 @@ public class TaskController extends AbstractTaskController {
     @PostMapping(value = "/search_es", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, @RequestBody SingleElasticTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
         return super.searchElastic(auth, pageable, searchBody, operation, assembler, locale);
+    }
+
+    @Override
+    @Operation(summary = "PFQL task search", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PostMapping(value = "/search_pfql", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public PagedModel<LocalisedTaskResource> searchPfql(Authentication auth, Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.searchPfql(auth, pageable, searchBody, operation, assembler, locale);
     }
 
     @Override

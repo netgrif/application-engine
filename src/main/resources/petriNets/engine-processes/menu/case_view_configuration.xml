@@ -329,8 +329,8 @@
     <data type="caseFilter">
         <id>case_filter</id>
         <title name="case_filter">Filter</title>
-        <desc name="case_filter_desc">Use Elasticsearch string query</desc>
-        <init>*</init>
+        <desc name="case_filter_desc">Use PFQL query</desc>
+        <init>cases</init>
     </data>
     <data type="boolean">
         <id>case_allow_export</id>
@@ -387,7 +387,7 @@
         <i18nString name="case_empty_content_icon_desc">Ak je toto pole prázdne, bude použitá predvolená ikona</i18nString>
         <i18nString name="case_empty_content_icon_preview">Náhľad ikony prázdneho obsahu</i18nString>
         <i18nString name="case_filter">Filter</i18nString>
-        <i18nString name="case_filter_desc">Použi Elasticsearch string query</i18nString>
+        <i18nString name="case_filter_desc">Použi PFQL query</i18nString>
         <i18nString name="case_allowed_nets">Povolené procesy</i18nString>
         <i18nString name="case_all_allowed_nets">Povoliť všetky procesy?</i18nString>
         <i18nString name="case_inherit_allowed_nets">Zdediť povolené procesy?</i18nString>
@@ -433,7 +433,7 @@
         </i18nString>
         <i18nString name="case_empty_content_icon_preview">Vorschau des leeren Inhaltssymbols</i18nString>
         <i18nString name="case_filter">Filter</i18nString>
-        <i18nString name="case_filter_desc">Verwenden Sie Elasticsearch String Query</i18nString>
+        <i18nString name="case_filter_desc">Verwenden Sie PFQL Query</i18nString>
         <i18nString name="case_allowed_nets">Erlaubte Prozesse</i18nString>
         <i18nString name="case_all_allowed_nets">Alle Prozesse erlauben?</i18nString>
         <i18nString name="case_inherit_allowed_nets">Erlaubte Prozesse erben?</i18nString>

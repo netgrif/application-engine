@@ -48,4 +48,6 @@ public class TaskSearchRequest implements Serializable {
     public List<String> stringId;
 
     public Map<String, String> tags;
+
+    public String query;
 }

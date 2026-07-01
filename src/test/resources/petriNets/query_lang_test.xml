@@ -8,6 +8,19 @@
 	<anonymousRole>false</anonymousRole>
 	<transitionRole>false</transitionRole>
 
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+
+	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<view>true</view>
+			<create>true</create>
+		</caseLogic>
+	</roleRef>
+
 	<data type="text" immediate="true">
 		<id>input_query</id>
 		<title/>
@@ -243,5 +256,11 @@
 		<x>700</x>
 		<y>180</y>
 		<label>TEST API</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 	</transition>
 </document>

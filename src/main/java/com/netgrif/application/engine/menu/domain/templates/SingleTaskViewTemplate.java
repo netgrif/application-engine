@@ -19,7 +19,7 @@ public class SingleTaskViewTemplate implements Template {
         menuItemBody.setUseTabbedView(false);
 
         SingleTaskViewBody singleTaskViewBody = new SingleTaskViewBody();
-        singleTaskViewBody.setFilterBody(Template.defaultTaskFilterBody());
+        singleTaskViewBody.setFilterBody(Template.defaultSingleTaskFilterBody());
         menuItemBody.setView(singleTaskViewBody);
 
         return menuItemBody;
