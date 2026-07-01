@@ -300,6 +300,7 @@ public class Importer {
             translation = new I18nString();
             i18n.put(name, translation);
         }
+        translation.setKey(name);
         translation.addTranslation(locale, i18NStringType.getValue());
     }
 

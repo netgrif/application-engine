@@ -298,8 +298,9 @@
             <xs:element type="transactionRef" name="transactionRef" minOccurs="0"/>
             <xs:element type="roleRef" name="roleRef" maxOccurs="unbounded" minOccurs="0"/>
             <xs:choice minOccurs="0">
-                <xs:element type="userRef" name="usersRef" maxOccurs="unbounded"/>
-                <xs:element type="userRef" name="userRef" maxOccurs="unbounded"/>
+        <!-- deprecated --> <xs:element type="actorRef" name="usersRef" maxOccurs="unbounded"/>
+        <!-- deprecated --> <xs:element type="actorRef" name="userRef" maxOccurs="unbounded"/>
+        <xs:element type="actorRef" name="actorRef" maxOccurs="unbounded"/>
             </xs:choice>
             <xs:element type="assignedUser" name="assignedUser" minOccurs="0"/>
             <xs:element type="dataRef" name="dataRef" maxOccurs="unbounded" minOccurs="0"/>
@@ -416,8 +417,9 @@
             <xs:element type="i18nStringTypeWithExpression" name="caseName" minOccurs="0"/>
             <xs:element type="caseRoleRef" name="roleRef" maxOccurs="unbounded" minOccurs="0"/>
             <xs:choice minOccurs="0">
-                <xs:element type="caseUserRef" name="usersRef" maxOccurs="unbounded"/>
-                <xs:element type="caseUserRef" name="userRef" maxOccurs="unbounded"/>
+        <!-- deprecated --> <xs:element type="caseActorRef" name="usersRef" maxOccurs="unbounded"/>
+        <!-- deprecated --> <xs:element type="caseActorRef" name="userRef" maxOccurs="unbounded"/>
+        <xs:element type="caseActorRef" name="actorRef" maxOccurs="unbounded"/>
             </xs:choice>
             <xs:element type="processEvents" name="processEvents" minOccurs="0"/>
             <xs:element type="caseEvents" name="caseEvents" minOccurs="0"/>
@@ -444,6 +446,14 @@
     </xs:complexType>
     <!-- ===== RESTRICTIONS ===== -->
     <xs:simpleType name="data_type">
+    <xs:annotation>
+      <xs:documentation>
+        Deprecated attributes:
+        - filter: use caseFilter/taskFilter/processFilter
+        - user: use actor
+        - userList: use actorList
+      </xs:documentation>
+    </xs:annotation>
         <xs:restriction base="xs:string">
             <xs:enumeration value="number"/>
             <xs:enumeration value="text"/>
@@ -456,13 +466,18 @@
             <xs:enumeration value="date"/>
             <xs:enumeration value="file"/>
             <xs:enumeration value="fileList"/>
-            <xs:enumeration value="user"/>
-            <xs:enumeration value="userList"/>
+      <!-- deprecated --> <xs:enumeration value="user"/>
+      <xs:enumeration value="actor"/>
+      <!-- deprecated --> <xs:enumeration value="userList"/>
+      <xs:enumeration value="actorList"/>
             <xs:enumeration value="dateTime"/>
             <xs:enumeration value="button"/>
             <xs:enumeration value="taskRef"/>
             <xs:enumeration value="caseRef"/>
-            <xs:enumeration value="filter"/>
+      <!-- deprecated --> <xs:enumeration value="filter"/>
+      <xs:enumeration value="caseFilter"/>
+      <xs:enumeration value="taskFilter"/>
+      <xs:enumeration value="processFilter"/>
             <xs:enumeration value="i18n"/>
         </xs:restriction>
     </xs:simpleType>
@@ -470,6 +485,7 @@
         <xs:restriction base="xs:string">
             <xs:enumeration value="namespace"/>
             <xs:enumeration value="process"/>
+      <xs:enumeration value="global"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="arc_type">
@@ -673,7 +689,7 @@
             <xs:extension base="permissionRef"/>
         </xs:complexContent>
     </xs:complexType>
-    <xs:complexType name="userRef">
+  <xs:complexType name="actorRef">
         <xs:complexContent>
             <xs:extension base="permissionRef"/>
         </xs:complexContent>
@@ -689,7 +705,7 @@
             <xs:extension base="casePermissionRef"/>
         </xs:complexContent>
     </xs:complexType>
-    <xs:complexType name="caseUserRef">
+  <xs:complexType name="caseActorRef">
         <xs:complexContent>
             <xs:extension base="casePermissionRef"/>
         </xs:complexContent>

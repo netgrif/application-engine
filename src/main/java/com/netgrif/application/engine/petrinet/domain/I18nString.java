@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain;
 
 import lombok.Data;
+import org.bson.types.ObjectId;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ public class I18nString implements Serializable {
 
     public I18nString() {
         this.translations = new HashMap<>();
+        this.key = new ObjectId().toString();
     }
 
     public I18nString(String defaultValue) {

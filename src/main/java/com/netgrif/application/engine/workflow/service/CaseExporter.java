@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.properties.SchemaProperties;
 import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.model.Properties;
@@ -36,6 +37,9 @@ public class CaseExporter {
 
     @Autowired
     private SchemaProperties properties;
+
+    @Autowired
+    private IUserService userService;
 
     private final ObjectFactory objectFactory = new ObjectFactory();
 
@@ -83,7 +87,7 @@ public class CaseExporter {
     private void exportCaseMetadata(com.netgrif.application.engine.workflow.domain.Case caseToExport) {
         this.xmlCase.setId(caseToExport.getStringId());
 //        todo should the whole object be exported? is id specific enough? should email be exported instead of id?
-        this.xmlCase.setAuthor(caseToExport.getAuthor().getId());
+        this.xmlCase.setAuthor(caseToExport.getAuthor().getEmail());
         this.xmlCase.setColor(caseToExport.getColor());
         this.xmlCase.setProcessVersion(caseToExport.getPetriNet().getVersion().toString());
         this.xmlCase.setProcessIdentifier(caseToExport.getProcessIdentifier());
@@ -94,12 +98,16 @@ public class CaseExporter {
         this.xmlCase.setCreationDate(exportLocalDateTime(caseToExport.getCreationDate()));
         this.xmlCase.setLastModified(exportLocalDateTime(caseToExport.getLastModified()));
         this.xmlCase.setViewRoles(exportCollectionOfStrings(caseToExport.getViewRoles()));
-        this.xmlCase.setViewUserRefs(exportCollectionOfStrings(caseToExport.getNegativeViewUsers()));
-        this.xmlCase.setViewUsers(exportCollectionOfStrings(caseToExport.getNegativeViewUsers()));
-        this.xmlCase.setNegativeViewUsers(exportCollectionOfStrings(caseToExport.getNegativeViewUsers()));
+        this.xmlCase.setViewUserRefs(exportCollectionOfStrings(caseToExport.getViewUserRefs()));
+//        todo export users with email instead of objectId
+        this.xmlCase.setViewUsers(exportCollectionOfStrings(caseToExport.getViewUsers().stream().map((userId) -> userService.findById(userId, true).getEmail()).collect(Collectors.toList())));
+        this.xmlCase.setNegativeViewUsers(exportCollectionOfStrings(caseToExport.getNegativeViewUsers().stream().map((userId) -> userService.findById(userId, true).getEmail()).collect(Collectors.toList())));
         this.xmlCase.setActivePlaces(exportMapXsdType(caseToExport.getActivePlaces()));
         this.xmlCase.setConsumedTokens(exportMapXsdType(caseToExport.getConsumedTokens()));
-        this.xmlCase.setUsers(exportPermissions(caseToExport.getUsers()));
+        this.xmlCase.setUsers(exportPermissions(caseToExport.getUsers().keySet().stream().map((userId) -> {
+            String userMail = userService.findById(userId, true).getEmail();
+            return Map.entry(userMail, caseToExport.getUsers().get(userId));
+        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))));
     }
 
     private void exportTasks() {
@@ -113,8 +121,6 @@ public class CaseExporter {
         Task xmlTask = objectFactory.createTask();
         xmlTask.setId(taskToExport.getStringId());
         xmlTask.setTransitionId(taskToExport.getTransitionId());
-        xmlTask.setTitle(exportI18NString(taskToExport.getTitle()));
-        xmlTask.setPriority(exportInteger(taskToExport.getPriority()));
         xmlTask.setUserId(taskToExport.getUserId());
         xmlTask.setStartDate(exportLocalDateTime(taskToExport.getStartDate()));
         xmlTask.setFinishDate(exportLocalDateTime(taskToExport.getFinishDate()));
@@ -152,9 +158,6 @@ public class CaseExporter {
         xmlDataField.setId(fieldId);
         xmlDataField.setType(DataType.fromValue(caseToExport.getField(fieldId).getType().getName()));
         xmlDataField.setValues(exportDataFieldValue(dataFieldToExport.getValue(), caseToExport.getField(fieldId).getType()));
-        if (this.caseToExport.getField(fieldId).getType().equals(FieldType.FILTER)) {
-            xmlDataField.setFilterMetadata(exportFilterMetadata(dataFieldToExport.getFilterMetadata()));
-        }
         xmlDataField.setEncryption(dataFieldToExport.getEncryption());
         xmlDataField.setLastModified(exportLocalDateTime(dataFieldToExport.getLastModified()));
         xmlDataField.setVersion(dataFieldToExport.getVersion());
@@ -170,60 +173,6 @@ public class CaseExporter {
         }
         xmlDataField.setBehaviors(exportTaskBehaviors(dataFieldToExport.getBehavior()));
         return xmlDataField;
-    }
-
-    private FilterMetadata exportFilterMetadata(Map<String, Object> filterMetadata) {
-//        todo refactor whole metadata object
-        if (filterMetadata == null || filterMetadata.isEmpty()) {
-            return null;
-        }
-        FilterMetadata xmlMetadata = objectFactory.createFilterMetadata();
-        xmlMetadata.setFilterType(FilterType.fromValue(filterMetadata.get("filterType").toString()));
-        xmlMetadata.setPredicateMetadata(parsePredicateTreeMetadata((List<List<Object>>) filterMetadata.get("predicateTreeMetadata")));
-        xmlMetadata.getSearchCategories().getValue().addAll((List<String>) filterMetadata.get("searchCategories"));
-        xmlMetadata.setDefaultSearchCategories((Boolean) filterMetadata.get("defaultSearchCategories"));
-        xmlMetadata.setInheritAllowedNets((Boolean) filterMetadata.get("inheritAllowedNets"));
-        return xmlMetadata;
-    }
-
-    private PredicateTreeMetadata parsePredicateTreeMetadata(List<List<Object>> predicateTreeMetadata) {
-        if (predicateTreeMetadata == null || predicateTreeMetadata.isEmpty()) {
-            return null;
-        }
-        PredicateTreeMetadata xmlPredicateTreeMetadata = objectFactory.createPredicateTreeMetadata();
-        predicateTreeMetadata.forEach(list -> {
-            if (list == null || list.isEmpty()) {
-                return;
-            }
-            PredicateMetadataArray metadataArray = objectFactory.createPredicateMetadataArray();
-            list.forEach(data -> {
-                if (data == null) {
-                    return;
-                }
-                CategoryGeneratorMetadata metadata = objectFactory.createCategoryGeneratorMetadata();
-                Map<String, Object> retypedData = (Map<String, Object>) data;
-                metadata.setCategory(retypedData.get("category").toString());
-                metadata.setValues(exportCollectionOfStrings((Collection<String>) retypedData.get("category")));
-                metadata.setConfiguration(exportMetadataConfiguration((Map<String, String>) retypedData.get("configuration")));
-                metadataArray.getData().add(metadata);
-            });
-            xmlPredicateTreeMetadata.getPredicate().add(metadataArray);
-        });
-        return xmlPredicateTreeMetadata;
-    }
-
-    private CategoryMetadataConfiguration exportMetadataConfiguration(Map<String, String> configuration) {
-        if (configuration == null || configuration.isEmpty()) {
-            return null;
-        }
-        CategoryMetadataConfiguration xmlMetadata = objectFactory.createCategoryMetadataConfiguration();
-        configuration.forEach((key, value) -> {
-            ConfigurationValue xmlValue = objectFactory.createConfigurationValue();
-            xmlValue.setValue(value);
-            xmlValue.setId(key);
-            xmlMetadata.getValue().add(xmlValue);
-        });
-        return xmlMetadata;
     }
 
     private TaskBehaviors exportTaskBehaviors(Map<String, Set<FieldBehavior>> taskBehavior) {
@@ -380,7 +329,7 @@ public class CaseExporter {
                 } else {
                     userFieldValues = ((UserListFieldValue) value).getUserValues();
                 }
-                userFieldValues.forEach(userFieldValue -> values.getValue().add(userFieldValue.getId()));
+                userFieldValues.forEach(userFieldValue -> values.getValue().add(userFieldValue.getEmail()));
                 break;
             case FILE:
             case FILELIST:

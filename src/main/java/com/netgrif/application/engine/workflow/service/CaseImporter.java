@@ -206,9 +206,6 @@ public class CaseImporter {
             dataField.setEncryption(field.getEncryption());
             dataField.setLastModified(parseDateTimeFromXml(field.getLastModified()));
             dataField.setVersion(field.getVersion());
-            if (field.getType() == DataType.FILTER) {
-                dataField.setFilterMetadata(parseFilterMetadata(field.getFilterMetadata()));
-            }
             dataField.setValue(parseXmlValue(field));
             dataField.setComponent(parseXmlComponent(field.getComponent()));
             field.getDataRefComponent().stream()
@@ -227,58 +224,6 @@ public class CaseImporter {
             }
             importedCase.getDataSet().put(field.getId(), dataField);
         });
-    }
-
-    private Map<String, Object> parseFilterMetadata(FilterMetadata filterMetadata) {
-        Map<String, Object> filterMetadataMap = new HashMap<>();
-        if (filterMetadata == null) {
-            return filterMetadataMap;
-        }
-        filterMetadataMap.put("filterType", filterMetadata.getFilterType().toString());
-        filterMetadataMap.put("predicateMetadata", parsePredicateMetadata(filterMetadata.getPredicateMetadata()));
-        filterMetadataMap.put("searchCategories", filterMetadata.getSearchCategories());
-        filterMetadataMap.put("defaultSearchCategories", filterMetadata.isDefaultSearchCategories());
-        filterMetadataMap.put("inheritAllowedNets", filterMetadata.isInheritAllowedNets());
-        return filterMetadataMap;
-    }
-
-    private Object parsePredicateMetadata(PredicateTreeMetadata predicateMetadata) {
-        if (predicateMetadata == null || predicateMetadata.getPredicate() == null) {
-            return null;
-        }
-        List<List<Object>> values = new ArrayList<>();
-        predicateMetadata.getPredicate().forEach(predicate -> {
-            if (predicate == null) {
-                return;
-            }
-            List<Object> value = new ArrayList<>();
-            predicate.getData().forEach(data -> {
-                if (data == null) {
-                    return;
-                }
-                Map<String, Object> dataMap = new HashMap<>();
-                dataMap.put("category", data.getCategory());
-                dataMap.put("values", parseStringCollection(data.getValues()));
-                dataMap.put("configuration", parseConfiguration(data.getConfiguration()));
-                value.add(dataMap);
-            });
-            values.add(value);
-        });
-        return values;
-    }
-
-    private Object parseConfiguration(CategoryMetadataConfiguration configuration) {
-        if (configuration == null) {
-            return null;
-        }
-        Map<String, String> configurationMap = new HashMap<>();
-        configuration.getValue().forEach(data -> {
-            if (data == null) {
-                return;
-            }
-            configurationMap.put(data.getId(), data.getValue());
-        });
-        return configurationMap;
     }
 
     private Object parseXmlValue(com.netgrif.application.engine.importer.model.DataField field) {
@@ -362,7 +307,8 @@ public class CaseImporter {
     private Map<String, String> parseTranslations(String name) {
         Map<String, String> translations = new HashMap<>();
         this.xmlCase.getI18N().forEach(i18n -> i18n.getI18NString().stream()
-                .filter(i18nString -> i18nString.getName().equals(name))
+//                todo rework translations to have name required
+                .filter(i18nString -> i18nString.getName() != null && i18nString.getName().equals(name))
                 .forEach(translation -> translations.put(translation.getName(), translation.getName())));
         return translations;
     }
@@ -376,7 +322,7 @@ public class CaseImporter {
     private UserFieldValue parseUserFieldValue(String xmlValue) {
         IUser user;
         try {
-            user = userService.resolveById(xmlValue, true);
+            user = userService.findByEmail(xmlValue, true);
             return new UserFieldValue(user);
         } catch (IllegalArgumentException e) {
             log.warn("User with id [{}] not found, setting empty value", xmlValue);
@@ -438,7 +384,7 @@ public class CaseImporter {
 //        todo id and visualId cannot be set, both are generated in constructor
         IUser user;
         try {
-            user = userService.findById(xmlCase.getAuthor(), true);
+            user = userService.findByEmail(xmlCase.getAuthor(), true);
         } catch (IllegalArgumentException e) {
             log.warn("Author of case to be imported not found, setting technical user as author");
             user = userService.getSystem();
@@ -452,13 +398,32 @@ public class CaseImporter {
         importedCase.setCreationDate(parseDateTimeFromXml(xmlCase.getCreationDate()));
         importedCase.setLastModified(parseDateTimeFromXml(xmlCase.getLastModified()));
         importedCase.setViewUserRefs(parseStringCollection(xmlCase.getViewUserRefs()));
-        importedCase.setViewUsers(parseStringCollection(xmlCase.getViewUsers()));
-        importedCase.setNegativeViewUsers(parseStringCollection(xmlCase.getNegativeViewUsers()));
+        importedCase.setViewUsers(transformUserEmailsToIds(parseStringCollection(xmlCase.getViewUsers())));
+        importedCase.setNegativeViewUsers(transformUserEmailsToIds(parseStringCollection(xmlCase.getNegativeViewUsers())));
         importedCase.setConsumedTokens(parseMapXsdType(xmlCase.getConsumedTokens()));
-        importedCase.setUsers(parsePermissionMap(xmlCase.getUsers()));
+        Map<String, Map<String, Boolean>> userPermissions = parsePermissionMap(xmlCase.getUsers());
+        importedCase.setUsers(
+                userPermissions.keySet().stream().map((userEmail) -> {
+                    IUser mappedUser = userService.findByEmail(userEmail, true);
+                    if (mappedUser == null) {
+                        return null;
+                    }
+                    return Map.entry(mappedUser.getStringId(), parsePermissionMap(xmlCase.getUsers()).get(userEmail));
+                }).filter(Objects::nonNull).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+        );
         importedCase.setTitle(xmlCase.getTitle());
         importedCase.getPetriNet().initializeArcs(importedCase.getDataSet());
         updateCaseState();
+    }
+
+    private List<String> transformUserEmailsToIds(List<String> userEmails) {
+        return userEmails.stream().map((userId) -> {
+            IUser user = userService.findByEmail(userId, true);
+            if (user == null) {
+                return null;
+            }
+            return user.getStringId();
+        }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     private void updateCaseState() {

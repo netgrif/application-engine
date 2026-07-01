@@ -6,6 +6,8 @@ import com.netgrif.application.engine.files.StorageResolverService
 import com.netgrif.application.engine.files.interfaces.IStorageService
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.dataset.StorageField
+import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -138,9 +140,9 @@ class CaseImportExportTest {
     void setFiles(Case testCase, Map dataSet) {
         StorageField<?> fileField = testCase.getField("file") as StorageField<?>
         IStorageService fileStorageService = resolverService.resolve(fileField.getStorageType())
-        String fileFieldpath = fileStorageService.getPath(testCase.stringId, fileField.stringId, "arc_order_test.xml")
-        fileStorageService.save(fileField, fileFieldpath, new FileInputStream(new File(outputFileLocation.concat("arc_order_test.xml"))))
-        dataSet.put("file", ["type": "file", "value": "arc_order_test.xml:".concat(fileFieldpath)])
+        String fileFieldPath = fileStorageService.getPath(testCase.stringId, fileField.stringId, "arc_order_test.xml")
+        fileStorageService.save(fileField, fileFieldPath, new FileInputStream(new File(outputFileLocation.concat("arc_order_test.xml"))))
+        dataSet.put("file", ["type": "file", "value": "arc_order_test.xml:".concat(fileFieldPath)])
     }
 
     static void assertDataImport(Case importedCase) {
@@ -149,21 +151,21 @@ class CaseImportExportTest {
         assert importedCase.dataSet["text"].value == "test text"
         assert importedCase.dataSet["password_data"].value == "password"
         assert importedCase.dataSet["text_area"].value == "text area"
-        assert (importedCase.dataSet["enumeration_autocomplete"].value as I18nString).defaultValue == "Alice"
-        assert (importedCase.dataSet["enumeration"].value as I18nString).defaultValue == "changed_option"
+        assert (importedCase.dataSet["enumeration_autocomplete"].value as I18nString).defaultValue == "Alice" && (importedCase.dataSet["enumeration_autocomplete"].value as I18nString).key != null
+        assert (importedCase.dataSet["enumeration"].value as I18nString).defaultValue == "changed_option" && (importedCase.dataSet["enumeration"].value as I18nString).key != null
         assert importedCase.dataSet["enumeration"].choices[0].defaultValue == "changed_option"
-        assert (importedCase.dataSet["enumeration_list"].value as I18nString).defaultValue == "Alice"
+        assert (importedCase.dataSet["enumeration_list"].value as I18nString).defaultValue == "Alice" && (importedCase.dataSet["enumeration_list"].value as I18nString).key != null
         assert importedCase.dataSet["enumeration_map"].value == "al"
-        assert (importedCase.dataSet["multichoice"].value as Set<I18nString>).size() == 2 && (importedCase.dataSet["multichoice"].value as Set<I18nString>).stream().filter { ["Alice", "Carol"].contains(it.defaultValue) }.toList().size() == 2
-        assert (importedCase.dataSet["multichoice_list"].value as Set<I18nString>).size() == 2 && (importedCase.dataSet["multichoice_list"].value as Set<I18nString>).stream().filter { ["Alice", "Carol"].contains(it.defaultValue) }.toList().size() == 2
+        assert (importedCase.dataSet["multichoice"].value as Set<I18nString>).size() == 2 && (importedCase.dataSet["multichoice"].value as Set<I18nString>).stream().filter { ["Alice", "Carol"].contains(it.defaultValue) }.collect().size() == 2
+        assert (importedCase.dataSet["multichoice_list"].value as Set<I18nString>).size() == 2 && (importedCase.dataSet["multichoice_list"].value as Set<I18nString>).stream().filter { ["Alice", "Carol"].contains(it.defaultValue) }.collect().size() == 2
         assert (importedCase.dataSet["multichoice_map"].value as Set).containsAll(["al", "ca"])
         assert importedCase.dataSet["boolean"].value == true
-        assert importedCase.dataSet["date"].value.equals(LocalDate.of(2025, Month.APRIL, 1))
-        assert importedCase.dataSet["datetime"].value.equals(LocalDateTime.of(2025, Month.APRIL, 1, 17, 23))
+        assert importedCase.dataSet["date"].value == LocalDate.of(2025, Month.APRIL, 1)
+        assert importedCase.dataSet["datetime"].value == LocalDateTime.of(2025, Month.APRIL, 1, 17, 23)
         assert (importedCase.dataSet["taskRef"].value as List<String>).contains(importedCase.tasks.find { it.transition == "t2" }.task)
-        assert (importedCase.dataSet["test_i18n"].value as I18nString).defaultValue == "test i18n"
-        assert importedCase.dataSet["user"].value == null
-        assert importedCase.dataSet["userList1"].value == null
+        assert (importedCase.dataSet["test_i18n"].value as I18nString).defaultValue == "test i18n" && (importedCase.dataSet["test_i18n"].value as I18nString).key != null
+        assert (importedCase.dataSet["user"].value as UserFieldValue).email == "super@netgrif.com"
+        assert !(importedCase.dataSet["userList1"].value as UserListFieldValue).userValues.empty && (importedCase.dataSet["userList1"].value as UserListFieldValue).userValues[0].email == "super@netgrif.com"
         assert importedCase.dataSet["button"].value == 45
         assert (importedCase.dataSet["caseRef_field"].value as List<String>).contains(importedCase.stringId)
         assert (importedCase.dataSet["stringCollection_field"].value as List<String>).containsAll(["test_value_1", "test_value_2"])
