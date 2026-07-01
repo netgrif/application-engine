@@ -126,6 +126,15 @@
         </options>
         <init>sort</init>
     </data>
+    <data type="enumeration_map" immediate="true">
+        <id>task_headers_sort_mode_direction</id>
+        <title name="task_headers_sort_mode_direction">Default sort direction</title>
+        <options>
+            <option key="ascending" name="ascending">Ascending</option>
+            <option key="descending" name="descending">Descending</option>
+        </options>
+        <init>ascending</init>
+    </data>
     <data type="enumeration_map">
         <id>headers_options_holder</id>
         <title/>
@@ -249,6 +258,9 @@
         <i18nString name="task_filter_desc">Použi Elasticsearch string query</i18nString>
         <i18nString name="filter_settings">Filter</i18nString>
         <i18nString name="header_settings">Hlavičky</i18nString>
+        <i18nString name="task_headers_sort_mode_direction">Predvolený smer zoradenia</i18nString>
+        <i18nString name="ascending">Vzostupne</i18nString>
+        <i18nString name="descending">Zostupne</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="hidden">Versteckt</i18nString>
@@ -281,6 +293,9 @@
         <i18nString name="task_filter_desc">Elasticsearch String-Query verwenden</i18nString>
         <i18nString name="filter_settings">Filter</i18nString>
         <i18nString name="header_settings">Kopfzeilen</i18nString>
+        <i18nString name="task_headers_sort_mode_direction">Standard-Sortierrichtung</i18nString>
+        <i18nString name="ascending">Aufsteigend</i18nString>
+        <i18nString name="descending">Absteigend</i18nString>
     </i18n>
 
     <transition>
@@ -676,6 +691,22 @@
                     <appearance>outline</appearance>
                 </layout>
             </dataRef>
+            <dataRef>
+                <id>task_headers_sort_mode_direction</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
         </dataGroup>
         <event type="assign">
             <id>assign</id>
@@ -927,6 +958,20 @@
                 <layout>
                     <x>0</x>
                     <y>15</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_headers_sort_mode_direction</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>16</y>
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>

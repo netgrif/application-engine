@@ -226,6 +226,15 @@
         </options>
         <init>sort</init>
     </data>
+    <data type="enumeration_map" immediate="true">
+        <id>case_headers_sort_mode_direction</id>
+        <title name="case_headers_sort_mode_direction">Default sort direction</title>
+        <options>
+            <option key="ascending" name="ascending">Ascending</option>
+            <option key="descending" name="descending">Descending</option>
+        </options>
+        <init>ascending</init>
+    </data>
     <data type="enumeration_map">
         <id>headers_options_holder</id>
         <title/>
@@ -395,6 +404,9 @@
         <i18nString name="open_case_settings">Zobrazenie po kliknutí na inštanciu</i18nString>
         <i18nString name="create_case_btn_settings">Tlačidlo vytvorenia inštancie</i18nString>
         <i18nString name="header_settings">Hlavičky</i18nString>
+        <i18nString name="task_headers_sort_mode_direction">Predvolený smer zoradenia</i18nString>
+        <i18nString name="ascending">Vzostupne</i18nString>
+        <i18nString name="descending">Zostupne</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
@@ -441,6 +453,9 @@
         <i18nString name="open_case_settings">Ansicht nach dem Klicken auf die Instanz</i18nString>
         <i18nString name="create_case_btn_settings">Schaltfläche zum Erstellen einer Instanz</i18nString>
         <i18nString name="header_settings">Kopfzeilen</i18nString>
+        <i18nString name="task_headers_sort_mode_direction">Standard-Sortierrichtung</i18nString>
+        <i18nString name="ascending">Aufsteigend</i18nString>
+        <i18nString name="descending">Absteigend</i18nString>
     </i18n>
 
     <transition>
@@ -1042,6 +1057,22 @@
                     <appearance>outline</appearance>
                 </layout>
             </dataRef>
+            <dataRef>
+                <id>case_headers_sort_mode_direction</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
         </dataGroup>
         <event type="assign">
             <id>assign</id>
@@ -1370,7 +1401,7 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>view_configuration_type</id>
+                <id>case_headers_sort_mode_direction</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
@@ -1384,7 +1415,7 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>view_configuration_all_data_form</id>
+                <id>view_configuration_type</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
@@ -1398,13 +1429,27 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>case_allow_export</id>
+                <id>view_configuration_all_data_form</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
                     <y>23</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_allow_export</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>24</y>
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>
