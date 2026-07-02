@@ -1,24 +1,21 @@
 package com.netgrif.application.engine.migration.helpers
 
-import com.mongodb.BulkWriteException
+import com.mongodb.MongoBulkWriteException
 import com.mongodb.bulk.BulkWriteResult
 import com.netgrif.application.engine.configuration.properties.MigrationProperties
 import com.netgrif.application.engine.migration.model.MigrationError
 import com.netgrif.application.engine.migration.model.MigrationErrorHandlingMode
 import com.netgrif.application.engine.migration.model.MigrationErrorPolicy
 import com.netgrif.application.engine.migration.throwable.MigrationErrorException
-import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.utils.MongodbUtils
 import com.querydsl.core.types.Predicate
 import groovy.util.logging.Slf4j
 import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Query
-import org.springframework.data.util.CloseableIterator
 
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.stream.Stream
-
 /**
  * AbstractMigrationHelper is an abstract utility class to facilitate the bulk migration of
  * MongoDB documents. The class provides mechanisms for iterating over documents, preparing 
@@ -179,7 +176,7 @@ abstract class AbstractMigrationHelper<T> {
         try {
             BulkWriteResult bulkWriteResult = bulkOps.execute()
             log.debug("Processed bulk write of ${bulkWriteResult.modifiedCount}")
-        } catch (BulkWriteException e) {
+        } catch (MongoBulkWriteException e) {
             log.error("Failed to write bulk operation", e)
             e.getWriteErrors().forEach {
                 String message = "Error writing document with ID ${it.toString()}. Cause: ${it.getMessage()}"

@@ -1,11 +1,15 @@
 package com.netgrif.application.engine.petrinet.service
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.auth.domain.User
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
-import com.netgrif.application.engine.objects.auth.domain.*
+import com.netgrif.application.engine.objects.auth.domain.ActorRef
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
+import com.netgrif.application.engine.objects.auth.domain.Authority
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
@@ -26,7 +30,6 @@ import com.netgrif.application.engine.workflow.domain.repositories.TaskRepositor
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,10 +39,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-import static org.junit.jupiter.api.Assertions.assertFalse
-import static org.junit.jupiter.api.Assertions.assertNotNull
-import static org.junit.jupiter.api.Assertions.assertThrows
-import static org.junit.jupiter.api.Assertions.assertTrue
+import static org.junit.jupiter.api.Assertions.*
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -96,13 +96,12 @@ class PetriNetServiceTest {
     void setup() {
         testHelper.truncateDbs()
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Customer", lastName: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new User(firstName: "Customer", lastName: "User", username: CUSTOMER_USER_MAIL, email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
     }
 
     @Test
-    @Disabled
     void processImportAndDelete() {
         long processRoleCount = processRoleRepository.count()
         long processCount = petriNetRepository.count()
@@ -131,7 +130,7 @@ class PetriNetServiceTest {
         assert user.get().processRoles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
 
-        petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
+        petriNetService.deletePetriNet(new DeletePetriNetParams(testNet.stringId, superCreator.getLoggedSuper()))
         assert petriNetRepository.count() == processCount
         Thread.sleep(5000)
         assert elasticPetriNetRepository.findById(testNet.stringId).isEmpty()
@@ -251,7 +250,6 @@ class PetriNetServiceTest {
     }
 
     @Test
-    @Disabled
     void processSearch() {
         long processCount = petriNetRepository.count()
 

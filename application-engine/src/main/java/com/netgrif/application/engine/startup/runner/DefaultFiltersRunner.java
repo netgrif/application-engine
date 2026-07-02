@@ -47,6 +47,8 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
     public static final String FILTER_TYPE_TASK = "Task";
     public static final String FILTER_VISIBILITY_PRIVATE = "private";
     public static final String FILTER_VISIBILITY_PUBLIC = "public";
+    private static final String TYPE_ATTRIBUTE = "type";
+    private static final String VALUE_ATTRIBUTE = "value";
 
     private final IPetriNetService petriNetService;
     private final IWorkflowService workflowService;
@@ -453,34 +455,20 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
                     .build());
 
             Map<String, Map<String, Object>> setDataMap = new LinkedHashMap<>();
-            setDataMap.put(FILTER_TYPE_FIELD_ID, Map.of(
-                    "type", "enumeration_map",
-                    "value", filterType
-            ));
-            setDataMap.put(FILTER_VISIBILITY_FIELD_ID, Map.of(
-                    "type", "enumeration_map",
-                    "value", filterVisibility
-            ));
-            setDataMap.put(FILTER_FIELD_ID, Map.of(
-                    "type", "filter",
-                    "value", filterQuery,
-                    "allowedNets", allowedNets,
-                    "filterMetadata", filterMetadata // TODO this is a map of <String, Object> that needs to be converted to string
-            ));
+            setDataMap.put(FILTER_TYPE_FIELD_ID, fieldData("enumeration_map", filterType));
+            setDataMap.put(FILTER_VISIBILITY_FIELD_ID, fieldData("enumeration_map", filterVisibility));
+            setDataMap.put(FILTER_FIELD_ID, filterFieldData(filterQuery, allowedNets, filterMetadata));
 
             if (originId != null) {
-                setDataMap.put(viewOrigin ? FILTER_ORIGIN_VIEW_ID_FIELD_ID : FILTER_PARENT_CASE_ID_FIELD_ID, Map.of(
-                        "type", "text",
-                        "value", originId
-                ));
+                setDataMap.put(viewOrigin ? FILTER_ORIGIN_VIEW_ID_FIELD_ID : FILTER_PARENT_CASE_ID_FIELD_ID, fieldData("text", originId));
             }
 
             this.dataService.setData(newFilterTask, ImportHelper.populateDatasetWithObject(setDataMap));
             if (isImported) {
                 this.dataService.setData(newFilterTask, ImportHelper.populateDataset(Map.of(
                         IS_IMPORTED, Map.of(
-                                "type", "number",
-                                "value", "1"
+                                TYPE_ATTRIBUTE, "number",
+                                VALUE_ATTRIBUTE, "1"
                         )
                 )));
             }
@@ -501,6 +489,20 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
             log.error("Failed to create filter case", ex);
             return Optional.empty();
         }
+    }
+
+    private Map<String, Object> fieldData(String type, Object value) {
+        Map<String, Object> fieldData = new LinkedHashMap<>();
+        fieldData.put(TYPE_ATTRIBUTE, type);
+        fieldData.put(VALUE_ATTRIBUTE, value);
+        return fieldData;
+    }
+
+    private Map<String, Object> filterFieldData(String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata) {
+        Map<String, Object> fieldData = fieldData("filter", filterQuery);
+        fieldData.put("allowedNets", allowedNets);
+        fieldData.put("filterMetadata", filterMetadata);
+        return fieldData;
     }
 
 }

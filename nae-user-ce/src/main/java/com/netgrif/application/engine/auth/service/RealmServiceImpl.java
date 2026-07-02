@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.netgrif.application.engine.adapter.spring.configuration.AbstractMongoCollectionConfigurator;
 import com.netgrif.application.engine.auth.provider.AbstractAuthConfig;
 import com.netgrif.application.engine.auth.provider.AuthMethodProvider;
@@ -21,6 +20,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.Map;
@@ -261,12 +262,8 @@ public class RealmServiceImpl implements RealmService {
         Object targetConfig = existingConfig.getConfiguration();
 
         if (targetConfig != null && configUpdates != null && !configUpdates.isEmpty()) {
-            try {
-                JsonNode patchNode = objectMapper.valueToTree(configUpdates);
-                objectMapper.readerForUpdating(targetConfig).readValue(patchNode);
-            } catch (IOException e) {
-                throw new IllegalArgumentException("Failed to apply configuration patch", e);
-            }
+            JsonNode patchNode = objectMapper.valueToTree(configUpdates);
+            objectMapper.readerForUpdating(targetConfig).readValue(patchNode);
         }
         realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
         return existingConfig;

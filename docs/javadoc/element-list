@@ -1,3 +1,5 @@
+tools.jackson.databind
+tools.jackson.databind.node
 com.netgrif.application.engine
 com.netgrif.application.engine.actions
 com.netgrif.application.engine.adapter.spring.petrinet.domain

@@ -1,16 +1,15 @@
 package com.netgrif.application.engine.event
 
-import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser
+import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
+import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId
+import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

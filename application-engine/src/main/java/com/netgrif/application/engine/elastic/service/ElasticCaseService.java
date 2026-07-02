@@ -295,7 +295,10 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                 authorQuery.must(matchQuery("author", author.id, null, null)._toQuery());
             }
             if (author.name != null) {
-                authorQuery.must(termQuery("authorName", author.name)._toQuery());
+                authorQuery.must(termQuery("authorName.keyword", author.name)._toQuery());
+            }
+            if (author.username != null) {
+                authorQuery.must(termQuery("authorUsername", author.username)._toQuery());
             }
             if (author.username != null) {
                 authorQuery.must(termQuery("authorUsername", author.username)._toQuery());

@@ -9,17 +9,18 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.springframework.boot.autoconfigure.data.rest.RepositoryRestProperties;
-import org.springframework.boot.autoconfigure.session.RedisSessionProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.data.rest.autoconfigure.DataRestProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.data.redis.connection.RedisNode;
 import org.springframework.data.elasticsearch.core.RefreshPolicy;
+import org.springframework.session.data.redis.RedisIndexedSessionRepository;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.boot.session.data.redis.autoconfigure.SessionDataRedisProperties;
 
 import jakarta.validation.Valid;
 
@@ -108,10 +109,16 @@ public class DataConfigurationProperties {
     @Bean
     @Primary
     public RedisProperties redisProperties() {
-        String namespace = redis.getSession().getNamespace();
-        if (namespace == null || namespace.isBlank() || "spring:session".equals(namespace)) {
-            redis.getSession().setNamespace("spring:session:" + databaseName);
+        if (redis.getSession() == null) {
+            redis.setSession(new RedisProperties.EngineRedisSessionProperties());
         }
+
+        String namespace = redis.getSession().getNamespace();
+
+        if (namespace == null || namespace.isBlank() || RedisIndexedSessionRepository.DEFAULT_NAMESPACE.equals(namespace)) {
+            redis.getSession().setNamespace(RedisIndexedSessionRepository.DEFAULT_NAMESPACE + ":" + databaseName);
+        }
+
         return redis;
     }
 
@@ -119,14 +126,14 @@ public class DataConfigurationProperties {
      * Configuration properties for the REST-specific settings under the
      * {@code netgrif.engine.data.rest} prefix.
      * <p>
-     * This class extends {@link RepositoryRestProperties} to inherit
+     * This class extends {@link DataRestProperties} to inherit
      * Spring Data REST functionalities while adding application-specific customizations.
      */
     @Data
     @Primary
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
-    public static class RestProperties extends RepositoryRestProperties {
+    public static class RestProperties extends DataRestProperties {
     }
 
 
@@ -163,7 +170,7 @@ public class DataConfigurationProperties {
     @Data
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
-    public static class MongoProperties extends org.springframework.boot.autoconfigure.mongo.MongoProperties {
+    public static class MongoProperties extends org.springframework.boot.mongodb.autoconfigure.MongoProperties {
         /**
          * Flag indicating whether the database should drop collections during initialization.
          */
@@ -501,6 +508,12 @@ public class DataConfigurationProperties {
         private long connectionTtl;
 
         /**
+         * Forces generic JSON media type headers for Elasticsearch requests.
+         * This keeps the Elasticsearch Java 9 client usable against both Elasticsearch 8 and 9 nodes.
+         */
+        private boolean useGenericJsonMediaType = true;
+
+        /**
          * Specifies the time unit for connection TTL (Time-To-Live) in the application.
          * This determines the granularity of the connection TTL setting, such as
          * seconds, milliseconds, or another valid {@link TimeUnit}.
@@ -816,13 +829,13 @@ public class DataConfigurationProperties {
         /**
          * Configuration properties for Redis session management in the application.
          * <p>
-         * This class extends {@link RedisSessionProperties}, providing additional
+         * This class extends {@link SessionDataRedisProperties}, providing additional
          * configurations specific to Redis-based session handling in the application.
          * It allows session limiting and other Redis-specific session settings.
          */
         @Data
         @EqualsAndHashCode(callSuper = true)
-        public static class EngineRedisSessionProperties extends RedisSessionProperties {
+        public static class EngineRedisSessionProperties extends SessionDataRedisProperties {
 
             /**
              * Flag indicating whether to enable session limit functionality.

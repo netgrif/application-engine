@@ -3,7 +3,6 @@ netgrif:
     main:
       allow-bean-definition-overriding: true
       allow-circular-references: true
-      auto-configure-exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
     data:
       drop: false
       database-name: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}
@@ -17,6 +16,7 @@ netgrif:
         url: ${NETGRIF_ENGINE_DATA_ELASTIC_URL:localhost}
         port: ${NETGRIF_ENGINE_DATA_ELASTIC_PORT:9300}
         searchPort: ${NETGRIF_ENGINE_DATA_ELASTIC_SEARCH_PORT:9200}
+        use-generic-json-media-type: ${NETGRIF_ENGINE_DATA_ELASTIC_USE_GENERIC_JSON_MEDIA_TYPE:true}
         reindex: 0 0 * * * *
         index:
           petriNet: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_petrinet
@@ -29,8 +29,9 @@ netgrif:
         port: ${NETGRIF_ENGINE_DATA_REDIS_PORT:6379}
     jackson:
       default-property-inclusion: non_null
-      serialization:
-        write-dates-as-timestamps: true
+      datatype:
+        datetime:
+          write-dates-as-timestamps: true
     servlet:
       multipart:
         max-file-size: 50MB

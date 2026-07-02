@@ -18,6 +18,10 @@
 		<id>enumeration_0</id>
 		<title/>
 	</data>
+	<data type="number">
+		<id>number_0</id>
+		<title/>
+	</data>
 	<data type="button">
 		<id>button_0</id>
 		<title/>
@@ -74,6 +78,20 @@
 				<layout>
 					<x>0</x>
 					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>number_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>

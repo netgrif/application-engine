@@ -1,24 +1,14 @@
 package com.netgrif.application.engine.menu
 
+import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.auth.domain.User
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
-import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
-import com.netgrif.application.engine.startup.runner.FilterRunner
-import com.netgrif.application.engine.startup.runner.GroupRunner
-import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
-import com.netgrif.application.engine.workflow.service.UserFilterSearchService
-import com.netgrif.application.engine.workflow.service.interfaces.IDataService
-import com.netgrif.application.engine.workflow.service.interfaces.IMenuImportExportService
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.User
+import com.netgrif.application.engine.objects.auth.domain.Group
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldValue
@@ -27,6 +17,18 @@ import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuAndFilters
+import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
+import com.netgrif.application.engine.startup.runner.FilterRunner
+import com.netgrif.application.engine.startup.runner.GroupRunner
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
+import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import com.netgrif.application.engine.workflow.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.service.UserFilterSearchService
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService
+import com.netgrif.application.engine.workflow.service.interfaces.IMenuImportExportService
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -37,10 +39,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
+@TestPropertySource(properties = "netgrif.engine.filter.create-default-filters=true")
 @SpringBootTest
 class MenuImportExportTest {
 
@@ -51,6 +55,8 @@ class MenuImportExportTest {
     private static final String TEST_NET = "mortgage_net.xml"
     private static final String TEST_XML_FILE_PATH = "src/test/resources/menu_file_test.xml"
 
+    private static final String GROUP_NET_IDENTIFIER = "org_group"
+    private static final String GROUP_INIT_TASK = "Initialize group"
     private static final String GROUP_NAV_TASK = "navigationMenuConfig"
     private static final String IMPORT_FILE_FIELD = "import_menu_file"
     private static final String EXPORT_FILE_FIELD = "export_menu_file"
@@ -129,13 +135,15 @@ class MenuImportExportTest {
         this.testHelper.truncateDbs();
         this.defaultFiltersRunner.run()
         this.dummyUser = createDummyUser();
+        createDummyUserGroupCase()
     }
 
 
     @Test
-    @Disabled("Fix IllegalArgument")
+    @Disabled("deprecated")
     void testMenuImportExport() {
-        userAuth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(dummyUser), DUMMY_USER_PASSWORD)
+        def loggedUser = ActorTransformer.toLoggedUser(dummyUser)
+        userAuth = new UsernamePasswordAuthenticationToken(loggedUser, DUMMY_USER_PASSWORD, loggedUser.authorities)
         SecurityContextHolder.getContext().setAuthentication(userAuth)
 
         def testNet = importHelper.createNet(TEST_NET)
@@ -204,9 +212,30 @@ class MenuImportExportTest {
 
     private User createDummyUser() {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        return importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Dummy", lastName: "User", email: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
+        return importHelper.createUser(new User(firstName: "Dummy", lastName: "User", email: DUMMY_USER_MAIL, username: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
+    }
+
+    private void createDummyUserGroupCase() {
+        def groupNet = importHelper.createNet("engine-processes/org_group.xml")
+        assert groupNet.isPresent()
+        def preferenceItemNet = importHelper.createNet("engine-processes/preference_filter_item.xml")
+        assert preferenceItemNet.isPresent()
+
+        Group group = groupService.getDefaultUserGroup(dummyUser)
+        Case groupCase = workflowService.createCase(CreateCaseParams.with()
+                .processIdentifier(GROUP_NET_IDENTIFIER)
+                .title(DUMMY_USER_GROUP_TITLE)
+                .author(ActorTransformer.toLoggedUser(dummyUser))
+                .build()).case
+
+        groupCase.dataSet["group_id"].value = group.stringId
+        groupCase.dataSet["group_name"].value = DUMMY_USER_GROUP_TITLE
+        workflowService.save(groupCase)
+
+        importHelper.assignTaskToSuper(GROUP_INIT_TASK, groupCase.stringId)
+        importHelper.finishTaskAsSuper(GROUP_INIT_TASK, groupCase.stringId)
     }
 
 

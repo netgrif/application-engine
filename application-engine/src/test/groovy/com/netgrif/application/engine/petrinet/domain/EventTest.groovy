@@ -1,23 +1,24 @@
 package com.netgrif.application.engine.petrinet.domain
 
-import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
+import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.objects.workflow.domain.Case
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.runner.DefaultRoleRunner
 import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.runner.DefaultRoleRunner
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.startup.runner.SystemUserRunner
-import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
-import com.netgrif.application.engine.objects.workflow.domain.Case
-import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import com.netgrif.application.engine.workflow.service.TaskService
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -84,11 +85,10 @@ class EventTest {
 
 
     @Test
-    @Disabled
     void testEventImport() {
         testHelper.truncateDbs()
 
-        PetriNet net = petriNetService.importPetriNet(stream(EVENT_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        PetriNet net = petriNetService.importPetriNet(new ImportPetriNetParams(stream(EVENT_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
         instance = helper.createCase(EVENT_NET_CASE, net)
 
         outcome = helper.assignTaskToSuper(EVENT_NET_TASK, instance.stringId)
@@ -112,7 +112,24 @@ class EventTest {
 
     private void assertCancelOutcome() {
         assertActionsRuned("${EVENT_NET_TASK}_cancel", "Uloha vzrusena")
-        assert outcome.data.flatten().changedFields["chained"]["value"] == "chained"
+        SetDataEventOutcome setDataOutcome = findSetDataOutcome(outcome.outcomes, "chained")
+        assert setDataOutcome != null
+        assert setDataOutcome.changedFields["chained"].attributes["value"] == "chained"
+    }
+
+    private static SetDataEventOutcome findSetDataOutcome(Collection outcomes, String fieldId) {
+        for (def eventOutcome : outcomes ?: []) {
+            if (eventOutcome instanceof SetDataEventOutcome && eventOutcome.changedFields.containsKey(fieldId)) {
+                return eventOutcome
+            }
+            if (eventOutcome.hasProperty("outcomes")) {
+                SetDataEventOutcome nestedOutcome = findSetDataOutcome(eventOutcome.outcomes as Collection, fieldId)
+                if (nestedOutcome != null) {
+                    return nestedOutcome
+                }
+            }
+        }
+        return null
     }
 
     private void assertActionsRuned(String fieldIdWithoutPhase, String message) {

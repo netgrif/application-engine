@@ -10,9 +10,8 @@ import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -34,6 +33,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.ForwardedHeaderFilter;
+import org.springframework.boot.security.autoconfigure.web.servlet.SecurityFilterProperties;
 
 import java.util.List;
 
@@ -44,7 +44,7 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 @Controller
 @Configuration
 @EnableWebSecurity
-@Order(SecurityProperties.DEFAULT_FILTER_ORDER)
+@Order(SecurityFilterProperties.DEFAULT_FILTER_ORDER)
 public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired
@@ -84,7 +84,6 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     private WebEndpointProperties webEndpointProperties;
 
     private static final String ANONYMOUS_USER = "anonymousUser";
-
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

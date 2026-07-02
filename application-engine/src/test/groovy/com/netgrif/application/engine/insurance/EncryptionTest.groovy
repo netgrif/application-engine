@@ -1,17 +1,17 @@
 package com.netgrif.application.engine.insurance
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl
-import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.importer.service.Importer
+import com.netgrif.application.engine.objects.auth.domain.Authority
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.objects.workflow.domain.DataField
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.TaskService

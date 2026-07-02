@@ -1,15 +1,15 @@
 package com.netgrif.application.engine.auth.provider;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+
 import com.netgrif.application.engine.objects.auth.provider.AuthMethodConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
-import java.io.IOException;
 
 @Component
 public class AuthMethodConfigDeserializer extends StdDeserializer<AuthMethodConfig<?>> {
@@ -23,8 +23,9 @@ public class AuthMethodConfigDeserializer extends StdDeserializer<AuthMethodConf
     }
 
     @Override
-    public AuthMethodConfig<?> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JacksonException {
-        JsonNode node = jp.getCodec().readTree(jp);
+    public AuthMethodConfig<?> deserialize(JsonParser jp, DeserializationContext ctxt) throws JacksonException {
+        JsonNode node = jp.objectReadContext().readTree(jp);
+
 
         JsonNode realmId = node.get("realmId");
         if (realmId == null) {
@@ -78,7 +79,7 @@ public class AuthMethodConfigDeserializer extends StdDeserializer<AuthMethodConf
             throw new IllegalArgumentException("No provider registered for type: " + type);
         }
 
-        Object configuration = jp.getCodec().treeToValue(configNode, configClass);
+        Object configuration = ctxt.readTreeAsValue(configNode, configClass);  // ?? idk
         config.setConfiguration(configuration);
 
         return config;

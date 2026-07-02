@@ -3,15 +3,15 @@ package com.netgrif.application.engine.workflow
 import com.netgrif.application.engine.objects.petrinet.domain.DataGroup
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedField
+import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedField
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

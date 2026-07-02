@@ -12,6 +12,12 @@
         <id>2</id>
         <name>Perform</name>
     </role>
+    <roleRef>
+        <id>1</id>
+        <caseLogic>
+            <create>true</create>
+        </caseLogic>
+    </roleRef>
     <data type="text">
         <id>1</id>
         <title>Name</title>

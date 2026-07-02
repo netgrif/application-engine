@@ -7,7 +7,6 @@ import com.netgrif.application.engine.objects.auth.constants.UserConstants
 import com.netgrif.application.engine.objects.auth.domain.Authority
 import com.netgrif.application.engine.objects.auth.domain.Group
 import com.netgrif.application.engine.objects.auth.domain.QGroup
-import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.startup.ImportHelper

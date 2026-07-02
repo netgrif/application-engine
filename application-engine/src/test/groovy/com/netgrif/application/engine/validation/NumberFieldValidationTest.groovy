@@ -2,9 +2,9 @@ package com.netgrif.application.engine.validation
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
+import com.netgrif.application.engine.objects.workflow.domain.DataField
 import com.netgrif.application.engine.validation.domain.ValidationDataInput
 import com.netgrif.application.engine.validation.models.NumberFieldValidation
-import com.netgrif.application.engine.objects.workflow.domain.DataField
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

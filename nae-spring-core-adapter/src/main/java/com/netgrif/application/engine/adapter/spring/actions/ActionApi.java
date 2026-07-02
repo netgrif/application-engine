@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.adapter.spring.actions;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.dto.AuthPrincipalDto;
@@ -45,9 +44,8 @@ public interface ActionApi {
      * @param dataSet the data to be set, organized as a map
      * @param params  additional parameters for the operation
      * @return the outcome of the set data operation
-     * @throws JsonProcessingException if there is an error processing JSON data
      */
-    SetDataEventOutcome setData(String taskId, Map<String, Map<String, Object>> dataSet, Map<String, String> params) throws JsonProcessingException;
+    SetDataEventOutcome setData(String taskId, Map<String, Map<String, Object>> dataSet, Map<String, String> params);
 
     /**
      * Finds a specific case by its ID.

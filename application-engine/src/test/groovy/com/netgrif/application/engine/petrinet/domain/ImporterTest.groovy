@@ -6,19 +6,18 @@ import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.ChoiceField
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.FieldBehavior
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.MissingPetriNetMetaDataException
+import com.netgrif.application.engine.objects.workflow.domain.Case
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,6 +27,8 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
+
+import java.time.temporal.ChronoUnit
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -274,7 +275,6 @@ class ImporterTest {
     }
 
     @Test
-    @Disabled
     void upsertTest() {
         def net = importHelper.upsertNet(FILE_NAME, IDENTIFIER)
         assert net.present
@@ -282,7 +282,7 @@ class ImporterTest {
         def upserted = importHelper.upsertNet(FILE_NAME, IDENTIFIER)
         assert upserted.present
 
-        assert upserted.get().creationDate == net.get().creationDate
+        assert upserted.get().creationDate.truncatedTo(ChronoUnit.MILLIS) == net.get().creationDate.truncatedTo(ChronoUnit.MILLIS)
     }
 
     @Test

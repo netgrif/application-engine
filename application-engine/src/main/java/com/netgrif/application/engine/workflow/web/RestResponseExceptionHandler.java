@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
+import tools.jackson.core.JacksonException;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import org.slf4j.Logger;
@@ -24,12 +24,12 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException exception, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         try {
             Throwable cause = exception.getCause();
-            if (!(cause instanceof JsonMappingException jme)) {
+            if (!(cause instanceof JacksonException jme)) {
                 log.error("Received HttpMessageNotWritableException: {}", exception.getMessage(), exception);
                 return super.handleHttpMessageNotWritable(exception, headers, status, request);
             }
 
-            List<JsonMappingException.Reference> path = jme.getPath();
+            List<JacksonException.Reference> path = jme.getPath();
 
             if (log.isTraceEnabled()) {
                 log.trace("JSON write failed (cause). msg={} | pathRef={}",
@@ -47,9 +47,9 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
             }
 
             if (path.size() > 3) {
-                Object fieldFrom = path.getLast().getFrom();
+                Object fieldFrom = path.getLast().from();
                 log.debug("Field of class [{}] from: {}", fieldFrom == null ? "null" : fieldFrom.getClass(), fieldFrom);
-                Object caseFrom = path.get(path.size() - 3).getFrom();
+                Object caseFrom = path.get(path.size() - 3).from();
                 log.debug("Case of class [{}] from: {}", caseFrom == null ? "null" : caseFrom.getClass(), caseFrom);
 
                 if (fieldFrom instanceof Field field && caseFrom instanceof Case useCase) {
@@ -70,19 +70,19 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return super.handleHttpMessageNotWritable(exception, headers, status, request);
     }
 
-    private static String describePath(List<JsonMappingException.Reference> path) {
+    private static String describePath(List<JacksonException.Reference> path) {
         if (path == null || path.isEmpty()) return "<empty>";
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < path.size(); i++) {
-            JsonMappingException.Reference ref = path.get(i);
-            Object from = ref.getFrom();
+            JacksonException.Reference ref = path.get(i);
+            Object from = ref.from();
 
             if (i > 0) sb.append(" | ");
 
             sb.append(i).append(":");
             sb.append(from == null ? "null" : from.getClass().getSimpleName());
 
-            if (ref.getFieldName() != null) sb.append(".").append(ref.getFieldName());
+            if (ref.getPropertyName() != null) sb.append(".").append(ref.getPropertyName());
             if (ref.getIndex() >= 0) sb.append("[").append(ref.getIndex()).append("]");
 
             sb.append(" (").append(ref).append(")");
@@ -90,17 +90,17 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return sb.toString();
     }
 
-    private static void tracePathAll(List<JsonMappingException.Reference> path) {
+    private static void tracePathAll(List<JacksonException.Reference> path) {
         if (path == null || path.isEmpty()) {
             log.trace("[JSON_WRITE][PATH] <empty>");
             return;
         }
 
         for (int i = 0; i < path.size(); i++) {
-            JsonMappingException.Reference ref = path.get(i);
-            Object from = ref.getFrom();
+            JacksonException.Reference ref = path.get(i);
+            Object from = ref.from();
 
-            String where = (ref.getFieldName() != null ? "." + ref.getFieldName() : "")
+            String where = (ref.getPropertyName() != null ? "." + ref.getPropertyName() : "")
                     + (ref.getIndex() >= 0 ? "[" + ref.getIndex() + "]" : "");
 
             log.trace("[JSON_WRITE][PATH] idx={} fromType={}{} ref={} from={}",

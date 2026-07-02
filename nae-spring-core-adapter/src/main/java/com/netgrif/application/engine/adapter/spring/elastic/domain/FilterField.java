@@ -35,9 +35,4 @@ public class FilterField extends com.netgrif.application.engine.objects.elastic.
     public List<String> getAllowedNets() {
         return super.getAllowedNets();
     }
-
-    @Field(type = Flattened)
-    public Map<String, Object> getFilterMetadata() {
-        return super.getFilterMetadata();
-    }
 }
