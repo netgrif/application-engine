@@ -64,8 +64,8 @@ services:
       - netgrif-platformnet
 
   nae-elasticsearch:
-    image: elasticsearch:9.4.1
-#   image: elasticsearch:8.19.15
+    #    image: elasticsearch:9.4.1
+    image: elasticsearch:8.19.15
     healthcheck:
       test: [ "CMD", "curl", "-sf", "http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=1s" ]
       interval: 10s
