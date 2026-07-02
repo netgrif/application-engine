@@ -31,7 +31,7 @@ RUN mvn -B -e -DskipTests -P docker-build clean install
 # prepare runtime
 FROM eclipse-temurin:21-jre-jammy
 
-ARG VERSION="7.0.0"
+ARG VERSION="7.0.1"
 
 LABEL authors="Netgrif <devops@netgrif.com>" \
       org.opencontainers.image.authors="NETGRIF <devops@netgrif.com>" \
