@@ -35,8 +35,6 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.*;
 
 public class QueryLangEvaluator extends QueryLangBaseListener {
 
-    // todo code encapsulation by resource type
-
     private final ParseTreeProperty<String> elasticQuery = new ParseTreeProperty<>();
     private final ParseTreeProperty<Predicate> mongoQuery = new ParseTreeProperty<>();
 
@@ -138,6 +136,19 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         setElasticQuery(current, elasticQuery);
     }
 
+    private Predicate getEmptyMongoQuery() {
+        return new BooleanBuilder();
+    }
+
+    private String getEmptyElasticQuery() {
+        return "*";
+    }
+
+    private void handleNoneConditions() {
+        fullMongoQuery = getEmptyMongoQuery();
+        fullElasticQuery = getEmptyElasticQuery();
+    }
+
     @Override
     public void enterProcessQuery(QueryLangParser.ProcessQueryContext ctx) {
         resourceType = QueryType.PROCESS;
@@ -146,9 +157,13 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitProcessQuery(QueryLangParser.ProcessQueryContext ctx) {
-        processBasicExpression(ctx.processConditions(), ctx);
-        fullMongoQuery = getMongoQuery(ctx);
-        fullElasticQuery = getElasticQuery(ctx);
+        if (ctx.processConditionsAndPaging() == null || ctx.processConditionsAndPaging().processConditions() == null) {
+            handleNoneConditions();
+        } else {
+            processBasicExpression(ctx.processConditionsAndPaging().processConditions(), ctx);
+            fullMongoQuery = getMongoQuery(ctx);
+            fullElasticQuery = getElasticQuery(ctx);
+        }
         pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
     }
 
@@ -160,9 +175,13 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitCaseQuery(QueryLangParser.CaseQueryContext ctx) {
-        processBasicExpression(ctx.caseConditions(), ctx);
-        fullMongoQuery = getMongoQuery(ctx);
-        fullElasticQuery = getElasticQuery(ctx);
+        if (ctx.caseConditionsAndPaging() == null || ctx.caseConditionsAndPaging().caseConditions() == null) {
+            handleNoneConditions();
+        } else {
+            processBasicExpression(ctx.caseConditionsAndPaging().caseConditions(), ctx);
+            fullMongoQuery = getMongoQuery(ctx);
+            fullElasticQuery = getElasticQuery(ctx);
+        }
         pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
     }
 
@@ -174,9 +193,13 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitTaskQuery(QueryLangParser.TaskQueryContext ctx) {
-        processBasicExpression(ctx.taskConditions(), ctx);
-        fullMongoQuery = getMongoQuery(ctx);
-        fullElasticQuery = getElasticQuery(ctx);
+        if (ctx.taskConditionsAndPaging() == null || ctx.taskConditionsAndPaging().taskConditions() == null) {
+            handleNoneConditions();
+        } else {
+            processBasicExpression(ctx.taskConditionsAndPaging().taskConditions(), ctx);
+            fullMongoQuery = getMongoQuery(ctx);
+            fullElasticQuery = getElasticQuery(ctx);
+        }
         pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
     }
 
@@ -188,9 +211,13 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitUserQuery(QueryLangParser.UserQueryContext ctx) {
-        processBasicExpression(ctx.userConditions(), ctx);
-        fullMongoQuery = getMongoQuery(ctx);
-        fullElasticQuery = getElasticQuery(ctx);
+        if (ctx.userConditionsAndPaging() == null || ctx.userConditionsAndPaging().userConditions() == null) {
+            handleNoneConditions();
+        } else {
+            processBasicExpression(ctx.userConditionsAndPaging().userConditions(), ctx);
+            fullMongoQuery = getMongoQuery(ctx);
+            fullElasticQuery = getElasticQuery(ctx);
+        }
         pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
     }
 

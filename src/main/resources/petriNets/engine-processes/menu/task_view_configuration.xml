@@ -79,8 +79,8 @@
     <data type="taskFilter">
         <id>task_filter</id>
         <title name="task_filter">Filter</title>
-        <desc name="task_filter_desc">Use Elasticsearch string query</desc>
-        <init>*</init>
+        <desc name="task_filter_desc">Use PFQL query</desc>
+        <init>tasks</init>
     </data>
 
     <!-- TASK VIEW CONFIGURATION DATA -->
@@ -255,7 +255,7 @@
         <i18nString name="task_all_allowed_nets">Povoliť všetky procesy?</i18nString>
         <i18nString name="task_inherit_allowed_nets">Zdediť povolené procesy?</i18nString>
         <i18nString name="task_filter">Filter</i18nString>
-        <i18nString name="task_filter_desc">Použi Elasticsearch string query</i18nString>
+        <i18nString name="task_filter_desc">Použi PFQL query</i18nString>
         <i18nString name="filter_settings">Filter</i18nString>
         <i18nString name="header_settings">Hlavičky</i18nString>
         <i18nString name="task_headers_sort_mode_direction">Predvolený smer zoradenia</i18nString>
@@ -290,7 +290,7 @@
         <i18nString name="task_all_allowed_nets">Alle Prozesse erlauben?</i18nString>
         <i18nString name="task_inherit_allowed_nets">Erlaubte Prozesse erben?</i18nString>
         <i18nString name="task_filter">Filter</i18nString>
-        <i18nString name="task_filter_desc">Elasticsearch String-Query verwenden</i18nString>
+        <i18nString name="task_filter_desc">Verwenden Sie PFQL Query</i18nString>
         <i18nString name="filter_settings">Filter</i18nString>
         <i18nString name="header_settings">Kopfzeilen</i18nString>
         <i18nString name="task_headers_sort_mode_direction">Standard-Sortierrichtung</i18nString>

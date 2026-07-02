@@ -34,9 +34,6 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.eval
 @RequiredArgsConstructor
 public class TaskSearchService implements IResourceSearchService<Task> {
 
-    public static final String QUERY_SINGLE_PREFIX = "task: ";
-    public static final String QUERY_MULTIPLE_PREFIX = "tasks: ";
-
     private final ITaskService taskService;
     private final IElasticTaskService elasticTaskService;
     private final IUserService userService;
@@ -126,7 +123,9 @@ public class TaskSearchService implements IResourceSearchService<Task> {
         checkEvaluatorIsMultiple(evaluator);
         checkEvaluatorResourceType(evaluator);
 
-        log.debug("Searching for all tasks using {}", evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB");
+        log.debug("Searching for all tasks using {} with pagination: page={}, size={}",
+                evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB",
+                evaluator.getPageable().getPageNumber(), evaluator.getPageable().getPageSize());
         if (evaluator.getSearchWithElastic()) {
             log.trace("Executing Elasticsearch query: {}", evaluator.getFullElasticQuery());
             Page<Task> result = findTasksElastic(evaluator.getFullElasticQuery(), evaluator.getPageable());

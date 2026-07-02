@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.pfql;
 
+import com.netgrif.application.engine.MockService;
 import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.pfql.domain.enums.QueryType;
 import com.netgrif.application.engine.pfql.service.taskresource.TaskSearchService;
@@ -15,6 +17,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -36,6 +40,9 @@ public class TaskSearchServiceTest {
 
     @Autowired
     private ImportHelper importHelper;
+
+    @Autowired
+    private MockService mockService;
 
     private String testTaskId;
 
@@ -66,6 +73,11 @@ public class TaskSearchServiceTest {
         assertNotNull(result);
         assertEquals(testTaskId, result.getStringId());
 
+        login(mockService.mockLoggedUser());
+        result = taskSearchService.searchOne("task: id eq '" + testTaskId + "'");
+        assertNull(result);
+        logout();
+
         result = taskSearchService.searchOne("task: id eq '" + new ObjectId() + "'");
         assertNull(result);
     }
@@ -81,6 +93,12 @@ public class TaskSearchServiceTest {
         assertEquals(1, result.getTotalElements());
         assertEquals(testTaskId, result.getContent().get(0).getStringId());
 
+        login(mockService.mockLoggedUser());
+        result = taskSearchService.searchAll("tasks: id eq '" + testTaskId + "'");
+        assertNotNull(result);
+        assertEquals(0, result.getTotalElements());
+        logout();
+
         result = taskSearchService.searchAll("tasks: id eq '" + new ObjectId() + "'");
         assertNotNull(result);
         assertEquals(0, result.getTotalElements());
@@ -93,6 +111,11 @@ public class TaskSearchServiceTest {
 
         long result = taskSearchService.count("task: id eq '" + testTaskId + "'");
         assertEquals(1, result);
+
+        login(mockService.mockLoggedUser());
+        result = taskSearchService.count("task: id eq '" + testTaskId + "'");
+        assertEquals(0, result);
+        logout();
 
         result = taskSearchService.count("tasks: id eq '" + testTaskId + "'");
         assertEquals(1, result);
@@ -109,11 +132,24 @@ public class TaskSearchServiceTest {
         boolean result = taskSearchService.exists("task: id eq '" + testTaskId + "'");
         assertTrue(result);
 
+        login(mockService.mockLoggedUser());
+        result = taskSearchService.exists("task: id eq '" + testTaskId + "'");
+        assertFalse(result);
+        logout();
+
         result = taskSearchService.exists("tasks: id eq '" + testTaskId + "'");
         assertTrue(result);
 
         result = taskSearchService.exists("tasks: id eq '" + new ObjectId() + "'");
         assertFalse(result);
+    }
+
+    private void login(LoggedUser loggedUser) {
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(loggedUser, null));
+    }
+
+    private void logout() {
+        SecurityContextHolder.getContext().setAuthentication(null);
     }
 
 }

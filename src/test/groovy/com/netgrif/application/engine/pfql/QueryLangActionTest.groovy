@@ -82,15 +82,7 @@ class QueryLangActionTest {
         pressButton(String.format(SEARCH_ONE_TEMPLATE, "process"))
         assertEquals("class com.netgrif.application.engine.petrinet.domain.PetriNet", testCase.getFieldValue(RESULT_CLASS_FIELD_ID))
 
-        updateQuery("identifier == '" + testProcess.identifier + "'")
-        pressButton(String.format(SEARCH_ONE_TEMPLATE, "process"))
-        assertEquals("class com.netgrif.application.engine.petrinet.domain.PetriNet", testCase.getFieldValue(RESULT_CLASS_FIELD_ID))
-
         updateQuery("processes: identifier == '" + testProcess.identifier + "'")
-        pressButton(String.format(SEARCH_TEMPLATE, "process"))
-        assertEquals("class java.util.Collections\$UnmodifiableRandomAccessList", testCase.getFieldValue(RESULT_CLASS_FIELD_ID))
-
-        updateQuery("identifier == '" + testProcess.identifier + "'")
         pressButton(String.format(SEARCH_TEMPLATE, "process"))
         assertEquals("class java.util.Collections\$UnmodifiableRandomAccessList", testCase.getFieldValue(RESULT_CLASS_FIELD_ID))
 
@@ -107,15 +99,7 @@ class QueryLangActionTest {
         pressButton(String.format(SEARCH_ONE_TEMPLATE, "case"))
         assertEquals("class com.netgrif.application.engine.workflow.domain.Case", testCase.getFieldValue(RESULT_CLASS_FIELD_ID))
 
-        updateQuery("processIdentifier == '" + testProcess.identifier + "'")
-        pressButton(String.format(SEARCH_ONE_TEMPLATE, "case"))
-        assertEquals("class com.netgrif.application.engine.workflow.domain.Case", testCase.getFieldValue(RESULT_CLASS_FIELD_ID))
-
         updateQuery("cases: processIdentifier == '" + testProcess.identifier + "'")
-        pressButton(String.format(SEARCH_TEMPLATE, "case"))
-        assertEquals("class java.util.Collections\$UnmodifiableRandomAccessList", testCase.getFieldValue(RESULT_CLASS_FIELD_ID))
-
-        updateQuery("processIdentifier == '" + testProcess.identifier + "'")
         pressButton(String.format(SEARCH_TEMPLATE, "case"))
         assertEquals("class java.util.Collections\$UnmodifiableRandomAccessList", testCase.getFieldValue(RESULT_CLASS_FIELD_ID))
 
@@ -132,15 +116,7 @@ class QueryLangActionTest {
         pressButton(String.format(SEARCH_ONE_TEMPLATE, "task"))
         assertEquals("class com.netgrif.application.engine.workflow.domain.Task", testCase.getFieldValue(RESULT_CLASS_FIELD_ID))
 
-        updateQuery("caseId == '" + testCase.stringId + "'")
-        pressButton(String.format(SEARCH_ONE_TEMPLATE, "task"))
-        assertEquals("class com.netgrif.application.engine.workflow.domain.Task", testCase.getFieldValue(RESULT_CLASS_FIELD_ID))
-
         updateQuery("tasks: caseId == '" + testCase.stringId + "'")
-        pressButton(String.format(SEARCH_TEMPLATE, "task"))
-        assertEquals("class java.util.Collections\$UnmodifiableRandomAccessList", testCase.getFieldValue(RESULT_CLASS_FIELD_ID))
-
-        updateQuery("caseId == '" + testCase.stringId + "'")
         pressButton(String.format(SEARCH_TEMPLATE, "task"))
         assertEquals("class java.util.Collections\$UnmodifiableRandomAccessList", testCase.getFieldValue(RESULT_CLASS_FIELD_ID))
 
@@ -157,15 +133,7 @@ class QueryLangActionTest {
         pressButton(String.format(SEARCH_ONE_TEMPLATE, "user"))
         assertEquals("class com.netgrif.application.engine.auth.domain.User", testCase.getFieldValue(RESULT_CLASS_FIELD_ID))
 
-        updateQuery("email == '" + superCreator.superUser.email + "'")
-        pressButton(String.format(SEARCH_ONE_TEMPLATE, "user"))
-        assertEquals("class com.netgrif.application.engine.auth.domain.User", testCase.getFieldValue(RESULT_CLASS_FIELD_ID))
-
         updateQuery("users: email == '" + superCreator.superUser.email + "'")
-        pressButton(String.format(SEARCH_TEMPLATE, "user"))
-        assertEquals("class java.util.Collections\$UnmodifiableRandomAccessList", testCase.getFieldValue(RESULT_CLASS_FIELD_ID))
-
-        updateQuery("email == '" + superCreator.superUser.email + "'")
         pressButton(String.format(SEARCH_TEMPLATE, "user"))
         assertEquals("class java.util.Collections\$UnmodifiableRandomAccessList", testCase.getFieldValue(RESULT_CLASS_FIELD_ID))
 

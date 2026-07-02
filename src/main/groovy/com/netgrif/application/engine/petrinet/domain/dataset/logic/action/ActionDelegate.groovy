@@ -53,7 +53,6 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleSe
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.pfql.service.IResourceSearchService
 import com.netgrif.application.engine.pfql.service.ISearchService
-import com.netgrif.application.engine.pfql.service.utils.SearchUtils
 import com.netgrif.application.engine.rules.domain.RuleRepository
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
@@ -2542,14 +2541,12 @@ class ActionDelegate {
      * <pre>
      *     searchCase("case: processIdentifier eq 'query_test' and data.number_0.value == 3")
      *     searchCase("case: id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
-     *     searchCase("id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
      * </pre>
      *
      * @param query query language string starting with {@code case:}
      * @return matching {@link Case} or {@code null} if none is found
      */
     Case searchCase(String query) {
-        query = SearchUtils.ensureStartsWithCase(query)
         return caseSearchService.searchOne(query)
     }
 
@@ -2563,14 +2560,12 @@ class ActionDelegate {
      * <pre>
      *     pagedSearchCases("cases: processIdentifier eq 'query_test' page 1 size 5 sort by title desc")
      *     pagedSearchCases("cases: author eq 'user@mail.com' and creationDate gt 2020-03-03")
-     *     pagedSearchCases("author eq 'user@mail.com' and creationDate gt 2020-03-03")
      * </pre>
      *
      * @param query query language string starting with {@code cases:}
      * @return {@link Page} of matching cases
      */
     Page<Case> pagedSearchCases(String query) {
-        query = SearchUtils.ensureStartsWithCases(query)
         return caseSearchService.searchAll(query)
     }
 
@@ -2584,7 +2579,6 @@ class ActionDelegate {
      * <pre>
      *     searchCases("cases: processIdentifier eq 'query_test' and data.boolean_0.value == true")
      *     searchCases("cases: title contains 'Test' sort by creationDate desc")
-     *     searchCases("title contains 'Test' sort by creationDate desc")
      * </pre>
      *
      * @param query query language string starting with {@code cases:}
@@ -2603,14 +2597,12 @@ class ActionDelegate {
      * <pre>
      *     countCases("cases: processIdentifier eq 'query_test'")
      *     countCases("cases: data.boolean_0.value == true and data.text_0.value != '4'")
-     *     countCases("data.boolean_0.value == true and data.text_0.value != '4'")
      * </pre>
      *
      * @param query query language string starting with {@code cases:}
      * @return number of matching cases
      */
     long countCases(String query) {
-        query = SearchUtils.ensureStartsWithCases(query)
         return caseSearchService.count(query)
     }
 
@@ -2623,14 +2615,12 @@ class ActionDelegate {
      * <pre>
      *     existsCase("cases: processIdentifier eq 'query_test'")
      *     existsCase("cases: id in ('5f9b1c2d3e4f5a6b7c8d9e0f', '5f9b1c2d3e4f5a6b7c8d9e10')")
-     *     existsCase("id in ('5f9b1c2d3e4f5a6b7c8d9e0f', '5f9b1c2d3e4f5a6b7c8d9e10')")
      * </pre>
      *
      * @param query query language string starting with {@code cases:}
      * @return {@code true} if a matching case exists, {@code false} otherwise
      */
     boolean existsCase(String query) {
-        query = SearchUtils.ensureStartsWithCases(query)
         return caseSearchService.exists(query)
     }
 
@@ -2643,14 +2633,12 @@ class ActionDelegate {
      * <pre>
      *     searchTask("task: transitionId eq 't1' and caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
      *     searchTask("task: id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
-     *     searchTask("id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
      * </pre>
      *
      * @param query query language string starting with {@code task:}
      * @return matching {@link Task} or {@code null} if none is found
      */
     Task searchTask(String query) {
-        query = SearchUtils.ensureStartsWithTask(query)
         return taskSearchService.searchOne(query)
     }
 
@@ -2664,14 +2652,12 @@ class ActionDelegate {
      * <pre>
      *     pagedSearchTasks("tasks: title eq 'test' page 0 size 10 sort by lastFinish desc")
      *     pagedSearchTasks("tasks: userId eq 'user1' and state eq enabled")
-     *     pagedSearchTasks("userId eq 'user1' and state eq enabled")
      * </pre>
      *
      * @param query query language string starting with {@code tasks:}
      * @return {@link Page} of matching tasks
      */
     Page<Task> pagedSearchTasks(String query) {
-        query = SearchUtils.ensureStartsWithTasks(query)
         return taskSearchService.searchAll(query)
     }
 
@@ -2685,14 +2671,12 @@ class ActionDelegate {
      * <pre>
      *     searchTasks("tasks: processId eq 'my_process' and userId in ('user1', 'user2')")
      *     searchTasks("tasks: title contains 'Approve' sort by title asc")
-     *     searchTasks("title contains 'Approve' sort by title asc")
      * </pre>
      *
      * @param query query language string starting with {@code tasks:}
      * @return list of matching tasks
      */
     List<Task> searchTasks(String query) {
-        query = SearchUtils.ensureStartsWithTasks(query)
         return pagedSearchTasks(query).content
     }
 
@@ -2705,14 +2689,12 @@ class ActionDelegate {
      * <pre>
      *     countTasks("tasks: caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
      *     countTasks("tasks: transitionId eq 't1' and userId eq 'user1'")
-     *     countTasks("transitionId eq 't1' and userId eq 'user1'")
      * </pre>
      *
      * @param query query language string starting with {@code tasks:}
      * @return number of matching tasks
      */
     long countTasks(String query) {
-        query = SearchUtils.ensureStartsWithTasks(query)
         return taskSearchService.count(query)
     }
 
@@ -2725,14 +2707,12 @@ class ActionDelegate {
      * <pre>
      *     existsTask("tasks: caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
      *     existsTask("tasks: transitionId eq 't1' and userId not eq 'user1'")
-     *     existsTask("transitionId eq 't1' and userId not eq 'user1'")
      * </pre>
      *
      * @param query query language string starting with {@code tasks:}
      * @return {@code true} if a matching task exists, {@code false} otherwise
      */
     boolean existsTask(String query) {
-        query = SearchUtils.ensureStartsWithTasks(query)
         return taskSearchService.exists(query)
     }
 
@@ -2745,14 +2725,12 @@ class ActionDelegate {
      * <pre>
      *     searchProcess("process: identifier == 'query_test'")
      *     searchProcess("process: identifier eq 'my_process' and version eq 1.0.0")
-     *     searchProcess("identifier eq 'my_process' and version eq 1.0.0")
      * </pre>
      *
      * @param query query language string starting with {@code process:}
      * @return matching {@link PetriNet} or {@code null} if none is found
      */
     PetriNet searchProcess(String query) {
-        query = SearchUtils.ensureStartsWithProcess(query)
         return processSearchService.searchOne(query)
     }
 
@@ -2766,14 +2744,12 @@ class ActionDelegate {
      * <pre>
      *     pagedSearchProcesses("processes: identifier eq 'my_process' page 0 size 10 sort by version desc")
      *     pagedSearchProcesses("processes: version in (1.0.0 : 2.0.0)")
-     *     pagedSearchProcesses("version in (1.0.0 : 2.0.0)")
      * </pre>
      *
      * @param query query language string starting with {@code processes:}
      * @return {@link Page} of matching processes
      */
     Page<PetriNet> pagedSearchProcesses(String query) {
-        query = SearchUtils.ensureStartsWithProcesses(query)
         return processSearchService.searchAll(query)
     }
 
@@ -2787,14 +2763,12 @@ class ActionDelegate {
      * <pre>
      *     searchProcesses("processes: title contains 'Test' sort by identifier asc")
      *     searchProcesses("processes: identifier in ('process_a', 'process_b')")
-     *     searchProcesses("identifier in ('process_a', 'process_b')")
      * </pre>
      *
      * @param query query language string starting with {@code processes:}
      * @return list of matching processes
      */
     List<PetriNet> searchProcesses(String query) {
-        query = SearchUtils.ensureStartsWithProcesses(query)
         return pagedSearchProcesses(query).content
     }
 
@@ -2807,14 +2781,12 @@ class ActionDelegate {
      * <pre>
      *     countProcesses("processes: identifier eq 'my_process'")
      *     countProcesses("processes: version gte 1.0.0")
-     *     countProcesses("version gte 1.0.0")
      * </pre>
      *
      * @param query query language string starting with {@code processes:}
      * @return number of matching processes
      */
     long countProcesses(String query) {
-        query = SearchUtils.ensureStartsWithProcesses(query)
         return processSearchService.count(query)
     }
 
@@ -2827,14 +2799,12 @@ class ActionDelegate {
      * <pre>
      *     existsProcess("processes: identifier eq 'my_process'")
      *     existsProcess("processes: version eq 1.0.0")
-     *     existsProcess("version eq 1.0.0")
      * </pre>
      *
      * @param query query language string starting with {@code processes:}
      * @return {@code true} if a matching process exists, {@code false} otherwise
      */
     boolean existsProcess(String query) {
-        query = SearchUtils.ensureStartsWithProcesses(query)
         return processSearchService.exists(query)
     }
 
@@ -2847,14 +2817,12 @@ class ActionDelegate {
      * <pre>
      *     searchUser("user: email eq 'user@mail.com'")
      *     searchUser("user: name eq 'John' and surname eq 'Doe'")
-     *     searchUser("name eq 'John' and surname eq 'Doe'")
      * </pre>
      *
      * @param query query language string starting with {@code user:}
      * @return matching {@link IUser} or {@code null} if none is found
      */
     IUser searchUser(String query) {
-        query = SearchUtils.ensureStartsWithUser(query)
         return userSearchService.searchOne(query)
     }
 
@@ -2868,14 +2836,12 @@ class ActionDelegate {
      * <pre>
      *     pagedSearchUsers("users: name eq 'John' page 0 size 25 sort by surname asc")
      *     pagedSearchUsers("users: email contains '@company.com'")
-     *     pagedSearchUsers("email contains '@company.com'")
      * </pre>
      *
      * @param query query language string starting with {@code users:}
      * @return {@link Page} of matching users
      */
     Page<IUser> pagedSearchUsers(String query) {
-        query = SearchUtils.ensureStartsWithUsers(query)
         return userSearchService.searchAll(query)
     }
 
@@ -2889,14 +2855,12 @@ class ActionDelegate {
      * <pre>
      *     searchUsers("users: surname eq 'Doe' sort by name asc")
      *     searchUsers("users: email in ('a@mail.com', 'b@mail.com')")
-     *     searchUsers("email in ('a@mail.com', 'b@mail.com')")
      * </pre>
      *
      * @param query query language string starting with {@code users:}
      * @return list of matching users
      */
     List<IUser> searchUsers(String query) {
-        query = SearchUtils.ensureStartsWithUsers(query)
         return pagedSearchUsers(query).content
     }
 
@@ -2909,14 +2873,12 @@ class ActionDelegate {
      * <pre>
      *     countUsers("users: email contains '@company.com'")
      *     countUsers("users: name eq 'John'")
-     *     countUsers("name eq 'John'")
      * </pre>
      *
      * @param query query language string starting with {@code users:}
      * @return number of matching users
      */
     long countUsers(String query) {
-        query = SearchUtils.ensureStartsWithUsers(query)
         return userSearchService.count(query)
     }
 
@@ -2929,14 +2891,12 @@ class ActionDelegate {
      * <pre>
      *     existsUser("users: email eq 'user@mail.com'")
      *     existsUser("users: name eq 'John' and surname eq 'Doe'")
-     *     existsUser("name eq 'John' and surname eq 'Doe'")
      * </pre>
      *
      * @param query query language string starting with {@code users:}
      * @return {@code true} if a matching user exists, {@code false} otherwise
      */
     boolean existsUser(String query) {
-        query = SearchUtils.ensureStartsWithUsers(query)
         return userSearchService.exists(query)
     }
 

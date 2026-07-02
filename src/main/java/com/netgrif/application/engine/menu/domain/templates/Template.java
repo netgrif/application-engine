@@ -13,14 +13,21 @@ public interface Template {
     static FilterBody defaultTaskFilterBody() {
         FilterBody filterBody = new FilterBody();
         filterBody.setType(FieldType.TASK_FILTER);
-        filterBody.setQuery("*");
+        filterBody.setQuery("tasks");
+        return filterBody;
+    }
+
+    static FilterBody defaultSingleTaskFilterBody() {
+        FilterBody filterBody = new FilterBody();
+        filterBody.setType(FieldType.TASK_FILTER);
+        filterBody.setQuery("task");
         return filterBody;
     }
 
     static FilterBody defaultCaseFilterBody() {
         FilterBody filterBody = new FilterBody();
         filterBody.setType(FieldType.CASE_FILTER);
-        filterBody.setQuery("*");
+        filterBody.setQuery("cases");
         return filterBody;
     }
 }
