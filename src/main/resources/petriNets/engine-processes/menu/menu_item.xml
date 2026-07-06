@@ -44,20 +44,20 @@
 			<id>menu_item_create</id>
 			<actions phase="post">
 				<action id="1">
-					move_dest_uri: f.move_dest_uri,
-					initializeTrans: t.initialize;
+					move_dest_uri: f.move_dest_uri;
 
 					String destUriPath = params["dest_uri_path"]
 					if (destUriPath == null || destUriPath.isEmpty()) {
 						return
 					}
 
-					def splitDestPathAsList = destUriPath.split(uriService.getUriSeparator()) as java.util.List
-					if (splitDestPathAsList.size() > 1) {
-						if (splitDestPathAsList.get(0).isEmpty()) {
-							splitDestPathAsList.set(0, uriService.getUriSeparator())
+					try {
+						def splitDestPathAsList = splitUriPath(destUriPath)
+						if (splitDestPathAsList.size() > 1) {
+							change move_dest_uri value { splitDestPathAsList }
 						}
-						change move_dest_uri value { splitDestPathAsList }
+					} catch (IllegalArgumentException ignore) {
+						log.error("Cannot move item on creation", ignore)
 					}
 				</action>
 			</actions>

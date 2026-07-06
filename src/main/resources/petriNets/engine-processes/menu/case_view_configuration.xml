@@ -238,7 +238,7 @@
             <option key="asc" name="ascending">Ascending</option>
             <option key="desc" name="descending">Descending</option>
         </options>
-        <init>asc</init>
+        <init>desc</init>
     </data>
     <data type="enumeration_map">
         <id>headers_options_holder</id>

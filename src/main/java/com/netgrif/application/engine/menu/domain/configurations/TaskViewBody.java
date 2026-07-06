@@ -20,7 +20,7 @@ public class TaskViewBody extends ViewBody {
     private List<String> headersMode = new ArrayList<>(List.of("sort", "edit"));
     private String headersDefaultMode = "sort";
     private String headersSortModeActive;
-    private String headersSortModeDirection = "ascending";
+    private String headersSortModeDirection = "desc";
     private boolean isHeaderModeChangeable = true;
     private boolean allowHeaderTableMode = true;
     private boolean useDefaultHeaders = true;

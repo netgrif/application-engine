@@ -26,7 +26,7 @@ public class CaseViewBody extends ViewBody {
     private List<String> headersMode = new ArrayList<>(List.of("sort", "edit", "search"));
     private String headersDefaultMode = "sort";
     private String headersSortModeActive;
-    private String headersSortModeDirection = "ascending";
+    private String headersSortModeDirection = "desc";
     private List<String> defaultHeaders;
     private boolean headerModeChangeable = true;
     private boolean useDefaultHeaders = true;
