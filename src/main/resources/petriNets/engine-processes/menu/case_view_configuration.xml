@@ -409,7 +409,7 @@
         <i18nString name="open_case_settings">Zobrazenie po kliknutí na inštanciu</i18nString>
         <i18nString name="create_case_btn_settings">Tlačidlo vytvorenia inštancie</i18nString>
         <i18nString name="header_settings">Hlavičky</i18nString>
-        <i18nString name="task_headers_sort_mode_direction">Predvolený smer zoradenia</i18nString>
+        <i18nString name="case_headers_sort_mode_direction">Predvolený smer zoradenia</i18nString>
         <i18nString name="ascending">Vzostupne</i18nString>
         <i18nString name="descending">Zostupne</i18nString>
         <i18nString name="case_headers_sort_mode_active">Aktívny stĺpec pre zoradenie</i18nString>
@@ -458,7 +458,7 @@
         <i18nString name="open_case_settings">Ansicht nach dem Klicken auf die Instanz</i18nString>
         <i18nString name="create_case_btn_settings">Schaltfläche zum Erstellen einer Instanz</i18nString>
         <i18nString name="header_settings">Kopfzeilen</i18nString>
-        <i18nString name="task_headers_sort_mode_direction">Standard-Sortierrichtung</i18nString>
+        <i18nString name="case_headers_sort_mode_direction">Standard-Sortierrichtung</i18nString>
         <i18nString name="ascending">Aufsteigend</i18nString>
         <i18nString name="descending">Absteigend</i18nString>
         <i18nString name="case_headers_sort_mode_active">Aktive Spalte zum Sortieren</i18nString>
