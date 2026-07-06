@@ -1,11 +1,13 @@
 package com.netgrif.application.engine.serialization;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.BeanDescription;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.introspect.BeanPropertyDefinition;
 
 import java.io.IOException;
 
@@ -41,7 +43,7 @@ import java.io.IOException;
  * @see FieldSelector
  * @see FieldSelectorHolder
  */
-public class DynamicFieldSerializer extends JsonSerializer<Object> {
+public class DynamicFieldSerializer extends ValueSerializer<Object> {
 
     /**
      * Holder containing the field selector used to determine which fields should be serialized.
@@ -68,9 +70,8 @@ public class DynamicFieldSerializer extends JsonSerializer<Object> {
      * @throws IOException if an I/O error occurs during serialization
      */
     @Override
-    public void serialize(Object value, JsonGenerator gen, SerializerProvider provider)
-            throws IOException {
-        serializeWithSelector(value, gen, provider, holder.getSelector());
+    public void serialize(Object value, JsonGenerator gen, SerializationContext context) {
+        serializeWithSelector(value, gen, context, holder.getSelector());
     }
 
     /**
@@ -88,8 +89,7 @@ public class DynamicFieldSerializer extends JsonSerializer<Object> {
      * @param selector the field selector that determines which fields to include in serialization
      * @throws IOException if an I/O error occurs during serialization
      */
-    public void serializeWithSelector(Object value, JsonGenerator gen,
-                                      SerializerProvider provider, FieldSelector selector) throws IOException {
+    public void serializeWithSelector(Object value, JsonGenerator gen, SerializationContext context, FieldSelector selector) {
 
         if (value == null) {
             gen.writeNull();
@@ -97,12 +97,12 @@ public class DynamicFieldSerializer extends JsonSerializer<Object> {
         }
 
         if (selector.includeAll()) {
-            provider.defaultSerializeValue(value, gen);
+            context.findValueSerializer(value.getClass()).serialize(value, gen, context);
             return;
         }
 
-        JavaType type = provider.constructType(value.getClass());
-        BeanDescription desc = provider.getConfig().introspect(type);
+        JavaType type = context.constructType(value.getClass());
+        BeanDescription desc = context.introspectBeanDescription(type);
 
         gen.writeStartObject();
         for (BeanPropertyDefinition prop : desc.findProperties()) {
@@ -113,13 +113,13 @@ public class DynamicFieldSerializer extends JsonSerializer<Object> {
             }
 
             Object propValue = prop.getAccessor().getValue(value);
-            gen.writeFieldName(name);
+            gen.writeName(name);
 
             FieldSelector nested = selector.nested(name);
             if (nested.includeAll()) {
-                provider.defaultSerializeValue(propValue, gen);
+                context.findValueSerializer(propValue.getClass()).serialize(propValue, gen, context);
             } else {
-                serializeWithSelector(propValue, gen, provider, nested);
+                serializeWithSelector(propValue, gen, context, nested);
             }
         }
         gen.writeEndObject();

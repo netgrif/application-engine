@@ -1,8 +1,5 @@
 package com.netgrif.application.engine.serialization;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.LocalisedGetDataEventOutcome;
 import com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.LocalisedGetDataGroupsEventOutcome;
 import com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.LocalisedSetDataEventOutcome;
@@ -10,6 +7,10 @@ import com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.
 import com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.base.LocalisedEventOutcome;
 import com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.base.LocalisedPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.base.LocalisedTaskEventOutcome;
+import org.springframework.boot.jackson.JacksonComponent;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
 import java.io.IOException;
 
@@ -33,7 +34,8 @@ import java.io.IOException;
  * @see FieldSelector
  * @see DynamicFieldSerializer
  */
-public class LocalizedEventOutcomeSerializer extends JsonSerializer<LocalisedEventOutcome> {
+@JacksonComponent(type = LocalisedEventOutcome.class)
+public class LocalizedEventOutcomeSerializer extends ValueSerializer<LocalisedEventOutcome> {
 
     /**
      * Holder containing the {@link FieldSelector} that determines which fields should be included
@@ -72,48 +74,47 @@ public class LocalizedEventOutcomeSerializer extends JsonSerializer<LocalisedEve
      * @throws IOException if an I/O error occurs during serialization
      */
     @Override
-    public void serialize(LocalisedEventOutcome outcome, JsonGenerator gen, SerializerProvider provider)
-            throws IOException {
+    public void serialize(LocalisedEventOutcome outcome, JsonGenerator gen, SerializationContext context) {
         gen.writeStartObject();
         FieldSelector selector = selectorHolder.getSelector();
 
         if (selector.includes("message") && outcome.getMessage() != null) {
-            gen.writeObjectField("message", outcome.getMessage());
+            gen.writePOJOProperty("message", outcome.getMessage());
         }
         if (selector.includes("frontActions") && outcome.getFrontActions() != null) {
-            gen.writeObjectField("frontActions", outcome.getFrontActions());
+            gen.writePOJOProperty("frontActions", outcome.getFrontActions());
         }
         if (selector.includes("outcomes")
                 && outcome.getOutcomes() != null) {
-            gen.writeArrayFieldStart("outcomes");
+            gen.writeArrayPropertyStart("outcomes");
             for (LocalisedEventOutcome child : outcome.getOutcomes()) {
-                provider.defaultSerializeValue(child, gen);
+                context.findValueSerializer(child.getClass()).serialize(child, gen, context);
             }
             gen.writeEndArray();
         }
         if (outcome instanceof LocalisedPetriNetEventOutcome specificOutcome && selector.includes("net") && specificOutcome.getNet() != null) {
-            gen.writeFieldName("net");
-            dynamicSerializer.serializeWithSelector(specificOutcome.getNet(), gen, provider, selector.nested("net"));
+            gen.writeName("net");
+            dynamicSerializer.serializeWithSelector(specificOutcome.getNet(), gen, context, selector.nested("net"));
         }
         if (outcome instanceof LocalisedCaseEventOutcome specificOutcome && selector.includes("case") && specificOutcome.getaCase() != null) {
-            gen.writeFieldName("aCase");
-            dynamicSerializer.serializeWithSelector(specificOutcome.getaCase(), gen, provider, selector.nested("case"));
+            gen.writeName("aCase");
+            dynamicSerializer.serializeWithSelector(specificOutcome.getaCase(), gen, context, selector.nested("case"));
         }
         if (outcome instanceof LocalisedTaskEventOutcome specificOutcome && selector.includes("task") && specificOutcome.getTask() != null) {
-            gen.writeFieldName("task");
-            dynamicSerializer.serializeWithSelector(specificOutcome.getTask(), gen, provider, selector.nested("task"));
+            gen.writeName("task");
+            dynamicSerializer.serializeWithSelector(specificOutcome.getTask(), gen, context, selector.nested("task"));
         }
         if (outcome instanceof LocalisedGetDataEventOutcome specificOutcome && selector.includes("data") && specificOutcome.getData() != null) {
-            gen.writeFieldName("data");
-            dynamicSerializer.serializeWithSelector(specificOutcome.getData(), gen, provider, selector.nested("data"));
+            gen.writeName("data");
+            dynamicSerializer.serializeWithSelector(specificOutcome.getData(), gen, context, selector.nested("data"));
         }
         if (outcome instanceof LocalisedGetDataGroupsEventOutcome specificOutcome && selector.includes("data") && specificOutcome.getData() != null) {
-            gen.writeFieldName("data");
-            dynamicSerializer.serializeWithSelector(specificOutcome.getData(), gen, provider, selector.nested("data"));
+            gen.writeName("data");
+            dynamicSerializer.serializeWithSelector(specificOutcome.getData(), gen, context, selector.nested("data"));
         }
         if (outcome instanceof LocalisedSetDataEventOutcome specificOutcome && selector.includes("changedFields") && specificOutcome.getChangedFields() != null) {
-            gen.writeFieldName("changedFields");
-            dynamicSerializer.serializeWithSelector(specificOutcome.getChangedFields(), gen, provider, selector.nested("changedFields"));
+            gen.writeName("changedFields");
+            dynamicSerializer.serializeWithSelector(specificOutcome.getChangedFields(), gen, context, selector.nested("changedFields"));
         }
 
         gen.writeEndObject();
