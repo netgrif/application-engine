@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+          xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
     <id>function_res</id>
     <initials>SFR</initials>
     <title>Test</title>
@@ -8,8 +8,7 @@
     <function name="createUser" scope="namespace">
         {  com.netgrif.application.engine.objects.auth.domain.User user ->
             if (user != null) {
-                userService.encodeUserPassword(user)
-                userService.save(user)
+                userService.createUser(user, null)
             }
         }
     </function>

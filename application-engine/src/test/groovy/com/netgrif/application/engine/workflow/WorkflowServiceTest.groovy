@@ -3,11 +3,11 @@ package com.netgrif.application.engine.workflow
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach

@@ -7,7 +7,6 @@ import com.netgrif.application.engine.petrinet.domain.version.StringToVersionCon
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.cache.annotation.EnableCaching;
@@ -30,7 +29,6 @@ import java.util.List;
 @EnableAspectJAutoProxy
 @ConfigurationPropertiesScan
 @SpringBootApplication(
-        exclude = {DataSourceAutoConfiguration.class},
         scanBasePackages = {"com.netgrif"})
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
 public class ApplicationEngine {

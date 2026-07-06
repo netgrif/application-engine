@@ -5,6 +5,7 @@ import com.netgrif.application.engine.business.orsr.IOrsrService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.objects.event.events.event.ActionStartEvent
 import com.netgrif.application.engine.objects.event.events.event.ActionStopEvent
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.expando.FunctionExpando
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import com.netgrif.application.engine.objects.petrinet.domain.Function
 import com.netgrif.application.engine.objects.workflow.domain.Case
@@ -17,6 +18,9 @@ import org.springframework.beans.factory.annotation.Lookup
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
+
 @Component
 @SuppressWarnings("GrMethodMayBeStatic")
 abstract class FieldActionsRunner {
@@ -24,9 +28,10 @@ abstract class FieldActionsRunner {
     private static final Logger log = LoggerFactory.getLogger(FieldActionsRunner.class)
 
     @Lookup("actionDelegate")
-    abstract ActionDelegate getActionDeleget()
+    abstract ActionDelegate getActionDelegate()
 
     @Autowired
+    @Deprecated(since = "7.0.0")
     private IOrsrService orsrService
 
     @Autowired
@@ -41,18 +46,17 @@ abstract class FieldActionsRunner {
     @Autowired
     private ApplicationEventPublisher publisher
 
-    private Map<String, Object> actionsCache = new HashMap<>()
+    private ConcurrentMap<String, Object> actionsCache = new ConcurrentHashMap<>()
 
     List<EventOutcome> run(com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action action, Case useCase, Map<String, String> params, List<Function> functions = []) {
         return run(action, useCase, Optional.empty(), params, functions)
     }
 
     List<EventOutcome> run(com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action action, Case useCase, Optional<Task> task, Map<String, String> params, List<Function> functions = []) {
-        if (!actionsCache)
-            actionsCache = new HashMap<>()
 
         log.debug("Action: $action")
         def code = getActionCode(action, functions)
+        List<EventOutcome> outcomes
         final ActionStartEvent actionStart = new ActionStartEvent(action)
         try {
             publisher.publishEvent(actionStart)
@@ -63,8 +67,12 @@ abstract class FieldActionsRunner {
             log.error("Action: $action.definition")
             publisher.publishEvent(new ActionStopEvent(action, actionStart, false))
             throw e
+        } finally {
+            ActionDelegate delegate = (code?.delegate instanceof ActionDelegate) ? (ActionDelegate) code.delegate : null
+            outcomes = (delegate?.outcomes != null) ? new ArrayList<>(delegate.outcomes) : new ArrayList<>()
+            cleanUp(code)
         }
-        return ((ActionDelegate) code.delegate).outcomes
+        return outcomes
     }
 
     Closure getActionCode(com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action action, List<Function> functions, boolean shouldRewriteCachedActions = false) {
@@ -72,19 +80,19 @@ abstract class FieldActionsRunner {
     }
 
     Closure getActionCode(Closure code, List<Function> functions) {
-        def actionDelegate = getActionDeleget()
+        def actionDelegate = getActionDelegate()
 
         actionsCacheService.getCachedFunctions(functions).each {
-            actionDelegate.metaClass."${it.function.name}" << it.code
+            actionDelegate."${it.function.name}" = it.code
         }
         actionsCacheService.getGlobalFunctionsCache().each { entry ->
-            def namespace = [:]
+            def functionExpando = new FunctionExpando(actionDelegate)
             entry.getValue().each {
-                namespace["${it.function.name}"] = it.code.rehydrate(actionDelegate, it.code.owner, it.code.thisObject)
+                functionExpando."${it.function.name}" = it.code
             }
-            actionDelegate.metaClass."${entry.key}" = namespace
+            actionDelegate."${entry.key}" = functionExpando
         }
-        return code.rehydrate(actionDelegate, code.owner, code.thisObject)
+        return prepareCode(code, actionDelegate)
     }
 
     void addToCache(String key, Object value) {
@@ -103,8 +111,32 @@ abstract class FieldActionsRunner {
         return postalCodeService
     }
 
+    @Deprecated(since = "7.0.0")
     IOrsrService getOrsrService() {
         return orsrService
     }
 
+    private void clearGroovyMetaClass(Object... targets) {
+        targets.each { target ->
+            if (target == null) {
+                return
+            }
+            GroovySystem.getMetaClassRegistry().removeMetaClass(target.getClass())
+        }
+    }
+
+    private Closure prepareCode(Closure closure, Object delegate) {
+        Closure hydratedClosure = closure.rehydrate(delegate, closure.owner, closure.thisObject)
+        hydratedClosure.setResolveStrategy(Closure.DELEGATE_FIRST)
+        return hydratedClosure
+    }
+
+    private void cleanUp(Closure code) {
+        if (code?.delegate instanceof ActionDelegate) {
+            ((ActionDelegate) code.delegate).clearAfterExecution()
+        } else {
+            log.warn("Code delegate is not instance of ActionDelegate")
+        }
+        clearGroovyMetaClass(code)
+    }
 }

@@ -19,7 +19,6 @@ import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Repository interface for managing {@link User} entities in the MongoDB database.

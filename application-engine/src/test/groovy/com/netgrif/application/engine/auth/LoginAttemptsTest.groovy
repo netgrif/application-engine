@@ -4,7 +4,6 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties
 import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.startup.ImportHelper
@@ -63,7 +62,7 @@ class LoginAttemptsTest {
                 .build()
 
         auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
+        importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Test", lastName: "Integration", username: USER_EMAIL, email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
                 [] as ProcessRole[])
     }

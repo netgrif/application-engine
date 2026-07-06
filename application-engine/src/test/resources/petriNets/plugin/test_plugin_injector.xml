@@ -1,4 +1,4 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
 	<id>test_plugin_injector</id>
 	<version>1.0.0</version>
 	<initials>TPI</initials>
@@ -26,7 +26,7 @@
 						change is_injected value { true }
 					} catch (NullPointerException ignore) {
 						change is_injected value { false }
-					} catch (io.grpc.StatusRuntimeException ignore) {
+					} catch (Exception ignore) {
 						change is_injected value { true }
 					}
 				</action>

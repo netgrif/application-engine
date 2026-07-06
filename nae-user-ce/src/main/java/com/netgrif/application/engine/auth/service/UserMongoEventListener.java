@@ -31,13 +31,13 @@ public class UserMongoEventListener implements AfterConvertCallback<AbstractActo
         entity.getProcessRoleIds().forEach(processRoleId -> {
             ProcessRole role = processRoleService.findById(processRoleId);
             if (role != null) {
-                entity.addProcessRole(role);
+                entity.getProcessRoles().add(role);
             }
         });
         entity.getAuthorityIds().forEach(authorityId -> {
             Authority authority = authorityService.getOne(authorityId);
             if (authority != null) {
-                entity.addAuthority(authority);
+                entity.getAuthoritySet().add(authority);
             }
         });
         return entity;

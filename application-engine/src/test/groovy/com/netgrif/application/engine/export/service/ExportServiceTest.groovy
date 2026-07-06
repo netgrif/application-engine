@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.export.service
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest
 import com.netgrif.application.engine.export.service.interfaces.IExportService
@@ -8,26 +9,23 @@ import com.netgrif.application.engine.objects.auth.constants.UserConstants
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.objects.workflow.domain.Case
+import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.objects.workflow.domain.Case
-import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
-import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import com.netgrif.application.engine.workflow.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @SpringBootTest
 @ActiveProfiles(["test"])
@@ -80,7 +78,7 @@ class ExportServiceTest {
     @Order(2)
     void testCaseMongoExport() {
         String exportTask = mainCase.tasks.find { it.transition == "t1" }.task
-        taskService.assignTask(new TaskParams(exportTask, ActorTransformer.toLoggedUser(userService.findUserByUsername(UserConstants.ADMIN_USER_USERNAME, null).get())))
+        taskService.assignTask(new TaskParams(exportTask, ActorTransformer.toLoggedUser(userService.findByEmail(UserConstants.ADMIN_USER_EMAIL, null))))
         File csvFile = new File("src/test/resources/csv/case_mongo_export.csv")
         assert csvFile.readLines().size() == 11
         String[] headerSplit = csvFile.readLines()[0].split(",")
@@ -122,7 +120,6 @@ class ExportServiceTest {
 
     @Test
     @Order(1)
-    @Disabled("Github action")
     void testTaskElasticExport() {
         Thread.sleep(10000)  //Elastic wait
         String exportTask = mainCase.tasks.find { it.transition == "t4" }.task

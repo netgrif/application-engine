@@ -267,18 +267,21 @@ public class MenuItemService implements IMenuItemService {
         }
         List<Case> casesToSave = new ArrayList<>();
 
-        List<String> parentIdList = MenuItemUtils.getCaseIdsFromCaseRef(itemCase, MenuItemConstants.FIELD_PARENT_ID);
-        if (parentIdList != null && !parentIdList.isEmpty()) {
-            Case oldParent = removeChildItemFromParent(parentIdList.get(0), itemCase);
+        List<String> oldParentIdList = MenuItemUtils.getCaseIdsFromCaseRef(itemCase, MenuItemConstants.FIELD_PARENT_ID);
+        Case newParent = getOrCreateFolderItem(destUri);
+
+        String oldParentId = oldParentIdList != null && !oldParentIdList.isEmpty() ? oldParentIdList.getFirst() : null;
+        boolean parentChanged = !Objects.equals(oldParentId, newParent != null ? newParent.getStringId() : null);
+
+        if (parentChanged && oldParentId != null) {
+            Case oldParent = removeChildItemFromParent(oldParentId, itemCase);
             casesToSave.add(oldParent);
         }
-
-        Case newParent = getOrCreateFolderItem(destUri);
-        if (newParent != null) {
+        if (parentChanged && newParent != null) {
             itemCase.getDataField(MenuItemConstants.FIELD_PARENT_ID).setValue(List.of(newParent.getStringId()));
             appendChildCaseIdInMemory(newParent, itemCase.getStringId());
             casesToSave.add(newParent);
-        } else {
+        } else if (newParent == null) {
             itemCase.getDataField(MenuItemConstants.FIELD_PARENT_ID).setValue(null);
         }
 

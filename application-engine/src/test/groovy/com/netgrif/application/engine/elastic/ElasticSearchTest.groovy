@@ -1,13 +1,16 @@
 package com.netgrif.application.engine.elastic
 
-import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
-import com.netgrif.application.engine.objects.auth.domain.Authority;
-import com.netgrif.application.engine.objects.auth.domain.User
-import com.netgrif.application.engine.objects.auth.domain.enums.UserState
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
+import com.netgrif.application.engine.objects.auth.domain.Authority
+import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -15,14 +18,13 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate
 import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
@@ -45,14 +47,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = ApplicationEngine.class
 )
 @AutoConfigureMockMvc
 @TestPropertySource(
         locations = "classpath:application-test.yaml"
 )
-@Disabled("Fix Test")
 class ElasticSearchTest {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticSearchTest)
@@ -86,6 +86,12 @@ class ElasticSearchTest {
     @Autowired
     private TestHelper testHelper
 
+    @Autowired
+    private IElasticCaseService elasticCaseService
+
+    @Autowired
+    private IElasticCaseMappingService caseMappingService
+
     private Authentication auth
     private MockMvc mvc
     private String netId, netId2
@@ -97,16 +103,18 @@ class ElasticSearchTest {
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
                 .build()
-        auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSW)
         testHelper.truncateDbs()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
-        def net2 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        def net = petriNetService.importPetriNet(new ImportPetriNetParams(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
+        def net2 = petriNetService.importPetriNet(new ImportPetriNetParams(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
         assert net
         assert net2
 
         netId = net.getStringId()
         netId2 = net2.getStringId()
+
+        assert netId
+        assert netId2
 
 //        def org = importHelper.createGroup("Test")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
@@ -114,13 +122,18 @@ class ElasticSearchTest {
         def testUser = importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [net.roles.values().find { it.importId == "process_role" }] as ProcessRole[])
+        auth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(testUser), USER_PASSW, testUser.authoritySet as List)
 
         10.times {
-            def _case = importHelper.createCase("$it" as String, it % 2 == 0 ? net : net2)
+            def _case = importHelper.createCaseAsSuper("$it" as String, it % 2 == 0 ? net : net2)
             _case.dataSet["number"].value = it * 100.0 as Double
             _case.dataSet["enumeration"].value = _case.petriNet.dataSet["enumeration"].choices[it % 3]
-            workflowService.save(_case)
+
+            def savedCase = workflowService.save(_case)
+            elasticCaseService.indexNow(caseMappingService.transform(savedCase))
         }
+
+        waitForIndexedCases(14)
 
         testCases = [
                 "searchByPetriNetIdentifier": [
@@ -137,23 +150,15 @@ class ElasticSearchTest {
                                         "id": superCreator.superUser.stringId
                                 ]
                         ]),
-                        "size": 11
+                        "size": 12
                 ],
-                "searchByAuthorName"        : [
+                "searchByAuthorUserName"    : [
                         "json": JsonOutput.toJson([
                                 "author": [
-                                        "name": superCreator.superUser.name
+                                        "username": superCreator.superUser.username
                                 ]
                         ]),
-                        "size": 11
-                ],
-                "searchByAuthorEmail"       : [
-                        "json": JsonOutput.toJson([
-                                "author": [
-                                        "email": superCreator.superUser.email
-                                ]
-                        ]),
-                        "size": 11
+                        "size": 12
                 ],
                 "searchByEnumeration"       : [
                         "json": JsonOutput.toJson([
@@ -170,6 +175,14 @@ class ElasticSearchTest {
                                 ]
                         ]),
                         "size": 1
+                ],
+                "searchByAuthorName"        : [
+                        "json": JsonOutput.toJson([
+                                "author": [
+                                "name": superCreator.superUser.name
+                        ]
+                     ]),
+                        "size": 12
                 ]
         ]
     }
@@ -182,7 +195,8 @@ class ElasticSearchTest {
             def result = search(content)
             def response = parseResult(result)
 
-            assert response?."_embedded"?."cases"?.size == value.value["size"]
+            assert response?."_embedded"?."cases"?.size() == value.value["size"]
+            assert response?."_embedded"?."cases"?.size() == value.value["size"] : "$value.key expected ${value.value["size"]}, got ${response?."_embedded"?."cases"?.size()}, response: ${result.response.contentAsString}"
         }
     }
 
@@ -198,6 +212,14 @@ class ElasticSearchTest {
         )
                 .andExpect(status().isOk())
                 .andReturn()
+    }
+
+    private void waitForIndexedCases(long expectedCount) {
+        long deadline = System.currentTimeMillis() + 15_000
+        while (repository.count() < expectedCount && System.currentTimeMillis() < deadline) {
+            Thread.sleep(700)
+        }
+        assert repository.count() >= expectedCount
     }
 
     @SuppressWarnings("GrMethodMayBeStatic")

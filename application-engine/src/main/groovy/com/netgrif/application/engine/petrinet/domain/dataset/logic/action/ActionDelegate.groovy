@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.AsyncRunner
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
+import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
 import com.netgrif.application.engine.auth.service.GroupService
@@ -69,6 +70,7 @@ import com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.Das
 import com.netgrif.application.engine.objects.workflow.domain.menu.dashboard.DashboardManagementBody
 import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.expando.DelegateExpando
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.plugin.meta.PluginHolder
 import com.netgrif.application.engine.startup.ImportHelper
@@ -107,7 +109,7 @@ import java.util.stream.Collectors
  * ActionDelegate class contains Actions API methods.
  */
 @SuppressWarnings(["GrMethodMayBeStatic", "GroovyUnusedDeclaration"])
-class ActionDelegate {
+class ActionDelegate extends DelegateExpando {
 
     static final Logger log = LoggerFactory.getLogger(ActionDelegate)
 
@@ -204,7 +206,7 @@ class ActionDelegate {
     IImpersonationService impersonationService
 
     @Autowired
-    SecurityConfigurationProperties.WebProperties webProperties
+    SecurityConfigurationProperties securityProperties
 
     @Autowired
     IMenuItemService menuItemService
@@ -217,6 +219,9 @@ class ActionDelegate {
 
     @Autowired
     IStorageResolverService storageResolverService
+
+    @Autowired
+    PaginationProperties paginationProperties
 
     FrontendActionOutcome Frontend
 
@@ -247,6 +252,23 @@ class ActionDelegate {
         this.Frontend = new FrontendActionOutcome(this.useCase, this.task, this.outcomes)
         this.NaeModule = new ModuleHolder()
         this.Plugin = new PluginHolder()
+    }
+
+    void clearAfterExecution() {
+        this.action = null
+        this.useCase = null
+        this.task = null
+        this.actionsRunner = null
+
+        this.map?.clear()
+        this.map = null
+
+        this.outcomes?.clear()
+        this.outcomes = null
+
+        this.Frontend = null
+        this.NaeModule = null
+        this.Plugin = null
     }
 
     def initFieldsMap(Map<String, String> fieldIds) {
@@ -587,7 +609,7 @@ class ActionDelegate {
     }
 
     def close = { Transition[] transitions ->
-        def service = ApplicationContextProvider.getBean("taskService")
+        ITaskService service = (ITaskService) ApplicationContextProvider.getBean("taskService")
         if (!service) {
             log.error("Could not find task service")
             return
@@ -930,6 +952,7 @@ class ActionDelegate {
         return null
     }
 
+    @Deprecated(since = "7.0.0")
     def byIco = { String ico ->
         return actionsRunner.orsrService.findByIco(ico)
     }
@@ -1185,6 +1208,7 @@ class ActionDelegate {
         return outcome
     }
 
+    @Deprecated(since = "7.0.0")
     Map<String, ChangedField> makeDataSetIntoChangedFields(Map<String, Map<String, String>> map, Case caze, Task task) {
         return map.collect { fieldAttributes ->
             ChangedField changedField = new ChangedField(fieldAttributes.key)
@@ -1462,15 +1486,22 @@ class ActionDelegate {
     }
 
     void deleteUser(AbstractUser user) {
-        List<Task> tasks = taskService.findByUser(new FullPageRequest(), user).toList()
-        if (tasks != null && tasks.size() > 0)
-            taskService.cancelTasks(tasks, user)
+        Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize())
+        Page<Task> tasksAssignedToUserPage = taskService.findByUser(pageable, user)
+        while (tasksAssignedToUserPage.hasContent()) {
+            taskService.cancelTasks(tasksAssignedToUserPage.getContent(), user)
+            tasksAssignedToUserPage = taskService.findByUser(pageable, user)
+        }
 
         QCase qCase = new QCase("case")
-        List<Case> cases = workflowService.searchAll(qCase.author.eq(ActorTransformer.toActorRef(user))).toList()
-        if (cases != null)
-            cases.forEach({ aCase -> aCase.setAuthor(ActorTransformer.anonymizedActorRef()) })
-
+        Page<Case> casesAuthoredByUserPage = workflowService.search(qCase.author.eq(ActorTransformer.toActorRef(user)), pageable)
+        while (casesAuthoredByUserPage.hasContent()) {
+            casesAuthoredByUserPage.forEach({ aCase ->
+                aCase.setAuthor(ActorTransformer.anonymizedActorRef())
+                workflowService.save(aCase)
+            })
+            casesAuthoredByUserPage = workflowService.search(qCase.author.eq(ActorTransformer.toActorRef(user)), pageable)
+        }
         userService.deleteUser(user)
     }
 
@@ -2023,10 +2054,12 @@ class ActionDelegate {
         item = workflowService.findOne(item.stringId)
         def roles = cl()
         def dataField = item.dataSet[roleFieldId]
-        if (roles instanceof List<ProcessRole>) {
-            dataField.options = collectRolesForPreferenceItem(roles)
-        } else if (roles instanceof Map<String, String>) {
-            dataField.options = collectRolesForPreferenceItem(roles)
+        if (roles instanceof List) {
+            if (roles.isEmpty() || roles.every { it instanceof ProcessRole }) {
+                dataField.options = collectRolesForPreferenceItem(roles as List<ProcessRole>)
+            }
+        } else if (roles instanceof Map) {
+            dataField.options = collectRolesForPreferenceItem(roles as Map<String, String>)
         }
         workflowService.save(item)
     }
@@ -2798,8 +2831,12 @@ class ActionDelegate {
         menuItemService.removeChildItemFromParent(folderId, childItem)
     }
 
-    String makeUrl(String publicViewUrl = webProperties.publicWeb.url, String identifier) {
+    String makeUrl(String publicViewUrl, String identifier) {
         return "${publicViewUrl}/${Base64.getEncoder().encodeToString(identifier.bytes)}" as String
+    }
+
+    String makeUrl(String identifier) {
+        return makeUrl(securityProperties.web.publicWeb.url, identifier)
     }
 
     void updateMultichoiceWithCurrentNode(MultichoiceMapField field, String path) {

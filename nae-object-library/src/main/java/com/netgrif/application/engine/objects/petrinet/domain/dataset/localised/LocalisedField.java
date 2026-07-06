@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.objects.petrinet.domain.dataset.localised;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.objects.petrinet.domain.Component;
 import com.netgrif.application.engine.objects.petrinet.domain.Format;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;

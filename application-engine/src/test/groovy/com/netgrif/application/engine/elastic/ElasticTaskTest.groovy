@@ -1,26 +1,26 @@
 package com.netgrif.application.engine.elastic
 
-import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
-import com.netgrif.application.engine.objects.elastic.domain.ElasticTask
+import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
 import com.netgrif.application.engine.elastic.service.ReindexingTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
+import com.netgrif.application.engine.objects.elastic.domain.ElasticTask
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -29,18 +29,11 @@ import java.lang.management.ManagementFactory
 import java.lang.management.ThreadInfo
 import java.lang.management.ThreadMXBean
 import java.time.LocalDateTime
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.ExecutionException
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = ApplicationEngine.class
 )
 @AutoConfigureMockMvc

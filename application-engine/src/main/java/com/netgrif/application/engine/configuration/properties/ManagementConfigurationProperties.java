@@ -3,10 +3,9 @@ package com.netgrif.application.engine.configuration.properties;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
-import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointProperties;
 import org.springframework.boot.actuate.autoconfigure.logging.LogFileWebEndpointProperties;
-import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.health.autoconfigure.actuate.endpoint.HealthEndpointProperties;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Component;
 

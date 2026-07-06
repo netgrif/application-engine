@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileListField;
@@ -14,6 +13,7 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.data
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;

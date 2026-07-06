@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.netgrif</groupId>
         <artifactId>application-engine-parent</artifactId>
-        <version>7.0.0-RC10.4</version>
+        <version>7.0.1</version>
     </parent>
 
     <artifactId>nae-user-ce</artifactId>
@@ -93,6 +93,11 @@
             <artifactId>spring-security-ldap</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
         <!-- Session -->
         <dependency>
             <groupId>org.springframework.session</groupId>
@@ -118,13 +123,7 @@
         </dependency>
         <!-- Jackson -->
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
             <scope>provided</scope>
@@ -175,7 +174,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <compilerArgument>-parameters</compilerArgument>
                     <source>21</source>

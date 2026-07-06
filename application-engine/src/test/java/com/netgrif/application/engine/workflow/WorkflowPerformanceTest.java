@@ -19,7 +19,7 @@ import com.netgrif.application.engine.workflow.service.TaskService;
 import com.netgrif.application.engine.workflow.service.WorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.util.Locale;
 
 @Slf4j
-@Disabled
+@Tag("performance")
 @SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)

@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.business;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Collection;
 import java.util.List;
 

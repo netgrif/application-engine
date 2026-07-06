@@ -1,14 +1,14 @@
 package com.netgrif.application.engine.configuration;
 
+import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class NetgrifEnvironmentPostProcessor implements EnvironmentPostProcessor  {
+public class NetgrifEnvironmentPostProcessor implements EnvironmentPostProcessor {
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> override = new HashMap<>();
@@ -20,6 +20,7 @@ public class NetgrifEnvironmentPostProcessor implements EnvironmentPostProcessor
         replacePrefix(environment, override, "logging", "netgrif.engine.logging");
         replacePrefix(environment, override, "management", "netgrif.engine.management");
         replacePrefix(environment, override, "spring.servlet.multipart", "netgrif.engine.servlet.multipart");
+        replacePrefix(environment, override, "spring.jackson", "netgrif.engine.jackson");
 
         environment.getPropertySources().addFirst(new MapPropertySource("netgrifEngineProperties", override));
     }
@@ -37,7 +38,12 @@ public class NetgrifEnvironmentPostProcessor implements EnvironmentPostProcessor
                 Map<String, Object> map = ((MapPropertySource) propertySource).getSource();
                 map.keySet().stream()
                         .filter(key -> key.startsWith(customPrefix))
-                        .forEach(key -> override.put(originalPrefix + key.substring(customPrefix.length()), map.get(key)));
+                        .forEach(key -> {
+                            String property = environment.getProperty(key);
+                            if (property != null) {
+                                override.put(originalPrefix + key.substring(customPrefix.length()), property);
+                            }
+                        });
             }
         });
     }

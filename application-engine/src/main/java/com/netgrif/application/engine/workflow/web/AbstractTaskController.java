@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
@@ -74,7 +74,6 @@ public abstract class AbstractTaskController {
         this.workflowService = workflowService;
         this.userService = userService;
     }
-
 
     public PagedModel<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
@@ -219,7 +218,6 @@ public abstract class AbstractTaskController {
         return CountResponse.taskCount(count);
     }
 
-
     public EntityModel<EventOutcomeWithMessage> getData(String taskId, Locale locale) {
         try {
             GetDataGroupsEventOutcome outcome = dataService.getDataGroups(taskId, locale);
@@ -251,14 +249,18 @@ public abstract class AbstractTaskController {
                 referencedTaskIds.addAll(referencedTaskIdsByDataGroup);
             }
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
-            dataBody.fields().forEachRemaining(fieldChangesEntry -> {
-                String taskIdToChangeWith = fieldChangesEntry.getKey();
+            dataBody.forEachEntry((taskIdToChangeWith, fieldChanges) -> {
                 if (!referencedTaskIds.contains(taskIdToChangeWith)) {
                     return;
                 }
+
+                if (!(fieldChanges instanceof ObjectNode fieldChangesObject)) {
+                    throw new IllegalArgumentException("Data changes for task [" + taskIdToChangeWith + "] must be JSON object");
+                }
+
                 Task taskToChangeWith = taskService.findOne(taskIdToChangeWith);
                 outcomes.put(taskIdToChangeWith, dataService.setData(taskToChangeWith,
-                        fieldChangesEntry.getValue().deepCopy(), new HashMap<>(), true));
+                        fieldChangesObject.deepCopy(), new HashMap<>(), true));
             });
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
             mainOutcome = handleMainSetDataEventOutcome(mainOutcome, taskId);

@@ -1,4 +1,4 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
 	<id>1</id>
 	<initials>TES</initials>
 	<title>PDF test</title>

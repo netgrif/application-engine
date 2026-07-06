@@ -6,7 +6,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine-parent</artifactId>
-    <version>7.0.0-RC10.4</version>
+    <version>7.0.1</version>
     <packaging>pom</packaging>
 
     <name>NETGRIF Application Engine parent</name>
@@ -60,29 +60,41 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <groovy.version>4.0.21</groovy.version>
-        <lombok.version>1.18.36</lombok.version>
-        <jakarta.validation.version>3.0.2</jakarta.validation.version>
-        <jakarta.annotation.version>2.1.1</jakarta.annotation.version>
-        <jakarta.bind.version>4.0.2</jakarta.bind.version>
-        <junit-jupiter.version>5.11.4</junit-jupiter.version>
-        <bson.version>5.2.1</bson.version>
-        <spring.boot.version>3.5.8</spring.boot.version>
-        <jackson.version>2.17.1</jackson.version>
+
+        <groovy.version>5.0.5</groovy.version>
+        <lombok.version>1.18.46</lombok.version>
+        <jakarta.validation.version>3.1.1</jakarta.validation.version>
+        <jakarta.annotation.version>3.0.0</jakarta.annotation.version>
+
+        <junit-jupiter.version>6.0.3</junit-jupiter.version>
+        <junit-platform.version>6.0.3</junit-platform.version>
+        <maven-surefire-plugin.version>3.5.6</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>3.5.6</maven-failsafe-plugin.version>
+        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
+        <maven-clean-plugin.version>3.4.1</maven-clean-plugin.version>
+
+        <bson.version>5.8.0</bson.version>
+        <jackson.version>3.1.2</jackson.version>
+        <jackson.version.jsr310>3.1.2</jackson.version.jsr310>
+        <spring.boot.version>4.1.0</spring.boot.version>
+        <springdoc.version>3.0.3</springdoc.version>
+
         <mapstruct.version>1.6.3</mapstruct.version>
         <querydsl.version>5.1.0</querydsl.version>
         <protobuf.version>4.33.1</protobuf.version>
-        <grpc.version>1.69.1</grpc.version>
+        <grpc.version>1.80.0</grpc.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
+
         <sonar.organization>netgrif-oss</sonar.organization>
+        <sonar.project>netgrif_application-engine</sonar.project>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <repositories>
         <repository>
-            <id>oss.snapshots</id>
-            <name>OSSRH SNAPSHOT</name>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+            <name>Central Snapshots</name>
+            <id>central-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
@@ -94,11 +106,33 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
             </dependency>
+
+            <!-- org.quartz-scheduler ak bude fixnuty!  -->
+            <dependency>
+                <groupId>com.mchange</groupId>
+                <artifactId>mchange-commons-java</artifactId>
+                <version>0.4.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.mchange</groupId>
+                <artifactId>c3p0</artifactId>
+                <version>0.12.0</version>
+            </dependency>
+            <!-- org.quartz-scheduler ak bude fixnuty!  -->
         </dependencies>
     </dependencyManagement>
 
@@ -114,7 +148,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <compilerArgument>-parameters</compilerArgument>
                     <source>${java.version}</source>
