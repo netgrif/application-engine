@@ -25,6 +25,7 @@ public class CaseViewBody extends ViewBody {
     private boolean allowHeaderTableMode = true;
     private List<String> headersMode = new ArrayList<>(List.of("sort", "edit", "search"));
     private String headersDefaultMode = "sort";
+    private String headersSortModeActive;
     private String headersSortModeDirection = "ascending";
     private List<String> defaultHeaders;
     private boolean headerModeChangeable = true;
@@ -83,6 +84,8 @@ public class CaseViewBody extends ViewBody {
                 this.headersMode == null ? new ArrayList<>() : this.headersMode);
         outcome.putDataSetEntry(CaseViewConstants.FIELD_HEADERS_DEFAULT_MODE, FieldType.ENUMERATION_MAP,
                 this.headersDefaultMode);
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_HEADERS_SORT_MODE_ACTIVE, FieldType.TEXT,
+                this.headersSortModeActive);
         outcome.putDataSetEntry(CaseViewConstants.FIELD_HEADERS_SORT_MODE_DIRECTION, FieldType.ENUMERATION_MAP,
                 this.headersSortModeDirection);
         if (this.defaultHeaders != null) {
