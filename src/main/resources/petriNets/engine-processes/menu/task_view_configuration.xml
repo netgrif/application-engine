@@ -266,8 +266,8 @@
         <i18nString name="task_headers_sort_mode_direction">Predvolený smer zoradenia</i18nString>
         <i18nString name="ascending">Vzostupne</i18nString>
         <i18nString name="descending">Zostupne</i18nString>
-        <i18nString name="task_headers_sort_mode_active">todo 2454</i18nString>
-        <i18nString name="task_headers_sort_mode_active_desc">todo 2454</i18nString>
+        <i18nString name="task_headers_sort_mode_active">Aktívny stĺpec pre zoradenie</i18nString>
+        <i18nString name="task_headers_sort_mode_active_desc">Napríklad: meta-title</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="hidden">Versteckt</i18nString>
@@ -303,8 +303,8 @@
         <i18nString name="task_headers_sort_mode_direction">Standard-Sortierrichtung</i18nString>
         <i18nString name="ascending">Aufsteigend</i18nString>
         <i18nString name="descending">Absteigend</i18nString>
-        <i18nString name="task_headers_sort_mode_active">todo 2454</i18nString>
-        <i18nString name="task_headers_sort_mode_active_desc">todo 2454</i18nString>
+        <i18nString name="task_headers_sort_mode_active">Aktive Spalte zum Sortieren</i18nString>
+        <i18nString name="task_headers_sort_mode_active_desc">Beispiel: meta-title</i18nString>
     </i18n>
 
     <transition>
