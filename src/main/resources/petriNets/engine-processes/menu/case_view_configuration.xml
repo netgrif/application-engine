@@ -445,11 +445,9 @@
         <i18nString name="settings">Einstellungen</i18nString>
         <i18nString name="case_allow_export">Erlaube Export?</i18nString>
         <i18nString name="case_empty_content_text">Leerer Inhaltstext</i18nString>
-        <i18nString name="case_empty_content_text_desc">Wenn dieses Feld leer ist, wird der Standardtext verwendet
-        </i18nString>
+        <i18nString name="case_empty_content_text_desc">Wenn dieses Feld leer ist, wird der Standardtext verwendet</i18nString>
         <i18nString name="case_empty_content_icon">Leeres Inhaltssymbol</i18nString>
-        <i18nString name="case_empty_content_icon_desc">Wenn dieses Feld leer ist, wird das Standardsymbol verwendet
-        </i18nString>
+        <i18nString name="case_empty_content_icon_desc">Wenn dieses Feld leer ist, wird das Standardsymbol verwendet</i18nString>
         <i18nString name="case_empty_content_icon_preview">Vorschau des leeren Inhaltssymbols</i18nString>
         <i18nString name="case_filter">Filter</i18nString>
         <i18nString name="case_filter_desc">Verwenden Sie Elasticsearch String Query</i18nString>
