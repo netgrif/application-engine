@@ -541,16 +541,8 @@
 		<id>view_configuration_type</id>
 		<title name="view_configuration_type">View type</title>
 		<options>
-			<init dynamic="true">menuItemService.getAvailableViewsAsOptions(true, true)</init>
+			<init dynamic="true">menuItemService.getPrimaryViewsAsOptions()</init>
 		</options>
-		<action trigger="set">
-			use_tabbed_view: f.use_tabbed_view,
-			view_configuration_type: f.view_configuration_type;
-
-			if (view_configuration_type.options == null || view_configuration_type.options.isEmpty()) {
-				change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(use_tabbed_view.value, true) }
-			}
-		</action>
 	</data>
 	<data type="caseRef">
 		<id>view_configuration_id</id>

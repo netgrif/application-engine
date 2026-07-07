@@ -268,15 +268,8 @@
         <id>view_configuration_type</id>
         <title name="view_configuration_type">View type</title>
         <options>
-            <init dynamic="true">menuItemService.getAvailableViewsAsOptions(true, useCase.processIdentifier)</init>
+            <init dynamic="true">menuItemService.getAvailableViewsAsOptions(useCase.processIdentifier)</init>
         </options>
-        <action trigger="set">
-            view_configuration_type: f.view_configuration_type;
-
-            if (view_configuration_type.options == null || view_configuration_type.options.isEmpty()) {
-                change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(true, useCase.processIdentifier) }
-            }
-        </action>
     </data>
     <data type="caseRef">
         <id>view_configuration_id</id>
