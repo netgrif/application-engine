@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.pfql;
 
+import com.netgrif.application.engine.MockService;
 import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.pfql.domain.enums.QueryType;
@@ -14,6 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -37,6 +41,9 @@ public class CaseSearchServiceTest {
 
     @Autowired
     private ImportHelper importHelper;
+
+    @Autowired
+    private MockService mockService;
 
     private Case testCase;
 
@@ -64,6 +71,11 @@ public class CaseSearchServiceTest {
         assertNotNull(result.getPetriNet());
         assertEquals(testCase.getStringId(), result.getStringId());
 
+        login(mockService.mockLoggedUser());
+        result = caseSearchService.searchOne("case: title eq 'test'");
+        assertNull(result);
+        logout();
+
         setData(Map.of(QUERY_FIELD_ID, Map.of("value", "xxx", "type", FieldType.TEXT.getName())));
         Thread.sleep(2000);
         result = caseSearchService.searchOne("case: data." + QUERY_FIELD_ID + ".value eq 'xxx'");
@@ -87,6 +99,12 @@ public class CaseSearchServiceTest {
         assertNotNull(result.getContent().get(0).getPetriNet());
         assertEquals(testCase.getStringId(), result.getContent().get(0).getStringId());
 
+        login(mockService.mockLoggedUser());
+        result = caseSearchService.searchAll("cases: title eq 'test'");
+        assertNotNull(result);
+        assertEquals(0, result.getTotalElements());
+        logout();
+
         setData(Map.of(QUERY_FIELD_ID, Map.of("value", "xxx", "type", FieldType.TEXT.getName())));
         Thread.sleep(2000);
         result = caseSearchService.searchAll("cases: data." + QUERY_FIELD_ID + ".value eq 'xxx'");
@@ -108,6 +126,11 @@ public class CaseSearchServiceTest {
         long result = caseSearchService.count("case: title eq 'test'");
         assertEquals(1, result);
 
+        login(mockService.mockLoggedUser());
+        result = caseSearchService.count("case: title eq 'test'");
+        assertEquals(0, result);
+        logout();
+
         result = caseSearchService.count("cases: title eq 'test'");
         assertEquals(1, result);
 
@@ -128,6 +151,11 @@ public class CaseSearchServiceTest {
         boolean result = caseSearchService.exists("case: title eq 'test'");
         assertTrue(result);
 
+        login(mockService.mockLoggedUser());
+        result = caseSearchService.exists("case: title eq 'test'");
+        assertFalse(result);
+        logout();
+
         result = caseSearchService.exists("cases: title eq 'test'");
         assertTrue(result);
 
@@ -146,6 +174,14 @@ public class CaseSearchServiceTest {
                 .map(TaskPair::getTask)
                 .findFirst().get();
         testCase = importHelper.setTaskData(taskId, dataSet).getCase();
+    }
+
+    private void login(LoggedUser loggedUser) {
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(loggedUser, null));
+    }
+
+    private void logout() {
+        SecurityContextHolder.getContext().setAuthentication(null);
     }
 
 }

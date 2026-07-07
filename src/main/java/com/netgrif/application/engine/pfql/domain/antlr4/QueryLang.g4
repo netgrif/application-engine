@@ -1,11 +1,16 @@
 // todo generate this with plugin
 grammar QueryLang;
 
-query: resource=(PROCESS | PROCESSES) delimeter processConditions (paging)? (processSorting)? EOF # processQuery
-     | resource=(CASE | CASES) delimeter caseConditions (paging)? (caseSorting)? EOF # caseQuery
-     | resource=(TASK | TASKS) delimeter taskConditions (paging)? (taskSorting)? EOF # taskQuery
-     | resource=(USER | USERS) delimeter userConditions (paging)? (userSorting)? EOF # userQuery
+query: resource=(PROCESS | PROCESSES) processConditionsAndPaging? EOF # processQuery
+     | resource=(CASE | CASES) caseConditionsAndPaging? EOF # caseQuery
+     | resource=(TASK | TASKS) taskConditionsAndPaging? EOF # taskQuery
+     | resource=(USER | USERS) userConditionsAndPaging? EOF # userQuery
      ;
+
+processConditionsAndPaging: delimeter processConditions? paging? processSorting?;
+caseConditionsAndPaging: delimeter caseConditions? paging? caseSorting?;
+taskConditionsAndPaging: delimeter taskConditions? paging? taskSorting?;
+userConditionsAndPaging: delimeter userConditions? paging? userSorting?;
 
 processConditions: processOrExpression ;
 processOrExpression: processAndExpression (SPACE OR SPACE processAndExpression)* ;

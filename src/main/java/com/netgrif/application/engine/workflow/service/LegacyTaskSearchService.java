@@ -95,7 +95,7 @@ public class LegacyTaskSearchService extends MongoSearchService<Task> {
     }
 
 
-    private Predicate buildSingleQuery(TaskSearchRequest request, LoggedUser user, Locale locale) {
+    public Predicate buildSingleQuery(TaskSearchRequest request, LoggedUser user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
 
         buildStringIdQuery(request, builder);
