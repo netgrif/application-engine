@@ -228,12 +228,12 @@ tasksUserIdComparison: tasksUserId SPACE stringComparison # tasksUserIdBasic
                      ;
 
 // basic comparisons
-objectIdComparison: (NOT SPACE?)? op=(EQ | NEQ) SPACE STRING ;
-stringComparison: (NOT SPACE?)? op=(EQ | NEQ | CONTAINS | LT | GT | LTE | GTE) SPACE STRING ;
+objectIdComparison: (NOT SPACE?)? op=(EQ | NEQ) SPACE (STRING | LOGGED_USER_ID) ;
+stringComparison: (NOT SPACE?)? op=(EQ | NEQ | CONTAINS | LT | GT | LTE | GTE) SPACE (STRING | loggedUserStringAttribute) ;
 numberComparison: (NOT SPACE?)? op=(EQ | NEQ | LT | GT | LTE | GTE) SPACE number=(INT | DOUBLE) ;
 dateComparison: (NOT SPACE?)? op=(EQ | NEQ | LT | GT | LTE | GTE) SPACE DATE ;
 dateTimeComparison: (NOT SPACE?)? op=(EQ | NEQ | LT | GT | LTE | GTE) SPACE DATETIME ;
-booleanComparison: (NOT SPACE?)? op=(EQ | NEQ) SPACE BOOLEAN ;
+booleanComparison: (NOT SPACE?)? op=(EQ | NEQ) SPACE (BOOLEAN | LOGGED_USER_ANONYMOUS) ;
 
 // in list/in range comparisons
 inListStringComparison: (NOT SPACE?)? op=IN SPACE? stringList ;
@@ -326,13 +326,13 @@ ASC: A S C ;
 DESC: D E S C ;
 
 // basic types
-stringList: '(' SPACE? (STRING SPACE? (',' SPACE? STRING SPACE? )* )? SPACE? ')' ;
+stringList: '(' SPACE? ((STRING | loggedUserStringAttribute) SPACE? (',' SPACE? (STRING | loggedUserStringAttribute) SPACE? )* )? SPACE? ')' ;
 intList: '(' SPACE? (INT SPACE? (',' SPACE? INT SPACE? )* )? SPACE? ')' ;
 doubleList: '(' SPACE? (DOUBLE SPACE? (',' SPACE? DOUBLE SPACE? )* )? SPACE? ')' ;
 dateList: '(' SPACE? (DATE SPACE? (',' SPACE? DATE SPACE? )* )? SPACE? ')' ;
 dateTimeList: '(' SPACE? (DATETIME SPACE? (',' SPACE? DATETIME SPACE? )* )? SPACE? ')' ;
 versionList: '(' SPACE? (VERSION_NUMBER SPACE? (',' SPACE? VERSION_NUMBER SPACE? )* )? SPACE? ')' ;
-stringRange: leftEndpoint=('(' | '[') SPACE? STRING SPACE? ':' SPACE? STRING SPACE? rightEndpoint=(')' | ']') ;
+stringRange: leftEndpoint=('(' | '[') SPACE? (STRING | loggedUserStringAttribute) SPACE? ':' SPACE? (STRING | loggedUserStringAttribute) SPACE? rightEndpoint=(')' | ']') ;
 intRange: leftEndpoint=('(' | '[') SPACE? INT SPACE? ':' SPACE? INT SPACE? rightEndpoint=(')' | ']') ;
 doubleRange: leftEndpoint=('(' | '[') SPACE? DOUBLE SPACE? ':' SPACE? DOUBLE SPACE? rightEndpoint=(')' | ']') ;
 dateRange: leftEndpoint=('(' | '[') SPACE? DATE SPACE? ':' SPACE? DATE SPACE? rightEndpoint=(')' | ']') ;
@@ -349,6 +349,13 @@ JAVA_ID: [a-zA-Z$_] [a-zA-Z0-9$_]* ;
 
 SPACE: [ ]+ ;
 ANY: . ;
+
+// place holders
+loggedUserStringAttribute: (LOGGED_USER_ID | LOGGED_USER_USERNAME | LOGGED_USER_FULLNAME);
+LOGGED_USER_ID: L O G G E D U S E R '.' I D ;
+LOGGED_USER_FULLNAME:  L O G G E D U S E R '.' F U L L N A M E ;
+LOGGED_USER_USERNAME:  L O G G E D U S E R '.' U S E R N A M E ;
+LOGGED_USER_ANONYMOUS: L O G G E D U S E R '.' A N O N Y M O U S ;
 
 // fragments
 fragment A : [aA];
