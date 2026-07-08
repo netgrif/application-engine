@@ -166,7 +166,7 @@
     <data type="stringCollection" immediate="true">
         <id>task_default_headers</id>
         <title name="task_default_headers">Set default headers</title>
-        <desc name="default_headers_desc">Example: "meta-title", "meta-user"</desc>
+        <desc name="default_headers_desc">Example: "meta-title", "meta-caseTitle", ...</desc>
     </data>
     <data type="boolean" immediate="true">
         <id>task_show_more_menu</id>
@@ -247,7 +247,7 @@
         <i18nString name="task_allow_header_table_mode">Povoliť tabuľkový mód pre hlavičky?</i18nString>
         <i18nString name="use_task_default_headers">Použiť vlastné predvolené hlavičky?</i18nString>
         <i18nString name="task_default_headers">Predvolené hlavičky</i18nString>
-        <i18nString name="default_headers_desc">Napríklad: "meta-title", "meta-user"</i18nString>
+        <i18nString name="default_headers_desc">Napríklad: "meta-title", "meta-caseTitle", ...</i18nString>
         <i18nString name="task_show_more_menu">Zobrazovať menu pre úlohovú položku?</i18nString>
         <i18nString name="item_settings">Nastavenie položky</i18nString>
         <i18nString name="item_settings_general">Všeobecné</i18nString>
@@ -281,7 +281,7 @@
         <i18nString name="task_allow_header_table_mode">Erlaube Tabellenmodus?</i18nString>
         <i18nString name="use_task_default_headers">Eigene Kopfzeilen verwenden?</i18nString>
         <i18nString name="task_default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
-        <i18nString name="default_headers_desc">Beispiel: "meta-title", "meta-user"</i18nString>
+        <i18nString name="default_headers_desc">Beispiel: "meta-title", "meta-caseTitle", ...</i18nString>
         <i18nString name="item_settings_general">Allgemein</i18nString>
         <i18nString name="fulltext_advanced">Einfacher und erweiterter Suchmodus</i18nString>
         <i18nString name="merge_filters">Mit dem Basisfilter kombinieren, falls vorhanden?</i18nString>

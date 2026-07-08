@@ -262,7 +262,7 @@
     <data type="stringCollection" immediate="true">
         <id>case_default_headers</id>
         <title name="case_default_headers">Set default headers</title>
-        <desc name="default_headers_desc">Example: "meta-title", "meta-visualId"</desc>
+        <desc name="default_headers_desc">Example: "meta-title", "myProcessIdentifier-myDataFieldId", ...</desc>
     </data>
     <data type="enumeration_map" immediate="true">
         <id>view_configuration_type</id>
@@ -364,7 +364,7 @@
         <i18nString name="create_case_button_icon">Identifikátor ikony tlačidla "Nová inštancia"</i18nString>
         <i18nString name="create_case_button_icon_preview">Náhľad ikony</i18nString>
         <i18nString name="case_default_headers">Predvolené hlavičky</i18nString>
-        <i18nString name="default_headers_desc">Napríklad: "meta-title", "meta-visualId"</i18nString>
+        <i18nString name="default_headers_desc">Napríklad: "meta-title", "myProcessIdentifier-myDataFieldId", ...</i18nString>
         <i18nString name="case_view_search_type">Typ vyhľadávania prípadov</i18nString>
         <i18nString name="hidden">Skryté</i18nString>
         <i18nString name="fulltext">Fulltext</i18nString>
@@ -413,7 +413,7 @@
         <i18nString name="create_case_button_icon">Ikone ID</i18nString>
         <i18nString name="create_case_button_icon_preview">Ikonevorschau</i18nString>
         <i18nString name="case_default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
-        <i18nString name="default_headers_desc">Beispiel: "meta-title", "meta-visualId"</i18nString>
+        <i18nString name="default_headers_desc">Beispiel: "meta-title", "myProcessIdentifier-myDataFieldId", ...</i18nString>
         <i18nString name="hidden">Versteckt</i18nString>
         <i18nString name="fulltext">Einfacher Suchmodus</i18nString>
         <i18nString name="sort">Sortieren</i18nString>
