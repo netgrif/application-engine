@@ -68,7 +68,7 @@ public class QueryLangTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testSearchService() {
+    public void testSearchService() throws InterruptedException {
         testHelper.truncateDbs();
 
         Optional<PetriNet> optionalPetriNet = helper.createNet("/pfql.xml");
@@ -84,6 +84,8 @@ public class QueryLangTest {
             params.put("id", String.valueOf(i));
             helper.createCase(String.format("Test %02d", i), process, params);
         }
+
+        Thread.sleep(2000);
 
         Object cases = searchService.search("cases: processIdentifier eq 'query_test' page 1 size 5 sort by title desc");
         assertNotNull(cases);
