@@ -222,17 +222,29 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     /// returns pair, where the first element is left value and the second element is right value
     private Pair<String, String> handleInRangeStringComparison(QueryLangParser.StringRangeContext ctx) {
-        String left = "", right = "";
+        List<ParseTree> filteredChildren = ctx.children.stream()
+                .filter(node -> node instanceof TerminalNode && ((TerminalNode) node).getSymbol().getType() == QueryLangParser.STRING
+                        || node instanceof QueryLangParser.LoggedUserStringAttributeContext)
+                .collect(Collectors.toList());
 
-        if (ctx.STRING(0) != null) {
-            left = getStringValue(ctx.STRING(0).getText());
-        } else if (ctx.loggedUserStringAttribute(0) != null) {
-            left = ctx.loggedUserStringAttribute(0).getText();
+        if (filteredChildren.size() < 2) {
+            throw new IllegalArgumentException("Wrong in range values");
         }
-        if (ctx.STRING(1) != null) {
-            right = getStringValue(ctx.STRING(1).getText());
-        } else if (ctx.loggedUserStringAttribute(1) != null) {
-            right = ctx.loggedUserStringAttribute(1).getText();
+
+        String left;
+        ParseTree leftNode = filteredChildren.get(0);
+        if (leftNode instanceof TerminalNode) {
+            left = getStringValue(leftNode.getText());
+        } else {
+            left = handleLoggedUserStringAttribute((QueryLangParser.LoggedUserStringAttributeContext) leftNode);
+        }
+
+        String right;
+        ParseTree rightNode = filteredChildren.get(1);
+        if (rightNode instanceof TerminalNode) {
+            right = getStringValue(rightNode.getText());
+        } else {
+            right = handleLoggedUserStringAttribute((QueryLangParser.LoggedUserStringAttributeContext) rightNode);
         }
 
         return Pair.of(left, right);

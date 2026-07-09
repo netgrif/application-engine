@@ -376,6 +376,22 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery("cases: title in ('test1' : loggedUser.username)").getFullMongoQuery();
+        expected = QCase.case$.title.gt("test1").and(QCase.case$.title.lt(systemUser.getUsername()));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("cases: title in (loggedUser.username : 'test1')").getFullMongoQuery();
+        expected = QCase.case$.title.gt(systemUser.getUsername()).and(QCase.case$.title.lt("test1"));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("cases: title in (loggedUser.username : loggedUser.fullName)").getFullMongoQuery();
+        expected = QCase.case$.title.gt(systemUser.getUsername()).and(QCase.case$.title.lt(systemUser.getFullName()));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+
         // only available for elastic query
         // places comparison
         actual = evaluateQuery("case: places.p1.marking eq 1").getFullMongoQuery();
@@ -1013,6 +1029,21 @@ public class QueryLangTest {
 
         // data options comparison
         checkStringComparisonElastic("case", "data.field1.options", "dataSet.field1.options");
+
+        actual = evaluateQuery("cases: title in ('test1' : loggedUser.username)").getFullElasticQuery();
+        expected = String.format("(title:>test1 AND title:<%s)", systemUser.getUsername());
+
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("cases: title in (loggedUser.username : 'test1')").getFullElasticQuery();
+        expected = String.format("(title:>%s AND title:<test1)", systemUser.getUsername());
+
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("cases: title in (loggedUser.username : loggedUser.fullName)").getFullElasticQuery();
+        expected = String.format("(title:>%s AND title:<%s)", systemUser.getUsername(), systemUser.getFullName());
+
+        assertEquals(expected, actual);
     }
 
     @Test
