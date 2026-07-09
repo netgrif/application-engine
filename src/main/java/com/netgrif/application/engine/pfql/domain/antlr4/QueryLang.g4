@@ -98,6 +98,7 @@ userAttribute: ID
              ;
 
 // resource comparisons
+// todo: authorComparison for process?
 processComparisons: idComparison
                   | identifierComparison
                   | versionComparison
