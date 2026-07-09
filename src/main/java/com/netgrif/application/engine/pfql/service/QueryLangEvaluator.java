@@ -195,8 +195,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                     .collect(Collectors.toList()));
         }
         if (ctx.loggedUserStringAttribute() != null && !ctx.loggedUserStringAttribute().isEmpty()) {
-            LoggedUser loggedUser = this.userService.getLoggedOrSystem().transformToLoggedUser();
-            result.add(getObjectIdValue(loggedUser.getId()));
+            boolean hasIdAttribute = ctx.loggedUserStringAttribute().stream()
+                    .anyMatch(loggedUserCtx -> loggedUserCtx.LOGGED_USER_ID() != null);
+            if (hasIdAttribute) {
+                LoggedUser loggedUser = this.userService.getLoggedOrSystem().transformToLoggedUser();
+                result.add(getObjectIdValue(loggedUser.getId()));
+            }
         }
 
         return result;
@@ -538,6 +542,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         Token op = ctx.inListStringComparison().op;
         boolean not = ctx.inListStringComparison().NOT() != null;
         checkOp(ComparisonType.ID, op);
+        List<ObjectId> objectIdList = handleObjectIdListComparison(ctx.inListStringComparison().stringList());
 
         switch (resourceType) {
             case PROCESS:
@@ -545,7 +550,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case CASE:
                 qObjectId = QCase.case$._id;
-                List<String> stringIdList = handleStringListComparison(ctx.inListStringComparison().stringList());
+                List<String> stringIdList = objectIdList.stream().map(ObjectId::toString).collect(Collectors.toList());
                 setElasticQuery(ctx, buildElasticQueryInList("stringId", stringIdList, not));
                 break;
             case TASK:
@@ -558,7 +563,6 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 throw new IllegalArgumentException("Unknown query type: " + resourceType);
         }
 
-        List<ObjectId> objectIdList = handleObjectIdListComparison(ctx.inListStringComparison().stringList());
         setMongoQuery(ctx, buildObjectIdPredicateInList(qObjectId, objectIdList, not));
     }
 

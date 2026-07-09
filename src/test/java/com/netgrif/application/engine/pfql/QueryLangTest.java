@@ -323,7 +323,14 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery(String.format("case: id in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
+        actual = evaluateQuery(String.format("case: id in ('%s', '%s', loggedUser.id, loggedUser.username, loggedUser.fullName)",
+                GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QCase.case$._id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID, new ObjectId(systemUser.getId()));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("case: id in ('%s', '%s', loggedUser.username, loggedUser.fullName)",
+                GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QCase.case$._id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
 
         compareMongoQueries(mongoDbUtils, actual, expected);
@@ -912,8 +919,12 @@ public class QueryLangTest {
 
         actual = evaluateQuery(String.format("case: id in ('%s', '%s', loggedUser.id, loggedUser.username, loggedUser.fullname)",
                 GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("stringId:(%s OR %s OR %s OR %s OR %s)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID,
-                systemUser.getId(), systemUser.getUsername(), systemUser.getFullName());
+        expected = String.format("stringId:(%s OR %s OR %s)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID, systemUser.getId());
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery(String.format("case: id in ('%s', '%s', loggedUser.username, loggedUser.fullname)",
+                GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("stringId:(%s OR %s)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
         // processId comparison
