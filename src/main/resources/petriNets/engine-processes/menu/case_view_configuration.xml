@@ -2,7 +2,7 @@
     <id>case_view_configuration</id>
     <version>1.0.0</version>
     <initials>CVC</initials>
-    <title>Case view configuration</title>
+    <title name="model_title">Case view configuration</title>
     <icon>check_box_outline_blank</icon>
     <defaultRole>true</defaultRole>
     <anonymousRole>false</anonymousRole>
@@ -395,6 +395,7 @@
         <i18nString name="open_case_settings">Zobrazenie po kliknutí na inštanciu</i18nString>
         <i18nString name="create_case_btn_settings">Tlačidlo vytvorenia inštancie</i18nString>
         <i18nString name="header_settings">Hlavičky</i18nString>
+        <i18nString name="model_title">todo 2453</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
@@ -441,6 +442,7 @@
         <i18nString name="open_case_settings">Ansicht nach dem Klicken auf die Instanz</i18nString>
         <i18nString name="create_case_btn_settings">Schaltfläche zum Erstellen einer Instanz</i18nString>
         <i18nString name="header_settings">Kopfzeilen</i18nString>
+        <i18nString name="model_title">todo 2453</i18nString>
     </i18n>
 
     <transition>
