@@ -157,13 +157,14 @@ public class PetriNetController {
     @GetMapping(value = "/{netId}/roles", produces = MediaTypes.HAL_JSON_VALUE)
     public ProcessRolesResource getRoles(@PathVariable String netId, Locale locale) {
         netId = decodeUrl(netId);
-        return new ProcessRolesResource(roleService.findAll(netId), service.getPetriNet(decodeUrl(netId)).getPermissions(), netId, locale);
+        return new ProcessRolesResource(roleService.findAll(netId), service.getPetriNet(netId).getPermissions(), netId, locale);
     }
 
     @Operation(summary = "Get transactions of process", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{netId}/transactions", produces = MediaTypes.HAL_JSON_VALUE)
     public TransactionsResource getTransactions(@PathVariable String netId, Locale locale) {
-        PetriNet net = service.getPetriNet(decodeUrl(netId));
+        netId = decodeUrl(netId);
+        PetriNet net = service.getPetriNet(netId);
         return new TransactionsResource(net.getTransactions().values(), netId, locale);
     }
 
