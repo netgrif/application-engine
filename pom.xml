@@ -74,8 +74,8 @@
         <maven-clean-plugin.version>3.4.1</maven-clean-plugin.version>
 
         <bson.version>5.8.0</bson.version>
-        <jackson.version>3.1.2</jackson.version>
-        <jackson.version.jsr310>3.1.2</jackson.version.jsr310>
+        <jackson.version>3.1.5</jackson.version>
+        <jackson.version.jsr310>3.1.5</jackson.version.jsr310>
         <spring.boot.version>4.1.0</spring.boot.version>
         <springdoc.version>3.0.3</springdoc.version>
 
