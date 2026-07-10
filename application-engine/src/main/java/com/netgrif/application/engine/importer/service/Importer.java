@@ -44,7 +44,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -79,7 +78,7 @@ public class Importer {
     protected ProcessRole anonymousRole;
     @Getter
     protected Map<String, ProcessRole> roles;
-    protected Map<String, Field> fields;
+    protected Map<String, Field<?>> fields;
     protected Map<String, Transition> transitions;
     protected Map<String, Place> places;
     protected Map<String, Transaction> transactions;
@@ -133,7 +132,6 @@ public class Importer {
     @Autowired
     private ILogicValidator logicValidator;
 
-    @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
             initialize();
@@ -145,7 +143,6 @@ public class Importer {
         return Optional.empty();
     }
 
-    @Transactional
     public Optional<PetriNet> importPetriNet(File xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
             return importPetriNet(new FileInputStream(xml));
@@ -169,7 +166,6 @@ public class Importer {
         this.functions = new LinkedList<>();
     }
 
-    @Transactional
     protected void unmarshallXml(InputStream xml) throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(Document.class);
 
@@ -177,7 +173,6 @@ public class Importer {
         document = (Document) jaxbUnmarshaller.unmarshal(xml);
     }
 
-    @Transactional
     public Path saveNetFile(PetriNet net, InputStream xmlFile) throws IOException {
         File savedFile = new File(fileStorageConfiguration.getArchivedPath() + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
         savedFile.getParentFile().mkdirs();
@@ -186,12 +181,11 @@ public class Importer {
         return savedFile.toPath();
     }
 
-    @Transactional
     protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
         net = new com.netgrif.application.engine.adapter.spring.petrinet.domain.PetriNet();
         net.setVersion(null);
 
-        documentValidator.checkConflictingAttributes(document, document.getUsersRef(), document.getUserRef(), "usersRef", "userRef");
+        documentValidator.checkConflictingAttributes(document, document.getUsersRef(), document.getActorRef(), "usersRef", "userRef");
         documentValidator.checkDeprecatedAttributes(document);
         document.getI18N().forEach(this::addI18N);
 
@@ -217,8 +211,9 @@ public class Importer {
         actionRefs.forEach(this::resolveActionRefs);
         document.getFunction().forEach(this::createFunction);
         document.getRoleRef().forEach(this::resolveRoleRef);
-        document.getUsersRef().forEach(this::resolveUserRef);
-        document.getUserRef().forEach(this::resolveUserRef);
+        document.getUsersRef().forEach(this::resolveActorRef); // deprecated
+        document.getUserRef().forEach(this::resolveActorRef); // deprecated
+        document.getActorRef().forEach(this::resolveActorRef);
 
         addPredefinedRolesWithDefaultPermissions();
 
@@ -240,7 +235,6 @@ public class Importer {
         return Optional.of(net);
     }
 
-    @Transactional
     protected void resolveRoleRef(CaseRoleRef roleRef) {
         CaseLogic logic = roleRef.getCaseLogic();
         String roleId = getRole(roleRef.getId()).getStringId();
@@ -255,7 +249,6 @@ public class Importer {
         net.addPermission(roleId, roleFactory.getProcessPermissions(logic));
     }
 
-    @Transactional
     protected void createFunction(com.netgrif.application.engine.objects.importer.model.Function function) {
         com.netgrif.application.engine.objects.petrinet.domain.Function fun = functionFactory.getFunction(function);
 
@@ -263,33 +256,29 @@ public class Importer {
         functions.add(fun);
     }
 
-    @Transactional
-    protected void resolveUserRef(CaseUserRef userRef) {
-        CaseLogic logic = userRef.getCaseLogic();
-        String usersId = userRef.getId();
+    protected void resolveActorRef(CaseActorRef actorRef) {
+        CaseLogic logic = actorRef.getCaseLogic();
+        String actorFieldId = actorRef.getId();
 
-        if (logic == null || usersId == null) {
+        if (logic == null || actorFieldId == null) {
             return;
         }
 
-        net.addUserPermission(usersId, roleFactory.getProcessPermissions(logic));
+        net.addActorPermission(actorFieldId, roleFactory.getProcessPermissions(logic));
     }
 
-    @Transactional
     protected void resolveProcessEvents(ProcessEvents processEvents) {
         if (processEvents != null && processEvents.getEvent() != null) {
             net.setProcessEvents(createProcessEventsMap(processEvents.getEvent()));
         }
     }
 
-    @Transactional
     protected void resolveCaseEvents(CaseEvents caseEvents) {
         if (caseEvents != null && caseEvents.getEvent() != null) {
             net.setCaseEvents(createCaseEventsMap(caseEvents.getEvent()));
         }
     }
 
-    @Transactional
     protected void evaluateFunctions() {
         try {
             actionsCacheService.evaluateFunctions(functions);
@@ -298,7 +287,6 @@ public class Importer {
         }
     }
 
-    @Transactional
     protected void evaluateActions(String s, Action action) {
         try {
             actionsRunner.getActionCode(action, functions, true);
@@ -307,7 +295,6 @@ public class Importer {
         }
     }
 
-    @Transactional
     protected void resolveActionRefs(String actionId, Action action) {
         Action referenced = actions.get(actionId);
         if (referenced == null) {
@@ -317,13 +304,11 @@ public class Importer {
         action.setTrigger(referenced.getTrigger());
     }
 
-    @Transactional
     protected void addI18N(I18N importI18N) {
         String locale = importI18N.getLocale();
         importI18N.getI18NString().forEach(translation -> addTranslation(translation, locale));
     }
 
-    @Transactional
     protected void addTranslation(I18NStringType i18NStringType, String locale) {
         String name = i18NStringType.getName();
         I18nString translation = getI18n(name);
@@ -334,7 +319,6 @@ public class Importer {
         translation.addTranslation(locale, i18NStringType.getValue());
     }
 
-    @Transactional
     protected void applyMapping(Mapping mapping) throws MissingIconKeyException {
         Transition transition = getTransition(mapping.getTransitionRef());
         mapping.getRoleRef().forEach(roleRef -> addRoleLogic(transition, roleRef));
@@ -345,7 +329,7 @@ public class Importer {
         mapping.getTrigger().forEach(trigger -> addTrigger(transition, trigger));
     }
 
-    @Transactional
+    
     protected void resolveDataActions(Data data) {
         String fieldId = data.getId();
         if (data.getEvent() != null && !data.getEvent().isEmpty()) {
@@ -383,7 +367,6 @@ public class Importer {
         });
     }
 
-    @Transactional
     protected void addActionRefs(Data data) {
         if (data.getActionRef() != null) {
             List<Action> actions = buildActionRefs(data.getActionRef());
@@ -403,7 +386,6 @@ public class Importer {
         return placeholder;
     }
 
-    @Transactional
     protected void resolveTransitionActions(com.netgrif.application.engine.objects.importer.model.Transition trans) {
         if (trans.getDataRef() != null) {
             resolveDataRefActions(trans.getDataRef(), trans);
@@ -417,7 +399,6 @@ public class Importer {
         }
     }
 
-    @Transactional
     protected void resolveDataRefActions(List<DataRef> dataRef, com.netgrif.application.engine.objects.importer.model.Transition trans) {
         dataRef.forEach(ref -> {
             String fieldId = getField(ref.getId()).getStringId();
@@ -464,7 +445,6 @@ public class Importer {
         return event;
     }
 
-    @Transactional
     protected void createArc(com.netgrif.application.engine.objects.importer.model.Arc importArc) {
         Arc arc = arcFactory.getArc(importArc);
         arc.setImportId(importArc.getId());
@@ -492,15 +472,13 @@ public class Importer {
         net.addArc(arc);
     }
 
-    @Transactional
     protected void createDataSet(Data importData) throws MissingIconKeyException {
-        Field field = fieldFactory.getField(importData, this);
+        Field<?> field = fieldFactory.getField(importData, this);
 
         net.addDataSetField(field);
         fields.put(importData.getId(), field);
     }
 
-    @Transactional
     protected void createTransition(com.netgrif.application.engine.objects.importer.model.Transition importTransition) throws MissingIconKeyException {
         transitionValidator.checkConflictingAttributes(importTransition, importTransition.getUsersRef(), importTransition.getUserRef(), "usersRef", "userRef");
         transitionValidator.checkDeprecatedAttributes(importTransition);
@@ -528,15 +506,18 @@ public class Importer {
                     addRoleLogic(transition, roleRef)
             );
         }
-        /* @Deprecated - This 'importTransition.getUsersRef()' is deprecated, will be removed in future releases*/
+        /* @Deprecated - This 'importTransition.getUsersRef()' is deprecated, will be removed in future releases */
         if (importTransition.getUsersRef() != null) {
-            importTransition.getUsersRef().forEach(usersRef ->
-                    addUserLogic(transition, usersRef));
+            importTransition.getUsersRef().forEach(usersRef -> addActorLogic(transition, usersRef));
         }
 
+        /* @Deprecated - This 'importTransition.getUserRef()' is deprecated, will be removed in future releases */
         if (importTransition.getUserRef() != null) {
-            importTransition.getUserRef().forEach(userRef ->
-                    addUserLogic(transition, userRef));
+            importTransition.getUserRef().forEach(userRef -> addActorLogic(transition, userRef));
+        }
+
+        if (importTransition.getActorRef() != null) {
+            importTransition.getActorRef().forEach(actorRef -> addActorLogic(transition, actorRef));
         }
 
         if (importTransition.getDataRef() != null) {
@@ -573,7 +554,6 @@ public class Importer {
         transitions.put(importTransition.getId(), transition);
     }
 
-    @Transactional
     protected void addAssignedUserPolicy(com.netgrif.application.engine.objects.importer.model.Transition importTransition, Transition transition) {
         if (importTransition.getAssignedUser().isCancel() != null) {
             transition.getAssignedUserPolicy().put("cancel", importTransition.getAssignedUser().isCancel());
@@ -583,7 +563,6 @@ public class Importer {
         }
     }
 
-    @Transactional
     protected com.netgrif.application.engine.objects.petrinet.domain.events.Event addEvent(String transitionId, com.netgrif.application.engine.objects.importer.model.Event imported) {
         com.netgrif.application.engine.objects.petrinet.domain.events.Event event = new com.netgrif.application.engine.objects.petrinet.domain.events.Event();
         event.setImportId(imported.getId());
@@ -596,7 +575,6 @@ public class Importer {
         return event;
     }
 
-    @Transactional
     protected com.netgrif.application.engine.objects.petrinet.domain.events.ProcessEvent addProcessEvent(com.netgrif.application.engine.objects.importer.model.ProcessEvent imported) {
         com.netgrif.application.engine.objects.petrinet.domain.events.ProcessEvent event = new com.netgrif.application.engine.objects.petrinet.domain.events.ProcessEvent();
         event.setMessage(toI18NString(imported.getMessage()));
@@ -608,7 +586,6 @@ public class Importer {
         return event;
     }
 
-    @Transactional
     protected com.netgrif.application.engine.objects.petrinet.domain.events.CaseEvent addCaseEvent(com.netgrif.application.engine.objects.importer.model.CaseEvent imported) {
         com.netgrif.application.engine.objects.petrinet.domain.events.CaseEvent event = new com.netgrif.application.engine.objects.petrinet.domain.events.CaseEvent();
         event.setMessage(toI18NString(imported.getMessage()));
@@ -659,7 +636,6 @@ public class Importer {
         return actionList;
     }
 
-    @Transactional
     protected void addDefaultRole(Transition transition) {
         if (!net.isDefaultRoleEnabled() || isDefaultRoleReferenced(transition)) {
             return;
@@ -671,7 +647,6 @@ public class Importer {
         transition.addRole(defaultRole.getStringId(), roleFactory.getPermissions(logic));
     }
 
-    @Transactional
     protected void addAnonymousRole(Transition transition) {
         if (!net.isAnonymousRoleEnabled() || isAnonymousRoleReferenced(transition)) {
             return;
@@ -682,7 +657,6 @@ public class Importer {
         transition.addRole(anonymousRole.getStringId(), roleFactory.getPermissions(logic));
     }
 
-    @Transactional
     protected void addDefaultPermissions() {
         if (!net.isDefaultRoleEnabled() || isDefaultRoleReferencedOnNet()) {
             return;
@@ -695,7 +669,6 @@ public class Importer {
         net.addPermission(defaultRole.getStringId(), roleFactory.getProcessPermissions(logic));
     }
 
-    @Transactional
     protected void addAnonymousPermissions() {
         if (!net.isAnonymousRoleEnabled() || isAnonymousRoleReferencedOnNet()) {
             return;
@@ -707,7 +680,6 @@ public class Importer {
         net.addPermission(anonymousRole.getStringId(), roleFactory.getProcessPermissions(logic));
     }
 
-    @Transactional
     protected void addDataWithDefaultGroup(Transition transition, DataRef dataRef) throws MissingIconKeyException {
         DataGroup dataGroup = new com.netgrif.application.engine.adapter.spring.workflow.domain.DataGroup();
         dataGroup.setImportId(transition.getImportId() + "_" + dataRef.getId() + "_" + System.currentTimeMillis());
@@ -724,7 +696,6 @@ public class Importer {
         addDataComponent(transition, dataRef);
     }
 
-    @Transactional
     protected void addDataGroup(Transition transition, com.netgrif.application.engine.objects.importer.model.DataGroup importDataGroup, int index) throws MissingIconKeyException {
         String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
         DataGroup dataGroup = new com.netgrif.application.engine.adapter.spring.workflow.domain.DataGroup();
@@ -753,7 +724,6 @@ public class Importer {
         }
     }
 
-    @Transactional
     protected void addToTransaction(Transition transition, TransactionRef transactionRef) {
         Transaction transaction = getTransaction(transactionRef.getId());
         if (transaction == null) {
@@ -762,7 +732,6 @@ public class Importer {
         transaction.addTransition(transition);
     }
 
-    @Transactional
     protected void addRoleLogic(Transition transition, RoleRef roleRef) {
         Logic logic = roleRef.getLogic();
         String roleId = getRole(roleRef.getId()).getStringId();
@@ -780,22 +749,20 @@ public class Importer {
         transition.addRole(roleId, roleFactory.getPermissions(logic));
     }
 
-    @Transactional
-    protected void addUserLogic(Transition transition, UserRef userRef) {
-        Logic logic = userRef.getLogic();
-        String userRefId = userRef.getId();
+    protected void addActorLogic(Transition transition, ActorRef actorRef) {
+        Logic logic = actorRef.getLogic();
+        String actorFieldId = actorRef.getId();
 
-        if (logic == null || userRefId == null) {
+        if (logic == null || actorFieldId == null) {
             return;
         }
 
         logicValidator.checkConflictingAttributes(logic, logic.isAssigned(), logic.isAssign(), "assigned", "assign");
         logicValidator.checkDeprecatedAttributes(logic);
 
-        transition.addUserRef(userRefId, roleFactory.getPermissions(logic));
+        transition.addActorRef(actorFieldId, roleFactory.getPermissions(logic));
     }
 
-    @Transactional
     protected void addDataLogic(Transition transition, DataRef dataRef) {
         Logic logic = dataRef.getLogic();
         try {
@@ -815,7 +782,6 @@ public class Importer {
         }
     }
 
-    @Transactional
     protected void addDataLayout(Transition transition, DataRef dataRef) {
         Layout layout = dataRef.getLayout();
         try {
@@ -846,7 +812,6 @@ public class Importer {
         }
     }
 
-    @Transactional
     protected void addDataComponent(Transition transition, DataRef dataRef) throws MissingIconKeyException {
         String fieldId = getField(dataRef.getId()).getStringId();
         Component component = null;
@@ -856,7 +821,6 @@ public class Importer {
         transition.addDataSet(fieldId, null, null, null, component);
     }
 
-    @Transactional
     protected Map<DataEventType, DataEvent> buildEvents(String fieldId, List<com.netgrif.application.engine.objects.importer.model.DataEvent> events, String transitionId) {
         Map<DataEventType, DataEvent> parsedEvents = new HashMap<>();
 
@@ -912,7 +876,6 @@ public class Importer {
         return dataEvent;
     }
 
-    @Transactional
     protected List<Action> buildActions(List<com.netgrif.application.engine.objects.importer.model.Action> imported, String fieldId, String transitionId) {
         return imported.stream()
                 .map(action -> parseAction(fieldId, transitionId, action))
@@ -979,7 +942,6 @@ public class Importer {
         return definition.matches("[\\W\\w\\s]*[\\w]*:[\\s]*[ft].[\\w]+;[\\w\\W\\s]*");
     }
 
-    @Transactional
     protected void parseObjectIds(Action action, String fieldId, String transitionId, String definition) {
         try {
             Map<String, String> ids = parseParams(definition);
@@ -1035,14 +997,12 @@ public class Importer {
         }
     }
 
-    @Transactional
     protected void addTrigger(Transition transition, com.netgrif.application.engine.objects.importer.model.Trigger importTrigger) {
         Trigger trigger = triggerFactory.buildTrigger(importTrigger);
 
         transition.addTrigger(trigger);
     }
 
-    @Transactional
     protected void createPlace(com.netgrif.application.engine.objects.importer.model.Place importPlace) {
         Place place = new Place();
         place.setImportId(importPlace.getId());
@@ -1059,7 +1019,6 @@ public class Importer {
         places.put(importPlace.getId(), place);
     }
 
-    @Transactional
     protected void createRole(Role importRole) {
         if (importRole.getId().equals(ProcessRole.DEFAULT_ROLE)) {
             throw new IllegalArgumentException("Role ID '" + ProcessRole.DEFAULT_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
@@ -1133,7 +1092,6 @@ public class Importer {
         return finalEvents;
     }
 
-    @Transactional
     protected void createTransaction(com.netgrif.application.engine.objects.importer.model.Transaction importTransaction) {
         Transaction transaction = new Transaction();
         transaction.setTitle(toI18NString(importTransaction.getTitle()));
@@ -1143,7 +1101,6 @@ public class Importer {
         transactions.put(importTransaction.getId(), transaction);
     }
 
-    @Transactional
     protected Node getNode(String id) {
         if (places.containsKey(id)) {
             return getPlace(id);
@@ -1174,9 +1131,10 @@ public class Importer {
                 return;
             }
         }
-        // Don't add if positive roles or triggers or positive user refs
+        // Don't add if positive roles or triggers or positive actor refs
         if ((importTransition.getRoleRef() != null && importTransition.getRoleRef().stream().anyMatch(this::hasPositivePermission))
                 || (importTransition.getTrigger() != null && !importTransition.getTrigger().isEmpty())
+                || (importTransition.getActorRef() != null && importTransition.getActorRef().stream().anyMatch(this::hasPositivePermission))
                 || (importTransition.getUsersRef() != null && importTransition.getUsersRef().stream().anyMatch(this::hasPositivePermission))
                 || (importTransition.getUserRef() != null && importTransition.getUserRef().stream().anyMatch(this::hasPositivePermission))) {
             return;
@@ -1197,9 +1155,9 @@ public class Importer {
     }
 
     protected void addPredefinedRolesWithDefaultPermissions() {
-        // only if no positive role associations and no positive user ref associations
+        // only if no positive role associations and no positive actor ref associations
         if (net.getPermissions().values().stream().anyMatch(perms -> perms.containsValue(true))
-                || net.getUserRefs().values().stream().anyMatch(perms -> perms.containsValue(true))) {
+                || net.getActorRefs().values().stream().anyMatch(perms -> perms.containsValue(true))) {
             return;
         }
 
@@ -1209,7 +1167,7 @@ public class Importer {
 
     protected PetriNet getNetByImportId(String id) {
         Optional<PetriNet> net = service.findByImportId(id);
-        if (!net.isPresent()) {
+        if (net.isEmpty()) {
             throw new IllegalArgumentException();
         }
         return net.get();

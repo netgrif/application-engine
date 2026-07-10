@@ -11,6 +11,7 @@ import com.querydsl.core.types.Predicate;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -20,6 +21,20 @@ public interface IExportService {
     Set<String> buildDefaultCsvCaseHeader(List<Case> exportCases);
 
     Set<String> buildDefaultCsvTaskHeader(List<Task> exportTasks);
+
+    Set<String> buildDefaultCsvCaseHeader(Predicate predicate, int pageSize);
+
+    Set<String> buildDefaultCsvCaseHeader(List<CaseSearchRequest> requests, LoggedUser user, int pageSize,
+                                          Locale locale, Boolean isIntersection);
+
+    Set<String> buildDefaultCsvTaskHeader(Predicate predicate, int pageSize);
+
+    Set<String> buildDefaultCsvTaskHeader(List<ElasticTaskSearchRequest> requests, LoggedUser user, int pageSize,
+                                          Locale locale, Boolean isIntersection);
+
+    PrintWriter createPrintWriter(OutputStream outStream, ExportDataConfig config);
+
+    void writeCaseCsvPage(PrintWriter writer, Set<String> csvHeader, List<Case> exportCases);
 
     OutputStream fillCsvCaseData(Predicate predicate, File outFile) throws FileNotFoundException;
 

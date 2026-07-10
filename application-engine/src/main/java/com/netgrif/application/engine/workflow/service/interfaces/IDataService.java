@@ -1,10 +1,8 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileListField;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
@@ -15,6 +13,7 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.data
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -51,9 +50,11 @@ public interface IDataService {
 
     SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params, boolean runStrict);
 
-    FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview) throws FileNotFoundException;
+    FileFieldInputStream getFile(Case useCase, FileField field, boolean forPreview) throws FileNotFoundException;
 
-    FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview, Map<String, String> params) throws FileNotFoundException;
+    FileFieldInputStream getFile(String caseId, String fieldId, boolean forPreview, Map<String, String> params) throws FileNotFoundException;
+
+    FileFieldInputStream getFile(Case useCase, FileField field, boolean forPreview, Map<String, String> params) throws FileNotFoundException;
 
     FileFieldInputStream getFileByName(Case useCase, FileListField field, String name) throws FileNotFoundException;
 
@@ -71,7 +72,7 @@ public interface IDataService {
 
     FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name, Map<String, String> params) throws FileNotFoundException;
 
-    FileFieldInputStream getFileByCase(String caseId, Task task, String fieldId, boolean forPreview) throws FileNotFoundException;
+    FileFieldInputStream getFileByCase(String caseId, String fieldId, boolean forPreview) throws FileNotFoundException;
 
     FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name) throws FileNotFoundException;
 
@@ -101,7 +102,7 @@ public interface IDataService {
 
     List<Field<?>> getImmediateFields(Task task);
 
-    UserFieldValue makeUserFieldValue(String id);
+    ActorFieldValue makeActorFieldValue(String id);
 
     Case applyFieldConnectedChanges(Case useCase, String fieldId);
 

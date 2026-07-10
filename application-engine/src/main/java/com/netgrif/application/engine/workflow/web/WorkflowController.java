@@ -13,6 +13,8 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.case
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.params.DeleteCaseParams;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -84,7 +86,13 @@ public class WorkflowController {
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Locale locale) {
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
         try {
-            CreateCaseEventOutcome outcome = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
+            CreateCaseEventOutcome outcome = workflowService.createCase(CreateCaseParams.with()
+                    .processId(body.netId)
+                    .title(body.title)
+                    .color(body.color)
+                    .author(loggedUser)
+                    .locale(locale)
+                    .build());
             return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getCase().getStringId() + " was created succesfully",
                     LocalisedEventOutcomeFactory.from(outcome, locale));
         } catch (Exception e) {
@@ -120,12 +128,24 @@ public class WorkflowController {
         LoggedUser user = ActorTransformer.toLoggedUser(userService.getLoggedUser());
 
         Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, locale, operation == MergeFilterOperation.AND);
+        if (log.isTraceEnabled()) {
+            log.trace("Found {} cases with id {}.", cases.getNumberOfElements(), cases.map(Case::getStringId));
+        }
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                 .search(searchBody, operation, pageable, assembler, locale)).withRel("search");
 
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
+
+        if (log.isTraceEnabled()) {
+            log.trace("Paged model of {}", resources);
+        }
+
         ResourceLinkAssembler.addLinks(resources, ElasticCase.class, selfLink.getRel().toString());
-        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
+
+        if (log.isTraceEnabled()) {
+            log.trace("Returning paged model with link: {}", resources);
+        }
+        return resources;
     }
 
     @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
@@ -180,7 +200,8 @@ public class WorkflowController {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8);
             Case aCase = workflowService.findOne(caseId);
-            taskService.reloadTasks(aCase);
+            taskService.reloadTasks(aCase, false);
+
             return MessageResource.successMessage("Task reloaded in case [" + caseId + "]");
         } catch (Exception e) {
             log.error("Reloading tasks of case [{}] failed:", caseId, e);
@@ -191,23 +212,30 @@ public class WorkflowController {
     @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN') && @workflowAuthorizationService.canCallDelete(@userService.getLoggedUser(), #caseId)")
     @Operation(summary = "Delete case", security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public EntityModel<EventOutcomeWithMessage> deleteCase(@PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
-        caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8);
-        DeleteCaseEventOutcome outcome;
-        if (deleteSubtree) {
-            outcome = workflowService.deleteSubtreeRootedAt(caseId);
-        } else {
-            outcome = workflowService.deleteCase(caseId);
+    public EntityModel<EventOutcomeWithMessage> deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
+        try {
+            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8);
+            DeleteCaseEventOutcome outcome;
+            if (deleteSubtree) {
+                outcome = workflowService.deleteSubtreeRootedAt(caseId);
+            } else {
+                outcome = workflowService.deleteCase(DeleteCaseParams.with()
+                        .useCaseId(caseId)
+                        .build());
+            }
+            return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted",
+                    LocalisedEventOutcomeFactory.from(outcome, LocaleContextHolder.getLocale()));
+        } catch (Exception e) {
+            log.error("Deleting case [{}] failed:", caseId, e);
+            return EventOutcomeWithMessageResource.errorMessage("Deleting case " + caseId + " has failed!");
         }
-        return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted",
-                LocalisedEventOutcomeFactory.from(outcome, LocaleContextHolder.getLocale()));
     }
 
     @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Download case file field value", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/{id}/file", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String caseId, @RequestParam("fieldId") String fieldId) throws FileNotFoundException {
-        FileFieldInputStream fileFieldInputStream = dataService.getFileByCase(caseId, null, fieldId, false);
+        FileFieldInputStream fileFieldInputStream = dataService.getFileByCase(caseId, fieldId, false);
 
         if (fileFieldInputStream.getInputStream() == null)
             throw new FileNotFoundException("File in field " + fieldId + " within case " + caseId + " was not found!");

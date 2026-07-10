@@ -1,16 +1,13 @@
 package com.netgrif.application.engine.workflow.domain;
 
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.deser.jdk.UntypedObjectDeserializer;
+import tools.jackson.databind.util.ClassUtil;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.deser.std.UntypedObjectDeserializer;
-import com.fasterxml.jackson.databind.util.ClassUtil;
-import org.springframework.lang.Nullable;
-
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -34,19 +31,22 @@ public class FilterDeserializer extends UntypedObjectDeserializer {
     }
 
     @Override
-    protected Object mapObject(JsonParser parser, DeserializationContext context) throws IOException {
+    protected Object mapObject(JsonParser parser, DeserializationContext context) throws JacksonException {
 
         String firstKey;
-        JsonToken token = parser.getCurrentToken();
+        JsonToken token = parser.currentToken();
         if (token == JsonToken.START_OBJECT) {
-            firstKey = parser.nextFieldName();
-        } else if (token == JsonToken.FIELD_NAME) {
-            firstKey = parser.getCurrentName();
+            firstKey = parser.nextName();
+            if (firstKey == null) {
+                return Collections.emptyMap();
+            }
+        } else if (token == JsonToken.PROPERTY_NAME) {
+            firstKey = parser.currentName();
         } else {
             if (token != JsonToken.END_OBJECT) {
-                throw JsonMappingException.from(parser,
-                        String.format("Cannot deserialize instance of %s out of %s token",
-                                ClassUtil.nameOf(handledType()), token));
+                return context.reportInputMismatch(handledType(),
+                        "Cannot deserialize instance of %s out of %s token",
+                        ClassUtil.nameOf(handledType()), token);
             }
             return Collections.emptyMap();
         }
@@ -64,7 +64,7 @@ public class FilterDeserializer extends UntypedObjectDeserializer {
                 valueByKey.put(nextKey, nextValue);
             }
 
-        } while ((nextKey = parser.nextFieldName()) != null);
+        } while ((nextKey = parser.nextName()) != null);
 
 
         return objectList.size() == 0 ? valueByKey : objectList;

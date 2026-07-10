@@ -1,16 +1,14 @@
 package com.netgrif.application.engine.workflow
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
 import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
+import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
@@ -25,6 +23,7 @@ import com.netgrif.application.engine.security.service.SecurityContextService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.utils.FullPageRequest
+import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.TaskSearchService
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
@@ -44,6 +43,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.node.ObjectNode
 
 @SpringBootTest
 @ActiveProfiles(["test"])
@@ -94,6 +95,9 @@ class TaskControllerTest {
     @Autowired
     private TaskController taskController
 
+    @Autowired
+    private ObjectMapper objectMapper
+
     private PetriNet allDataNet
 
     private PetriNet setDataNet
@@ -107,7 +111,7 @@ class TaskControllerTest {
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
-        def user = new User(
+        userService.saveUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(
                 firstName: "Dummy",
                 lastName: "Netgrif",
                 username: DUMMY_USER_MAIL,
@@ -135,9 +139,10 @@ class TaskControllerTest {
     @Test
     void testDeleteFile() {
         Case testCase = helper.createCase("My case", allDataNet)
-        String taskId = testCase.tasks.find {it.transition == "1"}.task
+        String taskId = testCase.tasks.find { it.transition == "1" }.task
 
-        dataService.saveFile(taskId, "file", new MockMultipartFile("test", new byte[] {}))
+        dataService.saveFile(taskId, "file", new MockMultipartFile("test", "test.txt", "text/plain", new byte[]{}))
+
         testCase = workflowService.findOne(testCase.stringId)
         assert testCase.dataSet["file"].value != null
 
@@ -149,9 +154,9 @@ class TaskControllerTest {
     @Test
     void testDeleteFileByName() {
         Case testCase = helper.createCase("My case", allDataNet)
-        String taskId = testCase.tasks.find {it.transition == "1"}.task
+        String taskId = testCase.tasks.find { it.transition == "1" }.task
 
-        dataService.saveFiles(taskId, "fileList", new MockMultipartFile[] {new MockMultipartFile("test", "test", null, new byte[] {})})
+        dataService.saveFiles(taskId, "fileList", new MockMultipartFile[]{new MockMultipartFile("test", "test", null, new byte[]{})})
         testCase = workflowService.findOne(testCase.stringId)
         assert testCase.dataSet["fileList"].value != null
 
@@ -165,13 +170,13 @@ class TaskControllerTest {
         Case testCase = helper.createCase("My case", setDataNet)
         String taskId = testCase.tasks.find { it.transition == "testSetDataFieldTypeRestriction" }.task
 
-        ObjectNode dataSet = populateNestedDataset([(taskId):["taskRef_0": ["type": "taskRef", "value": [taskId]]]])
+        ObjectNode dataSet = populateNestedDataset([(taskId): ["taskRef_0": ["type": "taskRef", "value": [taskId]]]])
         def response = taskController.setData(taskId, dataSet, Locale.default)
         assert response != null && response.content.outcome != null
         assert response.content.outcome.changedFields.changedFields.isEmpty()
         assert ((List<String>) workflowService.findOne(testCase.stringId).getDataField("taskRef_0").getValue()).isEmpty()
 
-        dataSet = populateNestedDataset([(taskId):["caseRef_0": ["type": "caseRef", "value": [testCase.stringId]]]])
+        dataSet = populateNestedDataset([(taskId): ["caseRef_0": ["type": "caseRef", "value": [testCase.stringId]]]])
         response = taskController.setData(taskId, dataSet, Locale.default)
         assert response != null && response.content.outcome != null
         assert response.content.outcome.changedFields.changedFields.isEmpty()
@@ -183,7 +188,7 @@ class TaskControllerTest {
         Case testCase = helper.createCase("My case", setDataNet)
         String taskId = testCase.tasks.find { it.transition == "data" }.task
 
-        ObjectNode dataSet = populateNestedDataset([(taskId):["text_1": ["type": "text", "value": "awd"]]])
+        ObjectNode dataSet = populateNestedDataset([(taskId): ["text_1": ["type": "text", "value": "awd"]]])
         def response = taskController.setData(taskId, dataSet, Locale.default)
         assert response != null && response.content.outcome == null
         assert response.content.error != null
@@ -207,14 +212,14 @@ class TaskControllerTest {
         workflowService.save(testCase2)
 
         String nestedOtherTaskId = testCase2.tasks.find { it.transition == "data" }.task
-        ObjectNode dataSet = populateNestedDataset([(nestedOtherTaskId):["text_0": ["type": "text", "value": "awd"]]])
+        ObjectNode dataSet = populateNestedDataset([(nestedOtherTaskId): ["text_0": ["type": "text", "value": "awd"]]])
         def response = taskController.setData(taskId, dataSet, Locale.default)
         assert response != null && response.content.outcome != null
         assert response.content.outcome.changedFields.changedFields.isEmpty()
         assert workflowService.findOne(testCase2.stringId).getDataField("text_0").getValue() == null
 
         String nestedTaskId = testCase3.tasks.find { it.transition == "data" }.task
-        dataSet = populateNestedDataset([(nestedTaskId):["text_0": ["type": "text", "value": "awd"]]])
+        dataSet = populateNestedDataset([(nestedTaskId): ["text_0": ["type": "text", "value": "awd"]]])
         response = taskController.setData(taskId, dataSet, Locale.default)
         assert response != null && response.content.outcome != null
         assert !response.content.outcome.changedFields.changedFields.isEmpty()
@@ -222,11 +227,42 @@ class TaskControllerTest {
     }
 
     @Test
+    void testSetDataOutcomeSerializesFrontendCaseProperty() {
+        Case testCase = helper.createCase("test set data outcome serializes frontend case property", setDataNet)
+        String taskId = testCase.tasks.find { it.transition == "data" }.task
+
+        ObjectNode dataSet = populateNestedDataset([(taskId): ["text_0": ["type": "text", "value": "frontend"]]])
+        def response = taskController.setData(taskId, dataSet, Locale.default)
+
+        def json = objectMapper.readTree(objectMapper.writeValueAsString(response.content))
+        assert json.at("/outcome/aCase/stringId").asText() == testCase.stringId
+        assert json.at("/outcome/task/stringId").asText() == taskId
+        assert json.at("/outcome/changedFields/changedFields/text_0/value").asText() == "frontend"
+        assert json.get("outcome").get("case") == null
+    }
+
+    @Test
+    void testCreateCaseOutcomeSerializesFrontendCaseProperty() {
+        def outcome = workflowService.createCase(CreateCaseParams.with()
+                .process(setDataNet)
+                .title("test create case outcome serializes frontend case property")
+                .author(superCreator.getLoggedSuper())
+                .locale(Locale.default)
+                .build())
+
+        def json = objectMapper.readTree(objectMapper.writeValueAsString(
+                LocalisedEventOutcomeFactory.from(outcome, Locale.default)))
+
+        assert json.at("/aCase/stringId").asText() == outcome.case.stringId
+        assert json.get("case") == null
+    }
+
+    @Test
     void testSetDataNonReferencedField() {
         Case testCase = helper.createCase("My case", setDataNet)
         String taskId = testCase.tasks.find { it.transition == "testSetDataNonReferencedField" }.task
 
-        ObjectNode dataSet = populateNestedDataset([(taskId):["text_1": ["type": "text", "value": "awd"]]])
+        ObjectNode dataSet = populateNestedDataset([(taskId): ["text_1": ["type": "text", "value": "awd"]]])
         def response = taskController.setData(taskId, dataSet, Locale.default)
 
         assert response != null && response.content.outcome == null
@@ -290,7 +326,7 @@ class TaskControllerTest {
         dataService.setData(task.stringId, ImportHelper.populateDataset([
                 "performable_users": [
                         "value": userIds,
-                        "type" : "userList"
+                        "type" : "actorList"
                 ]
         ]))
     }

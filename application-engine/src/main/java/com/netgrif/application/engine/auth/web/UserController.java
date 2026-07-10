@@ -52,6 +52,7 @@ public class UserController {
     private final RealmService realmService;
     private final UserFactory userFactory;
 
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Create a new user", description = "Creates a new user in the realm specified by id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User successfully created"),
@@ -179,17 +180,17 @@ public class UserController {
 //            return null;
 //        }
 //        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-//        String userId = updates.getStringId();
+//        String actorId = updates.getStringId();
 //        IUser user;
 //        try {
-//            user = userService.findById(userId, updatedUser.getRealmId());
+//            user = userService.findById(actorId, updatedUser.getRealmId());
 //        } catch (IllegalArgumentException e) {
-//            log.error("Could not find user with id [{}]", userId, e);
+//            log.error("Could not find user with id [{}]", actorId, e);
 //            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 //        }
 //        user = userService.update(user, updates.getUpdatedUser());
-//        securityContextService.saveToken(userId);
-//        if (Objects.equals(loggedUser.getId(), userId)) {
+//        securityContextService.saveToken(actorId);
+//        if (Objects.equals(loggedUser.getId(), actorId)) {
 //            loggedUser.setFirstName(user.getFirstName());
 //            loggedUser.setLastName(user.getLastName());
 //            securityContextService.reloadSecurityContext(loggedUser);
@@ -206,6 +207,7 @@ public class UserController {
 //        Page<IUser> page = userService.findAllActiveByProcessRoles(roleResourceIds, pageable);
 //        return ResponseEntity.ok();
 //    }
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Assign roles to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @PutMapping(value = "/{realmId}/{id}/roles", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
@@ -237,15 +239,15 @@ public class UserController {
 //            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
 //            @ApiResponse(responseCode = "500", description = "Internal server error")
 //    })
-//    public ResponseEntity<ResponseMessage> assignNegativeRolesToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
+//    public ResponseEntity<ResponseMessage> assignNegativeRolesToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String actorId, @RequestBody Set<String> roleIds, Authentication auth) {
 //        try {
-//            AbstractUser user = userService.findById(userId, realmId);
+//            AbstractUser user = userService.findById(actorId, realmId);
 //            processRoleService.assignNegativeRolesToUser(user, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()), (LoggedUser) auth.getPrincipal());
-//            log.info("Negative process roles {} assigned to user [{}]", roleIds, userId);
-//            return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Selected negative roles assigned to user " + userId));
+//            log.info("Negative process roles {} assigned to user [{}]", roleIds, actorId);
+//            return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Selected negative roles assigned to user " + actorId));
 //        } catch (IllegalArgumentException e) {
-//            log.error("Assigning negative roles to user with id [{}] has failed!", userId, e);
-//            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Assigning negative roles to user " + userId + " has failed!"));
+//            log.error("Assigning negative roles to user with id [{}] has failed!", actorId, e);
+//            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Assigning negative roles to user " + actorId + " has failed!"));
 //        }
 //    }
 //
@@ -279,9 +281,9 @@ public class UserController {
             userService.assignAuthority(userId, realmId, authorityId);
         } catch (IllegalArgumentException e) {
             log.error("Assigning authority to user [{}] has failed!", userId, e);
-            return ResponseEntity.badRequest().body(ResponseMessage.createSuccessMessage("Assigning authority to user " + userId + " has failed!"));
+            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Assigning authority to user " + userId + " has failed!"));
         }
-        return ResponseEntity.ok(ResponseMessage.createErrorMessage("Authority was assigned to user successfully"));
+        return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Authority was assigned to user successfully"));
     }
 
     @Operation(summary = "Get logged user's preferences", security = {@SecurityRequirement(name = "X-Auth-Token")})

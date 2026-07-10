@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
+    <id>actor_list</id>
+    <title>Actor list</title>
+    <initials>ULT</initials>
+    <data type="actorList">
+        <id>users_1</id>
+    </data>
+    <actorRef>
+        <id>users_1</id>
+        <caseLogic>
+            <create>false</create>
+            <delete>true</delete>
+        </caseLogic>
+    </actorRef>
+    <processEvents>
+        <event type="upload">
+            <id>upload</id>
+            <actions phase="post">
+                <action>
+                    createCase("actor_list", "Actor List")
+                </action>
+            </actions>
+        </event>
+    </processEvents>
+    <caseEvents>
+        <event type="create">
+            <id>create</id>
+            <actions phase="post">
+                <action>
+                    text: f.text;
+
+                    change text value {return "Its working..."}
+                </action>
+            </actions>
+        </event>
+        <event type="delete">
+            <id>pdf</id>
+            <actions phase="post">
+                <action>
+                    createCase("actor_list", "Destruct")
+                </action>
+            </actions>
+        </event>
+    </caseEvents>
+    <data type="text">
+        <id>text</id>
+        <title>Text</title>
+        <init>text</init>
+    </data>
+
+    <transition>
+        <id>1</id>
+        <label>Title</label>
+        <actorRef>
+            <id>users_1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </actorRef>
+    </transition>
+
+</document>

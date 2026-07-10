@@ -56,7 +56,7 @@ public class ElasticTaskQueueManager {
         try {
             queue.add(taskWrapper);
         } catch (Exception e) {
-            log.error("Queue error:" + e.getMessage());
+            log.error("Queue error: {}", e.getMessage(), e);
             throw e;
         }
 

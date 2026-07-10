@@ -139,7 +139,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
         queries.add("(dataSet.is_active.booleanValue:true)");
         queries.addAll(validityQueries());
         if (impersonatedId != null) {
-            queries.add("(dataSet.impersonated.userIdValue.keyword:" + impersonatedId + ")");
+            queries.add("(dataSet.impersonated.actorIdValue.keyword:" + impersonatedId + ")");
         }
         request.query = combineQueries(queries);
         return request;

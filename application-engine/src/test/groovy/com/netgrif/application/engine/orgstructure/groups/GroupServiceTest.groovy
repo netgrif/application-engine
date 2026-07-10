@@ -3,10 +3,10 @@ package com.netgrif.application.engine.orgstructure.groups
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.objects.auth.constants.UserConstants
 import com.netgrif.application.engine.objects.auth.domain.Authority
 import com.netgrif.application.engine.objects.auth.domain.Group
 import com.netgrif.application.engine.objects.auth.domain.QGroup
-import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.startup.ImportHelper
@@ -46,10 +46,10 @@ class GroupServiceTest {
     void groupTest() {
         testHelper.truncateDbs()
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        importHelper.createUser(new User(firstName: "Dummy", lastName: "User", email: DUMMY_USER_MAIL, username: DUMMY_USER_MAIL, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Dummy", lastName: "User", email: DUMMY_USER_MAIL, username: DUMMY_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
-        importHelper.createUser(new User(firstName: "Customer", lastName: "User", email: CUSTOMER_USER_MAIL, username: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Customer", lastName: "User", email: CUSTOMER_USER_MAIL, username: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
 
@@ -88,7 +88,7 @@ class GroupServiceTest {
         QGroup qGroup = new QGroup("group")
         Group group = groupService.findByPredicate(qGroup.identifier.eq("CUSTOM_GROUP_1"), new FullPageRequest()).getContent().get(0)
         groupService.addUser(userService.findUserByUsername(CUSTOMER_USER_MAIL, null).get(), group)
-        groupService.addUser(userService.findUserByUsername("engine@netgrif.com", null).get(), group)
+        groupService.addUser(userService.findUserByUsername(UserConstants.SYSTEM_USER_USERNAME, null).get(), group)
         return group
     }
 

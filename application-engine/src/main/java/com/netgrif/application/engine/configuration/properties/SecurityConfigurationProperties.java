@@ -2,6 +2,7 @@ package com.netgrif.application.engine.configuration.properties;
 
 import com.netgrif.application.engine.configuration.properties.enumeration.XFrameOptionsMode;
 import com.netgrif.application.engine.configuration.properties.enumeration.XXSSProtection;
+import com.netgrif.application.engine.objects.auth.constants.UserConstants;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -170,6 +171,18 @@ public class SecurityConfigurationProperties {
          */
         private String[] noAuthenticationPatterns = new String[0];
 
+        /**
+         * Specifies the administrator's username.
+         * Default value is "admin" from UserConstants.
+         */
+        private String username = UserConstants.ADMIN_USER_USERNAME;
+
+        /**
+         * Specifies the administrator's email address.
+         * Default value is "super@netgrif.com" from UserConstants.
+         */
+        private String email = UserConstants.ADMIN_USER_EMAIL;
+        
         /**
          * Specifies the administrator's password.
          */

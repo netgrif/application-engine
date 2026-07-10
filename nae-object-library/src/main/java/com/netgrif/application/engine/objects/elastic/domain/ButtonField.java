@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public abstract class ButtonField extends DataField {
 
-    public Integer buttonValue;
+    protected Integer buttonValue;
 
     public ButtonField(ButtonField field) {
         super(field);
@@ -18,12 +18,18 @@ public abstract class ButtonField extends DataField {
     }
 
     public ButtonField(Integer value) {
-        super(value.toString());
+        super(value == null ? null : value.toString());
+        this.buttonValue = value;
+    }
+
+    public void setButtonValue(Integer value) {
+        this.fulltextValue.clear();
+        this.fulltextValue.add(value == null ? null : value.toString());
         this.buttonValue = value;
     }
 
     @Override
     public Object getValue() {
-        return buttonValue;
+        return this.buttonValue;
     }
 }

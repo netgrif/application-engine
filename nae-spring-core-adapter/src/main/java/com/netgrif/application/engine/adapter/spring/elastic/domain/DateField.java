@@ -6,6 +6,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Long;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
@@ -23,17 +24,17 @@ public class DateField extends com.netgrif.application.engine.objects.elastic.do
 
     @Override
     @Field(type = Text)
-    public String[] getFulltextValue() {
+    public List<String> getFulltextValue() {
         return super.getFulltextValue();
     }
 
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     public LocalDateTime getDateValue() {
-        return dateValue;
+        return super.getDateValue();
     }
 
     @Field(type = Long)
     public Long getTimestampValue() {
-        return timestampValue;
+        return super.getTimestampValue();
     }
 }

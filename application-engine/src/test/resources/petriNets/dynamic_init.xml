@@ -1,5 +1,5 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+          xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
     <id>dynamic_init</id>
     <title>dynamic_init</title>
     <defaultRole>true</defaultRole>
@@ -29,7 +29,7 @@
         <init dynamic="true">java.time.LocalDateTime.now()</init>
     </data>
 
-    <data type="user" immediate="true">
+    <data type="actor" immediate="true">
         <id>user</id>
         <title>user</title>
         <init dynamic="true">

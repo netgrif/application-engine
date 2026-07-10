@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netgrif.application.engine.objects.auth.domain.ActorRef;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
@@ -36,9 +37,7 @@ public class Task {
 
     private Integer priority;
 
-    private String userId;
-
-    private String userRealmId;
+    private ActorRef assignee;
 
     private Map<String, Map<String, Boolean>> roles;
 
@@ -85,10 +84,9 @@ public class Task {
         this.caseColor = task.getCaseColor();
         this.caseTitle = task.getCaseTitle();
         this.priority = task.getPriority();
-        this.userId = task.getUser() != null ? task.getUser().getStringId() : null;
-        this.userRealmId = task.getUser() != null ? task.getUser().getRealmId() : null;
+        this.assignee = task.getAssignee();
         this.roles = task.getRoles();
-        this.users = task.getUsers();
+        this.users = task.getActors();
         this.startDate = task.getStartDate();
         this.finishDate = task.getFinishDate();
         this.finishedBy = task.getFinishedBy();

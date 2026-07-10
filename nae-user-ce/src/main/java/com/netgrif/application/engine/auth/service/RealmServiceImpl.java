@@ -1,8 +1,7 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netgrif.application.engine.adapter.spring.configuration.AbstractMongoIndexesConfigurator;
+
+import com.netgrif.application.engine.adapter.spring.configuration.AbstractMongoCollectionConfigurator;
 import com.netgrif.application.engine.auth.provider.AbstractAuthConfig;
 import com.netgrif.application.engine.auth.provider.AuthMethodProvider;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
@@ -21,6 +20,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.Map;
@@ -44,13 +45,13 @@ public class RealmServiceImpl implements RealmService {
     @Autowired
     private AnonymousUserRefService anonymousUserRefService;
 
-    private AbstractMongoIndexesConfigurator mongoIndexesConfigurator;
+    private AbstractMongoCollectionConfigurator mongoCollectionConfigurator;
 
     private CollectionNameProvider collectionNameProvider;
 
     @Autowired
-    public void setMongoIndexesConfigurator(AbstractMongoIndexesConfigurator mongoIndexesConfigurator) {
-        this.mongoIndexesConfigurator = mongoIndexesConfigurator;
+    public void setMongoCollectionConfigurator(AbstractMongoCollectionConfigurator mongoCollectionConfigurator) {
+        this.mongoCollectionConfigurator = mongoCollectionConfigurator;
     }
 
     @Lazy
@@ -79,7 +80,7 @@ public class RealmServiceImpl implements RealmService {
         if (!mongoTemplate.collectionExists(collectionName)) {
             try {
                 mongoTemplate.createCollection(collectionName);
-                mongoIndexesConfigurator.resolveIndexes(collectionName, User.class);
+                mongoCollectionConfigurator.resolveIndexes(collectionName, User.class);
             } catch (Exception e) {
                 log.error("Error occurred while creating collection for realm {}", realm.getName(), e);
                 realmRepository.delete(realm);
@@ -262,12 +263,8 @@ public class RealmServiceImpl implements RealmService {
         Object targetConfig = existingConfig.getConfiguration();
 
         if (targetConfig != null && configUpdates != null && !configUpdates.isEmpty()) {
-            try {
-                JsonNode patchNode = objectMapper.valueToTree(configUpdates);
-                objectMapper.readerForUpdating(targetConfig).readValue(patchNode);
-            } catch (IOException e) {
-                throw new IllegalArgumentException("Failed to apply configuration patch", e);
-            }
+            JsonNode patchNode = objectMapper.valueToTree(configUpdates);
+            objectMapper.readerForUpdating(targetConfig).readValue(patchNode);
         }
         realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
         return existingConfig;
@@ -275,8 +272,13 @@ public class RealmServiceImpl implements RealmService {
 
     @Override
     public void deleteRealm(String realmId) {
-        if (!realmRepository.existsById(realmId)) {
+        Optional<Realm> realmOptional = getRealmById(realmId);
+        if (realmOptional.isEmpty()) {
             throw new IllegalArgumentException("Realm with id " + realmId + " not found");
+        }
+        Realm realm = realmOptional.get();
+        if (realm.isDefaultRealm()) {
+            throw new IllegalArgumentException("Cannot delete default realm. Mark a realm as default before deleting current default.");
         }
         realmRepository.deleteById(realmId);
     }

@@ -5,6 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 
+import java.util.List;
+
 import static org.springframework.data.elasticsearch.annotations.FieldType.Integer;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
@@ -23,12 +25,12 @@ public class ButtonField extends com.netgrif.application.engine.objects.elastic.
 
     @Override
     @Field(type = Text)
-    public String[] getFulltextValue() {
+    public List<String> getFulltextValue() {
         return super.getFulltextValue();
     }
 
     @Field(type = Integer)
     public Integer getButtonValue() {
-        return buttonValue;
+        return super.getButtonValue();
     }
 }

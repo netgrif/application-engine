@@ -5,6 +5,11 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
@@ -20,23 +25,32 @@ public class FileField extends com.netgrif.application.engine.objects.elastic.do
         super(value);
     }
 
+    @Deprecated
     public FileField(FileFieldValue[] values) {
+        this(Arrays.asList(values));
+    }
+
+    public FileField(List<FileFieldValue> values) {
         super(values);
+    }
+
+    public FileField(HashSet<FileFieldValue> values) {
+        this(new ArrayList<>(values));
     }
 
     @Override
     @Field(type = Text)
-    public String[] getFulltextValue() {
+    public List<String> getFulltextValue() {
         return super.getFulltextValue();
     }
 
     @Field(type = Text)
-    public String[] getFileNameValue() {
+    public List<String> getFileNameValue() {
         return super.getFileNameValue();
     }
 
     @Field(type = Keyword)
-    public String[] getFileExtensionValue() {
+    public List<String> getFileExtensionValue() {
         return super.getFileExtensionValue();
     }
 }

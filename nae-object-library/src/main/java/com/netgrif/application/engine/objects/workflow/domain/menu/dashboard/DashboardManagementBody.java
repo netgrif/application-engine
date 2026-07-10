@@ -79,8 +79,8 @@ public class DashboardManagementBody {
         outcome.putDataSetEntry(DashboardManagementConstants.FIELD_LANGUAGE_DASHBOARD, FieldType.BOOLEAN, this.profileDashboard);
         outcome.putDataSetEntry(DashboardManagementConstants.FIELD_LOGOUT_DASHBOARD, FieldType.BOOLEAN, this.logoutDashboard);
         if (this.dashboardItems != null) {
-            outcome.putDataSetEntryWithOptions(DashboardManagementConstants.FIELD_DASHBOARD_ITEM_LIST, FieldType.ENUMERATION_MAP, this.dashboardItems, "");
-            outcome.putDataSetEntryWithOptions(DashboardManagementConstants.FIELD_DASHBOARD_ITEM_TO_MENU_ITEM_LIST, FieldType.ENUMERATION_MAP, this.menuItemsToDashboardItems, "");
+            outcome.putDataSetEntryWithOptions(DashboardManagementConstants.FIELD_DASHBOARD_ITEM_LIST, FieldType.ENUMERATION_MAP, this.dashboardItems, null);
+            outcome.putDataSetEntryWithOptions(DashboardManagementConstants.FIELD_DASHBOARD_ITEM_TO_MENU_ITEM_LIST, FieldType.ENUMERATION_MAP, this.menuItemsToDashboardItems, null);
             outcome.putDataSetEntry(DashboardManagementConstants.FIELD_ITEMS_ORDER, FieldType.TEXT, String.join(",", this.dashboardItems.keySet()));
         }
         return outcome;

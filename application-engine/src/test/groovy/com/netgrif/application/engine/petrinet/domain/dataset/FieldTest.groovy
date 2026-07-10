@@ -1,27 +1,14 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
-import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.*
 import com.netgrif.application.engine.startup.runner.GroupRunner
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.startup.runner.SystemUserRunner
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.BooleanField
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.CaseField
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.DateField
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.DateTimeField
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.EnumerationField
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileField
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.I18nField
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.MultichoiceField
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.MultichoiceMapField
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.NumberField
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.TaskField
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.TextField
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserField
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserListField
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -180,7 +167,7 @@ class FieldTest {
     }
 
     private void assertUserField() {
-        UserField field = net.dataSet["user"] as UserField
+        ActorField field = net.dataSet["user"] as ActorField
         assert field.description.defaultValue == "User field description"
         assert field.name.defaultValue == "User"
         assert field.placeholder.defaultValue == "User field placeholder"
@@ -203,7 +190,7 @@ class FieldTest {
     }
 
     private void assertUserList() {
-        UserListField field = net.dataSet["emptyUserList"] as UserListField
+        ActorListField field = net.dataSet["emptyUserList"] as ActorListField
         assert field.name.defaultValue == "Empty user list"
         assert field.description.defaultValue == "User list description"
         assert field.defaultValue == null

@@ -1,27 +1,30 @@
 package com.netgrif.application.engine.filters
 
-import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
+import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
+import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.elastic.service.ReindexingTask
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
-import com.netgrif.application.engine.objects.auth.domain.Authority;
+import com.netgrif.application.engine.objects.auth.domain.Authority
 import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldValue
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.service.PetriNetService
-import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
-import com.netgrif.application.engine.startup.runner.FilterRunner
-import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.objects.workflow.domain.*
 import com.netgrif.application.engine.objects.workflow.domain.filter.FilterImportExportList
+import com.netgrif.application.engine.petrinet.service.PetriNetService
+import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
+import com.netgrif.application.engine.startup.runner.FilterRunner
+import com.netgrif.application.engine.workflow.params.TaskParams
 import com.netgrif.application.engine.workflow.service.UserFilterSearchService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,6 +34,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 import javax.xml.XMLConstants
@@ -38,17 +42,19 @@ import javax.xml.transform.stream.StreamSource
 import javax.xml.validation.Schema
 import javax.xml.validation.SchemaFactory
 import javax.xml.validation.Validator
+import java.time.LocalDateTime
 import java.util.stream.Collectors
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
+@TestPropertySource(properties = "netgrif.engine.filter.create-default-filters=true")
 @SpringBootTest
 class FilterImportExportTest {
 
     public static final String DUMMY_USER_MAIL = "dummy@netgrif.com"
     public static final String DUMMY_USER_PASSWORD = "password"
 
-    private static final int DEFAULT_FILTERS_SIZE = 5
+    private static final int DEFAULT_FILTERS_SIZE = 4
     private static final String[] FILTERS_TO_EXPORT = ["My cases", "My tasks", "Test filter"]
     private static final String[] FILTERS_TO_EXPORT_NEW = ["My cases new", "My tasks new", "Test filter new"]
 
@@ -97,19 +103,27 @@ class FilterImportExportTest {
     @Autowired
     private PetriNetService petriNetService
 
+    @Autowired
+    private ReindexingTask reindexingTask
+
     private Authentication userAuth
     private User dummyUser
+    private Case testFilter
     private Case importCase
     private Case exportCase
 
     @BeforeEach
     void setup() {
         this.testHelper.truncateDbs()
+        dummyUser = createDummyUser()
+        def loggedUser = ActorTransformer.toLoggedUser(dummyUser)
+        userAuth = new UsernamePasswordAuthenticationToken(loggedUser, DUMMY_USER_PASSWORD, loggedUser.authoritySet as Collection<AuthorityImpl>)
+        SecurityContextHolder.getContext().setAuthentication(userAuth)
         this.defaultFiltersRunner.run()
         createTestFilter()
-        dummyUser = createDummyUser()
-        userAuth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(dummyUser), DUMMY_USER_PASSWORD)
-        SecurityContextHolder.getContext().setAuthentication(userAuth)
+        reindexCases()
+        Thread.sleep(1000)
+        waitForFilterCases(DEFAULT_FILTERS_SIZE + 1)
         Optional<PetriNet> importNet = petriNetService.findByImportId(this.filterRunner.IMPORT_NET_IDENTIFIER)
         Optional<PetriNet> exportNet = petriNetService.findByImportId(this.filterRunner.EXPORT_NET_IDENTIFIER)
         assert importNet.isPresent()
@@ -126,15 +140,17 @@ class FilterImportExportTest {
     }
 
     @Test
-    @Disabled("Fixne DJ")
     void createImportExportFiltersNet() {
         List<Case> filterCases = this.userFilterSearchService.autocompleteFindFilters("")
-        assert filterCases.size() == DEFAULT_FILTERS_SIZE
+        assert filterCases.size() == DEFAULT_FILTERS_SIZE + 1
 
         Set<String> exportFiltersIds = filterCases.stream()
                 .filter({ filterCase -> filterCase.title in FILTERS_TO_EXPORT })
                 .map({ filterCase -> filterCase.stringId })
                 .collect(Collectors.toSet())
+        exportFiltersIds.add(testFilter.stringId)
+        assert exportFiltersIds.size() == FILTERS_TO_EXPORT.length
+
         FileFieldValue exportedFiltersField = this.importExportService.exportFiltersToFile(exportFiltersIds)
         File exportedFiltersFile = new File(exportedFiltersField.getPath())
         assert exportedFiltersFile.exists()
@@ -142,7 +158,7 @@ class FilterImportExportTest {
         importCase.dataSet.get(UPLOAD_FILE_FIELD).value = exportedFiltersField
         this.workflowService.save(importCase)
         List<String> importedTasksIds = this.importExportService.importFilters()
-        assert importedTasksIds.size() == FILTERS_TO_EXPORT.size()
+        assert importedTasksIds.size() == FILTERS_TO_EXPORT.length
 
         validateFilterXML(new FileInputStream(exportedFiltersField.getPath()))
         importedTasksIds.forEach({ taskId ->
@@ -159,17 +175,20 @@ class FilterImportExportTest {
             ]))
         })
         Task importTask = this.taskService.searchOne(QTask.task.caseId.eq(importCase.stringId).and(QTask.task.transitionId.eq("importFilter")))
+        this.taskService.assignTask(new TaskParams(importTask.getStringId(), dummyUser))
         this.dataService.setData(importTask, ImportHelper.populateDataset([
                 (IMPORTED_FILTERS_FIELD): [
                         "type" : "taskRef",
                         "value": importedTasksIds
                 ]
         ]))
-        this.taskService.finishTask(importTask, dummyUser)
+        this.taskService.finishTask(new TaskParams(importTask.getStringId(), dummyUser))
+        reindexCases()
         Thread.sleep(1000)
+        waitForFilterCases(DEFAULT_FILTERS_SIZE + FILTERS_TO_EXPORT.length + 1)
         filterCases = this.userFilterSearchService.autocompleteFindFilters("")
         List<String> filterCasesNames = filterCases.stream().map({ filterCase -> filterCase.title }).collect(Collectors.toList())
-        assert filterCases.size() == DEFAULT_FILTERS_SIZE + FILTERS_TO_EXPORT.size()
+        assert filterCases.size() == DEFAULT_FILTERS_SIZE + FILTERS_TO_EXPORT.length + 1
 
         for (String filterName : FILTERS_TO_EXPORT_NEW) {
             assert filterName in filterCasesNames
@@ -179,8 +198,10 @@ class FilterImportExportTest {
                 assert filterCase.dataSet.get(VISIBILITY_FIELD).value == FILTER_VISIBILITY_PRIVATE
             }
         }
-        for (int i = 0; i < FILTERS_TO_EXPORT.size(); i++) {
-            Case filterCase1 = filterCases.get(filterCasesNames.indexOf(FILTERS_TO_EXPORT[i]))
+        for (int i = 0; i < FILTERS_TO_EXPORT.length; i++) {
+            Case filterCase1 = FILTERS_TO_EXPORT[i] == testFilter.title
+                    ? testFilter
+                    : filterCases.get(filterCasesNames.indexOf(FILTERS_TO_EXPORT[i]))
             DataField filterField1 = filterCase1.dataSet.get(FILTER_FIELD)
             Case filterCase2 = filterCases.get(filterCasesNames.indexOf(FILTERS_TO_EXPORT_NEW[i]))
             DataField filterField2 = filterCase2.dataSet.get(FILTER_FIELD)
@@ -189,6 +210,25 @@ class FilterImportExportTest {
             assert filterField1.allowedNets == filterField2.allowedNets
             assert filterField1.filterMetadata == filterField2.filterMetadata
         }
+    }
+
+    void reindexCases() {
+        reindexingTask.forceReindexPage(
+                QCase.case$.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER)
+                        .and(QCase.case$.lastModified.before(LocalDateTime.now())),
+                0,
+                1
+        )
+    }
+
+    void waitForFilterCases(int expectedCount) {
+        long deadline = System.currentTimeMillis() + 15_000
+        List<Case> filterCases = this.userFilterSearchService.autocompleteFindFilters("")
+        while (filterCases.size() < expectedCount && System.currentTimeMillis() < deadline) {
+            Thread.sleep(500)
+            filterCases = this.userFilterSearchService.autocompleteFindFilters("")
+        }
+        assert filterCases.size() >= expectedCount
     }
 
     @Test
@@ -305,7 +345,7 @@ class FilterImportExportTest {
 
     private User createDummyUser() {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        return importHelper.createUser(new User(firstName: "Dummy", lastName: "User", email: DUMMY_USER_MAIL, username: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
+        return importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Dummy", lastName: "User", email: DUMMY_USER_MAIL, username: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
     }
@@ -322,7 +362,7 @@ class FilterImportExportTest {
     }
 
     void createTestFilter() {
-        defaultFiltersRunner.createCaseFilter("Test filter", "filter_alt", FILTER_VISIBILITY_PUBLIC,
+        Optional<Case> filter = defaultFiltersRunner.createCaseFilter("Test filter", "filter_alt", FILTER_VISIBILITY_PUBLIC,
                 "((((dataSet.number.numberValue:5) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.number.numberValue:[10 TO 100.548]) AND " +
                         "(processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.text.fulltextValue:*asdad*) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) " +
                         "OR ((dataSet.enumeration.fulltextValue:*asdasd*) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.enumeration_map.fulltextValue:*asdasd*) " +
@@ -331,8 +371,8 @@ class FilterImportExportTest {
                         "(processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.date.timestampValue:[1631138400000 TO 1631224800000}) AND " +
                         "(processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.date.timestampValue:[1631138400000 TO 1631311200000}) AND " +
                         "(processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.file.fileNameValue:*asdasd*) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) OR " +
-                        "((dataSet.fileList.fileNameValue:*asdasd*) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.user.userIdValue:<<me>>) AND " +
-                        "(processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.user.userIdValue:7) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) " +
+                        "((dataSet.fileList.fileNameValue:*asdasd*) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.user.actorIdValue:<<me>>) AND " +
+                        "(processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.user.actorIdValue:7) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) " +
                         "OR ((dataSet.datetime.timestampValue:[1631184300000 TO 1631184360000}) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) OR " +
                         "((dataSet.datetime.timestampValue:[1631184360000 TO 1631270820000}) AND (processIdentifier:6139e51308215f25b0a498c2_all_data))) AND (title:*asdasd*) AND " +
                         "((creationDateSortable:[1631138400000 TO 1631224800000}) OR (creationDateSortable:[1631138400000 TO 1631311200000})) AND " +
@@ -546,6 +586,8 @@ class FilterImportExportTest {
                         (SLOVAK_ISO_3166_CODE): "Testovaci filter"
                 ]
         )
+        assert filter.isPresent()
+        testFilter = filter.get()
     }
 
 }

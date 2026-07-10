@@ -9,4 +9,5 @@ public class MinIoHostInfo {
     private String host;
     private String user;
     private String password;
+    private Map<String, String> bucketAliases;
 }

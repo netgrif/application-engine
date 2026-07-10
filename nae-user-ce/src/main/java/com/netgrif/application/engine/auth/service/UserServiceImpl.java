@@ -156,7 +156,7 @@ public class UserServiceImpl implements UserService {
     public Optional<AbstractUser> findUserByUsername(String username, String realmId) {
         log.debug("Finding user by username [{}] in realm [{}]", username, realmId);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
-        Optional<AbstractUser> userOpt = userRepository.findByUsername(username, mongoTemplate, collectionName).map(user -> (AbstractUser) user);
+        Optional<AbstractUser> userOpt = userRepository.findByUsername(username, mongoTemplate, collectionName).map(user -> user);
         if (userOpt.isPresent()) {
             log.debug("User [{}] found in realm [{}]", username, realmId);
         } else {
@@ -192,9 +192,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public AbstractUser createUser(AbstractUser user, String realmId) {
         log.info("Creating user [{}] in realm [{}]", user.getUsername(), realmId);
+        setPassword(user, user.getPassword());
         addDefaultAuthorities(user);
         addDefaultRole(user);
-        setPassword(user, user.getPassword());
 
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
         user = userRepository.saveUser(((User) user), mongoTemplate, collectionName);
@@ -218,12 +218,12 @@ public class UserServiceImpl implements UserService {
     public User createUserFromThirdParty(String username, String email, String firstName, String lastName, String realmId, String authMethod) {
         log.info("Creating user [{}] from third-party auth [{}] in realm [{}] without password", username, authMethod, realmId);
         User user = initializeNewUser(username, email, firstName, lastName, "N/A", realmId);
+        setDisablePassword(user);
         addDefaultAuthorities(user);
         addDefaultRole(user);
-        setDisablePassword(user);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
         userRepository.saveUser(user, mongoTemplate, collectionName);
-        log.info("User [{}] from third-party [{}] successfully created in realm [{}]", username, realmId);
+        log.info("User [{}] from third-party auth [{}] successfully created in realm [{}]", username, authMethod, realmId);
         return user;
     }
 
@@ -590,8 +590,8 @@ public class UserServiceImpl implements UserService {
     public AbstractUser createSystemUser() {
         User system = (User) findByEmail(UserConstants.SYSTEM_USER_EMAIL, null);
         if (system == null) {
-            system = new User();
-            system.setUsername(UserConstants.SYSTEM_USER_EMAIL);
+            system = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
+            system.setUsername(UserConstants.SYSTEM_USER_USERNAME);
             system.setEmail(UserConstants.SYSTEM_USER_EMAIL);
             system.setPassword("n/a");
             system.setFirstName(UserConstants.SYSTEM_USER_NAME);
@@ -638,7 +638,7 @@ public class UserServiceImpl implements UserService {
 
     protected User initializeNewUser(String username, String email, String firstName, String lastName, String password, String realmId) {
         log.trace("Initializing new user [{}] in realm [{}]", username, realmId);
-        User user = new User();
+        User user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
         user.setRealmId(realmId);
         user.setUsername(username);
         user.setEmail(email);

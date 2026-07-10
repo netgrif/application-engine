@@ -1,12 +1,23 @@
 netgrif:
   engine:
+    server:
+      port: 8080
     logging:
       endpoints: true
     data:
       database-name: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_dev
+      redis:
+        session:
+          namespace: ${NETGRIF_ENGINE_DATA_REDIS_SESSION_NAMESPACE:netgrif_dev}
       mongodb:
         drop: true
       elasticsearch:
+        priority:
+          full-text-fields:
+            - "title.keyword^2"
+            - "authorName^1"
+            - "authorEmail^1"
+            - "visualId^2"
         drop: true
         index:
           petriNet: ${NETGRIF_ENGINE_DATA_DATABASE_NAME:nae}_dev_petrinet
@@ -25,6 +36,8 @@ netgrif:
             host: http://127.0.0.1:9000
             user: root
             password: password
+            bucket-aliases:
+              pistucket: uat-pistucket
     swagger:
       enabled: true
     security:

@@ -170,7 +170,7 @@ public abstract class AbstractDispatcher {
             }, executor);
             futures.add(future);
         }
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
         E updatedEvent = event;
         for (RegisteredListener registeredListener : contextEditingListeners) {
             if (foo.apply(registeredListener)) {

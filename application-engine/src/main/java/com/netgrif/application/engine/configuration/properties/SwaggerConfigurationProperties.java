@@ -2,7 +2,7 @@ package com.netgrif.application.engine.configuration.properties;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springdoc.core.SwaggerUiConfigProperties;
+import org.springdoc.core.properties.SwaggerUiConfigProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**

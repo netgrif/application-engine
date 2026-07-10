@@ -92,14 +92,14 @@ public class Case extends com.netgrif.application.engine.objects.workflow.domain
 
     @Override
     @JsonIgnore
-    public List<String> getViewUserRefs() {
-        return super.getViewUserRefs();
+    public List<String> getViewActorRefs() {
+        return super.getViewActorRefs();
     }
 
     @Override
     @JsonIgnore
-    public List<String> getViewUsers() {
-        return super.getViewUsers();
+    public List<String> getViewActors() {
+        return super.getViewActors();
     }
 
     @Override

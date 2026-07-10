@@ -2,18 +2,18 @@ package com.netgrif.application.engine.configuration;
 
 import com.netgrif.application.engine.adapter.spring.configuration.filters.NetgrifHttpRequestTransformFilter;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
-import com.netgrif.application.engine.configuration.security.ImpersonationRequestFilter;
-import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
-import com.netgrif.application.engine.configuration.security.RestAuthenticationEntryPoint;
-import com.netgrif.application.engine.configuration.security.SecurityContextFilter;
+import com.netgrif.application.engine.configuration.security.*;
+import com.netgrif.application.engine.objects.auth.domain.Authority;
+import com.netgrif.application.engine.auth.service.AuthorityService;
+import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.security.filter.HostValidationRequestFilter;
 import com.netgrif.application.engine.configuration.security.RealmFilter;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -32,6 +32,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.ForwardedHeaderFilter;
+import org.springframework.boot.security.autoconfigure.web.servlet.SecurityFilterProperties;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 @Slf4j
 @Configuration
 @EnableWebSecurity
-@Order(SecurityProperties.DEFAULT_FILTER_ORDER)
+@Order(SecurityFilterProperties.DEFAULT_FILTER_ORDER)
 public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired
@@ -64,6 +65,9 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired
     private PublicAuthenticationFilter publicAuthenticationFilter;
+
+    @Autowired
+    private WebEndpointProperties webEndpointProperties;
 
     @Autowired
     private NetgrifHttpRequestTransformFilter netgrifHttpRequestTransformFilter;
@@ -106,6 +110,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .addFilterBefore(publicAuthenticationFilter, SecurityContextFilter.class)
                 .addFilterBefore(netgrifHttpRequestTransformFilter, BasicAuthenticationFilter.class)
                 .addFilterBefore(realmFilter, PublicAuthenticationFilter.class)
+                .addFilterAfter(actuatorRequestFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(requestMatcherRegistry ->
                         requestMatcherRegistry
                                 .requestMatchers(getPatterns()).permitAll()
@@ -172,5 +177,9 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     private ImpersonationRequestFilter impersonationRequestFilter() {
         return new ImpersonationRequestFilter(impersonationService);
+    }
+
+    private ActuatorRequestFilter actuatorRequestFilter() {
+        return new ActuatorRequestFilter(webEndpointProperties);
     }
 }

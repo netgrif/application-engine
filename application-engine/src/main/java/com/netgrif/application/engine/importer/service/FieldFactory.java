@@ -18,10 +18,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataValidatio
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
@@ -31,6 +28,12 @@ import java.util.stream.Collectors;
 @org.springframework.stereotype.Component
 @Slf4j
 public final class FieldFactory {
+
+    private static final List<DateTimeFormatter> LOCAL_DATE_FORMATTERS = List.of(
+            DateTimeFormatter.BASIC_ISO_DATE,
+            DateTimeFormatter.ISO_DATE,
+            DateTimeFormatter.ofPattern("dd.MM.yyyy")
+    );
 
     @Autowired
     private StorageConfigurationProperties fileStorageConfiguration;
@@ -112,27 +115,72 @@ public final class FieldFactory {
         if (value == null)
             return null;
 
-        List<String> patterns = Arrays.asList("dd.MM.yyyy");
-        try {
-            return LocalDate.parse(value, DateTimeFormatter.BASIC_ISO_DATE);
-        } catch (DateTimeParseException e) {
+        value = value.trim();
+        if (value.isEmpty())
+            return null;
+
+        LocalDate localDate = parseLocalDate(value);
+        if (localDate != null)
+            return localDate;
+
+        LocalDate epochMillisDate = parseEpochMillisDate(value);
+        if (epochMillisDate != null)
+            return epochMillisDate;
+
+        LocalDate offsetDate = parseOffsetDate(value);
+        if (offsetDate != null)
+            return offsetDate;
+
+        LocalDate instantDate = parseInstantDate(value);
+        if (instantDate != null)
+            return instantDate;
+
+        LocalDateTime dateTime = parseDateTimeFromString(value);
+        return dateTime != null ? dateTime.toLocalDate() : null;
+    }
+
+    private static LocalDate parseLocalDate(String value) {
+        for (DateTimeFormatter formatter : LOCAL_DATE_FORMATTERS) {
             try {
-                return LocalDate.parse(value, DateTimeFormatter.ISO_DATE);
-            } catch (DateTimeParseException ex) {
-                for (String pattern : patterns) {
-                    try {
-                        return LocalDate.parse(value, DateTimeFormatter.ofPattern(pattern));
-                    } catch (DateTimeParseException | IllegalArgumentException exc) {
-                        continue;
-                    }
-                }
+                return LocalDate.parse(value, formatter);
+            } catch (DateTimeParseException ignored) {
+                // Try the next supported local date format.
             }
         }
-        LocalDateTime dateTime = parseDateTimeFromString(value);
-        if (dateTime != null) {
-            return dateTime.toLocalDate();
-        }
         return null;
+    }
+
+    private static LocalDate parseEpochMillisDate(String value) {
+        if (!value.matches("-?\\d{9,}")) {
+            return null;
+        }
+        try {
+            return Instant.ofEpochMilli(Long.parseLong(value))
+                    .atOffset(ZoneOffset.UTC)
+                    .toLocalDate();
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
+
+    private static LocalDate parseInstantDate(String value) {
+        try {
+            return Instant.parse(value)
+                    .atOffset(ZoneOffset.UTC)
+                    .toLocalDate();
+        } catch (DateTimeParseException ignored) {
+            return null;
+        }
+    }
+
+    private static LocalDate parseOffsetDate(String value) {
+        try {
+            return OffsetDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME)
+                    .atZoneSameInstant(ZoneId.systemDefault())
+                    .toLocalDate();
+        } catch (DateTimeParseException ignored) {
+            return null;
+        }
     }
 
     public static LocalDateTime parseDateTime(Object value) {
@@ -223,11 +271,13 @@ public final class FieldFactory {
             case NUMBER:
                 field = buildNumberField(data);
                 break;
+            case ACTOR:
             case USER:
-                field = buildUserField(data, importer);
+                field = buildActorField(data, importer);
                 break;
+            case ACTOR_LIST:
             case USER_LIST:
-                field = buildUserListField(data, importer);
+                field = buildActorListField(data, importer);
                 break;
             case CASE_REF:
                 field = buildCaseField(data);
@@ -505,22 +555,22 @@ public final class FieldFactory {
         return field;
     }
 
-    private UserField buildUserField(Data data, Importer importer) {
+    private ActorField buildActorField(Data data, Importer importer) {
         String[] roles = data.getValues().stream()
                 .map(value -> importer.getRoles().get(value.getValue()).getStringId())
                 .toArray(String[]::new);
-        UserField field = new UserField(roles);
+        ActorField field = new ActorField(roles);
         setDefaultValues(field, data, inits -> {
             field.setDefaultValue(null);
         });
         return field;
     }
 
-    private UserListField buildUserListField(Data data, Importer importer) {
+    private ActorListField buildActorListField(Data data, Importer importer) {
         String[] roles = data.getValues().stream()
                 .map(value -> importer.getRoles().get(value.getValue()).getStringId())
                 .toArray(String[]::new);
-        UserListField field = new UserListField(roles);
+        ActorListField field = new ActorListField(roles);
         setDefaultValues(field, data, inits -> {
         });
         return field;
@@ -709,33 +759,33 @@ public final class FieldFactory {
             case FILELIST:
                 parseFileListValue((FileListField) field, useCase, fieldId);
                 break;
-            case USER:
-                parseUserValues((UserField) field, useCase, fieldId);
+            case ACTOR:
+                parseActorValues((ActorField) field, useCase, fieldId);
                 break;
-            case USERLIST:
-                parseUserListValues((UserListField) field, useCase, fieldId);
+            case ACTORLIST:
+                parseActorListValues((ActorListField) field, useCase, fieldId);
                 break;
             default:
                 field.setValue(useCase.getFieldValue(fieldId));
         }
     }
 
-    private void parseUserValues(UserField field, Case useCase, String fieldId) {
-        DataField userField = useCase.getDataField(fieldId);
-        if (userField.getChoices() != null) {
-            Set<String> roles = userField.getChoices().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
+    private void parseActorValues(ActorField field, Case useCase, String fieldId) {
+        DataField actorField = useCase.getDataField(fieldId);
+        if (actorField.getChoices() != null) {
+            Set<String> roles = actorField.getChoices().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
             field.setRoles(roles);
         }
-        field.setValue((UserFieldValue) useCase.getFieldValue(fieldId));
+        field.setValue((ActorFieldValue) useCase.getFieldValue(fieldId));
     }
 
-    private void parseUserListValues(UserListField field, Case useCase, String fieldId) {
-        DataField userListField = useCase.getDataField(fieldId);
-        if (userListField.getChoices() != null) {
-            Set<String> roles = userListField.getChoices().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
+    private void parseActorListValues(ActorListField field, Case useCase, String fieldId) {
+        DataField actorListField = useCase.getDataField(fieldId);
+        if (actorListField.getChoices() != null) {
+            Set<String> roles = actorListField.getChoices().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
             field.setRoles(roles);
         }
-        field.setValue((UserListFieldValue) useCase.getFieldValue(fieldId));
+        field.setValue((ActorListFieldValue) useCase.getFieldValue(fieldId));
     }
 
     private Double parseNumberValue(Case useCase, String fieldId) {

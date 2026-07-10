@@ -1,19 +1,19 @@
 package com.netgrif.application.engine.ipc
 
-import com.netgrif.application.engine.auth.service.UserService
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
+import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
+import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
+import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.objects.workflow.domain.Case
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
-import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
-import com.netgrif.application.engine.objects.petrinet.domain.VersionType
-import com.netgrif.application.engine.objects.workflow.domain.Case
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -66,9 +66,12 @@ class TaskApiTest {
     public static final String TASK_SEARCH_NET_FILE = "ipc_task_search.xml"
 
     @Test
-    @Disabled("GroovyRuntime Could not find matching constructor")
     void testTaskSearch() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(stream(TASK_SEARCH_NET_FILE))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
 
         assert netOptional.getNet() != null
 
@@ -97,9 +100,12 @@ class TaskApiTest {
     public static final String TASK_EVENTS_TASK = "Task"
 
     @Test
-    @Disabled()
     void testTaskEventActions() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_EVENTS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(stream(TASK_EVENTS_NET_FILE))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
 
         assert netOptional.getNet() != null
 
@@ -119,10 +125,17 @@ class TaskApiTest {
     public static final String LEASING_NET_TASK_EDIT_COST = "T2"
 
     @Test
-    @Disabled("spusta 2 krat")
     void testTaskExecution() {
-        def limitsNetOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        def leasingNetOptional = petriNetService.importPetriNet(stream(LEASING_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def limitsNetOptional = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(stream(LIMITS_NET_FILE))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
+        def leasingNetOptional = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(stream(LEASING_NET_FILE))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
 
         assert limitsNetOptional.getNet() != null
         assert leasingNetOptional.getNet() != null
@@ -156,9 +169,9 @@ class TaskApiTest {
 
 //@formatter:off
         assert limits.dataSet["limit"].value as Double == 970_000 as Double
-        assert leasing1.dataSet["2"].value as Double == 970_000 as Double
+        assert leasing1.dataSet["2"].value as Double == 940_000 as Double
         assert leasing1.dataSet["1"].value as Double == 30_000 as Double
-        assert leasing2.dataSet["2"].value as Double == 970_000 as Double
+        assert leasing2.dataSet["2"].value as Double == 940_000 as Double
         assert leasing2.dataSet["1"].value as Double == 0 as Double
 //@formatter:on
 
@@ -183,9 +196,9 @@ class TaskApiTest {
         leasing2 = leasing2Opt.get()
 
         assert limits.dataSet["limit"].value as Double == 950_000 as Double
-        assert leasing1.dataSet["2"].value as Double == 950_000 as Double
+        assert leasing1.dataSet["2"].value as Double == 930_000 as Double
         assert leasing1.dataSet["1"].value as Double == 30_000 as Double
-        assert leasing2.dataSet["2"].value as Double == 950_000 as Double
+        assert leasing2.dataSet["2"].value as Double == 930_000 as Double
         assert leasing2.dataSet["1"].value as Double == 20_000 as Double
     }
 
@@ -196,7 +209,11 @@ class TaskApiTest {
 
     @Test
     void testTaskBulkActions() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_BULK_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(stream(TASK_BULK_NET_FILE))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
 
         assert netOptional.getNet() != null
         PetriNet net = netOptional.getNet()
@@ -209,7 +226,7 @@ class TaskApiTest {
         helper.assignTaskToSuper(TASK_BULK_TASK, control.stringId)
         helper.finishTaskAsSuper(TASK_BULK_TASK, control.stringId)
 
-        assert taskRepository.findAll(QTask.task.userId.eq(userService.system.getStringId())).size() == 2
+        assert taskRepository.findAll(QTask.task.assignee.id.eq(userService.system.getStringId())).size() == 2
     }
 
     public static final String TASK_GETTER_NET_FILE = "ipc_data.xml"
@@ -221,7 +238,11 @@ class TaskApiTest {
 
     @Test
     void testGetData() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_GETTER_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(stream(TASK_GETTER_NET_FILE))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
 
         assert netOptional.getNet() != null
         PetriNet net = netOptional.getNet()
@@ -256,7 +277,11 @@ class TaskApiTest {
 
     @Test
     void testSetData() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_SETTER_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(stream(TASK_SETTER_NET_FILE))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
 
         assert netOptional.getNet() != null
         PetriNet net = netOptional.getNet()

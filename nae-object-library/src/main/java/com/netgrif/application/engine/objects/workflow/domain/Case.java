@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.objects.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netgrif.application.engine.objects.annotations.Indexable;
+import com.netgrif.application.engine.objects.annotations.EnsureCollection;
 import com.netgrif.application.engine.objects.auth.domain.ActorRef;
 import com.netgrif.application.engine.objects.annotations.Indexed;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
@@ -20,10 +20,11 @@ import java.io.Serializable;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Getter
-@Indexable
+@EnsureCollection
 @QueryEntity
 public abstract class Case implements Serializable {
 
@@ -101,27 +102,27 @@ public abstract class Case implements Serializable {
     private Map<String, Map<String, Boolean>> permissions;
 
     @Setter
-    private Map<String, Map<String, Boolean>> userRefs;
+    private Map<String, Map<String, Boolean>> actorRefs;
 
     @Setter
-    private Map<String, Map<String, Boolean>> users;
+    private Map<String, Map<String, Boolean>> actors;
 
     @Setter
     private List<String> viewRoles;
 
     @Setter
     @JsonIgnore
-    private List<String> viewUserRefs;
+    private List<String> viewActorRefs;
 
     @Setter
     @JsonIgnore
-    private List<String> viewUsers;
+    private List<String> viewActors;
 
     @Setter
     private List<String> negativeViewRoles;
 
     @Setter
-    private List<String> negativeViewUsers;
+    private List<String> negativeViewActors;
 
     @Setter
     private Map<String, String> tags;
@@ -134,13 +135,13 @@ public abstract class Case implements Serializable {
         tasks = new HashSet<>();
         enabledRoles = new HashSet<>();
         permissions = new HashMap<>();
-        userRefs = new HashMap<>();
-        users = new HashMap<>();
+        actorRefs = new HashMap<>();
+        actors = new HashMap<>();
         viewRoles = new LinkedList<>();
-        viewUserRefs = new LinkedList<>();
-        viewUsers = new LinkedList<>();
+        viewActorRefs = new LinkedList<>();
+        viewActors = new LinkedList<>();
         negativeViewRoles = new LinkedList<>();
-        negativeViewUsers = new ArrayList<>();
+        negativeViewActors = new ArrayList<>();
         tags = new HashMap<>();
     }
 
@@ -156,7 +157,7 @@ public abstract class Case implements Serializable {
         enabledRoles = new HashSet<>(petriNet.getRoles().keySet());
         negativeViewRoles.addAll(petriNet.getNegativeViewRoles());
         icon = petriNet.getIcon();
-        userRefs = petriNet.getUserRefs();
+        actorRefs = petriNet.getActorRefs();
         tags = new HashMap<>(petriNet.getTags());
 
         permissions = petriNet.getPermissions().entrySet().stream()
@@ -173,7 +174,7 @@ public abstract class Case implements Serializable {
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
 
         resolveViewRoles();
-        resolveViewUserRefs();
+        resolveViewActorRefs();
     }
 
     public String getStringId() {
@@ -193,26 +194,29 @@ public abstract class Case implements Serializable {
         List<MapOptionsField<I18nString, ?>> dynamicOptionsFields = new LinkedList<>();
         List<ChoiceField<?>> dynamicChoicesFields = new LinkedList<>();
         petriNet.getDataSet().forEach((key, field) -> {
+            DataField dataField;
             if (field.isDynamicDefaultValue()) {
                 dynamicInitFields.add(field);
-                this.dataSet.put(key, new DataField());
+                dataField = new DataField();
+                this.dataSet.put(key, dataField);
             } else {
-                this.dataSet.put(key, new DataField(field.getDefaultValue()));
+                dataField = new DataField(field.getDefaultValue());
+                this.dataSet.put(key, dataField);
             }
             if (field.getComponent() != null) {
-                this.dataSet.get(key).setComponent(field.getComponent());
+                dataField.setComponent(field.getComponent());
             }
-            if (field instanceof UserField) {
-                this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
+            if (field instanceof ActorField) {
+                dataField.setChoices(((ActorField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
             }
-            if (field instanceof UserListField) {
-                this.dataSet.get(key).setChoices(((UserListField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
+            if (field instanceof ActorListField) {
+                dataField.setChoices(((ActorListField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
             }
             if (field instanceof FieldWithAllowedNets) {
-                this.dataSet.get(key).setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());
+                dataField.setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());
             }
             if (field instanceof FilterField) {
-                this.dataSet.get(key).setFilterMetadata(((FilterField) field).getFilterMetadata());
+                dataField.setFilterMetadata(((FilterField) field).getFilterMetadata());
             }
             if (field instanceof MapOptionsField && ((MapOptionsField) field).isDynamic()) {
                 dynamicOptionsFields.add((MapOptionsField<I18nString, ?>) field);
@@ -281,12 +285,12 @@ public abstract class Case implements Serializable {
         return petriNetObjectId.toString();
     }
 
-    public void addUsers(Set<String> userIds, Map<String, Boolean> permissions) {
-        userIds.forEach(userId -> {
-            if (users.containsKey(userId) && users.get(userId) != null) {
-                compareExistingUserPermissions(userId, new HashMap<>(permissions));
+    public void addActors(Set<String> actorIds, Map<String, Boolean> permissions) {
+        actorIds.forEach(actorId -> {
+            if (actors.containsKey(actorId) && actors.get(actorId) != null) {
+                compareExistingActorPermissions(actorId, new HashMap<>(permissions));
             } else {
-                users.put(userId, new HashMap<>(permissions));
+                actors.put(actorId, new HashMap<>(permissions));
             }
         });
     }
@@ -300,28 +304,37 @@ public abstract class Case implements Serializable {
         });
     }
 
-    public void resolveViewUserRefs() {
-        this.viewUserRefs.clear();
-        this.userRefs.forEach((userRef, perms) -> {
+    public void resolveViewActorRefs() {
+        this.viewActorRefs.clear();
+        this.actorRefs.forEach((actorRef, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
-                viewUserRefs.add(userRef);
+                viewActorRefs.add(actorRef);
             }
         });
     }
 
-    public void resolveViewUsers() {
-        this.viewUsers.clear();
-        this.users.forEach((user, perms) -> {
+    /**
+     * Initializes {@link #viewActors} collection. Any actor defined in {@link #actors} with permission {@link RolePermission#VIEW}
+     * of true value is added to the {@link #viewActors} collection.
+     *
+     * @return true if the {@link #viewActors} was modified, false otherwise
+     */
+    public boolean resolveViewActors() {
+        AtomicBoolean isModified = new AtomicBoolean(!this.viewActors.isEmpty());
+        this.viewActors.clear();
+        this.actors.forEach((actor, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
-                viewUsers.add(user);
+                isModified.set(viewActors.add(actor));
             }
         });
+        return isModified.get();
     }
 
-    private void compareExistingUserPermissions(String userId, Map<String, Boolean> permissions) {
-        permissions.forEach((id, perm) -> {
-            if ((users.containsKey(userId) && !users.get(userId).containsKey(id)) || (users.containsKey(userId) && users.get(userId).containsKey(id) && users.get(userId).get(id))) {
-                users.get(userId).put(id, perm);
+    private void compareExistingActorPermissions(String actorId, Map<String, Boolean> permissions) {
+        permissions.forEach((permType, permValue) -> {
+            if ((actors.containsKey(actorId) && !actors.get(actorId).containsKey(permType))
+                    || (actors.containsKey(actorId) && actors.get(actorId).containsKey(permType) && actors.get(actorId).get(permType))) {
+                actors.get(actorId).put(permType, permValue);
             }
         });
     }

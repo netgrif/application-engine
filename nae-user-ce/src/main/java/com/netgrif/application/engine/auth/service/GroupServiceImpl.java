@@ -129,20 +129,36 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void removeAllByRealmId(String realmId) {
-        this.groupRepository.removeAllByRealmId(realmId);
+        Pageable groupPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<Group> groups = groupRepository.findAllByRealmId(realmId, groupPageable);
+        while (groups.hasContent()) {
+            groups.forEach(this::delete);
+            groups = groupRepository.findAllByRealmId(realmId, groupPageable);
+        }
     }
 
     @Override
     public void removeAllByRealmIdIn(Collection<String> realmIds) {
         if (realmIds == null || realmIds.isEmpty()) {
             this.removeAllGroups();
+            return;
         }
-        this.groupRepository.removeAllByRealmIdIn(realmIds);
+        Pageable groupPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<Group> groups = groupRepository.findAllByRealmIdIn(realmIds, groupPageable);
+        while (groups.hasContent()) {
+            groups.forEach(this::delete);
+            groups = groupRepository.findAllByRealmIdIn(realmIds, groupPageable);
+        }
     }
 
     @Override
     public void removeAllGroups() {
-        this.groupRepository.deleteAll();
+        Pageable groupPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<Group> groups = groupRepository.findAll(groupPageable);
+        while (groups.hasContent()) {
+            groups.forEach(this::delete);
+            groups = groupRepository.findAll(groupPageable);
+        }
     }
 
     @Override
@@ -176,7 +192,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group create(String identifier, String title, AbstractUser groupOwner) {
         log.info("Creating default group for user: [{}]", groupOwner.getStringId());
-        Group group = new Group(identifier, groupOwner.getRealmId());
+        Group group = new com.netgrif.application.engine.adapter.spring.auth.domain.Group(identifier, groupOwner.getRealmId());
         group.setOwnerId(groupOwner.getStringId());
         group.setOwnerUsername(groupOwner.getUsername());
         group.setDisplayName(title);

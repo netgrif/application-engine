@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.configuration.MongoIndexesConfigurator;
+import com.netgrif.application.engine.configuration.MongoCollectionConfigurator;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
@@ -22,19 +22,21 @@ public class MongoDbRunner implements ApplicationEngineStartupRunner {
 
     private final MongoTemplate mongoTemplate;
 
-    private final MongoIndexesConfigurator mongoIndexesConfigurator;
+    private final MongoCollectionConfigurator mongoCollectionConfigurator;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         if (mongoProperties.getDrop()) {
-            if (mongoProperties.getHost() != null && mongoProperties.getPort() != null)
+            if (mongoProperties.getHost() != null && mongoProperties.getPort() != null) {
                 log.info("Dropping Mongo database {}:{}/{}", mongoProperties.getHost(), mongoProperties.getPort(), mongoProperties.getDatabase());
-            else if (mongoProperties.getUri() != null)
+            } else if (mongoProperties.getUri() != null) {
                 log.info("Dropping Mongo database {}", mongoProperties.getUri());
+            }
             mongoTemplate.getDb().drop();
+            mongoCollectionConfigurator.resolveCollections();
         }
         if (mongoProperties.getRunnerEnsureIndex()) {
-            mongoIndexesConfigurator.resolveIndexes();
+            mongoCollectionConfigurator.resolveIndexes();
         }
     }
 

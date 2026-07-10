@@ -1,4 +1,4 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
 	<id>test_setData</id>
 	<initials>TSD</initials>
 	<title>TestSetData</title>
@@ -16,6 +16,10 @@
 	</data>
 	<data type="enumeration">
 		<id>enumeration_0</id>
+		<title/>
+	</data>
+	<data type="number">
+		<id>number_0</id>
 		<title/>
 	</data>
 	<data type="button">
@@ -74,6 +78,20 @@
 				<layout>
 					<x>0</x>
 					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>number_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>

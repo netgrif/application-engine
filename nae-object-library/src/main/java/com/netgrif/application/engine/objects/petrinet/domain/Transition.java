@@ -40,7 +40,7 @@ public class Transition extends Node {
 
     @Getter
     @Setter
-    private Map<String, Map<String, Boolean>> userRefs;
+    private Map<String, Map<String, Boolean>> actorRefs;
 
     @Getter
     @Setter
@@ -93,7 +93,7 @@ public class Transition extends Node {
         super();
         dataSet = new LinkedHashMap<>();
         roles = new HashMap<>();
-        userRefs = new HashMap<>();
+        actorRefs = new HashMap<>();
         triggers = new LinkedList<>();
         negativeViewRoles = new LinkedList<>();
         dataGroups = new LinkedHashMap<>();
@@ -134,11 +134,15 @@ public class Transition extends Node {
         negativeViewRoles.add(roleId);
     }
 
-    public void addUserRef(String userRefId, Map<String, Boolean> permissions) {
-        if (userRefs.containsKey(userRefId) && userRefs.get(userRefId) != null) {
-            userRefs.get(userRefId).putAll(permissions);
+    public void addActorRef(String actorFieldId, Map<String, Boolean> permissions) {
+        if (actorFieldId == null) {
+            throw new IllegalArgumentException("actorFieldId must not be null");
+        }
+        Map<String, Boolean> safePermissions = (permissions == null) ? new HashMap<>() : permissions;
+        if (actorRefs.containsKey(actorFieldId) && actorRefs.get(actorFieldId) != null) {
+            actorRefs.get(actorFieldId).putAll(safePermissions);
         } else {
-            userRefs.put(userRefId, permissions);
+            actorRefs.put(actorFieldId, safePermissions);
         }
     }
 
@@ -258,7 +262,7 @@ public class Transition extends Node {
         this.setDataSet(transition.dataSet == null ? null : transition.dataSet.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y.clone(), LinkedHashMap::new)));
         this.setRoles(transition.roles == null ? null : transition.roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
         this.setNegativeViewRoles(new ArrayList<>(transition.negativeViewRoles));
-        this.setUserRefs(transition.userRefs == null ? null : transition.userRefs.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
+        this.setActorRefs(transition.actorRefs == null ? null : transition.actorRefs.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
         this.setTriggers(transition.triggers == null ? null : transition.triggers.stream().map(Trigger::clone).collect(Collectors.toList()));
         this.setLayout(transition.layout == null ? null : transition.layout.clone());
         this.setPriority(transition.priority);

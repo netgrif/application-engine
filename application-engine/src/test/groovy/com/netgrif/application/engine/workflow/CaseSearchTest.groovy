@@ -1,35 +1,37 @@
 package com.netgrif.application.engine.workflow
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.objects.auth.constants.UserConstants
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.objects.workflow.domain.Case
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.CaseSearchService
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import tools.jackson.databind.ObjectMapper
 
 import static org.hamcrest.core.StringContains.containsString
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
@@ -42,7 +44,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = ApplicationEngine.class
 )
-@Disabled("searchByMoreValues")
 @AutoConfigureMockMvc
 class CaseSearchTest {
 
@@ -65,6 +66,7 @@ class CaseSearchTest {
     private SuperCreatorRunner superCreator
 
     private MockMvc mvc
+    private Authentication auth
 
     @BeforeEach
     void setup() {
@@ -76,9 +78,9 @@ class CaseSearchTest {
 
         PetriNet net = getNet()
 
-        Case case1 = importHelper.createCase("Case1-Test", net)
-        Case case2 = importHelper.createCase("Case2", net)
-        Case case3 = importHelper.createCase("Case3", net)
+        Case case1 = importHelper.createCaseAsSuper("Case1-Test", net)
+        Case case2 = importHelper.createCaseAsSuper("Case2", net)
+        Case case3 = importHelper.createCaseAsSuper("Case3", net)
 
         importHelper.assignTaskToSuper("tran", case1.stringId)
         importHelper.assignTaskToSuper("tran", case2.stringId)
@@ -118,20 +120,23 @@ class CaseSearchTest {
         ])
 
         importHelper.updateSuperUser()
+        def loggedSuper = superCreator.getLoggedSuper()
+        auth = new UsernamePasswordAuthenticationToken(loggedSuper, userPassword, loggedSuper.authorities)
     }
 
     PetriNet getNet() {
-        def netOptional = petriNetService.importPetriNet(
-                new FileInputStream("src/test/resources/case_search_test.xml"),
-                VersionType.MAJOR,
-                superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/case_search_test.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert netOptional.getNet() != null
         return netOptional.getNet()
     }
 
     @Test
-    void searchByAuthorEmail() {
-        performSearch("super@netgrif.com", "Case2")
+    void searchByAuthorIdentifier() {
+        performSearch(UserConstants.ADMIN_USER_USERNAME, "Case2")
     }
 
     @Test
@@ -145,7 +150,6 @@ class CaseSearchTest {
     }
 
     @Test
-    @Disabled("IllegalState")
     void searchByMoreValues() {
         performSearch("Test", "Case1-Test")
     }
@@ -163,11 +167,11 @@ class CaseSearchTest {
 
     void performSearch(String input, String expect = "", Boolean includeInput = true) {
         String request = buildRequestBody(input)
-        mvc.perform(post("/api/workflow/case/search2")
+        mvc.perform(post("/api/workflow/case/search_mongo")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(request)
-                .with(httpBasic(UserConstants.ADMIN_USER_USERNAME, userPassword))
-                .with(csrf()))
+                .with(csrf())
+                .with(authentication(this.auth)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaTypes.HAL_JSON_VALUE))

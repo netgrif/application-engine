@@ -1,13 +1,10 @@
 package com.netgrif.application.engine.pdf.generator.service.fieldbuilder;
 
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfTextField;
 import com.netgrif.application.engine.objects.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldValue;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileListFieldValue;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue;
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedField;
 import org.jsoup.Jsoup;
@@ -59,11 +56,13 @@ public class TextFieldBuilder extends FieldBuilder {
             case FILELIST:
                 value = field.getValue() != null ? resolveFileListNames((FileListFieldValue) field.getValue()) : "";
                 break;
-            case USER:
-                value = field.getValue() != null ? ((UserFieldValue) field.getValue()).getFullName() : "";
+            case ACTOR:
+                value = field.getValue() != null ? ((ActorFieldValue) field.getValue()).getFullName() : "";
                 break;
-            case USERLIST:
-                value = field.getValue() != null ? ((UserListFieldValue) field.getValue()).getUserValues().stream().map(UserFieldValue::getFullName).collect(Collectors.joining(", ")) : "";
+            case ACTORLIST:
+                value = field.getValue() != null ? ((ActorListFieldValue) field.getValue()).getActorValues().stream()
+                        .map(ActorFieldValue::getFullName)
+                        .collect(Collectors.joining(", ")) : "";
                 break;
             default:
                 value = field.getValue() != null ? Jsoup.parse(field.getValue().toString()).text() : "";

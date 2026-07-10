@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.adapter.spring.actions;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.dto.AuthPrincipalDto;
@@ -18,6 +17,7 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.List;
 
@@ -44,9 +44,8 @@ public interface ActionApi {
      * @param dataSet the data to be set, organized as a map
      * @param params  additional parameters for the operation
      * @return the outcome of the set data operation
-     * @throws JsonProcessingException if there is an error processing JSON data
      */
-    SetDataEventOutcome setData(String taskId, Map<String, Map<String, String>> dataSet, Map<String, String> params) throws JsonProcessingException;
+    SetDataEventOutcome setData(String taskId, Map<String, Map<String, Object>> dataSet, Map<String, String> params);
 
     /**
      * Finds a specific case by its ID.
@@ -91,6 +90,44 @@ public interface ActionApi {
      * @return the total number of cases matching the criteria
      */
     Long countCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Boolean isIntersection);
+
+    /**
+     * Searches for cases matching the given predicate.
+     *
+     * @param processIdentifier reserved for interface compatibility; this implementation
+     *                          does not filter by process identifier and returns cases
+     *                          from all processes. Use the predicate parameter to filter
+     *                          by specific process(es) if needed.
+     * @param predicate         the criteria for filtering cases
+     * @param pageable          the pagination information
+     * @param params           additional parameters for the operation
+     * @return a page of cases matching the criteria
+     */
+    Page<Case> searchCases(String processIdentifier, Predicate predicate, Pageable pageable, Map<String, String> params);
+
+    /**
+     * Searches for cases using elastic search queries.
+     *
+     * @param elasticStringQueries a list of queries for filtering cases
+     * @param authPrincipalDto     the authorization principal used for the search
+     * @param pageable             the pagination information
+     * @param isIntersection       true to intersect results of all queries; false for union
+     * @param params           additional parameters for the operation
+     * @return a page of cases matching the criteria
+     */
+    Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection, Map<String, String> params);
+
+
+    /**
+     * Counts the number of cases that match the provided elastic search queries.
+     *
+     * @param elasticStringQueries a list of elastic search queries used for filtering cases
+     * @param authPrincipalDto     the authorization principal for the operation
+     * @param isIntersection       true to intersect the results of all queries; false for union
+     * @param params           additional parameters for the operation
+     * @return the total number of cases matching the criteria
+     */
+    Long countCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Boolean isIntersection, Map<String, String> params);
 
     /**
      * Creates a new case identified by the given process identifier.
@@ -147,6 +184,43 @@ public interface ActionApi {
     Page<Task> searchTasks(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection);
 
     /**
+     * Searches for tasks matching the given predicate.
+     *
+     * @param processIdentifier reserved for interface compatibility; this implementation
+     *                          does not filter by process identifier and returns tasks
+     *                          from all processes. Use the predicate parameter to filter
+     *                          by specific process(es) if needed.
+     * @param predicate         the criteria for filtering tasks
+     * @param pageable          the pagination information
+     * @param params            additional params for the operation
+     * @return a page of tasks matching the criteria
+     */
+    Page<Task> searchTasks(String processIdentifier, Predicate predicate, Pageable pageable, Map<String, String> params);
+
+    /**
+     * Searches for tasks using elastic search queries.
+     *
+     * @param elasticStringQueries a list of queries for filtering tasks
+     * @param authPrincipalDto     the authorization principal used for the search
+     * @param pageable             the pagination information
+     * @param isIntersection       true to intersect results of all queries; false for union
+     * @param params            additional params for the operation
+     * @return a page of tasks matching the criteria
+     */
+    Page<Task> searchTasks(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection, Map<String, String> params);
+
+    /**
+     * Counts tasks using elastic search queries.
+     *
+     * @param elasticStringQueries a list of queries for filtering tasks
+     * @param authPrincipalDto     the authorization principal used for the search
+     * @param isIntersection       true to intersect results of all queries; false for union
+     * @param params            additional params for the operation
+     * @return number of tasks matching the query
+     */
+    Long countTasks(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Boolean isIntersection, Map<String, String> params);
+
+    /**
      * Assigns a specific task to a user.
      *
      * @param taskId           the ID of the task to assign
@@ -195,4 +269,28 @@ public interface ActionApi {
      * @return the system user
      */
     AbstractUser getSystemUser();
+
+    AuthPrincipalDto getSystemUserDto();
+
+    SetDataEventOutcome saveFile(String taskId, String fieldId, ActionFileHolder file, Map<String, String> params);
+
+    SetDataEventOutcome saveFiles(String taskId, String fieldId, ActionFileHolder[] files, Map<String, String> params);
+
+    SetDataEventOutcome deleteFile(String taskId, String fieldId, Map<String, String> params);
+
+    SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name, Map<String, String> params);
+
+    ActionFileHolder getFile(String caseId, String fieldId, Boolean forPreview, Map<String, String> params) throws IOException;
+
+    ActionFileHolder getFileByCaseAndName(String caseId, String fieldId, String name, Map<String, String> params) throws IOException;
+
+    boolean isProcessUp(String processIdentifier);
+
+    boolean isProcessDown(String processIdentifier);
+
+    ProcessAvailability getProcessAvailability(String processIdentifier);
+
+    ProcessAvailabilities getProcessAvailability(List<String> processIdentifiers);
+
+    ProcessAvailabilities getProcessAvailability(String... processIdentifiers);
 }

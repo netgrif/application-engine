@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
 	<id>preference_filter_item</id>
 	<initials>PFI</initials>
 	<title>Preference filter item</title>
@@ -122,7 +122,7 @@
 				"referenced_filters": ["type": "caseRef", "value": previousCaseRefValue],
 			])
 			async.run {
-				workflowService.deleteCase(useCase.stringId)
+				deleteCase(useCase.stringId)
 			}
 		</action>
 	</data>
@@ -416,7 +416,7 @@
 					entryName: f.entry_name,
 					icon: f.icon_name;
 
-					def filterCase = findCase({it._id.objectId.eq(new com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
+					def filterCase = findCase({it._id.eq(new com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
 
 					change entryDefaultName value {return filterCase.title}
 

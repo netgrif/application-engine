@@ -7,19 +7,33 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
-@Data
-public class AuthPrincipalDto implements Serializable {
-
+public record AuthPrincipalDto(String username,
+                               String realmId,
+                               @JsonIgnore
+                               String sessionId) implements Serializable {
     @Serial
     private static final long serialVersionUID = 6725518942728316525L;
 
-    private String username;
+    @Override
+    public String toString() {
+        return "AuthPrincipalDto{" +
+                "username='" + username + '\'' +
+                ", realmId='" + realmId + '\'' +
+                '}';
+    }
 
-    private String realmId;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AuthPrincipalDto that = (AuthPrincipalDto) o;
+        return Objects.equals(username, that.username) && Objects.equals(realmId, that.realmId);
+    }
 
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    @JsonIgnore
-    private String sessionId;
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(username, realmId);
+    }
 }

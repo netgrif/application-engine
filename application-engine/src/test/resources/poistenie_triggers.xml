@@ -128,7 +128,7 @@
         <id>26</id>
         <title>Koľko rokov ste nemali poisťovací prípad?</title>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>27</id>
         <title>Vlastník poistenia</title>
         <values>1</values>

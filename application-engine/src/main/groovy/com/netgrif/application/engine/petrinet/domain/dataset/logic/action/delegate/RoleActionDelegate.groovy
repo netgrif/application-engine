@@ -33,7 +33,8 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
 
     def init(Action action, RoleContext roleContext, Map<String, String> params = [:]) {
         this.action = action
-        this.actionContext = actionContext
+        //this.actionContext = actionContext
+        this.actionContext = roleContext
         this.params = params
 
         this.processRole = roleContext.role
@@ -42,8 +43,7 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
     }
 
     AbstractUser assignRole(ProcessRole role, AbstractUser user = affectedUser) {
-        String roleId = role.stringId
-        return assignRole(roleId, user, petriNet)
+        return userService.addRole(user, role.stringId)
     }
 
     AbstractUser assignRole(String roleId, AbstractUser user = affectedUser) {
@@ -69,8 +69,8 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
     }
 
     AbstractUser removeRole(ProcessRole role, AbstractUser user = affectedUser) {
-        String roleId = role.stringId
-        return removeRole(roleId, user)
+        user.removeProcessRole(role)
+        return userService.saveUser(user)
     }
 
     AbstractUser removeRole(String roleId, AbstractUser user = affectedUser) {
@@ -94,7 +94,7 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
         String roleId = foundEntry.key
         ProcessRole role = processRoleService.findById(roleId)
 
-        user.getProcessRoles().remove(role)
+        user.removeProcessRole(role)
         return userService.saveUser(user)
     }
 }

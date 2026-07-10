@@ -19,7 +19,6 @@ import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Repository interface for managing {@link User} entities in the MongoDB database.
@@ -202,7 +201,7 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
      */
     default Page<User> findAllByProcessRoles__idIn(Collection<ProcessResourceId> rolesId, Pageable pageable, MongoTemplate mongoTemplate, String collection) {
         Query query = Query.query(
-                Criteria.where("processRoles._id").in(rolesId));
+                Criteria.where("processRoleIds").in(rolesId.stream().map(ProcessResourceId::toString).toList()));
         return resolveUserPage(pageable, mongoTemplate, collection, query);
     }
 

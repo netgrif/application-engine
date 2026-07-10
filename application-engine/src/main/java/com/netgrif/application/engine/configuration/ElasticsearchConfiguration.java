@@ -1,35 +1,27 @@
 package com.netgrif.application.engine.configuration;
 
-import co.elastic.clients.json.JsonpMapper;
-import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
-import com.netgrif.application.engine.objects.elastic.serializer.LocalDateTimeJsonDeserializer;
-import com.netgrif.application.engine.objects.elastic.serializer.LocalDateTimeJsonSerializer;
 import com.netgrif.application.engine.workflow.service.CaseEventHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
-import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
-import org.apache.http.impl.nio.reactor.IOReactorConfig;
-import org.apache.http.nio.conn.NHttpClientConnectionManager;
-import org.apache.http.nio.reactor.IOReactorException;
-import org.elasticsearch.client.RestClientBuilder;
+import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
+import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
+import org.apache.hc.core5.reactor.IOReactorConfig;
+import org.apache.hc.core5.util.TimeValue;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.*;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchClients;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.elasticsearch.support.HttpHeaders;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.apache.http.impl.nio.reactor.IOReactorConfig.Builder.getDefaultMaxIoThreadCount;
-import static org.elasticsearch.client.RestClientBuilder.*;
+import static co.elastic.clients.transport.rest5_client.low_level.Rest5ClientBuilder.DEFAULT_CONNECT_TIMEOUT_MILLIS;
+import static co.elastic.clients.transport.rest5_client.low_level.Rest5ClientBuilder.DEFAULT_MAX_CONN_PER_ROUTE;
+import static co.elastic.clients.transport.rest5_client.low_level.Rest5ClientBuilder.DEFAULT_MAX_CONN_TOTAL;
+import static org.springframework.data.elasticsearch.client.elc.rest5_client.Rest5Clients.DEFAULT_SOCKET_TIMEOUT_MILLIS;
+import static org.springframework.data.elasticsearch.client.elc.rest5_client.Rest5Clients.ElasticsearchConnectionManagerCallback;
+import static org.springframework.data.elasticsearch.client.elc.rest5_client.Rest5Clients.ElasticsearchHttpClientConfigurationCallback;
 
 @Slf4j
 @Configuration
@@ -40,6 +32,12 @@ import static org.elasticsearch.client.RestClientBuilder.*;
         )
 })
 public class ElasticsearchConfiguration extends org.springframework.data.elasticsearch.client.elc.ElasticsearchConfiguration {
+
+    private static final String ACCEPT_HEADER = "Accept";
+    private static final String CONTENT_TYPE_HEADER = "Content-Type";
+    private static final String GENERIC_JSON_MEDIA_TYPE = "application/json";
+    private static final String GENERIC_NDJSON_MEDIA_TYPE = "application/x-ndjson";
+    private static final String NDJSON_MEDIA_TYPE_SUFFIX = "x-ndjson";
 
     private final DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
 
@@ -103,8 +101,8 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
             }
         }
 
-        clientBuilder.withClientConfigurer(ElasticsearchClients.ElasticsearchHttpClientConfigurationCallback.from(this::configureHttpAsyncClientBuilder))
-                .withClientConfigurer(ElasticsearchClients.ElasticsearchRestClientConfigurationCallback.from(this::configureRestClientBuilder));
+        clientBuilder.withClientConfigurer(ElasticsearchHttpClientConfigurationCallback.from(this::configureHttpAsyncClientBuilder))
+                .withClientConfigurer(ElasticsearchConnectionManagerCallback.from(this::configureConnectionManager));
 
         long connectionTimeout = elasticsearchProperties.getConnectionTimeout();
         long socketTimeout = elasticsearchProperties.getSocketTimeout();
@@ -127,68 +125,54 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
         return clientBuilder.build();
     }
 
-    @NotNull
-    @Override
-    public JsonpMapper jsonpMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeJsonSerializer());
-        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeJsonDeserializer());
-        mapper.registerModule(javaTimeModule);
-        return new JacksonJsonpMapper(mapper);
-    }
-
-    protected NHttpClientConnectionManager configureConnectionManager() throws IOReactorException {
-        return null;
-    }
-
     protected HttpAsyncClientBuilder configureHttpAsyncClientBuilder(HttpAsyncClientBuilder httpAsyncClientBuilder) {
-        NHttpClientConnectionManager connectionManager;
         int threadCount = elasticsearchProperties.getIoThreadCount();
-        int defaultMaxConnectionPerRoute = elasticsearchProperties.getDefaultMaxConnectionsPerHost();
-        int totalConnections = elasticsearchProperties.getMaxConnections();
-
-        try {
-            connectionManager = configureConnectionManager();
-        } catch (IOReactorException e) {
-            throw new IllegalStateException("Could not initialize IO reactor", e);
-        }
 
         if (threadCount <= 0) {
-            threadCount = getDefaultMaxIoThreadCount();
-        }
-
-        if (defaultMaxConnectionPerRoute <= 0) {
-            defaultMaxConnectionPerRoute = DEFAULT_MAX_CONN_PER_ROUTE;
-        }
-
-        if (totalConnections <= 0) {
-            totalConnections = DEFAULT_MAX_CONN_TOTAL;
+            threadCount = IOReactorConfig.DEFAULT.getIoThreadCount();
         }
 
         IOReactorConfig config = IOReactorConfig.custom()
                 .setIoThreadCount(threadCount)
                 .build();
 
-        httpAsyncClientBuilder
-                .setDefaultIOReactorConfig(config)
-                .setMaxConnPerRoute(defaultMaxConnectionPerRoute)
-                .setMaxConnTotal(totalConnections)
-                // these values are validated in PoolEntry PoolingNHttpClientConnectionManager respectively
-                .setConnectionTimeToLive(elasticsearchProperties.getConnectionTtl(), elasticsearchProperties.getConnectionTtlUnit());
+        httpAsyncClientBuilder.setIOReactorConfig(config);
 
-        if (connectionManager != null) {
-            httpAsyncClientBuilder.setConnectionManager(connectionManager);
+        if (elasticsearchProperties.isUseGenericJsonMediaType()) {
+            httpAsyncClientBuilder.addRequestInterceptorLast((request, entity, context) -> {
+                request.setHeader(ACCEPT_HEADER, GENERIC_JSON_MEDIA_TYPE);
+                if (request.containsHeader(CONTENT_TYPE_HEADER)) {
+                    String contentType = request.getFirstHeader(CONTENT_TYPE_HEADER).getValue();
+                    request.setHeader(CONTENT_TYPE_HEADER, contentType.contains(NDJSON_MEDIA_TYPE_SUFFIX)
+                            ? GENERIC_NDJSON_MEDIA_TYPE
+                            : GENERIC_JSON_MEDIA_TYPE);
+                } else if (entity != null) {
+                    request.setHeader(CONTENT_TYPE_HEADER, GENERIC_JSON_MEDIA_TYPE);
+                }
+            });
         }
 
         return httpAsyncClientBuilder;
     }
 
-    protected RestClientBuilder configureRestClientBuilder(RestClientBuilder restClientBuilder) {
-        return restClientBuilder;
+    protected PoolingAsyncClientConnectionManagerBuilder configureConnectionManager(
+            PoolingAsyncClientConnectionManagerBuilder connectionManagerBuilder) {
+        int maxPerRoute = elasticsearchProperties.getDefaultMaxConnectionsPerHost();
+        int maxTotal = elasticsearchProperties.getMaxConnections();
+
+        connectionManagerBuilder
+                .setMaxConnPerRoute(maxPerRoute > 0 ? maxPerRoute : DEFAULT_MAX_CONN_PER_ROUTE)
+                .setMaxConnTotal(maxTotal > 0 ? maxTotal : DEFAULT_MAX_CONN_TOTAL);
+
+        if (elasticsearchProperties.getConnectionTtl() > 0 && elasticsearchProperties.getConnectionTtlUnit() != null) {
+            connectionManagerBuilder.setConnectionTimeToLive(TimeValue.of(
+                    elasticsearchProperties.getConnectionTtl(),
+                    elasticsearchProperties.getConnectionTtlUnit()));
+        }
+
+        return connectionManagerBuilder;
     }
+
 
     private boolean hasCredentials() {
         return elasticsearchProperties.getUsername() != null && !elasticsearchProperties.getUsername().isBlank() &&

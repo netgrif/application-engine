@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+          xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
     <id>wst_usersRef</id>
     <initials>WSU</initials>
     <title>WorkflowAuthorizationService test</title>
@@ -20,36 +20,44 @@
         <id>finish_neg_role</id>
         <name>finish neg role</name>
     </role>
-    <data type="userList">
+    <role>
+        <id>view_pos_role</id>
+        <name>view pos role</name>
+    </role>
+    <data type="actorList">
         <id>assign_pos_ul</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>assign_neg_ul</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>delegate_pos_ul</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>delegate_neg_ul</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>cancel_pos_ul</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>cancel_neg_ul</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>finish_pos_ul</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>finish_neg_ul</id>
+        <title/>
+    </data>
+    <data type="actorList">
+        <id>view_pos_ul</id>
         <title/>
     </data>
     <data type="text">
@@ -90,54 +98,66 @@
                 <finish>false</finish>
             </logic>
         </roleRef>
-        <userRef>
+        <roleRef>
+            <id>view_pos_role</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <actorRef>
             <id>assign_pos_ul</id>
             <logic>
                 <assign>true</assign>
             </logic>
-        </userRef>
-        <userRef>
+        </actorRef>
+        <actorRef>
             <id>assign_neg_ul</id>
             <logic>
                 <assign>false</assign>
             </logic>
-        </userRef>
-        <userRef>
+        </actorRef>
+        <actorRef>
             <id>delegate_pos_ul</id>
             <logic>
                 <delegate>true</delegate>
             </logic>
-        </userRef>
-        <userRef>
+        </actorRef>
+        <actorRef>
             <id>delegate_neg_ul</id>
             <logic>
                 <delegate>false</delegate>
             </logic>
-        </userRef>
-        <userRef>
+        </actorRef>
+        <actorRef>
             <id>cancel_pos_ul</id>
             <logic>
                 <cancel>true</cancel>
             </logic>
-        </userRef>
-        <userRef>
+        </actorRef>
+        <actorRef>
             <id>cancel_neg_ul</id>
             <logic>
                 <cancel>false</cancel>
             </logic>
-        </userRef>
-        <userRef>
+        </actorRef>
+        <actorRef>
             <id>finish_pos_ul</id>
             <logic>
                 <finish>true</finish>
             </logic>
-        </userRef>
-        <userRef>
+        </actorRef>
+        <actorRef>
             <id>finish_neg_ul</id>
             <logic>
                 <finish>false</finish>
             </logic>
-        </userRef>
+        </actorRef>
+        <actorRef>
+            <id>view_pos_ul</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </actorRef>
         <dataRef>
             <id>text</id>
             <logic>

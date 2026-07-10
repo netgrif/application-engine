@@ -1,34 +1,38 @@
 package com.netgrif.application.engine.objects.elastic.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
-@AllArgsConstructor
 public abstract class DataField implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 2035013102812591274L;
 
-    public String[] fulltextValue;
+    protected List<String> fulltextValue = new ArrayList<>();
 
     DataField(DataField dataField) {
-        this.fulltextValue = dataField.fulltextValue == null ? null : Arrays.copyOf(dataField.fulltextValue, dataField.fulltextValue.length);
+        this(dataField.fulltextValue == null ? new ArrayList<>() : new ArrayList<>(dataField.fulltextValue));
     }
 
     DataField(String fulltextValue) {
-        this.fulltextValue = new String[1];
-        this.fulltextValue[0] = fulltextValue;
+        this(fulltextValue == null ? new ArrayList<>() : List.of(fulltextValue));
+    }
+
+    DataField(List<String> fulltextValue) {
+        if (fulltextValue != null) {
+            this.fulltextValue.addAll(fulltextValue);
+        }
     }
 
     public Object getValue() {
-        return (fulltextValue != null && fulltextValue.length > 0) ? fulltextValue[0] : null;
+        return (!fulltextValue.isEmpty()) ? fulltextValue.getFirst() : null;
     }
 }

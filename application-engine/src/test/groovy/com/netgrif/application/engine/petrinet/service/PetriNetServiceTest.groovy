@@ -1,11 +1,15 @@
 package com.netgrif.application.engine.petrinet.service
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.auth.domain.User
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
-import com.netgrif.application.engine.objects.auth.domain.*
+import com.netgrif.application.engine.objects.auth.domain.ActorRef
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
+import com.netgrif.application.engine.objects.auth.domain.Authority
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
@@ -16,6 +20,8 @@ import com.netgrif.application.engine.objects.petrinet.domain.version.Version
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.application.engine.petrinet.params.DeletePetriNetParams
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -24,7 +30,6 @@ import com.netgrif.application.engine.workflow.domain.repositories.TaskRepositor
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,10 +39,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-import static org.junit.jupiter.api.Assertions.assertFalse
-import static org.junit.jupiter.api.Assertions.assertNotNull
-import static org.junit.jupiter.api.Assertions.assertThrows
-import static org.junit.jupiter.api.Assertions.assertTrue
+import static org.junit.jupiter.api.Assertions.*
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -94,13 +96,12 @@ class PetriNetServiceTest {
     void setup() {
         testHelper.truncateDbs()
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        importHelper.createUser(new User(firstName: "Customer", lastName: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new User(firstName: "Customer", lastName: "User", username: CUSTOMER_USER_MAIL, email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
     }
 
     @Test
-    @Disabled
     void processImportAndDelete() {
         long processRoleCount = processRoleRepository.count()
         long processCount = petriNetRepository.count()
@@ -129,7 +130,7 @@ class PetriNetServiceTest {
         assert user.get().processRoles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
 
-        petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
+        petriNetService.deletePetriNet(new DeletePetriNetParams(testNet.stringId, superCreator.getLoggedSuper()))
         assert petriNetRepository.count() == processCount
         Thread.sleep(5000)
         assert elasticPetriNetRepository.findById(testNet.stringId).isEmpty()
@@ -220,7 +221,7 @@ class PetriNetServiceTest {
     }
 
     @Test
-    void testVersionActiveOnDelete() {
+    void testVersionDefaultOnDelete() {
         ImportPetriNetEventOutcome outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("1"), superCreator.loggedSuper)
         PetriNet processV1 = outcome.getNet()
         outcome = importProcess(VERSION_PROCESS_FILE_FORMAT.formatted("2"), superCreator.loggedSuper)
@@ -232,24 +233,23 @@ class PetriNetServiceTest {
         assertFalse(petriNetService.get(processV2.getObjectId()).defaultVersion)
         assertTrue(petriNetService.get(processV3.getObjectId()).defaultVersion)
 
-        petriNetService.deletePetriNet(processV2.getStringId(), superCreator.loggedSuper)
+        petriNetService.deletePetriNet(new DeletePetriNetParams(processV2.getStringId(), superCreator.loggedSuper))
 
         assertTrue(petriNetRepository.findById(processV2.getStringId()).isEmpty())
         assertFalse(petriNetService.get(processV1.getObjectId()).defaultVersion)
         assertTrue(petriNetService.get(processV3.getObjectId()).defaultVersion)
 
-        petriNetService.deletePetriNet(processV3.getStringId(), superCreator.loggedSuper)
+        petriNetService.deletePetriNet(new DeletePetriNetParams(processV3.getStringId(), superCreator.loggedSuper))
 
         assertTrue(petriNetRepository.findById(processV3.getStringId()).isEmpty())
         assertTrue(petriNetService.get(processV1.getObjectId()).defaultVersion)
 
-        petriNetService.deletePetriNet(processV1.getStringId(), superCreator.loggedSuper)
+        petriNetService.deletePetriNet(new DeletePetriNetParams(processV1.getStringId(), superCreator.loggedSuper))
 
         assertTrue(petriNetRepository.findById(processV1.getStringId()).isEmpty())
     }
 
     @Test
-    @Disabled
     void processSearch() {
         long processCount = petriNetRepository.count()
 
@@ -310,6 +310,6 @@ class PetriNetServiceTest {
     }
 
     private ImportPetriNetEventOutcome importProcess(String filePath, LoggedUser author) {
-        return petriNetService.importPetriNet(stream(filePath), VersionType.MAJOR, author)
+        return petriNetService.importPetriNet(new ImportPetriNetParams(stream(filePath), VersionType.MAJOR, author))
     }
 }

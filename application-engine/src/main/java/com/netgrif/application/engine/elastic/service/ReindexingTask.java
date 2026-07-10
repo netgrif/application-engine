@@ -28,17 +28,16 @@ public class ReindexingTask {
 
     private static final Logger log = LoggerFactory.getLogger(ReindexingTask.class);
 
-    private int pageSize;
-    private TaskRepository taskRepository;
-    private ElasticCaseRepository elasticCaseRepository;
-    private IElasticCaseService elasticCaseService;
-    private IElasticTaskService elasticTaskService;
-    private IElasticCaseMappingService caseMappingService;
-    private IElasticTaskMappingService taskMappingService;
-    private IWorkflowService workflowService;
-    private DataConfigurationProperties.ElasticsearchProperties elasticsearchProperties;
+    private final int pageSize;
+    private final TaskRepository taskRepository;
+    private final ElasticCaseRepository elasticCaseRepository;
+    private final IElasticCaseService elasticCaseService;
+    private final IElasticTaskService elasticTaskService;
+    private final IElasticCaseMappingService caseMappingService;
+    private final IElasticTaskMappingService taskMappingService;
+    private final IWorkflowService workflowService;
     private LocalDateTime lastRun;
-    private IElasticIndexService elasticIndexService;
+    private final IElasticIndexService elasticIndexService;
 
     @Autowired
     public ReindexingTask(
@@ -60,19 +59,25 @@ public class ReindexingTask {
         this.caseMappingService = caseMappingService;
         this.taskMappingService = taskMappingService;
         this.workflowService = workflowService;
-        this.elasticsearchProperties = elasticsearchProperties;
-        this.pageSize = elasticsearchProperties.getReindexExecutor().getSize();
+        int configuredPageSize = elasticsearchProperties.getReindexExecutor().getSize();
+        if (configuredPageSize <= 0) {
+            throw new IllegalArgumentException("netgrif.engine.data.elasticsearch.reindex-executor.size must be > 0");
+        }
+        this.pageSize = configuredPageSize;
         this.elasticIndexService = elasticIndexService;
 
         lastRun = LocalDateTime.now();
-        if (this.elasticsearchProperties.getReindexFrom() != null) {
-            lastRun = lastRun.minus(this.elasticsearchProperties.getReindexFrom());
+        if (elasticsearchProperties.getReindexFrom() != null) {
+            if (elasticsearchProperties.getReindexFrom().isNegative()) {
+                throw new IllegalArgumentException("netgrif.engine.data.elasticsearch.reindex-from must be non-negative");
+            }
+            lastRun = lastRun.minus(elasticsearchProperties.getReindexFrom());
         }
     }
 
     @Scheduled(cron = "#{springElasticsearchReindex}")
     public void reindex() {
-        log.info("Reindexing stale cases: started reindexing after " + lastRun);
+        log.info("Reindexing stale cases: started reindexing after {}", lastRun);
 
         elasticIndexService.bulkIndex(false, lastRun, null, null);
 
@@ -84,7 +89,7 @@ public class ReindexingTask {
     }
 
     private void reindexPage(Predicate predicate, int page, long numOfPages, boolean forced) {
-        log.info("Reindexing " + (page + 1) + " / " + numOfPages);
+        log.info("Reindexing {} / {}", page + 1, numOfPages);
         Page<Case> cases = this.workflowService.search(predicate, PageRequest.of(page, pageSize));
 
         for (Case aCase : cases) {

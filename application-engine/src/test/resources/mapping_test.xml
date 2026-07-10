@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+        xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
     <id>test</id>
     <initials>TST</initials>
     <title>Test</title>
@@ -75,7 +75,7 @@
         <id>25</id>
         <title name="alarm">Is a burglar alarm fitted and used?</title>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>27</id>
         <title name="property_owner">Property owner</title>
         <values>1</values>

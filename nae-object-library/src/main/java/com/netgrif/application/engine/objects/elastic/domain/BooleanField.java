@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public abstract class BooleanField extends DataField {
 
-    public Boolean booleanValue;
+    protected Boolean booleanValue;
 
     public BooleanField(BooleanField field) {
         super(field);
@@ -24,6 +24,6 @@ public abstract class BooleanField extends DataField {
 
     @Override
     public Object getValue() {
-        return booleanValue;
+        return this.booleanValue;
     }
 }

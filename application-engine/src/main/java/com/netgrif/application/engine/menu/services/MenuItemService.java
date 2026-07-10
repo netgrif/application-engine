@@ -25,6 +25,9 @@ import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner;
 import com.netgrif.application.engine.startup.runner.FilterRunner;
 import com.netgrif.application.engine.startup.runner.MenuProcessRunner;
+import com.netgrif.application.engine.workflow.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.params.DeleteCaseParams;
+import com.netgrif.application.engine.workflow.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -264,18 +267,21 @@ public class MenuItemService implements IMenuItemService {
         }
         List<Case> casesToSave = new ArrayList<>();
 
-        List<String> parentIdList = MenuItemUtils.getCaseIdsFromCaseRef(itemCase, MenuItemConstants.FIELD_PARENT_ID);
-        if (parentIdList != null && !parentIdList.isEmpty()) {
-            Case oldParent = removeChildItemFromParent(parentIdList.get(0), itemCase);
+        List<String> oldParentIdList = MenuItemUtils.getCaseIdsFromCaseRef(itemCase, MenuItemConstants.FIELD_PARENT_ID);
+        Case newParent = getOrCreateFolderItem(destUri);
+
+        String oldParentId = oldParentIdList != null && !oldParentIdList.isEmpty() ? oldParentIdList.getFirst() : null;
+        boolean parentChanged = !Objects.equals(oldParentId, newParent != null ? newParent.getStringId() : null);
+
+        if (parentChanged && oldParentId != null) {
+            Case oldParent = removeChildItemFromParent(oldParentId, itemCase);
             casesToSave.add(oldParent);
         }
-
-        Case newParent = getOrCreateFolderItem(destUri);
-        if (newParent != null) {
+        if (parentChanged && newParent != null) {
             itemCase.getDataField(MenuItemConstants.FIELD_PARENT_ID).setValue(List.of(newParent.getStringId()));
             appendChildCaseIdInMemory(newParent, itemCase.getStringId());
             casesToSave.add(newParent);
-        } else {
+        } else if (newParent == null) {
             itemCase.getDataField(MenuItemConstants.FIELD_PARENT_ID).setValue(null);
         }
 
@@ -504,7 +510,9 @@ public class MenuItemService implements IMenuItemService {
     }
 
     protected void removeView(Case viewCase) {
-        workflowService.deleteCase(viewCase);
+        workflowService.deleteCase(DeleteCaseParams.with()
+                .useCase(viewCase)
+                .build());
         log.trace("Removed configuration view case [{}].", viewCase.getStringId());
     }
 
@@ -667,7 +675,12 @@ public class MenuItemService implements IMenuItemService {
     }
 
     protected Case createCase(String identifier, String title, LoggedUser loggedUser) {
-        return workflowService.createCaseByIdentifier(identifier, title, "", loggedUser).getCase();
+        return workflowService.createCase(CreateCaseParams.with()
+                .processIdentifier(identifier)
+                .title(title)
+                .color("")
+                .author(loggedUser)
+                .build()).getCase();
     }
 
     protected Case setData(Case useCase, String transId, Map<String, Map<String, Object>> dataSet) {
@@ -685,9 +698,15 @@ public class MenuItemService implements IMenuItemService {
         AbstractUser loggedUser = userService.getLoggedOrSystem();
         String taskId = MenuItemUtils.findTaskIdInCase(useCase, transId);
         Task task = taskService.findOne(taskId);
-        task = taskService.assignTask(task, loggedUser).getTask();
+        task = taskService.assignTask(TaskParams.with()
+                .task(task)
+                .user(loggedUser)
+                .build()).getTask();
         task = dataService.setData(task, ImportHelper.populateDataset((Map) dataSet)).getTask();
-        return taskService.finishTask(task, loggedUser).getCase();
+        return taskService.finishTask(TaskParams.with()
+                .task(task)
+                .user(loggedUser)
+                .build()).getCase();
     }
 
     protected String nameFromPath(String path) {

@@ -3,6 +3,8 @@ package com.netgrif.application.engine.adapter.spring.elastic.domain;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 
+import java.util.List;
+
 import static org.springframework.data.elasticsearch.annotations.FieldType.Double;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
@@ -19,7 +21,7 @@ public class NumberField extends com.netgrif.application.engine.objects.elastic.
 
     @Override
     @Field(type = Text)
-    public String[] getFulltextValue() {
+    public List<String> getFulltextValue() {
         return super.getFulltextValue();
     }
 

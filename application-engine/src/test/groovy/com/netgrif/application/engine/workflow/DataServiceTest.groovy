@@ -1,22 +1,20 @@
 package com.netgrif.application.engine.workflow
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.objects.petrinet.domain.DataGroup
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedField
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedField
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,6 +22,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.node.ObjectNode
 
 import java.lang.reflect.Method
 
@@ -61,24 +61,39 @@ class DataServiceTest {
     @BeforeEach
     void beforeAll() {
         testHelper.truncateDbs()
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_referenced.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/data_service_referenced.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert net.getNet() != null
 
-        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_taskref.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/data_service_taskref.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert net.getNet() != null
         this.net = net.getNet()
 
-        ImportPetriNetEventOutcome agreementNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/agreement.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome agreementNet = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/agreement.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
         assert agreementNet.getNet() != null
         this.agreementNet = agreementNet.getNet()
 
-        ImportPetriNetEventOutcome netoutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/test_setData.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome netoutcome = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/test_setData.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build());
         assert netoutcome.getNet() != null;
         this.setDataNet = netoutcome.getNet();
     }
 
     @Test
-    @Disabled
     void testTaskrefedFileFieldAction() {
         def aCase = importHelper.createCase("Case", this.net)
         assert aCase != null
@@ -94,12 +109,15 @@ class DataServiceTest {
 
         MockMultipartFile file = new MockMultipartFile("data", "filename.txt", "text/plain", "hello world".getBytes())
 
-        ChangedFieldByFileFieldContainer changes = dataService.saveFile(taskId, fileField.stringId, file)
-        assert changes.changedFields.size() == 1
         LocalisedField textField = findField(datagroups, TEXT_FIELD_TITLE)
-        assert changes.changedFields.containsKey(textField.stringId)
-        assert changes.changedFields.get(textField.stringId).containsKey("value")
-        assert changes.changedFields.get(textField.stringId).get("value") == "OK"
+        SetDataEventOutcome changes = dataService.saveFile(fileField.parentTaskId, fileField.stringId, file)
+        SetDataEventOutcome changedOutcome = changes.outcomes.find { outcome ->
+            outcome instanceof SetDataEventOutcome && outcome.changedFields.containsKey(textField.stringId)
+        } as SetDataEventOutcome
+        assert changedOutcome != null
+        assert changedOutcome.changedFields.size() == 1
+        assert changedOutcome.changedFields.get(textField.stringId).attributes.containsKey("value")
+        assert changedOutcome.changedFields.get(textField.stringId).attributes.get("value") == "OK"
     }
 
     LocalisedField findField(List<DataGroup> datagroups, String fieldTitle) {
@@ -202,6 +220,59 @@ class DataServiceTest {
         ] as Map)).getCase()
 
         assert caze.getDataField("enumeration_0").getChoices().size() == 2;
+    }
+
+    @Test
+    void testSetDataEnumerationNullValue() {
+        def aCase = importHelper.createCase("test set data enumeration null value", setDataNet)
+
+        def taskId = importHelper.getTaskId("", aCase.stringId)
+        def caze = dataService.setData(taskId, ImportHelper.populateDataset([
+                "enumeration_0": [
+                        "type" : "enumeration",
+                        "value": null
+                ]
+        ] as Map)).getCase()
+
+        assert caze.getDataField("enumeration_0").getValue() == null
+    }
+
+    @Test
+    void testSetDataNumberEmptyStringAndNullValue() {
+        def aCase = importHelper.createCase("test set data number empty string and null value", setDataNet)
+
+        def taskId = importHelper.getTaskId("", aCase.stringId)
+        def caze = dataService.setData(taskId, ImportHelper.populateDatasetWithObject([
+                "number_0": [
+                        "type" : "number",
+                        "value": 12.34
+                ]
+        ] as Map)).getCase()
+        assert caze.getDataField("number_0").getValue() == 12.34d
+
+        caze = dataService.setData(taskId, ImportHelper.populateDataset([
+                "number_0": [
+                        "type" : "number",
+                        "value": ""
+                ]
+        ] as Map)).getCase()
+        assert caze.getDataField("number_0").getValue() == null
+
+        caze = dataService.setData(taskId, ImportHelper.populateDatasetWithObject([
+                "number_0": [
+                        "type" : "number",
+                        "value": 56.78
+                ]
+        ] as Map)).getCase()
+        assert caze.getDataField("number_0").getValue() == 56.78d
+
+        caze = dataService.setData(taskId, ImportHelper.populateDataset([
+                "number_0": [
+                        "type" : "number",
+                        "value": null
+                ]
+        ] as Map)).getCase()
+        assert caze.getDataField("number_0").getValue() == null
     }
 
     @Test

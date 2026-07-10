@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -13,19 +13,19 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public abstract class FieldWithAllowedNetsField extends DataField {
 
-    public String[] allowedNets;
+    protected List<String> allowedNets;
 
     public FieldWithAllowedNetsField(FieldWithAllowedNetsField field) {
         super(field);
-        this.allowedNets = field.allowedNets == null ? null : Arrays.copyOf(field.allowedNets, field.allowedNets.length);
+        this.allowedNets = field.allowedNets == null ? null : new ArrayList<>(field.allowedNets);
     }
 
-    public FieldWithAllowedNetsField(String fullTextValue, String[] allowedNets) {
+    public FieldWithAllowedNetsField(String fullTextValue, List<String> allowedNets) {
         super(fullTextValue);
         this.allowedNets = allowedNets;
     }
 
-    public FieldWithAllowedNetsField(String[] fullTextValue, String[] allowedNets) {
+    public FieldWithAllowedNetsField(List<String> fullTextValue, List<String> allowedNets) {
         super(fullTextValue);
         this.allowedNets = allowedNets;
     }

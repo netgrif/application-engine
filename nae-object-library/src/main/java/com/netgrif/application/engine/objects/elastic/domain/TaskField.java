@@ -6,15 +6,16 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public abstract class TaskField extends DataField {
 
-    public String[] taskRefValue;
+    public List<String> taskRefValue;
 
-    public TaskField(String[] values) {
+    public TaskField(List<String> values) {
         super(values);
         this.taskRefValue = values;
     }
@@ -24,6 +25,6 @@ public abstract class TaskField extends DataField {
         if (taskRefValue == null) {
             return new ArrayList<>();
         }
-        return new ArrayList<>(Arrays.asList(taskRefValue));
+        return new ArrayList<>(taskRefValue);
     }
 }

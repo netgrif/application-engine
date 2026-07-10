@@ -23,7 +23,7 @@ public class Executor {
 
     public Executor(@Value("${netgrif.engine.data.elasticsearch.executors.size:500}") long maxSize, @Value("${netgrif.engine.data.elasticsearch.executors.timeout:5}") long timeout) {
         this.executors = Collections.synchronizedMap(new ExecutorMaxSizeHashMap(maxSize, timeout));
-        log.info("Executor created, thread capacity: " + maxSize);
+        log.info("Executor created, thread capacity: {}", maxSize);
     }
 
     @PreDestroy
@@ -34,11 +34,11 @@ public class Executor {
                 if (!executor.awaitTermination(EXECUTOR_TIMEOUT, TimeUnit.SECONDS)) {
                     executor.shutdownNow();
                     if (!executor.awaitTermination(EXECUTOR_TIMEOUT, TimeUnit.SECONDS)) {
-                        log.error("Executor " + id + " did not terminate");
+                        log.error("Executor {} did not terminate", id);
                     }
                 }
             } catch (InterruptedException e) {
-                log.error("Thread (executor " + id + ") was interrupted while waiting for termination: ", e);
+                log.error("Thread (executor {}) was interrupted while waiting for termination: ", id, e);
                 executor.shutdownNow();
             }
         });
@@ -59,7 +59,7 @@ public class Executor {
             }
             executorService.execute(task);
         } catch (RuntimeException e) {
-            log.error("Elastic executor was killed before finish: " + e.getMessage());
+            log.error("Elastic executor was killed before finish: {}", e.getMessage(), e);
         }
     }
 }

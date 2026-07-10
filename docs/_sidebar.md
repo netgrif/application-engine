@@ -10,7 +10,7 @@
     * [Filter](search/filter.md)
     * [Import / Export](search/filter_import_export.md)
 * [Permissions]()
-    * [User list](roles/userlist.md)
+    * [Actor list](roles/actorlist.md)
     * [Permissions](roles/permissions.md)
     * [Assigned user policy](roles/assigned_user_policy.md)
 * [Views]()

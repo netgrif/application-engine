@@ -4,6 +4,7 @@ import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import groovy.util.logging.Slf4j
@@ -25,34 +26,39 @@ class ActionMigration {
     private UserService userService;
 
     void migrateActions(String petriNetPath, Pageable pageable = Pageable.unpaged()) {
-        InputStream netStream = new ClassPathResource(petriNetPath).inputStream
-        ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(netStream, VersionType.MAJOR, ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
-        List<PetriNet> oldPetriNets
+        try (InputStream netStream = new ClassPathResource(petriNetPath).inputStream) {
+            ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                    .xmlFile(netStream)
+                    .releaseType(VersionType.MAJOR)
+                    .author(ActorTransformer.toLoggedUser(userService.getLoggedOrSystem()))
+                    .build())
+            List<PetriNet> oldPetriNets
 
-        if(newPetriNet.getNet() != null) {
-            String message = "Petri net from file [" + petriNetPath + "] was not imported"
-            log.error(message)
-            throw new IllegalArgumentException(message)
-        } else {
-            oldPetriNets = petriNetService.getByIdentifier(newPetriNet.getNet().importId, pageable)
-                    .stream().filter({ net -> (net.version != newPetriNet.getNet().version)})
-                    .collect(Collectors.toList())
-        }
+            if (newPetriNet.getNet() == null) {
+                String message = "Petri net from file [" + petriNetPath + "] was not imported"
+                log.error(message)
+                throw new IllegalArgumentException(message)
+            } else {
+                oldPetriNets = petriNetService.getByIdentifier(newPetriNet.getNet().importId, pageable)
+                        .stream().filter({ net -> (net.version != newPetriNet.getNet().version)})
+                        .collect(Collectors.toList())
+            }
 
-        if(oldPetriNets.size() == 0){
-            String message = "Older version of Petri net with ID [" + newPetriNet.getNet().importId + "] is not present in MongoDB."
-            log.error(message)
-            throw new IllegalArgumentException(message)
-        } else {
-            oldPetriNets.each {net ->
-                migrateDataSetActions(newPetriNet.getNet(), net)
-                migrateDataRefActions(newPetriNet.getNet(), net)
-                petriNetService.save(net)
+            if (oldPetriNets.size() == 0){
+                String message = "Older version of Petri net with ID [" + newPetriNet.getNet().importId + "] is not present in MongoDB."
+                log.error(message)
+                throw new IllegalArgumentException(message)
+            } else {
+                oldPetriNets.each {net ->
+                    migrateDataSetActions(newPetriNet.getNet(), net)
+                    migrateDataRefActions(newPetriNet.getNet(), net)
+                    petriNetService.save(net)
+                }
             }
         }
     }
 
-    private void migrateDataSetActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
+    private static void migrateDataSetActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
         newPetriNet.dataSet.each { key, data ->
             if (data.events != null && data.events.size() > 0) {
                 oldPetriNet.dataSet[key].events = data.events
@@ -60,7 +66,7 @@ class ActionMigration {
         }
     }
 
-    private void migrateDataRefActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
+    private static void migrateDataRefActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
         newPetriNet.transitions.each { transKey, trans ->
             trans.dataSet.each { dataKey, data ->
                 if (data.events != null && data.events.size() > 0) {
