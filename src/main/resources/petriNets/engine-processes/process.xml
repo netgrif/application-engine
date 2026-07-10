@@ -69,8 +69,8 @@
 			new com.netgrif.application.engine.petrinet.domain.I18nString(
 				"This process version will be archived, existing instances will continue their execution, new instances could not be created.",
 				[
-						sk: "todo 2453",
-						de: "todo 2453"
+						sk: "Táto verzia procesu bude archivovaná, existujúce inštancie budú pokračovať v ich vykonávaní, nové inštancie nebude možné vytvoriť.",
+						de: "Diese Prozessversion wird archiviert, bestehende Instanzen werden weiterhin ausgeführt, neue Instanzen konnten nicht erstellt werden."
 				]
 			)
 		</init>
@@ -82,8 +82,8 @@
 			new com.netgrif.application.engine.petrinet.domain.I18nString(
 					"Finishing this task will create a copy of this process with increased version.",
 					[
-							sk: "todo 2453",
-							de: "todo 2453"
+							sk: "Dokončením tejto úlohy sa vytvorí kópia tohto procesu so zvýšenou verziou.",
+							de: "Durch den Abschluss dieser Aufgabe wird eine Kopie dieses Prozesses mit erhöhter Versionsnummer erstellt."
 					]
 			)
 		</init>
@@ -95,8 +95,8 @@
 			new com.netgrif.application.engine.petrinet.domain.I18nString(
 					"This will permanently delete this process version and all its instances and tasks.",
 					[
-							sk: "todo 2453",
-							de: "todo 2453"
+							sk: "Týmto sa natrvalo odstráni táto verzia procesu a všetky jej inštancie a úlohy.",
+							de: "Dadurch werden diese Prozessversion und alle ihre Instanzen und Aufgaben endgültig gelöscht."
 					]
 			)
 		</init>
@@ -108,8 +108,8 @@
 			new com.netgrif.application.engine.petrinet.domain.I18nString(
 					"Finishing this task will deploy the process and enable creating new instances of this process.",
 					[
-							sk: "todo 2453",
-							de: "todo 2453"
+							sk: "Dokončenie tejto úlohy nasadí proces a umožní vytvorenie nových inštancií tohto procesu.",
+							de: "Nach Abschluss dieser Aufgabe wird der Prozess bereitgestellt und die Erstellung neuer Instanzen dieses Prozesses ermöglicht."
 					]
 			)
 		</init>
@@ -209,68 +209,68 @@
 	</data>
 
 	<i18n locale="sk">
-		<i18nString name="model_title">todo 2453</i18nString>
-		<i18nString name="copy_version">todo 2453</i18nString>
-		<i18nString name="icon">todo 2453</i18nString>
-		<i18nString name="id">todo 2453</i18nString>
-		<i18nString name="log_archive">todo 2453</i18nString>
-		<i18nString name="log_delete">todo 2453</i18nString>
-		<i18nString name="log_deploy">todo 2453</i18nString>
-		<i18nString name="state">todo 2453</i18nString>
-		<i18nString name="state_draft">todo 2453</i18nString>
-		<i18nString name="state_deployed">todo 2453</i18nString>
-		<i18nString name="state_archived">todo 2453</i18nString>
-		<i18nString name="state_trash">todo 2453</i18nString>
-		<i18nString name="title">todo 2453</i18nString>
-		<i18nString name="version">todo 2453</i18nString>
-		<i18nString name="version_increment">todo 2453</i18nString>
-		<i18nString name="xml_file">todo 2453</i18nString>
-		<i18nString name="xml_text">todo 2453</i18nString>
-		<i18nString name="deploy_label">todo 2453</i18nString>
-		<i18nString name="deploy_finish">todo 2453</i18nString>
-		<i18nString name="edit_label">todo 2453</i18nString>
-		<i18nString name="form_label">todo 2453</i18nString>
-		<i18nString name="t10_label">todo 2453</i18nString>
-		<i18nString name="t10_finish">todo 2453</i18nString>
-		<i18nString name="t11_label">todo 2453</i18nString>
-		<i18nString name="t11_finish">todo 2453</i18nString>
-		<i18nString name="t4_label">todo 2453</i18nString>
-		<i18nString name="t6_label">todo 2453</i18nString>
-		<i18nString name="t9_label">todo 2453</i18nString>
-		<i18nString name="view_label">todo 2453</i18nString>
-		<i18nString name="view_finish">todo 2453</i18nString>
+		<i18nString name="model_title">Proces</i18nString>
+		<i18nString name="copy_version">Verzia kópie</i18nString>
+		<i18nString name="icon">Ikona</i18nString>
+		<i18nString name="id">Identifikátor</i18nString>
+		<i18nString name="log_archive">Log</i18nString>
+		<i18nString name="log_delete">Log</i18nString>
+		<i18nString name="log_deploy">Log nasadenia</i18nString>
+		<i18nString name="state">Stav</i18nString>
+		<i18nString name="state_draft">V návrhu</i18nString>
+		<i18nString name="state_deployed">Nasadený</i18nString>
+		<i18nString name="state_archived">Archivovaný</i18nString>
+		<i18nString name="state_trash">V koši</i18nString>
+		<i18nString name="title">Názov</i18nString>
+		<i18nString name="version">Verzia</i18nString>
+		<i18nString name="version_increment">Inkrement verzie</i18nString>
+		<i18nString name="xml_file">XML súbor</i18nString>
+		<i18nString name="xml_text">XML text</i18nString>
+		<i18nString name="deploy_label">Navrhnúť</i18nString>
+		<i18nString name="deploy_finish">Nasadiť</i18nString>
+		<i18nString name="edit_label">Upraviť</i18nString>
+		<i18nString name="form_label">Formulár</i18nString>
+		<i18nString name="t10_label">Odstrániť s inštanciami</i18nString>
+		<i18nString name="t10_finish">Odstrániť</i18nString>
+		<i18nString name="t11_label">Odstrániť</i18nString>
+		<i18nString name="t11_finish">Odstrániť</i18nString>
+		<i18nString name="t4_label">Vytvoriť novú verziu</i18nString>
+		<i18nString name="t6_label">Odstrániť</i18nString>
+		<i18nString name="t9_label">Archivovať</i18nString>
+		<i18nString name="view_label">Zobraziť</i18nString>
+		<i18nString name="view_finish">Vytvoriť</i18nString>
 	</i18n>
 	<i18n locale="de">
-		<i18nString name="model_title">todo 2453</i18nString>
-		<i18nString name="copy_version">todo 2453</i18nString>
-		<i18nString name="icon">todo 2453</i18nString>
-		<i18nString name="id">todo 2453</i18nString>
-		<i18nString name="log_archive">todo 2453</i18nString>
-		<i18nString name="log_delete">todo 2453</i18nString>
-		<i18nString name="log_deploy">todo 2453</i18nString>
-		<i18nString name="state">todo 2453</i18nString>
-		<i18nString name="state_draft">todo 2453</i18nString>
-		<i18nString name="state_deployed">todo 2453</i18nString>
-		<i18nString name="state_archived">todo 2453</i18nString>
-		<i18nString name="state_trash">todo 2453</i18nString>
-		<i18nString name="title">todo 2453</i18nString>
-		<i18nString name="version">todo 2453</i18nString>
-		<i18nString name="version_increment">todo 2453</i18nString>
-		<i18nString name="xml_file">todo 2453</i18nString>
-		<i18nString name="xml_text">todo 2453</i18nString>
-		<i18nString name="deploy_label">todo 2453</i18nString>
-		<i18nString name="deploy_finish">todo 2453</i18nString>
-		<i18nString name="edit_label">todo 2453</i18nString>
-		<i18nString name="form_label">todo 2453</i18nString>
-		<i18nString name="t10_label">todo 2453</i18nString>
-		<i18nString name="t10_finish">todo 2453</i18nString>
-		<i18nString name="t11_label">todo 2453</i18nString>
-		<i18nString name="t11_finish">todo 2453</i18nString>
-		<i18nString name="t4_label">todo 2453</i18nString>
-		<i18nString name="t6_label">todo 2453</i18nString>
-		<i18nString name="t9_label">todo 2453</i18nString>
-		<i18nString name="view_label">todo 2453</i18nString>
-		<i18nString name="view_finish">todo 2453</i18nString>
+		<i18nString name="model_title">Prozess</i18nString>
+		<i18nString name="copy_version">Version der Kopie</i18nString>
+		<i18nString name="icon">Symbol</i18nString>
+		<i18nString name="id">Kennung</i18nString>
+		<i18nString name="log_archive">Protokoll</i18nString>
+		<i18nString name="log_delete">Protokoll</i18nString>
+		<i18nString name="log_deploy">Bereitstellungsprotokoll</i18nString>
+		<i18nString name="state">Status</i18nString>
+		<i18nString name="state_draft">Entwurf</i18nString>
+		<i18nString name="state_deployed">Bereitgestellt</i18nString>
+		<i18nString name="state_archived">Archiviert</i18nString>
+		<i18nString name="state_trash">Im Papierkorb</i18nString>
+		<i18nString name="title">Titel</i18nString>
+		<i18nString name="version">Version</i18nString>
+		<i18nString name="version_increment">Versionsinkrementierung</i18nString>
+		<i18nString name="xml_file">XML-Datei</i18nString>
+		<i18nString name="xml_text">XML-Text</i18nString>
+		<i18nString name="deploy_label">Bereitstellen</i18nString>
+		<i18nString name="deploy_finish">Bereitstellen</i18nString>
+		<i18nString name="edit_label">Bearbeiten</i18nString>
+		<i18nString name="form_label">Formular</i18nString>
+		<i18nString name="t10_label">Mit Fällen löschen</i18nString>
+		<i18nString name="t10_finish">Löschen</i18nString>
+		<i18nString name="t11_label">Löschen</i18nString>
+		<i18nString name="t11_finish">Löschen</i18nString>
+		<i18nString name="t4_label">Neue Version erstellen</i18nString>
+		<i18nString name="t6_label">Löschen</i18nString>
+		<i18nString name="t9_label">Archivieren</i18nString>
+		<i18nString name="view_label">Ansehen</i18nString>
+		<i18nString name="view_finish">Erstellen</i18nString>
 	</i18n>
 	<transition>
 		<id>deploy</id>

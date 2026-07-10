@@ -710,7 +710,7 @@
 		<i18nString name="configuration_templates">Konfiguračná šablóna</i18nString>
 		<i18nString name="role_settings">Rola</i18nString>
 		<i18nString name="view_settings">Zobrazenie</i18nString>
-		<i18nString name="model_title">todo 2453</i18nString>
+		<i18nString name="model_title">Menu položka</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="icon_preview">Ikonevorschau</i18nString>
@@ -765,7 +765,7 @@
 		<i18nString name="configuration_templates">Konfigurationsvorlage</i18nString>
 		<i18nString name="role_settings">Rolle</i18nString>
 		<i18nString name="view_settings">Ansicht</i18nString>
-		<i18nString name="model_title">todo 2453</i18nString>
+		<i18nString name="model_title">Menüeintrag</i18nString>
 	</i18n>
 
 	<!-- TRANSITIONS -->

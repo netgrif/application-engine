@@ -249,7 +249,7 @@
         <i18nString name="task_filter_desc">Použi PFQL query</i18nString>
         <i18nString name="filter_settings">Filter</i18nString>
         <i18nString name="header_settings">Hlavičky</i18nString>
-        <i18nString name="model_title">todo 2453</i18nString>
+        <i18nString name="model_title">Konfigurácia zobrazenia úloh</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="hidden">Versteckt</i18nString>
@@ -282,7 +282,7 @@
         <i18nString name="task_filter_desc">Verwenden Sie PFQL Query</i18nString>
         <i18nString name="filter_settings">Filter</i18nString>
         <i18nString name="header_settings">Kopfzeilen</i18nString>
-        <i18nString name="model_title">todo 2453</i18nString>
+        <i18nString name="model_title">Aufgabenansichtskonfiguration</i18nString>
     </i18n>
 
     <transition>

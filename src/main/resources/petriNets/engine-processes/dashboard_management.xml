@@ -381,9 +381,9 @@
         <i18nString name="profile_url_desc">URL adresa na stránku profilu</i18nString>
         <i18nString name="login_url">URL prihlásenia</i18nString>
         <i18nString name="login_url_desc">URL adresa na stránku prihlásenia. Nechajte prázdne pre rozhodnutie aplikáciou.</i18nString>
-        <i18nString name="add_new_item_placeholder">todo 2453</i18nString>
-        <i18nString name="remove_new_item_placeholder">todo 2453</i18nString>
-        <i18nString name="model_title">todo 2453</i18nString>
+        <i18nString name="add_new_item_placeholder">Pridať novú položku</i18nString>
+        <i18nString name="remove_new_item_placeholder">Odstrániť položku</i18nString>
+        <i18nString name="model_title">Manažment panelu</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="dashboard_id">Dashboard-ID</i18nString>
@@ -411,9 +411,9 @@
         <i18nString name="profile_url_desc">URL-Adresse der Profilseite</i18nString>
         <i18nString name="login_url">Anmelde-URL</i18nString>
         <i18nString name="login_url_desc">URL-Adresse der Anmeldeseite. Lassen Sie leer, um durch Anwendung zu entscheiden.</i18nString>
-        <i18nString name="add_new_item_placeholder">todo 2453</i18nString>
-        <i18nString name="remove_new_item_placeholder">todo 2453</i18nString>
-        <i18nString name="model_title">todo 2453</i18nString>
+        <i18nString name="add_new_item_placeholder">Neues Element hinzufügen</i18nString>
+        <i18nString name="remove_new_item_placeholder">Element entfernen</i18nString>
+        <i18nString name="model_title">Dashboard-Verwaltung</i18nString>
     </i18n>
 
     <!-- TRANSITIONS -->
