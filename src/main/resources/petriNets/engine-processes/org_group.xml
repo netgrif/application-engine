@@ -20,8 +20,8 @@
 	<data type="text">
 		<id>group_id</id>
 		<title name="group_id">Group ID</title>
-		<placeholder name="group_id_desc">Enter group ID</placeholder>
-		<desc name="group_id_placeh">ID of organization group</desc>
+		<placeholder name="group_id_placeh">Enter group ID</placeholder>
+		<desc name="group_id_desc">ID of organization group</desc>
 		<action trigger="get">
 			id: f.group_id;
 			change id value { useCase.stringId }
