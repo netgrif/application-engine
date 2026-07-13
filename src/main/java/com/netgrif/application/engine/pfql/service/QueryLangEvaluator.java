@@ -1215,7 +1215,11 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String string = handleStringComparisonWithPlaceholders(ctx.stringComparison());
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".textValue", op.getType(), string, not));
+        String attribute = "dataSet." + fieldId + ".fulltextValue";
+        if (op.getType() == QueryLangParser.EQ || op.getType() == QueryLangParser.NEQ) {
+            attribute += ".keyword";
+        }
+        setElasticQuery(ctx, buildElasticQuery(attribute, op.getType(), string, not));
         this.searchWithElastic = true;
     }
 
@@ -1226,7 +1230,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         List<String> stringList = handleStringListComparison(ctx.inListStringComparison().stringList());
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQueryInList("dataSet." + fieldId + ".textValue", stringList, not));
+        setElasticQuery(ctx, buildElasticQueryInList("dataSet." + fieldId + ".fulltextValue", stringList, not));
         this.searchWithElastic = true;
     }
 
@@ -1239,7 +1243,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         Pair<String, String> leftAndRightStrings = handleInRangeStringComparison(ctx.inRangeStringComparison().stringRange());
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQueryInRange("dataSet." + fieldId + ".textValue", leftAndRightStrings.getFirst(),
+        setElasticQuery(ctx, buildElasticQueryInRange("dataSet." + fieldId + ".fulltextValue", leftAndRightStrings.getFirst(),
                 leftEndpointOpen, leftAndRightStrings.getSecond(), rightEndpointOpen, not));
         this.searchWithElastic = true;
     }
