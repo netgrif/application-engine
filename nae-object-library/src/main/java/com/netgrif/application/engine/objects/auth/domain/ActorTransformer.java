@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
+import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Duration;
@@ -23,6 +24,7 @@ public class ActorTransformer {
      * @param f the LoggedUserFactory implementation to be used
      */
     @Setter
+    @Getter
     private static LoggedUserFactory loggedUserFactory = () -> {
         throw new IllegalStateException("No LoggedUserFactory configured");
     };
@@ -38,6 +40,7 @@ public class ActorTransformer {
      * Sets the factory used for creating AbstractUser instances.
      **/
     @Setter
+    @Getter
     private static UserFactory userFactory = () -> {
         throw new IllegalStateException("No UserFactory configured");
     };
@@ -75,11 +78,6 @@ public class ActorTransformer {
         default AbstractUser create(LoggedUser loggedUser) {
             throw new IllegalStateException("Method is not implemented");
         }
-    }
-
-
-    public static LoggedUserFactory getLoggedUserFactory() {
-        return factory;
     }
 
     /**

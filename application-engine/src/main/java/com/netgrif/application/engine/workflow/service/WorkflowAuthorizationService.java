@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -22,7 +23,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
     private IPetriNetService petriNetService;
 
     @Override
-    public boolean canCallDelete(LoggedUser user, String caseId) {
+    public boolean canCallDelete(AbstractUser user, String caseId) {
         // TODO: impersonation user.getSelfOrImpersonated().isAdmin()
         if (user.isAdmin()) {
             return true;
@@ -41,7 +42,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
     }
 
     @Override
-    public boolean canCallCreate(LoggedUser user, String netId) {
+    public boolean canCallCreate(AbstractUser user, String netId) {
         // TODO: impersonation
         if (user.isAdmin()) {
             return true;
@@ -51,6 +52,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
         // TODO: impersonation
         return userHasAtLeastOneRolePermission(user, net, ProcessRolePermission.CREATE);
     }
+
 
     @Override
     public Boolean userHasAtLeastOneRolePermission(AbstractUser user, PetriNet net, ProcessRolePermission... permissions) {

@@ -2,10 +2,10 @@ package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.AnonymousUser;
 import com.netgrif.application.engine.adapter.spring.auth.domain.AnonymousUserRef;
+import com.netgrif.application.engine.adapter.spring.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.objects.auth.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
