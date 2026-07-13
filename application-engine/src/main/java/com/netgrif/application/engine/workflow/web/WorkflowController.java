@@ -212,7 +212,7 @@ public class WorkflowController {
     @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN') && @workflowAuthorizationService.canCallDelete(@userService.getLoggedUser(), #caseId)")
     @Operation(summary = "Delete case", security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public EntityModel<EventOutcomeWithMessage> deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
+    public EntityModel<EventOutcomeWithMessage> deleteCase(@PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8);
             DeleteCaseEventOutcome outcome;

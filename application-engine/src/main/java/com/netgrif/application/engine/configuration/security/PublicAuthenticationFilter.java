@@ -20,6 +20,7 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -39,7 +40,7 @@ public class PublicAuthenticationFilter extends NetgrifOncePerRequestFilter {
                                       SecurityConfigurationProperties securityConfigurationProperties) {
         this.anonymousUserRefService = anonymousUserRefService;
         this.authorityService = authorityService;
-        setRequestMatcher(Arrays.stream(securityConfigurationProperties.getServerPatterns()).map(AntPathRequestMatcher::new).collect(Collectors.toSet()));
+        setRequestMatcher(Arrays.stream(securityConfigurationProperties.getServerPatterns()).map(PathPatternRequestMatcher::pathPattern).collect(Collectors.toSet()));
     }
 
     @Override

@@ -22,7 +22,7 @@ public class CaseResource extends EntityModel<Case> {
     private void buildLinks() {
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
                         .methodOn(WorkflowController.class)
-                        .createCase(new CreateCaseBody(), null, LocaleContextHolder.getLocale()))
+                        .createCase(new CreateCaseBody(), LocaleContextHolder.getLocale()))
                 .withRel("create"));
     }
 }

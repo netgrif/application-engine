@@ -2,10 +2,10 @@ package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
+import com.netgrif.application.engine.adapter.spring.auth.domain.User
 import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
@@ -19,7 +19,6 @@ import com.netgrif.application.engine.objects.workflow.domain.DataField
 import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.security.service.SecurityContextService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.utils.FullPageRequest
@@ -111,7 +110,7 @@ class TaskControllerTest {
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
-        userService.saveUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(
+        def user = userService.saveUser(new User(
                 firstName: "Dummy",
                 lastName: "Netgrif",
                 username: DUMMY_USER_MAIL,
@@ -119,7 +118,7 @@ class TaskControllerTest {
                 password: "superAdminPassword",
                 state: UserState.ACTIVE,
                 authoritySet: [authorityService.getOrCreate(Authority.user), authorityService.getOrCreate(Authority.admin)] as Set<Authority>,
-                processRoles: [] as Set<ProcessRole>)
+                processRoles: [] as Set<ProcessRole>))
 
         user = userService.saveUser(user)
 
