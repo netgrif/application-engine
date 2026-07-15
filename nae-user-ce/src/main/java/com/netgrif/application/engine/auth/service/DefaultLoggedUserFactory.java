@@ -10,7 +10,6 @@ public class DefaultLoggedUserFactory implements ActorTransformer.LoggedUserFact
 
     @Override
     public LoggedUser create() {
-        LoggedUser loggedUser = new LoggedUserImpl();
-        return loggedUser;
+        return new LoggedUserImpl();
     }
 }

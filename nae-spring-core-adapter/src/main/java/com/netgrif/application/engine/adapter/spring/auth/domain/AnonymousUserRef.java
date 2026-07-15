@@ -25,7 +25,7 @@ import java.util.Set;
  * authorities, and groups.
  */
 @Data
-@Document(collection = "anonym_user")
+@Document(collection = "anonymousUserRef")
 public class AnonymousUserRef implements Serializable {
 
     /**

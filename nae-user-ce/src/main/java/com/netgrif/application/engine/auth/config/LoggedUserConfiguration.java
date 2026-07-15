@@ -1,6 +1,5 @@
-package com.netgrif.application.engine.adapter.spring.configuration;
+package com.netgrif.application.engine.auth.config;
 
-import com.netgrif.application.engine.adapter.spring.auth.service.DefaultLoggedUserFactory;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
