@@ -16,6 +16,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.querydsl.core.types.Predicate
 import groovy.util.logging.Slf4j
 import org.bson.types.ObjectId
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.FindAndReplaceOptions
 import org.springframework.data.mongodb.core.MongoTemplate
@@ -65,7 +66,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param mongoTemplate MongoTemplate to interact with MongoDB.
      * @param migrationConfigurationProperties Properties for migration configuration, including cases.
      */
-    CaseMigrationHelper(MongoTemplate mongoTemplate,
+    CaseMigrationHelper(@Qualifier("migrationMongoTemplate") MongoTemplate mongoTemplate,
                         MigrationProperties migrationProperties,
                         IPetriNetService petriNetService,
                         IElasticCaseService elasticCaseService,
