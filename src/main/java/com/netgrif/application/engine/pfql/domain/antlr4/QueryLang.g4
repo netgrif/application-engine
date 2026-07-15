@@ -107,27 +107,27 @@ processComparisons: idComparison
                   ;
 
 caseComparisons: idComparison
-               | processIdObjIdComparison
+               | processIdObjIdComparison  // todo 2466 not in FE
                | processIdentifierComparison
                | titleComparison
                | creationDateComparison
                | authorComparison
-               | placesComparison
-               | tasksStateComparison
-               | tasksUserIdComparison
+               | placesComparison // todo 2466 not in FE
+               | tasksStateComparison // todo 2466 not in FE
+               | tasksUserIdComparison // todo 2466 not in FE
                | dataValueComparison
-               | dataOptionsComparison
+               | dataOptionsComparison // todo 2466 not in FE
                ;
 
-taskComparisons: idComparison
+taskComparisons: idComparison // todo 2466 not in FE
                | transitionIdComparison
-               | titleComparison
-               | stateComparison
+               | titleComparison // todo 2466 not in FE
+               | stateComparison // todo 2466 not in FE
                | userIdComparison
-               | caseIdComparison
+               | caseIdComparison // todo 2466 not in FE
                | processIdComparison
-               | lastAssignComparison
-               | lastFinishComparison
+               | lastAssignComparison // todo 2466 not in FE
+               | lastFinishComparison // todo 2466 not in FE
                ;
 
 userComparisons: idComparison
