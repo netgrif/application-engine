@@ -63,7 +63,7 @@ public abstract class ProcessRole extends Imported {
         if (this.getProcessId() == null) {
             _id = new ProcessResourceId();
         } else {
-            _id = new ProcessResourceId(new ObjectId(this.getProcessId()));
+            _id = new ProcessResourceId(processIdentifier, new ObjectId());
         }
     }
 

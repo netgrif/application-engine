@@ -175,7 +175,7 @@ public abstract class Task implements Serializable {
 
     public Task() {
         if (this.processIdentifier != null && !this.processIdentifier.isEmpty()) {
-            this._id = new ProcessResourceId(new ObjectId(this.processIdentifier));
+            this._id = new ProcessResourceId(this.processIdentifier, new ObjectId());
         }
     }
 
@@ -187,14 +187,14 @@ public abstract class Task implements Serializable {
     public void setProcessIdentifier(String processIdentifier) {
         this.processIdentifier = processIdentifier;
         if (processIdentifier != null && !processIdentifier.isEmpty()) {
-            this._id = new ProcessResourceId(new ObjectId(processIdentifier));
+            this._id = new ProcessResourceId(processIdentifier, new ObjectId());
         }
     }
 
     public ProcessResourceId get_id() {
         if (this._id == null) {
             this._id = this.processId != null && !this.processId.isEmpty()
-                    ? new ProcessResourceId(new ObjectId(this.processId))
+                    ? new ProcessResourceId(this.processIdentifier, new ObjectId())
                     : new ProcessResourceId();
         }
         return this._id;

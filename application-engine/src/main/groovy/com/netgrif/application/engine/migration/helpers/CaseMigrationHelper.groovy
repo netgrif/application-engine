@@ -461,7 +461,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      */
     void migratePetriNet(Case useCase, PetriNet newNet, MigrationErrorPolicy errorPolicy = defaultErrorPolicy()) {
         log.debug("Starting migratePetriNet for case: ${useCase.stringId}, new net: ${newNet.stringId}")
-        ProcessResourceId newCaseId = new ProcessResourceId(newNet.getStringId(), useCase.get_id().getObjectId())
+        ProcessResourceId newCaseId = new ProcessResourceId(newNet.getIdentifier(), useCase.get_id().getObjectId())
         useCase.set_id(newCaseId)
         useCase.setPetriNetObjectId(newNet.objectId)
         log.trace("Updated petriNet reference for case: ${useCase.stringId} to net: ${newNet.stringId}")

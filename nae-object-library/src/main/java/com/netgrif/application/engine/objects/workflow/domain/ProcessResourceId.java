@@ -6,8 +6,6 @@ import org.bson.types.ObjectId;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.Date;
 import java.util.Objects;
 
@@ -25,26 +23,21 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
     // todo add example values to javadoc
 
     private ObjectId objectId;
-    private String shortProcessId;
+    private String shortProcessIdentifier;
 
     public ProcessResourceId() {
         this.objectId = new ObjectId();
-        this.shortProcessId = NONE_SHORT_ID_VALUE;
-    }
-
-    public ProcessResourceId(ObjectId processId) {
-        this.objectId = new ObjectId();
-        this.shortProcessId = generateShortProcessId(processId.toString());
+        this.shortProcessIdentifier = NONE_SHORT_ID_VALUE;
     }
 
     public ProcessResourceId(String processIdentifier, String objectId) {
         this.objectId = new ObjectId(objectId);
-        this.shortProcessId = generateShortProcessId(processIdentifier);
+        this.shortProcessIdentifier = generateShortProcessId(processIdentifier);
     }
 
     public ProcessResourceId(String processIdentifier, ObjectId objectId) {
         this.objectId = objectId;
-        this.shortProcessId = generateShortProcessId(processIdentifier);
+        this.shortProcessIdentifier = generateShortProcessId(processIdentifier);
     }
 
     public ProcessResourceId(String compositeId) {
@@ -52,12 +45,12 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
         if (parts.length != 2) {
             throw new IllegalArgumentException("Invalid composite ID format: " + compositeId);
         }
-        this.shortProcessId = parts[0];
+        this.shortProcessIdentifier = parts[0];
         this.objectId = new ObjectId(parts[1]);
     }
 
     public String getFullId() {
-        return shortProcessId + ID_SEPARATOR + objectId.toHexString();
+        return shortProcessIdentifier + ID_SEPARATOR + objectId.toHexString();
     }
 
     public String getStringId() {
@@ -123,12 +116,12 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ProcessResourceId that = (ProcessResourceId) o;
-        return Objects.equals(objectId, that.objectId) && Objects.equals(shortProcessId, that.shortProcessId);
+        return Objects.equals(objectId, that.objectId) && Objects.equals(shortProcessIdentifier, that.shortProcessIdentifier);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(objectId, shortProcessId);
+        return Objects.hash(objectId, shortProcessIdentifier);
     }
 
 }
