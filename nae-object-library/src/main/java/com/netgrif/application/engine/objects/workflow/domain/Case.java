@@ -147,7 +147,7 @@ public abstract class Case implements Serializable {
 
     public Case(PetriNet petriNet) {
         this();
-        this._id = new ProcessResourceId(petriNet.getObjectId());
+        this._id = new ProcessResourceId(petriNet.getIdentifier());
         petriNetObjectId = petriNet.getObjectId();
         processIdentifier = petriNet.getIdentifier();
         this.petriNet = petriNet;

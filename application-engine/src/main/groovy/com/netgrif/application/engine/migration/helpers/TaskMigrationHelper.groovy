@@ -268,6 +268,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
             Task oldTask = taskService.findOne(taskPair.task)
             log.trace("Updating task roles and permissions for task: ${oldTask.stringId}")
             oldTask.setProcessId(net.stringId)
+            oldTask.setProcessIdentifier(net.identifier)
             oldTask.setRoles(newTransition.roles)
             oldTask.setNegativeViewRoles(newTransition.negativeViewRoles)
             oldTask.resolveViewRoles()

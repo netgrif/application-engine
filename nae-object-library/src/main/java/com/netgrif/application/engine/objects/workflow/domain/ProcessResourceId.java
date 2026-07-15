@@ -6,6 +6,8 @@ import org.bson.types.ObjectId;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.Date;
 import java.util.Objects;
 
@@ -35,14 +37,14 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
         this.shortProcessId = generateShortProcessId(processId.toString());
     }
 
-    public ProcessResourceId(String processId, String objectId) {
+    public ProcessResourceId(String processIdentifier, String objectId) {
         this.objectId = new ObjectId(objectId);
-        this.shortProcessId = generateShortProcessId(processId);
+        this.shortProcessId = generateShortProcessId(processIdentifier);
     }
 
-    public ProcessResourceId(String processId, ObjectId objectId) {
+    public ProcessResourceId(String processIdentifier, ObjectId objectId) {
         this.objectId = objectId;
-        this.shortProcessId = generateShortProcessId(processId);
+        this.shortProcessId = generateShortProcessId(processIdentifier);
     }
 
     public ProcessResourceId(String compositeId) {
@@ -75,12 +77,12 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
         return getFullId();
     }
 
-    private static String generateShortProcessId(String processId) {
-        if (processId == null || processId.isEmpty()) {
+    private static String generateShortProcessId(String processIdentifier) {
+        if (processIdentifier == null || processIdentifier.isEmpty()) {
             return null;
         }
         try {
-            BigInteger number = new BigInteger(processId, 16);
+            BigInteger number = new BigInteger(1, processIdentifier.getBytes());
             StringBuilder shortIdBuilder = new StringBuilder();
 
             while (number.compareTo(BigInteger.ZERO) > 0) {
@@ -91,7 +93,7 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
 
             return shortIdBuilder.reverse().toString();
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid input string for encoding: " + processId, e);
+            throw new IllegalArgumentException("Invalid input string for encoding: " + processIdentifier, e);
         }
     }
 
@@ -108,7 +110,7 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
             }
             number = number.add(BigInteger.valueOf(index));
         }
-        return number.toString(16);
+        return new String(number.toByteArray());
     }
 
     @Override
