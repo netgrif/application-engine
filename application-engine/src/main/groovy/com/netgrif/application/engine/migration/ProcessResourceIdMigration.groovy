@@ -106,29 +106,41 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
                     if (petriNet.getRoles() != null && !petriNet.getRoles().isEmpty()) {
                         Map<String, ProcessRole> newValues = new LinkedHashMap<>()
                         petriNet.getRoles().each { oldRoleStringId, processRole ->
-                            ProcessResourceId oldRoleId = processRole.get_id()
-                            oldRoleId.setShortProcessIdentifier(null)
-                            ProcessResourceId newRoleId = new ProcessResourceId(processRole.getProcessIdentifier(), oldRoleId.getObjectId())
-                            processRole.set_id(newRoleId)
+                            if (!processRole.isGlobal()) {
+                                ProcessResourceId oldRoleId = processRole.get_id()
+                                oldRoleId.setShortProcessIdentifier(null)
+                                ProcessResourceId newRoleId = new ProcessResourceId(processRole.getProcessIdentifier(), oldRoleId.getObjectId())
+                                processRole.set_id(newRoleId)
 
-                            mongoTemplate.insert(processRole)
-                            mongoTemplate.remove(Query.query(Criteria.where("_id").is(oldRoleId)), ProcessRole.class)
+                                mongoTemplate.insert(processRole)
+                                mongoTemplate.remove(Query.query(Criteria.where("_id").is(oldRoleId)), ProcessRole.class)
 
-                            newValues.put(newRoleId.toString(), processRole)
+                                newValues.put(newRoleId.toString(), processRole)
+                            } else {
+                                newValues.put(oldRoleStringId, processRole)
+                            }
                         }
                         petriNet.setRoles(newValues)
                     }
                     if (petriNet.getPermissions() != null && !petriNet.getPermissions().isEmpty()) {
                         Map<String, Map<String, Boolean>> newValues = new HashMap<>()
                         petriNet.getPermissions().each { oldRoleId, permissions ->
-                            newValues.put(getNewIdFromOldId(oldRoleId), permissions)
+                            if (!oldRoleId.startsWith(ProcessResourceId.NONE_SHORT_ID_VALUE)) {
+                                newValues.put(getNewIdFromOldId(oldRoleId), permissions)
+                            } else {
+                                newValues.put(oldRoleId, permissions)
+                            }
                         }
                         petriNet.setPermissions(newValues)
                     }
                     if (petriNet.getNegativeViewRoles() != null && !petriNet.getNegativeViewRoles().isEmpty()) {
                         List<String> newValues = new ArrayList<>()
                         petriNet.getNegativeViewRoles().each { oldRoleId ->
-                            newValues.add(getNewIdFromOldId(oldRoleId))
+                            if (!oldRoleId.startsWith(ProcessResourceId.NONE_SHORT_ID_VALUE)) {
+                                newValues.add(getNewIdFromOldId(oldRoleId))
+                            } else {
+                                newValues.add(oldRoleId)
+                            }
                         }
                         petriNet.setNegativeViewRoles(newValues)
                     }
@@ -151,7 +163,11 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
                         if (it.getRoles() != null && !it.getRoles().isEmpty()) {
                             Map<String, Map<String, Boolean>> newValues = new HashMap<>()
                             it.getRoles().each { oldRoleId, permissions ->
-                                newValues.put(getNewIdFromOldId(oldRoleId), permissions)
+                                if (!oldRoleId.startsWith(ProcessResourceId.NONE_SHORT_ID_VALUE)) {
+                                    newValues.put(getNewIdFromOldId(oldRoleId), permissions)
+                                } else {
+                                    newValues.put(oldRoleId, permissions)
+                                }
                             }
                             it.setRoles(newValues)
                         }
@@ -159,7 +175,11 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
                         if (it.getViewRoles() != null && !it.getViewRoles().isEmpty()) {
                             List<String> newValues = new ArrayList<>()
                             it.getViewRoles().each { oldRoleId ->
-                                newValues.add(getNewIdFromOldId(oldRoleId))
+                                if (!oldRoleId.startsWith(ProcessResourceId.NONE_SHORT_ID_VALUE)) {
+                                    newValues.add(getNewIdFromOldId(oldRoleId))
+                                } else {
+                                    newValues.add(oldRoleId)
+                                }
                             }
                             it.setViewRoles(newValues)
                         }
@@ -167,7 +187,11 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
                         if (it.getNegativeViewRoles() != null && !it.getNegativeViewRoles().isEmpty()) {
                             List<String> newValues = new ArrayList<>()
                             it.getNegativeViewRoles().each { oldRoleId ->
-                                newValues.add(getNewIdFromOldId(oldRoleId))
+                                if (!oldRoleId.startsWith(ProcessResourceId.NONE_SHORT_ID_VALUE)) {
+                                    newValues.add(getNewIdFromOldId(oldRoleId))
+                                } else {
+                                    newValues.add(oldRoleId)
+                                }
                             }
                             it.setNegativeViewRoles(newValues)
                         }
@@ -185,14 +209,22 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
                 if (useCase.getEnabledRoles() != null && !useCase.getEnabledRoles().isEmpty()) {
                     Set<String> newValues = new HashSet<>()
                     useCase.getEnabledRoles().each { oldRoleId ->
-                        newValues.add(getNewIdFromOldId(oldRoleId))
+                        if (!oldRoleId.startsWith(ProcessResourceId.NONE_SHORT_ID_VALUE)) {
+                            newValues.add(getNewIdFromOldId(oldRoleId))
+                        } else {
+                            newValues.add(oldRoleId)
+                        }
                     }
                     useCase.setEnabledRoles(newValues)
                 }
                 if (useCase.getViewRoles() != null && !useCase.getViewRoles().isEmpty()) {
                     List<String> newValues = new ArrayList<>()
                     useCase.getViewRoles().each { oldRoleId ->
-                        newValues.add(getNewIdFromOldId(oldRoleId))
+                        if (!oldRoleId.startsWith(ProcessResourceId.NONE_SHORT_ID_VALUE)) {
+                            newValues.add(getNewIdFromOldId(oldRoleId))
+                        } else {
+                            newValues.add(oldRoleId)
+                        }
                     }
                     useCase.setViewRoles(newValues)
                 }
@@ -200,7 +232,11 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
                 if (useCase.getNegativeViewRoles() != null && !useCase.getNegativeViewRoles().isEmpty()) {
                     List<String> newValues = new ArrayList<>()
                     useCase.getNegativeViewRoles().each { oldRoleId ->
-                        newValues.add(getNewIdFromOldId(oldRoleId))
+                        if (!oldRoleId.startsWith(ProcessResourceId.NONE_SHORT_ID_VALUE)) {
+                            newValues.add(getNewIdFromOldId(oldRoleId))
+                        } else {
+                            newValues.add(oldRoleId)
+                        }
                     }
                     useCase.setNegativeViewRoles(newValues)
                 }
@@ -208,7 +244,11 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
                 if (useCase.getPermissions() != null && !useCase.getPermissions().isEmpty()) {
                     Map<String, Map<String, Boolean>> newValues = new HashMap<>()
                     useCase.getPermissions().each { oldRoleId, permissions ->
-                        newValues.put(getNewIdFromOldId(oldRoleId), permissions)
+                        if (!oldRoleId.startsWith(ProcessResourceId.NONE_SHORT_ID_VALUE)) {
+                            newValues.put(getNewIdFromOldId(oldRoleId), permissions)
+                        } else {
+                            newValues.put(oldRoleId, permissions)
+                        }
                     }
                     useCase.setPermissions(newValues)
                 }
