@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.objects.workflow.domain;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 
 import java.io.Serial;
@@ -10,6 +11,7 @@ import java.util.Date;
 import java.util.Objects;
 
 @Getter
+@Setter
 public final class ProcessResourceId implements Comparable<ProcessResourceId>, Serializable {
 
     @Serial

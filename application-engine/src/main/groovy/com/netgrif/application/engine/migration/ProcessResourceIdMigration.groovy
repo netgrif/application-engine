@@ -69,7 +69,7 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
                 Case useCase = cursor.next()
 
                 ProcessResourceId oldCaseId = useCase.get_id()
-                oldCaseId.shortProcessIdentifier = null
+                oldCaseId.setShortProcessIdentifier(null)
                 ProcessResourceId newCaseId = new ProcessResourceId(useCase.getProcessIdentifier(), oldCaseId.getObjectId())
 
                 if (newCaseId == oldCaseId) {
@@ -78,9 +78,10 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
 
                 if (useCase.getTasks() != null && !useCase.getTasks().isEmpty()) {
                     Set<TaskPair> newTaskPairs = new HashSet<>()
-                    List<Task> oldTasks = mongoTemplate.find(Query.query(Criteria.where("caseId").is(oldCaseId.toString())), Task.class)
+                    List<Task> oldTasks = mongoTemplate.find(Query.query(Criteria.where("caseId").is(oldCaseId.shortProcessId + ProcessResourceId.ID_SEPARATOR + oldCaseId.getObjectId().toString())), Task.class)
                     oldTasks.forEach {
                         ProcessResourceId oldTaskId = it.get_id()
+                        oldTaskId.setShortProcessIdentifier(null)
                         ProcessResourceId newTaskId = new ProcessResourceId(useCase.getProcessIdentifier(), oldTaskId.getObjectId())
                         if (newTaskId != oldTaskId) {
                             it.set_id(newTaskId)
@@ -102,23 +103,25 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
                     if (field instanceof FieldWithAllowedNets) {
                         List<String> oldValues = (List<String>) dataField.getValue()
                         List<String> newValues = new ArrayList<>()
-                        oldValues.forEach { oldStringId ->
-                            String[] parts = oldStringId.split(ProcessResourceId.ID_SEPARATOR);
-                            if (parts.length != 2) {
-                                throw new IllegalArgumentException("Invalid composite ID format: " + oldStringId);
-                            }
-                            String processId = ProcessResourceId.decodeShortProcessId(parts[0])
-                            if (processIdentifierIdMap.containsKey(processId)) {
-                                newValues.add(new ProcessResourceId(processIdentifierIdMap.get(processId), parts[1]).toString())
-                            } else {
-                                try {
-                                    PetriNet petriNet = mongoTemplate.findById(new ObjectId(processId), PetriNet.class)
-                                    if (petriNet != null) {
-                                        processIdentifierIdMap.put(processId, petriNet.getIdentifier())
-                                        newValues.add(new ProcessResourceId(petriNet.getIdentifier(), parts[1]).toString())
+                        if (oldValues != null) {
+                            oldValues.forEach { oldStringId ->
+                                String[] parts = oldStringId.split(ProcessResourceId.ID_SEPARATOR);
+                                if (parts.length != 2) {
+                                    throw new IllegalArgumentException("Invalid composite ID format: " + oldStringId);
+                                }
+                                String processId = ProcessResourceId.decodeShortProcessId(parts[0])
+                                if (processIdentifierIdMap.containsKey(processId)) {
+                                    newValues.add(new ProcessResourceId(processIdentifierIdMap.get(processId), parts[1]).toString())
+                                } else {
+                                    try {
+                                        PetriNet petriNet = mongoTemplate.findById(new ObjectId(processId), PetriNet.class)
+                                        if (petriNet != null) {
+                                            processIdentifierIdMap.put(processId, petriNet.getIdentifier())
+                                            newValues.add(new ProcessResourceId(petriNet.getIdentifier(), parts[1]).toString())
+                                        }
+                                    } catch (IllegalArgumentException e) {
+                                        log.error("Error while update reference fields", e)
                                     }
-                                } catch (IllegalArgumentException e) {
-                                    log.error("Error while update reference fields", e)
                                 }
                             }
                         }
