@@ -69,6 +69,7 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
                 Case useCase = cursor.next()
 
                 ProcessResourceId oldCaseId = useCase.get_id()
+                oldCaseId.shortProcessIdentifier = null
                 ProcessResourceId newCaseId = new ProcessResourceId(useCase.getProcessIdentifier(), oldCaseId.getObjectId())
 
                 if (newCaseId == oldCaseId) {
@@ -127,9 +128,8 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
 
                 useCase.set_id(newCaseId)
 
-
                 mongoTemplate.insert(useCase)
-                mongoTemplate.remove(Query.query(Criteria.where("_id.objectId").is(oldCaseId.getObjectId()).and("_id.shortProcessId").is(oldCaseId.getShortProcessId())), Case.class)
+                mongoTemplate.remove(Query.query(Criteria.where("_id").is(oldCaseId)), Case.class)
                 elasticCaseService.index(elasticCaseMappingService.transform(useCase))
                 elasticCaseService.remove(oldCaseId.toString())
             }
