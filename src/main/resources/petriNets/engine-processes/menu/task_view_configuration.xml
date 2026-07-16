@@ -126,14 +126,19 @@
         </options>
         <init>sort</init>
     </data>
+    <data type="text" immediate="true">
+        <id>task_headers_sort_mode_active</id>
+        <title name="task_headers_sort_mode_active">Active column for sorting</title>
+        <desc name="task_headers_sort_mode_active_desc">Example: meta-title</desc>
+    </data>
     <data type="enumeration_map" immediate="true">
         <id>task_headers_sort_mode_direction</id>
         <title name="task_headers_sort_mode_direction">Default sort direction</title>
         <options>
-            <option key="ascending" name="ascending">Ascending</option>
-            <option key="descending" name="descending">Descending</option>
+            <option key="asc" name="ascending">Ascending</option>
+            <option key="desc" name="descending">Descending</option>
         </options>
-        <init>ascending</init>
+        <init>desc</init>
     </data>
     <data type="enumeration_map">
         <id>headers_options_holder</id>
@@ -161,7 +166,7 @@
     <data type="stringCollection" immediate="true">
         <id>task_default_headers</id>
         <title name="task_default_headers">Set default headers</title>
-        <desc name="default_headers_desc">Example: "meta-title", "meta-user"</desc>
+        <desc name="default_headers_desc">Example: "meta-title", "meta-caseTitle", ...</desc>
     </data>
     <data type="boolean" immediate="true">
         <id>task_show_more_menu</id>
@@ -242,7 +247,7 @@
         <i18nString name="task_allow_header_table_mode">Povoliť tabuľkový mód pre hlavičky?</i18nString>
         <i18nString name="use_task_default_headers">Použiť vlastné predvolené hlavičky?</i18nString>
         <i18nString name="task_default_headers">Predvolené hlavičky</i18nString>
-        <i18nString name="default_headers_desc">Napríklad: "meta-title", "meta-user"</i18nString>
+        <i18nString name="default_headers_desc">Napríklad: "meta-title", "meta-caseTitle", ...</i18nString>
         <i18nString name="task_show_more_menu">Zobrazovať menu pre úlohovú položku?</i18nString>
         <i18nString name="item_settings">Nastavenie položky</i18nString>
         <i18nString name="item_settings_general">Všeobecné</i18nString>
@@ -261,6 +266,8 @@
         <i18nString name="task_headers_sort_mode_direction">Predvolený smer zoradenia</i18nString>
         <i18nString name="ascending">Vzostupne</i18nString>
         <i18nString name="descending">Zostupne</i18nString>
+        <i18nString name="task_headers_sort_mode_active">Aktívny stĺpec pre zoradenie</i18nString>
+        <i18nString name="task_headers_sort_mode_active_desc">Napríklad: meta-title</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="hidden">Versteckt</i18nString>
@@ -274,7 +281,7 @@
         <i18nString name="task_allow_header_table_mode">Erlaube Tabellenmodus?</i18nString>
         <i18nString name="use_task_default_headers">Eigene Kopfzeilen verwenden?</i18nString>
         <i18nString name="task_default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
-        <i18nString name="default_headers_desc">Beispiel: "meta-title", "meta-user"</i18nString>
+        <i18nString name="default_headers_desc">Beispiel: "meta-title", "meta-caseTitle", ...</i18nString>
         <i18nString name="item_settings_general">Allgemein</i18nString>
         <i18nString name="fulltext_advanced">Einfacher und erweiterter Suchmodus</i18nString>
         <i18nString name="merge_filters">Mit dem Basisfilter kombinieren, falls vorhanden?</i18nString>
@@ -296,6 +303,8 @@
         <i18nString name="task_headers_sort_mode_direction">Standard-Sortierrichtung</i18nString>
         <i18nString name="ascending">Aufsteigend</i18nString>
         <i18nString name="descending">Absteigend</i18nString>
+        <i18nString name="task_headers_sort_mode_active">Aktive Spalte zum Sortieren</i18nString>
+        <i18nString name="task_headers_sort_mode_active_desc">Beispiel: meta-title</i18nString>
     </i18n>
 
     <transition>
@@ -692,13 +701,29 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>task_headers_sort_mode_direction</id>
+                <id>task_headers_sort_mode_active</id>
                 <logic>
                     <behavior>editable</behavior>
                     <behavior>required</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_headers_sort_mode_direction</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
                     <y>2</y>
                     <rows>1</rows>
                     <cols>1</cols>
@@ -965,13 +990,27 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>task_headers_sort_mode_direction</id>
+                <id>task_headers_sort_mode_active</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
                     <y>16</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_headers_sort_mode_direction</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>17</y>
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>

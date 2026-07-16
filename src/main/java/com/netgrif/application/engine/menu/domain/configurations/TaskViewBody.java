@@ -19,7 +19,8 @@ public class TaskViewBody extends ViewBody {
     private String viewSearchType = "fulltext_advanced";
     private List<String> headersMode = new ArrayList<>(List.of("sort", "edit"));
     private String headersDefaultMode = "sort";
-    private String headersSortModeDirection = "ascending";
+    private String headersSortModeActive;
+    private String headersSortModeDirection = "desc";
     private boolean isHeaderModeChangeable = true;
     private boolean allowHeaderTableMode = true;
     private boolean useDefaultHeaders = true;
@@ -72,6 +73,8 @@ public class TaskViewBody extends ViewBody {
             outcome.putDataSetEntry(TaskViewConstants.FIELD_DEFAULT_HEADERS, FieldType.STRING_COLLECTION,
                     this.defaultHeaders);
         }
+        outcome.putDataSetEntry(TaskViewConstants.FIELD_HEADERS_SORT_MODE_ACTIVE, FieldType.TEXT,
+                this.headersSortModeActive);
         outcome.putDataSetEntry(TaskViewConstants.FIELD_HEADERS_SORT_MODE_DIRECTION, FieldType.ENUMERATION_MAP,
                 this.headersSortModeDirection);
         outcome.putDataSetEntry(TaskViewConstants.FIELD_SHOW_MORE_MENU, FieldType.BOOLEAN,

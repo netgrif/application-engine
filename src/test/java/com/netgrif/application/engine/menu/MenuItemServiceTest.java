@@ -663,50 +663,30 @@ public class MenuItemServiceTest {
     }
 
     @Test
-    public void getAvailableViewsAsOptionsByIsPrimaryTest() {
+    public void getPrimaryViewsAsOptionsTest() {
         
-        Map<String, I18nString> options = menuItemService.getAvailableViewsAsOptions(true, true);
+        Map<String, I18nString> options = menuItemService.getPrimaryViewsAsOptions();
         assertNotNull(options);
         assertEquals(4, options.size());
         assertTrue(options.containsKey(MenuItemViewType.CASE_VIEW.getIdentifier()));
         assertTrue(options.containsKey(MenuItemViewType.TASK_VIEW.getIdentifier()));
         assertTrue(options.containsKey(MenuItemViewType.TABBED_TICKET_VIEW.getIdentifier()));
         assertTrue(options.containsKey(MenuItemViewType.SINGLE_TASK_VIEW.getIdentifier()));
-
-        options = menuItemService.getAvailableViewsAsOptions(true, false);
-        assertNotNull(options);
-        assertEquals(0, options.size());
-
-        options = menuItemService.getAvailableViewsAsOptions(false, false);
-        assertNotNull(options);
-        assertEquals(0, options.size());
-
-        options = menuItemService.getAvailableViewsAsOptions(false, true);
-        assertNotNull(options);
-        assertEquals(3, options.size());
-        assertTrue(options.containsKey(MenuItemViewType.CASE_VIEW.getIdentifier()));
-        assertTrue(options.containsKey(MenuItemViewType.TASK_VIEW.getIdentifier()));
-        assertTrue(options.containsKey(MenuItemViewType.SINGLE_TASK_VIEW.getIdentifier()));
     }
 
     @Test
     public void getAvailableViewsAsOptionsByViewIdentifierTest() {
-        Map<String, I18nString> options = menuItemService.getAvailableViewsAsOptions(true, MenuItemViewType.CASE_VIEW.getIdentifier());
+        Map<String, I18nString> options = menuItemService.getAvailableViewsAsOptions(MenuItemViewType.CASE_VIEW.getIdentifier());
         assertNotNull(options);
         assertEquals(1, options.size());
         assertTrue(options.containsKey(MenuItemViewType.TASK_VIEW.getIdentifier()));
 
-        options = menuItemService.getAvailableViewsAsOptions(true, MenuItemViewType.TABBED_TICKET_VIEW.getIdentifier());
+        options = menuItemService.getAvailableViewsAsOptions(MenuItemViewType.TABBED_TICKET_VIEW.getIdentifier());
         assertNotNull(options);
         assertEquals(1, options.size());
         assertTrue(options.containsKey(MenuItemViewType.SINGLE_TASK_VIEW.getIdentifier()));
 
-        options = menuItemService.getAvailableViewsAsOptions(false, MenuItemViewType.TABBED_TICKET_VIEW.getIdentifier());
-        assertNotNull(options);
-        assertEquals(1, options.size());
-        assertTrue(options.containsKey(MenuItemViewType.SINGLE_TASK_VIEW.getIdentifier()));
-
-        options = menuItemService.getAvailableViewsAsOptions(true, MenuItemViewType.TASK_VIEW.getIdentifier());
+        options = menuItemService.getAvailableViewsAsOptions(MenuItemViewType.TASK_VIEW.getIdentifier());
         assertNotNull(options);
         assertEquals(0, options.size());
     }

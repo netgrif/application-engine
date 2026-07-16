@@ -118,9 +118,10 @@ public class MenuItemBody {
         }
         this.view = viewBody;
         MenuItemViewType viewType = viewBody.getViewType();
-        if (viewType.isTabbed() != viewType.isUntabbed()) {
-            // if isTabbed == isUntabbed we cannot determine the result value
-            this.useTabbedView = viewType.isTabbed();
+        if (viewType.getViewType() == ViewType.ONLY_TABBED) {
+            this.useTabbedView = true;
+        } else if (viewType.getViewType() == ViewType.ONLY_UNTABBED) {
+            this.useTabbedView = false;
         }
     }
 
