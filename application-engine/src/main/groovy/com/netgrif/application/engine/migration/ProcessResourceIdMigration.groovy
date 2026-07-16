@@ -11,6 +11,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.CaseField
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldWithAllowedNets
+import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId
 import com.netgrif.application.engine.objects.workflow.domain.Task
@@ -59,10 +60,30 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
 
     @Override
     void migrate() {
-        Query query = Query.query(Criteria.where("_id.shortProcessId").exists(true))
-        query.cursorBatchSize(500)
+        Query roleQuery = Query.query(Criteria.where("_id.shortProcessId").exists(true))
+        roleQuery.cursorBatchSize(500)
+        try (Stream<ProcessRole> cursorStream = mongoTemplate.stream(roleQuery, ProcessRole.class)) {
+            Iterator<ProcessRole> cursor = cursorStream.iterator()
+            while (cursor.hasNext()) {
+                ProcessRole processRole = cursor.next()
 
-        try (Stream<Case> cursorStream = mongoTemplate.stream(query, Case.class)) {
+                if (processRole.isGlobal()) {
+                    continue
+                }
+
+                ProcessResourceId oldRoleId = processRole.get_id();
+                oldRoleId.setShortProcessIdentifier(null)
+                ProcessResourceId newRoleId = new ProcessResourceId(processRole.getProcessIdentifier(), oldRoleId.getObjectId())
+                processRole.set_id(newRoleId)
+
+                mongoTemplate.insert(processRole)
+                mongoTemplate.remove(Query.query(Criteria.where("_id").is(oldRoleId)), ProcessRole.class)
+            }
+        }
+
+        Query caseQuery = Query.query(Criteria.where("_id.shortProcessId").exists(true))
+        caseQuery.cursorBatchSize(500)
+        try (Stream<Case> cursorStream = mongoTemplate.stream(caseQuery, Case.class)) {
             Iterator<Case> cursor = cursorStream.iterator()
 
             while (cursor.hasNext()) {
@@ -96,6 +117,105 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
                         newTaskPairs.add(new TaskPair(newTaskId.toString(), it.transitionId))
                     }
                     useCase.setTasks(newTaskPairs)
+                }
+
+                if (useCase.getEnabledRoles() != null && !useCase.getEnabledRoles().isEmpty()) {
+                    Set<String> newValues = new HashSet<>()
+                    useCase.getEnabledRoles().each { oldRoleId ->
+                        String[] parts = oldRoleId.split(ProcessResourceId.ID_SEPARATOR);
+                        if (parts.length != 2) {
+                            throw new IllegalArgumentException("Invalid composite ID format: " + oldRoleId);
+                        }
+                        String processId = ProcessResourceId.decodeShortProcessId(parts[0])
+                        if (processIdentifierIdMap.containsKey(processId)) {
+                            newValues.add(new ProcessResourceId(processIdentifierIdMap.get(processId), parts[1]).toString())
+                        } else {
+                            try {
+                                PetriNet petriNet = mongoTemplate.findById(new ObjectId(processId), PetriNet.class)
+                                if (petriNet != null) {
+                                    processIdentifierIdMap.put(processId, petriNet.getIdentifier())
+                                    newValues.add(new ProcessResourceId(petriNet.getIdentifier(), parts[1]).toString())
+                                }
+                            } catch (IllegalArgumentException e) {
+                                log.error("Error while update reference fields", e)
+                            }
+                        }
+                    }
+                    useCase.setEnabledRoles(newValues)
+                }
+                if (useCase.getViewRoles() != null && !useCase.getViewRoles().isEmpty()) {
+                    List<String> newValues = new ArrayList<>()
+                    useCase.getViewRoles().each { oldRoleId ->
+                        String[] parts = oldRoleId.split(ProcessResourceId.ID_SEPARATOR);
+                        if (parts.length != 2) {
+                            throw new IllegalArgumentException("Invalid composite ID format: " + oldRoleId);
+                        }
+                        String processId = ProcessResourceId.decodeShortProcessId(parts[0])
+                        if (processIdentifierIdMap.containsKey(processId)) {
+                            newValues.add(new ProcessResourceId(processIdentifierIdMap.get(processId), parts[1]).toString())
+                        } else {
+                            try {
+                                PetriNet petriNet = mongoTemplate.findById(new ObjectId(processId), PetriNet.class)
+                                if (petriNet != null) {
+                                    processIdentifierIdMap.put(processId, petriNet.getIdentifier())
+                                    newValues.add(new ProcessResourceId(petriNet.getIdentifier(), parts[1]).toString())
+                                }
+                            } catch (IllegalArgumentException e) {
+                                log.error("Error while update reference fields", e)
+                            }
+                        }
+                    }
+                    useCase.setViewRoles(newValues)
+                }
+
+                if (useCase.getNegativeViewRoles() != null && !useCase.getNegativeViewRoles().isEmpty()) {
+                    List<String> newValues = new ArrayList<>()
+                    useCase.getNegativeViewRoles().each { oldRoleId ->
+                        String[] parts = oldRoleId.split(ProcessResourceId.ID_SEPARATOR);
+                        if (parts.length != 2) {
+                            throw new IllegalArgumentException("Invalid composite ID format: " + oldRoleId);
+                        }
+                        String processId = ProcessResourceId.decodeShortProcessId(parts[0])
+                        if (processIdentifierIdMap.containsKey(processId)) {
+                            newValues.add(new ProcessResourceId(processIdentifierIdMap.get(processId), parts[1]).toString())
+                        } else {
+                            try {
+                                PetriNet petriNet = mongoTemplate.findById(new ObjectId(processId), PetriNet.class)
+                                if (petriNet != null) {
+                                    processIdentifierIdMap.put(processId, petriNet.getIdentifier())
+                                    newValues.add(new ProcessResourceId(petriNet.getIdentifier(), parts[1]).toString())
+                                }
+                            } catch (IllegalArgumentException e) {
+                                log.error("Error while update reference fields", e)
+                            }
+                        }
+                    }
+                    useCase.setNegativeViewRoles(newValues)
+                }
+
+                if (useCase.getPermissions() != null && !useCase.getPermissions().isEmpty()) {
+                    Map<String, Map<String, Boolean>> newValues = new HashMap<>()
+                    useCase.getPermissions().each { oldRoleId, permissions ->
+                        String[] parts = oldRoleId.split(ProcessResourceId.ID_SEPARATOR);
+                        if (parts.length != 2) {
+                            throw new IllegalArgumentException("Invalid composite ID format: " + oldRoleId);
+                        }
+                        String processId = ProcessResourceId.decodeShortProcessId(parts[0])
+                        if (processIdentifierIdMap.containsKey(processId)) {
+                            newValues.put(new ProcessResourceId(processIdentifierIdMap.get(processId), parts[1]).toString(), permissions)
+                        } else {
+                            try {
+                                PetriNet petriNet = mongoTemplate.findById(new ObjectId(processId), PetriNet.class)
+                                if (petriNet != null) {
+                                    processIdentifierIdMap.put(processId, petriNet.getIdentifier())
+                                    newValues.put(new ProcessResourceId(petriNet.getIdentifier(), parts[1]).toString(), permissions)
+                                }
+                            } catch (IllegalArgumentException e) {
+                                log.error("Error while update reference fields", e)
+                            }
+                        }
+                    }
+                    useCase.setPermissions(newValues)
                 }
 
                 useCase.dataSet.each { key, dataField ->
