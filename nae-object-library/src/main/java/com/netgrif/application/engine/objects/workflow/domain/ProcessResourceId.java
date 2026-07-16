@@ -26,6 +26,9 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
 
     private String shortProcessIdentifier;
 
+    @Deprecated(since = "7.0.0", forRemoval = true)
+    private String shortProcessId;
+
     public ProcessResourceId() {
         this.objectId = new ObjectId();
         this.shortProcessIdentifier = NONE_SHORT_ID_VALUE;
