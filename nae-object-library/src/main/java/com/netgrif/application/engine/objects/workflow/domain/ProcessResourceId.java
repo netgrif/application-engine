@@ -23,6 +23,7 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
     // todo add example values to javadoc
 
     private ObjectId objectId;
+
     private String shortProcessIdentifier;
 
     public ProcessResourceId() {
@@ -32,16 +33,16 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
 
     public ProcessResourceId(String processIdentifier, String objectId) {
         this.objectId = new ObjectId(objectId);
-        this.shortProcessIdentifier = generateShortProcessId(processIdentifier);
+        this.shortProcessIdentifier = generateShortProcessIdentifier(processIdentifier);
     }
 
     public ProcessResourceId(String processIdentifier, ObjectId objectId) {
         this.objectId = objectId;
-        this.shortProcessIdentifier = generateShortProcessId(processIdentifier);
+        this.shortProcessIdentifier = generateShortProcessIdentifier(processIdentifier);
     }
 
     public ProcessResourceId(String compositeId) {
-        String[] parts = compositeId.split("-");
+        String[] parts = compositeId.split(ID_SEPARATOR);
         if (parts.length != 2) {
             throw new IllegalArgumentException("Invalid composite ID format: " + compositeId);
         }
@@ -70,7 +71,23 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
         return getFullId();
     }
 
-    private static String generateShortProcessId(String processIdentifier) {
+    public static String decodeShortProcessId(String shortProcessId) {
+        if (shortProcessId == null || shortProcessId.isEmpty()) {
+            return null;
+        }
+        BigInteger number = BigInteger.ZERO;
+        for (char c : shortProcessId.toCharArray()) {
+            number = number.multiply(CHAR_ARRAY_LENGTH);
+            int index = CHAR_ARRAY.indexOf(c);
+            if (index == -1) {
+                throw new IllegalArgumentException("Invalid character in short process ID: " + c);
+            }
+            number = number.add(BigInteger.valueOf(index));
+        }
+        return number.toString(16);
+    }
+
+    private static String generateShortProcessIdentifier(String processIdentifier) {
         if (processIdentifier == null || processIdentifier.isEmpty()) {
             return null;
         }
@@ -90,7 +107,7 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
         }
     }
 
-    public static String decodeShortProcessId(String shortProcessId) {
+    public static String decodeShortProcessIdentifier(String shortProcessId) {
         if (shortProcessId == null || shortProcessId.isEmpty()) {
             return null;
         }

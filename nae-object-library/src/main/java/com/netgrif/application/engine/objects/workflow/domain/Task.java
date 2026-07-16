@@ -34,6 +34,7 @@ public abstract class Task implements Serializable {
     @Serial
     private static final long serialVersionUID = -7112277728921547546L;
 
+    @Setter
     private ProcessResourceId _id;
 
     @Setter
