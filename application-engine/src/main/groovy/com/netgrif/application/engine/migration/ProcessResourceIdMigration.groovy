@@ -152,39 +152,15 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
         }
 
         if (task.getRoles() != null && !task.getRoles().isEmpty()) {
-            Map<String, Map<String, Boolean>> newValues = new HashMap<>()
-            task.getRoles().each { oldRoleId, permissions ->
-                if (!oldRoleId.startsWith(ProcessResourceId.NONE_SHORT_ID_VALUE)) {
-                    newValues.put(getNewIdFromOldId(oldRoleId), permissions)
-                } else {
-                    newValues.put(oldRoleId, permissions)
-                }
-            }
-            task.setRoles(newValues)
+            task.setRoles(migratePetriNetPermissions(task.getRoles()))
         }
 
         if (task.getViewRoles() != null && !task.getViewRoles().isEmpty()) {
-            List<String> newValues = new ArrayList<>()
-            task.getViewRoles().each { oldRoleId ->
-                if (!oldRoleId.startsWith(ProcessResourceId.NONE_SHORT_ID_VALUE)) {
-                    newValues.add(getNewIdFromOldId(oldRoleId))
-                } else {
-                    newValues.add(oldRoleId)
-                }
-            }
-            task.setViewRoles(newValues)
+            task.setViewRoles(migrateRoleIds(task.getViewRoles()))
         }
 
         if (task.getNegativeViewRoles() != null && !task.getNegativeViewRoles().isEmpty()) {
-            List<String> newValues = new ArrayList<>()
-            task.getNegativeViewRoles().each { oldRoleId ->
-                if (!oldRoleId.startsWith(ProcessResourceId.NONE_SHORT_ID_VALUE)) {
-                    newValues.add(getNewIdFromOldId(oldRoleId))
-                } else {
-                    newValues.add(oldRoleId)
-                }
-            }
-            task.setNegativeViewRoles(newValues)
+            task.setNegativeViewRoles(migrateRoleIds(task.getNegativeViewRoles()))
         }
 
         mongoTemplate.insert(task)
