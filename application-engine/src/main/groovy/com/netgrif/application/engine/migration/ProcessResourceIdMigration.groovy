@@ -76,63 +76,11 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
 
                 migratePetriNet(useCase)
 
-                if (useCase.getTasks() != null && !useCase.getTasks().isEmpty()) {
-                    migrateTasksOfCase(useCase, oldCaseId, newCaseId)
-                }
+                migrateTasksOfCase(useCase, oldCaseId, newCaseId)
 
-                if (useCase.getEnabledRoles() != null && !useCase.getEnabledRoles().isEmpty()) {
-                    useCase.setEnabledRoles(new HashSet<>(migrateRoleIds(useCase.getEnabledRoles())))
-                }
-                if (useCase.getViewRoles() != null && !useCase.getViewRoles().isEmpty()) {
-                    useCase.setViewRoles(migr)
-                    List<String> newValues = new ArrayList<>()
-                    useCase.getViewRoles().each { oldRoleId ->
-                        if (!oldRoleId.startsWith(ProcessResourceId.NONE_SHORT_ID_VALUE)) {
-                            newValues.add(getNewIdFromOldId(oldRoleId))
-                        } else {
-                            newValues.add(oldRoleId)
-                        }
-                    }
-                    useCase.setViewRoles(newValues)
-                }
+                migrateCasePermissions(useCase)
 
-                if (useCase.getNegativeViewRoles() != null && !useCase.getNegativeViewRoles().isEmpty()) {
-                    List<String> newValues = new ArrayList<>()
-                    useCase.getNegativeViewRoles().each { oldRoleId ->
-                        if (!oldRoleId.startsWith(ProcessResourceId.NONE_SHORT_ID_VALUE)) {
-                            newValues.add(getNewIdFromOldId(oldRoleId))
-                        } else {
-                            newValues.add(oldRoleId)
-                        }
-                    }
-                    useCase.setNegativeViewRoles(newValues)
-                }
-
-                if (useCase.getPermissions() != null && !useCase.getPermissions().isEmpty()) {
-                    Map<String, Map<String, Boolean>> newValues = new HashMap<>()
-                    useCase.getPermissions().each { oldRoleId, permissions ->
-                        if (!oldRoleId.startsWith(ProcessResourceId.NONE_SHORT_ID_VALUE)) {
-                            newValues.put(getNewIdFromOldId(oldRoleId), permissions)
-                        } else {
-                            newValues.put(oldRoleId, permissions)
-                        }
-                    }
-                    useCase.setPermissions(newValues)
-                }
-
-                useCase.dataSet.each { key, dataField ->
-                    Field<?> field = useCase.getField(key)
-                    if (field instanceof FieldWithAllowedNets) {
-                        List<String> oldValues = (List<String>) dataField.getValue()
-                        List<String> newValues = new ArrayList<>()
-                        if (oldValues != null) {
-                            oldValues.forEach { oldStringId ->
-                                newValues.add(getNewIdFromOldId(oldStringId))
-                            }
-                        }
-                        dataField.setValue(newValues)
-                    }
-                }
+                migrateDataFields(useCase)
 
                 useCase.set_id(newCaseId)
 
@@ -267,6 +215,39 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
         petriNet.setRoles(newValues)
     }
 
+    private void migrateCasePermissions(Case useCase) {
+        if (useCase.getEnabledRoles() != null && !useCase.getEnabledRoles().isEmpty()) {
+            useCase.setEnabledRoles(new HashSet<>(migrateRoleIds(useCase.getEnabledRoles())))
+        }
+        if (useCase.getViewRoles() != null && !useCase.getViewRoles().isEmpty()) {
+            useCase.setViewRoles(migrateRoleIds(useCase.getViewRoles()))
+        }
+
+        if (useCase.getNegativeViewRoles() != null && !useCase.getNegativeViewRoles().isEmpty()) {
+            useCase.setNegativeViewRoles(migrateRoleIds(useCase.getNegativeViewRoles()))
+        }
+
+        if (useCase.getPermissions() != null && !useCase.getPermissions().isEmpty()) {
+            useCase.setPermissions(migratePetriNetPermissions(useCase.getPermissions()))
+        }
+    }
+
+    private void migrateDataFields(Case useCase) {
+        useCase.dataSet.each { key, dataField ->
+            Field<?> field = useCase.getField(key)
+            if (field instanceof FieldWithAllowedNets) {
+                List<String> oldValues = (List<String>) dataField.getValue()
+                List<String> newValues = new ArrayList<>()
+                if (oldValues != null) {
+                    oldValues.forEach { oldStringId ->
+                        newValues.add(getNewIdFromOldId(oldStringId))
+                    }
+                }
+                dataField.setValue(newValues)
+            }
+        }
+    }
+
     private Map<String, Map<String, Boolean>> migratePetriNetPermissions(Map<String, Map<String, Boolean>> rolePermissionMap) {
         Map<String, Map<String, Boolean>> newValues = new HashMap<>()
         rolePermissionMap.each { oldRoleId, permissions ->
@@ -276,6 +257,7 @@ class ProcessResourceIdMigration extends MigrationOrderedCommandLineRunner {
                 newValues.put(oldRoleId, permissions)
             }
         }
+        return newValues
     }
 
     private List<String> migrateRoleIds(Collection<String> oldRoleIds) {
