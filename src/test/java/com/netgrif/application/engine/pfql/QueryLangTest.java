@@ -1061,40 +1061,40 @@ public class QueryLangTest {
 
         // and comparison
         actual = evaluateQuery(String.format("case: id eq '%s' and title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("stringId:%s AND title:test", GENERIC_OBJECT_ID);
+        expected = String.format("stringId:%s AND title.keyword:test", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
         // and not comparison
         actual = evaluateQuery(String.format("case: id eq '%s' and title not eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("stringId:%s AND NOT title:test", GENERIC_OBJECT_ID);
+        expected = String.format("stringId:%s AND NOT title.keyword:test", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
         actual = evaluateQuery(String.format("case: id eq '%s' and title != 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("stringId:%s AND NOT title:test", GENERIC_OBJECT_ID);
+        expected = String.format("stringId:%s AND NOT title.keyword:test", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
         // or comparison
         actual = evaluateQuery(String.format("case: id eq '%s' or title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("stringId:%s OR title:test", GENERIC_OBJECT_ID);
+        expected = String.format("stringId:%s OR title.keyword:test", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
         // or not comparison
         actual = evaluateQuery(String.format("case: id eq '%s' or title not eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("stringId:%s OR NOT title:test", GENERIC_OBJECT_ID);
+        expected = String.format("stringId:%s OR NOT title.keyword:test", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
         actual = evaluateQuery(String.format("case: id eq '%s' or title neq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("stringId:%s OR NOT title:test", GENERIC_OBJECT_ID);
+        expected = String.format("stringId:%s OR NOT title.keyword:test", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
         // parenthesis comparison
         actual = evaluateQuery(String.format("case: id eq '%s' and (title eq 'test' or title eq 'test1')", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("stringId:%s AND (title:test OR title:test1)", GENERIC_OBJECT_ID);
+        expected = String.format("stringId:%s AND (title.keyword:test OR title.keyword:test1)", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
         // nested parenthesis comparison
         actual = evaluateQuery(String.format("case: id eq '%s' and (title eq 'test' or (title eq 'test1' and processIdentifier eq 'test'))", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("stringId:%s AND (title:test OR (title:test1 AND processIdentifier:test))", GENERIC_OBJECT_ID);
+        expected = String.format("stringId:%s AND (title.keyword:test OR (title.keyword:test1 AND processIdentifier:test))", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
     }
 
