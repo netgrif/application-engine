@@ -591,7 +591,11 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case CASE:
                 stringPath = QCase.case$.title;
-                setElasticQuery(ctx, buildElasticQuery("title", op.getType(), string, not));
+                String elasticAttribute = "title";
+                if (op.getType() == QueryLangParser.EQ || op.getType() == QueryLangParser.NEQ) {
+                    elasticAttribute += ".keyword";
+                }
+                setElasticQuery(ctx, buildElasticQuery(elasticAttribute, op.getType(), string, not));
                 break;
             case TASK:
                 stringPath = QTask.task.title.defaultValue;

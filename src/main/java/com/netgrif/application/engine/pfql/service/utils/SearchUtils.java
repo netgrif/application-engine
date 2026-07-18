@@ -400,6 +400,9 @@ public class SearchUtils {
 
     public static String buildElasticQuery(String attribute, int op, String value, boolean not) {
         String query = null;
+        if (value != null && value.contains(" ")) {
+            value = "\"" + value + "\"";
+        }
         switch (op) {
             case QueryLangParser.EQ:
             case QueryLangParser.IN:

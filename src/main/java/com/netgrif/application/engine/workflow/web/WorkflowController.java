@@ -135,6 +135,7 @@ public class WorkflowController {
             ResourceLinkAssembler.addLinks(resources, ElasticCase.class, selfLink.getRel().toString());
             return resources;
         } catch (IllegalArgumentException e) {
+            log.warn("Bad request when calling PFQL search API: {}", e.getMessage());
             throw new BadRequestException("Bad request: " + e.getMessage());
         } catch (Exception e) {
             log.error("Something went wrong while searching cases by PFQL", e);
