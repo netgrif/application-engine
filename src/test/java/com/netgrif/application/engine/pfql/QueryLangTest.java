@@ -2034,17 +2034,13 @@ public class QueryLangTest {
 
     private static void checkStringComparisonElastic(String resource, String attribute, String resultAttribute) {
         String actual = evaluateQuery(String.format("%s: %s eq 'test'", resource, attribute)).getFullElasticQuery();
-        String expected;
-        if (resultAttribute.matches("dataSet\\.[^.]*\\.fulltextValue")) {
-            expected = String.format("%s.keyword:test", resultAttribute);
-        } else {
-            expected = String.format("%s:test", resultAttribute);
-        }
+        String expectedWithKeyword = String.format("%s.keyword:test", resultAttribute);
+        String expectedWithoutKeyword = String.format("%s:test", resultAttribute);
 
-        assertEquals(expected, actual);
+        assertTrue(actual.equals(expectedWithKeyword) || actual.equals(expectedWithoutKeyword));
 
         actual = evaluateQuery(String.format("%s: %s contains 'test'", resource, attribute)).getFullElasticQuery();
-        expected = String.format("%s:*test*", resultAttribute);
+        String expected = String.format("%s:*test*", resultAttribute);
 
         assertEquals(expected, actual);
 

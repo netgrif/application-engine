@@ -180,7 +180,8 @@ public class SearchUtils {
     }
 
     public static String getStringValue(String queryLangString) {
-        return queryLangString.replace("'", "");
+        String result = queryLangString.replace("'", "");
+        return result.contains(" ") ? "\"" + result + "\"" : result;
     }
 
     public static ObjectId getObjectIdValue(String queryLangString) {
@@ -400,9 +401,6 @@ public class SearchUtils {
 
     public static String buildElasticQuery(String attribute, int op, String value, boolean not) {
         String query = null;
-        if (value != null && value.contains(" ")) {
-            value = "\"" + value + "\"";
-        }
         switch (op) {
             case QueryLangParser.EQ:
             case QueryLangParser.IN:
