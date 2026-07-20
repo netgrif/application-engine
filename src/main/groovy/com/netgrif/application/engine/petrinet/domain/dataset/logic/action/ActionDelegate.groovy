@@ -17,12 +17,26 @@ import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearc
 import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
-import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
+import com.netgrif.application.engine.files.IStorageResolverService
+import com.netgrif.application.engine.files.StorageResolverService
+import com.netgrif.application.engine.files.interfaces.IStorageService
 import com.netgrif.application.engine.history.service.IHistoryService
+import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
 import com.netgrif.application.engine.mail.interfaces.IMailService
+import com.netgrif.application.engine.menu.domain.FilterBody
+import com.netgrif.application.engine.menu.domain.MenuItemBody
+import com.netgrif.application.engine.menu.domain.MenuItemConstants
+import com.netgrif.application.engine.menu.domain.configurations.CaseViewBody
+import com.netgrif.application.engine.menu.domain.configurations.TaskViewBody
+import com.netgrif.application.engine.menu.domain.configurations.ViewBody
+import com.netgrif.application.engine.menu.domain.dashboard.DashboardItemBody
+import com.netgrif.application.engine.menu.domain.dashboard.DashboardManagementBody
+import com.netgrif.application.engine.menu.service.interfaces.DashboardItemService
+import com.netgrif.application.engine.menu.service.interfaces.DashboardManagementService
+import com.netgrif.application.engine.menu.service.interfaces.IMenuItemService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
@@ -37,23 +51,20 @@ import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
+import com.netgrif.application.engine.pfql.service.IResourceSearchService
+import com.netgrif.application.engine.pfql.service.ISearchService
 import com.netgrif.application.engine.rules.domain.RuleRepository
-import com.netgrif.application.engine.startup.DefaultFiltersRunner
-import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
-import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.QCase
-import com.netgrif.application.engine.workflow.domain.QTask
-import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.*
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
-import com.netgrif.application.engine.workflow.domain.menu.MenuItemBody
-import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
@@ -74,10 +85,9 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 
-import java.text.Normalizer
+import java.nio.file.Files
 import java.time.ZoneId
 import java.util.stream.Collectors
-
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -155,16 +165,7 @@ class ActionDelegate {
     Scheduler scheduler
 
     @Autowired
-    IUserFilterSearchService filterSearchService
-
-    @Autowired
     IConfigurableMenuService configurableMenuService
-
-    @Autowired
-    IMenuImportExportService menuImportExportService
-
-    @Autowired
-    IFilterImportExportService filterImportExportService
 
     @Autowired
     IExportService exportService
@@ -189,6 +190,33 @@ class ActionDelegate {
 
     @Autowired
     PublicViewProperties publicViewProperties
+
+    @Autowired
+    IMenuItemService menuItemService
+
+    @Autowired
+    DashboardManagementService dashboardManagementService
+
+    @Autowired
+    DashboardItemService dashboardItemService
+
+    @Autowired
+    IStorageResolverService storageResolver
+
+    @Autowired
+    ISearchService searchService
+
+    @Autowired
+    IResourceSearchService<Case> caseSearchService
+
+    @Autowired
+    IResourceSearchService<Task> taskSearchService
+
+    @Autowired
+    IResourceSearchService<PetriNet> processSearchService
+
+    @Autowired
+    IResourceSearchService<IUser> userSearchService
 
     FrontendActionOutcome Frontend
 
@@ -580,7 +608,7 @@ class ActionDelegate {
         },
          where: { Closure<Predicate> closure ->
              [with: { Map dataSet ->
-                 executeTasks(dataSet, taskId, closure)
+                 executeTasks(dataSet, task.stringId, closure)
              }]
          }]
     }
@@ -655,7 +683,7 @@ class ActionDelegate {
              saveChangedChoices(field, targetCase, targetTask)
          },
          allowedNets        : { cl ->
-             if (!(field instanceof CaseField)) // TODO make this work with FilterField as well
+             if (!(field instanceof CaseField))
                  return
 
              def allowedNets = cl()
@@ -898,9 +926,192 @@ class ActionDelegate {
         return result.content
     }
 
+    /**
+     * Finds cases referenced by a field in its value.
+     *
+     * Use this overload when working on a case from the current action context. For working with fields from out of the
+     * current action context see other overloads of this action.
+     *
+     * <p>If the field value is {@code null}, this method returns an empty list.</p>
+     * <p>If the value cannot be converted to case IDs, this method returns an empty list.</p>
+     *
+     * @param caseRef field whose value contains case IDs, may be of types
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#CASE_REF},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
+     * @return list of matching cases, or an empty list when the field value is {@code null}
+     * @see ActionDelegate#findCases(DataField)
+     * @see ActionDelegate#findCases(List)
+     * @see ActionDelegate#findCases(Closure)
+     * @see ActionDelegate#findCases(Closure, Pageable)
+     */
+    List<Case> findCases(Field caseRef) {
+        if(caseRef.value == null) {
+            log.debug("[findCases(Field)]: Value of field with id [${caseRef.importId}] is null, returning empty list.")
+            return []
+        }
+        try {
+            return this.findCases([caseRef.value].flatten() as List<String>)
+        } catch (ClassCastException e) {
+            log.error("Method cannot be used with field with id [${caseRef.importId}].", e)
+            return []
+        }
+    }
+
+    /**
+     * Finds cases referenced by a dataField in its value.
+     *
+     * Use this overload when working on a case not from the current action context. For working with fields from the current
+     * action context see other overloads of this action.
+     *
+     * <p>If the field value is {@code null}, this method returns an empty list.</p>
+     * <p>If the value cannot be converted to case IDs, this method returns an empty list.</p>
+     *
+     * @param caseRef field whose value contains case IDs, may be of types
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#CASE_REF},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
+     * @return list of matching cases, or an empty list when the field value is {@code null}
+     * @see ActionDelegate#findCases(Field)
+     * @see ActionDelegate#findCases(List)
+     * @see ActionDelegate#findCases(Closure)
+     * @see ActionDelegate#findCases(Closure, Pageable)
+     */
+    List<Case> findCases(DataField caseRef) {
+        if(caseRef.value == null) {
+            log.debug("[findCases(DataField]: Value of field is null, returning empty list.")
+            return []
+        }
+        try {
+            return this.findCases([caseRef.value].flatten() as List<String>)
+        } catch (ClassCastException e) {
+            log.error("Method cannot be used with field.", e)
+            return []
+        }
+    }
+
+
+    /**
+     * Finds cases by their MongoDB IDs.
+     *
+     * @param mongoIds list of case IDs
+     * @return list of matching cases, or an empty list when the input is {@code null} or {@code empty}
+     * @see ActionDelegate#findCases(Field)
+     * @see ActionDelegate#findCases(DataField)
+     * @see ActionDelegate#findCases(Closure)
+     * @see ActionDelegate#findCases(Closure, Pageable)
+     */
+    List<Case> findCases(List<String> mongoIds) {
+        if(mongoIds == null || mongoIds.empty) {
+            log.debug("[findCases(List<String>)]: Null value detected, returning empty list.")
+            return []
+        }
+        return workflowService.findAllById(mongoIds)
+    }
+
     Case findCase(Closure<Predicate> predicate) {
         QCase qCase = new QCase("case")
         return workflowService.searchOne(predicate(qCase))
+    }
+
+
+
+    /**
+     * Finds the first case referenced by a field in its value.
+     *
+     * Use this overload when working on a case from current action context. For working with fields from out of the
+     * current action context see other overloads of this action.
+     *
+     * <p>If the field value is {@code null}, this method returns {@code null}.</p>
+     * <p>If the value cannot be converted to case IDs, this method returns {@code null}.</p>
+     *
+     * @param caseRef field whose value contains case IDs, may be of types
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#CASE_REF},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
+     * @return referenced case, or {@code null} when the field value is invalid
+     * @see ActionDelegate#findCase(DataField)
+     * @see ActionDelegate#findCase(String)
+     * @see ActionDelegate#findCase(Closure)
+     */
+    Case findCase(Field caseRef) {
+        if(caseRef.value == null) {
+            log.debug("[findCase(Field]: Value of field with id [${caseRef.importId}] is null, returning null.")
+            return null
+        }
+        try {
+            List<String> castValue = [caseRef.value].flatten() as List<String>
+            if(castValue.size() == 0) {
+                log.debug("[findCase(Field]: Value of field with id [${caseRef.importId}] does not contain at least one element, returning null.")
+                return null
+            }
+            return this.findCase(castValue[0])
+        } catch (ClassCastException e) {
+            log.error("Method cannot be used with field with id [${caseRef.importId}].", e)
+            return null
+        }
+    }
+
+
+    /**
+     * Finds the first case referenced by a dataField in its value.
+     *
+     * Use this overload when working on a case from out of current action context. For working with fields from the current
+     * action context see other overloads of this action.
+     *
+     * <p>If the field value is {@code null}, this method returns {@code null}.</p>
+     * <p>If the value cannot be converted to case IDs, this method returns {@code null}.</p>
+     *
+     * @param caseRef field whose value contains case IDs, may be of types
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#CASE_REF},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
+     * @return referenced case, or {@code null} when the dataField value is invalid
+     * @see ActionDelegate#findCase(Field)
+     * @see ActionDelegate#findCase(String)
+     * @see ActionDelegate#findCase(Closure)
+     */
+    Case findCase(DataField caseRef) {
+        if(caseRef.value == null) {
+            log.debug("[findCase(DataField)]: Value of field is null, returning null.")
+            return null
+        }
+        try {
+            List<String> castValue = [caseRef.value].flatten() as List<String>
+            if(castValue.size() == 0) {
+                log.debug("[findCase(DataField)]: Value of field does not contain at least one element, returning null.")
+                return null
+            }
+            return this.findCase(castValue[0])
+        } catch (ClassCastException e) {
+            log.error("Method cannot be used with field.", e)
+            return null
+        }
+    }
+
+    /**
+     * Finds case by its MongoDB ID.
+     *
+     * @param mongoId case IDs
+     * @return resulting case
+     * @see ActionDelegate#findCase(Field)
+     * @see ActionDelegate#findCase(DataField)
+     * @see ActionDelegate#findCase(Closure)
+     */
+    Case findCase(String mongoId) {
+        return workflowService.findOne(mongoId)
     }
 
     Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
@@ -913,19 +1124,70 @@ class ActionDelegate {
         return outcome.getCase()
     }
 
+    /**
+     * Deletes a case by its MongoDB ID.
+     *
+     * @param mongoId case identifier
+     * @return deleted case, or {@code null} when the input is {@code null}
+     */
+    Case deleteCase(String mongoId) {
+        if(mongoId == null){
+            log.debug("[deleteCase(String)]: Null value detected, returning null.")
+            return null
+        }
+        return this.deleteCase(workflowService.findOne(mongoId))
+    }
+
+    /**
+     * Deletes the provided case.
+     *
+     * @param toDelete case to delete
+     * @return deleted case, or {@code null} when the input is {@code null}
+     */
+    Case deleteCase(Case toDelete) {
+        if(toDelete == null){
+            log.debug("[deleteCase(Case)]: Null value detected, returning null.")
+            return null
+        }
+        return workflowService.deleteCase(toDelete).case
+    }
+
     Task assignTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        AssignTaskEventOutcome outcome = taskService.assignTask(user.transformToLoggedUser(), taskId, params)
-        this.outcomes.add(outcome)
-        return outcome.getTask()
+        return addTaskOutcomeAndReturnTask(taskService.assignTask(user.transformToLoggedUser(), taskId, params))
     }
 
     Task assignTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         return addTaskOutcomeAndReturnTask(taskService.assignTask(task, user, params))
     }
 
-    void assignTasks(List<Task> tasks, IUser assignee = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        this.outcomes.addAll(taskService.assignTasks(tasks, assignee, params))
+    /**
+     * Assigns tasks for all transitions in the provided list and returns the assigned tasks.
+     *
+     * @param transitionIds transition identifiers whose tasks should be assigned
+     * @param aCase case used to resolve the tasks, defaults to the current case
+     * @param user user to assign the tasks to, defaults to the logged or system user
+     * @param params additional parameters
+     * @return assigned tasks
+     */
+    List<Task> assignTasksByTransitions(List<String> transitionIds, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        List<String> taskIds = getTaskIds(transitionIds, aCase)
+        List<Task> tasks = taskService.findAllById(taskIds)
+        return assignTasks(tasks, user, params)
+    }
+
+    /**
+     * Assigns the provided tasks and returns the assigned tasks.
+     *
+     * @param tasks tasks to assign
+     * @param assignee user to assign the tasks to, defaults to the logged or system user
+     * @param params additional parameters
+     * @return assigned tasks
+     */
+    List<Task> assignTasks(List<Task> tasks, IUser assignee = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        List<AssignTaskEventOutcome> outcomes = taskService.assignTasks(tasks, assignee, params)
+        this.outcomes.addAll(outcomes)
+        return outcomes.collect { it.task }
     }
 
     Task cancelTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
@@ -937,8 +1199,34 @@ class ActionDelegate {
         return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, user, params))
     }
 
-    void cancelTasks(List<Task> tasks, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        this.outcomes.addAll(taskService.cancelTasks(tasks, user, params))
+
+    /**
+     * Cancels tasks for all transitions in the provided list and returns the canceled tasks.
+     *
+     * @param transitionIds transition identifiers whose tasks should be canceled
+     * @param aCase case used to resolve the tasks, defaults to the current case
+     * @param user user performing the cancellation, defaults to the logged or system user
+     * @param params additional parameters
+     * @return canceled tasks
+     */
+    List<Task> cancelTasksByTransitions(List<String> transitionIds, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        List<String> taskIds = getTaskIds(transitionIds, aCase)
+        List<Task> tasks = taskService.findAllById(taskIds)
+        return cancelTasks(tasks, user, params)
+    }
+
+    /**
+     * Cancels the provided tasks and returns the canceled tasks.
+     *
+     * @param tasks tasks to cancel
+     * @param user user performing the cancellation, defaults to the logged or system user
+     * @param params additional parameters
+     * @return canceled tasks
+     */
+    List<Task> cancelTasks(List<Task> tasks, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        List<CancelTaskEventOutcome> outcomes = taskService.cancelTasks(tasks, user, params)
+        this.outcomes.addAll(outcomes)
+        return outcomes.collect { it.task }
     }
 
     private Task addTaskOutcomeAndReturnTask(TaskEventOutcome outcome) {
@@ -946,17 +1234,42 @@ class ActionDelegate {
         return outcome.getTask()
     }
 
-    void finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    Task finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        addTaskOutcomeAndReturnTask(taskService.finishTask(user.transformToLoggedUser(), taskId, params))
+        return addTaskOutcomeAndReturnTask(taskService.finishTask(user.transformToLoggedUser(), taskId, params))
     }
 
-    void finishTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        addTaskOutcomeAndReturnTask(taskService.finishTask(task, user, params))
+    Task finishTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        return addTaskOutcomeAndReturnTask(taskService.finishTask(task, user, params))
     }
 
-    void finishTasks(List<Task> tasks, IUser finisher = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        this.outcomes.addAll(taskService.finishTasks(tasks, finisher, params))
+    /**
+     * Finishes tasks for all transitions in the provided list and returns the finished tasks.
+     *
+     * @param transitionIds transition identifiers whose tasks should be finished
+     * @param aCase case used to resolve the tasks, defaults to the current case
+     * @param user user performing the finish operation, defaults to the logged or system user
+     * @param params additional parameters
+     * @return finished tasks
+     */
+    List<Task> finishTasksByTransitions(List<String> transitionIds, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        List<String> taskIds = getTaskIds(transitionIds, aCase)
+        List<Task> tasks = taskService.findAllById(taskIds)
+        return finishTasks(tasks, user, params)
+    }
+
+    /**
+     * Finishes the provided tasks and returns the finished tasks.
+     *
+     * @param tasks tasks to finish
+     * @param finisher user performing the finish operation, defaults to the logged or system user
+     * @param params additional parameters
+     * @return finished tasks
+     */
+    List<Task> finishTasks(List<Task> tasks, IUser finisher = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        List<FinishTaskEventOutcome> outcomes = taskService.finishTasks(tasks, finisher, params)
+        this.outcomes.addAll(outcomes)
+        return outcomes.collect { it.task }
     }
 
     List<Task> findTasks(Closure<Predicate> predicate) {
@@ -971,18 +1284,279 @@ class ActionDelegate {
         return result.content
     }
 
+    /**
+     * Finds tasks referenced by a field in its value.
+     *
+     * Use this overload when working on a case from current action context. For working with fields from out of the
+     * current action context see other overloads of this action.
+     *
+     * <p>If the field value is {@code null}, this method returns an empty list.</p>
+     * <p>If the value cannot be converted to task IDs, this method returns an empty list.</p>
+     *
+     * @param taskRef field whose value contains task IDs
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TASK_REF},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
+     * @return list of matching tasks, or an empty list when the field value is {@code null}
+     * @see ActionDelegate#findTasks(DataField)
+     * @see ActionDelegate#findTasks(List<String>)
+     */
+    List<Task> findTasks(Field taskRef) {
+        if(taskRef.value == null) {
+            log.debug("[findTasks(Field)]: Value of field with id [${taskRef.importId}] is null, returning empty list.")
+            return []
+        }
+        try {
+            return this.findTasks([taskRef.value].flatten() as List<String>)
+        } catch (ClassCastException e) {
+            log.error("Method cannot be used with field with id [${taskRef.importId}].", e)
+            return []
+        }
+    }
+    
+    /**
+     * Finds tasks referenced by a dataField in its value.
+     *
+     * Use this overload when working on a case not from the current action context. For working with fields from out of the
+     * current action context see other overloads of this action.
+     *
+     * <p>If the field value is {@code null}, this method returns an empty list.</p>
+     * <p>If the value cannot be converted to task IDs, this method returns an empty list.</p>
+     *
+     * @param taskRef field whose value contains task IDs
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TASK_REF},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
+     * @return list of matching tasks, or an empty list when the field value is {@code null}
+     * @see ActionDelegate#findTasks(Field)
+     * @see ActionDelegate#findTasks(List<String>)
+     */
+    List<Task> findTasks(DataField taskRef) {
+        if(taskRef.value == null) {
+            log.debug("[findTasks(DataField)]: Value of field is null, returning empty list.")
+            return []
+        }
+        try {
+            return this.findTasks([taskRef.value].flatten() as List<String>)
+        } catch (ClassCastException e) {
+            log.error("Method cannot be used with field.", e)
+            return []
+        }
+    }
+
+    /**
+     * Finds tasks by their MongoDB IDs.
+     *
+     * @param mongoIds task identifiers
+     * @return list of matching tasks, or an empty list when the input is {@code null} or {@code empty}
+     * @see ActionDelegate#findTasks(Field)
+     * @see ActionDelegate#findTasks(DataField)
+     */
+    List<Task> findTasks(List<String> mongoIds) {
+        if(mongoIds == null || mongoIds.empty) {
+            log.debug("[findTasks(List<String>)]: Null value detected, returning empty list.")
+            return []
+        }
+        return taskService.findAllById(mongoIds)
+    }
+
     Task findTask(Closure<Predicate> predicate) {
         QTask qTask = new QTask("task")
         return taskService.searchOne(predicate(qTask))
     }
 
     Task findTask(String mongoId) {
-        return taskService.searchOne(QTask.task._id.eq(new ObjectId(mongoId)))
+        return taskService.findOne(mongoId)
+    }
+
+    /**
+     * Finds the first task referenced by a field in its value.
+     *
+     * Use this overload when working on a case from the current action context. For working with fields from out of the
+     * current action context see other overloads of this action.
+     *
+     * <p>If the field value is {@code null}, this method returns {@code null}.</p>
+     * <p>If the field contains no value or the value cannot be converted to a task ID, this method returns
+     * {@code null}.</p>
+     *
+     * @param taskRef field whose value contains a task ID
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TASK_REF},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
+     * @return referenced task, or {@code null} when the field value is invalid
+     * @see ActionDelegate#findTask(DataField)
+     * @see ActionDelegate#findTask(String)
+     * @see ActionDelegate#findTask(Closure)
+     */
+    Task findTask(Field taskRef) {
+        if(taskRef.value == null) {
+            log.debug("[findTask(Field)]: Value of field with id [${taskRef.importId}] is null, returning null")
+            return null
+        }
+        try {
+            List<String> castValue = [taskRef.value].flatten() as List<String>
+            if(castValue.size() == 0) {
+                log.debug("[findTask(Field)]: Value of field with id [${taskRef.importId}] does not contain at least one element, returning null.")
+                return null
+            }
+            return this.findTask(castValue[0])
+        } catch (ClassCastException e) {
+            log.error("Method cannot be used with field with id [${taskRef.importId}].", e)
+            return null
+        }
+    }
+
+    /**
+     * Finds the first task referenced by a dataField in its value.
+     *
+     * Use this overload when working on a case not from the current action context. For working with fields from out of the
+     * current action context see other overloads of this action.
+     *
+     * <p>If the field value is {@code null}, this method returns {@code null}.</p>
+     * <p>If the field contains no value or the value cannot be converted to a task ID, this method returns
+     * {@code null}.</p>
+     *
+     * @param taskRef field whose value contains a task ID
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TASK_REF},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#MULTICHOICE_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#ENUMERATION_MAP},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#STRING_COLLECTION},
+     * {@link com.netgrif.application.engine.petrinet.domain.dataset.FieldType#TEXT},
+     * @return referenced task, or {@code null} when the field value is invalid
+     * @see ActionDelegate#findTask(Field)
+     * @see ActionDelegate#findTask(String)
+     * @see ActionDelegate#findTask(Closure)
+     */
+    Task findTask(DataField taskRef) {
+        if(taskRef.value == null) {
+            log.debug("[findTask(DataField)]: Value of field is null, returning null")
+            return null
+        }
+        try {
+            List<String> castValue = [taskRef.value].flatten() as List<String>
+            if(castValue.size() == 0) {
+                log.debug("[findTask(DataField)]: Value of field does not contain at least one element, returning null.")
+                return null
+            }
+            return this.findTask(castValue[0])
+        } catch (ClassCastException e) {
+            log.error("Method cannot be used with field.", e)
+            return null
+        }
+    }
+
+    /**
+     * Finds a Petri net by its MongoDB ID.
+     *
+     * @param mongoId Petri net identifier
+     * @return matching Petri net, or {@code null} when the input is {@code null}
+     */
+    PetriNet findPetriNet(String mongoId) {
+        if(mongoId == null){
+            log.debug("[findPetriNet(String)]: Null value detected, returning null.")
+            return null
+        }
+        return petriNetService.getPetriNet(mongoId)
+    }
+
+    /**
+     * Finds a Petri net by its {@link ObjectId}.
+     *
+     * @param objectId Petri net object identifier
+     * @return matching Petri net, or {@code null} when the input is {@code null}
+     */
+    PetriNet findPetriNet(ObjectId objectId) {
+        if(objectId == null){
+            log.debug("[findPetriNet(ObjectId)]: Null value detected, returning null.")
+            return null
+        }
+        return petriNetService.get(objectId)
+    }
+
+    /**
+     * Finds Petri nets by their MongoDB IDs.
+     *
+     * @param mongoIds list of Petri net identifiers
+     * @return matching Petri nets, or an empty list when the input is {@code null} or {@code empty}
+     */
+    List<PetriNet> findPetriNets(List<String> mongoIds) {
+        if(mongoIds == null || mongoIds.empty){
+            log.debug("[findPetriNets(List<String>)]: Null value detected, returning empty list.")
+            return []
+        }
+        return petriNetService.findAllById(mongoIds)
+    }
+
+    /**
+     * Finds Petri nets by their {@link ObjectId} values.
+     *
+     * @param objectIds list of Petri net object identifiers
+     * @return matching Petri nets, or an empty list when the input is {@code null} or {@code empty}
+     */
+    List<PetriNet> findPetriNetsByObjectIds(List<ObjectId> objectIds) {
+        if(objectIds == null || objectIds.empty){
+            log.debug("[findPetriNetsByObjectIds(List<ObjectId>)]: Null value detected, returning empty list.")
+            return []
+        }
+        return petriNetService.get(objectIds as Collection<ObjectId>)
+    }
+
+    /**
+     * Finds a Petri net by its identifier and optional version.
+     *
+     * If the version is not provided, the newest available version is returned.
+     *
+     * @param identifier Petri net identifier
+     * @param version requested version, or {@code null} for the newest version
+     * @return matching Petri net, or {@code null} when the identifier is {@code null}
+     */
+    PetriNet findPetriNetByIdentifier(String identifier, Version version = null) {
+        if(identifier == null) {
+            log.debug("[findPetriNetByIdentifier(String, Version)]: Null identifier value detected, returning null.")
+            return null
+        }
+        return version == null ? petriNetService.getNewestVersionByIdentifier(identifier) : petriNetService.getPetriNet(identifier, version)
+    }
+
+    /**
+     * Converts cases to a map of option keys and translated option values.
+     *
+     * @param casesToTransform cases to convert
+     * @param valueTransformation transformation used to derive the option label from a case, case title is used if not specified otherwise
+     * @param keyTransformation transformation used to derive the option key from a case, case stringId is used if not specified otherwise
+     * @return map of option keys and translated values
+     */
+    Map<String, I18nString> casesToOptions(List<Case> casesToTransform, Closure<String> valueTransformation = { return it.title }, Closure<String> keyTransformation = { return it.stringId }) {
+        return casesToTransform.collectEntries {
+            [(keyTransformation(it)): new I18nString(valueTransformation(it))]
+        }
     }
 
     String getTaskId(String transitionId, Case aCase = useCase) {
         List<TaskReference> refs = taskService.findAllByCase(aCase.stringId, null)
-        refs.find { it.transitionId == transitionId }.stringId
+        return refs.find { it.transitionId == transitionId }.stringId
+    }
+
+    /**
+     * Returns task identifiers for tasks belonging to the provided transitions in the given case.
+     *
+     * @param transitionIds transition identifiers
+     * @param aCase case whose tasks should be inspected, defaults to the current case
+     * @return list of matching task identifiers
+     */
+    List<String> getTaskIds(List<String> transitionIds, Case aCase = useCase) {
+        List<TaskReference> refs = taskService.findAllByCase(aCase.stringId, null)
+        return refs.findAll { transitionIds.contains(it.transitionId) }.collect { it.stringId}
     }
 
     IUser assignRole(String roleMongoId, IUser user = userService.loggedUser) {
@@ -1040,8 +1614,7 @@ class ActionDelegate {
     }
 
     SetDataEventOutcome setData(String transitionId, Case useCase, Map dataSet, Map<String, String> params = [:]) {
-        def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
-        def task = taskService.searchOne(predicate)
+        Task task = taskService.findOne(useCase.tasks.find { it.transition == transitionId }.task)
         return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet), params))
     }
 
@@ -1378,25 +1951,6 @@ class ActionDelegate {
         return new DynamicValidation(rule, message)
     }
 
-    List<Case> findFilters(String userInput) {
-        return filterSearchService.autocompleteFindFilters(userInput)
-    }
-
-    List<Case> findAllFilters() {
-        return filterSearchService.autocompleteFindFilters("")
-    }
-
-    FileFieldValue exportFilters(Collection<String> filtersToExport) {
-        if (filtersToExport.isEmpty()) {
-            return null
-        }
-        return filterImportExportService.exportFiltersToFile(filtersToExport)
-    }
-
-    List<String> importFilters() {
-        return filterImportExportService.importFilters()
-    }
-
     File exportCasesToFile(Closure<Predicate> predicate, String pathName, ExportDataConfig config = null,
                            int pageSize = exportConfiguration.getMongoPageSize()) {
         File exportFile = new File(pathName)
@@ -1509,8 +2063,8 @@ class ActionDelegate {
     }
 
     /**
-     * Action API case search function using Elasticsearch database
-     * @param requests the CaseSearchRequest list
+     * Action API task search function using Elasticsearch database
+     * @param requests the @link{ElasticTaskSearchRequest} list
      * @param loggedUser the user who is searching for the requests
      * @param page the order of page to return. by default it returns the first page
      * @param pageable the page configuration that will contain the requests
@@ -1518,13 +2072,13 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Task> findTasks(List<ElasticTaskSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Task> findTasksElastic(List<ElasticTaskSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
                          int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         return elasticTaskService.search(requests, loggedUser, PageRequest.of(page, pageSize), locale, isIntersection)
     }
 
     /**
-     * Action API case search function using Elasticsearch database
+     * Action API task search function using Elasticsearch database
      * @param request case search request
      * @param loggedUser the user who is searching for the requests
      * @param page the order of page to return. by default it returns the first page
@@ -1533,384 +2087,33 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Task> findTasks(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Task> findTasksElastic(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
                          int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         List<ElasticTaskSearchRequest> requests = Collections.singletonList(new ElasticTaskSearchRequest(request))
-        return findTasks(requests, loggedUser, page, pageSize, locale, isIntersection)
-    }
-
-    List<Case> findDefaultFilters() {
-        if (!createDefaultFilters) {
-            return []
-        }
-        return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.id.eq(userService.system.stringId)) })
+        return findTasksElastic(requests, loggedUser, page, pageSize, locale, isIntersection)
     }
 
     /**
-     * Creates filter instance of type {@value DefaultFiltersRunner#FILTER_TYPE_CASE}
-     *
-     * @param title filter case title
-     * @param query elastic query for the view
-     * @param icon filter case icon
-     * @param allowedNets List of process identifiers
-     * @param visibility Possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
-     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
-     *
-     * @return created {@link Case} instance of filter
-     */
-    @NamedVariant
-    Case createCaseFilter(def title, String query, List<String> allowedNets,
-                          String icon = "", String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, def filterMetadata = null) {
-        return createFilter(title, query, DefaultFiltersRunner.FILTER_TYPE_CASE, allowedNets, icon, visibility, filterMetadata)
-    }
-
-    /**
-     * Creates filter instance of type {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
-     *
-     * @param title filter case title
-     * @param query elastic query for the view
-     * @param icon filter case icon
-     * @param allowedNets List of process identifiers
-     * @param visibility Possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
-     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
-     *
-     * @return created {@link Case} instance of filter
-     */
-    @NamedVariant
-    Case createTaskFilter(def title, String query, List<String> allowedNets,
-                          String icon = "", String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, def filterMetadata = null) {
-        return createFilter(title, query, DefaultFiltersRunner.FILTER_TYPE_TASK, allowedNets, icon, visibility, filterMetadata)
-    }
-
-    /**
-     * Creates filter instance.
-     *
-     * @param title filter case title
-     * @param query elastic query for the view
-     * @param type Filter type. Possible values: {@value DefaultFiltersRunner#FILTER_TYPE_CASE} or {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
-     * @param icon filter case icon
-     * @param allowedNets List of process identifiers
-     * @param visibility Possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
-     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
-     *
-     * @return created {@link Case} instance of filter
-     */
-    @NamedVariant
-    Case createFilter(def title, String query, String type, List<String> allowedNets,
-                      String icon, String visibility, def filterMetadata) {
-        Case filterCase = createCase(FilterRunner.FILTER_PETRI_NET_IDENTIFIER, title as String)
-        filterCase.setIcon(icon)
-        filterCase.dataSet[DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID].value = (title instanceof I18nString) ? title : new I18nString(title as String)
-        filterCase = workflowService.save(filterCase)
-        Task newFilterTask = findTask { it._id.eq(new ObjectId(filterCase.tasks.find { it.transition == DefaultFiltersRunner.AUTO_CREATE_TRANSITION }.task)) }
-        assignTask(newFilterTask)
-
-        def setDataMap = [
-                (DefaultFiltersRunner.FILTER_TYPE_FIELD_ID)      : [
-                        "type" : "enumeration_map",
-                        "value": type
-                ],
-                (DefaultFiltersRunner.FILTER_VISIBILITY_FIELD_ID): [
-                        "type" : "enumeration_map",
-                        "value": visibility
-                ],
-                (DefaultFiltersRunner.FILTER_FIELD_ID)           : [
-                        "type"          : "filter",
-                        "value"         : query,
-                        "allowedNets"   : allowedNets,
-                        "filterMetadata": filterMetadata ?: defaultFilterMetadata(type)
-                ]
-        ]
-        setData(newFilterTask, setDataMap)
-        finishTask(newFilterTask)
-        return workflowService.findOne(filterCase.stringId)
-    }
-
-    /**
-     * Changes data of provided filter instance. These attributes can be changed:
-     * <ul>
-     * <li> <code>changeFilter filter query { "processIdentifier:"my_process_id" }</code>
-     * <li> <code>changeFilter filter visibility { "private" }</code>
-     * <li> <code>changeFilter filter allowedNets { ["my_process_id1","my_process_id2"] }</code>
-     * <li> <pre>changeFilter filter filterMetadata { [
-     "searchCategories"       : [],
-     "predicateMetadata"      : [],
-     "filterType"             : "Case",
-     "defaultSearchCategories": true,
-     "inheritAllowedNets"     : false
-     ] }</pre>
-     * <li> <code>changeFilter filter title { new I18nString("New title") }</code>
-     * <li> <code>changeFilter filter title { "New title" }</code>
-     * <li> <code>changeFilter filter icon { "filter_alt" }</code>
-     * <li> <code>changeFilter filter uri { "/my_node1/my_node2" }</code>
-     * </ul>
-     * @param filter {@link Case} instance of filter
-     */
-    def changeFilter(Case filter) {
-        [query         : { cl ->
-            updateFilter(filter, [
-                    (DefaultFiltersRunner.FILTER_FIELD_ID): [
-                            "type" : "enumeration_map",
-                            "value": cl() as String
-                    ]
-            ])
-        },
-         visibility    : { cl ->
-             updateFilter(filter, [
-                     (DefaultFiltersRunner.FILTER_VISIBILITY_FIELD_ID): [
-                             "type" : "enumeration_map",
-                             "value": cl() as String
-                     ]
-             ])
-         },
-         allowedNets   : { cl ->
-             String currentQuery = workflowService.findOne(filter.stringId).dataSet[DefaultFiltersRunner.FILTER_FIELD_ID].value
-             updateFilter(filter, [
-                     (DefaultFiltersRunner.FILTER_FIELD_ID): [
-                             "type"       : "filter",
-                             "value"      : currentQuery,
-                             "allowedNets": cl() as List<String>
-                     ]
-             ])
-         },
-         filterMetadata: { cl ->
-             String currentQuery = workflowService.findOne(filter.stringId).dataSet[DefaultFiltersRunner.FILTER_FIELD_ID].value
-             updateFilter(filter, [
-                     (DefaultFiltersRunner.FILTER_FIELD_ID): [
-                             "type"          : "filter",
-                             "value"         : currentQuery,
-                             "filterMetadata": cl() as Map<String, Object>
-                     ]
-             ])
-         },
-         title         : { cl ->
-             filter = workflowService.findOne(filter.stringId)
-             def value = cl()
-             filter.setTitle(value as String)
-             filter.dataSet[DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID].value = (value instanceof I18nString) ? value : new I18nString(value as String)
-             workflowService.save(filter)
-         },
-         icon          : { cl ->
-             filter = workflowService.findOne(filter.stringId)
-             def icon = cl() as String
-             filter.setIcon(icon)
-             workflowService.save(filter)
-         },
-         uri           : { cl ->
-             filter = workflowService.findOne(filter.stringId)
-             def uri = cl() as String
-             filter.setUriNodeId(uriService.findByUri(uri).stringId)
-             workflowService.save(filter)
-         }]
-    }
-
-    /**
-     * deletes filter instance
-     * Note: do not call this method if given instance is referenced in any preference_item instance
-     * @param filter
-     * @return
-     */
-    def deleteFilter(Case filter) {
-        workflowService.deleteCase(filter.stringId)
-    }
-
-    /**
-     * create menu item for given filter instance
-     * @param uri
-     * @param identifier - unique item identifier
-     * @param filter
-     * @param groupName
-     * @param allowedRoles ["role_import_id": "net_import_id"]
-     * @param bannedRoles ["role_import_id": "net_import_id"]
-     * @return
-     */
-    @Deprecated
-    Case createMenuItem(String uri, String identifier, Case filter, String groupName, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
-        MenuItemBody body = new MenuItemBody(
-                uri,
-                identifier,
-                filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
-                null
-        )
-        body.setFilter(filter)
-        body.setCaseDefaultHeaders(caseDefaultHeaders)
-        body.setTaskDefaultHeaders(taskDefaultHeaders)
-        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
-        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
-        body.setUseCustomView(false)
-        body.setCaseRequireTitleInCreation(true)
-
-        return createMenuItem(body)
-    }
-
-    /**
-     * create menu item for given filter instance
-     * @param uri
-     * @param identifier - unique item identifier
-     * @param filter
-     * @param groupName
-     * @param allowedRoles
-     * @param bannedRoles
-     * @return
-     */
-    @Deprecated
-    Case createMenuItem(String uri, String identifier, Case filter, String groupName, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
-        MenuItemBody body = new MenuItemBody(
-                uri,
-                identifier,
-                filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
-                null
-        )
-        body.setFilter(filter)
-        body.setCaseDefaultHeaders(caseDefaultHeaders)
-        body.setTaskDefaultHeaders(taskDefaultHeaders)
-        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
-        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
-        body.setUseCustomView(false)
-        body.setCaseRequireTitleInCreation(true)
-
-        return createMenuItem(body)
-    }
-
-    /**
-     * create menu item for given filter instance
-     * @param uri
-     * @param identifier - unique item identifier
-     * @param filter
-     * @param groupName
-     * @param allowedRoles ["role_import_id": "net_import_id"]
-     * @param bannedRoles ["role_import_id": "net_import_id"]
-     * @param group - if null, default group is used
-     * @return
-     */
-    @Deprecated
-    Case createMenuItem(String uri, String identifier, Case filter, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], Case group = null, List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
-        MenuItemBody body = new MenuItemBody(
-                uri,
-                identifier,
-                filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
-                null
-        )
-        body.setFilter(filter)
-        body.setCaseDefaultHeaders(caseDefaultHeaders)
-        body.setTaskDefaultHeaders(taskDefaultHeaders)
-        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
-        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
-        body.setUseCustomView(false)
-        body.setCaseRequireTitleInCreation(true)
-
-        return createMenuItem(body)
-    }
-
-    /**
-     * create menu item for given filter instance
-     * @param uri
-     * @param identifier - unique item identifier
-     * @param filter
-     * @param allowedRoles
-     * @param bannedRoles
-     * @param group - if null, default group is used
-     * @return
-     */
-    @Deprecated
-    Case createMenuItem(String uri, String identifier, Case filter, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], Case group = null, List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
-        MenuItemBody body = new MenuItemBody(
-                uri,
-                identifier,
-                filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
-                null
-        )
-        body.setFilter(filter)
-        body.setCaseDefaultHeaders(caseDefaultHeaders)
-        body.setTaskDefaultHeaders(taskDefaultHeaders)
-        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
-        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
-        body.setUseCustomView(false)
-        body.setCaseRequireTitleInCreation(true)
-
-        return createMenuItem(body)
-    }
-
-    /**
-     * Creates item in menu with given parameters
-     *
-     * @param uri resource where the item is located in
-     * @param identifier unique identifier of item
-     * @param name displayed label in menu and tab
-     * @param icon displayed icon in menu and tab
-     * @param filter Case instance of filter.xml
-     * @param allowedRoles Map of roles, which have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param bannedRoles Map of roles, which don't have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param caseDefaultHeaders List of headers displayed in case view
-     * @param taskDefaultHeaders List of headers displayed in task view
-     *
-     * @return created Case of preference_item
-     * */
-    @NamedVariant
-    Case createMenuItem(String uri, String identifier, def name, String icon = "filter_none", Case filter = null,
-                        Map<String, String> allowedRoles = [:], Map<String, String> bannedRoles = [:],
-                        List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
-        MenuItemBody body = new MenuItemBody(
-                uri,
-                identifier,
-                (name instanceof I18nString) ? name : new I18nString(name as String),
-                icon
-        )
-        body.setFilter(filter)
-        body.setCaseDefaultHeaders(caseDefaultHeaders)
-        body.setTaskDefaultHeaders(taskDefaultHeaders)
-        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
-        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
-        body.setUseCustomView(false)
-        body.setCaseRequireTitleInCreation(true)
-
-        return createMenuItem(body)
-    }
-
-    /**
-     * Changes data of provided preference_item instance. These attributes can be changed:
+     * Changes data of provided menu_item instance. These attributes can be changed:
      * <ul>
      * <li> <code>changeMenuItem item allowedRoles { ["role_1":"my_process_id"] }</code>
      * <li> <code>changeMenuItem item bannedRoles { ["role_1":"my_process_id"] }</code>
-     * <li> <code>changeMenuItem item caseDefaultHeaders { ["meta-title","meta-visualId"] }</code>
-     * <li> <code>changeMenuItem item taskDefaultHeaders { ["meta-title","meta-caseId"] }</code>
-     * <li> <code>changeMenuItem item filter { filterCase }</code>
      * <li> <code>changeMenuItem item uri { "/my_node1/my_node2" }</code>
      * <li> <code>changeMenuItem item title { new I18nString("New title") }</code>
      * <li> <code>changeMenuItem item title { "New title" }</code>
      * <li> <code>changeMenuItem item menuIcon { "filter_alt" }</code>
      * <li> <code>changeMenuItem item tabIcon { "filter_none" }</code>
      * </ul>
-     * @param item {@link Case} instance of preference_item.xml
+     * @param item {@link Case} instance of menu_item.xml
      */
     def changeMenuItem(Case item) {
-        [allowedRoles          : { cl ->
-            updateMenuItemRoles(item, cl as Closure, MenuItemConstants.PREFERENCE_ITEM_FIELD_ALLOWED_ROLES.attributeId)
+        [allowedRoles      : { cl ->
+            updateMenuItemRoles(item, cl as Closure, MenuItemConstants.FIELD_ALLOWED_ROLES)
         },
-         bannedRoles           : { cl ->
-             updateMenuItemRoles(item, cl as Closure, MenuItemConstants.PREFERENCE_ITEM_FIELD_BANNED_ROLES.attributeId)
+         bannedRoles       : { cl ->
+             updateMenuItemRoles(item, cl as Closure, MenuItemConstants.FIELD_BANNED_ROLES)
          },
-         caseDefaultHeaders    : { cl ->
-             String defaultHeaders = cl() as String
-             setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
-                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS.attributeId): ["type": "text", "value": defaultHeaders]
-             ])
-         },
-         taskDefaultHeaders    : { cl ->
-             String defaultHeaders = cl() as String
-             setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
-                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS.attributeId): ["type": "text", "value": defaultHeaders]
-             ])
-         },
-         filter                : { cl ->
-             def filter = cl() as Case
-             setData("change_filter", item, [
-                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_NEW_FILTER_ID.attributeId): ["type": "text", "value": filter.stringId]
-             ])
-         },
-         uri                   : { cl ->
+         uri               : { cl ->
              def uri = cl() as String
              def aCase = useCase
              if (useCase == null || item.stringId != useCase.stringId) {
@@ -1918,41 +2121,35 @@ class ActionDelegate {
              }
              moveMenuItem(aCase, uri)
          },
-         title                 : { cl ->
+         title             : { cl ->
              def value = cl()
              I18nString newName = (value instanceof I18nString) ? value : new I18nString(value as String)
-             setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
-                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME.attributeId): ["type": "i18n", "value": newName]
+             setData(MenuItemConstants.TRANS_SYNC_ID, item, [
+                     (MenuItemConstants.FIELD_MENU_NAME): ["type": "i18n", "value": newName]
              ])
          },
-         menuIcon              : { cl ->
+         menuIcon          : { cl ->
              def value = cl()
-             setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
-                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_ICON.attributeId): ["type": "text", "value": value]
+             setData(MenuItemConstants.TRANS_SYNC_ID, item, [
+                     (MenuItemConstants.FIELD_MENU_ICON): ["type": "text", "value": value]
              ])
          },
-         tabIcon               : { cl ->
+         tabIcon           : { cl ->
              def value = cl()
-             setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
-                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_TAB_ICON.attributeId): ["type": "text", "value": value]
+             setData(MenuItemConstants.TRANS_SYNC_ID, item, [
+                     (MenuItemConstants.FIELD_TAB_ICON): ["type": "text", "value": value]
              ])
          },
-         requireTitleInCreation: { cl ->
+         useCustomView     : { cl ->
              def value = cl()
-             setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
-                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_REQUIRE_TITLE_IN_CREATION.attributeId): ["type": "boolean", "value": value]
+             setData(MenuItemConstants.TRANS_SYNC_ID, item, [
+                     (MenuItemConstants.FIELD_USE_CUSTOM_VIEW): ["type": "boolean", "value": value]
              ])
          },
-         useCustomView         : { cl ->
+         customViewSelector: { cl ->
              def value = cl()
-             setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
-                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_USE_CUSTOM_VIEW.attributeId): ["type": "boolean", "value": value]
-             ])
-         },
-         customViewSelector    : { cl ->
-             def value = cl()
-             setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
-                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_CUSTOM_VIEW_SELECTOR.attributeId): ["type": "text", "value": value]
+             setData(MenuItemConstants.TRANS_SYNC_ID, item, [
+                     (MenuItemConstants.FIELD_CUSTOM_VIEW_SELECTOR): ["type": "text", "value": value]
              ])
          }]
 
@@ -1981,202 +2178,30 @@ class ActionDelegate {
         }
     }
 
-    /**
-     * simplifies the process of creating a filter, menu item
-     * @param uri
-     * @param identifier - unique identifier of menu item
-     * @param title
-     * @param query
-     * @param icon
-     * @param type - "Case" or "Task"
-     * @param allowedNets
-     * @param groupName - name of group to add menu item to
-     * @param allowedRoles
-     * @param bannedRoles
-     * @param visibility - "private" or "public"
-     * @return
-     */
-    @Deprecated
-    Case createFilterInMenu(String uri, String identifier, def title, String query, String type,
-                            List<String> allowedNets,
-                            String groupName,
-                            Map<String, String> allowedRoles = [:],
-                            Map<String, String> bannedRoles = [:],
-                            List<String> defaultHeaders = [],
-                            String icon = "",
-                            String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE) {
-        Case filter = createFilter(title, query, type, allowedNets, icon, visibility, null)
-        Case menuItem = createMenuItem(uri, identifier, filter, groupName, allowedRoles, bannedRoles, defaultHeaders)
-        return menuItem
-    }
-
-    /**
-     * simplifies the process of creating a filter, menu item
-     * @param uri
-     * @param identifier - unique identifier of menu item
-     * @param title
-     * @param query
-     * @param icon
-     * @param type - "Case" or "Task"
-     * @param allowedNets
-     * @param allowedRoles
-     * @param bannedRoles
-     * @param visibility - "private" or "public"
-     * @param orgGroup - group to add item to, if null default group is used
-     * @return
-     */
-    @Deprecated
-    Case createFilterInMenu(String uri, String identifier, def title, String query, String type, List<String> allowedNets,
-                            Map<String, String> allowedRoles = [:],
-                            Map<String, String> bannedRoles = [:],
-                            List<String> defaultHeaders,
-                            String icon = "",
-                            String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE,
-                            Case orgGroup = null) {
-        Case filter = createFilter(title, query, type, allowedNets, icon, visibility, null)
-        Case menuItem = createMenuItem(uri, identifier, filter, allowedRoles, bannedRoles, orgGroup, defaultHeaders)
-        return menuItem
-    }
-
-    /**
-     * Creates filter and preference_item instances with given parameters.
-     *
-     * @param uri resource where the item is located in
-     * @param itemIdentifier unique identifier of item
-     * @param itemAndFilterName displayed label in menu and tab
-     * @param filterQuery elastic query for filter
-     * @param filterType type of filter. Possible values: {@value DefaultFiltersRunner#FILTER_TYPE_CASE} or
-     * {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
-     * @param filterVisibility possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or
-     * {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
-     * @param filterAllowedNets List of allowed nets. Element of list is process identifier
-     * @param itemAndFilterIcon displayed icon in menu and tab
-     * @param itemAllowedRoles Map of roles, which have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param itemBannedRoles Map of roles, which don't have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param itemCaseDefaultHeaders List of headers displayed in case view
-     * @param itemTaskDefaultHeaders List of headers displayed in task view
-     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
-     *
-     * @return created {@link Case} instance of preference_item
-     * */
-    @NamedVariant
-    Case createFilterInMenu(String uri, String itemIdentifier, def itemAndFilterName, String filterQuery,
-                            String filterType, String filterVisibility, List<String> filterAllowedNets = [],
-                            String itemAndFilterIcon = "filter_none", Map<String, String> itemAllowedRoles = [:],
-                            Map<String, String> itemBannedRoles = [:], List<String> itemCaseDefaultHeaders = [],
-                            List<String> itemTaskDefaultHeaders = [], def filterMetadata = null) {
-        Case filter = createFilter(itemAndFilterName, filterQuery, filterType, filterAllowedNets, itemAndFilterIcon, filterVisibility, filterMetadata)
-        Case menuItem = createMenuItem(uri, itemIdentifier, itemAndFilterName, itemAndFilterIcon, filter, itemAllowedRoles, itemBannedRoles, itemCaseDefaultHeaders, itemTaskDefaultHeaders)
-        return menuItem
-    }
-
-    /**
-     * Creates filter and preference_item instances with given parameters.
-     *
-     * @param body configuration class for menu item creation
-     * @param filterQuery elastic query for filter
-     * @param filterType type of filter. Possible values: {@value DefaultFiltersRunner#FILTER_TYPE_CASE} or
-     * {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
-     * @param filterVisibility possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or
-     * {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
-     * @param filterAllowedNets List of allowed nets. Element of list is process identifier
-     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
-     *
-     * @return created {@link Case} instance of preference_item
-     * */
-    Case createFilterInMenu(MenuItemBody body, String filterQuery, String filterType, String filterVisibility,
-                            List<String> filterAllowedNets = [], def filterMetadata = null) {
-        Case filter = createFilter(body.menuName, filterQuery, filterType, filterAllowedNets, body.menuIcon, filterVisibility, filterMetadata)
-        body.filter = filter
-        Case menuItem = createMenuItem(body)
-        return menuItem
-    }
-
     Case createMenuItem(MenuItemBody body) {
-        String sanitizedIdentifier = sanitize(body.identifier)
-
-        if (existsMenuItem(sanitizedIdentifier)) {
-            throw new IllegalArgumentException("Menu item identifier $sanitizedIdentifier is not unique!")
-        }
-
-        Case parentItemCase = getOrCreateFolderItem(body.uri)
-        I18nString newName = body.menuName ?: (body.filter?.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString)
-
-        Case menuItemCase = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, newName?.defaultValue)
-        menuItemCase.setUriNodeId(uriService.findByUri(body.uri).stringId)
-        menuItemCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_ALLOWED_ROLES.attributeId].options = body.allowedRoles
-        menuItemCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_BANNED_ROLES.attributeId].options = body.bannedRoles
-        if (parentItemCase != null) {
-            parentItemCase = appendChildCaseIdAndSave(parentItemCase, menuItemCase.stringId)
-        }
-        menuItemCase = workflowService.save(menuItemCase)
-        Task newItemTask = findTask { it._id.eq(new ObjectId(menuItemCase.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)) }
-        String nodePath = createNodePath(body.uri, sanitizedIdentifier)
-        uriService.getOrCreate(nodePath, UriContentType.CASE)
-
-        newItemTask = assignTask(newItemTask)
-        setData(newItemTask, body.toDataSet(parentItemCase.stringId, nodePath))
-        finishTask(newItemTask)
-
-        return workflowService.findOne(menuItemCase.stringId)
+        return menuItemService.createMenuItem(body)
     }
 
-    protected String sanitize(String input) {
-        return Normalizer.normalize(input.trim(), Normalizer.Form.NFD)
-                .replaceAll("[^\\p{ASCII}]", "")
-                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
-                .replaceAll("[\\W-]+", "-")
-                .toLowerCase()
-    }
+    protected ViewBody createLegacyMenuItemViews(FilterBody filterBody, List<String> caseDefaultHeaders = null,
+                                                 List<String> taskDefaultHeaders = null) {
+        if (filterBody.getType() == "Case") {
+            ViewBody caseView = new CaseViewBody()
+            caseView.setFilterBody(filterBody)
+            caseView.setDefaultHeaders(caseDefaultHeaders)
+            caseView.setRequireTitleInCreation(true)
 
-    protected String createNodePath(String uri, String identifier) {
-        if (uri == uriService.getUriSeparator()) {
-            return uri + identifier
-        } else {
-            return uri + uriService.getUriSeparator() + identifier
+            ViewBody taskView = new TaskViewBody()
+            taskView.setDefaultHeaders(taskDefaultHeaders)
+            caseView.setChainedView(taskView)
+
+            return caseView
+        } else if (filterBody.getType() == "Task") {
+            ViewBody taskView = new TaskViewBody()
+            taskView.setFilterBody(filterBody)
+            taskView.setDefaultHeaders(taskDefaultHeaders)
+            return taskView
         }
-    }
-
-    protected Case getOrCreateFolderItem(String uri) {
-        UriNode node = uriService.getOrCreate(uri, UriContentType.CASE)
-        MenuItemBody body = new MenuItemBody(new I18nString(node.name), "folder")
-        return getOrCreateFolderRecursive(node, body)
-    }
-
-    protected Case getOrCreateFolderRecursive(UriNode node, MenuItemBody body, Case childFolderCase = null) {
-        Case folder = findFolderCase(node)
-        if (folder != null) {
-            if (childFolderCase != null) {
-                folder = appendChildCaseIdAndSave(folder, childFolderCase.stringId)
-                initializeParentId(childFolderCase, folder.stringId)
-            }
-            return folder
-        }
-
-        folder = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, body.menuName.toString())
-        folder.setUriNodeId(node.parentId)
-        if (childFolderCase != null) {
-            folder = appendChildCaseIdAndSave(folder, childFolderCase.stringId)
-            initializeParentId(childFolderCase, folder.stringId)
-        } else {
-            folder = workflowService.save(folder)
-        }
-        Task newItemTask = findTask { it._id.eq(new ObjectId(folder.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)) }
-        assignTask(newItemTask)
-        setData(newItemTask, body.toDataSet(null, node.uriPath))
-        finishTask(newItemTask)
-
-        folder = workflowService.findOne(folder.stringId)
-        if (node.parentId != null) {
-            UriNode parentNode = uriService.findById(node.parentId)
-            body = new MenuItemBody(new I18nString(parentNode.name), "folder")
-
-            getOrCreateFolderRecursive(parentNode, body, folder)
-        }
-
-        return folder
+        return null
     }
 
     /**
@@ -2184,208 +2209,29 @@ class ActionDelegate {
      * item is moved. Cyclic destination path is forbidden (f.e. from <code>"/my_node"</code> to
      * <code>"/my_node/my_node2"</code>
      *
-     * @param item Instance of preference_item to be moved
+     * @param item Instance of menu_item to be moved
      * @param destUri destination path where the item will be moved. F.e. <code>"/my_new_node"</code>
      * */
     void moveMenuItem(Case item, String destUri) {
-        if (isCyclicNodePath(item, destUri)) {
-            throw new IllegalArgumentException("Cyclic path not supported. Destination path: ${destUri}")
-        }
-
-        List<Case> casesToSave = new ArrayList<>()
-
-        List<String> parentIdList = item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value as ArrayList<String>
-        if (parentIdList != null && parentIdList.size() > 0) {
-            Case oldParent = removeChildItemFromParent(parentIdList[0], item)
-            casesToSave.add(oldParent)
-        }
-
-        UriNode destNode = uriService.getOrCreate(destUri, UriContentType.CASE)
-        Case newParent = getOrCreateFolderItem(destNode.uriPath)
-        if (newParent != null) {
-            item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value = [newParent.stringId] as ArrayList
-            newParent = appendChildCaseId(newParent, item.stringId)
-            casesToSave.add(newParent)
-        } else {
-            item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value = null
-        }
-
-        item.uriNodeId = destNode.stringId
-        item = resolveAndHandleNewNodePath(item, destNode.uriPath)
-        casesToSave.add(item)
-
-        if (hasChildren(item)) {
-            List<Case> childrenToSave = updateNodeInChildrenFoldersRecursive(item)
-            casesToSave.addAll(childrenToSave)
-        }
-
-        for (aCase in casesToSave) {
-            if (aCase != null) {
-                workflowService.save(aCase)
-            }
-        }
+        menuItemService.moveItem(item, destUri)
     }
 
     /**
-     * Duplicates menu item. It creates new preference_item instance with the same {@link Case#dataSet} as the provided
-     * item instance. The only difference is in title, menu_item_identifier and associations
+     * Duplicates menu item. It creates new menu_item instance with the same dataSet as the provided
+     * item instance. The only difference is in title, menu_item_identifier and associations. Configuration cases are
+     * duplicated as well.
      *
      * @param originItem Menu item instance, which is duplicated
      * @param newTitle Title of menu item, that is displayed in menu and tab. Cannot be empty or null.
      * @param newIdentifier unique menu item identifier
      *
-     * @return duplicated {@link Case} instance of preference_item
+     * @return duplicated {@link Case} instance of menu_item
+     *
+     * @throws IllegalArgumentException if the input data are invalid or the menu item of the new identifier already
+     * exists
      * */
     Case duplicateMenuItem(Case originItem, I18nString newTitle, String newIdentifier) {
-        if (!newIdentifier) {
-            throw new IllegalArgumentException("View item identifier is null!")
-        }
-        if (newTitle == null || newTitle.defaultValue == "") {
-            throw new IllegalArgumentException("Default title is empty")
-        }
-        String sanitizedIdentifier = sanitize(newIdentifier)
-        if (existsMenuItem(sanitizedIdentifier)) {
-            throw new IllegalArgumentException("View item identifier $sanitizedIdentifier is not unique!")
-        }
-
-        Case duplicated = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, newTitle.defaultValue)
-        duplicated.uriNodeId = originItem.uriNodeId
-        duplicated.dataSet = originItem.dataSet
-        duplicated.title = newTitle.defaultValue
-        duplicated = workflowService.save(duplicated)
-
-        UriNode node = uriService.findById(originItem.uriNodeId)
-        String newNodePath = createNodePath(node.uriPath, sanitizedIdentifier)
-        uriService.getOrCreate(newNodePath, UriContentType.CASE)
-
-        Task newItemTask = findTask { it._id.eq(new ObjectId(duplicated.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)) }
-        Map updatedDataSet = [
-                (MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE.attributeId)               : [
-                        "value": null,
-                        "type" : "text"
-                ],
-                (MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER.attributeId)          : [
-                        "value": null,
-                        "type" : "text"
-                ],
-                (MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME.attributeId)                     : [
-                        "value": newTitle,
-                        "type" : "i18n"
-                ],
-                (MenuItemConstants.PREFERENCE_ITEM_FIELD_TAB_NAME.attributeId)                      : [
-                        "value": newTitle,
-                        "type" : "i18n"
-                ],
-                (MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId)                     : [
-                        "value": newNodePath,
-                        "type" : "text"
-                ],
-                // Must be reset by button, because we have the same dataSet reference between originItem and duplicated
-                (MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_RESET_CHILD_ITEM_IDS.attributeId): [
-                        "value": 0,
-                        "type" : "button"
-                ],
-        ]
-        assignTask(newItemTask)
-        dataService.setData(newItemTask, ImportHelper.populateDataset(updatedDataSet))
-        finishTask(newItemTask)
-
-        String parentId = (originItem.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value as ArrayList).get(0)
-        if (parentId) {
-            Case parent = workflowService.findOne(parentId)
-            appendChildCaseIdAndSave(parent, duplicated.stringId)
-        }
-        return workflowService.findOne(duplicated.stringId)
-    }
-
-    private List<Case> updateNodeInChildrenFoldersRecursive(Case parentFolder) {
-        List<String> childItemIds = parentFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as List<String>
-        if (childItemIds == null || childItemIds.isEmpty()) {
-            return new ArrayList<Case>()
-        }
-
-        List<Case> children = workflowService.findAllById(childItemIds)
-
-        List<Case> casesToSave = new ArrayList<>()
-        for (child in children) {
-            UriNode parentNode = uriService.getOrCreate(parentFolder.getFieldValue(MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId) as String, UriContentType.CASE)
-            child.uriNodeId = parentNode.stringId
-            child = resolveAndHandleNewNodePath(child, parentNode.uriPath)
-
-            casesToSave.add(child)
-            casesToSave.addAll(updateNodeInChildrenFoldersRecursive(child))
-        }
-
-        return casesToSave
-    }
-
-    private Case resolveAndHandleNewNodePath(Case folderItem, String destUri) {
-        String newNodePath = resolveNewNodePath(folderItem, destUri)
-        UriNode newNode = uriService.getOrCreate(newNodePath, UriContentType.CASE)
-        folderItem.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId].value = newNode.uriPath
-
-        return folderItem
-    }
-
-    private String resolveNewNodePath(Case folderItem, String destUri) {
-        return destUri +
-                uriService.getUriSeparator() +
-                folderItem.getFieldValue(MenuItemConstants.PREFERENCE_ITEM_FIELD_IDENTIFIER.attributeId) as String
-    }
-
-    private Case removeChildItemFromParent(String folderId, Case childItem) {
-        Case parentFolder = workflowService.findOne(folderId)
-        (parentFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as List).remove(childItem.stringId)
-        parentFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_HAS_CHILDREN.attributeId].value = hasChildren(parentFolder)
-        workflowService.save(parentFolder)
-    }
-
-    private boolean isCyclicNodePath(Case folderItem, String destUri) {
-        String oldNodePath = folderItem.getFieldValue(MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId)
-        return destUri.contains(oldNodePath)
-    }
-
-    private boolean hasChildren(Case folderItem) {
-        List children = folderItem.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as List
-        return children != null && children.size() > 0
-    }
-
-    private Case appendChildCaseIdAndSave(Case folderCase, String childItemCaseId) {
-        folderCase = appendChildCaseId(folderCase, childItemCaseId)
-        return workflowService.save(folderCase)
-    }
-
-    private Case appendChildCaseId(Case folderCase, String childItemCaseId) {
-        List<String> childIds = folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as ArrayList<String>
-        if (childIds == null) {
-            folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value = [childItemCaseId] as ArrayList
-        } else {
-            folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value = childIds + [childItemCaseId] as ArrayList
-        }
-
-        folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_HAS_CHILDREN.attributeId].value = hasChildren(folderCase)
-
-        return folderCase
-    }
-
-    private Case initializeParentId(Case childFolderCase, String parentFolderCaseId) {
-        childFolderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value = [parentFolderCaseId] as ArrayList
-        return workflowService.save(childFolderCase)
-    }
-
-    protected Case findFolderCase(UriNode node) {
-        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.nodePath.textValue.keyword:\"$node.uriPath\"")
-    }
-
-    /**
-     * Finds filter by name
-     *
-     * @param name Title of the filter
-     *
-     * @return found filter instance. Can be null
-     */
-    Case findFilter(String name) {
-        return findCaseElastic("processIdentifier:$FilterRunner.FILTER_PETRI_NET_IDENTIFIER AND title.keyword:\"$name\"" as String)
+        return menuItemService.duplicateItem(originItem, newTitle, newIdentifier)
     }
 
     /**
@@ -2393,10 +2239,19 @@ class ActionDelegate {
      *
      * @param menuItemIdentifier unique menu item identifier
      *
-     * @return found preference_item instance. Can be null
+     * @return found menu_item instance. Can be null
      */
     Case findMenuItem(String menuItemIdentifier) {
-        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.menu_item_identifier.textValue.keyword:\"$menuItemIdentifier\"" as String)
+        return menuItemService.findMenuItem(menuItemIdentifier)
+    }
+
+    /**
+     * @param node uri node
+     *
+     * @return folder menu item case by provided UriNode
+     * */
+    Case findFolderCase(UriNode node) {
+        return menuItemService.findFolderCase(node)
     }
 
     /**
@@ -2407,7 +2262,7 @@ class ActionDelegate {
      * @return true if the item exists
      * */
     boolean existsMenuItem(String menuItemIdentifier) {
-        return countCasesElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND dataSet.menu_item_identifier.fulltextValue.keyword:\"$menuItemIdentifier\"") > 0
+        return menuItemService.existsMenuItem(menuItemIdentifier)
     }
 
     /**
@@ -2417,13 +2272,7 @@ class ActionDelegate {
      * @return
      */
     Case findMenuItem(String uri, String name) {
-        UriNode uriNode = uriService.findByUri(uri)
-        return findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND title.keyword:\"$name\" AND uriNodeId:\"$uriNode.stringId\"")
-    }
-
-    Case findMenuItemByUriAndIdentifier(String uri, String identifier) {
-        String nodePath = createNodePath(uri, identifier)
-        return findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND dataSet.${MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId}.textValue.keyword:\"$nodePath\"")
+        return menuItemService.findMenuItem(uri, name)
     }
 
     /**
@@ -2450,22 +2299,34 @@ class ActionDelegate {
         return findMenuItem(uri, name)
     }
 
-    /**
-     * Retrieves filter case from preference_item {@link Case}
-     *
-     * @param item preference_item instance
-     *
-     * @return found filter instance. If not found, <code>null</code> is returned
-     */
-    Case getFilterFromMenuItem(Case item) {
-        String filterId = (item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_FILTER_CASE.attributeId].value as List)[0] as String
-        return filterId ? workflowService.findOne(filterId) : null
+    Case createDashboardManagement(DashboardManagementBody body) {
+        return dashboardManagementService.createDashboardManagement(body)
+    }
+
+    Case createDashboardItem(DashboardItemBody body) {
+        return dashboardItemService.getOrCreate(body)
+    }
+
+    Case findDashboardManagement(String identifier) {
+        return dashboardManagementService.findDashboardManagement(identifier)
+    }
+
+    Case findDashboardItem(String identifier) {
+        return dashboardItemService.findById(identifier)
+    }
+
+    Case updateDashboardManagement(Case managementCase, DashboardManagementBody body) {
+        return dashboardManagementService.updateDashboardManagement(managementCase, body)
+    }
+
+    Case updateDashboardItem(Case itemCase, DashboardItemBody body) {
+        return dashboardItemService.update(itemCase, body)
     }
 
     /**
      * search elastic with string query for first occurrence
-     * @param query
-     * @return
+     * @param query string with search conditions
+     * @return one case which match search condition or null
      */
     Case findCaseElastic(String query) {
         def result = findCasesElastic(query, PageRequest.of(0, 1))
@@ -2473,9 +2334,20 @@ class ActionDelegate {
     }
 
     /**
+     * search elastic with string query for cases and default page size of 100 cases
+     * @param query string with search conditions
+     * @param pageSize optional parameter which decides number of returned elements
+     * @return list of cases (default max 100) which match condition
+     */
+    List<Case> findCasesElastic(String query, int pageSize = 100) {
+        this.findCasesElastic(query, PageRequest.of(0, pageSize))
+    }
+
+    /**
      * search elastic with string query for cases
-     * @param query
-     * @return
+     * @param query string with search conditions
+     * @param pageable object which decides page size, page number and order of elements
+     * @return list of cases (size and order depends on pageable object) which match condition
      */
     List<Case> findCasesElastic(String query, Pageable pageable) {
         CaseSearchRequest request = new CaseSearchRequest()
@@ -2484,6 +2356,11 @@ class ActionDelegate {
         return result
     }
 
+    /**
+     * find count of cases which match condition
+     * @param query string with search conditions
+     * @return number of cases which match condition
+     */
     long countCasesElastic(String query) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
@@ -2509,7 +2386,7 @@ class ActionDelegate {
     Map<String, I18nString> collectRolesForPreferenceItem(Map<String, String> roles) {
         Map<String, PetriNet> temp = [:]
         return roles.collectEntries { entry ->
-            if (entry.value.equals(GLOBAL_ROLE)) {
+            if (entry.value == GLOBAL_ROLE) {
                 Set<ProcessRole> findGlobalRole = processRoleService.findAllByImportId(ProcessRole.GLOBAL + entry.key)
                 if (findGlobalRole == null || findGlobalRole.isEmpty()) {
                     return
@@ -2530,146 +2407,8 @@ class ActionDelegate {
         } as Map<String, I18nString>
     }
 
-    private void updateFilter(Case filter, Map dataSet) {
-        setData(DefaultFiltersRunner.DETAILS_TRANSITION, filter, dataSet)
-    }
-
     I18nString i18n(String value, Map<String, String> translations) {
         return new I18nString(value, translations)
-    }
-
-    @Deprecated
-    Map<String, Case> createMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles, Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
-        if (existsMenuItem(id)) {
-            log.info("$id menu exists")
-            return null
-        }
-        Case filter = createCaseFilter(title, query, allowedNets, icon, DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE)
-        Case menu = createMenuItem(uri, id, filter, roles, bannedRoles, group, defaultHeaders)
-        return [
-                "filter"  : filter,
-                "menuItem": menu
-        ]
-    }
-
-    @Deprecated
-    Map<String, Case> createTaskMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles, Case group = null, List<String> defaultHeaders = []) {
-        if (existsMenuItem(id)) {
-            log.info("$id menu exists")
-            return null
-        }
-        Case filter = createTaskFilter(title, query, allowedNets, icon, DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE)
-        Case menu = createMenuItem(uri, id, filter, roles, [:], group, defaultHeaders)
-        return [
-                "filter"  : filter,
-                "menuItem": menu
-        ]
-    }
-
-    @Deprecated
-    Case createOrUpdateCaseMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles = [:], Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
-        return createOrUpdateMenuItemAndFilter(uri, id, title, query, DefaultFiltersRunner.FILTER_TYPE_CASE,
-                DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, allowedNets, icon, roles, bannedRoles, defaultHeaders)
-    }
-
-    @Deprecated
-    Case createOrUpdateTaskMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles = [:], Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
-        return createOrUpdateMenuItemAndFilter(uri, id, title, query, DefaultFiltersRunner.FILTER_TYPE_TASK,
-                DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, allowedNets, icon, roles, bannedRoles, defaultHeaders)
-    }
-
-    @Deprecated
-    Case createOrUpdateMenuItem(String id, String uri, String type, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles = [:], Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
-        Case menuItem = findMenuItem(sanitize(id))
-        if (!menuItem) {
-            Case filter = createFilter(title, query, type, allowedNets, icon, DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, null)
-            createUri(uri, UriContentType.DEFAULT)
-
-            return createMenuItem(uri, id, title, icon, filter, roles, bannedRoles)
-        } else {
-            Case filter = getFilterFromMenuItem(menuItem)
-            changeFilter filter query { query }
-            changeFilter filter allowedNets { allowedNets }
-            changeFilter filter title { title }
-            changeFilter filter icon { icon }
-            changeMenuItem menuItem allowedRoles { roles }
-            changeMenuItem menuItem bannedRoles { bannedRoles }
-            changeMenuItem menuItem defaultHeaders { defaultHeaders.join(",") }
-            changeMenuItem menuItem uri { uri }
-            changeMenuItem menuItem filter { filter }
-
-            return workflowService.findOne(menuItem.stringId)
-        }
-    }
-
-    /**
-     * Creates or updates menu item with given identifier.
-     *
-     * @param uri resource where the item is located in
-     * @param identifier unique identifier of item
-     * @param name displayed label in menu and tab
-     * @param icon displayed icon in menu and tab
-     * @param filter Case instance of filter.xml
-     * @param allowedRoles Map of roles, which have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param bannedRoles Map of roles, which don't have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param caseDefaultHeaders List of headers displayed in case view
-     * @param taskDefaultHeaders List of headers displayed in task view
-     *
-     * @return created or updated menu item instance
-     * */
-    Case createOrUpdateMenuItem(String uri, String identifier, def name, String icon = "filter_none", Case filter = null,
-                                Map<String, String> allowedRoles = [:], Map<String, String> bannedRoles = [:],
-                                List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
-        MenuItemBody body = new MenuItemBody(uri, identifier, name, icon)
-        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
-        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
-        body.setCaseDefaultHeaders(caseDefaultHeaders)
-        body.setTaskDefaultHeaders(taskDefaultHeaders)
-        body.setFilter(filter)
-
-        return createOrUpdateMenuItem(body)
-    }
-
-    /**
-     * Creates or updates menu item with given identifier along with the filter instance. It's safe to use on existing
-     * menu item instance, that doesn't contain filter. In such case, missing filter will be created with provided
-     * parameters.
-     *
-     * @param uri resource where the item is located in
-     * @param itemIdentifier unique identifier of item
-     * @param itemAndFilterName displayed label in menu and tab
-     * @param filterQuery elastic query for filter
-     * @param filterType type of filter. Possible values: {@value DefaultFiltersRunner#FILTER_TYPE_CASE} or
-     * {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
-     * @param filterVisibility possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or
-     * {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
-     * @param filterAllowedNets List of allowed nets. Element of list is process identifier
-     * @param itemAndFilterIcon displayed icon in menu and tab
-     * @param itemAllowedRoles Map of roles, which have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param itemBannedRoles Map of roles, which don't have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param itemCaseDefaultHeaders List of headers displayed in case view
-     * @param itemTaskDefaultHeaders List of headers displayed in task view
-     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
-     *
-     * @return created or updated menu item instance along with the actual filter
-     * */
-    Case createOrUpdateMenuItemAndFilter(String uri, String itemIdentifier, def itemAndFilterName, String filterQuery,
-                                         String filterType, String filterVisibility, List<String> filterAllowedNets = [],
-                                         String itemAndFilterIcon = "filter_none", Map<String, String> itemAllowedRoles = [:],
-                                         Map<String, String> itemBannedRoles = [:], List<String> itemCaseDefaultHeaders = [],
-                                         List<String> itemTaskDefaultHeaders = [], def filterMetadata = null) {
-        MenuItemBody body = new MenuItemBody(uri, itemIdentifier, itemAndFilterName, itemAndFilterIcon)
-        body.allowedRoles = collectRolesForPreferenceItem(itemAllowedRoles)
-        body.bannedRoles = collectRolesForPreferenceItem(itemBannedRoles)
-        body.caseDefaultHeaders = itemCaseDefaultHeaders
-        body.taskDefaultHeaders = itemTaskDefaultHeaders
-
-        return createOrUpdateMenuItemAndFilter(body, filterQuery, filterType, filterVisibility, filterAllowedNets,
-                filterMetadata)
     }
 
     /**
@@ -2680,51 +2419,7 @@ class ActionDelegate {
      * @return created or updated menu item instance
      * */
     Case createOrUpdateMenuItem(MenuItemBody body) {
-        Case item = findMenuItem(sanitize(body.identifier))
-        if (item) {
-            return updateMenuItem(item, body)
-        } else {
-            return createMenuItem(body)
-        }
-    }
-
-    /**
-     * Creates or updates menu item with given identifier along with the filter instance. It's safe to use on existing
-     * menu item instance, that doesn't contain filter. In such case, missing filter will be created with provided
-     * parameters.
-     *
-     * @param body data for menu item
-     * @param filterQuery elastic query for filter
-     * @param filterType type of filter. Possible values: {@value DefaultFiltersRunner#FILTER_TYPE_CASE} or
-     * {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
-     * @param filterVisibility possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or
-     * {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
-     * @param filterAllowedNets List of allowed nets. Element of list is process identifier
-     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
-     *
-     * @return created or updated menu item instance along with the actual filter
-     * */
-    Case createOrUpdateMenuItemAndFilter(MenuItemBody body, String filterQuery, String filterType, String filterVisibility,
-                                         List<String> filterAllowedNets = [], def filterMetadata = null) {
-        Case item = findMenuItem(sanitize(body.identifier))
-        if (item) {
-            Case filter = getFilterFromMenuItem(item)
-            if (filter) {
-                changeFilter filter query { filterQuery }
-                changeFilter filter visibility { filterVisibility }
-                changeFilter filter allowedNets { filterAllowedNets }
-                changeFilter filter filterMetadata { filterMetadata ?: defaultFilterMetadata(filterType) }
-                changeFilter filter title { body.menuName }
-                changeFilter filter icon { body.menuIcon }
-            } else {
-                body.filter = createFilter(body.menuName, filterQuery, filterType, filterAllowedNets, body.menuIcon,
-                        filterVisibility, filterMetadata)
-            }
-
-            return updateMenuItem(item, body)
-        } else {
-            return createFilterInMenu(body, filterQuery, filterType, filterVisibility, filterAllowedNets, filterMetadata)
-        }
+        return menuItemService.createOrUpdateMenuItem(body)
     }
 
     /**
@@ -2735,38 +2430,7 @@ class ActionDelegate {
      * @return created or existing menu item instance
      * */
     Case createOrIgnoreMenuItem(MenuItemBody body) {
-        Case item = findMenuItem(body.identifier)
-        if (!item) {
-            return createMenuItem(body)
-        } else {
-            return item
-        }
-    }
-
-    /**
-     * Creates menu item or ignores it if already exists. If existing item does not contain filter, the filter instance
-     * is created by provided parameters.
-     *
-     * @param body configuration class for menu item
-     *
-     * @return created or existing menu item instance
-     * */
-    Case createOrIgnoreMenuItemAndFilter(MenuItemBody body, String filterQuery, String filterType, String filterVisibility,
-                                         List<String> filterAllowedNets = [], def filterMetadata = null) {
-        Case item = findMenuItem(body.identifier)
-        if (!item) {
-            return createFilterInMenu(body, filterQuery, filterType, filterVisibility, filterAllowedNets, filterMetadata)
-        } else {
-            Case filter = getFilterFromMenuItem(item)
-            if (!filter) {
-                filter = createFilter(body.menuName, filterQuery, filterType, filterAllowedNets, body.menuIcon, filterVisibility,
-                        filterMetadata)
-                changeMenuItem item filter { filter }
-                return workflowService.findOne(item.stringId)
-            } else {
-                return item
-            }
-        }
+        return menuItemService.createOrIgnoreMenuItem(body)
     }
 
     /**
@@ -2778,18 +2442,11 @@ class ActionDelegate {
      * @return updated menu item instance
      * */
     Case updateMenuItem(Case item, MenuItemBody body) {
-        def outcome = setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, body.toDataSet())
-        return outcome.case
+        return menuItemService.updateMenuItem(item, body)
     }
 
-    static Map defaultFilterMetadata(String type) {
-        return [
-                "searchCategories"       : [],
-                "predicateMetadata"      : [],
-                "filterType"             : type,
-                "defaultSearchCategories": true,
-                "inheritAllowedNets"     : false
-        ]
+    void removeChildItemFromParent(String folderId, Case childItem) {
+        menuItemService.removeChildItemFromParent(folderId, childItem)
     }
 
     String makeUrl(String publicViewUrl = publicViewProperties.url, String identifier) {
@@ -2863,5 +2520,444 @@ class ActionDelegate {
         Task task = taskService.findOne(taskId)
         Case taskCase = workflowService.findOne(task.caseId)
         return taskCase.getPetriNet().getDataSet().get(fieldId)
+    }
+
+    PetriNet importPetriNet(String xmlText) {
+        InputStream xmlStream = new ByteArrayInputStream(xmlText.bytes)
+        def outcome = petriNetService.importPetriNet(xmlStream, loggedUser().transformToLoggedUser())
+        return outcome.getNet()
+    }
+
+    /**
+     * Searches for a single {@link Case} matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code case} (singular).
+     * </p>
+     * Example:
+     * <pre>
+     *     searchCase("case: processIdentifier eq 'query_test' and data.number_0.value == 3")
+     *     searchCase("case: id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code case:}
+     * @return matching {@link Case} or {@code null} if none is found
+     */
+    Case searchCase(String query) {
+        return caseSearchService.searchOne(query)
+    }
+
+    /**
+     * Searches for all {@link Case} instances matching the given query and returns a paged result.
+     * <p>
+     * The query must start with the resource keyword {@code cases} (plural) and may contain
+     * paging and sorting clauses.
+     * </p>
+     * Example:
+     * <pre>
+     *     pagedSearchCases("cases: processIdentifier eq 'query_test' page 1 size 5 sort by title desc")
+     *     pagedSearchCases("cases: author eq 'user@mail.com' and creationDate gt 2020-03-03")
+     * </pre>
+     *
+     * @param query query language string starting with {@code cases:}
+     * @return {@link Page} of matching cases
+     */
+    Page<Case> pagedSearchCases(String query) {
+        return caseSearchService.searchAll(query)
+    }
+
+    /**
+     * Searches for all {@link Case} instances matching the given query and returns them as a list.
+     * <p>
+     * The query must start with the resource keyword {@code cases} (plural). This is a convenience
+     * method returning only the content of {@link #pagedSearchCases(String)}.
+     * </p>
+     * Example:
+     * <pre>
+     *     searchCases("cases: processIdentifier eq 'query_test' and data.boolean_0.value == true")
+     *     searchCases("cases: title contains 'Test' sort by creationDate desc")
+     * </pre>
+     *
+     * @param query query language string starting with {@code cases:}
+     * @return list of matching cases
+     */
+    List<Case> searchCases(String query) {
+        return pagedSearchCases(query).content
+    }
+
+    /**
+     * Counts the number of {@link Case} instances matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code cases} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     countCases("cases: processIdentifier eq 'query_test'")
+     *     countCases("cases: data.boolean_0.value == true and data.text_0.value != '4'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code cases:}
+     * @return number of matching cases
+     */
+    long countCases(String query) {
+        return caseSearchService.count(query)
+    }
+
+    /**
+     * Checks whether at least one {@link Case} matching the given query exists.
+     * <p>
+     * The query must start with the resource keyword {@code cases} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     existsCase("cases: processIdentifier eq 'query_test'")
+     *     existsCase("cases: id in ('5f9b1c2d3e4f5a6b7c8d9e0f', '5f9b1c2d3e4f5a6b7c8d9e10')")
+     * </pre>
+     *
+     * @param query query language string starting with {@code cases:}
+     * @return {@code true} if a matching case exists, {@code false} otherwise
+     */
+    boolean existsCase(String query) {
+        return caseSearchService.exists(query)
+    }
+
+    /**
+     * Searches for a single {@link Task} matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code task} (singular).
+     * </p>
+     * Example:
+     * <pre>
+     *     searchTask("task: transitionId eq 't1' and caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     *     searchTask("task: id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code task:}
+     * @return matching {@link Task} or {@code null} if none is found
+     */
+    Task searchTask(String query) {
+        return taskSearchService.searchOne(query)
+    }
+
+    /**
+     * Searches for all {@link Task} instances matching the given query and returns a paged result.
+     * <p>
+     * The query must start with the resource keyword {@code tasks} (plural) and may contain
+     * paging and sorting clauses.
+     * </p>
+     * Example:
+     * <pre>
+     *     pagedSearchTasks("tasks: title eq 'test' page 0 size 10 sort by lastFinish desc")
+     *     pagedSearchTasks("tasks: userId eq 'user1' and state eq enabled")
+     * </pre>
+     *
+     * @param query query language string starting with {@code tasks:}
+     * @return {@link Page} of matching tasks
+     */
+    Page<Task> pagedSearchTasks(String query) {
+        return taskSearchService.searchAll(query)
+    }
+
+    /**
+     * Searches for all {@link Task} instances matching the given query and returns them as a list.
+     * <p>
+     * The query must start with the resource keyword {@code tasks} (plural). This is a convenience
+     * method returning only the content of {@link #pagedSearchTasks(String)}.
+     * </p>
+     * Example:
+     * <pre>
+     *     searchTasks("tasks: processId eq 'my_process' and userId in ('user1', 'user2')")
+     *     searchTasks("tasks: title contains 'Approve' sort by title asc")
+     * </pre>
+     *
+     * @param query query language string starting with {@code tasks:}
+     * @return list of matching tasks
+     */
+    List<Task> searchTasks(String query) {
+        return pagedSearchTasks(query).content
+    }
+
+    /**
+     * Counts the number of {@link Task} instances matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code tasks} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     countTasks("tasks: caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     *     countTasks("tasks: transitionId eq 't1' and userId eq 'user1'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code tasks:}
+     * @return number of matching tasks
+     */
+    long countTasks(String query) {
+        return taskSearchService.count(query)
+    }
+
+    /**
+     * Checks whether at least one {@link Task} matching the given query exists.
+     * <p>
+     * The query must start with the resource keyword {@code tasks} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     existsTask("tasks: caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     *     existsTask("tasks: transitionId eq 't1' and userId not eq 'user1'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code tasks:}
+     * @return {@code true} if a matching task exists, {@code false} otherwise
+     */
+    boolean existsTask(String query) {
+        return taskSearchService.exists(query)
+    }
+
+    /**
+     * Searches for a single {@link PetriNet} (process) matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code process} (singular).
+     * </p>
+     * Example:
+     * <pre>
+     *     searchProcess("process: identifier == 'query_test'")
+     *     searchProcess("process: identifier eq 'my_process' and version eq 1.0.0")
+     * </pre>
+     *
+     * @param query query language string starting with {@code process:}
+     * @return matching {@link PetriNet} or {@code null} if none is found
+     */
+    PetriNet searchProcess(String query) {
+        return processSearchService.searchOne(query)
+    }
+
+    /**
+     * Searches for all {@link PetriNet} (process) instances matching the given query and returns a paged result.
+     * <p>
+     * The query must start with the resource keyword {@code processes} (plural) and may contain
+     * paging and sorting clauses.
+     * </p>
+     * Example:
+     * <pre>
+     *     pagedSearchProcesses("processes: identifier eq 'my_process' page 0 size 10 sort by version desc")
+     *     pagedSearchProcesses("processes: version in (1.0.0 : 2.0.0)")
+     * </pre>
+     *
+     * @param query query language string starting with {@code processes:}
+     * @return {@link Page} of matching processes
+     */
+    Page<PetriNet> pagedSearchProcesses(String query) {
+        return processSearchService.searchAll(query)
+    }
+
+    /**
+     * Searches for all {@link PetriNet} (process) instances matching the given query and returns them as a list.
+     * <p>
+     * The query must start with the resource keyword {@code processes} (plural). This is a convenience
+     * method returning only the content of {@link #pagedSearchProcesses(String)}.
+     * </p>
+     * Example:
+     * <pre>
+     *     searchProcesses("processes: title contains 'Test' sort by identifier asc")
+     *     searchProcesses("processes: identifier in ('process_a', 'process_b')")
+     * </pre>
+     *
+     * @param query query language string starting with {@code processes:}
+     * @return list of matching processes
+     */
+    List<PetriNet> searchProcesses(String query) {
+        return pagedSearchProcesses(query).content
+    }
+
+    /**
+     * Counts the number of {@link PetriNet} (process) instances matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code processes} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     countProcesses("processes: identifier eq 'my_process'")
+     *     countProcesses("processes: version gte 1.0.0")
+     * </pre>
+     *
+     * @param query query language string starting with {@code processes:}
+     * @return number of matching processes
+     */
+    long countProcesses(String query) {
+        return processSearchService.count(query)
+    }
+
+    /**
+     * Checks whether at least one {@link PetriNet} (process) matching the given query exists.
+     * <p>
+     * The query must start with the resource keyword {@code processes} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     existsProcess("processes: identifier eq 'my_process'")
+     *     existsProcess("processes: version eq 1.0.0")
+     * </pre>
+     *
+     * @param query query language string starting with {@code processes:}
+     * @return {@code true} if a matching process exists, {@code false} otherwise
+     */
+    boolean existsProcess(String query) {
+        return processSearchService.exists(query)
+    }
+
+    /**
+     * Searches for a single {@link IUser} matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code user} (singular).
+     * </p>
+     * Example:
+     * <pre>
+     *     searchUser("user: email eq 'user@mail.com'")
+     *     searchUser("user: name eq 'John' and surname eq 'Doe'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code user:}
+     * @return matching {@link IUser} or {@code null} if none is found
+     */
+    IUser searchUser(String query) {
+        return userSearchService.searchOne(query)
+    }
+
+    /**
+     * Searches for all {@link IUser} instances matching the given query and returns a paged result.
+     * <p>
+     * The query must start with the resource keyword {@code users} (plural) and may contain
+     * paging and sorting clauses.
+     * </p>
+     * Example:
+     * <pre>
+     *     pagedSearchUsers("users: name eq 'John' page 0 size 25 sort by surname asc")
+     *     pagedSearchUsers("users: email contains '@company.com'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code users:}
+     * @return {@link Page} of matching users
+     */
+    Page<IUser> pagedSearchUsers(String query) {
+        return userSearchService.searchAll(query)
+    }
+
+    /**
+     * Searches for all {@link IUser} instances matching the given query and returns them as a list.
+     * <p>
+     * The query must start with the resource keyword {@code users} (plural). This is a convenience
+     * method returning only the content of {@link #pagedSearchUsers(String)}.
+     * </p>
+     * Example:
+     * <pre>
+     *     searchUsers("users: surname eq 'Doe' sort by name asc")
+     *     searchUsers("users: email in ('a@mail.com', 'b@mail.com')")
+     * </pre>
+     *
+     * @param query query language string starting with {@code users:}
+     * @return list of matching users
+     */
+    List<IUser> searchUsers(String query) {
+        return pagedSearchUsers(query).content
+    }
+
+    /**
+     * Counts the number of {@link IUser} instances matching the given query.
+     * <p>
+     * The query must start with the resource keyword {@code users} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     countUsers("users: email contains '@company.com'")
+     *     countUsers("users: name eq 'John'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code users:}
+     * @return number of matching users
+     */
+    long countUsers(String query) {
+        return userSearchService.count(query)
+    }
+
+    /**
+     * Checks whether at least one {@link IUser} matching the given query exists.
+     * <p>
+     * The query must start with the resource keyword {@code users} (plural).
+     * </p>
+     * Example:
+     * <pre>
+     *     existsUser("users: email eq 'user@mail.com'")
+     *     existsUser("users: name eq 'John' and surname eq 'Doe'")
+     * </pre>
+     *
+     * @param query query language string starting with {@code users:}
+     * @return {@code true} if a matching user exists, {@code false} otherwise
+     */
+    boolean existsUser(String query) {
+        return userSearchService.exists(query)
+    }
+
+    /**
+     * Generic search that resolves the resource type from the query itself and executes the search.
+     * <p>
+     * The query must start with one of the resource keywords: {@code process}/{@code processes},
+     * {@code case}/{@code cases}, {@code task}/{@code tasks} or {@code user}/{@code users}.
+     * When the singular form is used, a single matching instance is returned. When the plural form
+     * is used, the content (a {@link List}) of the resulting {@link Page} is returned.
+     * </p>
+     * Example:
+     * <pre>
+     *     search("case: processIdentifier eq 'query_test' and data.number_0.value == 3")
+     *     search("cases: processIdentifier eq 'query_test' page 1 size 5 sort by title desc")
+     *     search("process: identifier == 'query_test'")
+     * </pre>
+     *
+     * @param query query language string starting with a resource keyword
+     * @return a single resource instance (singular form), a {@link List} of instances (plural form),
+     *         or {@code null} if nothing matches
+     */
+    Object search(String query) {
+        Object result = searchService.search(query)
+        if (result instanceof Page<?>) {
+            return result.content
+        }
+        return result
+    }
+
+    /**
+     * Generic count that resolves the resource type from the query itself and counts matching instances.
+     * <p>
+     * The query must start with one of the resource keywords: {@code processes}, {@code cases},
+     * {@code tasks} or {@code users} (plural form).
+     * </p>
+     * Example:
+     * <pre>
+     *     count("cases: processIdentifier eq 'query_test' and data.boolean_0.value == true")
+     *     count("users: email contains '@company.com'")
+     * </pre>
+     *
+     * @param query query language string starting with a resource keyword
+     * @return number of matching instances
+     */
+    long count(String query) {
+        return searchService.count(query)
+    }
+
+    /**
+     * Generic existence check that resolves the resource type from the query itself.
+     * <p>
+     * The query must start with one of the resource keywords: {@code processes}, {@code cases},
+     * {@code tasks} or {@code users} (plural form).
+     * </p>
+     * Example:
+     * <pre>
+     *     exists("cases: processIdentifier eq 'query_test'")
+     *     exists("tasks: transitionId eq 't1' and userId eq 'user1'")
+     * </pre>
+     *
+     * @param query query language string starting with a resource keyword
+     * @return {@code true} if a matching instance exists, {@code false} otherwise
+     */
+    boolean exists(String query) {
+        return searchService.exists(query)
     }
 }

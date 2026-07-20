@@ -1,0 +1,989 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>task_view_configuration</id>
+    <version>1.0.0</version>
+    <initials>TTV</initials>
+    <title>Task view configuration</title>
+    <icon>check_box_outline_blank</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <transitionRole>false</transitionRole>
+    <roleRef>
+        <id>system</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>admin</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>default</id>
+        <caseLogic>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <role>
+        <id>system</id>
+        <title>System</title>
+    </role>
+    <role>
+        <id>admin</id>
+        <title>Admin</title>
+    </role>
+
+    <function scope="process" name="initializeAdvancedForm">
+        { ->
+            def advancedContentFormField = useCase.getField("advanced_content_form")
+            change advancedContentFormField value { [useCase.tasks.find { taskPair -> taskPair.transition == "filter_settings"}.task,
+                                                     useCase.tasks.find { taskPair -> taskPair.transition == "header_settings"}.task] }
+        }
+    </function>
+    <function scope="process" name="updateOptionsBasedOnValue">
+        {
+            com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField toBeUpdated,
+            com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField valueSelector,
+            com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField optionsHolder
+                ->
+                def existingOptions = optionsHolder.options
+                def selectedValues = valueSelector.value
+                def newOptions = [:]
+
+                if (selectedValues != null) {
+                    existingOptions.each { key, value ->
+                        if (selectedValues.contains(key)) {
+                            newOptions.put(key, value)
+                        }
+                    }
+                }
+
+                if (!newOptions.containsKey(toBeUpdated.value)) {
+                    change toBeUpdated value { null }
+                }
+
+                change toBeUpdated options { newOptions }
+        }
+    </function>
+
+    <data type="boolean" immediate="true">
+        <id>merge_filters</id>
+        <title name="merge_filters">Merge with base filter if present?</title>
+        <init>true</init>
+    </data>
+    <data type="taskFilter">
+        <id>task_filter</id>
+        <title name="task_filter">Filter</title>
+        <desc name="task_filter_desc">Use PFQL query</desc>
+        <init>tasks</init>
+    </data>
+
+    <!-- TASK VIEW CONFIGURATION DATA -->
+    <data type="enumeration_map" immediate="true">
+        <id>task_view_search_type</id>
+        <title name="task_view_search_type">Search type for task view</title>
+        <options>
+            <option key="hidden" name="hidden">Hidden</option>
+            <option key="fulltext" name="fulltext">Fulltext</option>
+            <option key="fulltext_advanced" name="fulltext_advanced">Fulltext and advanced</option>
+        </options>
+        <init>fulltext_advanced</init>
+    </data>
+    <data type="multichoice_map" immediate="true">
+        <id>task_headers_mode</id>
+        <title name="task_headers_mode">Header mode</title>
+        <options>
+            <option key="sort" name="sort">Sort</option>
+            <option key="edit" name="edit">Edit</option>
+        </options>
+        <init>sort,edit</init>
+        <action trigger="set">
+            headersMode: f.task_headers_mode,
+            defaultMode: f.task_headers_default_mode,
+            holder: f.headers_options_holder;
+
+            updateOptionsBasedOnValue(defaultMode, headersMode, holder)
+        </action>
+        <action trigger="get">
+            headersMode: f.task_headers_mode,
+            defaultMode: f.task_headers_default_mode,
+            holder: f.headers_options_holder;
+
+            updateOptionsBasedOnValue(defaultMode, headersMode, holder)
+        </action>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>task_headers_default_mode</id>
+        <title name="task_headers_default_mode">Default header mode</title>
+        <options>
+            <option key="sort" name="sort">Sort</option>
+            <option key="edit" name="edit">Edit</option>
+        </options>
+        <init>sort</init>
+    </data>
+    <data type="enumeration_map">
+        <id>headers_options_holder</id>
+        <title/>
+        <options>
+            <option key="sort" name="sort">Sort</option>
+            <option key="edit" name="edit">Edit</option>
+        </options>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>task_is_header_mode_changeable</id>
+        <title name="task_is_header_mode_changeable">Can header mode be changed?</title>
+        <init>true</init>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>task_allow_header_table_mode</id>
+        <title name="task_allow_header_table_mode">Allow table mode for headers?</title>
+        <init>true</init>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>use_task_default_headers</id>
+        <title name="use_task_default_headers">Use custom default headers?</title>
+        <init>true</init>
+    </data>
+    <data type="stringCollection" immediate="true">
+        <id>task_default_headers</id>
+        <title name="task_default_headers">Set default headers</title>
+        <desc name="default_headers_desc">Example: "meta-title", "meta-user"</desc>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>task_show_more_menu</id>
+        <title name="task_show_more_menu">Show more menu for task item?</title>
+        <init>true</init>
+    </data>
+    <data type="taskRef">
+        <id>advanced_content_form</id>
+        <title/>
+        <component>
+            <name>task-list</name>
+            <property key="headers">meta-caseId,meta-title</property>
+        </component>
+    </data>
+    <data type="i18n">
+        <id>task_empty_content_text</id>
+        <title name="task_empty_content_text">Empty content text</title>
+        <desc name="task_empty_content_text_desc">If empty, default text will be used</desc>
+    </data>
+    <data type="text">
+        <id>task_empty_content_icon</id>
+        <title name="task_empty_content_icon">Empty content icon</title>
+        <desc name="task_empty_content_icon_desc">If empty, default icon will be used</desc>
+        <event type="set">
+            <id>0</id>
+            <actions phase="post">
+                <action>
+                    icon: f.this,
+                    iconPreview: f.task_empty_content_icon_preview;
+
+                    if (icon.value == "") {
+                        change iconPreview value {<![CDATA["""<span></span>"""]]>}
+                        return
+                    }
+
+                    change iconPreview value {
+                        <![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + icon.value + <![CDATA["""</span>"""]]>
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>task_empty_content_icon_preview</id>
+        <title name="task_empty_content_icon_preview">Empty content icon preview</title>
+        <component>
+            <name>htmltextarea</name>
+        </component>
+    </data>
+    <data type="stringCollection">
+        <id>task_allowed_nets</id>
+        <title name="task_allowed_nets">Allowed nets</title>
+    </data>
+    <data type="boolean">
+        <id>task_all_allowed_nets</id>
+        <title name="task_all_allowed_nets">All allowed nets?</title>
+        <init>true</init>
+    </data>
+    <data type="boolean">
+        <id>task_inherit_allowed_nets</id>
+        <title name="task_inherit_allowed_nets">Inherit allowed nets?</title>
+        <init>true</init>
+    </data>
+
+    <!-- I18NS -->
+    <i18n locale="sk">
+        <i18nString name="hidden">Skryté</i18nString>
+        <i18nString name="fulltext">Fulltext</i18nString>
+        <i18nString name="fulltext_advanced">Fulltext a rozšírené</i18nString>
+        <i18nString name="sort">Zoraďovanie</i18nString>
+        <i18nString name="search">Vyhľadávanie</i18nString>
+        <i18nString name="edit">Upravovanie</i18nString>
+        <i18nString name="merge_filters">Zjednotiť filter so základným filtrom ak existuje?</i18nString>
+        <i18nString name="task_view_search_type">Typ vyhľadávania úloh</i18nString>
+        <i18nString name="task_headers_mode">Mód hlavičiek</i18nString>
+        <i18nString name="task_headers_default_mode">Predvolený mód hlavičiek</i18nString>
+        <i18nString name="task_is_header_mode_changeable">Môže byť mód hlavičiek zmenený?</i18nString>
+        <i18nString name="task_allow_header_table_mode">Povoliť tabuľkový mód pre hlavičky?</i18nString>
+        <i18nString name="use_task_default_headers">Použiť vlastné predvolené hlavičky?</i18nString>
+        <i18nString name="task_default_headers">Predvolené hlavičky</i18nString>
+        <i18nString name="default_headers_desc">Napríklad: "meta-title", "meta-user"</i18nString>
+        <i18nString name="task_show_more_menu">Zobrazovať menu pre úlohovú položku?</i18nString>
+        <i18nString name="item_settings">Nastavenie položky</i18nString>
+        <i18nString name="item_settings_general">Všeobecné</i18nString>
+        <i18nString name="task_empty_content_text">Text prázdneho obsahu</i18nString>
+        <i18nString name="task_empty_content_text_desc">Ak je toto pole prázdne, bude použitý predvolený text</i18nString>
+        <i18nString name="task_empty_content_icon">Ikona prázdneho obsahu</i18nString>
+        <i18nString name="task_empty_content_icon_desc">Ak je toto pole prázdne, bude použitá predvolená ikona</i18nString>
+        <i18nString name="task_empty_content_icon_preview">Náhľad ikony prázdneho obsahu</i18nString>
+        <i18nString name="task_allowed_nets">Povolené procesy</i18nString>
+        <i18nString name="task_all_allowed_nets">Povoliť všetky procesy?</i18nString>
+        <i18nString name="task_inherit_allowed_nets">Zdediť povolené procesy?</i18nString>
+        <i18nString name="task_filter">Filter</i18nString>
+        <i18nString name="task_filter_desc">Použi PFQL query</i18nString>
+        <i18nString name="filter_settings">Filter</i18nString>
+        <i18nString name="header_settings">Hlavičky</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="hidden">Versteckt</i18nString>
+        <i18nString name="fulltext">Einfacher Suchmodus</i18nString>
+        <i18nString name="sort">Sortieren</i18nString>
+        <i18nString name="search">Suchen</i18nString>
+        <i18nString name="edit">Bearbeiten</i18nString>
+        <i18nString name="task_headers_mode">Kopfzeilenmodus</i18nString>
+        <i18nString name="task_headers_default_mode">Standardkopfzeilenmodus</i18nString>
+        <i18nString name="task_is_header_mode_changeable">Erlaube Änderung des Kopfzeilenmodus?</i18nString>
+        <i18nString name="task_allow_header_table_mode">Erlaube Tabellenmodus?</i18nString>
+        <i18nString name="use_task_default_headers">Eigene Kopfzeilen verwenden?</i18nString>
+        <i18nString name="task_default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
+        <i18nString name="default_headers_desc">Beispiel: "meta-title", "meta-user"</i18nString>
+        <i18nString name="item_settings_general">Allgemein</i18nString>
+        <i18nString name="fulltext_advanced">Einfacher und erweiterter Suchmodus</i18nString>
+        <i18nString name="merge_filters">Mit dem Basisfilter kombinieren, falls vorhanden?</i18nString>
+        <i18nString name="task_view_search_type">Suchmodus im Aufgabenansicht</i18nString>
+        <i18nString name="task_show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Aufgaben anzeigen</i18nString>
+        <i18nString name="item_settings">Menüeintrageinstellungen</i18nString>
+        <i18nString name="task_empty_content_text">Text für leeren Inhalt</i18nString>
+        <i18nString name="task_empty_content_text_desc">Wenn dieses Feld leer ist, wird der Standardtext verwendet</i18nString>
+        <i18nString name="task_empty_content_icon">Icon für leeren Inhalt</i18nString>
+        <i18nString name="task_empty_content_icon_desc">Wenn dieses Feld leer ist, wird das Standard-Icon verwendet</i18nString>
+        <i18nString name="task_empty_content_icon_preview">Vorschau des Icons für leeren Inhalt</i18nString>
+        <i18nString name="task_allowed_nets">Erlaubte Prozesse</i18nString>
+        <i18nString name="task_all_allowed_nets">Alle Prozesse erlauben?</i18nString>
+        <i18nString name="task_inherit_allowed_nets">Erlaubte Prozesse erben?</i18nString>
+        <i18nString name="task_filter">Filter</i18nString>
+        <i18nString name="task_filter_desc">Verwenden Sie PFQL Query</i18nString>
+        <i18nString name="filter_settings">Filter</i18nString>
+        <i18nString name="header_settings">Kopfzeilen</i18nString>
+    </i18n>
+
+    <transition>
+        <id>initialize</id>
+        <x>368</x>
+        <y>208</y>
+        <label>initialize [await sync]</label>
+        <icon>hourglass_empty</icon>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <event type="finish">
+            <id>finish</id>
+            <actions phase="post">
+                <action>
+                    initializeAdvancedForm()
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>data_sync</id>
+        <x>368</x>
+        <y>328</y>
+        <label>Data sync</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>settings</id>
+        <x>496</x>
+        <y>112</y>
+        <label>Settings</label>
+        <icon>settings</icon>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>view_dataGroup</id>
+            <cols>3</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>task_view_search_type</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_show_more_menu</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_empty_content_text</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_empty_content_icon</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_empty_content_icon_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_all_allowed_nets</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_allowed_nets</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_inherit_allowed_nets</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>advanced_content_form</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>assign_0</id>
+            <title/>
+        </event>
+        <event type="finish">
+            <id>finish_0</id>
+            <title/>
+        </event>
+    </transition>
+    <transition>
+        <id>filter_settings</id>
+        <x>400</x>
+        <y>48</y>
+        <label name="filter_settings">Filter</label>
+        <icon>filter_alt</icon>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>filter_update</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>task_filter</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>merge_filters</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>assign</id>
+            <title/>
+        </event>
+        <event type="cancel">
+            <id>cancel</id>
+            <title/>
+        </event>
+        <event type="finish">
+            <id>finish_0</id>
+            <title/>
+        </event>
+        <event type="delegate">
+            <id>delegate</id>
+            <title/>
+        </event>
+    </transition>
+    <transition>
+        <id>header_settings</id>
+        <x>592</x>
+        <y>48</y>
+        <label name="header_settings">Header</label>
+        <icon>view_column</icon>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>view_headers</id>
+            <cols>3</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>task_is_header_mode_changeable</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        trans: t.this,
+                        isChangeable: f.task_is_header_mode_changeable,
+                        mode: f.task_headers_mode,
+                        defaultMode: f.task_headers_default_mode;
+
+                        make [mode, defaultMode], editable on trans when { isChangeable.value }
+                        make [mode, defaultMode], required on trans when { isChangeable.value }
+
+                        make [mode, defaultMode], hidden on trans when { !isChangeable.value }
+                        make [mode, defaultMode], optional on trans when { !isChangeable.value }
+                    </action>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>use_task_default_headers</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        trans: t.this,
+                        use: f.use_task_default_headers,
+                        headers: f.task_default_headers;
+
+                        make headers,editable on trans when { use.value }
+                        make headers,visible on trans when { !use.value }
+                    </action>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_default_headers</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_allow_header_table_mode</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_headers_mode</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_headers_default_mode</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>assign</id>
+            <title/>
+        </event>
+        <event type="cancel">
+            <id>cancel</id>
+            <title/>
+        </event>
+        <event type="finish">
+            <id>finish_0</id>
+            <title/>
+        </event>
+        <event type="delegate">
+            <id>delegate</id>
+            <title/>
+        </event>
+    </transition>
+    <transition>
+        <id>all_menu_data</id>
+        <x>10</x>
+        <y>10</y>
+        <label>All menu data</label>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>all_menu_data_0</id>
+            <cols>1</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>task_filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>merge_filters</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_view_search_type</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_show_more_menu</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_empty_content_text</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_empty_content_icon</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>5</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_empty_content_icon_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>6</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_all_allowed_nets</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>7</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_allowed_nets</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>8</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_inherit_allowed_nets</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>9</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_is_header_mode_changeable</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>10</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_allow_header_table_mode</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>11</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_headers_mode</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>12</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_headers_default_mode</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>13</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>use_task_default_headers</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>14</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>task_default_headers</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>15</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <place>
+        <id>initialized</id>
+        <x>496</x>
+        <y>208</y>
+        <label>initialized</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>uninitialized</id>
+        <x>240</x>
+        <y>208</y>
+        <label>uninitialized</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <arc>
+        <id>a1</id>
+        <type>read</type>
+        <sourceId>initialized</sourceId>
+        <destinationId>settings</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>regular</type>
+        <sourceId>uninitialized</sourceId>
+        <destinationId>initialize</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a3</id>
+        <type>regular</type>
+        <sourceId>initialize</sourceId>
+        <destinationId>initialized</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a4</id>
+        <type>read</type>
+        <sourceId>initialized</sourceId>
+        <destinationId>filter_settings</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a5</id>
+        <type>read</type>
+        <sourceId>initialized</sourceId>
+        <destinationId>header_settings</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>

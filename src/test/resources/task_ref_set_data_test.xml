@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
 	<id>task_ref_set_data_test</id>
-	<initials>TRS</initials>
+    <version>1.0.0</version>
+    <initials>TRS</initials>
 	<title>Task ref set data test</title>
 	<defaultRole>true</defaultRole>
 	<transitionRole>false</transitionRole>

@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.querydsl.core.types.Predicate;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -77,4 +78,11 @@ public interface IUserService {
 
     IUser createSystemUser();
 
+    Page<IUser> search(Predicate predicate, Pageable pageable);
+
+    IUser searchOne(Predicate predicate);
+
+    long count(Predicate predicate);
+
+    boolean exists(Predicate predicate);
 }

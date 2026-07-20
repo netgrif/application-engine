@@ -7,6 +7,11 @@ import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.Sin
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.application.engine.pfql.service.QueryLangEvaluator;
+import com.netgrif.application.engine.pfql.service.taskresource.TaskSearchService;
+import com.netgrif.application.engine.pfql.service.utils.SearchUtils;
+import com.netgrif.application.engine.utils.throwable.BadRequestException;
+import com.netgrif.application.engine.utils.throwable.InternalServerErrorException;
 import com.netgrif.application.engine.workflow.domain.IllegalArgumentWithChangedFieldsException;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -15,14 +20,17 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
+import com.netgrif.application.engine.workflow.service.LegacyTaskSearchService;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.web.responsebodies.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -43,26 +51,15 @@ import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
+@RequiredArgsConstructor
 public abstract class AbstractTaskController {
 
-    public static final Logger log = LoggerFactory.getLogger(TaskController.class);
-
     private final ITaskService taskService;
-
     private final IDataService dataService;
-
     private final IWorkflowService workflowService;
-
-    private final IElasticTaskService searchService;
-
-    public AbstractTaskController(ITaskService taskService, IDataService dataService, IWorkflowService workflowService,
-                                  IElasticTaskService searchService) {
-        this.taskService = taskService;
-        this.dataService = dataService;
-        this.workflowService = workflowService;
-        this.searchService = searchService;
-    }
-
+    private final IElasticTaskService elasticTaskService;
+    private final LegacyTaskSearchService searchService;
 
     public PagedModel<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
@@ -184,7 +181,7 @@ public abstract class AbstractTaskController {
     }
 
     public PagedModel<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, SingleElasticTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        Page<Task> tasks = searchService.search(searchBody.getList(), (LoggedUser) auth.getPrincipal(), pageable, locale, operation == MergeFilterOperation.AND);
+        Page<Task> tasks = elasticTaskService.search(searchBody.getList(), (LoggedUser) auth.getPrincipal(), pageable, locale, operation == MergeFilterOperation.AND);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .searchElastic(auth, pageable, searchBody, operation, assembler, locale)).withRel("search_es");
         PagedModel<LocalisedTaskResource> resources = assembler.toModel(tasks, new TaskResourceAssembler(locale), selfLink);
@@ -192,8 +189,34 @@ public abstract class AbstractTaskController {
         return resources;
     }
 
+    public PagedModel<LocalisedTaskResource> searchPfql(Authentication auth, Pageable pageable, SingleTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        try {
+            Predicate completePredicate = searchBody.getList().stream()
+                    .map((request) -> {
+                        if (request.query == null || request.query.isEmpty()) {
+                            return searchService.buildSingleQuery(request, (LoggedUser) auth.getPrincipal(), locale);
+                        } else {
+                            QueryLangEvaluator evaluator = SearchUtils.evaluateQuery(request.query);
+                            return evaluator.getFullMongoQuery();
+                        }
+                    })
+                    .reduce(ExpressionUtils::and).orElse(null);
+            Page<Task> tasks = taskService.search(completePredicate, pageable);
+            Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
+                    .searchPfql(auth, pageable, searchBody, operation, assembler, locale)).withRel("search_pfql");
+            PagedModel<LocalisedTaskResource> resources = assembler.toModel(tasks, new TaskResourceAssembler(locale), selfLink);
+            ResourceLinkAssembler.addLinks(resources, Task.class, selfLink.getRel().toString());
+            return resources;
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Bad request: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("Something went wrong while searching for tasks", e);
+            throw new InternalServerErrorException("Something went wrong");
+        }
+    }
+
     public CountResponse count(SingleElasticTaskSearchRequestAsList query, MergeFilterOperation operation, Authentication auth, Locale locale) {
-        long count = searchService.count(query.getList(), (LoggedUser) auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);
+        long count = elasticTaskService.count(query.getList(), (LoggedUser) auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);
         return CountResponse.taskCount(count);
     }
 

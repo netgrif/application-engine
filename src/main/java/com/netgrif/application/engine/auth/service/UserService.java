@@ -10,7 +10,6 @@ import com.netgrif.application.engine.orgstructure.groups.config.GroupConfigurat
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.startup.SystemUserRunner;
-import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,9 +49,6 @@ public class UserService extends AbstractUserService {
     @Autowired
     private GroupConfigurationProperties groupProperties;
 
-    @Autowired
-    private IFilterImportExportService filterImportExportService;
-
     @Override
     public IUser saveNewAndAuthenticate(IUser user) {
         return saveNew(user, true);
@@ -70,8 +66,6 @@ public class UserService extends AbstractUserService {
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save((User) user);
-        filterImportExportService.createFilterImport(user);
-        filterImportExportService.createFilterExport(user);
 
         if (groupProperties.isDefaultEnabled())
             groupService.createGroup(user);

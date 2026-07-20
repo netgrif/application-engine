@@ -178,7 +178,6 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         if (request == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
-        addRolesQueryConstraint(request, user);
 
         BoolQueryBuilder query = boolQuery();
         buildViewPermissionQuery(query, user);
@@ -197,17 +196,6 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         else
             return query;
     }
-
-    protected void addRolesQueryConstraint(ElasticTaskSearchRequest request, LoggedUser user) {
-        if (request.role != null && !request.role.isEmpty()) {
-            Set<String> roles = new HashSet<>(request.role);
-            roles.addAll(user.getProcessRoles());
-            request.role = new ArrayList<>(roles);
-        } else {
-            request.role = new ArrayList<>(user.getProcessRoles());
-        }
-    }
-
 
     /**
      * Tasks of case with id "5cb07b6ff05be15f0b972c4d"

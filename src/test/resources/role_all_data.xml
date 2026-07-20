@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
 	<id>all_data</id>
-	<initials>ALL</initials>
+    <version>1.0.0</version>
+    <initials>ALL</initials>
     <title>All Data</title>
     <icon>device_hub</icon>
     <defaultRole>true</defaultRole>

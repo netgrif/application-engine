@@ -1,6 +1,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
 	<id>button_set_data</id>
-	<initials>SDB</initials>
+    <version>1.0.0</version>
+    <initials>SDB</initials>
 	<title>Set Data Button v3</title>
 	<icon>device_hub</icon>
 	<defaultRole>true</defaultRole>

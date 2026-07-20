@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
@@ -291,12 +292,6 @@ public class DataService implements IDataService {
                     modified = true;
                 }
                 String fieldType = getFieldTypeFromNode((ObjectNode) entry.getValue());
-                Map<String, Object> filterMetadata = parseFilterMetadataValue((ObjectNode) entry.getValue(), fieldType);
-                if (filterMetadata != null) {
-                    dataField.setFilterMetadata(filterMetadata);
-                    changedField.addAttribute("filterMetadata", filterMetadata);
-                    modified = true;
-                }
                 Map<String, I18nString> options = parseOptionsNode(entry.getValue(), fieldType);
                 if (options != null) {
                     setDataFieldOptions(options, dataField, changedField, fieldType);
@@ -1010,7 +1005,7 @@ public class DataService implements IDataService {
     private List<String> parseAllowedNetsValue(JsonNode jsonNode) {
         ObjectNode node = (ObjectNode) jsonNode;
         String fieldType = getFieldTypeFromNode(node);
-        if (Objects.equals(fieldType, FieldType.CASE_REF.getName()) || Objects.equals(fieldType, FieldType.FILTER.getName())) {
+        if (Objects.equals(fieldType, FieldType.CASE_REF.getName())) {
             return parseListStringAllowedNets(node);
         }
         return null;
@@ -1021,10 +1016,11 @@ public class DataService implements IDataService {
     }
 
     private List<String> parseListString(ObjectNode node, String attributeKey) {
-        ArrayNode arrayNode = (ArrayNode) node.get(attributeKey);
-        if (arrayNode == null) {
+        Object objectNode = node.get(attributeKey);
+        if (objectNode == null || objectNode instanceof NullNode) {
             return null;
         }
+        ArrayNode arrayNode = (ArrayNode) objectNode;
         ArrayList<String> list = new ArrayList<>();
         arrayNode.forEach(string -> list.add(string.asText()));
         return list;
@@ -1051,19 +1047,6 @@ public class DataService implements IDataService {
 
     private String getFieldTypeFromNode(ObjectNode node) {
         return node.get("type").asText();
-    }
-
-    private Map<String, Object> parseFilterMetadataValue(ObjectNode node, String fieldType) {
-        if (Objects.equals(fieldType, FieldType.FILTER.getName())) {
-            JsonNode filterMetadata = node.get("filterMetadata");
-            if (filterMetadata == null) {
-                return null;
-            }
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.convertValue(filterMetadata, new TypeReference<Map<String, Object>>() {
-            });
-        }
-        return null;
     }
 
     private I18nString parseI18nStringValues(ObjectNode node) {

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.files.minio;
 
 import com.netgrif.application.engine.files.interfaces.IStorageService;
-import com.netgrif.application.engine.files.throwable.BadRequestException;
+import com.netgrif.application.engine.utils.throwable.BadRequestException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.application.engine.files.throwable.StorageNotEnabledException;

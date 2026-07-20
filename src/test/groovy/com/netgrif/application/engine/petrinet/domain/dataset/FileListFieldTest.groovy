@@ -14,6 +14,9 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest
+import io.minio.BucketExistsArgs
+import io.minio.MakeBucketArgs
+import io.minio.MinioClient
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -54,6 +57,9 @@ class FileListFieldTest {
     public static final String TASK_TITLE = "Task"
     public static final String USER_EMAIL = "super@netgrif.com"
     public static final String MOCK_FILE_NAME = "hello.txt"
+    public static final String BUCKET = "default"
+
+    static MinioClient mc;
 
     @Value('${admin.password:password}')
     private String userPassword
@@ -89,6 +95,17 @@ class FileListFieldTest {
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
+
+        mc = MinioClient.builder()
+                .endpoint("http://127.0.0.1:9000")
+                .credentials("root", "password")
+                .build();
+
+        boolean exists = mc.bucketExists(BucketExistsArgs.builder().bucket(BUCKET).build());
+        if (!exists) {
+            mc.makeBucket(MakeBucketArgs.builder().bucket(BUCKET).build());
+        }
+
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(SecurityMockMvcConfigurers.springSecurity())

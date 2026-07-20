@@ -1,0 +1,69 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
+	<id>filter_test</id>
+    <version>1.0.0</version>
+    <initials>FTT</initials>
+	<title>filter_test</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+
+	<data type="filter">
+		<id>filter_field</id>
+		<title/>
+		<init>someQueryString</init>
+	</data>
+
+	<data type="caseFilter">
+		<id>case_filter_field</id>
+		<title/>
+		<init>someQueryString</init>
+	</data>
+
+	<data type="taskFilter">
+		<id>task_filter_field</id>
+		<title/>
+		<init>someQueryString</init>
+	</data>
+
+	<data type="processFilter">
+		<id>process_filter_field</id>
+		<title/>
+		<init>someQueryString</init>
+	</data>
+
+	<transition>
+		<id>t1</id>
+		<x>700</x>
+		<y>180</y>
+		<label>test</label>
+		<dataGroup>
+			<id>t1_0</id>
+			<layout>legacy</layout>
+			<dataRef>
+				<id>filter_field</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>case_filter_field</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>task_filter_field</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>process_filter_field</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+	</transition>
+</document>

@@ -5,7 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.4.2](https://github.com/netgrif/application-engine/commits/v6.4.2)
+## [6.5.0](https://github.com/netgrif/application-engine/releases/tag/v6.5.0) (2026-07-20)
+
+### Fixed
+- [NAE-2099] MenuItemService.appendChildCaseIdInDataSet not setting hasChildren correctly
+- [NAE 2424] UserRefs negative view permissions aren't resolved
+ 
+### Added
+- [NAE-2033] Welcome dashboard
+- [NAE-2439] Implement new filter data types
+- [NAE-2443] PFQL support
+- [ETASK-23] Dynamic view configuration
+- [NAE-2447] System process Process
+- [NAE-2450] Filter field PFQL support
+
+### Changed
+- [NAE-2034] Open first view
+- [NAE-2051] Implement configurable view in menu items
+- [NAE-2039] Search in workflow view
+- [NAE-2052] Integrate ticket view with menu items
+- [NAE-2063] Action API 6.5.0
+- [NAE-2136] Speed up Elasticsearch reindex
+- [NAE-2390] Action API Improvements
+- [NAE 2441] Event permissions
 
 ## [6.4.2](https://github.com/netgrif/application-engine/releases/tag/v6.4.2) (2025-05-16)
 

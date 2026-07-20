@@ -1,0 +1,1512 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>case_view_configuration</id>
+    <version>1.0.0</version>
+    <initials>CVC</initials>
+    <title>Case view configuration</title>
+    <icon>check_box_outline_blank</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <transitionRole>false</transitionRole>
+    <roleRef>
+        <id>system</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>admin</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>default</id>
+        <caseLogic>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <caseEvents>
+        <event type="create">
+            <id>view_create</id>
+            <actions phase="post">
+                <action id="0">
+                    is_tabbed_var_arc: f.is_tabbed_var_arc;
+                    change is_tabbed_var_arc value { Boolean.valueOf(params["is_tabbed"]) ? 1 : 0 }
+                </action>
+            </actions>
+        </event>
+        <event type="delete">
+            <id>view_delete</id>
+            <actions phase="pre">
+                <action id="1">
+                    removeViewCase()
+                </action>
+            </actions>
+        </event>
+    </caseEvents>
+    <role>
+        <id>system</id>
+        <title>System</title>
+    </role>
+    <role>
+        <id>admin</id>
+        <title>Admin</title>
+    </role>
+
+    <function scope="process" name="initializeAdvancedForm">
+        { ->
+            def advancedContentFormField = useCase.getField("advanced_content_form")
+            def taskIds = [useCase.tasks.find { taskPair -> taskPair.transition == "header_settings"}.task,
+                           useCase.tasks.find { taskPair -> taskPair.transition == "create_case_btn_settings"}.task,
+                           useCase.tasks.find { taskPair -> taskPair.transition == "filter_settings"}.task]
+            String nextViewTaskId = useCase.tasks.find { taskPair -> taskPair.transition == "open_case_settings"}?.task
+            if (nextViewTaskId != null) {
+                taskIds.add(nextViewTaskId)
+            }
+            change advancedContentFormField value { taskIds }
+        }
+    </function>
+    <function scope="process" name="removeViewCase">
+        { ->
+
+            def viewIdAsList = useCase.dataSet['view_configuration_id'].value
+            if (viewIdAsList == null || viewIdAsList.isEmpty()) {
+                return
+            }
+
+            async.run {
+                workflowService.deleteCase(viewIdAsList[0])
+            }
+        }
+    </function>
+    <function scope="process" name="updateOptionsBasedOnValue">
+        {
+            com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField toBeUpdated,
+            com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField valueSelector,
+            com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField optionsHolder
+                ->
+                def existingOptions = optionsHolder.options
+                def selectedValues = valueSelector.value
+                def newOptions = [:]
+
+                if (selectedValues != null) {
+                    existingOptions.each { key, value ->
+                        if (selectedValues.contains(key)) {
+                            newOptions.put(key, value)
+                        }
+                    }
+                }
+
+                if (!newOptions.containsKey(toBeUpdated.value)) {
+                    change toBeUpdated value { null }
+                }
+
+                change toBeUpdated options { newOptions }
+        }
+    </function>
+
+    <!-- VIEW CONFIGURATION DATA -->
+    <data type="enumeration_map" immediate="true">
+        <id>case_view_search_type</id>
+        <title name="case_view_search_type">Search type for case view</title>
+        <options>
+            <option key="hidden" name="hidden">Hidden</option>
+            <option key="fulltext" name="fulltext">Fulltext</option>
+            <option key="fulltext_advanced" name="fulltext_advanced">Fulltext and advanced</option>
+        </options>
+        <init>fulltext_advanced</init>
+    </data>
+    <data type="i18n" immediate="true">
+        <id>create_case_button_title</id>
+        <title name="create_case_button_title">"New case" button title</title>
+    </data>
+    <data type="text">
+        <id>create_case_button_icon_preview</id>
+        <title name="create_case_button_icon_preview">Icon preview</title>
+        <init><![CDATA[<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">add</span>]]></init>
+        <component>
+            <name>htmltextarea</name>
+        </component>
+    </data>
+    <data type="text" immediate="true">
+        <id>create_case_button_icon</id>
+        <title name="create_case_button_icon">"New case" button icon identifier</title>
+        <init>add</init>
+        <action trigger="set">
+            create_case_button_icon_preview: f.create_case_button_icon_preview,
+            create_case_button_icon: f.create_case_button_icon;
+
+
+            if (create_case_button_icon.value == "") {
+                change create_case_button_icon_preview value {<![CDATA["""<span></span>"""]]>}
+                return;
+            }
+
+            change create_case_button_icon_preview value {
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + create_case_button_icon.value + <![CDATA["""</span>"""]]>
+            }
+        </action>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>show_create_case_button</id>
+        <title name="show_create_case_button">Show create case button?</title>
+        <init>true</init>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>require_title_in_creation</id>
+        <title name="require_title_in_creation">Require title input in case creation?</title>
+        <init>true</init>
+    </data>
+    <data type="text" immediate="true">
+        <id>banned_nets_in_creation</id>
+        <title name="banned_nets_in_creation">Banned processes for creation</title>
+        <desc name="banned_nets_in_creation_desc">Write down process identifiers separated by comma. Example: mynet1,mynet2</desc>
+        <action trigger="set">
+            bannedNets: f.this;
+
+            String trimmed = bannedNets.value?.replaceAll("\\s","")
+            if (bannedNets.value != trimmed) {
+                change bannedNets value { trimmed }
+            }
+        </action>
+    </data>
+    <data type="i18n">
+        <id>view_header</id>
+        <title/>
+        <init name="view_header">Case view</init>
+        <component>
+            <name>divider</name>
+        </component>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>case_show_more_menu</id>
+        <title name="case_show_more_menu">Show more menu for case item?</title>
+        <init>false</init>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>case_allow_header_table_mode</id>
+        <title name="case_allow_header_table_mode">Allow table mode for headers?</title>
+        <init>true</init>
+    </data>
+    <data type="multichoice_map" immediate="true">
+        <id>case_headers_mode</id>
+        <title name="case_headers_mode">Header mode</title>
+        <options>
+            <option key="sort" name="sort">Sort</option>
+            <option key="search" name="search">Search</option>
+            <option key="edit" name="edit">Edit</option>
+        </options>
+        <init>sort,edit,search</init>
+        <action trigger="set">
+            headersMode: f.case_headers_mode,
+            defaultMode: f.case_headers_default_mode,
+            holder: f.headers_options_holder;
+
+            updateOptionsBasedOnValue(defaultMode, headersMode, holder)
+        </action>
+        <action trigger="get">
+            headersMode: f.case_headers_mode,
+            defaultMode: f.case_headers_default_mode,
+            holder: f.headers_options_holder;
+
+            updateOptionsBasedOnValue(defaultMode, headersMode, holder)
+        </action>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>case_headers_default_mode</id>
+        <title name="case_headers_default_mode">Default header mode</title>
+        <options>
+            <option key="sort" name="sort">Sort</option>
+            <option key="search" name="search">Search</option>
+            <option key="edit" name="edit">Edit</option>
+        </options>
+        <init>sort</init>
+    </data>
+    <data type="enumeration_map">
+        <id>headers_options_holder</id>
+        <title/>
+        <options>
+            <option key="sort" name="sort">Sort</option>
+            <option key="search" name="search">Search</option>
+            <option key="edit" name="edit">Edit</option>
+        </options>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>case_is_header_mode_changeable</id>
+        <title name="case_is_header_mode_changeable">Can header mode be changed?</title>
+        <init>true</init>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>use_case_default_headers</id>
+        <title name="use_case_default_headers">Use custom default headers?</title>
+        <init>true</init>
+    </data>
+    <data type="stringCollection" immediate="true">
+        <id>case_default_headers</id>
+        <title name="case_default_headers">Set default headers</title>
+        <desc name="default_headers_desc">Example: "meta-title", "meta-visualId"</desc>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>view_configuration_type</id>
+        <title name="view_configuration_type">View type</title>
+        <options>
+            <init dynamic="true">menuItemService.getAvailableViewsAsOptions(true, useCase.processIdentifier)</init>
+        </options>
+        <action trigger="set">
+            view_configuration_type: f.view_configuration_type;
+
+            if (view_configuration_type.options == null || view_configuration_type.options.isEmpty()) {
+                change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(true, useCase.processIdentifier) }
+            }
+        </action>
+    </data>
+    <data type="caseRef">
+        <id>view_configuration_id</id>
+        <title/>
+        <allowedNets>
+            <allowedNet>task_view_configuration</allowedNet>
+        </allowedNets>
+    </data>
+    <data type="taskRef">
+        <id>view_configuration_form</id>
+        <title/>
+    </data>
+    <data type="taskRef">
+        <id>view_configuration_all_data_form</id>
+        <title/>
+    </data>
+    <data type="taskRef">
+        <id>advanced_content_form</id>
+        <title/>
+        <component>
+            <name>task-list</name>
+            <property key="headers">meta-caseId,meta-title</property>
+        </component>
+    </data>
+    <data type="number">
+        <id>is_tabbed_var_arc</id>
+        <title>Is tabbed</title>
+    </data>
+    <data type="i18n">
+        <id>case_empty_content_text</id>
+        <title name="case_empty_content_text">Empty content text</title>
+        <desc name="case_empty_content_text_desc">If empty, default text will be used</desc>
+    </data>
+    <data type="text">
+        <id>case_empty_content_icon</id>
+        <title name="case_empty_content_icon">Empty content icon</title>
+        <desc name="case_empty_content_icon_desc">If empty, default icon will be used</desc>
+        <event type="set">
+            <id>0</id>
+            <actions phase="post">
+                <action>
+                    icon: f.this,
+                    iconPreview: f.case_empty_content_icon_preview;
+
+                    if (icon.value == "") {
+                        change iconPreview value {<![CDATA["""<span></span>"""]]>}
+                        return
+                    }
+
+                    change iconPreview value {
+                        <![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + icon.value + <![CDATA["""</span>"""]]>
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>case_empty_content_icon_preview</id>
+        <title name="case_empty_content_icon_preview">Empty content icon preview</title>
+        <component>
+            <name>htmltextarea</name>
+        </component>
+    </data>
+    <data type="caseFilter">
+        <id>case_filter</id>
+        <title name="case_filter">Filter</title>
+        <desc name="case_filter_desc">Use PFQL query</desc>
+        <init>cases</init>
+    </data>
+    <data type="boolean">
+        <id>case_allow_export</id>
+        <title name="case_allow_export">Allow export?</title>
+    </data>
+    <data type="stringCollection">
+        <id>case_allowed_nets</id>
+        <title name="case_allowed_nets">Allowed nets</title>
+    </data>
+    <data type="boolean">
+        <id>case_all_allowed_nets</id>
+        <title name="case_all_allowed_nets">All allowed nets?</title>
+        <init>true</init>
+    </data>
+    <data type="boolean">
+        <id>case_inherit_allowed_nets</id>
+        <title name="case_inherit_allowed_nets">Inherit allowed nets?</title>
+        <init>true</init>
+    </data>
+
+    <!-- I18NS -->
+    <i18n locale="sk">
+        <i18nString name="create_case_button_title">Názov tlačidla "Nová inštancia"</i18nString>
+        <i18nString name="create_case_button_icon">Identifikátor ikony tlačidla "Nová inštancia"</i18nString>
+        <i18nString name="create_case_button_icon_preview">Náhľad ikony</i18nString>
+        <i18nString name="case_default_headers">Predvolené hlavičky</i18nString>
+        <i18nString name="default_headers_desc">Napríklad: "meta-title", "meta-visualId"</i18nString>
+        <i18nString name="case_view_search_type">Typ vyhľadávania prípadov</i18nString>
+        <i18nString name="hidden">Skryté</i18nString>
+        <i18nString name="fulltext">Fulltext</i18nString>
+        <i18nString name="fulltext_advanced">Fulltext a rozšírené</i18nString>
+        <i18nString name="require_title_in_creation">Vyžadovať názov inštancii pri vytváraní?</i18nString>
+        <i18nString name="banned_nets_in_creation">Zakázané siete pri vytváraní</i18nString>
+        <i18nString name="banned_nets_in_creation_desc">Uveďte identifikátory procesov oddelené čiarkou. Napríklad: mynet1,mynet2</i18nString>
+        <i18nString name="show_create_case_button">Zobraziť tlačidlo na vytvorenie prípadu?</i18nString>
+        <i18nString name="case_show_more_menu">Zobrazovať menu pre prípadovú položku?</i18nString>
+        <i18nString name="sort">Zoraďovanie</i18nString>
+        <i18nString name="search">Vyhľadávanie</i18nString>
+        <i18nString name="edit">Upravovanie</i18nString>
+        <i18nString name="case_headers_mode">Mód hlavičiek</i18nString>
+        <i18nString name="case_headers_default_mode">Predvolený mód hlavičiek</i18nString>
+        <i18nString name="case_is_header_mode_changeable">Môže byť mód hlavičiek zmenený?</i18nString>
+        <i18nString name="case_allow_header_table_mode">Povoliť tabuľkový mód pre hlavičky?</i18nString>
+        <i18nString name="use_case_default_headers">Použiť vlastné predvolené hlavičky?</i18nString>
+        <i18nString name="item_settings">Nastavenie položky</i18nString>
+        <i18nString name="view_header">Zobrazenie prípadov</i18nString>
+        <i18nString name="item_settings_general">Všeobecné</i18nString>
+        <i18nString name="view_configuration_type">Typ zobrazenia</i18nString>
+        <i18nString name="settings">Nastavenie</i18nString>
+        <i18nString name="case_allow_export">Povoliť export?</i18nString>
+        <i18nString name="case_empty_content_text">Text prázdneho obsahu</i18nString>
+        <i18nString name="case_empty_content_text_desc">Ak je toto pole prázdne, bude použitý predvolený text</i18nString>
+        <i18nString name="case_empty_content_icon">Ikona prázdneho obsahu</i18nString>
+        <i18nString name="case_empty_content_icon_desc">Ak je toto pole prázdne, bude použitá predvolená ikona</i18nString>
+        <i18nString name="case_empty_content_icon_preview">Náhľad ikony prázdneho obsahu</i18nString>
+        <i18nString name="case_filter">Filter</i18nString>
+        <i18nString name="case_filter_desc">Použi PFQL query</i18nString>
+        <i18nString name="case_allowed_nets">Povolené procesy</i18nString>
+        <i18nString name="case_all_allowed_nets">Povoliť všetky procesy?</i18nString>
+        <i18nString name="case_inherit_allowed_nets">Zdediť povolené procesy?</i18nString>
+        <i18nString name="filter_settings">Filter</i18nString>
+        <i18nString name="open_case_settings">Zobrazenie po kliknutí na inštanciu</i18nString>
+        <i18nString name="create_case_btn_settings">Tlačidlo vytvorenia inštancie</i18nString>
+        <i18nString name="header_settings">Hlavičky</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
+        <i18nString name="create_case_button_icon">Ikone ID</i18nString>
+        <i18nString name="create_case_button_icon_preview">Ikonevorschau</i18nString>
+        <i18nString name="case_default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
+        <i18nString name="default_headers_desc">Beispiel: "meta-title", "meta-visualId"</i18nString>
+        <i18nString name="hidden">Versteckt</i18nString>
+        <i18nString name="fulltext">Einfacher Suchmodus</i18nString>
+        <i18nString name="sort">Sortieren</i18nString>
+        <i18nString name="search">Suchen</i18nString>
+        <i18nString name="edit">Bearbeiten</i18nString>
+        <i18nString name="case_headers_mode">Kopfzeilenmodus</i18nString>
+        <i18nString name="case_headers_default_mode">Standardkopfzeilenmodus</i18nString>
+        <i18nString name="case_is_header_mode_changeable">Erlaube Änderung des Kopfzeilenmodus?</i18nString>
+        <i18nString name="case_allow_header_table_mode">Erlaube Tabellenmodus?</i18nString>
+        <i18nString name="use_case_default_headers">Eigene Kopfzeilen verwenden?</i18nString>
+        <i18nString name="item_settings_general">Allgemein</i18nString>
+        <i18nString name="case_view_search_type">Suchmodus im Fallansicht</i18nString>
+        <i18nString name="fulltext_advanced">Einfacher und erweiterter Suchmodus</i18nString>
+        <i18nString name="require_title_in_creation">Erforde den Titel beim erzeugen von Fällen?</i18nString>
+        <i18nString name="banned_nets_in_creation">Ausgeschlossene Prozesse</i18nString>
+        <i18nString name="banned_nets_in_creation_desc">Trenne die Prozessidentifikatoren mit einer Komma. z.B.: netz1,netz2</i18nString>
+        <i18nString name="show_create_case_button">Schaltfläche „Fall erstellen“ anzeigen?</i18nString>
+        <i18nString name="case_show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Fällen anzeigen</i18nString>
+        <i18nString name="item_settings">Menüeintrageinstellungen</i18nString>
+        <i18nString name="view_header">Fallansicht</i18nString>
+        <i18nString name="view_configuration_type">Der Ansichtstyp</i18nString>
+        <i18nString name="settings">Einstellungen</i18nString>
+        <i18nString name="case_allow_export">Erlaube Export?</i18nString>
+        <i18nString name="case_empty_content_text">Leerer Inhaltstext</i18nString>
+        <i18nString name="case_empty_content_text_desc">Wenn dieses Feld leer ist, wird der Standardtext verwendet
+        </i18nString>
+        <i18nString name="case_empty_content_icon">Leeres Inhaltssymbol</i18nString>
+        <i18nString name="case_empty_content_icon_desc">Wenn dieses Feld leer ist, wird das Standardsymbol verwendet
+        </i18nString>
+        <i18nString name="case_empty_content_icon_preview">Vorschau des leeren Inhaltssymbols</i18nString>
+        <i18nString name="case_filter">Filter</i18nString>
+        <i18nString name="case_filter_desc">Verwenden Sie PFQL Query</i18nString>
+        <i18nString name="case_allowed_nets">Erlaubte Prozesse</i18nString>
+        <i18nString name="case_all_allowed_nets">Alle Prozesse erlauben?</i18nString>
+        <i18nString name="case_inherit_allowed_nets">Erlaubte Prozesse erben?</i18nString>
+        <i18nString name="filter_settings">Filter</i18nString>
+        <i18nString name="open_case_settings">Ansicht nach dem Klicken auf die Instanz</i18nString>
+        <i18nString name="create_case_btn_settings">Schaltfläche zum Erstellen einer Instanz</i18nString>
+        <i18nString name="header_settings">Kopfzeilen</i18nString>
+    </i18n>
+
+    <transition>
+        <id>initialize</id>
+        <x>368</x>
+        <y>208</y>
+        <label>initialize [await sync]</label>
+        <icon>hourglass_empty</icon>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <event type="finish">
+            <id>finish</id>
+            <actions phase="post">
+                <action>
+                    initializeAdvancedForm()
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>data_sync</id>
+        <x>368</x>
+        <y>328</y>
+        <label>Data sync</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>settings</id>
+        <x>496</x>
+        <y>112</y>
+        <label name="settings">Settings</label>
+        <icon>settings</icon>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>view_dataGroup</id>
+            <cols>3</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>case_view_search_type</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_show_more_menu</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_allow_export</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_empty_content_text</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_empty_content_icon</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    </logic>
+                <layout>
+                    <x>1</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_empty_content_icon_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                    </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_all_allowed_nets</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_allowed_nets</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    </logic>
+                <layout>
+                    <x>1</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_inherit_allowed_nets</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    </logic>
+                <layout>
+                    <x>2</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>advanced_content_form</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>assign_0</id>
+            <title/>
+        </event>
+        <event type="finish">
+            <id>finish_0</id>
+            <title/>
+        </event>
+    </transition>
+    <transition>
+        <id>filter_settings</id>
+        <x>432</x>
+        <y>48</y>
+        <label name="filter_settings">Filter</label>
+        <icon>filter_alt</icon>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>filter_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>case_filter</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>assign</id>
+            <title/>
+        </event>
+        <event type="cancel">
+            <id>cancel</id>
+            <title/>
+        </event>
+        <event type="finish">
+            <id>finish_0</id>
+            <title/>
+        </event>
+        <event type="delegate">
+            <id>delegate</id>
+            <title/>
+        </event>
+    </transition>
+    <transition>
+        <id>open_case_settings</id>
+        <x>336</x>
+        <y>48</y>
+        <label name="open_case_settings">Open case view</label>
+        <icon>queue_play_next</icon>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>associated_view_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>view_configuration_type</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>view_configuration_form</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>assign</id>
+            <title/>
+        </event>
+        <event type="cancel">
+            <id>cancel</id>
+            <title/>
+        </event>
+        <event type="finish">
+            <id>finish_0</id>
+            <title/>
+        </event>
+        <event type="delegate">
+            <id>delegate</id>
+            <title/>
+        </event>
+    </transition>
+    <transition>
+        <id>create_case_btn_settings</id>
+        <x>656</x>
+        <y>48</y>
+        <label name="create_case_btn_settings">Create case button</label>
+        <icon>add_box</icon>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>create_case_btn_0</id>
+            <cols>3</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>show_create_case_button</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>require_title_in_creation</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>create_case_button_title</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>create_case_button_icon</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>create_case_button_icon_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>banned_nets_in_creation</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>assign</id>
+            <title/>
+        </event>
+        <event type="cancel">
+            <id>cancel</id>
+            <title/>
+        </event>
+        <event type="finish">
+            <id>finish_0</id>
+            <title/>
+        </event>
+        <event type="delegate">
+            <id>delegate</id>
+            <title/>
+        </event>
+    </transition>
+    <transition>
+        <id>header_settings</id>
+        <x>560</x>
+        <y>48</y>
+        <label name="header_settings">Header</label>
+        <icon>view_column</icon>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>header_0</id>
+            <cols>3</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>case_is_header_mode_changeable</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                    <action trigger="set">
+                        trans: t.this,
+                        isChangeable: f.case_is_header_mode_changeable,
+                        mode: f.case_headers_mode,
+                        defaultMode: f.case_headers_default_mode;
+
+                        make [mode, defaultMode], editable on trans when { isChangeable.value }
+                        make [mode, defaultMode], required on trans when { isChangeable.value }
+
+                        make [mode, defaultMode], hidden on trans when { !isChangeable.value }
+                        make [mode, defaultMode], optional on trans when { !isChangeable.value }
+                    </action>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>use_case_default_headers</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        trans: t.this,
+                        use: f.use_case_default_headers,
+                        headers: f.case_default_headers;
+
+                        make headers,editable on trans when { use.value }
+                        make headers,visible on trans when { !use.value }
+                    </action>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_default_headers</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_allow_header_table_mode</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_headers_mode</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_headers_default_mode</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>assign</id>
+            <title/>
+        </event>
+        <event type="cancel">
+            <id>cancel</id>
+            <title/>
+        </event>
+        <event type="finish">
+            <id>finish_0</id>
+            <title/>
+        </event>
+        <event type="delegate">
+            <id>delegate</id>
+            <title/>
+        </event>
+    </transition>
+    <transition>
+        <id>all_menu_data</id>
+        <x>10</x>
+        <y>10</y>
+        <label>All menu data</label>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>all_menu_data_0</id>
+            <cols>1</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>case_filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_view_search_type</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>show_create_case_button</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_show_more_menu</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_empty_content_text</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_empty_content_icon</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>5</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_empty_content_icon_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>6</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_all_allowed_nets</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>7</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_allowed_nets</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>8</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_inherit_allowed_nets</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>9</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>create_case_button_title</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>10</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>create_case_button_icon</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>11</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>create_case_button_icon_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>12</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>require_title_in_creation</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>13</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>banned_nets_in_creation</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>14</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_is_header_mode_changeable</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>15</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_allow_header_table_mode</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>16</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_headers_mode</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>17</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_headers_default_mode</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>18</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>use_case_default_headers</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>19</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_default_headers</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>20</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>view_configuration_type</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>21</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>view_configuration_all_data_form</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>22</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_allow_export</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>23</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <place>
+        <id>initialized</id>
+        <x>496</x>
+        <y>208</y>
+        <label>initialized</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>uninitialized</id>
+        <x>240</x>
+        <y>208</y>
+        <label>uninitialized</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>is_tabbed</id>
+        <x>240</x>
+        <y>48</y>
+        <label>is_tabbed</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>is_untabbed</id>
+        <x>112</x>
+        <y>144</y>
+        <label>is_untabbed</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <arc>
+        <id>a1</id>
+        <type>read</type>
+        <sourceId>initialized</sourceId>
+        <destinationId>settings</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>regular</type>
+        <sourceId>uninitialized</sourceId>
+        <destinationId>initialize</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a3</id>
+        <type>regular</type>
+        <sourceId>initialize</sourceId>
+        <destinationId>initialized</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a4</id>
+        <type>read</type>
+        <sourceId>initialized</sourceId>
+        <destinationId>filter_settings</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a5</id>
+        <type>read</type>
+        <sourceId>initialized</sourceId>
+        <destinationId>open_case_settings</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a6</id>
+        <type>read</type>
+        <sourceId>initialized</sourceId>
+        <destinationId>header_settings</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a7</id>
+        <type>read</type>
+        <sourceId>initialized</sourceId>
+        <destinationId>create_case_btn_settings</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a8</id>
+        <type>regular</type>
+        <sourceId>initialize</sourceId>
+        <destinationId>is_tabbed</destinationId>
+        <multiplicity>1</multiplicity>
+        <reference>is_tabbed_var_arc</reference>
+    </arc>
+    <arc>
+        <id>a9</id>
+        <type>read</type>
+        <sourceId>is_tabbed</sourceId>
+        <destinationId>open_case_settings</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>

@@ -90,6 +90,9 @@ class ImportHelper {
     @Autowired
     private IUriService uriService
 
+    @Autowired
+    private SystemUserRunner systemCreator
+
     private final ClassLoader loader = ImportHelper.getClassLoader()
 
 
@@ -177,12 +180,12 @@ class ImportHelper {
         return user
     }
 
-    Case createCase(String title, PetriNet net, LoggedUser user) {
-        return workflowService.createCase(net.getStringId(), title, "", user).getCase()
+    Case createCase(String title, PetriNet net, LoggedUser user, Map<String, String> params = [:]) {
+        return workflowService.createCase(net.getStringId(), title, "", user, params).getCase()
     }
 
-    Case createCase(String title, PetriNet net) {
-        return createCase(title, net, userService.getSystem().transformToLoggedUser())
+    Case createCase(String title, PetriNet net, Map<String, String> params = [:]) {
+        return createCase(title, net, userService.getSystem().transformToLoggedUser(), params)
     }
 
     Case createCaseAsSuper(String title, PetriNet net) {
@@ -237,6 +240,22 @@ class ImportHelper {
 
     void updateSuperUser() {
         superCreator.setAllToSuperUser();
+    }
+
+    Optional<PetriNet> importProcess(String message, String netIdentifier, String netFileName) {
+        PetriNet filter = petriNetService.getNewestVersionByIdentifier(netIdentifier)
+        if (filter != null) {
+            log.info("${message} has already been imported.")
+            return Optional.of(filter)
+        }
+
+        Optional<PetriNet> filterNet = this.createNet(netFileName, VersionType.MAJOR, systemCreator.loggedSystem)
+
+        if (!filterNet.isPresent()) {
+            log.error("Import of ${message} failed!")
+        }
+
+        return filterNet
     }
 
     static ObjectNode populateDataset(Map<String, Map<String, String>> data) {

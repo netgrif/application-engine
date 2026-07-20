@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.files.interfaces;
 
-import com.netgrif.application.engine.files.throwable.BadRequestException;
+import com.netgrif.application.engine.utils.throwable.BadRequestException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.application.engine.importer.model.Data;
