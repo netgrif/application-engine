@@ -182,6 +182,9 @@ public class SearchUtils {
 
     public static String getStringValue(String queryLangString) {
         String result = queryLangString.replace("'", "");
+        if (result.isBlank()) {
+            return "\"\"";
+        }
         return result.contains(" ") ? "\"" + result + "\"" : result;
     }
 
