@@ -40,6 +40,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     private final ParseTreeProperty<String> elasticQuery = new ParseTreeProperty<>();
     private final ParseTreeProperty<Predicate> mongoQuery = new ParseTreeProperty<>();
+    private final String elasticFuzzyMaxDistance = "2";
 
     private final IUserService userService;
 
@@ -1812,6 +1813,46 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
         setMongoQuery(ctx, null);
         setElasticQuery(ctx, isNotNull ? "_exists_:" + elasticAttribute : "!(_exists_:" + elasticAttribute + ")");
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitTitleLike(QueryLangParser.TitleLikeContext ctx) {
+        StringPath stringPath;
+        Token op = ctx.stringLikeComparison().stringComparison().op;
+        boolean not = ctx.stringLikeComparison().stringComparison().NOT() != null;
+        String string = handleStringComparisonWithPlaceholders(ctx.stringLikeComparison().stringComparison());
+
+        switch (resourceType) {
+            case PROCESS:
+                stringPath = QPetriNet.petriNet.title.defaultValue;
+                break;
+            case CASE:
+                stringPath = QCase.case$.title;
+                setElasticQuery(ctx, buildElasticQuery("title", op.getType(), string + "~" + elasticFuzzyMaxDistance, not));
+                break;
+            case TASK:
+                stringPath = QTask.task.title.defaultValue;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown query type: " + resourceType);
+        }
+
+        Predicate mongoQuery = stringPath.likeIgnoreCase("%" + string + "%");
+        setMongoQuery(ctx, not ? mongoQuery.not() : mongoQuery);
+    }
+
+    @Override
+    public void exitDataStringLike(QueryLangParser.DataStringLikeContext ctx) {
+        String fieldId = ctx.dataValue().fieldId.getText();
+        Token op = ctx.stringLikeComparison().stringComparison().op;
+        checkOp(ComparisonType.STRING, op);
+        boolean not = ctx.stringLikeComparison().stringComparison().NOT() != null;
+        String string = handleStringComparisonWithPlaceholders(ctx.stringLikeComparison().stringComparison());
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".fulltextValue", op.getType(),
+                string + "~" + elasticFuzzyMaxDistance, not));
         this.searchWithElastic = true;
     }
 

@@ -142,6 +142,7 @@ idComparison: ID SPACE objectIdComparison # idBasic
             | ID SPACE nullComparison # idNull
             ;
 titleComparison: TITLE SPACE stringComparison # titleBasic
+               | TITLE SPACE stringLikeComparison # titleLike
                | TITLE SPACE inListStringComparison # titleList
                | TITLE SPACE inRangeStringComparison # titleRange
                | TITLE SPACE nullComparison # titleNull
@@ -221,6 +222,7 @@ emailComparison: EMAIL SPACE stringComparison # emailBasic
                | EMAIL SPACE nullComparison # emailNull
                ;
 dataValueComparison: dataValue SPACE stringComparison # dataString
+              | dataValue SPACE stringLikeComparison # dataStringLike
               | dataValue SPACE numberComparison # dataNumber
               | dataValue SPACE dateComparison # dataDate
               | dataValue SPACE dateTimeComparison # dataDatetime
@@ -252,6 +254,7 @@ tasksUserIdComparison: tasksUserId SPACE stringComparison # tasksUserIdBasic
 // basic comparisons
 objectIdComparison: (NOT SPACE?)? op=(EQ | NEQ) SPACE (STRING | LOGGED_USER_ID) ;
 stringComparison: (NOT SPACE?)? op=(EQ | NEQ | CONTAINS | LT | GT | LTE | GTE) SPACE (STRING | loggedUserStringAttribute) ;
+stringLikeComparison: stringComparison LIKE ;
 numberComparison: (NOT SPACE?)? op=(EQ | NEQ | LT | GT | LTE | GTE) SPACE number=(INT | DOUBLE) ;
 dateComparison: (NOT SPACE?)? op=(EQ | NEQ | LT | GT | LTE | GTE) SPACE DATE ;
 dateTimeComparison: (NOT SPACE?)? op=(EQ | NEQ | LT | GT | LTE | GTE) SPACE DATETIME ;
@@ -299,7 +302,7 @@ LT: L T | '<' ;
 GT: G T | '>' ;
 LTE: L T E | '<=' ;
 GTE: G T E | '>=' ;
-CONTAINS: C O N T A I N S | '~';
+CONTAINS: C O N T A I N S | '~' ;
 IN: I N ;
 
 // resurces
@@ -369,6 +372,7 @@ DATE: DIGIT DIGIT DIGIT DIGIT '-' ('0' [1-9] | '1' [0-2]) '-' ('0' [1-9] | [12] 
 BOOLEAN: T R U E | F A L S E ;
 VERSION_NUMBER: DIGIT+ '.' DIGIT+ '.' DIGIT+ ;
 NULL: N U L L ;
+LIKE: '*' ;
 JAVA_ID: [a-zA-Z$_] [a-zA-Z0-9$_]* ;
 
 SPACE: [ ]+ ;

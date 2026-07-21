@@ -126,6 +126,9 @@ public class QueryLangTest {
 
         cases = searchService.search("cases: processIdentifier eq 'query_test' and author eq loggedUser.id");
         assertEquals(10, ((Page<Case>) cases).getTotalElements());
+
+        cases = searchService.search("cases: processIdentifier eq 'query_test' and data.text_0.value eq 'x'*");
+        assertEquals(10, ((Page<Case>) cases).getTotalElements());
     }
 
     @Test
@@ -257,6 +260,11 @@ public class QueryLangTest {
 
         // title comparison
         checkStringComparison(mongoDbUtils, "process", "title", QPetriNet.petriNet.title.defaultValue);
+
+        actual = evaluateQuery("process: title eq 'somxthing'*").getFullMongoQuery();
+        expected = QPetriNet.petriNet.title.defaultValue.likeIgnoreCase("%somxthing%");
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
 
         // creationDate comparison
         checkDateComparison(mongoDbUtils, "process", "creationDate", QPetriNet.petriNet.creationDate);
@@ -1154,6 +1162,14 @@ public class QueryLangTest {
 
         checkDateComparisonElastic("case", "data.field3.value", "dataSet.field3.timestampValue");
 
+        actual = evaluateQuery("case: data.field1.value eq 'somxthing'*").getFullElasticQuery();
+        expected = "dataSet.field1.fulltextValue:somxthing~2";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: data.field1.value neq 'somxthing'*").getFullElasticQuery();
+        expected = "NOT dataSet.field1.fulltextValue:somxthing~2";
+        assertEquals(expected, actual);
+
         actual = evaluateQuery("case: data.field1.value eq true").getFullElasticQuery();
         expected = "dataSet.field1.booleanValue:true";
         assertEquals(expected, actual);
@@ -1198,6 +1214,14 @@ public class QueryLangTest {
 
         actual = evaluateQuery("case: title neq null").getFullElasticQuery();
         expected = "_exists_:title";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: title eq 'somxthing'*").getFullElasticQuery();
+        expected = "title:somxthing~2";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: title not eq 'somxthing anxthing'*").getFullElasticQuery();
+        expected = "NOT title:\"somxthing anxthing\"~2";
         assertEquals(expected, actual);
     }
 
