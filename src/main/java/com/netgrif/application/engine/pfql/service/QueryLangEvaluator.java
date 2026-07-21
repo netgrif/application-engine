@@ -1578,4 +1578,250 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
             sortOrders.add(new Sort.Order(dir, prop));
         });
     }
+
+    @Override
+    public void exitIdNull(QueryLangParser.IdNullContext ctx) {
+        Predicate mongoQuery;
+        Token op = ctx.nullComparison().op;
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        checkOp(ComparisonType.NULL, op);
+
+        switch (resourceType) {
+            case PROCESS:
+                mongoQuery = isNotNull ? QPetriNet.petriNet._id.isNotNull() : QPetriNet.petriNet._id.isNull();
+                break;
+            case CASE:
+                mongoQuery = isNotNull ? QCase.case$._id.isNotNull() : QCase.case$._id.isNull();
+                setElasticQuery(ctx, isNotNull ? "_exists_:stringId" : "!(_exists_:stringId)");
+                break;
+            case TASK:
+                mongoQuery = isNotNull ? QTask.task._id.isNotNull() : QTask.task._id.isNull();
+                break;
+            case USER:
+                mongoQuery = isNotNull ? QUser.user._id.isNotNull() : QUser.user._id.isNull();
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown query type: " + resourceType);
+        }
+
+        setMongoQuery(ctx, mongoQuery);
+    }
+
+    @Override
+    public void exitTitleNull(QueryLangParser.TitleNullContext ctx) {
+        Predicate mongoQuery;
+        Token op = ctx.nullComparison().op;
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        checkOp(ComparisonType.NULL, op);
+
+        switch (resourceType) {
+            case PROCESS:
+                mongoQuery = isNotNull ? QPetriNet.petriNet.title.isNotNull() : QPetriNet.petriNet.title.isNull();
+                break;
+            case CASE:
+                mongoQuery = isNotNull ? QCase.case$.title.isNotNull() : QCase.case$.title.isNull();
+                setElasticQuery(ctx, isNotNull ? "_exists_:title" : "!(_exists_:title)");
+                break;
+            case TASK:
+                mongoQuery = isNotNull ? QTask.task.title.isNotNull() : QTask.task.title.isNull();
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown query type: " + resourceType);
+        }
+
+        setMongoQuery(ctx, mongoQuery);
+    }
+
+    @Override
+    public void exitIdentifierNull(QueryLangParser.IdentifierNullContext ctx) {
+        Token op = ctx.nullComparison().op;
+        checkOp(ComparisonType.NULL, op);
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        setMongoQuery(ctx, isNotNull ? QPetriNet.petriNet.identifier.isNotNull() : QPetriNet.petriNet.identifier.isNull());
+    }
+
+    @Override
+    public void exitVersionNull(QueryLangParser.VersionNullContext ctx) {
+        Token op = ctx.nullComparison().op;
+        checkOp(ComparisonType.NULL, op);
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        setMongoQuery(ctx, isNotNull ? QPetriNet.petriNet.version.isNotNull() : QPetriNet.petriNet.version.isNull());
+    }
+
+    @Override
+    public void exitCdNull(QueryLangParser.CdNullContext ctx) {
+        Token op = ctx.nullComparison().op;
+        checkOp(ComparisonType.NULL, op);
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+
+        Predicate mongoQuery;
+        switch (resourceType) {
+            case PROCESS:
+                mongoQuery = isNotNull ? QPetriNet.petriNet.creationDate.isNotNull() : QPetriNet.petriNet.creationDate.isNull();
+                break;
+            case CASE:
+                mongoQuery = isNotNull ? QCase.case$.creationDate.isNotNull() : QCase.case$.creationDate.isNull();
+                setElasticQuery(ctx, isNotNull ? "_exists_:creationDateSortable" : "!(_exists_:creationDateSortable)");
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown query type: " + resourceType);
+        }
+
+        setMongoQuery(ctx, mongoQuery);
+    }
+
+    @Override
+    public void exitProcessIdNull(QueryLangParser.ProcessIdNullContext ctx) {
+        Token op = ctx.nullComparison().op;
+        checkOp(ComparisonType.NULL, op);
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        setMongoQuery(ctx, isNotNull ? QTask.task.processId.isNotNull() : QTask.task.processId.isNull() );
+    }
+
+    @Override
+    public void exitProcessIdObjNull(QueryLangParser.ProcessIdObjNullContext ctx) {
+        Token op = ctx.nullComparison().op;
+        checkOp(ComparisonType.NULL, op);
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        setMongoQuery(ctx, isNotNull ? QCase.case$.petriNetObjectId.isNotNull() : QCase.case$.petriNetObjectId.isNull());
+        setElasticQuery(ctx, isNotNull ? "_exists_:processId" : "!(_exists_:processId)");
+    }
+
+    @Override
+    public void exitProcessIdentifierNull(QueryLangParser.ProcessIdentifierNullContext ctx) {
+        Token op = ctx.nullComparison().op;
+        checkOp(ComparisonType.NULL, op);
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        setMongoQuery(ctx, isNotNull ? QCase.case$.processIdentifier.isNotNull() : QCase.case$.processIdentifier.isNull());
+        setElasticQuery(ctx, isNotNull ? "_exists_:processIdentifier" : "!(_exists_:processIdentifier)");
+    }
+
+    @Override
+    public void exitAuthorNull(QueryLangParser.AuthorNullContext ctx) {
+        Token op = ctx.nullComparison().op;
+        checkOp(ComparisonType.NULL, op);
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        setMongoQuery(ctx, isNotNull ? QCase.case$.author.id.isNotNull() : QCase.case$.author.id.isNull());
+        setElasticQuery(ctx, isNotNull ? "_exists_:author" : "!(_exists_:author)");
+    }
+
+    @Override
+    public void exitTransitionIdNull(QueryLangParser.TransitionIdNullContext ctx) {
+        Token op = ctx.nullComparison().op;
+        checkOp(ComparisonType.NULL, op);
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        setMongoQuery(ctx, isNotNull ? QTask.task.transitionId.isNotNull() : QTask.task.transitionId.isNull());
+    }
+
+    @Override
+    public void exitUserIdNull(QueryLangParser.UserIdNullContext ctx) {
+        Token op = ctx.nullComparison().op;
+        checkOp(ComparisonType.NULL, op);
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        setMongoQuery(ctx, isNotNull ? QTask.task.userId.isNotNull() : QTask.task.userId.isNull());
+    }
+
+    @Override
+    public void exitLfNull(QueryLangParser.LfNullContext ctx) {
+        // todo implement lastFinished
+    }
+
+    @Override
+    public void exitCaseIdNull(QueryLangParser.CaseIdNullContext ctx) {
+        Token op = ctx.nullComparison().op;
+        checkOp(ComparisonType.NULL, op);
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        setMongoQuery(ctx, isNotNull ? QTask.task.caseId.isNotNull() : QTask.task.caseId.isNull());
+    }
+
+    @Override
+    public void exitLaNull(QueryLangParser.LaNullContext ctx) {
+        // todo implement lastAssigned
+    }
+
+    @Override
+    public void exitNameNull(QueryLangParser.NameNullContext ctx) {
+        Token op = ctx.nullComparison().op;
+        checkOp(ComparisonType.NULL, op);
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        setMongoQuery(ctx, isNotNull ? QUser.user.name.isNotNull() : QUser.user.name.isNull());
+    }
+
+    @Override
+    public void exitSurnameNull(QueryLangParser.SurnameNullContext ctx) {
+        Token op = ctx.nullComparison().op;
+        checkOp(ComparisonType.NULL, op);
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        setMongoQuery(ctx, isNotNull ? QUser.user.surname.isNotNull() : QUser.user.surname.isNull());
+    }
+
+    @Override
+    public void exitEmailNull(QueryLangParser.EmailNullContext ctx) {
+        Token op = ctx.nullComparison().op;
+        checkOp(ComparisonType.NULL, op);
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        setMongoQuery(ctx, isNotNull ? QUser.user.email.isNotNull() : QUser.user.email.isNull());
+    }
+
+    @Override
+    public void exitDataNull(QueryLangParser.DataNullContext ctx) {
+        Token op = ctx.nullComparison().op;
+        checkOp(ComparisonType.NULL, op);
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        String fieldId = ctx.dataValue().fieldId.getText();
+        String elasticAttribute = "dataSet." + fieldId + ".fulltextValue";
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, isNotNull ? "_exists_:" + elasticAttribute : "!(_exists_:" + elasticAttribute + ")");
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataOptionsNull(QueryLangParser.DataOptionsNullContext ctx) {
+        Token op = ctx.nullComparison().op;
+        checkOp(ComparisonType.NULL, op);
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        String fieldId = ctx.dataOptions().fieldId.getText();
+        String elasticAttribute = "dataSet." + fieldId + ".options";
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, isNotNull ? "_exists_:" + elasticAttribute : "!(_exists_:" + elasticAttribute + ")");
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitPlacesNull(QueryLangParser.PlacesNullContext ctx) {
+        Token op = ctx.nullComparison().op;
+        checkOp(ComparisonType.NULL, op);
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        String placeId = ctx.places().placeId.getText();
+        String elasticAttribute = "places." + placeId + ".marking";
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, isNotNull ? "_exists_:" + elasticAttribute : "!(_exists_:" + elasticAttribute + ")");
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitTasksUserIdNull(QueryLangParser.TasksUserIdNullContext ctx) {
+        Token op = ctx.nullComparison().op;
+        checkOp(ComparisonType.NULL, op);
+        boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
+        String taskId = ctx.tasksUserId().taskId.getText();
+        String elasticAttribute = "tasks." + taskId + ".userId";
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, isNotNull ? "_exists_:" + elasticAttribute : "!(_exists_:" + elasticAttribute + ")");
+        this.searchWithElastic = true;
+    }
+
+    private boolean shouldBeNotNull(QueryLangParser.NullComparisonContext ctx) {
+        if (ctx == null) {
+            throw new IllegalArgumentException("Null comparison context must be provided");
+        }
+        if (ctx.EQ() == null && ctx.NEQ() == null) {
+            throw new IllegalArgumentException("Any of the operators EQ or NEQ must be used");
+        }
+        return ctx.NOT() != null && ctx.EQ() != null || ctx.NOT() == null && ctx.NEQ() != null;
+    }
 }

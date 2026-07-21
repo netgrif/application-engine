@@ -42,7 +42,8 @@ public class SearchUtils {
             ComparisonType.NUMBER, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
             ComparisonType.DATE, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
             ComparisonType.DATETIME, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
-            ComparisonType.BOOLEAN, List.of(QueryLangParser.EQ, QueryLangParser.NEQ)
+            ComparisonType.BOOLEAN, List.of(QueryLangParser.EQ, QueryLangParser.NEQ),
+            ComparisonType.NULL, List.of(QueryLangParser.EQ, QueryLangParser.NEQ)
     );
 
     public static final Map<String, String> processAttrToSortPropMapping = Map.of(

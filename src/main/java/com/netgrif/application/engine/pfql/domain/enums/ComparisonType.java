@@ -7,5 +7,6 @@ public enum ComparisonType {
     DATE,
     DATETIME,
     BOOLEAN,
-    OPTIONS
+    OPTIONS,
+    NULL
 }
