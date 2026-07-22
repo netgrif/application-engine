@@ -181,6 +181,14 @@ public abstract class AbstractTaskController {
     }
 
     public PagedModel<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, SingleElasticTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        searchBody.getList().forEach((request) -> {
+            // todo: temporary for loop until the frontend works fully with PFQL
+            if (!isPfqlQuery(request.query)) {
+                return;
+            }
+            QueryLangEvaluator evaluator = SearchUtils.evaluateQuery(request.query);
+            request.query = evaluator.getFullElasticQuery();
+        });
         Page<Task> tasks = elasticTaskService.search(searchBody.getList(), (LoggedUser) auth.getPrincipal(), pageable, locale, operation == MergeFilterOperation.AND);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .searchElastic(auth, pageable, searchBody, operation, assembler, locale)).withRel("search_es");
@@ -371,5 +379,20 @@ public abstract class AbstractTaskController {
         } else {
             return mainOutcome;
         }
+    }
+
+    protected boolean isPfqlQuery(String query) {
+        // todo: temporary until the frontend works fully with PFQL
+        return query != null && !query.isBlank() && (
+                startsWithPfqlPrefix("case", query) || startsWithPfqlPrefix("cases", query)
+                        || startsWithPfqlPrefix("task", query) || startsWithPfqlPrefix("tasks", query)
+                        || startsWithPfqlPrefix("process", query) || startsWithPfqlPrefix("processes", query)
+                        || startsWithPfqlPrefix("user", query) || startsWithPfqlPrefix("users", query)
+        );
+    }
+
+    protected boolean startsWithPfqlPrefix(String prefix, String query) {
+        // todo: temporary until the frontend works fully with PFQL
+        return query.startsWith(prefix + ":") || query.startsWith(prefix + " where");
     }
 }

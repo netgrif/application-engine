@@ -538,6 +538,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case TASK:
                 qObjectId = QTask.task._id;
+                setElasticQuery(ctx, buildElasticQuery("stringId", op.getType(), objectId.toString(), not));
                 break;
             case USER:
                 qObjectId = QUser.user._id;
@@ -556,6 +557,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         boolean not = ctx.inListStringComparison().NOT() != null;
         checkOp(ComparisonType.ID, op);
         List<ObjectId> objectIdList = handleObjectIdListComparison(ctx.inListStringComparison().stringList());
+        List<String> stringIdList = objectIdList.stream().map(ObjectId::toString).collect(Collectors.toList());
 
         switch (resourceType) {
             case PROCESS:
@@ -563,11 +565,11 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case CASE:
                 qObjectId = QCase.case$._id;
-                List<String> stringIdList = objectIdList.stream().map(ObjectId::toString).collect(Collectors.toList());
                 setElasticQuery(ctx, buildElasticQueryInList("stringId", stringIdList, not));
                 break;
             case TASK:
                 qObjectId = QTask.task._id;
+                setElasticQuery(ctx, buildElasticQueryInList("stringId", stringIdList, not));
                 break;
             case USER:
                 qObjectId = QUser.user._id;
@@ -585,6 +587,10 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         Token op = ctx.stringComparison().op;
         boolean not = ctx.stringComparison().NOT() != null;
         String string = handleStringComparisonWithPlaceholders(ctx.stringComparison());
+        String elasticAttribute = "title";
+        if (op.getType() == QueryLangParser.EQ || op.getType() == QueryLangParser.NEQ) {
+            elasticAttribute += ".keyword";
+        }
 
         switch (resourceType) {
             case PROCESS:
@@ -592,14 +598,11 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case CASE:
                 stringPath = QCase.case$.title;
-                String elasticAttribute = "title";
-                if (op.getType() == QueryLangParser.EQ || op.getType() == QueryLangParser.NEQ) {
-                    elasticAttribute += ".keyword";
-                }
                 setElasticQuery(ctx, buildElasticQuery(elasticAttribute, op.getType(), string, not));
                 break;
             case TASK:
                 stringPath = QTask.task.title.defaultValue;
+                setElasticQuery(ctx, buildElasticQuery(elasticAttribute, op.getType(), string, not));
                 break;
             default:
                 throw new IllegalArgumentException("Unknown query type: " + resourceType);
@@ -624,6 +627,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case TASK:
                 stringPath = QTask.task.title.defaultValue;
+                setElasticQuery(ctx, buildElasticQueryInList("title", stringList, not));
                 break;
             default:
                 throw new IllegalArgumentException("Unknown query type: " + resourceType);
@@ -651,6 +655,8 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case TASK:
                 stringPath = QTask.task.title.defaultValue;
+                setElasticQuery(ctx, buildElasticQueryInRange("title", leftAndRightStrings.getFirst(),
+                        leftEndpointOpen, leftAndRightStrings.getSecond(), rightEndpointOpen, not));
                 break;
             default:
                 throw new IllegalArgumentException("Unknown query type: " + resourceType);
@@ -833,6 +839,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String string = handleStringComparisonWithPlaceholders(ctx.stringComparison());
 
         setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
+        setElasticQuery(ctx, buildElasticQuery("processId", op.getType(), string, not));
     }
 
     @Override
@@ -842,6 +849,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         List<String> stringList = handleStringListComparison(ctx.inListStringComparison().stringList());
 
         setMongoQuery(ctx, buildStringPredicateInList(stringPath, stringList, not));
+        setElasticQuery(ctx, buildElasticQueryInList("processId", stringList, not));
     }
 
     @Override
@@ -930,6 +938,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String string = handleStringComparisonWithPlaceholders(ctx.stringComparison());
 
         setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
+        setElasticQuery(ctx, buildElasticQuery("transitionId", op.getType(), string, not));
     }
 
     @Override
@@ -939,6 +948,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         List<String> stringList = handleStringListComparison(ctx.inListStringComparison().stringList());
 
         setMongoQuery(ctx, buildStringPredicateInList(stringPath, stringList, not));
+        setElasticQuery(ctx, buildElasticQueryInList("transitionId", stringList, not));
     }
 
     @Override
@@ -951,6 +961,8 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
         setMongoQuery(ctx, buildStringPredicateInRange(stringPath, leftAndRightStrings.getFirst(), leftEndpointOpen,
                 leftAndRightStrings.getSecond(), rightEndpointOpen, not));
+        setElasticQuery(ctx, buildElasticQueryInRange("transitionId", leftAndRightStrings.getFirst(),
+                leftEndpointOpen, leftAndRightStrings.getSecond(), rightEndpointOpen, not));
     }
 
     @Override
@@ -974,6 +986,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String string = handleStringComparisonWithPlaceholders(ctx.stringComparison());
 
         setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
+        setElasticQuery(ctx, buildElasticQuery("userId", op.getType(), string, not));
     }
 
     @Override
@@ -983,6 +996,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         List<String> stringList = handleStringListComparison(ctx.inListStringComparison().stringList());
 
         setMongoQuery(ctx, buildStringPredicateInList(stringPath, stringList, not));
+        setElasticQuery(ctx, buildElasticQueryInList("userId", stringList, not));
     }
 
     @Override
@@ -993,6 +1007,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String string = handleStringComparisonWithPlaceholders(ctx.stringComparison());
 
         setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
+        setElasticQuery(ctx, buildElasticQuery("caseId", op.getType(), string, not));
     }
 
     @Override
@@ -1002,6 +1017,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         List<String> stringList = handleStringListComparison(ctx.inListStringComparison().stringList());
 
         setMongoQuery(ctx, buildStringPredicateInList(stringPath, stringList, not));
+        setElasticQuery(ctx, buildElasticQueryInList("caseId", stringList, not));
     }
 
     @Override
@@ -1597,6 +1613,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case TASK:
                 mongoQuery = isNotNull ? QTask.task._id.isNotNull() : QTask.task._id.isNull();
+                setElasticQuery(ctx, isNotNull ? "_exists_:stringId" : "!(_exists_:stringId)");
                 break;
             case USER:
                 mongoQuery = isNotNull ? QUser.user._id.isNotNull() : QUser.user._id.isNull();
@@ -1625,6 +1642,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case TASK:
                 mongoQuery = isNotNull ? QTask.task.title.isNotNull() : QTask.task.title.isNull();
+                setElasticQuery(ctx, isNotNull ? "_exists_:title" : "!(_exists_:title)");
                 break;
             default:
                 throw new IllegalArgumentException("Unknown query type: " + resourceType);
@@ -1677,6 +1695,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         checkOp(ComparisonType.NULL, op);
         boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
         setMongoQuery(ctx, isNotNull ? QTask.task.processId.isNotNull() : QTask.task.processId.isNull() );
+        setElasticQuery(ctx, isNotNull ? "_exists_:processId" : "!(_exists_:processId)");
     }
 
     @Override
@@ -1712,6 +1731,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         checkOp(ComparisonType.NULL, op);
         boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
         setMongoQuery(ctx, isNotNull ? QTask.task.transitionId.isNotNull() : QTask.task.transitionId.isNull());
+        setElasticQuery(ctx, isNotNull ? "_exists_:transitionId" : "!(_exists_:transitionId)");
     }
 
     @Override
@@ -1720,6 +1740,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         checkOp(ComparisonType.NULL, op);
         boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
         setMongoQuery(ctx, isNotNull ? QTask.task.userId.isNotNull() : QTask.task.userId.isNull());
+        setElasticQuery(ctx, isNotNull ? "_exists_:userId" : "!(_exists_:userId)");
     }
 
     @Override
@@ -1733,6 +1754,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         checkOp(ComparisonType.NULL, op);
         boolean isNotNull = shouldBeNotNull(ctx.nullComparison());
         setMongoQuery(ctx, isNotNull ? QTask.task.caseId.isNotNull() : QTask.task.caseId.isNull());
+        setElasticQuery(ctx, isNotNull ? "_exists_:caseId" : "!(_exists_:caseId)");
     }
 
     @Override
@@ -1833,6 +1855,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case TASK:
                 stringPath = QTask.task.title.defaultValue;
+                setElasticQuery(ctx, buildElasticQuery("title", op.getType(), string + "~" + elasticFuzzyMaxDistance, not));
                 break;
             default:
                 throw new IllegalArgumentException("Unknown query type: " + resourceType);
