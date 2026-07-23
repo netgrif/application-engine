@@ -139,8 +139,19 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
      * @param objectId  the object ID
      * @return an {@link Optional} containing the found {@link ProcessRole}, if any
      */
+    @Deprecated(since = "7.0.2")
     @Query("{ '_id.shortProcessId': ?0, '_id.objectId': ?1 }")
     Optional<ProcessRole> findByNetworkIdAndObjectId(String networkId, ObjectId objectId);
+
+    /**
+     * Finds a {@link ProcessRole} by a network ID and object ID.
+     *
+     * @param networkIdentifier the short process ID
+     * @param objectId  the object ID
+     * @return an {@link Optional} containing the found {@link ProcessRole}, if any
+     */
+    @Query("{ '_id.shortProcessIdentifier': ?0, '_id.objectId': ?1 }")
+    Optional<ProcessRole> findByNetworkIdentifierAndObjectId(String networkIdentifier, ObjectId objectId);
 
     /**
      * Finds all {@link ProcessRole} entities by a collection of composite resource IDs.
