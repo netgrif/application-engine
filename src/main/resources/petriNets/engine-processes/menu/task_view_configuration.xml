@@ -2,7 +2,7 @@
     <id>task_view_configuration</id>
     <version>1.0.0</version>
     <initials>TTV</initials>
-    <title>Task view configuration</title>
+    <title name="model_title">Task view configuration</title>
     <icon>check_box_outline_blank</icon>
     <defaultRole>true</defaultRole>
     <anonymousRole>false</anonymousRole>
@@ -249,6 +249,7 @@
         <i18nString name="task_filter_desc">Použi PFQL query</i18nString>
         <i18nString name="filter_settings">Filter</i18nString>
         <i18nString name="header_settings">Hlavičky</i18nString>
+        <i18nString name="model_title">Konfigurácia zobrazenia úloh</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="hidden">Versteckt</i18nString>
@@ -281,6 +282,7 @@
         <i18nString name="task_filter_desc">Verwenden Sie PFQL Query</i18nString>
         <i18nString name="filter_settings">Filter</i18nString>
         <i18nString name="header_settings">Kopfzeilen</i18nString>
+        <i18nString name="model_title">Aufgabenansichtskonfiguration</i18nString>
     </i18n>
 
     <transition>
