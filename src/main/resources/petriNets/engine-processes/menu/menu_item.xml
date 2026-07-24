@@ -40,6 +40,28 @@
 				</action>
 			</actions>
 		</event>
+		<event type="create">
+			<id>menu_item_create</id>
+			<actions phase="post">
+				<action id="1">
+					move_dest_uri: f.move_dest_uri;
+
+					String destUriPath = params["dest_uri_path"]
+					if (destUriPath == null || destUriPath.isEmpty()) {
+						return
+					}
+
+					try {
+						def splitDestPathAsList = splitUriPath(destUriPath)
+						if (splitDestPathAsList.size() > 1) {
+							change move_dest_uri value { splitDestPathAsList }
+						}
+					} catch (IllegalArgumentException ignore) {
+						log.error("Cannot move item on creation", ignore)
+					}
+				</action>
+			</actions>
+		</event>
 	</caseEvents>
 	<role>
 		<id>system</id>
@@ -235,18 +257,15 @@
 		<title/>
 	</data>
 	<data type="boolean" immediate="true">
-		<id>hasChildren</id>
+		<id>is_folder</id>
 		<title/>
 	</data>
 	<data type="button">
 		<id>duplicate_reset_childItemIds</id>
 		<title/>
 		<action trigger="set">
-			hasChildren: f.hasChildren,
 			childItemIds: f.childItemIds;
-
 			change childItemIds value { [] }
-			change hasChildren value { false }
 		</action>
 	</data>
 	<data type="text" immediate="true">
@@ -522,16 +541,8 @@
 		<id>view_configuration_type</id>
 		<title name="view_configuration_type">View type</title>
 		<options>
-			<init dynamic="true">menuItemService.getAvailableViewsAsOptions(true, true)</init>
+			<init dynamic="true">menuItemService.getPrimaryViewsAsOptions()</init>
 		</options>
-		<action trigger="set">
-			use_tabbed_view: f.use_tabbed_view,
-			view_configuration_type: f.view_configuration_type;
-
-			if (view_configuration_type.options == null || view_configuration_type.options.isEmpty()) {
-				change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(use_tabbed_view.value, true) }
-			}
-		</action>
 	</data>
 	<data type="caseRef">
 		<id>view_configuration_id</id>
@@ -927,9 +938,17 @@
 				<action>
 					moveDestUri: f.move_dest_uri;
 
-					String uriNodeId = elasticCaseService.findUriNodeId(useCase)
-					def node = uriService.findById(uriNodeId)
-					updateMultichoiceWithCurrentNode(moveDestUri, node)
+					def node
+					if (moveDestUri.value != null &amp;&amp; !moveDestUri.value.isEmpty()) {
+						String uriPath = moveDestUri.value.join("/")
+						uriPath = uriPath.replace("//","/")
+						node = uriService.findByUri(uriPath)
+						change moveDestUri options { findOptionsBasedOnSelectedNode(node) }
+					} else {
+						String uriNodeId = elasticCaseService.findUriNodeId(useCase)
+						node = uriService.findById(uriNodeId)
+						updateMultichoiceWithCurrentNode(moveDestUri, node)
+					}
 				</action>
 			</actions>
 		</event>
@@ -976,6 +995,7 @@
 					newUri = newUri.replace("//","/")
 
 					changeMenuItem useCase uri { newUri }
+					Frontend.reloadMenu()
 				</action>
 			</actions>
 			<title name="create_item_finish">Create</title>
@@ -1233,6 +1253,7 @@
 					newUri = newUri.replace("//","/")
 
 					changeMenuItem useCase uri { newUri }
+					Frontend.reloadMenu()
 				</action>
 			</actions>
 			<title name="move_item_finish">Move</title>
@@ -1877,7 +1898,7 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>hasChildren</id>
+				<id>is_folder</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>

@@ -226,6 +226,20 @@
         </options>
         <init>sort</init>
     </data>
+    <data type="text" immediate="true">
+        <id>case_headers_sort_mode_active</id>
+        <title name="case_headers_sort_mode_active">Active column for sorting</title>
+        <desc name="case_headers_sort_mode_active_desc">Example: meta-title</desc>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>case_headers_sort_mode_direction</id>
+        <title name="case_headers_sort_mode_direction">Default sort direction</title>
+        <options>
+            <option key="asc" name="ascending">Ascending</option>
+            <option key="desc" name="descending">Descending</option>
+        </options>
+        <init>desc</init>
+    </data>
     <data type="enumeration_map">
         <id>headers_options_holder</id>
         <title/>
@@ -248,21 +262,14 @@
     <data type="stringCollection" immediate="true">
         <id>case_default_headers</id>
         <title name="case_default_headers">Set default headers</title>
-        <desc name="default_headers_desc">Example: "meta-title", "meta-visualId"</desc>
+        <desc name="default_headers_desc">Example: "meta-title", "myProcessIdentifier-myDataFieldId", ...</desc>
     </data>
     <data type="enumeration_map" immediate="true">
         <id>view_configuration_type</id>
         <title name="view_configuration_type">View type</title>
         <options>
-            <init dynamic="true">menuItemService.getAvailableViewsAsOptions(true, useCase.processIdentifier)</init>
+            <init dynamic="true">menuItemService.getAvailableViewsAsOptions(useCase.processIdentifier)</init>
         </options>
-        <action trigger="set">
-            view_configuration_type: f.view_configuration_type;
-
-            if (view_configuration_type.options == null || view_configuration_type.options.isEmpty()) {
-                change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(true, useCase.processIdentifier) }
-            }
-        </action>
     </data>
     <data type="caseRef">
         <id>view_configuration_id</id>
@@ -357,7 +364,7 @@
         <i18nString name="create_case_button_icon">Identifikátor ikony tlačidla "Nová inštancia"</i18nString>
         <i18nString name="create_case_button_icon_preview">Náhľad ikony</i18nString>
         <i18nString name="case_default_headers">Predvolené hlavičky</i18nString>
-        <i18nString name="default_headers_desc">Napríklad: "meta-title", "meta-visualId"</i18nString>
+        <i18nString name="default_headers_desc">Napríklad: "meta-title", "myProcessIdentifier-myDataFieldId", ...</i18nString>
         <i18nString name="case_view_search_type">Typ vyhľadávania prípadov</i18nString>
         <i18nString name="hidden">Skryté</i18nString>
         <i18nString name="fulltext">Fulltext</i18nString>
@@ -395,6 +402,11 @@
         <i18nString name="open_case_settings">Zobrazenie po kliknutí na inštanciu</i18nString>
         <i18nString name="create_case_btn_settings">Tlačidlo vytvorenia inštancie</i18nString>
         <i18nString name="header_settings">Hlavičky</i18nString>
+        <i18nString name="case_headers_sort_mode_direction">Predvolený smer zoradenia</i18nString>
+        <i18nString name="ascending">Vzostupne</i18nString>
+        <i18nString name="descending">Zostupne</i18nString>
+        <i18nString name="case_headers_sort_mode_active">Aktívny stĺpec pre zoradenie</i18nString>
+        <i18nString name="case_headers_sort_mode_active_desc">Napríklad: meta-title</i18nString>
         <i18nString name="model_title">Konfigurácia zobrazenia prípadov</i18nString>
     </i18n>
     <i18n locale="de">
@@ -402,7 +414,7 @@
         <i18nString name="create_case_button_icon">Ikone ID</i18nString>
         <i18nString name="create_case_button_icon_preview">Ikonevorschau</i18nString>
         <i18nString name="case_default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
-        <i18nString name="default_headers_desc">Beispiel: "meta-title", "meta-visualId"</i18nString>
+        <i18nString name="default_headers_desc">Beispiel: "meta-title", "myProcessIdentifier-myDataFieldId", ...</i18nString>
         <i18nString name="hidden">Versteckt</i18nString>
         <i18nString name="fulltext">Einfacher Suchmodus</i18nString>
         <i18nString name="sort">Sortieren</i18nString>
@@ -427,11 +439,9 @@
         <i18nString name="settings">Einstellungen</i18nString>
         <i18nString name="case_allow_export">Erlaube Export?</i18nString>
         <i18nString name="case_empty_content_text">Leerer Inhaltstext</i18nString>
-        <i18nString name="case_empty_content_text_desc">Wenn dieses Feld leer ist, wird der Standardtext verwendet
-        </i18nString>
+        <i18nString name="case_empty_content_text_desc">Wenn dieses Feld leer ist, wird der Standardtext verwendet</i18nString>
         <i18nString name="case_empty_content_icon">Leeres Inhaltssymbol</i18nString>
-        <i18nString name="case_empty_content_icon_desc">Wenn dieses Feld leer ist, wird das Standardsymbol verwendet
-        </i18nString>
+        <i18nString name="case_empty_content_icon_desc">Wenn dieses Feld leer ist, wird das Standardsymbol verwendet</i18nString>
         <i18nString name="case_empty_content_icon_preview">Vorschau des leeren Inhaltssymbols</i18nString>
         <i18nString name="case_filter">Filter</i18nString>
         <i18nString name="case_filter_desc">Verwenden Sie PFQL Query</i18nString>
@@ -442,6 +452,11 @@
         <i18nString name="open_case_settings">Ansicht nach dem Klicken auf die Instanz</i18nString>
         <i18nString name="create_case_btn_settings">Schaltfläche zum Erstellen einer Instanz</i18nString>
         <i18nString name="header_settings">Kopfzeilen</i18nString>
+        <i18nString name="case_headers_sort_mode_direction">Standard-Sortierrichtung</i18nString>
+        <i18nString name="ascending">Aufsteigend</i18nString>
+        <i18nString name="descending">Absteigend</i18nString>
+        <i18nString name="case_headers_sort_mode_active">Aktive Spalte zum Sortieren</i18nString>
+        <i18nString name="case_headers_sort_mode_active_desc">Beispiel: meta-title</i18nString>
         <i18nString name="model_title">Konfiguration der Fallansicht</i18nString>
     </i18n>
 
@@ -1044,6 +1059,38 @@
                     <appearance>outline</appearance>
                 </layout>
             </dataRef>
+            <dataRef>
+                <id>case_headers_sort_mode_active</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_headers_sort_mode_direction</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
         </dataGroup>
         <event type="assign">
             <id>assign</id>
@@ -1372,7 +1419,7 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>view_configuration_type</id>
+                <id>case_headers_sort_mode_active</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
@@ -1386,7 +1433,7 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>view_configuration_all_data_form</id>
+                <id>case_headers_sort_mode_direction</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
@@ -1400,13 +1447,41 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>case_allow_export</id>
+                <id>view_configuration_type</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
                     <y>23</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>view_configuration_all_data_form</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>24</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_allow_export</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>25</y>
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>
