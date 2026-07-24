@@ -31,6 +31,7 @@ com.netgrif.application.engine.configuration.security.filter
 com.netgrif.application.engine.configuration.security.interfaces
 com.netgrif.application.engine.configuration.security.jwt
 com.netgrif.application.engine.elastic.domain
+com.netgrif.application.engine.elastic.serializer
 com.netgrif.application.engine.elastic.service
 com.netgrif.application.engine.elastic.service.executors
 com.netgrif.application.engine.elastic.service.interfaces
@@ -46,6 +47,9 @@ com.netgrif.application.engine.export.configuration
 com.netgrif.application.engine.export.domain
 com.netgrif.application.engine.export.service
 com.netgrif.application.engine.export.service.interfaces
+com.netgrif.application.engine.export.utils
+com.netgrif.application.engine.export.web
+com.netgrif.application.engine.export.web.requestbodies
 com.netgrif.application.engine.files
 com.netgrif.application.engine.files.interfaces
 com.netgrif.application.engine.files.local
@@ -165,6 +169,7 @@ com.netgrif.application.engine.workflow.domain.repositories
 com.netgrif.application.engine.workflow.domain.triggers
 com.netgrif.application.engine.workflow.service
 com.netgrif.application.engine.workflow.service.interfaces
+com.netgrif.application.engine.workflow.utils
 com.netgrif.application.engine.workflow.web
 com.netgrif.application.engine.workflow.web.requestbodies
 com.netgrif.application.engine.workflow.web.requestbodies.file

@@ -188,6 +188,12 @@
 		<label>Deploy</label>
 		<icon>upload_file</icon>
 		<assignPolicy>auto</assignPolicy>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>deploy_0</id>
 			<cols>6</cols>
@@ -306,16 +312,6 @@
 		<y>80</y>
 		<label>Edit</label>
 		<icon>edit</icon>
-		<roleRef>
-			<id>default</id>
-			<logic>
-				<!--TODO: after builder merge-->
-				<!--<view>false</view>-->
-				<view>true</view>
-				<cancel>true</cancel>
-				<assign>true</assign>
-			</logic>
-		</roleRef>
 		<roleRef>
 			<id>system</id>
 			<logic>
@@ -538,6 +534,12 @@
 		<y>272</y>
 		<label>Delete with cases</label>
 		<icon>delete_forever</icon>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>t10_0</id>
 			<cols>4</cols>
@@ -594,6 +596,12 @@
 		<y>272</y>
 		<label>Delete</label>
 		<icon>delete_forever</icon>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>t11_0</id>
 			<cols>4</cols>
@@ -656,6 +664,12 @@
 		<label>Create new version</label>
 		<icon>plus_one</icon>
 		<assignPolicy>auto</assignPolicy>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>t4_0</id>
 			<cols>4</cols>
@@ -757,6 +771,12 @@
 		<y>272</y>
 		<label>Delete</label>
 		<icon>delete_forever</icon>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>t6_0</id>
 			<cols>4</cols>
@@ -819,6 +839,12 @@
 		<y>208</y>
 		<label>Archive</label>
 		<icon>folder</icon>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>t9_0</id>
 			<cols>4</cols>
