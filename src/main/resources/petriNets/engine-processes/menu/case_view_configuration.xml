@@ -2,7 +2,7 @@
     <id>case_view_configuration</id>
     <version>1.0.0</version>
     <initials>CVC</initials>
-    <title>Case view configuration</title>
+    <title name="model_title">Case view configuration</title>
     <icon>check_box_outline_blank</icon>
     <defaultRole>true</defaultRole>
     <anonymousRole>false</anonymousRole>
@@ -407,6 +407,7 @@
         <i18nString name="descending">Zostupne</i18nString>
         <i18nString name="case_headers_sort_mode_active">Aktívny stĺpec pre zoradenie</i18nString>
         <i18nString name="case_headers_sort_mode_active_desc">Napríklad: meta-title</i18nString>
+        <i18nString name="model_title">Konfigurácia zobrazenia prípadov</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
@@ -456,6 +457,7 @@
         <i18nString name="descending">Absteigend</i18nString>
         <i18nString name="case_headers_sort_mode_active">Aktive Spalte zum Sortieren</i18nString>
         <i18nString name="case_headers_sort_mode_active_desc">Beispiel: meta-title</i18nString>
+        <i18nString name="model_title">Konfiguration der Fallansicht</i18nString>
     </i18n>
 
     <transition>

@@ -2,7 +2,7 @@
     <id>task_view_configuration</id>
     <version>1.0.0</version>
     <initials>TTV</initials>
-    <title>Task view configuration</title>
+    <title name="model_title">Task view configuration</title>
     <icon>check_box_outline_blank</icon>
     <defaultRole>true</defaultRole>
     <anonymousRole>false</anonymousRole>
@@ -268,6 +268,7 @@
         <i18nString name="descending">Zostupne</i18nString>
         <i18nString name="task_headers_sort_mode_active">Aktívny stĺpec pre zoradenie</i18nString>
         <i18nString name="task_headers_sort_mode_active_desc">Napríklad: meta-title</i18nString>
+        <i18nString name="model_title">Konfigurácia zobrazenia úloh</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="hidden">Versteckt</i18nString>
@@ -305,6 +306,7 @@
         <i18nString name="descending">Absteigend</i18nString>
         <i18nString name="task_headers_sort_mode_active">Aktive Spalte zum Sortieren</i18nString>
         <i18nString name="task_headers_sort_mode_active_desc">Beispiel: meta-title</i18nString>
+        <i18nString name="model_title">Aufgabenansichtskonfiguration</i18nString>
     </i18n>
 
     <transition>

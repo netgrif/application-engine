@@ -2,7 +2,7 @@
     <id>tabbed_ticket_view_configuration</id>
     <version>1.0.0</version>
     <initials>TVC</initials>
-    <title>Tabbed ticket view configuration</title>
+    <title name="model_title">Tabbed ticket view configuration</title>
     <icon>check_box_outline_blank</icon>
     <defaultRole>true</defaultRole>
     <anonymousRole>false</anonymousRole>
@@ -109,11 +109,13 @@
         <i18nString name="view_configuration_type">Zobrazenie</i18nString>
         <i18nString name="settings">Nastavenie</i18nString>
         <i18nString name="next_view_settings">Ďalšie zobrazenie</i18nString>
+        <i18nString name="model_title">Konfigurácia kariet tiketového zobrazenia</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="view_configuration_type">Der Ansichtstyp</i18nString>
         <i18nString name="settings">Einstellungen</i18nString>
         <i18nString name="next_view_settings">Nächste Ansicht</i18nString>
+        <i18nString name="model_title">Tabbed-Ticket-Ansicht-Konfiguration</i18nString>
     </i18n>
 
     <transition>

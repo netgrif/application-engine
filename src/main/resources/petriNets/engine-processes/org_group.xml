@@ -3,7 +3,7 @@
 	<id>org_group</id>
 	<version>1.0.0</version>
 	<initials>GRP</initials>
-	<title>Organization group</title>
+	<title name="model_title">Organization group</title>
 	<icon>home</icon>
 	<defaultRole>true</defaultRole>
 	<transitionRole>false</transitionRole>
@@ -19,9 +19,9 @@
 	<!-- DATA -->
 	<data type="text">
 		<id>group_id</id>
-		<title>Group ID</title>
-		<placeholder>Enter group ID</placeholder>
-		<desc>ID of organization group</desc>
+		<title name="group_id">Group ID</title>
+		<placeholder name="group_id_placeh">Enter group ID</placeholder>
+		<desc name="group_id_desc">ID of organization group</desc>
 		<action trigger="get">
 			id: f.group_id;
 			change id value { useCase.stringId }
@@ -29,13 +29,13 @@
 	</data>
 	<data type="user">
 		<id>author</id>
-		<title>Group Author</title>
+		<title name="author">Group Author</title>
 	</data>
 	<data type="text">
 		<id>group_name</id>
-		<title>Group name</title>
-		<placeholder>Enter group name</placeholder>
-		<desc>Name of organization group</desc>
+		<title name="group_name">Group name</title>
+		<placeholder name="group_name_placeh">Enter group name</placeholder>
+		<desc name="group_name_desc">Name of organization group</desc>
 		<action trigger="set">
 			name: f.group_name;
 			useCase.setTitle(name.value)
@@ -44,9 +44,9 @@
 	</data>
 	<data type="user">
 		<id>user_selection</id>
-		<title>Select user</title>
-		<placeholder>No user selected</placeholder>
-		<desc>Select user to be added as a group member</desc>
+		<title name="user_selection">Select user</title>
+		<placeholder name="user_selection_placeh">No user selected</placeholder>
+		<desc name="user_selection_desc">Select user to be added as a group member</desc>
 		<action trigger="get">
 			userField: f.user_selection;
 			change userField value { null }
@@ -59,8 +59,8 @@
 	</data>
 	<data type="multichoice_map">
 		<id>members</id>
-		<title>Members</title>
-		<desc>Members of current organization group</desc>
+		<title name="members">Members</title>
+		<desc name="members_desc">Members of current organization group</desc>
 		<component>
 			<name>list</name>
 		</component>
@@ -100,7 +100,7 @@
 	</data>
 	<data type="taskRef">
 		<id>imported_menu_ids</id>
-		<title></title>
+		<title/>
 	</data>
 	<data type="file">
 		<id>export_menu_file</id>
@@ -110,12 +110,12 @@
 	</data>
 	<data type="button">
 		<id>update_available_entries_btn</id>
-		<title></title>
+		<title/>
 		<placeholder name="update_available_entries_btn_placeholder">Update entries</placeholder>
 	</data>
 	<data type="button">
 		<id>clear_menu_selection_btn</id>
-		<title></title>
+		<title/>
 		<placeholder name="clear_menu_selection_btn_placeholder">Clear menu configurations</placeholder>
 		<action trigger="set">
 			menusForExport: f.menus_for_export;
@@ -146,7 +146,7 @@
 	</data>
 	<data type="button">
 		<id>add_to_export_btn</id>
-		<title></title>
+		<title/>
 		<placeholder name="add_to_export_placeholder">Add entries to export</placeholder>
 		<action trigger="set">
 			selectedEntries: f.available_export_entries,
@@ -192,7 +192,7 @@
 	</data>
 	<data type="file">
 		<id>import_menu_file</id>
-		<title>Import menu</title>
+		<title name="import_menu_file">Import menu</title>
 		<placeholder name="import_file_placeholder">Menu file to import</placeholder>
 		<desc name="import_file_desc">Upload XML file containing menu here</desc>
 	</data>
@@ -288,8 +288,36 @@
 		<i18nString name="update_available_entries_btn_placeholder">Aktualizovať dostupné položky</i18nString>
 		<i18nString name="clear_menu_selection_btn_placeholder">Zmazať vytvorené konfigurácie</i18nString>
 		<i18nString name="import_export_dg">Import a export položiek menu</i18nString>
+		<i18nString name="import_menu_file">Vložiť menu</i18nString>
+		<i18nString name="import_file_placeholder">Nahrať menu súbor</i18nString>
+		<i18nString name="import_file_desc">Nahrajte XML súbor obsahujúci menu</i18nString>
+		<i18nString name="2_label">Inicializácia skupiny</i18nString>
+		<i18nString name="6_label">Informácie skupiny</i18nString>
+		<i18nString name="8_label">Pridať používateľa</i18nString>
+		<i18nString name="25_label">Upraviť informácie skupiny</i18nString>
+		<i18nString name="28_label">Vymazať používateľa</i18nString>
+		<i18nString name="import_menu_btn_placeholder">Nahrať menu</i18nString>
+		<i18nString name="import_menu_btn_desc">Nahrá menu na základe poskytnutého XML súboru</i18nString>
+		<i18nString name="model_title">Organizačná skupina</i18nString>
 	</i18n>
 	<i18n locale="de">
+		<i18nString name="author">Gruppenautor</i18nString>
+		<i18nString name="group_id">Gruppen-ID</i18nString>
+		<i18nString name="group_id_desc">Gruppen-ID eingeben</i18nString>
+		<i18nString name="group_id_placeh">ID der Organisationsgruppe</i18nString>
+		<i18nString name="group_name">Gruppenname</i18nString>
+		<i18nString name="group_name_desc">Name der Organisationsgruppe</i18nString>
+		<i18nString name="group_name_placeh">Gruppenname eingeben</i18nString>
+		<i18nString name="user_selection">Benutzer auswählen</i18nString>
+		<i18nString name="user_selection_desc">Benutzer auswählen, der als Gruppenmitglied hinzugefügt werden soll</i18nString>
+		<i18nString name="user_selection_placeh">Kein Benutzer ausgewählt</i18nString>
+		<i18nString name="members">Mitglieder</i18nString>
+		<i18nString name="members_desc">Mitglieder der aktuellen Organisationsgruppe</i18nString>
+		<i18nString name="user_action_selection">Aktion auswählen</i18nString>
+		<i18nString name="user_action_selection_add">Vorhandenen Benutzer hinzufügen</i18nString>
+		<i18nString name="user_action_selection_invite">Neuen Benutzer einladen</i18nString>
+		<i18nString name="invite_by_mail">E-Mail-Adresse hinzufügen</i18nString>
+		<i18nString name="invite_by_mail_desc">E-Mail-Adresse hinzufügen, um Einladung zu senden</i18nString>
 		<i18nString name="select_menu_item_filter">Filter auswählen</i18nString>
 		<i18nString name="add_menu_item">Als Menüpunkt hinzufügen</i18nString>
 		<i18nString name="menu_configuration">Menükonfiguration</i18nString>
@@ -307,6 +335,17 @@
 		<i18nString name="update_available_entries_btn_placeholder">Verfügbare Menüeinträge aktualisieren</i18nString>
 		<i18nString name="clear_menu_selection_btn_placeholder">Menükonfigurationen löschen</i18nString>
 		<i18nString name="import_export_dg">Import und Export von Menüeinträge</i18nString>
+		<i18nString name="import_menu_file">Menü importieren</i18nString>
+		<i18nString name="import_file_placeholder">Menüdatei hochladen</i18nString>
+		<i18nString name="import_file_desc">XML-Datei mit Menü hier hochladen</i18nString>
+		<i18nString name="2_label">Gruppe initialisieren</i18nString>
+		<i18nString name="6_label">Gruppeninformationen</i18nString>
+		<i18nString name="8_label">Benutzer hinzufügen</i18nString>
+		<i18nString name="25_label">Gruppeninformationen bearbeiten</i18nString>
+		<i18nString name="28_label">Benutzer entfernen</i18nString>
+		<i18nString name="import_menu_btn_placeholder">Menü hochladen</i18nString>
+		<i18nString name="import_menu_btn_desc">Menü aus der bereitgestellten XML-Datei importieren</i18nString>
+		<i18nString name="model_title">Organisationsgruppe</i18nString>
 	</i18n>
 	<!-- TRANSITIONS -->
 	<transition>
@@ -316,7 +355,7 @@
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Initialize group</label>
+		<label name="2_label">Initialize group</label>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>DataGroup_0</id>
@@ -375,7 +414,7 @@
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Group info</label>
+		<label name="6_label">Group info</label>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>DataGroup_0</id>
@@ -449,7 +488,7 @@
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Add user</label>
+		<label name="8_label">Add user</label>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>DataGroup_0</id>
@@ -537,7 +576,7 @@
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Edit group info</label>
+		<label name="25_label">Edit group info</label>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>DataGroup_0</id>
@@ -596,7 +635,7 @@
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Remove user</label>
+		<label name="28_label">Remove user</label>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>DataGroup_0</id>
