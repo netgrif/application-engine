@@ -1,8 +1,11 @@
 package com.netgrif.application.engine.pfql;
 
 import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.QUser;
 import com.netgrif.application.engine.auth.domain.User;
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.QPetriNet;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
@@ -19,7 +22,6 @@ import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.StringPath;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,10 +63,12 @@ public class QueryLangTest {
     @Autowired
     private TestHelper testHelper;
 
+    @Autowired
+    private IUserService userService;
+
     @Test
     @SuppressWarnings("unchecked")
-    @Disabled
-    public void testSearchService() {
+    public void testSearchService() throws InterruptedException {
         testHelper.truncateDbs();
 
         Optional<PetriNet> optionalPetriNet = helper.createNet("/pfql.xml");
@@ -80,6 +84,8 @@ public class QueryLangTest {
             params.put("id", String.valueOf(i));
             helper.createCase(String.format("Test %02d", i), process, params);
         }
+
+        Thread.sleep(2000);
 
         Object cases = searchService.search("cases: processIdentifier eq 'query_test' page 1 size 5 sort by title desc");
         assertNotNull(cases);
@@ -107,6 +113,9 @@ public class QueryLangTest {
 
         cases = searchService.search("cases: processIdentifier eq 'query_test'    and data.boolean_0.value == true and data.text_0.value != '4'");
         assertEquals(4, ((Page<Case>) cases).getTotalElements());
+
+        cases = searchService.search("cases: processIdentifier eq 'query_test' and author eq loggedUser.id");
+        assertEquals(10, ((Page<Case>) cases).getTotalElements());
     }
 
     @Test
@@ -238,6 +247,12 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        IUser systemUser = userService.getSystem();
+        actual = evaluateQuery("process: id neq loggedUser.id").getFullMongoQuery();
+        expected = QPetriNet.petriNet._id.eq(new ObjectId(systemUser.getStringId())).not();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // and comparison
         actual = evaluateQuery(String.format("process: id eq '%s' and title eq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QPetriNet.petriNet._id.eq(GENERIC_OBJECT_ID).and(QPetriNet.petriNet.title.defaultValue.eq("test"));
@@ -304,7 +319,20 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery(String.format("case: id in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
+        LoggedUser systemUser = userService.getSystem().transformToLoggedUser();
+        actual = evaluateQuery("case: id neq loggedUser.id").getFullMongoQuery();
+        expected = QCase.case$._id.eq(new ObjectId(systemUser.getId())).not();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("case: id in ('%s', '%s', loggedUser.id, loggedUser.username, loggedUser.fullName)",
+                GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QCase.case$._id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID, new ObjectId(systemUser.getId()));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("case: id in ('%s', '%s', loggedUser.username, loggedUser.fullName)",
+                GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QCase.case$._id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
 
         compareMongoQueries(mongoDbUtils, actual, expected);
@@ -335,15 +363,36 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery("case: author eq loggedUser.id").getFullMongoQuery();
+        expected = QCase.case$.author.id.eq(systemUser.getId());
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         actual = evaluateQuery("case: author contains 'test'").getFullMongoQuery();
         expected = QCase.case$.author.id.contains("test");
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery("case: author in ('test', 'test1')").getFullMongoQuery();
-        expected = QCase.case$.author.id.in("test", "test1");
+        actual = evaluateQuery("case: author in ('test', 'test1', loggedUser.id, loggedUser.username, loggedUser.fullName)").getFullMongoQuery();
+        expected = QCase.case$.author.id.in("test", "test1", systemUser.getId(), systemUser.getUsername(), systemUser.getFullName());
 
         compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("cases: title in ('test1' : loggedUser.username)").getFullMongoQuery();
+        expected = QCase.case$.title.gt("test1").and(QCase.case$.title.lt(systemUser.getUsername()));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("cases: title in (loggedUser.username : 'test1')").getFullMongoQuery();
+        expected = QCase.case$.title.gt(systemUser.getUsername()).and(QCase.case$.title.lt("test1"));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("cases: title in (loggedUser.username : loggedUser.fullName)").getFullMongoQuery();
+        expected = QCase.case$.title.gt(systemUser.getUsername()).and(QCase.case$.title.lt(systemUser.getFullName()));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
 
         // only available for elastic query
         // places comparison
@@ -459,8 +508,11 @@ public class QueryLangTest {
         compareMongoQueries(mongoDbUtils, actual, expected);
 
         // parenthesis comparison
-        actual = evaluateQuery(String.format("case: id eq '%s' and (title eq 'test' or title eq 'test1')", GENERIC_OBJECT_ID)).getFullMongoQuery();
-        expected = QCase.case$._id.eq(GENERIC_OBJECT_ID).and(QCase.case$.title.eq("test").or(QCase.case$.title.eq("test1")));
+        LoggedUser systemUser = userService.getSystem().transformToLoggedUser();
+        actual = evaluateQuery(String.format("case: id eq '%s' and (title eq 'test' or title eq 'test1' or title eq loggedUser.username)",
+                GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QCase.case$._id.eq(GENERIC_OBJECT_ID)
+                .and(QCase.case$.title.eq("test").or(QCase.case$.title.eq("test1")).or(QCase.case$.title.eq(systemUser.getUsername())));
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -489,8 +541,9 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery(String.format("task: id in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
-        expected = QTask.task._id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+        LoggedUser systemUser = userService.getSystem().transformToLoggedUser();
+        actual = evaluateQuery(String.format("task: id in ('%s', '%s', loggedUser.id)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QTask.task._id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID, new ObjectId(systemUser.getId()));
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -654,8 +707,14 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery(String.format("user: id in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
-        expected = QUser.user._id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+        LoggedUser systemUser = userService.getSystem().transformToLoggedUser();
+        actual = evaluateQuery("user: id eq loggedUser.id").getFullMongoQuery();
+        expected = QUser.user._id.eq(new ObjectId(systemUser.getId()));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("user: id in ('%s', '%s', loggEduser.id)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QUser.user._id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID, new ObjectId(systemUser.getId()));
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -687,6 +746,12 @@ public class QueryLangTest {
         // and comparison
         actual = evaluateQuery(String.format("user: id eq '%s' and email eq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QUser.user._id.eq(GENERIC_OBJECT_ID).and(QUser.user.email.eq("test"));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        LoggedUser systemUser = userService.getSystem().transformToLoggedUser();
+        actual = evaluateQuery(String.format("user: id eq '%s' and email eq loggedUser.username", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QUser.user._id.eq(GENERIC_OBJECT_ID).and(QUser.user.email.eq(systemUser.getUsername()));
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -865,7 +930,18 @@ public class QueryLangTest {
         expected = String.format("stringId:%s", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
-        actual = evaluateQuery(String.format("case: id in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullElasticQuery();
+        LoggedUser systemUser = userService.getSystem().transformToLoggedUser();
+        actual = evaluateQuery("case: id neq loggedUser.id").getFullElasticQuery();
+        expected = String.format("NOT stringId:%s", systemUser.getId());
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery(String.format("case: id in ('%s', '%s', loggedUser.id, loggedUser.username, loggedUser.fullname)",
+                GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("stringId:(%s OR %s OR %s)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID, systemUser.getId());
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery(String.format("case: id in ('%s', '%s', loggedUser.username, loggedUser.fullname)",
+                GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullElasticQuery();
         expected = String.format("stringId:(%s OR %s)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
@@ -892,12 +968,21 @@ public class QueryLangTest {
         expected = "author:test";
         assertEquals(expected, actual);
 
+        actual = evaluateQuery("case: author eq loggedUser.id").getFullElasticQuery();
+        expected = String.format("author:%s", systemUser.getId());
+        assertEquals(expected, actual);
+
         actual = evaluateQuery("case: author contains 'test'").getFullElasticQuery();
         expected = "author:*test*";
         assertEquals(expected, actual);
 
-        actual = evaluateQuery(String.format("case: author in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("author:(%s OR %s)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+        actual = evaluateQuery("case: author contains loggedUser.id").getFullElasticQuery();
+        expected = String.format("author:*%s*", systemUser.getId());
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery(String.format("case: author in ('%s', '%s', loggedUser.id)", GENERIC_OBJECT_ID,
+                GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("author:(%s OR %s OR %s)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID, new ObjectId(systemUser.getId()));
         assertEquals(expected, actual);
 
         // places comparison
@@ -926,7 +1011,7 @@ public class QueryLangTest {
         assertEquals(expected, actual);
 
         // data value comparison
-        checkStringComparisonElastic("case", "data.field1.value", "dataSet.field1.textValue");
+        checkStringComparisonElastic("case", "data.field1.value", "dataSet.field1.fulltextValue");
 
         checkNumberComparisonElastic("case", "data.field2.value", "dataSet.field2.numberValue");
 
@@ -936,12 +1021,31 @@ public class QueryLangTest {
         expected = "dataSet.field1.booleanValue:true";
         assertEquals(expected, actual);
 
+        actual = evaluateQuery("case: data.field1.value eq loggedUser.anonymous").getFullElasticQuery();
+        expected = "dataSet.field1.booleanValue:false";
+        assertEquals(expected, actual);
+
         actual = evaluateQuery("case: data.field1.value eq false").getFullElasticQuery();
         expected = "dataSet.field1.booleanValue:false";
         assertEquals(expected, actual);
 
         // data options comparison
         checkStringComparisonElastic("case", "data.field1.options", "dataSet.field1.options");
+
+        actual = evaluateQuery("cases: title in ('test1' : loggedUser.username)").getFullElasticQuery();
+        expected = String.format("(title:>test1 AND title:<%s)", systemUser.getUsername());
+
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("cases: title in (loggedUser.username : 'test1')").getFullElasticQuery();
+        expected = String.format("(title:>%s AND title:<test1)", systemUser.getUsername());
+
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("cases: title in (loggedUser.username : loggedUser.fullName)").getFullElasticQuery();
+        expected = String.format("(title:>%s AND title:<%s)", systemUser.getUsername(), systemUser.getFullName());
+
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -1715,6 +1819,8 @@ public class QueryLangTest {
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case email eq 'test'"));
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case page 2"));
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case:"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case: creationDate eq loggedUser.id"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case: processIdentifier eq loggedUser.anonymous"));
     }
 
     @Test
@@ -1928,7 +2034,12 @@ public class QueryLangTest {
 
     private static void checkStringComparisonElastic(String resource, String attribute, String resultAttribute) {
         String actual = evaluateQuery(String.format("%s: %s eq 'test'", resource, attribute)).getFullElasticQuery();
-        String expected = String.format("%s:test", resultAttribute);
+        String expected;
+        if (resultAttribute.matches("dataSet\\.[^.]*\\.fulltextValue")) {
+            expected = String.format("%s.keyword:test", resultAttribute);
+        } else {
+            expected = String.format("%s:test", resultAttribute);
+        }
 
         assertEquals(expected, actual);
 
