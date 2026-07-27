@@ -138,7 +138,7 @@ class TestHelper {
     }
 
     private List<String> mongoCollections() {
-        return template.db.listCollectionNames()
+        return mongoTemplate.db.listCollectionNames()
                 .into(new ArrayList<String>())
                 .findAll { !it.startsWith("system.") }
     }

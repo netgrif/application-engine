@@ -4,14 +4,31 @@ import com.icegreen.greenmail.configuration.GreenMailConfiguration
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
+import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
+import com.netgrif.application.engine.objects.auth.constants.UserConstants
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
+import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldValue
+import com.netgrif.application.engine.objects.workflow.domain.Case
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
+import com.netgrif.application.engine.startup.runner.FilterRunner
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
+import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
+import jakarta.mail.internet.MimeMessage
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -46,9 +63,6 @@ class ActionDelegateTest {
 
     @Autowired
     private DefaultFiltersRunner defaultFiltersRunner
-
-    @Autowired
-    private IWorkflowService workflowService
 
     @Autowired
     private UserService userService
@@ -170,7 +184,7 @@ class ActionDelegateTest {
     void testAsyncRunAction() {
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(ImportPetriNetParams.with()
                 .xmlFile(new FileInputStream("src/test/resources/petriNets/async_run.xml"))
-                .releaseType(VersionType.MAJOR)
+                .releaseType(ØIVersionType.MAJOR)
                 .author(superCreator.getLoggedSuper())
                 .build())
         assert net.getNet() != null
