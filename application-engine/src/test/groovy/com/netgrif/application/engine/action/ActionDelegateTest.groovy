@@ -142,6 +142,7 @@ class ActionDelegateTest {
         CreateCaseEventOutcome outcome = workflowService.createCase(CreateCaseParams.with()
                 .processId(net.getNet().getStringId())
                 .title("Test title")
+                .author(userService.getLoggedOrSystem())
                 .build())
         assert outcome.getCase() != null
     }

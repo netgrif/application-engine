@@ -4,11 +4,12 @@ import com.mongodb.*;
 import com.mongodb.connection.*;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.*;
 
+import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.util.StringUtils;
 
@@ -30,6 +31,13 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
 
     public MongoClientConfiguration(DataConfigurationProperties.MongoProperties mongoProperties) {
         this.mongoProperties = mongoProperties;
+    }
+
+    @Bean
+    @Primary
+    @Override
+    public @NotNull MongoTemplate mongoTemplate(@NotNull MongoDatabaseFactory databaseFactory, @NotNull MappingMongoConverter converter) {
+        return super.mongoTemplate(databaseFactory, converter);
     }
 
     @Override
