@@ -4,9 +4,7 @@ import com.mongodb.*;
 import com.mongodb.connection.*;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.*;
 
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;

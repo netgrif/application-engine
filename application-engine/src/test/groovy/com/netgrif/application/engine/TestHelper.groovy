@@ -28,7 +28,7 @@ class TestHelper {
     private SuperCreatorRunner superCreator
 
     @Autowired
-    private MongoTemplate template
+    private MongoTemplate mongoTemplate
 
     @Autowired
     private ElasticIndexService indexService
@@ -118,7 +118,7 @@ class TestHelper {
         while (true) {
             try {
                 List<String> collections = mongoCollections()
-                collections.each { template.dropCollection(it) }
+                collections.each { mongoTemplate.dropCollection(it) }
                 List<String> remainingCollections = mongoCollections()
                 if (!remainingCollections.isEmpty()) {
                     if (++attempts >= MONGO_READY_ATTEMPTS) {
