@@ -66,7 +66,7 @@ class CaseMigrationHelper extends AbstractMigrationHelper<Case> {
      * @param mongoTemplate MongoTemplate to interact with MongoDB.
      * @param migrationConfigurationProperties Properties for migration configuration, including cases.
      */
-    CaseMigrationHelper(@Qualifier("migrationMongoTemplate") MongoTemplate mongoTemplate,
+    CaseMigrationHelper(@Qualifier("mongoTemplate") MongoTemplate mongoTemplate,
                         MigrationProperties migrationProperties,
                         IPetriNetService petriNetService,
                         IElasticCaseService elasticCaseService,

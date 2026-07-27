@@ -24,7 +24,7 @@ class TestHelper {
     private SuperCreatorRunner superCreator
 
     @Autowired
-    private MongoTemplate template
+    private MongoTemplate mongoTemplate
 
     @Autowired
     private ElasticIndexService indexService
@@ -84,7 +84,7 @@ class TestHelper {
     private DefaultRealmRunner defaultRealmRunner
 
     void truncateDbs() {
-        template.db.drop()
+        mongoTemplate.db.drop()
         indexService.deleteIndex(ElasticPetriNet.class)
         indexService.deleteIndex(ElasticCase.class)
         indexService.deleteIndex(ElasticTask.class)

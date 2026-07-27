@@ -84,7 +84,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param importerProvider the {@link ObjectFactory} that supplies {@link Importer} instances for importing Petri Net models from various sources
      * @param userService the {@link UserService} for managing user-related operations, including retrieving system user for Petri Net imports
      */
-    PetriNetMigrationHelper(@Qualifier("migrationMongoTemplate") MongoTemplate mongoTemplate,
+    PetriNetMigrationHelper(@Qualifier("mongoTemplate") MongoTemplate mongoTemplate,
                             MigrationProperties migrationProperties,
                             IPetriNetService petriNetService,
                             ProcessRoleRepository processRoleRepository,

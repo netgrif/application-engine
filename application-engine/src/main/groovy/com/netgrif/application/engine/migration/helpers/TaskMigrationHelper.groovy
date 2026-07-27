@@ -71,7 +71,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      *
      * @param mongoTemplate the {@link MongoTemplate} to use for interacting with MongoDB
      */
-    TaskMigrationHelper(@Qualifier("migrationMongoTemplate") MongoTemplate mongoTemplate,
+    TaskMigrationHelper(@Qualifier("mongoTemplate") MongoTemplate mongoTemplate,
                         MigrationProperties migrationProperties,
                         IPetriNetService petriNetService,
                         ITaskService taskService,
