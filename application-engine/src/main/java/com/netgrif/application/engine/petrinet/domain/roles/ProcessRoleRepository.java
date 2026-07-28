@@ -126,7 +126,7 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
         if (parts.length == 2) {
             String networkId = parts[0];
             ObjectId objectId = new ObjectId(parts[1]);
-            return findByNetworkIdAndObjectId(networkId, objectId);
+            return findByNetworkIdentifierAndObjectId(networkId, objectId);
         } else {
             return findByIdObjectId(new ObjectId(compositeId));
         }

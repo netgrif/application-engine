@@ -184,7 +184,7 @@ class ActionDelegateTest {
     void testAsyncRunAction() {
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(ImportPetriNetParams.with()
                 .xmlFile(new FileInputStream("src/test/resources/petriNets/async_run.xml"))
-                .releaseType(ØIVersionType.MAJOR)
+                .releaseType(VersionType.MAJOR)
                 .author(superCreator.getLoggedSuper())
                 .build())
         assert net.getNet() != null

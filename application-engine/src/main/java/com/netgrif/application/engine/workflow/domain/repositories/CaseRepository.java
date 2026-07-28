@@ -38,14 +38,20 @@ public interface CaseRepository extends MongoRepository<Case, String>, QuerydslP
         if (parts.length == 2) {
             String networkId = parts[0];
             ObjectId objectId = new ObjectId(parts[1]);
-            return findByNetworkIdAndObjectId(networkId, objectId);
+            return findByNetworkIdentifierAndObjectId(networkId, objectId);
         } else {
             return findByIdObjectId(new ObjectId(compositeId));
         }
     }
 
+    @Deprecated(since = "7.0.0")
     @Query("{ '_id.shortProcessId': ?0, '_id.objectId': ?1 }")
     Optional<Case> findByNetworkIdAndObjectId(String ProcessId, ObjectId objectId);
+
+    @Deprecated(since = "7.0.1")
+    @Query("{ '_id.shortProcessIdentifier': ?0, '_id.objectId': ?1 }")
+    Optional<Case> findByNetworkIdentifierAndObjectId(String ProcessId, ObjectId objectId);
+
 
     @Override
     default void customize(QuerydslBindings bindings, QCase qCase) {
