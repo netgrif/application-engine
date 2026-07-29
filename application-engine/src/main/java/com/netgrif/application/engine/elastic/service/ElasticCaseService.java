@@ -549,7 +549,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     private List<String> normalizeFullTextSearch(String fullText) {
         return Arrays.stream(fullText
-                        .replaceAll("\\\\+(?=\\s)", "")
+                        .replaceAll("\\\\", "")
                         .replaceAll("\\s+", " ")
                         .trim()
                         .split("\\s+"))
