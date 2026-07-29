@@ -59,7 +59,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     protected DataConfigurationProperties.ElasticsearchProperties elasticProperties;
     protected IPetriNetService petriNetService;
     protected IWorkflowService workflowService;
-    protected IElasticCasePrioritySearch iElasticCasePrioritySearch;
+    protected IElasticCasePrioritySearch elasticCasePrioritySearch;
     protected ApplicationEventPublisher publisher;
     protected ElasticQueueManager caseElasticIndexQueueManager;
     protected ElasticQueueManager caseElasticDeleteQueueManager;
@@ -70,7 +70,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                               DataConfigurationProperties.ElasticsearchProperties elasticProperties,
                               @Lazy IPetriNetService petriNetService,
                               @Lazy IWorkflowService workflowService,
-                              IElasticCasePrioritySearch iElasticCasePrioritySearch,
+                              IElasticCasePrioritySearch elasticCasePrioritySearch,
                               ApplicationEventPublisher publisher,
                               ElasticsearchClient elasticsearchClient) {
         this.repository = repository;
@@ -79,7 +79,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         this.elasticProperties = elasticProperties;
         this.petriNetService = petriNetService;
         this.workflowService = workflowService;
-        this.iElasticCasePrioritySearch = iElasticCasePrioritySearch;
+        this.elasticCasePrioritySearch = elasticCasePrioritySearch;
         this.publisher = publisher;
         this.caseElasticIndexQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient, publisher);
         this.caseElasticDeleteQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient, publisher);
@@ -413,14 +413,29 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     protected void buildFullTextQuery(CaseSearchRequest request, BoolQuery.Builder query) {
-        if (request.fullText == null || request.fullText.isEmpty()) {
+        if (request.fullText == null || request.fullText.isBlank()) {
             return;
         }
 
-        // TODO: improvement? wildcard does not scale good
-        //String searchText = elasticsearchProperties.isAnalyzerEnabled() ? request.fullText : "*" + request.fullText + "*";
-        String searchText = "*" + request.fullText + "*";
-        QueryStringQuery fullTextQuery = QueryStringQuery.of(builder -> builder.fields(iElasticCasePrioritySearch.fullTextFields()).query(searchText));
+        List<String> fullTextTerms = normalizeFullTextSearch(request.fullText);
+        if (fullTextTerms.isEmpty()) {
+            return;
+        }
+
+        String searchText = fullTextTerms.stream()
+                .map(this::escapeQueryStringTerm)
+                .map(term -> "*" + term + "*")
+                .collect(Collectors.joining(" AND "));
+
+        QueryStringQuery fullTextQuery = QueryStringQuery.of(builder -> builder
+                .fields(elasticCasePrioritySearch.fullTextFields())
+                .query(searchText)
+                .allowLeadingWildcard(true)
+                .analyzeWildcard(true)
+                .defaultOperator(co.elastic.clients.elasticsearch._types.query_dsl.Operator.And)
+        );
+
+        log.debug("Fulltext search input [{}] normalized to terms [{}] and query [{}]", request.fullText, fullTextTerms, searchText);
         query.must(fullTextQuery._toQuery());
     }
 
@@ -530,5 +545,40 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                 .index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX))
                 .id(useCase.getId())
                 .document(template.getElasticsearchConverter().mapObject(useCase))));
+    }
+
+    private List<String> normalizeFullTextSearch(String fullText) {
+        return Arrays.stream(fullText
+                        .replaceAll("\\\\+(?=\\s)", "")
+                        .replaceAll("\\s+", " ")
+                        .trim()
+                        .split("\\s+"))
+                .map(String::trim)
+                .filter(term -> !term.isBlank())
+                .toList();
+    }
+
+    private String escapeQueryStringTerm(String term) {
+        StringBuilder escaped = new StringBuilder();
+
+        for (int i = 0; i < term.length(); i++) {
+            char character = term.charAt(i);
+
+            if (isQueryStringReservedCharacter(character)) {
+                escaped.append('\\');
+            }
+
+            escaped.append(character);
+        }
+
+        return escaped.toString();
+    }
+
+    private boolean isQueryStringReservedCharacter(char character) {
+        return switch (character) {
+            case '+', '-', '=', '>', '<', '!', '(', ')', '{', '}', '[', ']',
+                 '^', '"', '~', '*', '?', ':', '\\', '/' -> true;
+            default -> false;
+        };
     }
 }
