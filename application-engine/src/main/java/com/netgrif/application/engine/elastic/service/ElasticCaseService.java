@@ -10,6 +10,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.domain.BulkOperationWrapper;
+import com.netgrif.application.engine.elastic.service.model.FullTextField;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
@@ -422,21 +423,28 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             return;
         }
 
-        String searchText = fullTextTerms.stream()
-                .map(this::escapeQueryStringTerm)
-                .map(term -> "*" + term + "*")
-                .collect(Collectors.joining(" AND "));
+        List<FullTextField> fullTextFields = elasticCasePrioritySearch.fullTextFields().stream()
+                .map(this::parseFullTextField)
+                .toList();
 
-        QueryStringQuery fullTextQuery = QueryStringQuery.of(builder -> builder
-                .fields(elasticCasePrioritySearch.fullTextFields())
-                .query(searchText)
-                .allowLeadingWildcard(true)
-                .analyzeWildcard(true)
-                .defaultOperator(co.elastic.clients.elasticsearch._types.query_dsl.Operator.And)
-        );
+        BoolQuery.Builder fullTextQuery = new BoolQuery.Builder();
 
-        log.debug("Fulltext search input [{}] normalized to terms [{}] and query [{}]", request.fullText, fullTextTerms, searchText);
-        query.must(fullTextQuery._toQuery());
+        fullTextTerms.forEach(term -> {
+            BoolQuery.Builder termQuery = new BoolQuery.Builder();
+            String wildcardValue = "*" + escapeWildcardValue(term) + "*";
+
+            fullTextFields.forEach(fullTextField -> termQuery.should(QueryBuilders.wildcard(builder -> builder
+                    .field(fullTextField.field())
+                    .value(wildcardValue)
+                    .caseInsensitive(true)
+                    .boost(fullTextField.boost())
+            )));
+
+            termQuery.minimumShouldMatch("1");
+            fullTextQuery.must(termQuery.build()._toQuery());
+        });
+
+        query.must(fullTextQuery.build()._toQuery());
     }
 
     /**
@@ -554,31 +562,35 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                         .trim()
                         .split("\\s+"))
                 .map(String::trim)
+                .map(this::removeDanglingEscapeCharacters)
                 .filter(term -> !term.isBlank())
                 .toList();
     }
 
-    private String escapeQueryStringTerm(String term) {
-        StringBuilder escaped = new StringBuilder();
-
-        for (int i = 0; i < term.length(); i++) {
-            char character = term.charAt(i);
-
-            if (isQueryStringReservedCharacter(character)) {
-                escaped.append('\\');
-            }
-
-            escaped.append(character);
-        }
-
-        return escaped.toString();
+    private String removeDanglingEscapeCharacters(String term) {
+        return term.replaceAll("\\\\+$", "");
     }
 
-    private boolean isQueryStringReservedCharacter(char character) {
-        return switch (character) {
-            case '+', '-', '=', '>', '<', '!', '(', ')', '{', '}', '[', ']',
-                 '^', '"', '~', '*', '?', ':', '\\', '/' -> true;
-            default -> false;
-        };
+    private FullTextField parseFullTextField(String fieldDefinition) {
+        String[] parts = fieldDefinition.split("\\^", 2);
+        String field = parts[0].trim();
+        float boost = 1.0f;
+
+        if (parts.length == 2 && !parts[1].isBlank()) {
+            try {
+                boost = Float.parseFloat(parts[1].trim());
+            } catch (NumberFormatException e) {
+                log.warn("Invalid boost [{}] in fulltext field definition [{}]. Using default boost 1.0.", parts[1], fieldDefinition);
+            }
+        }
+
+        return new FullTextField(field, boost);
+    }
+
+    private String escapeWildcardValue(String value) {
+        return value
+                .replace("\\", "\\\\")
+                .replace("*", "\\*")
+                .replace("?", "\\?");
     }
 }
