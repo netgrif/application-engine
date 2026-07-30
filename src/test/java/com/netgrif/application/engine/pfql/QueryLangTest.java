@@ -92,6 +92,11 @@ public class QueryLangTest {
         assertEquals(PageImpl.class, cases.getClass());
         assertEquals(10, ((Page<Case>) cases).getTotalElements());
 
+        Object cases2 = searchService.search("cases: processIdentifier eq \"query_test\" page 1 size 5 sort by title desc");
+        assertNotNull(cases2);
+        assertEquals(PageImpl.class, cases2.getClass());
+        assertEquals(10, ((Page<Case>) cases2).getTotalElements());
+
         Object case3 = searchService.search("case: processIdentifier eq 'query_test' and data.number_0.value == 3");
         assertNotNull(case3);
         assertEquals(Case.class, case3.getClass());
@@ -102,6 +107,21 @@ public class QueryLangTest {
         assertNotNull(case4);
         assertEquals(Case.class, case4.getClass());
         assertEquals("4", ((Case) case4).getFieldValue("text_0"));
+
+        Object case4_2 = searchService.search("case: processIdentifier eq \"query_test\" and data.text_0.value == \"4\"");
+        assertNotNull(case4_2);
+        assertEquals(Case.class, case4_2.getClass());
+        assertEquals("4", ((Case) case4_2).getFieldValue("text_0"));
+
+        Object case4_3 = searchService.search("case: processIdentifier eq 'query_test' and data.text_0.value == \"4\"");
+        assertNotNull(case4_3);
+        assertEquals(Case.class, case4_3.getClass());
+        assertEquals("4", ((Case) case4_3).getFieldValue("text_0"));
+
+        Object case4_4 = searchService.search("case: processIdentifier eq \"query_test\" and data.text_0.value == '4'");
+        assertNotNull(case4_4);
+        assertEquals(Case.class, case4_4.getClass());
+        assertEquals("4", ((Case) case4_4).getFieldValue("text_0"));
 
         Object case5 = searchService.search("case: processIdentifier eq 'query_test' and data.boolean_0.value == true");
         assertNotNull(case5);
