@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.event;
 
+import com.netgrif.application.engine.configuration.properties.ActionsProperties;
 import groovy.lang.GroovyShell;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
@@ -30,6 +31,9 @@ public class GroovyShellFactory implements IGroovyShellFactory {
     @Autowired
     private CompilerConfiguration configuration;
 
+    @Autowired
+    private ActionsProperties actionsProperties;
+
     private volatile GroovyShell shell;
 
     @Override
@@ -55,6 +59,10 @@ public class GroovyShellFactory implements IGroovyShellFactory {
     }
 
     private Set<String> findAllActionImportClasses() {
+        Set<String> configuredImportNames = actionsProperties.getImports().stream()
+                .map(this::simpleName)
+                .collect(Collectors.toSet());
+
         Set<Class<?>> classes = ACTION_IMPORT_PACKAGES.stream()
                 .flatMap(packageName -> findAllClassesUsingClassLoader(packageName).stream())
                 .map(this::loadClass)
@@ -62,11 +70,16 @@ public class GroovyShellFactory implements IGroovyShellFactory {
 
         return classes.stream()
                 .collect(Collectors.groupingBy(Class::getSimpleName))
-                .values().stream()
-                .map(this::selectActionImport)
+                .entrySet().stream()
+                .filter(entry -> !configuredImportNames.contains(entry.getKey()))
+                .map(entry -> selectActionImport(entry.getValue()))
                 .flatMap(Optional::stream)
                 .map(Class::getName)
                 .collect(Collectors.toSet());
+    }
+
+    private String simpleName(String className) {
+        return className.substring(className.lastIndexOf('.') + 1);
     }
 
     private Optional<Class<?>> selectActionImport(List<Class<?>> candidates) {
