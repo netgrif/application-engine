@@ -121,8 +121,12 @@ netgrif:
         web:
           base-path: /manage
           exposure:
-            include: "health,info,metrics,loggers,env,beans,threaddump,heapdump,mappings,conditions,configprops,scheduledtasks,caches,flyway,liquibase,prometheus"
+            include: "health,info,metrics,prometheus,beans,env,threaddump,heapdump,loggers,logfile,logfiles,caches,conditions,configprops,mappings,scheduledtasks,httpexchanges,startup,nodeinfo,elasticnodes,netgriftracing"
       endpoint:
+        shutdown:
+          enabled: false
+        heapdump:
+          access: unrestricted
         health:
           show-details: when_authorized
           show-components: when_authorized
