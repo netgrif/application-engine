@@ -138,6 +138,8 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
      * @param networkId the short process ID
      * @param objectId  the object ID
      * @return an {@link Optional} containing the found {@link ProcessRole}, if any
+     *
+     * @deprecated since 7.0.2, use {@link #findByNetworkIdentifierAndObjectId(String, ObjectId)} instead
      */
     @Deprecated(since = "7.0.2")
     @Query("{ '_id.shortProcessId': ?0, '_id.objectId': ?1 }")
