@@ -44,11 +44,11 @@ public interface CaseRepository extends MongoRepository<Case, String>, QuerydslP
         }
     }
 
-    @Deprecated(since = "7.0.0")
+    @Deprecated(since = "7.0.2")
     @Query("{ '_id.shortProcessId': ?0, '_id.objectId': ?1 }")
     Optional<Case> findByNetworkIdAndObjectId(String ProcessId, ObjectId objectId);
 
-    @Deprecated(since = "7.0.1")
+    @Deprecated(since = "7.0.2")
     @Query("{ '_id.shortProcessIdentifier': ?0, '_id.objectId': ?1 }")
     Optional<Case> findByNetworkIdentifierAndObjectId(String ProcessId, ObjectId objectId);
 

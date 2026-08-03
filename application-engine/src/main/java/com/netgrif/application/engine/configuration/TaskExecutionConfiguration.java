@@ -16,12 +16,4 @@ public class TaskExecutionConfiguration {
         executor.setCorePoolSize(5);
         return executor;
     }
-
-    @Bean("actionsExecutor")
-    TaskExecutor actionsExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(5);
-        executor.setThreadNamePrefix("ActionsExecutor-");
-        return executor;
-    }
 }

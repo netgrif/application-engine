@@ -2,6 +2,7 @@ package com.netgrif.application.engine.event;
 
 import com.netgrif.application.engine.configuration.properties.ActionsProperties;
 import groovy.lang.GroovyShell;
+import lombok.extern.slf4j.Slf4j;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class GroovyShellFactory implements IGroovyShellFactory {
 
@@ -92,9 +94,18 @@ public class GroovyShellFactory implements IGroovyShellFactory {
                 .filter(candidate -> importSpecificity(candidate, candidates) == highestSpecificity)
                 .toList();
 
-        return mostSpecificCandidates.size() == 1
-                ? Optional.of(mostSpecificCandidates.getFirst())
-                : Optional.empty();
+        if (mostSpecificCandidates.size() != 1) {
+            List<String> collidingClassNames = candidates.stream()
+                    .map(Class::getName)
+                    .sorted()
+                    .toList();
+            log.warn("Skipping automatic action import for ambiguous class name [{}]. " +
+                            "Conflicting candidates: {}. Configure an explicit import to resolve the conflict.",
+                    candidates.getFirst().getSimpleName(), collidingClassNames);
+            return Optional.empty();
+        }
+
+        return Optional.of(mostSpecificCandidates.getFirst());
     }
 
     private int importSpecificity(Class<?> candidate, List<Class<?>> candidates) {

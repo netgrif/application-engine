@@ -22,17 +22,6 @@ import java.util.Set;
 public class MigrationProperties {
 
     /**
-     * The name of the MongoTemplate bean to be used for migration operations.
-     * This property allows specifying a custom MongoTemplate bean from the application context
-     * that will be used by migration helpers to interact with the MongoDB database.
-     * If the specified bean is not found or is not usable, the system will fall back to the default
-     * "mongoTemplate" bean. This is particularly useful in multi-database scenarios where different
-     * MongoTemplate instances are configured for different databases.
-     * Default value is {@code "mongoTemplate"}.
-     */
-    private String mongoTemplateBeanName = "mongoTemplate";
-
-    /**
      * A list of migration process identifiers or names that should be skipped when applying migration logic.
      * This property allows you to configure specific migrations that should be ignored,
      * typically useful for excluding unnecessary or problematic migrations.

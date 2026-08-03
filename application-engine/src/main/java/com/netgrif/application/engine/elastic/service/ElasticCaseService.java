@@ -557,8 +557,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     private List<String> normalizeFullTextSearch(String fullText) {
         return Arrays.stream(fullText
-                        .replaceAll("\\\\", "")
-                        .replaceAll("\\s+", " ")
+                        .replace("\\\\", "")
+                        .replace("\\s+", " ")
                         .trim()
                         .split("\\s+"))
                 .map(String::trim)
@@ -568,7 +568,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     private String removeDanglingEscapeCharacters(String term) {
-        return term.replaceAll("\\\\+$", "");
+        return term.replace("\\\\+$", "");
     }
 
     private FullTextField parseFullTextField(String fieldDefinition) {
@@ -579,6 +579,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         if (parts.length == 2 && !parts[1].isBlank()) {
             try {
                 boost = Float.parseFloat(parts[1].trim());
+                boost = Float.isFinite(boost) && boost > 0 ? boost : 1.0f;
             } catch (NumberFormatException e) {
                 log.warn("Invalid boost [{}] in fulltext field definition [{}]. Using default boost 1.0.", parts[1], fieldDefinition);
             }

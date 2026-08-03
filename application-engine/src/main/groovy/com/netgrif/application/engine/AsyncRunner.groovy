@@ -14,7 +14,7 @@ class AsyncRunner {
 
     private final TaskExecutor actionsExecutor
 
-    AsyncRunner(@Qualifier("actionsExecutor") TaskExecutor actionsExecutor) {
+    AsyncRunner(@Qualifier("taskExecutor") TaskExecutor actionsExecutor) {
         this.actionsExecutor = actionsExecutor
     }
 
