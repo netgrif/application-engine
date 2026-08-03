@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.pfql.service.utils;
 
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.configuration.ApplicationContextProvider;
 import com.netgrif.application.engine.petrinet.domain.QPetriNet;
 import com.netgrif.application.engine.petrinet.domain.version.QVersion;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
@@ -161,7 +163,8 @@ public class SearchUtils {
             return explainQueryInternal(walker, query, errorListener);
         }
 
-        QueryLangEvaluator evaluator = new QueryLangEvaluator();
+        IUserService userService = (IUserService) ApplicationContextProvider.getBean(IUserService.class);
+        QueryLangEvaluator evaluator = new QueryLangEvaluator(userService);
         walker.walk(evaluator, query);
 
         return evaluator;

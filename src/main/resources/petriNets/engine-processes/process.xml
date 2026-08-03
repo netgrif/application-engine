@@ -2,7 +2,7 @@
 	<id>process</id>
 	<version>1.0.0</version>
 	<initials>PRO</initials>
-	<title>Process</title>
+	<title name="model_title">Process</title>
 	<icon>device_hub</icon>
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
@@ -28,7 +28,7 @@
 	</function>
 	<data type="text">
 		<id>copy_version</id>
-		<title>Version of the copy</title>
+		<title name="copy_version">Version of the copy</title>
 	</data>
 	<data type="taskRef">
 		<id>form_ref</id>
@@ -39,54 +39,80 @@
 	</data>
 	<data type="text">
 		<id>icon</id>
-		<title>Icon</title>
+		<title name="icon">Icon</title>
 		<init>device_hub</init>
 	</data>
 	<data type="text" immediate="true">
 		<id>id</id>
-		<title>Identifier</title>
+		<title name="id">Identifier</title>
 		<init>new_process</init>
 	</data>
 	<data type="text">
 		<id>log_archive</id>
-		<title>Log</title>
+		<title name="log_archive">Log</title>
 	</data>
 	<data type="text">
 		<id>log_delete</id>
-		<title>Log</title>
+		<title name="log_delete">Log</title>
 		<component>
 			<name>textarea</name>
 		</component>
 	</data>
 	<data type="text">
 		<id>log_deploy</id>
-		<title>Deploy Log</title>
+		<title name="log_deploy">Deploy Log</title>
 	</data>
-	<data type="text">
+	<data type="i18n">
 		<id>message_archive</id>
 		<title/>
-		<init>This process version will be archived, existing instances will continue their execution, new instances could not be created.</init>
-		<component>
-			<name>richtextarea</name>
-		</component>
+		<init dynamic="true">
+			new com.netgrif.application.engine.petrinet.domain.I18nString(
+				"This process version will be archived, existing instances will continue their execution, new instances could not be created.",
+				[
+						sk: "Táto verzia procesu bude archivovaná, existujúce inštancie budú pokračovať v ich vykonávaní, nové inštancie nebude možné vytvoriť.",
+						de: "Diese Prozessversion wird archiviert, bestehende Instanzen werden weiterhin ausgeführt, neue Instanzen konnten nicht erstellt werden."
+				]
+			)
+		</init>
 	</data>
-	<data type="text">
+	<data type="i18n">
 		<id>message_copy</id>
 		<title/>
-		<init>Finishing this task will create a copy of this process with increased version.</init>
+		<init dynamic="true">
+			new com.netgrif.application.engine.petrinet.domain.I18nString(
+					"Finishing this task will create a copy of this process with increased version.",
+					[
+							sk: "Dokončením tejto úlohy sa vytvorí kópia tohto procesu so zvýšenou verziou.",
+							de: "Durch den Abschluss dieser Aufgabe wird eine Kopie dieses Prozesses mit erhöhter Versionsnummer erstellt."
+					]
+			)
+		</init>
 	</data>
-	<data type="text">
+	<data type="i18n">
 		<id>message_delete</id>
 		<title/>
-		<init>This will permanently delete this process version and all its instances and tasks.</init>
-		<component>
-			<name>richtextarea</name>
-		</component>
+		<init dynamic="true">
+			new com.netgrif.application.engine.petrinet.domain.I18nString(
+					"This will permanently delete this process version and all its instances and tasks.",
+					[
+							sk: "Týmto sa natrvalo odstráni táto verzia procesu a všetky jej inštancie a úlohy.",
+							de: "Dadurch werden diese Prozessversion und alle ihre Instanzen und Aufgaben endgültig gelöscht."
+					]
+			)
+		</init>
 	</data>
-	<data type="text">
+	<data type="i18n">
 		<id>message_deploy</id>
 		<title/>
-		<init>Finishing this task will deploy the process and enable creating new instances of this process.</init>
+		<init dynamic="true">
+			new com.netgrif.application.engine.petrinet.domain.I18nString(
+					"Finishing this task will deploy the process and enable creating new instances of this process.",
+					[
+							sk: "Dokončenie tejto úlohy nasadí proces a umožní vytvorenie nových inštancií tohto procesu.",
+							de: "Nach Abschluss dieser Aufgabe wird der Prozess bereitgestellt und die Erstellung neuer Instanzen dieses Prozesses ermöglicht."
+					]
+			)
+		</init>
 	</data>
 	<data type="text">
 		<id>mongo_id</id>
@@ -94,18 +120,18 @@
 	</data>
 	<data type="enumeration_map" immediate="true">
 		<id>state</id>
-		<title>State</title>
+		<title name="state">State</title>
 		<options>
-			<option key="draft">Draft</option>
-			<option key="deployed">Deployed</option>
-			<option key="archived">Archived</option>
-			<option key="trash">In Trash</option>
+			<option key="draft" name="state_draft">Draft</option>
+			<option key="deployed" name="state_deployed">Deployed</option>
+			<option key="archived" name="state_archived">Archived</option>
+			<option key="trash" name="state_trash">In Trash</option>
 		</options>
 		<init>draft</init>
 	</data>
 	<data type="text" immediate="true">
 		<id>title</id>
-		<title>Title</title>
+		<title name="title">Title</title>
 		<init>New Process</init>
 		<event type="set">
 			<id>title_set</id>
@@ -122,7 +148,7 @@
 	</data>
 	<data type="text" immediate="true">
 		<id>version</id>
-		<title>Version</title>
+		<title name="version">Version</title>
 		<validations>
 			<validation>
 				<expression>regex ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$</expression>
@@ -144,7 +170,7 @@
 	</data>
 	<data type="enumeration_map">
 		<id>version_increment</id>
-		<title>Version increment</title>
+		<title name="version_increment">Version increment</title>
 		<options>
 			<option key="MAJOR">Major</option>
 			<option key="MINOR">Minor</option>
@@ -172,20 +198,85 @@
 	</data>
 	<data type="file">
 		<id>xml_file</id>
-		<title>XML file</title>
+		<title name="xml_file">XML file</title>
 	</data>
 	<data type="text">
 		<id>xml_text</id>
-		<title>XML Text</title>
+		<title name="xml_text">XML Text</title>
 		<component>
 			<name>textarea</name>
 		</component>
 	</data>
+
+	<i18n locale="sk">
+		<i18nString name="model_title">Proces</i18nString>
+		<i18nString name="copy_version">Verzia kópie</i18nString>
+		<i18nString name="icon">Ikona</i18nString>
+		<i18nString name="id">Identifikátor</i18nString>
+		<i18nString name="log_archive">Log</i18nString>
+		<i18nString name="log_delete">Log</i18nString>
+		<i18nString name="log_deploy">Log nasadenia</i18nString>
+		<i18nString name="state">Stav</i18nString>
+		<i18nString name="state_draft">V návrhu</i18nString>
+		<i18nString name="state_deployed">Nasadený</i18nString>
+		<i18nString name="state_archived">Archivovaný</i18nString>
+		<i18nString name="state_trash">V koši</i18nString>
+		<i18nString name="title">Názov</i18nString>
+		<i18nString name="version">Verzia</i18nString>
+		<i18nString name="version_increment">Inkrement verzie</i18nString>
+		<i18nString name="xml_file">XML súbor</i18nString>
+		<i18nString name="xml_text">XML text</i18nString>
+		<i18nString name="deploy_label">Navrhnúť</i18nString>
+		<i18nString name="deploy_finish">Nasadiť</i18nString>
+		<i18nString name="edit_label">Upraviť</i18nString>
+		<i18nString name="form_label">Formulár</i18nString>
+		<i18nString name="t10_label">Odstrániť s inštanciami</i18nString>
+		<i18nString name="t10_finish">Odstrániť</i18nString>
+		<i18nString name="t11_label">Odstrániť</i18nString>
+		<i18nString name="t11_finish">Odstrániť</i18nString>
+		<i18nString name="t4_label">Vytvoriť novú verziu</i18nString>
+		<i18nString name="t6_label">Odstrániť</i18nString>
+		<i18nString name="t9_label">Archivovať</i18nString>
+		<i18nString name="view_label">Zobraziť</i18nString>
+		<i18nString name="view_finish">Vytvoriť</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="model_title">Prozess</i18nString>
+		<i18nString name="copy_version">Version der Kopie</i18nString>
+		<i18nString name="icon">Symbol</i18nString>
+		<i18nString name="id">Kennung</i18nString>
+		<i18nString name="log_archive">Protokoll</i18nString>
+		<i18nString name="log_delete">Protokoll</i18nString>
+		<i18nString name="log_deploy">Bereitstellungsprotokoll</i18nString>
+		<i18nString name="state">Status</i18nString>
+		<i18nString name="state_draft">Entwurf</i18nString>
+		<i18nString name="state_deployed">Bereitgestellt</i18nString>
+		<i18nString name="state_archived">Archiviert</i18nString>
+		<i18nString name="state_trash">Im Papierkorb</i18nString>
+		<i18nString name="title">Titel</i18nString>
+		<i18nString name="version">Version</i18nString>
+		<i18nString name="version_increment">Versionsinkrementierung</i18nString>
+		<i18nString name="xml_file">XML-Datei</i18nString>
+		<i18nString name="xml_text">XML-Text</i18nString>
+		<i18nString name="deploy_label">Bereitstellen</i18nString>
+		<i18nString name="deploy_finish">Bereitstellen</i18nString>
+		<i18nString name="edit_label">Bearbeiten</i18nString>
+		<i18nString name="form_label">Formular</i18nString>
+		<i18nString name="t10_label">Mit Fällen löschen</i18nString>
+		<i18nString name="t10_finish">Löschen</i18nString>
+		<i18nString name="t11_label">Löschen</i18nString>
+		<i18nString name="t11_finish">Löschen</i18nString>
+		<i18nString name="t4_label">Neue Version erstellen</i18nString>
+		<i18nString name="t6_label">Löschen</i18nString>
+		<i18nString name="t9_label">Archivieren</i18nString>
+		<i18nString name="view_label">Ansehen</i18nString>
+		<i18nString name="view_finish">Erstellen</i18nString>
+	</i18n>
 	<transition>
 		<id>deploy</id>
 		<x>176</x>
 		<y>176</y>
-		<label>Deploy</label>
+		<label name="deploy_label">Deploy</label>
 		<icon>upload_file</icon>
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
@@ -277,7 +368,7 @@
 		</dataGroup>
 		<event type="finish">
 			<id>deploy_finish</id>
-			<title>Deploy</title>
+			<title name="deploy_finish">Deploy</title>
 			<actions phase="pre">
 				<action id="action1">
 					<![CDATA[
@@ -310,7 +401,7 @@
 		<id>edit</id>
 		<x>80</x>
 		<y>80</y>
-		<label>Edit</label>
+		<label name="edit_label">Edit</label>
 		<icon>edit</icon>
 		<roleRef>
 			<id>system</id>
@@ -398,7 +489,7 @@
 		<id>form</id>
 		<x>176</x>
 		<y>80</y>
-		<label>Form</label>
+		<label name="form_label">Form</label>
 		<icon>format_align_justify</icon>
 		<roleRef>
 			<id>anonymous</id>
@@ -532,7 +623,7 @@
 		<id>t10</id>
 		<x>368</x>
 		<y>272</y>
-		<label>Delete with cases</label>
+		<label name="t10_label">Delete with cases</label>
 		<icon>delete_forever</icon>
 		<roleRef>
 			<id>system</id>
@@ -575,7 +666,7 @@
 		</dataGroup>
 		<event type="finish">
 			<id>delete_with_cases_finish</id>
-			<title>Delete</title>
+			<title name="t10_finish">Delete</title>
 			<actions phase="pre">
 				<action id="action_0">
 					<![CDATA[
@@ -594,7 +685,7 @@
 		<id>t11</id>
 		<x>464</x>
 		<y>272</y>
-		<label>Delete</label>
+		<label name="t11_label">Delete</label>
 		<icon>delete_forever</icon>
 		<roleRef>
 			<id>system</id>
@@ -643,7 +734,7 @@
 		</dataGroup>
 		<event type="finish">
 			<id>t11_finish</id>
-			<title>Delete</title>
+			<title name="t11_finish">Delete</title>
 			<actions phase="pre">
 				<action id="action8">
 					<![CDATA[
@@ -661,7 +752,7 @@
 		<id>t4</id>
 		<x>368</x>
 		<y>80</y>
-		<label>Create new version</label>
+		<label name="t4_label">Create new version</label>
 		<icon>plus_one</icon>
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
@@ -769,7 +860,7 @@
 		<id>t6</id>
 		<x>80</x>
 		<y>272</y>
-		<label>Delete</label>
+		<label name="t6_label">Delete</label>
 		<icon>delete_forever</icon>
 		<roleRef>
 			<id>system</id>
@@ -837,7 +928,7 @@
 		<id>t9</id>
 		<x>368</x>
 		<y>208</y>
-		<label>Archive</label>
+		<label name="t9_label">Archive</label>
 		<icon>folder</icon>
 		<roleRef>
 			<id>system</id>
@@ -901,7 +992,7 @@
 		<id>view</id>
 		<x>368</x>
 		<y>144</y>
-		<label>View</label>
+		<label name="view_label">View</label>
 		<icon>remove_red_eye</icon>
 		<dataGroup>
 			<id>view_0</id>
@@ -938,7 +1029,7 @@
 		</dataGroup>
 		<event type="finish">
 			<id>view_finish</id>
-			<title>Create</title>
+			<title name="view_finish">Create</title>
 		</event>
 	</transition>
 	<place>
