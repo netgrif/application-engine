@@ -557,8 +557,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     private List<String> normalizeFullTextSearch(String fullText) {
         return Arrays.stream(fullText
-                        .replace("\\\\", "")
-                        .replace("\\s+", " ")
+                        .replaceAll("\\\\", "")
+                        .replaceAll("\\s+", " ")
                         .trim()
                         .split("\\s+"))
                 .map(String::trim)
@@ -568,7 +568,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     private String removeDanglingEscapeCharacters(String term) {
-        return term.replace("\\\\+$", "");
+        return term.replaceAll("\\\\+$", "");
     }
 
     private FullTextField parseFullTextField(String fieldDefinition) {
