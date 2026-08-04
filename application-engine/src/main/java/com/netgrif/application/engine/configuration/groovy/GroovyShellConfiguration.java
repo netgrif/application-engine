@@ -40,7 +40,11 @@ public class GroovyShellConfiguration {
         return new String[]{
                 "com.netgrif.application.engine.objects",
                 "com.netgrif.application.engine.adapter.spring",
-                "java.time"
+                "com.netgrif.application.engine.objects.petrinet.domain.dataset",
+                "org.bson.types",
+                "java.time",
+                "java.util",
+                "java.util.stream"
         };
     }
 

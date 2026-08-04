@@ -1,0 +1,25 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>async_run</id>
+	<version>1.0.0</version>
+	<initials>ASR</initials>
+	<title>Async Run</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<caseEvents>
+		<event type="create">
+			<id>async_run_create</id>
+			<actions phase="post">
+				<action id="action1">
+					<![CDATA[
+					async.run {
+					    sleep(2000)
+					    println useCase.stringId
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</caseEvents>
+</document>

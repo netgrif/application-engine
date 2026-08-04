@@ -38,14 +38,32 @@ public interface CaseRepository extends MongoRepository<Case, String>, QuerydslP
         if (parts.length == 2) {
             String networkId = parts[0];
             ObjectId objectId = new ObjectId(parts[1]);
-            return findByNetworkIdAndObjectId(networkId, objectId);
+            return findByNetworkIdentifierAndObjectId(networkId, objectId);
         } else {
             return findByIdObjectId(new ObjectId(compositeId));
         }
     }
 
+
+    /**
+     * @deprecated since 7.0.2, use {@link #findByNetworkIdentifierAndObjectId(String, ObjectId)}
+     */
+    @Deprecated(since = "7.0.2")
     @Query("{ '_id.shortProcessId': ?0, '_id.objectId': ?1 }")
-    Optional<Case> findByNetworkIdAndObjectId(String ProcessId, ObjectId objectId);
+    Optional<Case> findByNetworkIdAndObjectId(String processId, ObjectId objectId);
+
+    /**
+     * Finds a case by its network identifier and MongoDB object ID.
+     * <p>
+     * This method queries cases using the shortProcessIdentifier field in the composite ID.
+     *
+     * @param processIdentifier the short process identifier (network identifier) of the case
+     * @param objectId          the MongoDB object ID of the case
+     * @return an Optional containing the case if found, or empty if not found
+     */
+    @Query("{ '_id.shortProcessIdentifier': ?0, '_id.objectId': ?1 }")
+    Optional<Case> findByNetworkIdentifierAndObjectId(String processIdentifier, ObjectId objectId);
+
 
     @Override
     default void customize(QuerydslBindings bindings, QCase qCase) {

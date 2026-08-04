@@ -30,7 +30,7 @@ public class Task extends com.netgrif.application.engine.objects.workflow.domain
     }
 
     @Builder(builderMethodName = "with")
-    public Task(ProcessResourceId _id, String processId, String caseId, String transitionId, TaskLayout layout, I18nString title,
+    public Task(ProcessResourceId _id, String processId, String processIdentifier, String caseId, String transitionId, TaskLayout layout, I18nString title,
                 String caseColor, String caseTitle, Integer priority, ActorRef assignee, AbstractUser user,
                 List<Trigger> triggers, Map<String, Map<String, Boolean>> roles, Map<String, Map<String, Boolean>> actorRefs,
                 Map<String, Map<String, Boolean>> actors, List<String> viewRoles, List<String> viewActorRefs, List<String> viewActors,
@@ -38,7 +38,7 @@ public class Task extends com.netgrif.application.engine.objects.workflow.domain
                 String finishedBy, String transactionId, Boolean requiredFilled, LinkedHashSet<String> immediateDataFields, List<Field<?>> immediateData,
                 String icon, AssignPolicy assignPolicy, DataFocusPolicy dataFocusPolicy, FinishPolicy finishPolicy, Map<EventType, I18nString> eventTitles,
                 Map<String, Boolean> assignedUserPolicy, Map<String, Integer> consumedTokens, Map<String, String> tags) {
-        super(_id, processId, caseId, transitionId, layout, title, caseColor, caseTitle, priority, assignee, user,
+        super(_id, processId, processIdentifier, caseId, transitionId, layout, title, caseColor, caseTitle, priority, assignee, user,
                 triggers, roles, actorRefs, actors, viewRoles, viewActorRefs, viewActors, negativeViewRoles, negativeViewActors,
                 startDate, finishDate, finishedBy, transactionId, requiredFilled, immediateDataFields, immediateData, icon,
                 assignPolicy, dataFocusPolicy, finishPolicy, eventTitles, assignedUserPolicy, consumedTokens, tags);

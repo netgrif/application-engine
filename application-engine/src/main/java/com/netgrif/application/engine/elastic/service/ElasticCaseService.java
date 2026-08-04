@@ -10,6 +10,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.domain.BulkOperationWrapper;
+import com.netgrif.application.engine.elastic.service.model.FullTextField;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
@@ -42,6 +43,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.function.BinaryOperator;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -59,7 +61,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     protected DataConfigurationProperties.ElasticsearchProperties elasticProperties;
     protected IPetriNetService petriNetService;
     protected IWorkflowService workflowService;
-    protected IElasticCasePrioritySearch iElasticCasePrioritySearch;
+    protected IElasticCasePrioritySearch elasticCasePrioritySearch;
     protected ApplicationEventPublisher publisher;
     protected ElasticQueueManager caseElasticIndexQueueManager;
     protected ElasticQueueManager caseElasticDeleteQueueManager;
@@ -70,7 +72,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                               DataConfigurationProperties.ElasticsearchProperties elasticProperties,
                               @Lazy IPetriNetService petriNetService,
                               @Lazy IWorkflowService workflowService,
-                              IElasticCasePrioritySearch iElasticCasePrioritySearch,
+                              IElasticCasePrioritySearch elasticCasePrioritySearch,
                               ApplicationEventPublisher publisher,
                               ElasticsearchClient elasticsearchClient) {
         this.repository = repository;
@@ -79,7 +81,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         this.elasticProperties = elasticProperties;
         this.petriNetService = petriNetService;
         this.workflowService = workflowService;
-        this.iElasticCasePrioritySearch = iElasticCasePrioritySearch;
+        this.elasticCasePrioritySearch = elasticCasePrioritySearch;
         this.publisher = publisher;
         this.caseElasticIndexQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient, publisher);
         this.caseElasticDeleteQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient, publisher);
@@ -413,15 +415,37 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     protected void buildFullTextQuery(CaseSearchRequest request, BoolQuery.Builder query) {
-        if (request.fullText == null || request.fullText.isEmpty()) {
+        if (request.fullText == null || request.fullText.isBlank()) {
             return;
         }
 
-        // TODO: improvement? wildcard does not scale good
-        //String searchText = elasticsearchProperties.isAnalyzerEnabled() ? request.fullText : "*" + request.fullText + "*";
-        String searchText = "*" + request.fullText + "*";
-        QueryStringQuery fullTextQuery = QueryStringQuery.of(builder -> builder.fields(iElasticCasePrioritySearch.fullTextFields()).query(searchText));
-        query.must(fullTextQuery._toQuery());
+        List<String> fullTextTerms = normalizeFullTextSearch(request.fullText);
+        if (fullTextTerms.isEmpty()) {
+            return;
+        }
+
+        List<FullTextField> fullTextFields = elasticCasePrioritySearch.fullTextFields().stream()
+                .map(this::parseFullTextField)
+                .toList();
+
+        BoolQuery.Builder fullTextQuery = new BoolQuery.Builder();
+
+        fullTextTerms.forEach(term -> {
+            BoolQuery.Builder termQuery = new BoolQuery.Builder();
+            String wildcardValue = "*" + escapeWildcardValue(term) + "*";
+
+            fullTextFields.forEach(fullTextField -> termQuery.should(QueryBuilders.wildcard(builder -> builder
+                    .field(fullTextField.field())
+                    .value(wildcardValue)
+                    .caseInsensitive(true)
+                    .boost(fullTextField.boost())
+            )));
+
+            termQuery.minimumShouldMatch("1");
+            fullTextQuery.must(termQuery.build()._toQuery());
+        });
+
+        query.must(fullTextQuery.build()._toQuery());
     }
 
     /**
@@ -530,5 +554,45 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                 .index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX))
                 .id(useCase.getId())
                 .document(template.getElasticsearchConverter().mapObject(useCase))));
+    }
+
+    private List<String> normalizeFullTextSearch(String fullText) {
+        return Arrays.stream(fullText
+                        .replace("\\", "")
+                        .replaceAll("\\s+", " ")
+                        .trim()
+                        .split("\\s+"))
+                .map(String::trim)
+                .map(this::removeDanglingEscapeCharacters)
+                .filter(term -> !term.isBlank())
+                .toList();
+    }
+
+    private String removeDanglingEscapeCharacters(String term) {
+        return term.replaceAll("\\\\+$", "");
+    }
+
+    private FullTextField parseFullTextField(String fieldDefinition) {
+        String[] parts = fieldDefinition.split("\\^", 2);
+        String field = parts[0].trim();
+        float boost = 1.0f;
+
+        if (parts.length == 2 && !parts[1].isBlank()) {
+            try {
+                boost = Float.parseFloat(parts[1].trim());
+                boost = Float.isFinite(boost) && boost > 0 ? boost : 1.0f;
+            } catch (NumberFormatException e) {
+                log.warn("Invalid boost [{}] in fulltext field definition [{}]. Using default boost 1.0.", parts[1], fieldDefinition);
+            }
+        }
+
+        return new FullTextField(field, boost);
+    }
+
+    private String escapeWildcardValue(String value) {
+        return value
+                .replace("\\", "\\\\")
+                .replace("*", "\\*")
+                .replace("?", "\\?");
     }
 }
