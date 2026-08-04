@@ -14,6 +14,7 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -68,6 +69,8 @@ public class GroovyShellFactory implements IGroovyShellFactory {
         Set<Class<?>> classes = ACTION_IMPORT_PACKAGES.stream()
                 .flatMap(packageName -> findAllClassesUsingClassLoader(packageName).stream())
                 .map(this::loadClass)
+                .filter(java.util.Objects::nonNull)
+                .filter(this::isProductionClass)
                 .collect(Collectors.toCollection(HashSet::new));
 
         return classes.stream()
@@ -117,9 +120,24 @@ public class GroovyShellFactory implements IGroovyShellFactory {
     private Class<?> loadClass(String className) {
         try {
             return Class.forName(className, false, getClass().getClassLoader());
-        } catch (ClassNotFoundException e) {
-            throw new IllegalStateException("Failed to load discovered action import class " + className, e);
+        } catch (ClassNotFoundException | LinkageError e) {
+            log.warn("Skipping discovered action import class [{}] that failed to load", className, e);
+            return null;
         }
+    }
+
+    private boolean isProductionClass(Class<?> candidate) {
+        return java.util.Objects.equals(
+                codeSourceLocation(candidate),
+                codeSourceLocation(GroovyShellFactory.class)
+        );
+    }
+
+    private URL codeSourceLocation(Class<?> type) {
+        return Optional.ofNullable(type.getProtectionDomain())
+                .map(java.security.ProtectionDomain::getCodeSource)
+                .map(java.security.CodeSource::getLocation)
+                .orElse(null);
     }
 
     private Set<String> findAllClassesUsingClassLoader(String packagePattern) {
@@ -142,9 +160,6 @@ public class GroovyShellFactory implements IGroovyShellFactory {
             );
             Set<String> classNames = new HashSet<>();
             for (Resource resource : resources) {
-                if (resource.getDescription().contains("test-classes")) {
-                    continue;
-                }
                 String className = metadataReaderFactory.getMetadataReader(resource)
                         .getClassMetadata()
                         .getClassName();

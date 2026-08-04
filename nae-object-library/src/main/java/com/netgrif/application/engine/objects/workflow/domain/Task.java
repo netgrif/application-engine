@@ -194,7 +194,7 @@ public abstract class Task implements Serializable {
 
     public ProcessResourceId get_id() {
         if (this._id == null) {
-            this._id = this.processId != null && !this.processId.isEmpty()
+            this._id = this.processIdentifier != null && !this.processIdentifier.isEmpty()
                     ? new ProcessResourceId(this.processIdentifier, new ObjectId())
                     : new ProcessResourceId();
         }
