@@ -43,6 +43,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.function.BinaryOperator;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -554,7 +555,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     private List<String> normalizeFullTextSearch(String fullText) {
         return Arrays.stream(fullText
-                        .replaceAll("\\\\", "")
+                        .replace("\\", "")
                         .replaceAll("\\s+", " ")
                         .trim()
                         .split("\\s+"))
