@@ -240,6 +240,10 @@ class ActionDelegate extends DelegateExpando {
     FieldActionsRunner actionsRunner
     List<EventOutcome> outcomes
 
+    private int pendingAsyncExecutions
+    private boolean executionFinished
+    private boolean executionStateCleared
+
     def init(Action action, Case useCase, Optional<Task> task, FieldActionsRunner actionsRunner, Map<String, String> params = [:]) {
         this.action = action
         this.useCase = useCase
@@ -254,7 +258,32 @@ class ActionDelegate extends DelegateExpando {
         this.Plugin = new PluginHolder()
     }
 
-    void clearAfterExecution() {
+    synchronized void retainForAsyncExecution() {
+        if (executionStateCleared) {
+            throw new IllegalStateException("Action execution state has already been cleared")
+        }
+        pendingAsyncExecutions++
+    }
+
+    synchronized void releaseAfterAsyncExecution() {
+        if (pendingAsyncExecutions == 0) {
+            throw new IllegalStateException("No asynchronous action execution is pending")
+        }
+        pendingAsyncExecutions--
+        clearExecutionStateIfPossible()
+    }
+
+    synchronized void clearAfterExecution() {
+        executionFinished = true
+        clearExecutionStateIfPossible()
+    }
+
+    private void clearExecutionStateIfPossible() {
+        if (!executionFinished || pendingAsyncExecutions != 0 || executionStateCleared) {
+            return
+        }
+        executionStateCleared = true
+
         this.action = null
         this.useCase = null
         this.task = null

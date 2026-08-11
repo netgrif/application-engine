@@ -80,7 +80,7 @@ class AssignRemoveTest {
                 [userAuthorities.get("user")] as Authority[],
                 [] as ProcessRole[])
         def loggedUser = ActorTransformer.toLoggedUser(testUser)
-        auth = new UsernamePasswordAuthenticationToken(loggedUser, "password", loggedUser.authorities)
+        auth = new UsernamePasswordAuthenticationToken(loggedUser, "password", loggedUser.authoritySet)
         SecurityContextHolder.getContext().setAuthentication(auth)
 
         Set<String> actionRoleIds = net.roles.values()

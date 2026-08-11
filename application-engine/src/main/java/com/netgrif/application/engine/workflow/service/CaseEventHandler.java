@@ -57,7 +57,7 @@ public class CaseEventHandler extends AbstractMongoEventListener<Case> {
             return;
         }
 
-        String objectId = ((Document)document.get("_id")).get("shortProcessId") + "-" + ((Document)document.get("_id")).get("objectId").toString();
+        String objectId = ((Document)document.get("_id")).get("shortProcessIdentifier") + "-" + ((Document)document.get("_id")).get("objectId").toString();
         service.remove(objectId);
     }
 }

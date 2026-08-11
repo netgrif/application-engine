@@ -20,6 +20,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import groovy.util.logging.Slf4j
 import org.apache.tomcat.util.http.fileupload.IOUtils
 import org.springframework.beans.factory.ObjectFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
 import org.springframework.data.domain.Pageable
@@ -83,7 +84,7 @@ class PetriNetMigrationHelper extends AbstractMigrationHelper<PetriNet> {
      * @param importerProvider the {@link ObjectFactory} that supplies {@link Importer} instances for importing Petri Net models from various sources
      * @param userService the {@link UserService} for managing user-related operations, including retrieving system user for Petri Net imports
      */
-    PetriNetMigrationHelper(MongoTemplate mongoTemplate,
+    PetriNetMigrationHelper(@Qualifier("mongoTemplate") MongoTemplate mongoTemplate,
                             MigrationProperties migrationProperties,
                             IPetriNetService petriNetService,
                             ProcessRoleRepository processRoleRepository,

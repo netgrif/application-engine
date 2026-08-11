@@ -1057,7 +1057,7 @@ public class Importer {
         if (importRole.isGlobal() != null && importRole.isGlobal()) {
             role.setGlobal(importRole.isGlobal());
         } else {
-            role.set_id(new ProcessResourceId(new ObjectId(net.getStringId())));
+            role.set_id(new ProcessResourceId(net.getIdentifier(), new ObjectId()));
             role.setProcessId(net.getStringId());
             role.setProcessTitle(net.getTitle());
             role.setProcessIdentifier(net.getIdentifier());

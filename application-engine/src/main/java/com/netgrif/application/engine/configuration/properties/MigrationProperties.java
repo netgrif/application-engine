@@ -18,7 +18,7 @@ import java.util.Set;
  */
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "nae.migration")
+@ConfigurationProperties(prefix = "netgrif.engine.migration")
 public class MigrationProperties {
 
     /**

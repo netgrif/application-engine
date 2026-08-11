@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
 #  eng:
-#    image: netgrif/application-engine:7.0.1
+#    image: netgrif/application-engine:7.0.2
 #    ports:
 #      - "8080:8080"
 #    environment:
@@ -16,7 +16,8 @@ services:
 #      NETGRIF_WORKER_NODE_NODE_TYPE: ENGINE_ROOT
 #      netgrif.engine.data.redis.namespace: netgrif
 #      netgrif.engine.logging.file.path: log
-#      netgrif.engine.management.endpoints.web.exposure.include: "*"
+#      netgrif.engine.management.endpoints.web.exposure.include: "health,info,metrics,prometheus,beans,env,threaddump,loggers,logfile,logfiles,caches,conditions,configprops,mappings,scheduledtasks,httpexchanges,startup,nodeinfo,elasticnodes,netgriftracing"
+#      netgrif.engine.management.endpoint.shutdown.enabled: 'false'
 #      netgrif.engine.management.health.ldap.enabled: 'false'
 #      netgrif.engine.main.allow-bean-definition-overriding: 'true'
 #      netgrif.engine.management.health.mail.enabled: 'false'
@@ -27,8 +28,8 @@ services:
 #      netgrif.engine.management.endpoint.health.show-details: always
 #      netgrif.engine.management.metrics.export.simple: enabled
 #      netgrif.engine.management.endpoints.web.base-path: /manage
-#      netgrif.engine.security.server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/v3/api-docs,/v3/api-docs/**,/swagger-ui.html,/swagger-ui/**,/api/public/**,/manage/**
-#      netgrif.engine.security.anonymous-exceptions: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/manage/**
+#      netgrif.engine.security.server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/v3/api-docs,/v3/api-docs/**,/swagger-ui.html,/swagger-ui/**,/api/public/**,/manage/health
+#      netgrif.engine.security.anonymous-exceptions: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/manage/health
 #    depends_on:
 #      nae-mongodb:
 #        condition: service_started
