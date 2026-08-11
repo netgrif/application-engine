@@ -2,7 +2,10 @@ package com.netgrif.application.engine.workflow;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.objects.auth.domain.*;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import com.netgrif.application.engine.objects.auth.domain.PasswordCredential;
+import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType;
@@ -17,7 +20,7 @@ import com.netgrif.application.engine.workflow.service.TaskService;
 import com.netgrif.application.engine.workflow.service.WorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +40,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @Slf4j
-@Disabled
+@Tag("performance")
 @SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
@@ -85,7 +88,7 @@ public class WorkflowMvcPerformanceTest {
                 .apply(springSecurity())
                 .build();
 
-        User user = new User();
+        User user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
         user.setFirstName("Firstname");
         user.setLastName("Lastname");
         user.setUsername("username1");

@@ -54,6 +54,8 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
             return;
         }
 
+        log.info("Caching functions for PetriNet id={}", petriNet.getIdentifier());
+
         List<CachedFunction> functions = petriNet.getFunctions(FunctionScope.GLOBAL).stream()
                 .map(function -> CachedFunction.build(shell, function))
                 .collect(Collectors.toList());
@@ -66,6 +68,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
         } else {
             globalFunctionsCache.evictIfPresent(petriNet.getIdentifier());
         }
+        log.info("Finished caching functions for PetriNet id={}", petriNet.getIdentifier());
     }
 
     @Override

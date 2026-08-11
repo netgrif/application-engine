@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
+import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
@@ -107,6 +108,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     protected IElasticCaseMappingService caseMappingService;
+
+    @Autowired
+    protected PaginationProperties paginationProperties;
 
     @Lazy
     @Autowired
@@ -252,13 +256,22 @@ public class WorkflowService implements IWorkflowService {
         return useCase;
     }
 
+    @Override
+    public void updateCaseFromDb(Case useCase) {
+        Case actual = findOne(useCase.getStringId());
+        actual.getDataSet().forEach((id, dataField) -> {
+            if (dataField.isNewerThen(useCase.getDataField(id))) {
+                useCase.getDataSet().put(id, dataField);
+            }
+        });
+    }
+
     /**
      * Resolves actor permissions for the useCase based on the actor list data field.
      *
-     * @param useCase useCase where to resolve actor permissions
+     * @param useCase      useCase where to resolve actor permissions
      * @param actorFieldId field id of the actor list
-     * @param permission permission associated with the useCase and actor list
-     *
+     * @param permission   permission associated with the useCase and actor list
      * @return true if the useCase was modified, false otherwise
      */
     private boolean resolveActorRefPermissions(Case useCase, String actorFieldId, Map<String, Boolean> permission) {
@@ -278,20 +291,25 @@ public class WorkflowService implements IWorkflowService {
             return null;
         }
         return actorListFieldValue.getActorValues().stream()
+                .filter(this::actorExists)
                 .map(ActorFieldValue::getId)
-                .filter(actorId -> {
-                    AbstractUser user = userService.findById(actorId, null);
-                    if (user != null) {
-                        return true;
-                    }
-                    try {
-                        groupService.findById(actorId);
-                        return true;
-                    } catch (IllegalArgumentException ignored) {
-                        return false;
-                    }
-                })
                 .collect(Collectors.toList());
+    }
+
+    private boolean actorExists(ActorFieldValue actorFieldValue) {
+        if (actorFieldValue == null || actorFieldValue.getId() == null || actorFieldValue.getId().isBlank() || !ObjectId.isValid(actorFieldValue.getId())) {
+            return false;
+        }
+        AbstractUser user = userService.findById(actorFieldValue.getId(), actorFieldValue.getRealmId());
+        if (user != null) {
+            return true;
+        }
+        try {
+            groupService.findById(actorFieldValue.getId());
+            return true;
+        } catch (IllegalArgumentException ignored) {
+            return false;
+        }
     }
 
     public CreateCaseEventOutcome createCase(CreateCaseParams createCaseParams) {
@@ -446,12 +464,14 @@ public class WorkflowService implements IWorkflowService {
     public void deleteInstancesOfPetriNet(PetriNet net, boolean force) {
         log.info("[{}]: User {} is deleting all cases and tasks of Petri net {} version {}", net.getStringId(),
                 userService.getLoggedOrSystem().getStringId(), net.getIdentifier(), net.getVersion().toString());
-        List<Case> cases = this.searchAll(QCase.case$.petriNetObjectId.eq(net.getObjectId())).getContent();
-        if (!cases.isEmpty()) {
-            cases.forEach(aCase -> deleteCase(DeleteCaseParams.with()
+        Pageable casePageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Page<Case> casePage = search(QCase.case$.petriNetObjectId.eq(net.getObjectId()), casePageable);
+        while (casePage.hasContent()) {
+            casePage.forEach(aCase -> deleteCase(DeleteCaseParams.with()
                     .useCase(aCase)
                     .force(force)
                     .build()));
+            casePage = search(QCase.case$.petriNetObjectId.eq(net.getObjectId()), casePageable);
         }
     }
 

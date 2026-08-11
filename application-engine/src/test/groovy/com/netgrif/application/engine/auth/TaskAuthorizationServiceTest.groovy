@@ -1,17 +1,23 @@
 package com.netgrif.application.engine.auth
 
+import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.auth.domain.User
 import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
-import com.netgrif.application.engine.objects.auth.domain.User
+import com.netgrif.application.engine.objects.auth.domain.Authority
+import com.netgrif.application.engine.objects.auth.domain.enums.UserState
+import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
+import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.objects.workflow.domain.Case
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.params.DeleteCaseParams
 import com.netgrif.application.engine.workflow.params.TaskParams
@@ -19,15 +25,8 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskAuthorizationService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.enums.UserState
-import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
-import com.netgrif.application.engine.objects.petrinet.domain.VersionType
-import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.objects.workflow.domain.Case
 import groovy.json.JsonOutput
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -192,7 +191,6 @@ class TaskAuthorizationServiceTest {
 
 
     @Test
-    @Disabled("Assign Test")
     void testTaskAuthorizationService() {
         def tests = [
                 { -> testAssignAuthorization() },
@@ -590,4 +588,45 @@ class TaskAuthorizationServiceTest {
         workflowService.deleteCase(new DeleteCaseParams(case_.stringId))
     }
 
+    @Test
+    void testCanAssignWithRoleAssignTrueAndWithActorRefAssignUndefined() {
+        ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "assign_pos_role")
+        userService.addRole(testUser, positiveRole.get_id())
+        Case case_ = workflowService.createCase(CreateCaseParams.with()
+                .process(netWithUserRefs)
+                .title("Test assign")
+                .color("")
+                .author(ActorTransformer.toLoggedUser(testUser))
+                .build()).getCase()
+
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_pos_ul": [
+                        "value": [testUser.stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        assert taskAuthorizationService.canCallAssign(ActorTransformer.toLoggedUser(testUser), (new ArrayList<>(case_.getTasks())).get(0).task)
+    }
+
+    @Test
+    void testCanAssignWithRoleAssignUndefinedAndWithActorRefAssignTrue() {
+        ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "view_pos_role")
+        userService.addRole(testUser, positiveRole.get_id())
+        Case case_ = workflowService.createCase(CreateCaseParams.with()
+                .process(netWithUserRefs)
+                .title("Test assign")
+                .color("")
+                .author(ActorTransformer.toLoggedUser(testUser))
+                .build()).getCase()
+
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "assign_pos_ul": [
+                        "value": [testUser.stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        assert taskAuthorizationService.canCallAssign(ActorTransformer.toLoggedUser(testUser), (new ArrayList<>(case_.getTasks())).get(0).task)
+    }
 }

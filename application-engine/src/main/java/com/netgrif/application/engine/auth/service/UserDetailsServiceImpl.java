@@ -44,11 +44,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new RuntimeException("blocked");
         }
 
-        LoggedUserImpl loggedUser = getLoggedUser(email);
-
-        publisher.publishEvent(new UserLoginEvent(loggedUser));
-
-        return loggedUser;
+        return getLoggedUser(email);
     }
 
     protected LoggedUserImpl getLoggedUser(String email) throws UsernameNotFoundException {

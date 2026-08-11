@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.adapter.spring.workflow.domain;
 
 import com.netgrif.application.engine.objects.workflow.domain.DataFieldsCollection;
+import org.springframework.data.annotation.Transient;
 
-import java.beans.Transient;
 
 public class DataGroup extends com.netgrif.application.engine.objects.petrinet.domain.DataGroup {
 
@@ -10,7 +10,7 @@ public class DataGroup extends com.netgrif.application.engine.objects.petrinet.d
         super();
     }
 
-    public DataGroup(DataGroup group) {
+    public DataGroup(com.netgrif.application.engine.objects.petrinet.domain.DataGroup group) {
         super(group);
     }
 

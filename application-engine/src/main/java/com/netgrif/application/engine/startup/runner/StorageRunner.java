@@ -5,7 +5,6 @@ import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -21,17 +20,15 @@ class StorageRunner implements ApplicationEngineStartupRunner {
 
     private final StorageConfigurationProperties storageConfigurationProperties;
 
-    private final StorageConfigurationProperties fileStorageConfiguration;
-
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("Creating storage folder");
-        File storage = new File(fileStorageConfiguration.getPath() + File.separator + "uploadedModels" + File.separator + "model.txt");
+        File storage = new File(storageConfigurationProperties.getPath() + File.separator + "uploadedModels" + File.separator + "model.txt");
         storage.getParentFile().mkdirs();
 
         if (storageConfigurationProperties.isClean()) {
             log.info("Removing files from storage folder and it's sub-folders");
-            purgeDirectory(new File(fileStorageConfiguration.getPath()));
+            purgeDirectory(new File(storageConfigurationProperties.getPath()));
         }
 
         log.info("Creating log folder");

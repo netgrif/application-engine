@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
@@ -201,7 +201,7 @@ public class TaskController extends AbstractTaskController {
         return super.setData(taskId, dataBody, locale);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId) && @taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #dataBody.parentTaskId)")
     @Operation(summary = "Upload file into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -220,7 +220,7 @@ public class TaskController extends AbstractTaskController {
         return super.getFile(taskId, fieldId);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId) && @taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #requestBody.parentTaskId)")
     @Operation(summary = "Remove file from the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -233,7 +233,7 @@ public class TaskController extends AbstractTaskController {
         return super.deleteFile(requestBody.getParentTaskId(), requestBody.getFieldId());
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId) && @taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #requestBody.parentTaskId)")
     @Operation(summary = "Upload multiple files into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -252,7 +252,7 @@ public class TaskController extends AbstractTaskController {
         return super.getNamedFile(taskId, fieldId, fileName);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId) && @taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #requestBody.parentTaskId)")
     @Operation(summary = "Remove file from tasks file list field value",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})

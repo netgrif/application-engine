@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+          xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
     <id>test</id>
     <initials>TST</initials>
     <title>Test</title>
@@ -12,6 +12,12 @@
         <id>2</id>
         <name>Perform</name>
     </role>
+    <roleRef>
+        <id>1</id>
+        <caseLogic>
+            <create>true</create>
+        </caseLogic>
+    </roleRef>
     <data type="text">
         <id>1</id>
         <title>Name</title>

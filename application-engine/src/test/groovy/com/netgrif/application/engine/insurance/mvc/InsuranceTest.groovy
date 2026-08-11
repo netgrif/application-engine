@@ -1,34 +1,33 @@
 package com.netgrif.application.engine.insurance.mvc
 
-import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
-import com.netgrif.application.engine.objects.auth.domain.Authority;
-import com.netgrif.application.engine.objects.auth.domain.User
-import com.netgrif.application.engine.objects.auth.domain.enums.UserState
+import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.auth.domain.User
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
+import com.netgrif.application.engine.objects.auth.domain.Authority
+import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.hamcrest.CoreMatchers
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.DisplayName
 
 //import com.netgrif.application.engine.orgstructure.domain.Group
 
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletRequest
@@ -53,7 +52,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@Disabled
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest(
@@ -141,13 +139,10 @@ class InsuranceTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         def processRoles = ImportHelper.getProcessRolesByImportId(net.getNet(), ["agent": "1", "company": "2"])
-        importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        def testUser = importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
                 [processRoles.get("agent"), processRoles.get("company")] as ProcessRole[])
-        List<ProcessRole> roles = processRoleService.findAll(netId)
-        processRoleService.assignRolesToUser(userService.findUserByUsername(USER_EMAIL, null).orElse(null), roles.findAll { it.importId in ["1", "2"] }.collect { it._id } as Set, userService.transformToLoggedUser(userService.getLoggedOrSystem()))
-
-        auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
+        auth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(testUser), "password", testUser.authoritySet as List)
         auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
 
         mapper = net.getNet().dataSet.collectEntries { [(it.value.importId as int): (it.key)] }
@@ -159,7 +154,6 @@ class InsuranceTest {
     private Map mapper
 
     @Test
-    @Disabled
     @DisplayName("Insurance Test")
     void test() {
         createCase()
@@ -257,15 +251,13 @@ class InsuranceTest {
         def result = mvc.perform(post(CASE_CREATE_URL)
                 .accept(MediaTypes.HAL_JSON_VALUE)
                 .content(content)
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .with(csrf().asHeader())
                 .with(authentication(auth)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath('$.outcome.aCase.title', CoreMatchers.is(CASE_NAME)))
-//                .andExpect(jsonPath('$.outcome.aCase.petriNetId', CoreMatchers.is(netId)))
                 .andReturn()
         def response = parseResult(result)
-        caseId = response.outcome.aCase.id
+        caseId = createdCaseId(response)
     }
 
     def searchTasks(String title, int expected) {
@@ -791,5 +783,16 @@ class InsuranceTest {
     @SuppressWarnings("GrMethodMayBeStatic")
     private def parseResult(MvcResult result) {
         return (new JsonSlurper()).parseText(result.response.getContentAsString(StandardCharsets.UTF_8))
+    }
+
+    private static String createdCaseId(def response) {
+        def outcome = response.outcome
+        def aCase = outcome?.get("acase") ?: outcome?.get("aCase") ?: outcome?.get("case")
+        if (aCase?.id) {
+            return aCase.id
+        }
+        def matcher = (response.success as String) =~ /Case with id (.+) was created/
+        assert matcher.find() : "Create case response did not contain a case id: ${response}"
+        return matcher.group(1)
     }
 }

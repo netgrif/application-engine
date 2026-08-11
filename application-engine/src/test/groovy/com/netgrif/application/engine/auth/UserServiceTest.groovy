@@ -1,18 +1,17 @@
 package com.netgrif.application.engine.auth
 
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
-import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
-
 import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.startup.ImportHelper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -26,7 +25,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDateTime
 
 import static org.junit.jupiter.api.Assertions.assertNull
-import static org.junit.jupiter.api.Assertions.assertThrows
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -135,7 +133,7 @@ class UserServiceTest {
         Optional<AbstractUser> userOptional = userService.findUserByUsername("dummy@netgrif.com", null)
         User user = null
         if (userOptional.isEmpty()) {
-            user = new User()
+            user = new com.netgrif.application.engine.adapter.spring.auth.domain.User()
             user.setFirstName("Dummy")
             user.setLastName("User")
             user.setUsername("dummy@netgrif.com")

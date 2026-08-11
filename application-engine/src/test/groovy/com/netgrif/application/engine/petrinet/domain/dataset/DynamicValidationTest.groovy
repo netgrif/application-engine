@@ -4,18 +4,19 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.validation.DynamicValidation
+import com.netgrif.application.engine.objects.workflow.domain.Case
+import com.netgrif.application.engine.objects.workflow.domain.Task
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.objects.workflow.domain.Case
-import com.netgrif.application.engine.objects.workflow.domain.Task
-import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
-import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -55,9 +56,8 @@ class DynamicValidationTest {
     }
 
     @Test
-    @Disabled
     void testValidations() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_validations.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new ImportPetriNetParams(new FileInputStream("src/test/resources/petriNets/dynamic_validations.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         Case useCase = importHelper.createCase("test", optNet.getNet())
         Map<String, Field> data = getData(useCase)
         assert (data["number"]).validations[0] instanceof DynamicValidation
@@ -72,8 +72,8 @@ class DynamicValidationTest {
 
         SetDataEventOutcome changes = setData(useCase, ["number_valid_switch": ["type": "boolean", "value": true],
                                                         "text_valid_switch"  : ["type": "boolean", "value": true]])
-        assert (changes.changedFields["number"].attributes["validations"] as List)[0]["validationRule"] == "odd"
-        assert (changes.changedFields["text"].attributes["validations"] as List)[0]["validationRule"] == "email"
+        assert (changedField(changes, "number").attributes["validations"] as List)[0]["validationRule"] == "odd"
+        assert (changedField(changes, "text").attributes["validations"] as List)[0]["validationRule"] == "email"
 
         useCase = workflowService.findOne(useCase.stringId)
         assert useCase.dataSet["number"].validations[0].validationRule == "odd"
@@ -88,8 +88,8 @@ class DynamicValidationTest {
 
         changes = setData(useCase, ["number_valid_switch": ["type": "boolean", "value": false],
                                     "text_valid_switch"  : ["type": "boolean", "value": false]])
-        assert (changes.changedFields["number"].attributes["validations"] as List)[0]["validationRule"] == ("inrange ${useCase.dataSet["min"].value as Integer},${useCase.dataSet["max"].value as Integer}" as String)
-        assert (changes.changedFields["text"].attributes["validations"] as List)[0]["validationRule"] == ("maxLength ${useCase.dataSet["max"].value as Integer}" as String)
+        assert (changedField(changes, "number").attributes["validations"] as List)[0]["validationRule"] == ("inrange ${useCase.dataSet["min"].value as Integer},${useCase.dataSet["max"].value as Integer}" as String)
+        assert (changedField(changes, "text").attributes["validations"] as List)[0]["validationRule"] == ("maxLength ${useCase.dataSet["max"].value as Integer}" as String)
 
         setData(useCase, ["min": ["type": "number", "value": "10"],
                           "max": ["type": "number", "value": "20"]])
@@ -115,6 +115,19 @@ class DynamicValidationTest {
     SetDataEventOutcome setData(Case useCase, Map<String, Map<String, Object>> values) {
         Task task = task(useCase)
         return dataService.setData(task, ImportHelper.populateDataset(values))
+    }
+
+    def changedField(EventOutcome outcome, String fieldId) {
+        if (outcome == null) {
+            return null
+        }
+        if (outcome instanceof SetDataEventOutcome) {
+            def direct = outcome.changedFields[fieldId]
+            if (direct != null) {
+                return direct
+            }
+        }
+        return outcome.outcomes?.findResult { child -> changedField(child, fieldId) }
     }
 
     Task task(Case useCase) {

@@ -1,166 +1,162 @@
-# Netgrif Application Engine
+# application-engine
 
-[![License](https://img.shields.io/badge/license-NETGRIF%20Community%20License-green)](https://netgrif.com/license)
-[![Java](https://img.shields.io/badge/Java-21-red)](https://openjdk.java.net/projects/jdk/11/)
-[![Petriflow 1.0.1](https://img.shields.io/badge/Petriflow-1.0.1-0aa8ff)](https://petriflow.com)
-[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/netgrif/application-engine?sort=semver&display_name=tag)](https://github.com/netgrif/application-engine/releases)
-[![build](https://github.com/netgrif/application-engine/actions/workflows/master-build.yml/badge.svg)](https://github.com/netgrif/application-engine/actions/workflows/master-build.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=netgrif_application-engine&metric=alert_status)](https://sonarcloud.io/dashboard?id=netgrif_application-engine)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=netgrif_application-engine&metric=coverage)](https://sonarcloud.io/dashboard?id=netgrif_application-engine)
-[![Known Vulnerabilities](https://snyk.io/test/github/netgrif/application-engine/badge.svg)](https://snyk.io/test/github/netgrif/application-engine)
+> Main Spring Boot application module of the [Netgrif Application Engine](../README.md).
 
-> Next-generation end-to-end low code platform.
+This module is the runnable assembly of the NAE platform. It wires together all sibling modules
+(`nae-user-ce`, `nae-spring-core-adapter`, `nae-user-common`, `nae-object-library`), provides the
+REST API, Spring Boot auto-configuration, and the Petriflow process runtime. It can be run as a
+**standalone JAR / Docker container** or embedded as a **library** inside another Spring Boot application.
 
-Application Engine is a workflow management system fully supporting low-code language Petriflow. Application Engine (NAE
-for short)
-is based on Spring framework with fully complaint Petriflow language interpreter. NAE runs inside the Java Virtual
-Machine. It can be embedded into Java 11 project or used as a standalone process server. On top of the process server,
-NAE provides additional components to make integration to your project/environment seamless.
+---
 
-* Petriflow low-code language: [http://petriflow.com](https://petriflow.com)
-* Documentation: [https://engine.netgrif.com](https://engine.netgrif.com)
+## Module coordinates
 
-<!-- * Getting Started: [https://engine.netgrif.com/get_started](https://engine.netgrif.com/get_started) -->
-
-* Issue Tracker: [GitHub issues](https://github.com/netgrif/application-engine/issues)
-* Java docs: [https://engine.netgrif.com/javadoc](https://engine.netgrif.com/javadoc)
-
-<!-- * Roadmap: [https://engine.netgrif.com/roadmap](https://engine.netgrif.com/#/roadmap) -->
-
-* License: [NETGRIF Community License](https://netgrif.com/license)
-
-## Components
-
-Netgrif Application Engine (or NAE for short) consists of several key components:
-
-* **Workflow engine**
-    * **Process executions** - Process instance and task management
-    * [**Actions and Events processing**](https://engine.netgrif.com/#/events/events) - Compiling and running action's
-      code, handling events in processes
-    * [**Roles management and permissions resolution**](https://engine.netgrif.com/#/roles/permissions) - Permissions
-      and
-      restrictions resolving for processes
-    * [**Search and filters**](https://engine.netgrif.com/#/search/filter) - Indexing, querying and filter management.
-* **Authentication and authorization** - User management and application-wide permissions
-    * [**LDAP**](https://engine.netgrif.com/#/integration/ad_kerberos) - Integration to authentication solution via LDAP
-      protocol.
-    * **Organization structures** - Managing organization structure for application users
-* **Business rules engine** - Rules execution across whole application based on [Drools](https://drools.org/)
-* **Logging and auditing** - Logging to text file and Event/Audit log generation to the main database
-* **Mail service** - Mail client for sending and receiving emails
-* **Extension services**
-    * [**PDF generator**](https://engine.netgrif.com/#/services/pdf_generator) - Generate PDF from process form / task
-    * **QR code generator** - Generate QR code from process data
-
-## Requirements
-
-The Application engine has some requirements for runtime environment. The following table is summary of requirements to
-run and use the engine:
-
-| Name                                                   | Version | Description                                                     | Recommendation                                                         |
-|--------------------------------------------------------|---------|-----------------------------------------------------------------|:-----------------------------------------------------------------------|
-| [Java](https://openjdk.java.net/)                      | 21+     | Java Development Kit                                            | [OpenJDK 21](https://openjdk.java.net/install/)                        |
-| [Redis](https://redis.io/)                             | 7+      | Key-value in-memory database used for user sessions and caching | [Redis 7.2.5](https://redis.io/download)                               |
-| [MongoDB](https://www.mongodb.com/)                    | 8+      | Main document store database                                    | [MongoDB 8.0.3](hhttps://www.mongodb.com/docs/manual/installation/)        |
-| [Elasticsearch](https://www.elastic.co/elasticsearch/) | 8+      | Index database used for better application search               | [Elasticsearch 8.10.4](https://www.elastic.co/downloads/elasticsearch) |
-
-If you are planning on developing docker container based solution you can use our [docker-compose](docker-compose.yml)
-configuration to run all necessary databases to develop with NAE.
-
-<!-- If you are going to deploy your application on Kubernetes cluster please check out documentation
-for [Kubernetes deployment](https://engine.netgrif.com/#/devops/kubernetes). -->
-
-## Installation
-
-### Running as standalone
-
-You can start using the NAE by its self and then upload your processes via API. You run the NAE from JAR (Java Archive)
-file or as docker container.
-
-#### Running a JAR file
-
-To run the engine from the jar file you can use a release package available from this repository. The latest release
-package you can download from [here](https://github.com/netgrif/application-engine/releases/latest). Before you start
-you must generate own RSA key pair for session tokens, you can
-follow [this guide](https://engine.netgrif.com/#/views/public_view?id=backend).
-
-To quickly start working with the engine just write the following commands to download, unzip, generate security keys
-and start:
-
-```shell
-$ wget -O nae.zip https://github.com/netgrif/application-engine/releases/latest
-$ unzip nae.zip
-$ cd nae
-$ cd src/main/resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../../../..
-$ java -jar nae.jar
-```
-
-Only generate security keys:
-
-```shell
-$ cd src/main/resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../../../..
-```
-
-By default, the engine assumes that all databases are running locally. If you are running required database on server or
-on different ports, you can pass these settings as arguments to NAE.
-
-```shell
-$ java -jar nae.jar --spring.data.mongodb.uri=mongodb://localhost:27017/nae --spring.data.elasticsearch.url=localhost --spring.session.redis.host=localhost
-```
-
-<!-- For complete list of all configurable application properties
-see [article in documentation](https://engine.netgrif.com/properties). -->
-
-#### Running as Docker container
-
-You can also use docker to run the engine from the official image
-on [Docker hub](https://hub.docker.com/r/netgrif/application-engine).
-
-```shell
-$ docker pull netgrif/application-engine
-$ docker run -d -p 8080:8080 netgrif/application-engine
-```
-
-As the engine connects by default to locally ran databases for more precise configuration we recommend to use Docker
-compose file or Kubernetes manifest to run whole stack all at once. <!-- You can read more about it
-in [this guide](https://engine.netgrif.com/#/devops). -->
-
-### Embedding
-
-The Application Engine can be used inside your java application as a java library. The engine is written in Spring
-framework, so you can seamlessly integrate it to your Spring Boot application. The engine can be linked as a Maven
-dependency:
-
-```XML
+```xml
 
 <dependency>
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
+    <version>7.0.0</version>
 </dependency>
 ```
 
-<!-- For more information please read instructions in [Get Started](https://engine.netgrif.com/#/get_started) -->
+---
 
-## Other projects
+## Requirements
 
-<!-- ### Frontend library
+| Service                 | Version | Port        |
+|-------------------------|---------|-------------|
+| Java JDK                | 21+     | —           |
+| MongoDB *(replica set)* | 8+      | 27017       |
+| Elasticsearch           | 8+      | 9200 / 9300 |
+| Redis                   | 7+      | 6379        |
+| MinIO *(optional)*      | —       | 9000 / 9001 |
 
-For complete Netgrif Application Engine experience check out
-our [Angular library - Netgrif Components](https://github.com/netgrif/components)
-for building frontend applications in Application Engine platform powered by Petriflow processes. -->
+Start all services locally with the provided Docker Compose file:
 
-### Application Builder
+```shell
+docker-compose up -d
+```
 
-For creating processes in Petriflow language try our free Application Builder
-on [https://builder.netgrif.com](https://builder.netgrif.com). You can start from scratch or import existing process in
-BPMN 2.0 and builder automatically converts it into Petriflow.
+---
 
-## Reporting issues
+## Build
 
-If you find a bug, let us know at [Issue page](https://github.com/netgrif/application-engine/issues). First, please read
-our [Contribution guide](https://github.com/netgrif/application-engine/blob/master/CONTRIBUTING.md)
+Build this module alone (after a full root `mvn install`):
+
+```shell
+# standard JAR
+mvn clean package
+
+# Docker-ready fat JAR (output: target/app-exec.jar)
+mvn clean package -P docker-build
+```
+
+---
+
+## Run
+
+### Prerequisites — RSA key pair for JWT
+
+```shell
+cd src/main/resources/certificates
+openssl genrsa -out keypair.pem 4096
+openssl rsa -in keypair.pem -pubout -out public.crt
+openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der
+cd ../../../..
+```
+
+### JAR
+
+```shell
+java -jar target/app-exec.jar
+```
+
+Override infrastructure URLs at startup:
+
+```shell
+java -jar target/app-exec.jar \
+--netgrif.engine.data.mongodb.uri=mongodb://localhost:27017 \
+--netgrif.engine.data.elasticsearch.url=localhost \
+--netgrif.engine.data.redis.host=localhost
+```
+
+Or via environment variables:
+
+```shell
+export NETGRIF_ENGINE_DATA_MONGODB_URI=mongodb://localhost:27017
+export NETGRIF_ENGINE_DATA_ELASTIC_URL=localhost
+export NETGRIF_ENGINE_DATA_REDIS_HOST=localhost
+java -jar target/app-exec.jar
+```
+
+The engine starts on **http://localhost:8080** by default.
+
+### Docker
+
+```shell
+docker pull netgrif/application-engine
+docker run -d -p 8080:8080 \
+-e NETGRIF_ENGINE_DATA_MONGODB_URI=mongodb://host.docker.internal:27017 \
+-e NETGRIF_ENGINE_DATA_ELASTIC_URL=host.docker.internal \
+-e NETGRIF_ENGINE_DATA_REDIS_HOST=host.docker.internal \
+netgrif/application-engine
+```
+
+---
+
+## Key configuration properties
+
+| Property                                       | Env variable                                  | Default                                            | Description             |
+|------------------------------------------------|-----------------------------------------------|----------------------------------------------------|-------------------------|
+| `netgrif.engine.data.mongodb.uri`              | `NETGRIF_ENGINE_DATA_MONGODB_URI`             | `mongodb://localhost:27017`                        | MongoDB URI             |
+| `netgrif.engine.data.database-name`            | `NETGRIF_ENGINE_DATA_DATABASE_NAME`           | `nae`                                              | Database name           |
+| `netgrif.engine.data.elasticsearch.url`        | `NETGRIF_ENGINE_DATA_ELASTIC_URL`             | `localhost`                                        | Elasticsearch host      |
+| `netgrif.engine.data.elasticsearch.searchPort` | `NETGRIF_ENGINE_DATA_ELASTIC_SEARCH_PORT`     | `9200`                                             | Elasticsearch HTTP port |
+| `netgrif.engine.data.redis.host`               | `NETGRIF_ENGINE_DATA_REDIS_HOST`              | `localhost`                                        | Redis host              |
+| `netgrif.engine.data.redis.port`               | `NETGRIF_ENGINE_DATA_REDIS_PORT`              | `6379`                                             | Redis port              |
+| `netgrif.engine.security.auth.admin-password`  | `NETGRIF_ENGINE_SECURITY_AUTH_ADMIN_PASSWORD` | `password`                                         | Default admin password  |
+| `netgrif.engine.security.jwt.private-key`      | —                                             | `file:src/main/resources/certificates/private.der` | RSA private key path    |
+| `netgrif.engine.server.port`                   | —                                             | `8080`                                             | HTTP server port        |
+
+> ⚠️ Always change the default `admin-password` and `security.encryption.password` before any non-development
+> deployment.
+
+Full configuration
+reference: [https://platform.netgrif.cloud/refs/config/engine-standalone-config](https://platform.netgrif.cloud/refs/config/engine-standalone-config)
+
+---
+
+## Maven build profiles
+
+| Profile                 | Purpose                                                                         |
+|-------------------------|---------------------------------------------------------------------------------|
+| `dev`                   | Development mode — loads external JARs from `modules/` via `PropertiesLauncher` |
+| `docker-build`          | Produces `app-exec.jar` used by the `Dockerfile`                                |
+| `github-publish`        | Publishes to GitHub Packages                                                    |
+| `ossrh-publish`         | Publishes to Maven Central                                                      |
+| `netgrif-nexus-publish` | Publishes to internal Netgrif Nexus                                             |
+
+---
+
+## Development mode (IntelliJ / CLI)
+
+Use the pre-configured run configuration **"ApplicationEngine DEV with modules"** in `.run/`,
+or from the command line:
+
+```shell
+# From repository root — link nae-user-ce into the modules/ directory first
+bash -c 'jar_path=$(find nae-user-ce/target/ -maxdepth 1 -type f -name "nae-user-ce-*.jar" \
+! -name "*-javadoc.jar" ! -name "*-sources.jar" | head -n1) && \
+[[ -n "$jar_path" ]] && \
+cd application-engine/modules && ln -sf ../../"$jar_path" nae-user-ce.jar'
+
+# Then run with the dev profile
+mvn -pl application-engine -P dev spring-boot:run
+```
+
+---
 
 ## License
 
-The software is licensed under NETGRIF Community license. You may be found this license
-at [the LICENSE file](https://github.com/netgrif/application-engine/blob/master/LICENSE) in the repository. 
+[NETGRIF Community License](../LICENSE.txt)

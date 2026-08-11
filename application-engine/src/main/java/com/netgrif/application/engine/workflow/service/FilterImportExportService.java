@@ -1,10 +1,12 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.module.SimpleModule;
+import tools.jackson.dataformat.xml.XmlMapper;
+import tools.jackson.dataformat.xml.XmlWriteFeature;
+import tools.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.google.common.collect.Lists;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
@@ -48,6 +50,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.*;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -327,29 +330,58 @@ public class FilterImportExportService implements IFilterImportExportService {
             throw new FileNotFoundException();
         }
 
-        File f = new File(ffv.getPath());
-        validateFilterXML(new FileInputStream(f));
-        String importedFilter = InputStreamToString.inputStreamToString(new FileInputStream(f));
-        SimpleModule module = new SimpleModule().addDeserializer(Object.class, FilterDeserializer.getInstance());
-        XmlMapper xmlMapper = (XmlMapper) new XmlMapper().registerModule(module);
+        File file = new File(ffv.getPath());
+
+        try (InputStream validationInputStream = new FileInputStream(file)) {
+            validateFilterXML(validationInputStream);
+        }
+
+        String importedFilter;
+        try (InputStream xmlInputStream = new FileInputStream(file)) {
+            importedFilter = InputStreamToString.inputStreamToString(xmlInputStream);
+        }
+
+        SimpleModule module = new SimpleModule()
+                .addDeserializer(Object.class, FilterDeserializer.getInstance());
+
+        XmlMapper xmlMapper = XmlMapper.builder()
+                .addModule(module)
+                .build();
+
         return xmlMapper.readValue(importedFilter, FilterImportExportList.class);
     }
 
     @Transactional
     protected FileFieldValue createXML(FilterImportExportList filters) throws IOException {
-        String filePath = fileStorageConfiguration.getPath() + "/filterExport/" + userService.getLoggedUser().getStringId() + "/" + filterProperties.getExport().getFileName();
+        String filePath = Path.of(
+                fileStorageConfiguration.getPath(),
+                "filterExport",
+                userService.getLoggedUser().getStringId(),
+                filterProperties.getExport().getFileName()
+        ).toString();
+
         File f = new File(filePath);
-        f.getParentFile().mkdirs();
+        File parent = f.getParentFile();
 
-        XmlMapper xmlMapper = new XmlMapper();
-        xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
-        xmlMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        xmlMapper.writeValue(baos, filters);
+        if (parent != null && !parent.exists() && !parent.mkdirs()) {
+            throw new IOException("Could not create directory: " + parent.getAbsolutePath());
+        }
 
-        FileOutputStream fos = new FileOutputStream(f);
-        baos.writeTo(fos);
+        XmlMapper xmlMapper = XmlMapper.builder()
+                .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+                .enable(SerializationFeature.INDENT_OUTPUT)
+                .enable(XmlWriteFeature.WRITE_XML_DECLARATION)
+                .changeDefaultPropertyInclusion(inclusion -> inclusion
+                        .withValueInclusion(JsonInclude.Include.NON_EMPTY)
+                        .withContentInclusion(JsonInclude.Include.NON_EMPTY))
+                .build();
+
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             FileOutputStream fos = new FileOutputStream(f)) {
+
+            xmlMapper.writeValue(baos, filters);
+            baos.writeTo(fos);
+        }
 
         return new FileFieldValue(filterProperties.getExport().getFileName(), filePath);
     }
@@ -397,6 +429,4 @@ public class FilterImportExportService implements IFilterImportExportService {
         }
     }
 }
-
-
 

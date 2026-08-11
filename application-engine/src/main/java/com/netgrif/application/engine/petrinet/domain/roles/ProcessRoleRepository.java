@@ -126,7 +126,7 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
         if (parts.length == 2) {
             String networkId = parts[0];
             ObjectId objectId = new ObjectId(parts[1]);
-            return findByNetworkIdAndObjectId(networkId, objectId);
+            return findByNetworkIdentifierAndObjectId(networkId, objectId);
         } else {
             return findByIdObjectId(new ObjectId(compositeId));
         }
@@ -138,9 +138,22 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
      * @param networkId the short process ID
      * @param objectId  the object ID
      * @return an {@link Optional} containing the found {@link ProcessRole}, if any
+     *
+     * @deprecated since 7.0.2, use {@link #findByNetworkIdentifierAndObjectId(String, ObjectId)} instead
      */
+    @Deprecated(since = "7.0.2")
     @Query("{ '_id.shortProcessId': ?0, '_id.objectId': ?1 }")
     Optional<ProcessRole> findByNetworkIdAndObjectId(String networkId, ObjectId objectId);
+
+    /**
+     * Finds a {@link ProcessRole} by a network ID and object ID.
+     *
+     * @param networkIdentifier the short process ID
+     * @param objectId  the object ID
+     * @return an {@link Optional} containing the found {@link ProcessRole}, if any
+     */
+    @Query("{ '_id.shortProcessIdentifier': ?0, '_id.objectId': ?1 }")
+    Optional<ProcessRole> findByNetworkIdentifierAndObjectId(String networkIdentifier, ObjectId objectId);
 
     /**
      * Finds all {@link ProcessRole} entities by a collection of composite resource IDs.

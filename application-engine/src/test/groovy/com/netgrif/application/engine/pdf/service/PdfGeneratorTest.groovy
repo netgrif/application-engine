@@ -5,19 +5,19 @@ import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
+import com.netgrif.application.engine.objects.petrinet.domain.DataGroup
+import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldType
+import com.netgrif.application.engine.objects.workflow.domain.Case
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
 import com.netgrif.application.engine.pdf.generator.config.PdfResourceConfigurationProperties
 import com.netgrif.application.engine.pdf.generator.config.types.PdfPageNumberFormat
 import com.netgrif.application.engine.pdf.generator.domain.PdfField
 import com.netgrif.application.engine.pdf.generator.domain.PdfTextField
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
-import com.netgrif.application.engine.objects.petrinet.domain.DataGroup
-import com.netgrif.application.engine.objects.petrinet.domain.VersionType
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.FieldType
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.objects.workflow.domain.Case
-import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
-import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
 import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
@@ -36,9 +36,7 @@ import org.springframework.core.io.FileUrlResource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-
 import static org.junit.jupiter.api.Assertions.*
-
 
 @SpringBootTest
 @ActiveProfiles(["test"])

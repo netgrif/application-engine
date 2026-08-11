@@ -4,28 +4,48 @@ import com.icegreen.greenmail.configuration.GreenMailConfiguration
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
+import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
+import com.netgrif.application.engine.objects.auth.constants.UserConstants
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
+import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.FileFieldValue
+import com.netgrif.application.engine.objects.workflow.domain.Case
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
+import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
+import com.netgrif.application.engine.startup.runner.FilterRunner
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
+import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
+import jakarta.mail.internet.MimeMessage
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.domain.Pageable
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-import jakarta.mail.internet.MimeMessage
-
-import static java.util.Base64.*
+import static java.util.Base64.getEncoder
 
 @SpringBootTest
 @ActiveProfiles(["test"])
+@TestPropertySource(properties = "netgrif.engine.filter.create-default-filters=true")
 @ExtendWith(SpringExtension.class)
 class ActionDelegateTest {
 
@@ -39,22 +59,67 @@ class ActionDelegateTest {
     private IFilterImportExportService importExportService
 
     @Autowired
+    private FilterRunner filterRunner
+
+    @Autowired
+    private DefaultFiltersRunner defaultFiltersRunner
+
+    @Autowired
     private UserService userService
 
     @Autowired
     private SecurityConfigurationProperties.WebProperties webProperties
 
+    @Autowired
+    private IPetriNetService petriNetService
+
+    @Autowired
+    private IWorkflowService workflowService
+
+    @Autowired
+    private SuperCreatorRunner superCreator
+
+    private AbstractUser systemUser
+
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
+        systemUser = userService.findByEmail(UserConstants.SYSTEM_USER_EMAIL, null)
+        def loggedUser = ActorTransformer.toLoggedUser(systemUser)
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(loggedUser, null, loggedUser.authoritySet as Set<AuthorityImpl>))
+    }
+
+    @AfterEach
+    void after() {
+        SecurityContextHolder.clearContext()
     }
 
     @Test
-    @Disabled("Context user")
     void importFiltersTest(){
+        prepareFilterImportFile()
+
         List<String> actionDelegateList = actionDelegate.importFilters()
-        List<String> importedTasksIds = importExportService.importFilters()
-        assert actionDelegateList.size() == importedTasksIds.size()
+        assert actionDelegateList.size() == 2
+    }
+
+    private void prepareFilterImportFile() {
+        filterRunner.run(null)
+        defaultFiltersRunner.run(null)
+        List<Case> filters = workflowService.search(
+                QCase.case$.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER),
+                Pageable.ofSize(2)
+        ).content
+        assert filters.size() == 2
+
+        FileFieldValue exportedFilters = importExportService.exportFiltersToFile(filters.collect { it.stringId })
+        importExportService.createFilterImport(systemUser)
+        Case importCase = workflowService.searchOne(
+                QCase.case$.processIdentifier.eq(FilterRunner.IMPORT_NET_IDENTIFIER)
+                        .and(QCase.case$.author.id.eq(systemUser.stringId))
+        )
+        assert importCase != null
+        importCase.dataSet.get("upload_file").value = exportedFilters
+        workflowService.save(importCase)
     }
 
     @Test
@@ -113,5 +178,21 @@ class ActionDelegateTest {
         assert actionDelegate.makeUrl(identifier) == url
         assert actionDelegate.makeUrl(webProperties.publicWeb.url, identifier) == url
         assert actionDelegate.makeUrl("test.netgrif.com/public", "identifier") == "test.netgrif.com/public/${getEncoder().encodeToString(identifier.bytes)}"
+    }
+
+    @Test
+    void testAsyncRunAction() {
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                .xmlFile(new FileInputStream("src/test/resources/petriNets/async_run.xml"))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build())
+        assert net.getNet() != null
+        CreateCaseEventOutcome outcome = workflowService.createCase(CreateCaseParams.with()
+                .processId(net.getNet().getStringId())
+                .title("Test title")
+                .author(userService.getLoggedOrSystem())
+                .build())
+        assert outcome.getCase() != null
     }
 }

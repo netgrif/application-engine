@@ -36,8 +36,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
             }
         }
 
-        return Arrays.stream(permissions)
-                .anyMatch(permission -> hasPermission(aggregatePermissions.get(permission.toString())));
+        return checkPermissions(aggregatePermissions, Arrays.stream(permissions).map(RolePermission::toString).toList());
     }
 
     @Override
@@ -62,8 +61,8 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
                 return false;
             }
         }
-        return Arrays.stream(permissions)
-                .anyMatch(permission -> hasPermission(userPermissions.get(permission.toString())));
+
+        return checkPermissions(userPermissions, Arrays.stream(permissions).map(RolePermission::toString).toList());
     }
 
     @Override

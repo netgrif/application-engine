@@ -1,16 +1,15 @@
 package com.netgrif.application.engine.event
 
-import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser
+import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
+import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId
+import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -72,7 +71,7 @@ class GroovyShellFactoryTest {
     void roleActionsTest() {
         roleService.metaClass.groovyShellTestMethod = { String string, I18nString i18nString -> println("groovyShellTestMethod") }
 
-        def user = userService.findUserByUsername(userService.getSystem().getEmail(), null)
+        def user = userService.findUserByUsername(userService.getSystem().getUsername(), null)
         def processRoleCount = user.get().processRoles.size()
         def roles = roleService.findAllByNetStringId(net.getStringId())
         assert roles.size() == 1
@@ -81,7 +80,7 @@ class GroovyShellFactoryTest {
                 new HashSet<ProcessResourceId>(roles.collect { it._id } + user.get().processRoles.collect { it._id }),
                 new LoggedUserImpl(new ObjectId(), null, "a", "a", "", "b", "test@mail.com", "", null, null, null, null)
         )
-        user = userService.findUserByUsername(userService.getSystem().getEmail(), null)
+        user = userService.findUserByUsername(userService.getSystem().getUsername(), null)
         assert user.get().processRoles.size() == processRoleCount + 1
     }
 

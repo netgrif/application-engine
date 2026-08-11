@@ -2,33 +2,32 @@ package com.netgrif.application.engine.auth
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser
+import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
+import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
+import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.objects.auth.domain.PasswordCredential
-import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
-import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
+import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.security.service.ISecurityContextService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-import java.util.stream.Collectors;
+import java.util.stream.Collectors
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -67,7 +66,7 @@ class SecurityContextTest {
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
-        user = new User()
+        user = new com.netgrif.application.engine.adapter.spring.auth.domain.User()
         user.setUsername('test@email.com')
         user.setEmail('test@email.com')
         user.setCredential("password", new PasswordCredential('password', 0, true))

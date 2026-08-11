@@ -3,11 +3,13 @@ package com.netgrif.application.engine;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
-import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.mail.EmailType;
 import com.netgrif.application.engine.mail.domain.MailDraft;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
+import com.netgrif.application.engine.objects.auth.domain.User;
 import freemarker.template.TemplateException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,8 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -45,7 +45,7 @@ public class MailSenderServiceTest {
 
     @Test
     public void testSend() throws Exception {
-        User user = new User();
+        User user = new com.netgrif.application.engine.adapter.spring.auth.domain.User();
         user.setUsername(RECIPIENT);
         user.setEmail(RECIPIENT);
         user.setPassword("");

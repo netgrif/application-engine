@@ -1,51 +1,175 @@
 package com.netgrif.application.engine.event;
 
+import com.netgrif.application.engine.configuration.properties.ActionsProperties;
 import groovy.lang.GroovyShell;
+import lombok.extern.slf4j.Slf4j;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
+import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class GroovyShellFactory implements IGroovyShellFactory {
+
+    private static final List<String> ACTION_IMPORT_PACKAGES = List.of(
+            "com.netgrif.application.engine.objects.*",
+            "com.netgrif.application.engine.workflow.domain.*",
+            "com.netgrif.application.engine.adapter.spring.*"
+    );
 
     @Autowired
     private CompilerConfiguration configuration;
 
+    @Autowired
+    private ActionsProperties actionsProperties;
+
+    private volatile GroovyShell shell;
+
     @Override
     public GroovyShell getGroovyShell() {
-        ImportCustomizer importCustomizer = new ImportCustomizer();
+        GroovyShell local = shell;
+        if (local == null) {
+            synchronized (this) {
+                local = shell;
+                if (local == null) {
+                    ImportCustomizer importCustomizer = new ImportCustomizer();
 
-        Set<String> classNames = findAllClassesUsingClassLoader("com.netgrif.application.engine.workflow.domain");
-        importCustomizer.addImports(classNames.toArray(new String[0]));
+                    Set<String> classNames = findAllActionImportClasses();
+                    importCustomizer.addImports(classNames.toArray(new String[0]));
 
-        configuration.addCompilationCustomizers(importCustomizer);
+                    configuration.addCompilationCustomizers(importCustomizer);
 
-        return new GroovyShell(this.getClass().getClassLoader(), new groovy.lang.Binding(), this.configuration);
+                    local = new GroovyShell(this.getClass().getClassLoader(), new groovy.lang.Binding(), this.configuration);
+                    shell = local;
+                }
+            }
+        }
+        return local;
     }
 
-    private Set<String> findAllClassesUsingClassLoader(String packageName) {
-        String path = packageName.replace(".", "/");
-        InputStream stream = ClassLoader.getSystemClassLoader().getResourceAsStream(path);
-        if (stream == null) {
-            return Set.of();
+    private Set<String> findAllActionImportClasses() {
+        Set<String> configuredImportNames = actionsProperties.getImports().stream()
+                .map(this::simpleName)
+                .collect(Collectors.toSet());
+
+        Set<Class<?>> classes = ACTION_IMPORT_PACKAGES.stream()
+                .flatMap(packageName -> findAllClassesUsingClassLoader(packageName).stream())
+                .map(this::loadClass)
+                .filter(java.util.Objects::nonNull)
+                .filter(this::isProductionClass)
+                .collect(Collectors.toCollection(HashSet::new));
+
+        return classes.stream()
+                .collect(Collectors.groupingBy(Class::getSimpleName))
+                .entrySet().stream()
+                .filter(entry -> !configuredImportNames.contains(entry.getKey()))
+                .map(entry -> selectActionImport(entry.getValue()))
+                .flatMap(Optional::stream)
+                .map(Class::getName)
+                .collect(Collectors.toSet());
+    }
+
+    private String simpleName(String className) {
+        return className.substring(className.lastIndexOf('.') + 1);
+    }
+
+    private Optional<Class<?>> selectActionImport(List<Class<?>> candidates) {
+        int highestSpecificity = candidates.stream()
+                .mapToInt(candidate -> importSpecificity(candidate, candidates))
+                .max()
+                .orElseThrow();
+
+        List<Class<?>> mostSpecificCandidates = candidates.stream()
+                .filter(candidate -> importSpecificity(candidate, candidates) == highestSpecificity)
+                .toList();
+
+        if (mostSpecificCandidates.size() != 1) {
+            List<String> collidingClassNames = candidates.stream()
+                    .map(Class::getName)
+                    .sorted()
+                    .toList();
+            log.warn("Skipping automatic action import for ambiguous class name [{}]. " +
+                            "Conflicting candidates: {}. Configure an explicit import to resolve the conflict.",
+                    candidates.getFirst().getSimpleName(), collidingClassNames);
+            return Optional.empty();
         }
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
-            return reader.lines()
-                    .filter(line -> line.endsWith(".class"))
-                    .map(line -> packageName + "." + line.substring(0, line.lastIndexOf('.')))
-                    .collect(Collectors.toSet());
+        return Optional.of(mostSpecificCandidates.getFirst());
+    }
+
+    private int importSpecificity(Class<?> candidate, List<Class<?>> candidates) {
+        return (int) candidates.stream()
+                .filter(other -> other != candidate && other.isAssignableFrom(candidate))
+                .count();
+    }
+
+    private Class<?> loadClass(String className) {
+        try {
+            return Class.forName(className, false, getClass().getClassLoader());
+        } catch (ClassNotFoundException | LinkageError e) {
+            log.warn("Skipping discovered action import class [{}] that failed to load", className, e);
+            return null;
+        }
+    }
+
+    private boolean isProductionClass(Class<?> candidate) {
+        return java.util.Objects.equals(
+                codeSourceLocation(candidate),
+                codeSourceLocation(GroovyShellFactory.class)
+        );
+    }
+
+    private URL codeSourceLocation(Class<?> type) {
+        return Optional.ofNullable(type.getProtectionDomain())
+                .map(java.security.ProtectionDomain::getCodeSource)
+                .map(java.security.CodeSource::getLocation)
+                .orElse(null);
+    }
+
+    private Set<String> findAllClassesUsingClassLoader(String packagePattern) {
+        boolean recursive = packagePattern.endsWith(".*");
+        String packageName = recursive
+                ? packagePattern.substring(0, packagePattern.length() - 2)
+                : packagePattern;
+        return findAllClassesUsingClassLoader(packageName, recursive);
+    }
+
+    private Set<String> findAllClassesUsingClassLoader(String packageName, boolean recursive) {
+        String path = packageName.replace(".", "/");
+        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(getClass().getClassLoader());
+        MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(resolver);
+        String classPattern = recursive ? "/**/*.class" : "/*.class";
+
+        try {
+            Resource[] resources = resolver.getResources(
+                    ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + path + classPattern
+            );
+            Set<String> classNames = new HashSet<>();
+            for (Resource resource : resources) {
+                String className = metadataReaderFactory.getMetadataReader(resource)
+                        .getClassMetadata()
+                        .getClassName();
+                if (!className.contains("$") && !className.endsWith("package-info") && !className.endsWith("module-info")) {
+                    classNames.add(className);
+                }
+            }
+            return classNames;
         } catch (IOException e) {
-            e.printStackTrace();
-            return Set.of();
+            throw new IllegalStateException("Failed to discover classes in package " + packageName, e);
         }
     }
 }

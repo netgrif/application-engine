@@ -1,12 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
@@ -44,16 +38,24 @@ import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldsReso
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.localised.LocalisedField;
 import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -70,6 +72,7 @@ import java.util.stream.LongStream;
 public class DataService implements IDataService {
 
     private static final Set<FieldType> setDataForbiddenFieldTypes = Set.of(FieldType.TASK_REF, FieldType.CASE_REF);
+    private static final String CHOICES_ATTRIBUTE = "choices";
 
     @Autowired
     protected ApplicationEventPublisher publisher;
@@ -256,14 +259,14 @@ public class DataService implements IDataService {
     /**
      * Updates the data field's attributes of the provided task.
      *
-     * @param task the task object of which the data are updated
-     * @param values information about how to update the data fields
-     * @param params additional information to be injected to the action delegate context
+     * @param task      the task object of which the data are updated
+     * @param values    information about how to update the data fields
+     * @param params    additional information to be injected to the action delegate context
      * @param runStrict if set to true, additional validations are going to be applied when updating the data fields. If
-     *                set to false, minimal restrictions are considered.
-     *
+     *                  set to false, minimal restrictions are considered.
      * @return outcome containing Case, Task and changes that have been made.
-     * */
+     *
+     */
     @Override
     public SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params, boolean runStrict) {
         Case useCase = workflowService.findOne(task.getCaseId());
@@ -274,8 +277,10 @@ public class DataService implements IDataService {
         if (task.getUserId() != null) {
             task.setUser(userService.findById(task.getUserId(), task.getUserRealmId()));
         }
+
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
-        values.fields().forEachRemaining(entry -> {
+
+        values.propertyStream().forEach(entry -> {
             String fieldId = entry.getKey();
             DataField dataField = useCase.getDataSet().get(fieldId);
             if (dataField == null) {
@@ -294,75 +299,104 @@ public class DataService implements IDataService {
                 }
             }
 
-            Field<?> field = useCase.getPetriNet().getField(fieldId).orElseThrow(() -> new IllegalStateException("Field with id [%s] is missing from process with id [%s]"
-                    .formatted(fieldId, useCase.getPetriNetId())));
+            Field<?> field = useCase.getPetriNet().getField(fieldId).orElseThrow(() ->
+                    new IllegalStateException("Field with id [%s] is missing from process with id [%s]"
+                            .formatted(fieldId, useCase.getPetriNetId()))
+            );
+
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task, params));
+
             if (outcome.getMessage() == null) {
-                if (field.getEvents().containsKey(DataEventType.SET) &&
-                        field.getEvents().get(DataEventType.SET).getMessage() != null) {
+                if (field.getEvents().containsKey(DataEventType.SET)
+                        && field.getEvents().get(DataEventType.SET).getMessage() != null) {
                     outcome.setMessage(field.getEvents().get(DataEventType.SET).getMessage());
                 } else {
-                    Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
+                    Map<String, DataFieldLogic> dataSet = useCase.getPetriNet()
+                            .getTransition(task.getTransitionId())
+                            .getDataSet();
+
                     DataFieldLogic dataRef = dataSet.get(fieldId);
-                    if (dataRef != null && dataRef.getEvents().containsKey(DataEventType.SET)
+                    if (dataRef != null
+                            && dataRef.getEvents().containsKey(DataEventType.SET)
                             && dataRef.getEvents().get(DataEventType.SET).getMessage() != null) {
                         outcome.setMessage(dataRef.getEvents().get(DataEventType.SET).getMessage());
                     }
                 }
             }
+
             boolean modified = false;
             ChangedField changedField = new ChangedField();
             changedField.setId(fieldId);
+
             Object newValue = parseFieldsValues(entry.getValue(), dataField, task.getStringId());
+
             if (entry.getValue().has("value") || getFieldTypeFromNode((ObjectNode) entry.getValue()).equals("button")) {
                 dataField.setValue(newValue);
                 changedField.addAttribute("value", newValue);
                 modified = true;
             }
+
             List<String> allowedNets = parseAllowedNetsValue(entry.getValue());
             if (allowedNets != null) {
                 dataField.setAllowedNets(allowedNets);
                 changedField.addAttribute("allowedNets", allowedNets);
                 modified = true;
             }
+
             String fieldType = getFieldTypeFromNode((ObjectNode) entry.getValue());
+
             Map<String, Object> filterMetadata = parseFilterMetadataValue((ObjectNode) entry.getValue(), fieldType);
             if (filterMetadata != null) {
                 dataField.setFilterMetadata(filterMetadata);
                 changedField.addAttribute("filterMetadata", filterMetadata);
                 modified = true;
             }
+
             Map<String, I18nString> options = parseOptionsNode(entry.getValue(), fieldType);
             if (options != null) {
                 setDataFieldOptions(options, dataField, changedField, fieldType);
                 modified = true;
             }
+
             Set<I18nString> choices = parseChoicesNode((ObjectNode) entry.getValue(), fieldType);
             if (choices != null) {
                 dataField.setChoices(choices);
-                changedField.addAttribute("choices", choices.stream().map(i18nString -> i18nString.getTranslation(LocaleContextHolder.getLocale())).collect(Collectors.toSet()));
+                changedField.addAttribute(
+                        CHOICES_ATTRIBUTE,
+                        choices.stream()
+                                .map(i18nString -> i18nString.getTranslation(LocaleContextHolder.getLocale()))
+                                .collect(Collectors.toSet())
+                );
                 modified = true;
             }
+
             Map<String, String> properties = parseProperties(entry.getValue());
             if (properties != null) {
                 outcome.addOutcome(this.changeComponentProperties(useCase, task, field.getStringId(), properties));
                 modified = true;
             }
+
             if (modified) {
                 dataField.setLastModified(LocalDateTime.now());
             }
+
             if (dataConfigurationProperties.getValidation().isSetDataEnabled()) {
                 validation.valid(field, dataField);
             }
+
             outcome.addChangedField(fieldId, changedField);
+
             workflowService.save(useCase);
             publisher.publishEvent(new SetDataEvent(outcome, EventPhase.PRE, user));
+
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, params));
             applyFieldConnectedChanges(useCase, field);
         });
+
         updateDataset(useCase);
         outcome.setCase(workflowService.save(useCase));
         publisher.publishEvent(new SetDataEvent(outcome));
+
         return outcome;
     }
 
@@ -523,7 +557,7 @@ public class DataService implements IDataService {
     public FileFieldInputStream getFileByTask(String taskId, String fieldId, boolean forPreview) throws FileNotFoundException {
         Task task = taskService.findOne(taskId);
 
-        FileFieldInputStream fileFieldInputStream = getFileByCase(task.getCaseId(), task, fieldId, forPreview);
+        FileFieldInputStream fileFieldInputStream = getFileByCase(task.getCaseId(), fieldId, forPreview);
 
         if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null)
             throw new FileNotFoundException("File in field %s within task %s was not found!".formatted(fieldId, taskId));
@@ -543,10 +577,10 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public FileFieldInputStream getFileByCase(String caseId, Task task, String fieldId, boolean forPreview) throws FileNotFoundException {
+    public FileFieldInputStream getFileByCase(String caseId, String fieldId, boolean forPreview) throws FileNotFoundException {
         Case useCase = workflowService.findOne(caseId);
         FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
-        return getFile(useCase, task, field, forPreview);
+        return getFile(useCase, field, forPreview);
     }
 
     @Override
@@ -584,12 +618,19 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview) throws FileNotFoundException {
-        return getFile(useCase, task, field, forPreview, new HashMap<>());
+    public FileFieldInputStream getFile(Case useCase, FileField field, boolean forPreview) throws FileNotFoundException {
+        return getFile(useCase, field, forPreview, new HashMap<>());
     }
 
     @Override
-    public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview, Map<String, String> params) throws FileNotFoundException {
+    public FileFieldInputStream getFile(String caseId, String fieldId, boolean forPreview, Map<String, String> params) throws FileNotFoundException {
+        Case useCase = workflowService.findOne(caseId);
+        FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
+        return getFile(useCase, field, forPreview, params);
+    }
+
+    @Override
+    public FileFieldInputStream getFile(Case useCase, FileField field, boolean forPreview, Map<String, String> params) throws FileNotFoundException {
         runGetActionsFromFileField(field.getEvents(), useCase, params);
         if (useCase.getFieldValue(field.getStringId()) == null) {
             throw new FileNotFoundException("Field %s not found on case %s".formatted(field.getStringId(), useCase.getStringId()));
@@ -944,14 +985,14 @@ public class DataService implements IDataService {
         Object value;
         switch (getFieldTypeFromNode(node)) {
             case "date":
-                if (node.get("value") == null || node.get("value").isNull()) {
+                if (isEmptyOrNullValueNode(node.get("value"))) {
                     value = null;
                     break;
                 }
                 value = FieldFactory.parseDate(node.get("value").asText());
                 break;
             case "dateTime":
-                if (node.get("value") == null || node.get("value").isNull()) {
+                if (isEmptyOrNullValueNode(node.get("value"))) {
                     value = null;
                     break;
                 }
@@ -961,28 +1002,32 @@ public class DataService implements IDataService {
                 value = !(node.get("value") == null || node.get("value").isNull()) && node.get("value").asBoolean();
                 break;
             case "multichoice":
-                value = parseMultichoiceFieldValues(node).stream().map(I18nString::new).collect(Collectors.toCollection(LinkedHashSet::new));
+                Set<String> multichoiceValues = parseMultichoiceFieldValues(node);
+                value = multichoiceValues == null
+                        ? null
+                        : multichoiceValues.stream().map(I18nString::new).collect(Collectors.toCollection(LinkedHashSet::new));
                 break;
             case "multichoice_map":
                 value = parseMultichoiceFieldValues(node);
                 break;
             case "enumeration":
-                if (node.get("value") == null || node.get("value").asText() == null || "null".equals(node.get("value").asText())) {
+                JsonNode enumerationValueNode = node.get("value");
+                if (isEmptyOrNullValueNode(enumerationValueNode)) {
                     value = null;
                     break;
                 }
-                value = parseI18nString(node.get("value"));
+                value = parseI18nString(enumerationValueNode);
                 break;
             case "user":
             case "actor":
-                if (node.get("value") == null || node.get("value").isNull()) {
+                if (isEmptyOrNullValueNode(node.get("value"))) {
                     value = null;
                     break;
                 }
                 value = makeActorFieldValue(node.get("value").asText());
                 break;
             case "number":
-                if (node.get("value") == null || node.get("value").isNull()) {
+                if (isEmptyOrNullValueNode(node.get("value"))) {
                     value = null;
                     break;
                 }
@@ -1021,7 +1066,7 @@ public class DataService implements IDataService {
                 break;
             case "userList":
             case "actorList":
-                if (node.get("value") == null) {
+                if (isEmptyOrNullValueNode(node.get("value"))) {
                     value = null;
                     break;
                 }
@@ -1058,7 +1103,11 @@ public class DataService implements IDataService {
     }
 
     private Set<String> parseMultichoiceFieldValues(ObjectNode node) {
-        ArrayNode arrayNode = (ArrayNode) node.get("value");
+        JsonNode valueNode = node.get("value");
+        if (isEmptyOrNullValueNode(valueNode)) {
+            return null;
+        }
+        ArrayNode arrayNode = (ArrayNode) valueNode;
         HashSet<String> set = new LinkedHashSet<>();
         arrayNode.forEach(item -> set.add(item.asText()));
         return set;
@@ -1105,10 +1154,11 @@ public class DataService implements IDataService {
     }
 
     private List<String> parseListString(ObjectNode node, String attributeKey) {
-        ArrayNode arrayNode = (ArrayNode) node.get(attributeKey);
-        if (arrayNode == null) {
+        JsonNode valueNode = node.get(attributeKey);
+        if (isEmptyOrNullValueNode(valueNode)) {
             return null;
         }
+        ArrayNode arrayNode = (ArrayNode) valueNode;
         ArrayList<String> list = new ArrayList<>();
         arrayNode.forEach(string -> list.add(string.asText()));
         return list;
@@ -1127,10 +1177,24 @@ public class DataService implements IDataService {
     }
 
     private I18nString parseI18nString(JsonNode node) {
+        if (isNullValueNode(node)) {
+            return null;
+        }
         if (node.isTextual()) {
             return new I18nString(node.asText());
         }
+        if (!node.isObject()) {
+            return new I18nString(node.asText());
+        }
         return parseI18nStringValues((ObjectNode) node);
+    }
+
+    private boolean isNullValueNode(JsonNode node) {
+        return node == null || node.isNull() || (node.isTextual() && "null".equalsIgnoreCase(node.asText()));
+    }
+
+    private boolean isEmptyOrNullValueNode(JsonNode node) {
+        return isNullValueNode(node) || (node.isTextual() && node.asText().isBlank());
     }
 
     private String getFieldTypeFromNode(ObjectNode node) {
@@ -1151,19 +1215,32 @@ public class DataService implements IDataService {
     }
 
     private I18nString parseI18nStringValues(ObjectNode node) {
-        String defaultValue = node.get("defaultValue") != null ? node.get("defaultValue").asText() : "";
+        String defaultValue = node.get("defaultValue") != null
+                ? node.get("defaultValue").asText()
+                : "";
+
         Map<String, String> translations = new HashMap<>();
-        if (node.get("translations") != null) {
-            node.get("translations").fields().forEachRemaining(entry ->
+
+        JsonNode translationsNode = node.get("translations");
+        if (translationsNode != null && translationsNode.isObject()) {
+            ((ObjectNode) translationsNode).properties().forEach(entry ->
                     translations.put(entry.getKey(), entry.getValue().asText())
             );
         }
-        return new I18nString(defaultValue, translations);
+
+        I18nString value = new I18nString(defaultValue, translations);
+        JsonNode keyNode = node.get("key");
+        if (keyNode != null && !keyNode.isNull()) {
+            value.setKey(keyNode.asText());
+        }
+        return value;
     }
 
     private Map<String, I18nString> parseOptionsNode(JsonNode node, String fieldType) {
-        if (Objects.equals(fieldType, FieldType.ENUMERATION_MAP.getName()) || Objects.equals(fieldType, FieldType.MULTICHOICE_MAP.getName()) ||
-                Objects.equals(fieldType, FieldType.ENUMERATION.getName()) || Objects.equals(fieldType, FieldType.MULTICHOICE.getName())) {
+        if (Objects.equals(fieldType, FieldType.ENUMERATION_MAP.getName())
+                || Objects.equals(fieldType, FieldType.MULTICHOICE_MAP.getName())
+                || Objects.equals(fieldType, FieldType.ENUMERATION.getName())
+                || Objects.equals(fieldType, FieldType.MULTICHOICE.getName())) {
             return parseOptions(node);
         }
         return null;
@@ -1171,18 +1248,30 @@ public class DataService implements IDataService {
 
     private Map<String, I18nString> parseOptions(JsonNode node) {
         JsonNode optionsNode = node.get("options");
-        if (optionsNode == null) {
+        if (optionsNode == null || optionsNode.isNull()) {
             return null;
         }
-        ObjectMapper mapper = new ObjectMapper();
+
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(I18nString.class, new com.netgrif.application.engine.objects.petrinet.domain.I18nStringDeserializer());
-        mapper.registerModule(module);
-        Map<String, I18nString> optionsMapped = mapper.convertValue(optionsNode, new TypeReference<>() {
-        });
-        if (optionsMapped.isEmpty()) {
+        module.addDeserializer(
+                I18nString.class,
+                new com.netgrif.application.engine.objects.petrinet.domain.I18nStringDeserializer()
+        );
+
+        ObjectMapper mapper = JsonMapper.builder()
+                .addModule(module)
+                .build();
+
+        Map<String, I18nString> optionsMapped = mapper.convertValue(
+                optionsNode,
+                new TypeReference<Map<String, I18nString>>() {
+                }
+        );
+
+        if (optionsMapped == null) {
             return null;
         }
+
         return optionsMapped;
     }
 
@@ -1197,7 +1286,7 @@ public class DataService implements IDataService {
             Set<I18nString> choices = new LinkedHashSet<>();
             options.forEach((key, value) -> choices.add(value));
             dataField.setChoices(choices);
-            changedField.addAttribute("choices", choices
+            changedField.addAttribute(CHOICES_ATTRIBUTE, choices
                     .stream()
                     .map(i18nString -> i18nString
                             .getTranslation(LocaleContextHolder.getLocale())).collect(Collectors.toSet()));
@@ -1206,7 +1295,7 @@ public class DataService implements IDataService {
 
     private Set<I18nString> parseChoicesNode(ObjectNode node, String fieldType) {
         if (Objects.equals(fieldType, FieldType.ENUMERATION.getName()) || Objects.equals(fieldType, FieldType.MULTICHOICE.getName())) {
-            List<I18nString> list = parseListI18nString(node, "choices");
+            List<I18nString> list = parseListI18nString(node, CHOICES_ATTRIBUTE);
             if (list != null) {
                 return new HashSet<>(list);
             }

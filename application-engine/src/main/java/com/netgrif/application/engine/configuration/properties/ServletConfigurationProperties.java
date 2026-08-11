@@ -30,6 +30,6 @@ public class ServletConfigurationProperties {
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     @ConfigurationProperties(prefix = "netgrif.engine.servlet.multipart")
-    public static class MultipartProperties extends org.springframework.boot.autoconfigure.web.servlet.MultipartProperties {
+    public static class MultipartProperties extends org.springframework.boot.servlet.autoconfigure.MultipartProperties {
     }
 }

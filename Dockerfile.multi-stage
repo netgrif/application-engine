@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 # fetch dependencies
 FROM maven:3.9-eclipse-temurin-21 AS deps
 LABEL authors="Netgrif <devops@netgrif.com>"
@@ -23,24 +25,43 @@ COPY nae-spring-core-adapter/src /nae/nae-spring-core-adapter/src
 COPY nae-user-common/src /nae/nae-user-common/src
 COPY nae-user-ce/src /nae/nae-user-ce/src
 COPY application-engine/src /nae/application-engine/src
-RUN mvn -B -e -DskipTests -P docker-build clean package install
+RUN mvn -B -e -DskipTests -P docker-build clean install
 
 
 # prepare runtime
-FROM eclipse-temurin:21-jdk
-LABEL authors="Netgrif <devops@netgrif.com>"
-LABEL org.opencontainers.image.authors="NETGRIF <devops@netgrif.com>"
-LABEL org.opencontainers.image.title="Netgrif Application Engine"
-LABEL org.opencontainers.image.url="https://platform.netgrif.cloud"
-LABEL org.opencontainers.image.documentation="https://platform.netgrif.cloud/docs"
-LABEL org.opencontainers.image.vendor="NETGRIF"
+FROM eclipse-temurin:21-jre-jammy
 
-RUN mkdir -p /opt/netgrif/engine/modules && useradd -M netgrif
-COPY --from=build /nae/application-engine/target/app-exec.jar /opt/netgrif/engine/app.jar
-COPY --from=build /nae/application-engine/src/main/resources /opt/netgrif/engine/src/main/resources
-RUN chown -R netgrif /opt/netgrif/engine
+ARG VERSION="7.0.2"
 
-USER netgrif
+LABEL authors="Netgrif <devops@netgrif.com>" \
+      org.opencontainers.image.authors="NETGRIF <devops@netgrif.com>" \
+      org.opencontainers.image.documentation="https://platform.netgrif.cloud/docs" \
+      org.opencontainers.image.title="Netgrif Application Engine" \
+      org.opencontainers.image.url="https://platform.netgrif.cloud" \
+      org.opencontainers.image.vendor="NETGRIF" \
+      org.opencontainers.image.version="${VERSION}"
+
+ARG NETGRIF_UID=10001
+ARG NETGRIF_GID=10001
+
 WORKDIR /opt/netgrif/engine
+
+RUN groupadd --gid "${NETGRIF_GID}" netgrif \
+    && useradd --uid "${NETGRIF_UID}" --gid netgrif --home-dir /nonexistent --no-create-home --shell /usr/sbin/nologin netgrif \
+    && install -d -o netgrif -g netgrif -m 0750 \
+        /opt/netgrif/engine/modules \
+        /opt/netgrif/engine/storage \
+        /opt/netgrif/engine/log
+
+COPY --from=build --chown=0:0 --chmod=0444 /nae/application-engine/target/app-exec.jar app.jar
+COPY --from=build --chown=0:0 /nae/application-engine/src/main/resources src/main/resources
+
+RUN find src/main/resources -type d -exec chmod 0555 {} + \
+    && find src/main/resources -type f -exec chmod 0444 {} +
+
+USER ${NETGRIF_UID}:${NETGRIF_GID}
+
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","-Dfile.encoding=UTF-8","app.jar"]
+STOPSIGNAL SIGTERM
+
+ENTRYPOINT ["java", "-Dfile.encoding=UTF-8", "-jar", "app.jar"]

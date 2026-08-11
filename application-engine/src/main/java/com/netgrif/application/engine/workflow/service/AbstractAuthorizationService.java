@@ -2,13 +2,18 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class AbstractAuthorizationService {
+
+    protected Boolean checkPermissions(Map<String, Boolean> providedPermissions, List<String> requiredPermissions) {
+        if (requiredPermissions.stream().allMatch(permission -> providedPermissions.get(permission) == null)) {
+            return null;
+        }
+        return requiredPermissions.stream()
+                .anyMatch(permission -> hasPermission(providedPermissions.get(permission)));
+    }
 
     protected boolean hasPermission(Boolean permissionValue) {
         return permissionValue != null && permissionValue;

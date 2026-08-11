@@ -4,13 +4,8 @@ import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleN
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleNotGlobalException;
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleReferencedException;
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
-import com.netgrif.application.engine.auth.service.GroupService;
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.auth.service.RealmService;
-import com.netgrif.application.engine.objects.auth.domain.Group;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.objects.auth.domain.Realm;
+import com.netgrif.application.engine.auth.service.*;
+import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.event.events.user.UserRoleChangeEvent;
 import com.netgrif.application.engine.objects.importer.model.EventPhaseType;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
@@ -23,8 +18,8 @@ import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepos
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
+import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.Getter;
@@ -121,30 +116,29 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     @Override
     public void assignRolesToUser(AbstractUser user, Collection<ProcessResourceId> processResourceIds, LoggedUser loggedUser) {
-        assignRolesToActor(user.getProcessRoles(), processResourceIds);
+        assignRolesToActor(user, processResourceIds);
         saveUserAndReloadContext(user, loggedUser);
     }
 
     @Override
     public void assignRolesToGroup(Group group, Collection<ProcessResourceId> requestedRolesIds) {
-        assignRolesToActor(group.getProcessRoles(), requestedRolesIds);
+        assignRolesToActor(group, requestedRolesIds);
         groupService.save(group);
     }
 
-    protected void assignRolesToActor(Collection<ProcessRole> oldActorRoles, Collection<ProcessResourceId> requestedRolesIds) {
+    protected void assignRolesToActor(AbstractActor abstractActor, Collection<ProcessResourceId> requestedRolesIds) {
         List<ProcessRole> requestedRoles = this.findByIds(requestedRolesIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet()));
         if (requestedRoles.isEmpty() && !requestedRolesIds.isEmpty())
             throw new IllegalArgumentException("No process roles found.");
         if (requestedRoles.size() != requestedRolesIds.size())
             throw new IllegalArgumentException("Not all process roles were found!");
 
-        Set<ProcessRole> userOldRoles = new HashSet<>(oldActorRoles);
+        Set<ProcessRole> userOldRoles = new HashSet<>(abstractActor.getProcessRoles());
         Set<ProcessRole> rolesNewToUser = getRolesNewToActor(userOldRoles, requestedRoles);
         Set<ProcessRole> rolesRemovedFromUser = getRolesRemovedFromActor(userOldRoles, requestedRoles);
 
-
-        oldActorRoles.clear();
-        oldActorRoles.addAll(updateRequestedRoles(userOldRoles, rolesNewToUser, rolesRemovedFromUser));
+        abstractActor.clearProcessRoles();
+        abstractActor.addAllProcessRoles(updateRequestedRoles(userOldRoles, rolesNewToUser, rolesRemovedFromUser));
     }
 
     protected void saveUserAndReloadContext(AbstractUser user, LoggedUser loggedUser) {
@@ -416,8 +410,37 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
                 .collect(Collectors.toList());
         Set<String> deletedRoleStringIds = deletedRoleIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet());
 
-        deleteRolesOfNetFromUser(net, deletedRoleIds, deletedRoleStringIds, loggedUser);
-        deleteRolesOfNetFromGroup(net, deletedRoleIds, deletedRoleStringIds);
+        Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Pageable usersPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+
+        Page<Realm> realms;
+        do {
+            realms = realmService.getSmallRealm(realmPageable);
+
+            realms.forEach(realm -> {
+                Page<AbstractUser> users;
+                users = this.userService.findAllByProcessRoles(new HashSet<>(deletedRoleIds), realm.getName(), usersPageable);
+                while (users.hasContent()) {
+                    for (AbstractUser user : users) {
+                        log.info("[{}]: Removing deleted roles of Petri net {} version {} from user {} with id {}",
+                                net.getStringId(), net.getIdentifier(), net.getVersion().toString(), user.getFullName(), user.getStringId());
+
+                        if (user.getProcessRoles().isEmpty()) {
+                            continue;
+                        }
+
+                        Set<ProcessResourceId> newRoles = user.getProcessRoles().stream()
+                                .filter(role -> !deletedRoleStringIds.contains(role.getStringId()))
+                                .map(ProcessRole::get_id)
+                                .collect(Collectors.toSet());
+                        this.assignRolesToUser(user, newRoles, loggedUser);
+                    }
+                    users = this.userService.findAllByProcessRoles(new HashSet<>(deletedRoleIds), realm.getName(), usersPageable);
+                }
+            });
+
+            realmPageable = realmPageable.next();
+        } while (realms.hasNext());
 
         log.info("[{}]: Deleting all roles of Petri net {} version {}", net.getStringId(), net.getIdentifier(),
                 net.getVersion().toString());

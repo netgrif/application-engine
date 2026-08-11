@@ -16,8 +16,8 @@ import com.netgrif.application.engine.impersonation.service.interfaces.IImperson
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationSessionService;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
+import com.netgrif.application.engine.security.service.ISecurityContextService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;

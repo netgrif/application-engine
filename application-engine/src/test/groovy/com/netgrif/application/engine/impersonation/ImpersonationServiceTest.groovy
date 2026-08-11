@@ -10,13 +10,12 @@ import com.netgrif.application.engine.impersonation.service.interfaces.IImperson
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
-
 import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
-import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorListFieldValue
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.UserFieldValue
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.objects.workflow.domain.Task
@@ -131,21 +130,21 @@ class ImpersonationServiceTest {
         def authorityAnon = authorityService.getOrCreate(Authority.anonymous)
         def authorityAdmin = authorityService.getOrCreate(Authority.admin)
 
-        user1 = helper.createUser(new User(firstName: "Test", lastName: "User", email: "test@netgrif.com", "username": "test@netgrif.com", password: "password", state: UserState.ACTIVE),
+        user1 = helper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Test", lastName: "User", email: "test@netgrif.com", "username": "test@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority] as Authority[],
                 [] as ProcessRole[])
 
         auth1 = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(user1), (user1 as User).password, user1.authoritySet as List<GrantedAuthority>)
         auth1.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        user2 = helper.createUser(new User(firstName: "Test", lastName: "User2", email: "test2@netgrif.com", "username": "test2@netgrif.com", password: "password", state: UserState.ACTIVE),
+        user2 = helper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Test", lastName: "User2", email: "test2@netgrif.com", "username": "test2@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority, authorityAnon] as Authority[],
                 testNet.roles.values() as ProcessRole[])
 
         auth2 = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(user2), (user2 as User).password, user2.authoritySet as List<GrantedAuthority>)
         auth2.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        adminUser = helper.createUser(new User(firstName: "Admin", lastName: "User", email: "admin@netgrif.com", "username": "admin@netgrif.com", password: "password", state: UserState.ACTIVE),
+        adminUser = helper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Admin", lastName: "User", email: "admin@netgrif.com", "username": "admin@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority, authorityAdmin] as Authority[],
                 testNet.roles.values() as ProcessRole[])
 
@@ -255,7 +254,6 @@ class ImpersonationServiceTest {
 
 
     @Test
-    @Disabled("Disabled until user refactor is merged in v7.0.0")
     void testAuthMe() {
         def config = setup()
         def result = mvc.perform(get("/api/auth/login")

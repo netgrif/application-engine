@@ -29,12 +29,16 @@ netgrif:
             password: password
     swagger:
       enabled: true
+    server:
+      port: 0
     security:
-      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/v3/api-docs,/v3/api-docs/**,/swagger-ui.html,/swagger-ui/**,/api/public/**,/manage/**
+      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/v3/api-docs,/v3/api-docs/**,/swagger-ui.html,/swagger-ui/**,/api/public/**,/manage/health
       limits:
         login-attempts: 3
         login-timeout: 3
         login-timeout-unit: seconds
+      auth:
+        admin-password: password
       web:
         public-web:
           url: test.public.url

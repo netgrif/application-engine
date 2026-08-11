@@ -1,22 +1,22 @@
 package com.netgrif.application.engine.auth
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.auth.domain.User
 import com.netgrif.application.engine.auth.service.GroupService
+import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
-import com.netgrif.application.engine.objects.auth.domain.User
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState
-import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.objects.workflow.domain.Case
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.petrinet.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.objects.workflow.domain.Case
-import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAuthorizationService
@@ -24,20 +24,22 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
 import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -124,6 +126,11 @@ class WorkflowAuthorizationServiceTest {
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
+        mvc = MockMvcBuilders
+                .webAppContextSetup(wac)
+                .apply(springSecurity())
+                .build()
+
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(ImportPetriNetParams.with()
                 .xmlFile(new FileInputStream("src/test/resources/workflow_authorization_service_test.xml"))
                 .releaseType(VersionType.MAJOR)
@@ -140,16 +147,25 @@ class WorkflowAuthorizationServiceTest {
         assert netWithUserRefs.getNet() != null
         this.netWithUserRefs = netWithUserRefs.getNet()
 
-        def auths = importHelper.createAuthorities(["user": Authority.user])
-        testUser = importHelper.createUser(new User(firstName: "Role", lastName: "User", username: USER_EMAIL, email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")]as Authority[],
+        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+        testUser = importHelper.createUser(new User(firstName: "Role", lastName: "User", username: USER_EMAIL, email: USER_EMAIL, password: "password", state: UserState.ACTIVE),                [auths.get("user")]as Authority[],
 //                [org] as Group[],
                 [] as ProcessRole[])
+        AbstractUser adminUser = importHelper.createUser(new User(firstName: "Admin", lastName: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
+                [auths.get("admin")] as Authority[],
+                [] as ProcessRole[])
+        userAuth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(testUser), "password", testUser.authoritySet as List)
+        adminAuth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(adminUser), "password", adminUser.authoritySet as List)
     }
 
     @Test
-    @Disabled
     void testDeleteCase() {
+        ProcessRole positiveCreateRole = this.net.getRoles().values().find(v -> v.getImportId() == "create_pos_role")
+        ProcessRole positiveDeleteRole = this.net.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
+        testUser = userService.addRole(testUser, positiveCreateRole.getStringId())
+        testUser = userService.addRole(testUser, positiveDeleteRole.getStringId())
+        userAuth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(testUser), "password", testUser.authoritySet as List)
+
         def body = JsonOutput.toJson([
                 title: "test case",
                 netId: this.net.stringId,
@@ -163,7 +179,7 @@ class WorkflowAuthorizationServiceTest {
                 .andExpect(status().isOk())
                 .andReturn()
         def response = parseResult(result)
-        String userCaseId1 = response.outcome.aCase.id
+        String userCaseId1 = createdCaseId(response)
 
         result = mvc.perform(post(CREATE_CASE_URL)
                 .content(body)
@@ -172,7 +188,7 @@ class WorkflowAuthorizationServiceTest {
                 .andExpect(status().isOk())
                 .andReturn()
         response = parseResult(result)
-        String userCaseId2 = response.outcome.aCase.id
+        String userCaseId2 = createdCaseId(response)
 
         result = mvc.perform(post(CREATE_CASE_URL)
                 .content(body)
@@ -181,7 +197,7 @@ class WorkflowAuthorizationServiceTest {
                 .andExpect(status().isOk())
                 .andReturn()
         response = parseResult(result)
-        String otherUserCaseId = response.outcome.aCase.id
+        String otherUserCaseId = createdCaseId(response)
 
         /* TODO: momentalne vracia 200 OK, ma User vediet zmazat case ktory vytvoril Admin?
         mvc.perform(delete(DELETE_CASE_URL + otherUserCaseId)
@@ -311,8 +327,62 @@ class WorkflowAuthorizationServiceTest {
         userService.removeRole(testUser, negDeleteRole.getStringId())
     }
 
+    @Test
+    void testCanCallDeleteWithRoleDeleteTrueAndActorRefDeleteUndefined() {
+        ProcessRole positiveDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
+        userService.addRole(testUser, positiveDeleteRole.getStringId())
+        Case case_ = workflowService.createCase(CreateCaseParams.with()
+                .process(netWithUserRefs)
+                .title("Test delete")
+                .color("")
+                .author(ActorTransformer.toLoggedUser(testUser))
+                .build()).getCase()
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_actor_list": [
+                        "value": [testUser.stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        assert workflowAuthorizationService.canCallDelete(ActorTransformer.toLoggedUser(testUser), case_.getStringId())
+    }
+
+    @Test
+    void testCanCallDeleteWithRoleDeleteUndefinedAndActorRefDeleteTrue() {
+        ProcessRole positiveViewRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "view_pos_role")
+        userService.addRole(testUser, positiveViewRole.getStringId())
+        Case case_ = workflowService.createCase(CreateCaseParams.with()
+                .process(netWithUserRefs)
+                .title("Test delete")
+                .color("")
+                .author(ActorTransformer.toLoggedUser(testUser))
+                .build()).getCase()
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "pos_user_list": [
+                        "value": [testUser.stringId],
+                        "type": "actorList"
+                ]
+        ] as Map)).getCase()
+        assert workflowAuthorizationService.canCallDelete(ActorTransformer.toLoggedUser(testUser), case_.getStringId())
+    }
+
     @SuppressWarnings("GrMethodMayBeStatic")
     private def parseResult(MvcResult result) {
         return (new JsonSlurper()).parseText(result.response.contentAsString)
+    }
+
+    private static String createdCaseId(def response) {
+        def outcome = response.outcome
+        def aCase = outcome?.get("acase") ?: outcome?.get("aCase") ?: outcome?.get("case")
+        if (aCase?.stringId) {
+            return aCase.stringId
+        }
+        if (aCase?.id) {
+            return aCase.id
+        }
+        def matcher = (response.success as String) =~ /Case with id (.+) was created/
+        assert matcher.find() : "Create case response did not contain a case id: ${response}"
+        return matcher.group(1)
     }
 }

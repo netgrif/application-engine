@@ -257,6 +257,8 @@ public interface IPetriNetService {
      */
     void evictAllCaches();
 
+    void evictCache(String id, String identifier, String version);
+
     /**
      * Evicts the cache for the given {@link PetriNet}.
      *
