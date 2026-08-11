@@ -7,6 +7,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IRegistrationServi
 import com.netgrif.application.engine.auth.web.requestbodies.ChangePasswordRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
+import com.netgrif.application.engine.auth.web.responsebodies.UserDto;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
@@ -312,8 +313,8 @@ class AuthenticationControllerTest {
 
     @Test
     void loginUsesSecurityContextAuthentication() {
-        com.netgrif.application.engine.auth.web.responsebodies.User responseUser =
-                org.mockito.Mockito.mock(com.netgrif.application.engine.auth.web.responsebodies.User.class);
+        UserDto responseUser =
+                org.mockito.Mockito.mock(UserDto.class);
         when(loggedUser.getStringId()).thenReturn("self");
         when(userService.findById("self", null)).thenReturn(user);
         when(userFactory.getUser(user, Locale.ENGLISH)).thenReturn(responseUser);
