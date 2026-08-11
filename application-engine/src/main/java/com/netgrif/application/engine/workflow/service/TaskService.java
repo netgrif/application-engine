@@ -886,6 +886,7 @@ public class TaskService implements ITaskService {
         final Task task = com.netgrif.application.engine.adapter.spring.workflow.domain.Task.with()
                 .title(transition.getTitle())
                 .processId(useCase.getPetriNetId())
+                .processIdentifier(useCase.getProcessIdentifier())
                 .caseId(useCase.get_id().toString())
                 .transitionId(transition.getImportId())
                 .layout(transition.getLayout())

@@ -34,11 +34,17 @@ public abstract class Task implements Serializable {
     @Serial
     private static final long serialVersionUID = -7112277728921547546L;
 
+    @Setter
     private ProcessResourceId _id;
 
+    @Setter
     @Getter
     @Indexed
     private String processId;
+
+    @Getter
+    @Indexed
+    private String processIdentifier;
 
     @Getter
     @Setter
@@ -169,8 +175,8 @@ public abstract class Task implements Serializable {
     private Map<String, String> tags = new HashMap<>();
 
     public Task() {
-        if (this.processId != null && !this.processId.isEmpty()) {
-            this._id = new ProcessResourceId(new ObjectId(this.processId));
+        if (this.processIdentifier != null && !this.processIdentifier.isEmpty()) {
+            this._id = new ProcessResourceId(this.processIdentifier, new ObjectId());
         }
     }
 
@@ -179,17 +185,17 @@ public abstract class Task implements Serializable {
         return _id;
     }
 
-    public void setProcessId(String processId) {
-        this.processId = processId;
-        if (processId != null && !processId.isEmpty()) {
-            this._id = new ProcessResourceId(new ObjectId(processId));
+    public void setProcessIdentifier(String processIdentifier) {
+        this.processIdentifier = processIdentifier;
+        if (processIdentifier != null && !processIdentifier.isEmpty()) {
+            this._id = new ProcessResourceId(processIdentifier, new ObjectId());
         }
     }
 
     public ProcessResourceId get_id() {
         if (this._id == null) {
-            this._id = this.processId != null && !this.processId.isEmpty()
-                    ? new ProcessResourceId(new ObjectId(this.processId))
+            this._id = this.processIdentifier != null && !this.processIdentifier.isEmpty()
+                    ? new ProcessResourceId(this.processIdentifier, new ObjectId())
                     : new ProcessResourceId();
         }
         return this._id;

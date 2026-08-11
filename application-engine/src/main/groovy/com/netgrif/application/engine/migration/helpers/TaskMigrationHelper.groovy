@@ -15,6 +15,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.querydsl.core.types.Predicate
 import groovy.util.logging.Slf4j
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
@@ -70,7 +71,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
      *
      * @param mongoTemplate the {@link MongoTemplate} to use for interacting with MongoDB
      */
-    TaskMigrationHelper(MongoTemplate mongoTemplate,
+    TaskMigrationHelper(@Qualifier("mongoTemplate") MongoTemplate mongoTemplate,
                         MigrationProperties migrationProperties,
                         IPetriNetService petriNetService,
                         ITaskService taskService,
@@ -268,6 +269,7 @@ class TaskMigrationHelper extends AbstractMigrationHelper<Task> {
             Task oldTask = taskService.findOne(taskPair.task)
             log.trace("Updating task roles and permissions for task: ${oldTask.stringId}")
             oldTask.setProcessId(net.stringId)
+            oldTask.setProcessIdentifier(net.identifier)
             oldTask.setRoles(newTransition.roles)
             oldTask.setNegativeViewRoles(newTransition.negativeViewRoles)
             oldTask.resolveViewRoles()

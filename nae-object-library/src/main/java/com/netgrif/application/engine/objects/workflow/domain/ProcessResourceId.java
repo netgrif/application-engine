@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.objects.workflow.domain;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 
 import java.io.Serial;
@@ -10,6 +11,7 @@ import java.util.Date;
 import java.util.Objects;
 
 @Getter
+@Setter
 public final class ProcessResourceId implements Comparable<ProcessResourceId>, Serializable {
 
     @Serial
@@ -23,39 +25,38 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
     // todo add example values to javadoc
 
     private ObjectId objectId;
+
+    private String shortProcessIdentifier;
+
+    @Deprecated(since = "7.0.0", forRemoval = true)
     private String shortProcessId;
 
     public ProcessResourceId() {
         this.objectId = new ObjectId();
-        this.shortProcessId = NONE_SHORT_ID_VALUE;
+        this.shortProcessIdentifier = NONE_SHORT_ID_VALUE;
     }
 
-    public ProcessResourceId(ObjectId processId) {
-        this.objectId = new ObjectId();
-        this.shortProcessId = generateShortProcessId(processId.toString());
-    }
-
-    public ProcessResourceId(String processId, String objectId) {
+    public ProcessResourceId(String processIdentifier, String objectId) {
         this.objectId = new ObjectId(objectId);
-        this.shortProcessId = generateShortProcessId(processId);
+        this.shortProcessIdentifier = generateShortProcessIdentifier(processIdentifier);
     }
 
-    public ProcessResourceId(String processId, ObjectId objectId) {
+    public ProcessResourceId(String processIdentifier, ObjectId objectId) {
         this.objectId = objectId;
-        this.shortProcessId = generateShortProcessId(processId);
+        this.shortProcessIdentifier = generateShortProcessIdentifier(processIdentifier);
     }
 
     public ProcessResourceId(String compositeId) {
-        String[] parts = compositeId.split("-");
+        String[] parts = compositeId.split(ID_SEPARATOR);
         if (parts.length != 2) {
             throw new IllegalArgumentException("Invalid composite ID format: " + compositeId);
         }
-        this.shortProcessId = parts[0];
+        this.shortProcessIdentifier = parts[0];
         this.objectId = new ObjectId(parts[1]);
     }
 
     public String getFullId() {
-        return shortProcessId + ID_SEPARATOR + objectId.toHexString();
+        return shortProcessIdentifier + ID_SEPARATOR + objectId.toHexString();
     }
 
     public String getStringId() {
@@ -75,26 +76,6 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
         return getFullId();
     }
 
-    private static String generateShortProcessId(String processId) {
-        if (processId == null || processId.isEmpty()) {
-            return null;
-        }
-        try {
-            BigInteger number = new BigInteger(processId, 16);
-            StringBuilder shortIdBuilder = new StringBuilder();
-
-            while (number.compareTo(BigInteger.ZERO) > 0) {
-                int remainder = number.mod(CHAR_ARRAY_LENGTH).intValue();
-                shortIdBuilder.append(CHAR_ARRAY.charAt(remainder));
-                number = number.divide(CHAR_ARRAY_LENGTH);
-            }
-
-            return shortIdBuilder.reverse().toString();
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid input string for encoding: " + processId, e);
-        }
-    }
-
     public static String decodeShortProcessId(String shortProcessId) {
         if (shortProcessId == null || shortProcessId.isEmpty()) {
             return null;
@@ -111,6 +92,42 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
         return number.toString(16);
     }
 
+    private static String generateShortProcessIdentifier(String processIdentifier) {
+        if (processIdentifier == null || processIdentifier.isEmpty()) {
+            return null;
+        }
+        try {
+            BigInteger number = new BigInteger(1, processIdentifier.getBytes());
+            StringBuilder shortIdBuilder = new StringBuilder();
+
+            while (number.compareTo(BigInteger.ZERO) > 0) {
+                int remainder = number.mod(CHAR_ARRAY_LENGTH).intValue();
+                shortIdBuilder.append(CHAR_ARRAY.charAt(remainder));
+                number = number.divide(CHAR_ARRAY_LENGTH);
+            }
+
+            return shortIdBuilder.reverse().toString();
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid input string for encoding: " + processIdentifier, e);
+        }
+    }
+
+    public static String decodeShortProcessIdentifier(String shortProcessId) {
+        if (shortProcessId == null || shortProcessId.isEmpty()) {
+            return null;
+        }
+        BigInteger number = BigInteger.ZERO;
+        for (char c : shortProcessId.toCharArray()) {
+            number = number.multiply(CHAR_ARRAY_LENGTH);
+            int index = CHAR_ARRAY.indexOf(c);
+            if (index == -1) {
+                throw new IllegalArgumentException("Invalid character in short process ID: " + c);
+            }
+            number = number.add(BigInteger.valueOf(index));
+        }
+        return new String(number.toByteArray());
+    }
+
     @Override
     public int compareTo(ProcessResourceId other) {
         return this.getFullId().compareTo(other.getFullId());
@@ -121,12 +138,12 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ProcessResourceId that = (ProcessResourceId) o;
-        return Objects.equals(objectId, that.objectId) && Objects.equals(shortProcessId, that.shortProcessId);
+        return Objects.equals(objectId, that.objectId) && Objects.equals(shortProcessIdentifier, that.shortProcessIdentifier);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(objectId, shortProcessId);
+        return Objects.hash(objectId, shortProcessIdentifier);
     }
 
 }
