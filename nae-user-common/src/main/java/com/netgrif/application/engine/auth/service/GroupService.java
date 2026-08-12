@@ -241,6 +241,8 @@ public interface GroupService {
      */
     Page<Group> findByQuery(Query query, Pageable pageable);
 
+    Group assignAuthorities(String groupId, Set<String> authorityIds);
+
     /**
      * Assigns an authority to a group.
      *

@@ -351,6 +351,22 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    public Group assignAuthorities(String groupId, Set<String> authorityIds) {
+        Group group = this.findById(groupId);
+        Set<String> currentAuthorityIds = group.getAuthorityIds();
+
+        Set<String> removableAuthorityIds = new HashSet<>(currentAuthorityIds);
+        removableAuthorityIds.removeAll(authorityIds);
+
+        Set<String> newAuthorityIds = new HashSet<>(authorityIds);
+        newAuthorityIds.removeAll(currentAuthorityIds);
+
+        removableAuthorityIds.forEach(toBeRemovedId -> removeAuthority(groupId, toBeRemovedId));
+        newAuthorityIds.forEach(toBeAddedId -> addAuthority(groupId, toBeAddedId));
+        return group;
+    }
+
+    @Override
     public Group addAuthority(String groupId, String authorityId) {
         Group group = findById(groupId);
         Authority authority = authorityService.getOne(authorityId);
@@ -529,20 +545,20 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Page<Group> search(GroupSearchRequestDto searchDto, Pageable pageable) {
         List<Criteria> filters = new ArrayList<>();
-        if (searchDto != null && searchDto.ids() != null) {
-            Criteria criteria = Criteria.where("_id").in(searchDto.ids());
+        if (searchDto != null && searchDto.getIds() != null) {
+            Criteria criteria = Criteria.where("_id").in(searchDto.getIds());
             filters.add(criteria);
         }
-        if (searchDto != null && searchDto.fullText() != null && !searchDto.fullText().isBlank()) {
+        if (searchDto != null && searchDto.getFullText() != null && !searchDto.getFullText().isBlank()) {
             Criteria criteria = new Criteria().orOperator(
-                    Criteria.where("identifier").regex(searchDto.fullText(), "i"),
-                    Criteria.where("displayName").regex(searchDto.fullText(), "i"),
-                    Criteria.where("ownerUsername").regex(searchDto.fullText(), "i")
+                    Criteria.where("identifier").regex(searchDto.getFullText(), "i"),
+                    Criteria.where("displayName").regex(searchDto.getFullText(), "i"),
+                    Criteria.where("ownerUsername").regex(searchDto.getFullText(), "i")
             );
             filters.add(criteria);
         }
-        if (searchDto != null && searchDto.realmId() != null && !searchDto.realmId().isBlank())  {
-            filters.add(Criteria.where("realmId").regex(searchDto.realmId(), "i"));
+        if (searchDto != null && searchDto.getRealmId() != null && !searchDto.getRealmId().isBlank())  {
+            filters.add(Criteria.where("realmId").regex(searchDto.getRealmId(), "i"));
         }
         Query query = Query.query(filters.isEmpty() ? new Criteria() : new Criteria().andOperator(filters.toArray(new Criteria[0])));
         long count = mongoTemplate.count(query, Group.class);
