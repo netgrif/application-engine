@@ -191,8 +191,10 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group getDefaultSystemGroup() {
-        if (defaultSystemGroup == null) {
+        if (!groupRepository.existsByIdentifier(groupConfigurationProperties.getDefaultGroupIdentifier())) {
             defaultSystemGroup = create(groupConfigurationProperties.getDefaultGroupIdentifier(), groupConfigurationProperties.getDefaultGroupTitle(), userService.getSystem());
+        } else if (defaultSystemGroup == null) {
+            defaultSystemGroup = findByIdentifier(groupConfigurationProperties.getDefaultGroupIdentifier()).orElseThrow(() -> new IllegalStateException("Default system group does not exist"));
         }
         return defaultSystemGroup;
     }
@@ -449,6 +451,11 @@ public class GroupServiceImpl implements GroupService {
         if (parentGroup.getStringId().equals(childGroup.getStringId())) {
             throw new IllegalArgumentException("Trying to add group to itself [%s]!".formatted(parentGroup.getStringId()));
         }
+
+        if (parentGroup.getRealmId() != null && !parentGroup.getRealmId().equals(childGroup.getRealmId())) {
+            throw new IllegalArgumentException("Trying to add group [%s] to parent group [%s] from different realm!".formatted(childGroup.getStringId(), parentGroup.getStringId()));
+        }
+
         parentGroup.addSubGroupId(childGroup.getStringId());
         childGroup.addGroupId(parentGroup.getStringId());
         log.info("Adding group [{}] to parent group [{}]", childGroup.getStringId(), parentGroup.getStringId());
