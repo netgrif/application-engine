@@ -33,6 +33,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public final class FieldFactory {
 
+    private static final String FILTER_FIELD_VALIDATION_RULE = "query";
+
     @Value("${nae.storage.default-type:local}")
     private String defaultStorageType;
 
@@ -559,18 +561,21 @@ public final class FieldFactory {
     private CaseFilterField buildCaseFilterField(Data data) {
         CaseFilterField field = new CaseFilterField();
         setDefaultValue(field, data, field::setDefaultValue);
+        field.setValidations(getFilterValidationAsList());
         return field;
     }
 
     private TaskFilterField buildTaskFilterField(Data data) {
         TaskFilterField field = new TaskFilterField();
         setDefaultValue(field, data, field::setDefaultValue);
+        field.setValidations(getFilterValidationAsList());
         return field;
     }
 
     private ProcessFilterField buildProcessFilterField(Data data) {
         ProcessFilterField field = new ProcessFilterField();
         setDefaultValue(field, data, field::setDefaultValue);
+        field.setValidations(getFilterValidationAsList());
         return field;
     }
 
@@ -862,5 +867,12 @@ public final class FieldFactory {
 
     private void resolveStorage(Data data, StorageField<?> field) {
         field.setStorage(StorageFactory.createStorage(data, storageResolverService, defaultStorageType));
+    }
+
+    private List<com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation> getFilterValidationAsList() {
+        com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation defaultValidation = makeValidation(FILTER_FIELD_VALIDATION_RULE, null, false);
+        List<com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation> validations = new ArrayList<>();
+        validations.add(defaultValidation);
+        return validations;
     }
 }
