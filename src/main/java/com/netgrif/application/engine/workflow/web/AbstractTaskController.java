@@ -387,12 +387,12 @@ public abstract class AbstractTaskController {
 
     protected boolean isPfqlQuery(String query) {
         // todo: temporary until the frontend works fully with PFQL
-        return query != null && !query.isBlank() && (
-                startsWithPfqlPrefix("case", query) || startsWithPfqlPrefix("cases", query)
-                        || startsWithPfqlPrefix("task", query) || startsWithPfqlPrefix("tasks", query)
-                        || startsWithPfqlPrefix("process", query) || startsWithPfqlPrefix("processes", query)
-                        || startsWithPfqlPrefix("user", query) || startsWithPfqlPrefix("users", query)
-        );
+        return query != null && !query.isBlank() && hasValidPfqlPrefix(query);
+    }
+
+    protected boolean hasValidPfqlPrefix(String query) {
+        // todo: temporary until the frontend works fully with PFQL
+        return SearchUtils.validQueryResourcePrefixes.stream().anyMatch(prefix -> startsWithPfqlPrefix(prefix, query));
     }
 
     protected boolean startsWithPfqlPrefix(String prefix, String query) {
