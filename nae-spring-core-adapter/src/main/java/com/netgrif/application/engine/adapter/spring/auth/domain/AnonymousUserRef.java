@@ -116,6 +116,7 @@ public class AnonymousUserRef implements Serializable {
      * Creates a new anonymous user reference with current timestamp.
      */
     public AnonymousUserRef() {
+        this.id = new ObjectId().toHexString();
         this.createdAt = LocalDateTime.now();
     }
 
@@ -125,6 +126,7 @@ public class AnonymousUserRef implements Serializable {
      * @param realmId the ID of the security realm this anonymous user belongs to
      */
     public AnonymousUserRef(String realmId) {
+        this();
         this.realmId = realmId;
         this.createdAt = LocalDateTime.now();
     }

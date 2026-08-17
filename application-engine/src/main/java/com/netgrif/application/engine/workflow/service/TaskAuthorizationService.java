@@ -75,7 +75,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
             return false;
         } else {
             return task.getUserId().equals(user.getStringId())
-                    || (user.getAttributeValue("anonymous") != null && (Boolean) user.getAttributeValue("anonymous"));
+                    || (task.getUser().isAnonymous() && user.isAnonymous());
         }
     }
 

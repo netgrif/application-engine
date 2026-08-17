@@ -98,14 +98,12 @@ public class RealmServiceImpl implements RealmService {
 
     @Override
     public void enableAnonymUser(Realm realm) {
-        anonymousUserRefService.getOrCreateRef(realm.getName());
         realm.setPublicAccess(true);
         realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
     }
 
     @Override
     public void disableAnonymUser(Realm realm) {
-        anonymousUserRefService.deleteRef(realm.getName());
         realm.setPublicAccess(false);
         realmRepository.save((com.netgrif.application.engine.adapter.spring.auth.domain.Realm) realm);
     }

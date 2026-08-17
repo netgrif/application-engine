@@ -9,6 +9,4 @@ public interface AnonymousUserRefService {
     AnonymousUserRef getOrCreateRef(String realmId);
 
     Optional<AnonymousUserRef> getRef(String realmId);
-
-    void deleteRef(String realmId);
 }
