@@ -2,10 +2,14 @@ package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.dto.AuthoritySearchDto;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Service interface for managing {@link Authority} entities.
@@ -54,4 +58,21 @@ public interface AuthorityService {
      * @return a {@link Page} of {@link Authority} entities matching the search criteria.
      */
     Page<Authority> search(AuthoritySearchDto searchDto, Pageable pageable);
+
+    void delete(String name);
+
+    List<Authority> findByScope(String scope);
+
+    Authority findByName(String name);
+
+    Optional<Authority> findOptionalByName(String id);
+
+    @Cacheable("defaultUserAuthoritiesCache")
+    Set<Authority> getDefaultUserAuthorities();
+
+    @Cacheable("defaultAnonymousAuthoritiesCache")
+    Set<Authority> getDefaultAnonymousAuthorities();
+
+    @Cacheable("defaultAdminAuthoritiesCache")
+    Set<Authority> getDefaultAdminAuthorities();
 }

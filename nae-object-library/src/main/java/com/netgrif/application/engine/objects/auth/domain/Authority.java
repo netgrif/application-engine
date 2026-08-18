@@ -44,6 +44,8 @@ public abstract class Authority implements Serializable {
      */
     public static final String anonymous = "ANONYMOUS_USER";
 
+    public static final String SCOPE_SUFFIX = "*";
+
     /**
      * MongoDB ObjectId of the authority.
      */
