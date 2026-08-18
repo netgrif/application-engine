@@ -104,6 +104,7 @@ public class WorkflowController {
     @PostMapping(value = "/case/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> search(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
+        transformPfqlQueries(searchBody);
         Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, locale, operation == MergeFilterOperation.AND);
 
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
@@ -119,13 +120,7 @@ public class WorkflowController {
     public PagedModel<CaseResource> searchPfql(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
         try {
             LoggedUser user = (LoggedUser) auth.getPrincipal();
-            searchBody.getList().forEach((request) -> {
-                if (request.query == null || request.query.isEmpty()) {
-                    return;
-                }
-                QueryLangEvaluator evaluator = SearchUtils.evaluateQuery(request.query);
-                request.query = evaluator.getFullElasticQuery();
-            });
+            transformPfqlQueries(searchBody);
             Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, locale, operation == MergeFilterOperation.AND);
 
             Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
@@ -290,5 +285,30 @@ public class WorkflowController {
                 .ok()
                 .headers(headers)
                 .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
+    }
+
+    private boolean isPfqlQuery(String query) {
+        // todo: temporary until the frontend works fully with PFQL
+        return query != null && !query.isBlank() && hasValidPfqlPrefix(query);
+    }
+
+    private boolean startsWithPfqlPrefix(String prefix, String query) {
+        // todo: temporary until the frontend works fully with PFQL
+        return query.startsWith(prefix + ":") || query.startsWith(prefix + " where") || query.equals(prefix);
+    }
+
+    protected boolean hasValidPfqlPrefix(String query) {
+        // todo: temporary until the frontend works fully with PFQL
+        return SearchUtils.validQueryResourcePrefixes.stream().anyMatch(prefix -> startsWithPfqlPrefix(prefix, query));
+    }
+
+    private void transformPfqlQueries(SingleCaseSearchRequestAsList searchBody) {
+        searchBody.getList().forEach((request) -> {
+            if (!isPfqlQuery(request.query)) {
+                return;
+            }
+            QueryLangEvaluator evaluator = SearchUtils.evaluateQuery(request.query);
+            request.query = evaluator.getFullElasticQuery();
+        });
     }
 }
