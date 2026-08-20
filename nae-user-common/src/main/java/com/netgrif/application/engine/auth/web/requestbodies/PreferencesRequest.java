@@ -20,6 +20,7 @@ public class PreferencesRequest {
     private Map<String, List<String>> taskFilters = new HashMap<>();
     private Map<String, List<String>> caseFilters = new HashMap<>();
     private Map<String, List<String>> headers = new HashMap<>();
+    private Map<String, Map<String, String>> sorts= new HashMap<>();
 
     public Preferences toPreferences() {
         Preferences preferences = new com.netgrif.application.engine.adapter.spring.preferences.Preferences(userId);
@@ -28,6 +29,7 @@ public class PreferencesRequest {
         preferences.setTaskFilters(taskFilters);
         preferences.setCaseFilters(caseFilters);
         preferences.setHeaders(headers);
+        preferences.setSorts(sorts);
         return preferences;
     }
 
