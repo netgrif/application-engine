@@ -216,7 +216,7 @@ public class TaskService implements ITaskService {
             throw new IllegalArgumentException("Task with id=%s is not assigned to any user.".formatted(task.getStringId()));
         }
         // TODO: impersonation
-        if (!task.getUserId().equals(user.getStringId()) && !((Boolean) user.getAttributes().containsKey("anonymous"))) {
+        if (!task.getUserId().equals(user.getStringId()) && !((Boolean) user.isAnonymous())) {
             throw new IllegalArgumentException("User that is not assigned tried to finish task");
         }
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
