@@ -1,26 +1,25 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.petrinet.domain.throwable.IllegalTaskStateException;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskAuthorizationService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class TaskAuthorizationService extends AbstractAuthorizationService implements ITaskAuthorizationService {
 
-    @Autowired
-    private ITaskService taskService;
+    private final ITaskService taskService;
 
     @Override
-    public Boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions) {
-        return userHasAtLeastOneRolePermission(loggedUser, taskService.findById(taskId), permissions);
+    public Boolean userHasAtLeastOneRolePermission(AbstractUser user, String taskId, RolePermission... permissions) {
+        return userHasAtLeastOneRolePermission(user, taskService.findById(taskId), permissions);
     }
 
     @Override
@@ -40,8 +39,8 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     }
 
     @Override
-    public Boolean userHasUserListPermission(LoggedUser loggedUser, String taskId, RolePermission... permissions) {
-        return userHasUserListPermission(loggedUser, taskService.findById(taskId), permissions);
+    public Boolean userHasUserListPermission(AbstractUser user, String taskId, RolePermission... permissions) {
+        return userHasUserListPermission(user, taskService.findById(taskId), permissions);
     }
 
     @Override
@@ -66,23 +65,18 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     }
 
     @Override
-    public boolean isAssignee(LoggedUser loggedUser, String taskId) {
-        return isAssignee(loggedUser, taskService.findById(taskId));
-    }
-
-    @Override
     public boolean isAssignee(AbstractUser user, String taskId) {
         return isAssignee(user, taskService.findById(taskId));
     }
 
     @Override
     public boolean isAssignee(AbstractUser user, Task task) {
-        if (!isAssigned(task))
+        if (!isAssigned(task)) {
             return false;
-        else
-            // TODO: impersonation user.getSelfOrImpersonated().getStringId()
+        } else {
             return task.getUserId().equals(user.getStringId())
-                    || (user.getAttributeValue("anonymous") != null && (Boolean) user.getAttributeValue("anonymous"));
+                    || (task.getUser().isAnonymous() && user.isAnonymous());
+        }
     }
 
     private boolean isAssigned(String taskId) {
@@ -94,66 +88,66 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     }
 
     @Override
-    public boolean canCallAssign(LoggedUser loggedUser, String taskId) {
-        // TODO: impersonation loggedUser.getSelfOrImpersonated().isAdmin()
-        if (loggedUser.isAdmin()) {
+    public boolean canCallAssign(AbstractUser user, String taskId) {
+        // TODO: impersonation user.getSelfOrImpersonated().isAdmin()
+        if (user.isAdmin()) {
             return true;
         }
 
         Task task = taskService.findById(taskId);
         // TODO: impersonation
-        Boolean userPerm = userHasUserListPermission(loggedUser, task, RolePermission.ASSIGN);
+        Boolean userPerm = userHasUserListPermission(user, task, RolePermission.ASSIGN);
         if (userPerm != null) {
             return userPerm;
         }
 
         // TODO: impersonation
-        Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, task, RolePermission.ASSIGN);
+        Boolean rolePerm = userHasAtLeastOneRolePermission(user, task, RolePermission.ASSIGN);
         return rolePerm != null && rolePerm;
     }
 
     @Override
-    public boolean canCallDelegate(LoggedUser loggedUser, String taskId) {
-        // TODO: impersonation loggedUser.getSelfOrImpersonated().isAdmin()
-        if (loggedUser.isAdmin()) {
+    public boolean canCallDelegate(AbstractUser user, String taskId) {
+        // TODO: impersonation user.getSelfOrImpersonated().isAdmin()
+        if (user.isAdmin()) {
             return true;
         }
 
         Task task = taskService.findById(taskId);
         // TODO: impersonation
-        Boolean userPerm = userHasUserListPermission(loggedUser, task, RolePermission.DELEGATE);
+        Boolean userPerm = userHasUserListPermission(user, task, RolePermission.DELEGATE);
         if (userPerm != null) {
             return userPerm;
         }
 
         // TODO: impersonation
-        Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, task, RolePermission.DELEGATE);
+        Boolean rolePerm = userHasAtLeastOneRolePermission(user, task, RolePermission.DELEGATE);
         return rolePerm != null && rolePerm;
     }
 
     @Override
-    public boolean canCallFinish(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException {
+    public boolean canCallFinish(AbstractUser user, String taskId) throws IllegalTaskStateException {
         if (!isAssigned(taskId)) {
             throw new IllegalTaskStateException("Task with ID '%s' cannot be finished, because it is not assigned!".formatted(taskId));
         }
         // TODO: impersonation
-        if (loggedUser.isAdmin()) {
+        if (user.isAdmin()) {
             return true;
         }
 
         Task task = taskService.findById(taskId);
         // TODO: impersonation
-        if (!isAssignee(loggedUser, task)) {
+        if (!isAssignee(user, task)) {
             return false;
         }
         // TODO: impersonation
-        Boolean userPerm = userHasUserListPermission(loggedUser, task, RolePermission.FINISH);
+        Boolean userPerm = userHasUserListPermission(user, task, RolePermission.FINISH);
         if (userPerm != null) {
             return userPerm;
         }
 
         // TODO: impersonation
-        Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, task, RolePermission.FINISH);
+        Boolean rolePerm = userHasAtLeastOneRolePermission(user, task, RolePermission.FINISH);
         return rolePerm != null && rolePerm;
     }
 
@@ -166,42 +160,42 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     }
 
     @Override
-    public boolean canCallCancel(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException {
+    public boolean canCallCancel(AbstractUser user, String taskId) throws IllegalTaskStateException {
         if (!isAssigned(taskId)) {
             throw new IllegalTaskStateException("Task with ID '%s' cannot be canceled, because it is not assigned!".formatted(taskId));
         }
         // TODO: impersonation
-        if (loggedUser.isAdmin()) {
+        if (user.isAdmin()) {
             return true;
         }
 
         Task task = taskService.findById(taskId);
         // TODO: impersonation
-        if (!isAssignee(loggedUser, task) || !canAssignedCancel(task)) {
+        if (!isAssignee(user, task) || !canAssignedCancel(task)) {
             return false;
         }
 
         // TODO: impersonation
-        Boolean userPerm = userHasUserListPermission(loggedUser, task, RolePermission.CANCEL);
+        Boolean userPerm = userHasUserListPermission(user, task, RolePermission.CANCEL);
         if (userPerm != null) {
             return userPerm;
         }
 
         // TODO: impersonation
-        Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, task, RolePermission.CANCEL);
+        Boolean rolePerm = userHasAtLeastOneRolePermission(user, task, RolePermission.CANCEL);
         return rolePerm != null && rolePerm;
     }
 
     @Override
-    public boolean canCallSaveData(LoggedUser loggedUser, String taskId) {
-        // TODO: impersonation loggedUser.getSelfOrImpersonated().isAdmin()
-        return loggedUser.isAdmin() || isAssignee(loggedUser, taskId);
+    public boolean canCallSaveData(AbstractUser user, String taskId) {
+        // TODO: impersonation user.getSelfOrImpersonated().isAdmin()
+        return user.isAdmin() || isAssignee(user, taskId);
     }
 
     @Override
-    public boolean canCallSaveFile(LoggedUser loggedUser, String taskId) {
-        // TODO: impersonation loggedUser.getSelfOrImpersonated().isAdmin()
-        return loggedUser.isAdmin() || isAssignee(loggedUser, taskId);
+    public boolean canCallSaveFile(AbstractUser user, String taskId) {
+        // TODO: impersonation user.getSelfOrImpersonated().isAdmin()
+        return user.isAdmin() || isAssignee(user, taskId);
     }
 
     private Map<String, Boolean> findUserPermissions(Task task, AbstractUser user) {

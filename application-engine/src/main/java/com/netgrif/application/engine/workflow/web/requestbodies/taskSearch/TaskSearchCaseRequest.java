@@ -1,10 +1,12 @@
 package com.netgrif.application.engine.workflow.web.requestbodies.taskSearch;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskSearchCaseRequest implements Serializable {

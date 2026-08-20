@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.auth.service;
 
+import com.netgrif.application.engine.adapter.spring.auth.domain.AnonymousUser;
+import com.netgrif.application.engine.adapter.spring.auth.domain.AnonymousUserRef;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.adapter.spring.workflow.service.FilterImportExportService;
@@ -58,6 +60,8 @@ public class UserServiceImpl implements UserService {
     private AbstractUser systemUser;
 
     private RealmService realmService;
+
+    private AnonymousUserRefService anonymousUserRefService;
 
     @Getter
     private PaginationProperties paginationProperties;
@@ -118,6 +122,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public void setRealmService(RealmService realmService) {
         this.realmService = realmService;
+    }
+
+    @Autowired
+    public void setAnonymousUserRefService(AnonymousUserRefService anonymousUserRefService) {
+        this.anonymousUserRefService = anonymousUserRefService;
     }
 
     @Override
@@ -340,7 +349,11 @@ public class UserServiceImpl implements UserService {
         log.debug("Finding user by ID [{}]", id);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
         Optional<User> userOpt = userRepository.findById(new ObjectId(id), mongoTemplate, collectionName);
-        return userOpt.orElse(null);
+        if (userOpt.isPresent()) {
+            return userOpt.get();
+        }
+        Optional<AnonymousUserRef> anonymousUserRefOptional = anonymousUserRefService.getRef(realmId);
+        return anonymousUserRefOptional.map(anonymousUserRef -> new AnonymousUser(anonymousUserRef, authorityService.getOrCreate(Authority.anonymous))).orElse(null);
     }
 
     @Override
@@ -476,8 +489,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public AbstractUser getLoggedUser() {
         LoggedUser loggedUser = getLoggedUserFromContext();
-        Optional<AbstractUser> userOptional = findUserByUsername(loggedUser.getUsername(), loggedUser.getRealmId());
-        AbstractUser user = userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] in realm [%s] is not present in the system.".formatted(loggedUser.getUsername(), loggedUser.getRealmId())));
+        AbstractUser user;
+        if (loggedUser.isAnonymous()) {
+            user = ActorTransformer.toUser(loggedUser);
+        } else {
+            Optional<AbstractUser> userOptional = findUserByUsername(loggedUser.getUsername(), loggedUser.getRealmId());
+            user = userOptional.orElseThrow(() -> new IllegalArgumentException("User with username [%s] in realm [%s] is not present in the system.".formatted(loggedUser.getUsername(), loggedUser.getRealmId())));
+        }
         // TODO: impersonation
 //        if (loggedUser.isImpersonating()) {
 //            IUser impersonated = transformToUser((LoggedUserImpl) loggedUser.getImpersonated());

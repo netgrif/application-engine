@@ -69,6 +69,9 @@ public class SecurityConfigurationProperties {
      */
     private String[] anonymousExceptions;
 
+
+    private String anonymousAuthenticationKey = "anonymousUser";
+
     /**
      * Headers settings
      */
@@ -430,6 +433,8 @@ public class SecurityConfigurationProperties {
          */
         @Data
         public static class PublicProperties {
+
+            private boolean enabled = true;
 
             /**
              * Public URL for web functionalities.
