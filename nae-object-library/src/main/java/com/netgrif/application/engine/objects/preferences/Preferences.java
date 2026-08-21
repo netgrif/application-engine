@@ -45,7 +45,7 @@ public abstract class Preferences implements Serializable {
      */
     private Map<String, List<String>> headers = new HashMap<>();
 
-    private Map<String, Map<String, String>> sorts = new HashMap<>();
+    private Map<String, List<SortPreference>> sorts = new HashMap<>();
 
     public Preferences(String userId) {
         this._id = new ObjectId(userId);
