@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.insurance
 
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.LoggedUser
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
@@ -13,6 +14,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutc
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -46,8 +48,16 @@ class EncryptionTest {
     @Autowired
     private SuperCreator superCreator
 
+    @Autowired
+    private TestHelper testHelper
+
     private final String FIELD_NAME = "City"
     private final String FIELD_VALUE = "Bratislava"
+
+    @BeforeEach
+    void beforeEach() {
+        testHelper.truncateDbs()
+    }
 
     @Test
     void testEncryption() {

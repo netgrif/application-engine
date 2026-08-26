@@ -36,6 +36,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SearchUtils {
 
+    public static final List<String> validQueryResourcePrefixes = List.of("case", "cases", "task", "tasks", "process",
+            "processes", "user", "users");
+
     public static final Map<ComparisonType, List<Integer>> comparisonOperators = Map.of(
             ComparisonType.ID, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.IN),
             ComparisonType.STRING, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.CONTAINS, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
