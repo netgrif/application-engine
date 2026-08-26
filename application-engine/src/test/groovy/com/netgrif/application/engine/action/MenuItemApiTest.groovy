@@ -85,6 +85,7 @@ class MenuItemApiTest {
         assert item.dataSet[MenuItemConstants.FIELD_IDENTIFIER].value.toString() == "new_menu_item"
         assert item.dataSet[MenuItemConstants.FIELD_BANNED_ROLES].options.containsKey("role_2:filter_api_test")
         assert item.dataSet[MenuItemConstants.FIELD_ALLOWED_ROLES].options.containsKey("role_1:filter_api_test")
+        assert item.dataSet[MenuItemConstants.FIELD_ORDER].value == 30
         assert item.dataSet[MenuItemConstants.FIELD_USE_TABBED_VIEW].value == true
         assert item.dataSet[MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE].value == MenuItemView.TABBED_CASE_VIEW.identifier
 
@@ -146,6 +147,7 @@ class MenuItemApiTest {
 
         assert item.dataSet[MenuItemConstants.FIELD_MENU_NAME].value.toString() == "CHANGED FILTER"
         assert item.dataSet[MenuItemConstants.FIELD_ALLOWED_ROLES].options.entrySet()[0].key.contains("role_2")
+        assert item.dataSet[MenuItemConstants.FIELD_ORDER].value == 5
         assert item.dataSet[MenuItemConstants.FIELD_USE_TABBED_VIEW].value == true
         assert item.dataSet[MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE].value == MenuItemView.TABBED_CASE_VIEW.identifier
 //        assert item.uriNodeId == newUri.stringId
@@ -240,6 +242,30 @@ class MenuItemApiTest {
         assert folderCase.dataSet[MenuItemConstants.FIELD_NODE_PATH].value == "/netgrif/test3/netgrif2/test2"
 
         viewCase = workflowService.findOne(viewId2)
+    }
+
+    @Test
+    void testMoveDestinationGetActionUsesMenuNodePath() {
+        Case apiCase = createMenuItem("/netgrif/test")
+        Case item = getMenuItem(apiCase)
+        String moveTaskId = item.tasks.find { it.transition == "move_item" }.task
+
+        def moveDestination = dataService.getData(moveTaskId).data.find {
+            it.importId == "move_dest_uri"
+        }
+
+        assert moveDestination != null
+        assert (moveDestination.value as List) == ["/", "netgrif", "test"]
+        assert moveDestination.options.keySet().containsAll(["/", "netgrif", "test", "new_menu_item"])
+
+        Case correctedItem = dataService.setData(moveTaskId, ImportHelper.populateDatasetWithObject([
+                "move_dest_uri": [
+                        "type" : "multichoice_map",
+                        "value": ["/", "netgrif", "test", "missing_node"]
+                ]
+        ])).case
+
+        assert (correctedItem.dataSet["move_dest_uri"].value as List) == ["/", "netgrif", "test"]
     }
 
     @Test

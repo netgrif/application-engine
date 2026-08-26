@@ -24,6 +24,7 @@ public class MenuItemBody {
 
     private String menuIcon = "filter_none";
     private I18nString menuName;
+    private Double order;
     private Map<String, I18nString> allowedRoles = new HashMap<>();
     private Map<String, I18nString> bannedRoles = new HashMap<>();
     private boolean useCustomView = false;
@@ -98,6 +99,13 @@ public class MenuItemBody {
         this.menuName = new I18nString(name);
     }
 
+    public void setOrder(Double order) {
+        if (order != null && (!Double.isFinite(order))) {
+            throw new IllegalArgumentException("Order must be finite");
+        }
+        this.order = order;
+    }
+
     public void setTabName(I18nString name) {
         this.tabName = name;
     }
@@ -156,6 +164,7 @@ public class MenuItemBody {
         }
         outcome.putDataSetEntry(MenuItemConstants.FIELD_MENU_NAME, FieldType.I18N, this.menuName);
         outcome.putDataSetEntry(MenuItemConstants.FIELD_MENU_ICON, FieldType.TEXT, this.menuIcon);
+        outcome.putDataSetEntry(MenuItemConstants.FIELD_ORDER, FieldType.NUMBER, this.order);
         outcome.putDataSetEntry(MenuItemConstants.FIELD_USE_TABBED_VIEW, FieldType.BOOLEAN, this.useTabbedView);
         outcome.putDataSetEntry(MenuItemConstants.FIELD_TAB_NAME, FieldType.I18N, this.tabName);
         outcome.putDataSetEntry(MenuItemConstants.FIELD_TAB_ICON, FieldType.TEXT, this.tabIcon);

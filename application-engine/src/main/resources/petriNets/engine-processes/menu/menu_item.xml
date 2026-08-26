@@ -147,11 +147,10 @@
 			<name>autocomplete</name>
 		</component>
 		<action trigger="get">
-			moveDestUri: f.move_dest_uri;
-<!--TODO  skontrolovat-->
-			String uriNodeId = elasticCaseService.findUriNodeId(useCase)
-			def node = uriService.findById(uriNodeId)
-			updateMultichoiceWithCurrentNode(moveDestUri, node)
+			moveDestUri: f.move_dest_uri,
+			nodePath: f.nodePath;
+
+			updateMultichoiceWithCurrentNode(moveDestUri, parentPath(nodePath.value as String))
 		</action>
 		<action trigger="set">
 			prevDestUri: f.move_previous_dest_uri,
@@ -305,6 +304,11 @@
 			change menu_name_as_visible choices { [name.value] }
 			change menu_name_as_visible value { name.value }
 		</action>
+	</data>
+	<data type="number" immediate="true">
+		<id>order</id>
+		<title name="order">Order</title>
+		<desc name="order_desc">Optional ascending menu order. Equal values preserve their original relative order. Items without a value are displayed last.</desc>
 	</data>
 	<data type="button">
 		<id>add_allowed_roles</id>
@@ -611,6 +615,8 @@
 		<i18nString name="duplicate_view_identifier_desc">Musí byť jedinečný</i18nString>
 		<i18nString name="name">Názov položky</i18nString>
 		<i18nString name="name_desc">Bude zobrazený v menu</i18nString>
+		<i18nString name="order">Poradie</i18nString>
+		<i18nString name="order_desc">Voliteľné vzostupné poradie menu. Rovnaké hodnoty zachovajú pôvodné relatívne poradie. Položky bez hodnoty sa zobrazia posledné.</i18nString>
 		<i18nString name="tab_icon">Identifikátor ikony v karte</i18nString>
 		<i18nString name="tab_icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
 		<i18nString name="display_tab_icon">Zobraziť ikonu v karte?</i18nString>
@@ -668,6 +674,8 @@
 		<i18nString name="duplicate_view_identifier_desc">Muss einzigartig sein</i18nString>
 		<i18nString name="name">Titel des Eintrages</i18nString>
 		<i18nString name="name_desc">Wird im Menü angezeigt</i18nString>
+		<i18nString name="order">Reihenfolge</i18nString>
+		<i18nString name="order_desc">Optionale aufsteigende Menüreihenfolge. Gleiche Werte behalten ihre ursprüngliche relative Reihenfolge. Einträge ohne Wert werden zuletzt angezeigt.</i18nString>
 		<i18nString name="tab_icon">Ikonen Identifikator der Registerkarte</i18nString>
 		<i18nString name="display_tab_icon">Zeige die Registerkarte Ikone an?</i18nString>
 		<i18nString name="tab_name">Titel der Registerkarte</i18nString>
@@ -838,6 +846,20 @@
 					<cols>1</cols>
 					<template>material</template>
 					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>order</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
 		</dataGroup>

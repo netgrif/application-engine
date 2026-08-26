@@ -14,6 +14,7 @@ public class MenuItemConstants {
     public static final String FIELD_BANNED_ROLES = "banned_roles";
     public static final String FIELD_MENU_NAME = "menu_name";
     public static final String FIELD_MENU_ICON = "menu_icon";
+    public static final String FIELD_ORDER = "order";
     public static final String FIELD_TAB_NAME = "tab_name";
     public static final String FIELD_USE_TABBED_VIEW = "use_tabbed_view";
     public static final String FIELD_USE_TAB_ICON = "use_tab_icon";
