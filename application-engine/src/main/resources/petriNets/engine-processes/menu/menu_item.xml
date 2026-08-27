@@ -308,7 +308,7 @@
 	<data type="number" immediate="true">
 		<id>order</id>
 		<title name="order">Order</title>
-		<desc name="order_desc">Optional ascending menu order. Equal values preserve their original relative order. Items without a value are displayed last.</desc>
+		<desc name="order_desc">Optional explicit menu order. Smaller values are displayed first. Equal or missing values use the order of childItemIds as a stable fallback; missing values are displayed last.</desc>
 	</data>
 	<data type="button">
 		<id>add_allowed_roles</id>
@@ -523,35 +523,7 @@
 			<property key="stretch">true</property>
 		</component>
 		<action trigger="set">
-			parentId: f.parentId;
-
-			def parentCase = workflowService.findOne(parentId.value[0])
-			def taskId = useCase.tasks.find { it.transition == "row_for_ordering" }.task
-			def taskRefValue = parentCase.dataSet['childItemForms'].value
-			int taskRefValueSize = taskRefValue.size()
-			def caseRefValue = parentCase.dataSet['childItemIds'].value
-			int caseRefValueSize = caseRefValue.size()
-
-			int idxInTaskRef = taskRefValue.indexOf(taskId)
-			if (idxInTaskRef &lt; taskRefValueSize - 1) {
-				Collections.swap(taskRefValue, idxInTaskRef, idxInTaskRef + 1)
-			}
-
-			int idxInCaseRef = caseRefValue.indexOf(useCase.stringId)
-			if (idxInCaseRef &lt; caseRefValueSize - 1) {
-				Collections.swap(caseRefValue, idxInCaseRef, idxInCaseRef + 1)
-			}
-
-			setData("children_order", parentCase, [
-					"childItemForms" : [
-							"value" : taskRefValue,
-							"type" : "taskRef"
-					],
-					"childItemIds" : [
-							"value" : caseRefValue,
-							"type" : "caseRef"
-					]
-			])
+			moveMenuItemInOrder(useCase, 1)
 		</action>
 	</data>
 	<data type="button">
@@ -563,37 +535,7 @@
 			<property key="stretch">true</property>
 		</component>
 		<action trigger="set">
-			parentId: f.parentId;
-
-			def parentCase = workflowService.findOne(parentId.value[0])
-			def taskId = useCase.tasks.find { it.transition == "row_for_ordering" }.task
-			def taskRefValue = parentCase.dataSet['childItemForms'].value
-			def caseRefValue = parentCase.dataSet['childItemIds'].value
-
-			int idxInTaskRef = taskRefValue.indexOf(taskId)
-			if (idxInTaskRef > 0) {
-				Collections.swap(taskRefValue, idxInTaskRef - 1, idxInTaskRef)
-			} else {
-				return
-			}
-
-			int idxInCaseRef = caseRefValue.indexOf(useCase.stringId)
-			if (idxInCaseRef > 0) {
-				Collections.swap(caseRefValue, idxInCaseRef - 1, idxInCaseRef)
-			} else {
-				return
-			}
-
-			setData("children_order", parentCase, [
-					"childItemForms" : [
-							"value" : taskRefValue,
-							"type" : "taskRef"
-					],
-					"childItemIds" : [
-							"value" : caseRefValue,
-							"type" : "caseRef"
-					]
-			])
+			moveMenuItemInOrder(useCase, -1)
 		</action>
 	</data>
 
@@ -616,7 +558,7 @@
 		<i18nString name="name">Názov položky</i18nString>
 		<i18nString name="name_desc">Bude zobrazený v menu</i18nString>
 		<i18nString name="order">Poradie</i18nString>
-		<i18nString name="order_desc">Voliteľné vzostupné poradie menu. Rovnaké hodnoty zachovajú pôvodné relatívne poradie. Položky bez hodnoty sa zobrazia posledné.</i18nString>
+		<i18nString name="order_desc">Voliteľné explicitné poradie menu. Menšie hodnoty sa zobrazia prvé. Pri rovnakej alebo chýbajúcej hodnote sa ako stabilné záložné poradie použije childItemIds; položky bez hodnoty sa zobrazia posledné.</i18nString>
 		<i18nString name="tab_icon">Identifikátor ikony v karte</i18nString>
 		<i18nString name="tab_icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
 		<i18nString name="display_tab_icon">Zobraziť ikonu v karte?</i18nString>
@@ -675,7 +617,7 @@
 		<i18nString name="name">Titel des Eintrages</i18nString>
 		<i18nString name="name_desc">Wird im Menü angezeigt</i18nString>
 		<i18nString name="order">Reihenfolge</i18nString>
-		<i18nString name="order_desc">Optionale aufsteigende Menüreihenfolge. Gleiche Werte behalten ihre ursprüngliche relative Reihenfolge. Einträge ohne Wert werden zuletzt angezeigt.</i18nString>
+		<i18nString name="order_desc">Optionale explizite Menüreihenfolge. Kleinere Werte werden zuerst angezeigt. Bei gleichen oder fehlenden Werten wird childItemIds als stabile Ersatzreihenfolge verwendet; Einträge ohne Wert werden zuletzt angezeigt.</i18nString>
 		<i18nString name="tab_icon">Ikonen Identifikator der Registerkarte</i18nString>
 		<i18nString name="display_tab_icon">Zeige die Registerkarte Ikone an?</i18nString>
 		<i18nString name="tab_name">Titel der Registerkarte</i18nString>
@@ -1353,7 +1295,7 @@
 		<id>children_order</id>
 		<x>580</x>
 		<y>220</y>
-		<label>Manage item order</label>
+		<label>Manage process item order</label>
 		<icon>low_priority</icon>
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
@@ -1374,10 +1316,9 @@
 				<logic>
 					<behavior>editable</behavior>
 					<action trigger="get">
-						forms: f.childItemForms,
-						ids: f.childItemIds;
+						forms: f.childItemForms;
 
-						def orderedTaskIds = ids.value?.collect { id -> workflowService.findOne(id).tasks.find { it.transition == "row_for_ordering" }.task }
+						def orderedTaskIds = getOrderedMenuItemChildren(useCase).collect { child -> child.tasks.find { it.transition == "row_for_ordering" }.task }
 						change forms value { orderedTaskIds }
 					</action>
 				</logic>
@@ -1408,7 +1349,7 @@
 		</roleRef>
 		<dataGroup>
 			<id>row_for_ordering_0</id>
-			<cols>6</cols>
+			<cols>8</cols>
 			<layout>grid</layout>
 			<dataRef>
 				<id>menu_item_identifier</id>
@@ -1439,12 +1380,26 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>order_down</id>
+				<id>order</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>order_down</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>6</x>
 					<y>0</y>
 					<rows>1</rows>
 					<cols>1</cols>
@@ -1459,7 +1414,7 @@
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
-					<x>5</x>
+					<x>7</x>
 					<y>0</y>
 					<rows>1</rows>
 					<cols>1</cols>

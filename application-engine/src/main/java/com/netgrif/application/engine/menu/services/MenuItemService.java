@@ -15,6 +15,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.throwable.Transiti
 import com.netgrif.application.engine.objects.utils.MenuItemUtils;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.objects.workflow.domain.menu.FilterBody;
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody;
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemConstants;
@@ -389,6 +390,158 @@ public class MenuItemService implements IMenuItemService {
         parentFolder.getDataField(MenuItemConstants.FIELD_CHILD_ITEM_IDS).setValue(childIds);
         parentFolder.getDataField(MenuItemConstants.FIELD_HAS_CHILDREN).setValue(MenuItemUtils.hasFolderChildren(parentFolder));
         return workflowService.save(parentFolder);
+    }
+
+    @Override
+    public List<Case> getOrderedMenuItemChildren(Case parentItem) {
+        if (parentItem == null) {
+            return Collections.emptyList();
+        }
+
+        List<String> childIds = MenuItemUtils.getCaseIdsFromCaseRef(parentItem, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
+        if (childIds == null || childIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Map<String, Case> childrenById = workflowService.findAllById(childIds).stream()
+                .collect(java.util.stream.Collectors.toMap(Case::getStringId, child -> child));
+        List<Case> children = childIds.stream()
+                .map(childrenById::get)
+                .filter(Objects::nonNull)
+                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        Map<String, Integer> fallbackOrder = new HashMap<>();
+        for (int index = 0; index < childIds.size(); index++) {
+            fallbackOrder.putIfAbsent(childIds.get(index), index);
+        }
+
+        children.sort((first, second) -> compareMenuItems(first, second, fallbackOrder));
+        return children;
+    }
+
+    @Override
+    public List<SetDataEventOutcome> moveMenuItemInOrder(Case item, int offset) {
+        if (item == null) {
+            throw new IllegalArgumentException("Menu item must not be null.");
+        }
+        if (offset != -1 && offset != 1) {
+            throw new IllegalArgumentException("Menu item order offset must be -1 or 1.");
+        }
+
+        item = workflowService.findOne(item.getStringId());
+        String parentId = MenuItemUtils.getCaseIdFromCaseRef(item, MenuItemConstants.FIELD_PARENT_ID);
+        if (parentId == null) {
+            return Collections.emptyList();
+        }
+
+        Case parent = workflowService.findOne(parentId);
+        List<String> persistedChildIds = MenuItemUtils.getCaseIdsFromCaseRef(parent, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
+        if (persistedChildIds == null || persistedChildIds.size() < 2) {
+            return Collections.emptyList();
+        }
+
+        List<String> childIds = new ArrayList<>(persistedChildIds);
+        List<Case> orderedChildren = getOrderedMenuItemChildren(parent);
+        int currentIndex = indexOfCase(orderedChildren, item.getStringId());
+        int targetIndex = currentIndex + offset;
+        if (currentIndex < 0 || targetIndex < 0 || targetIndex >= orderedChildren.size()) {
+            return Collections.emptyList();
+        }
+
+        Case sibling = orderedChildren.get(targetIndex);
+        int currentFallbackIndex = childIds.indexOf(item.getStringId());
+        int siblingFallbackIndex = childIds.indexOf(sibling.getStringId());
+        if (currentFallbackIndex < 0 || siblingFallbackIndex < 0) {
+            return Collections.emptyList();
+        }
+
+        Double currentOrder = resolveMenuItemOrder(item);
+        Double siblingOrder = resolveMenuItemOrder(sibling);
+        Collections.swap(childIds, currentFallbackIndex, siblingFallbackIndex);
+        List<SetDataEventOutcome> outcomes = new ArrayList<>();
+
+        if (!Objects.equals(currentOrder, siblingOrder)) {
+            outcomes.add(setDataOutcome(item, MenuItemConstants.TRANS_ORDER_ROW_ID, Map.of(
+                    MenuItemConstants.FIELD_ORDER, orderDataField(siblingOrder)
+            )));
+            outcomes.add(setDataOutcome(sibling, MenuItemConstants.TRANS_ORDER_ROW_ID, Map.of(
+                    MenuItemConstants.FIELD_ORDER, orderDataField(currentOrder)
+            )));
+        }
+
+        Collections.swap(orderedChildren, currentIndex, targetIndex);
+        List<String> childTaskIds = orderedChildren.stream()
+                .map(child -> MenuItemUtils.findTaskIdInCase(child, MenuItemConstants.TRANS_ORDER_ROW_ID))
+                .filter(Objects::nonNull)
+                .toList();
+        outcomes.add(setDataOutcome(parent, MenuItemConstants.TRANS_CHILDREN_ORDER_ID, Map.of(
+                MenuItemConstants.FIELD_CHILD_ITEM_IDS, Map.of("type", "caseRef", "value", childIds),
+                MenuItemConstants.FIELD_CHILD_ITEM_FORMS, Map.of("type", "taskRef", "value", childTaskIds)
+        )));
+        return outcomes;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private SetDataEventOutcome setDataOutcome(Case caze, String transitionId,
+                                                Map<String, Map<String, Object>> dataSet) {
+        String taskId = MenuItemUtils.findTaskIdInCase(caze, transitionId);
+        return dataService.setData(taskId, ImportHelper.populateDataset((Map) dataSet));
+    }
+
+    private static Map<String, Object> orderDataField(Double value) {
+        Map<String, Object> field = new HashMap<>();
+        field.put("type", "number");
+        field.put("value", value);
+        return field;
+    }
+
+    protected static int compareMenuItems(Case first, Case second, Map<String, Integer> fallbackOrder) {
+        Double firstOrder = resolveMenuItemOrder(first);
+        Double secondOrder = resolveMenuItemOrder(second);
+        if (firstOrder == null && secondOrder == null) {
+            return compareFallbackOrder(first, second, fallbackOrder);
+        }
+        if (firstOrder == null) {
+            return 1;
+        }
+        if (secondOrder == null) {
+            return -1;
+        }
+
+        int explicitOrderComparison = Double.compare(firstOrder, secondOrder);
+        return explicitOrderComparison != 0
+                ? explicitOrderComparison
+                : compareFallbackOrder(first, second, fallbackOrder);
+    }
+
+    protected static Double resolveMenuItemOrder(Case item) {
+        if (item == null || item.getDataSet() == null || item.getDataSet().get(MenuItemConstants.FIELD_ORDER) == null) {
+            return null;
+        }
+        Object value = item.getDataSet().get(MenuItemConstants.FIELD_ORDER).getValue();
+        if (!(value instanceof Number number)) {
+            return null;
+        }
+        double order = number.doubleValue();
+        if (!Double.isFinite(order)) {
+            return null;
+        }
+        return order == 0d ? 0d : order;
+    }
+
+    private static int compareFallbackOrder(Case first, Case second, Map<String, Integer> fallbackOrder) {
+        return Integer.compare(
+                fallbackOrder.getOrDefault(first.getStringId(), Integer.MAX_VALUE),
+                fallbackOrder.getOrDefault(second.getStringId(), Integer.MAX_VALUE)
+        );
+    }
+
+    private static int indexOfCase(List<Case> cases, String caseId) {
+        for (int index = 0; index < cases.size(); index++) {
+            if (Objects.equals(cases.get(index).getStringId(), caseId)) {
+                return index;
+            }
+        }
+        return -1;
     }
 
     protected Case findCase(Predicate predicate) {

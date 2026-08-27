@@ -2107,7 +2107,7 @@ class ActionDelegate extends DelegateExpando {
      * Changes the optional ascending order of an existing menu item. A {@code null} value clears the order.
      *
      * @param item menu item instance to update
-     * @param order optional finite non-negative number
+     * @param order optional finite number
      * @return outcome of the set-data event
      */
     def changeMenuItemOrder(Case item, def order) {
@@ -2124,7 +2124,7 @@ class ActionDelegate extends DelegateExpando {
      * Finds a menu item by its unique identifier and changes its optional ascending order.
      *
      * @param menuItemIdentifier unique menu item identifier
-     * @param order optional finite non-negative number; {@code null} clears the order
+     * @param order optional finite number; {@code null} clears the order
      * @return outcome of the set-data event
      */
     def changeMenuItemOrder(String menuItemIdentifier, def order) {
@@ -2133,6 +2133,23 @@ class ActionDelegate extends DelegateExpando {
             throw new IllegalArgumentException("Menu item [$menuItemIdentifier] does not exist.")
         }
         return changeMenuItemOrder(item, order)
+    }
+
+    /**
+     * Returns process-backed children in the order used by the menu. Numeric order has priority and childItemIds is
+     * used as a stable fallback.
+     */
+    List<Case> getOrderedMenuItemChildren(Case parentItem) {
+        return menuItemService.getOrderedMenuItemChildren(parentItem)
+    }
+
+    /**
+     * Moves an item one position up or down among process-backed siblings and keeps numeric and fallback order in sync.
+     */
+    boolean moveMenuItemInOrder(Case item, int offset) {
+        def moveOutcomes = menuItemService.moveMenuItemInOrder(item, offset)
+        moveOutcomes.each { outcome -> addSetDataOutcomeToOutcomes(outcome) }
+        return !moveOutcomes.empty
     }
 
     void updateMenuItemRoles(Case item, Closure cl, String roleFieldId) {
