@@ -439,7 +439,6 @@ public class MenuItemService implements IMenuItemService {
             return Collections.emptyList();
         }
 
-        List<String> childIds = new ArrayList<>(persistedChildIds);
         List<Case> orderedChildren = getOrderedMenuItemChildren(parent);
         int currentIndex = indexOfCase(orderedChildren, item.getStringId());
         int targetIndex = currentIndex + offset;
@@ -448,15 +447,8 @@ public class MenuItemService implements IMenuItemService {
         }
 
         Case sibling = orderedChildren.get(targetIndex);
-        int currentFallbackIndex = childIds.indexOf(item.getStringId());
-        int siblingFallbackIndex = childIds.indexOf(sibling.getStringId());
-        if (currentFallbackIndex < 0 || siblingFallbackIndex < 0) {
-            return Collections.emptyList();
-        }
-
         Double currentOrder = resolveMenuItemOrder(item);
         Double siblingOrder = resolveMenuItemOrder(sibling);
-        Collections.swap(childIds, currentFallbackIndex, siblingFallbackIndex);
         List<SetDataEventOutcome> outcomes = new ArrayList<>();
 
         if (!Objects.equals(currentOrder, siblingOrder)) {
@@ -469,6 +461,7 @@ public class MenuItemService implements IMenuItemService {
         }
 
         Collections.swap(orderedChildren, currentIndex, targetIndex);
+        List<String> childIds = mergeResolvedChildOrder(persistedChildIds, orderedChildren);
         List<String> childTaskIds = orderedChildren.stream()
                 .map(child -> MenuItemUtils.findTaskIdInCase(child, MenuItemConstants.TRANS_ORDER_ROW_ID))
                 .filter(Objects::nonNull)
@@ -478,6 +471,22 @@ public class MenuItemService implements IMenuItemService {
                 MenuItemConstants.FIELD_CHILD_ITEM_FORMS, Map.of("type", "taskRef", "value", childTaskIds)
         )));
         return outcomes;
+    }
+
+    /**
+     * Persists the effective order of resolved children without dropping stale references that could not be loaded.
+     * Unresolved IDs keep their original slots and the resolved slots are filled in effective order.
+     */
+    private static List<String> mergeResolvedChildOrder(List<String> persistedChildIds, List<Case> orderedChildren) {
+        List<String> orderedResolvedIds = orderedChildren.stream().map(Case::getStringId).toList();
+        Set<String> resolvedIds = new HashSet<>(orderedResolvedIds);
+        Iterator<String> orderedIds = orderedResolvedIds.iterator();
+        List<String> mergedIds = new ArrayList<>(persistedChildIds.size());
+
+        for (String childId : persistedChildIds) {
+            mergedIds.add(resolvedIds.contains(childId) && orderedIds.hasNext() ? orderedIds.next() : childId);
+        }
+        return mergedIds;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

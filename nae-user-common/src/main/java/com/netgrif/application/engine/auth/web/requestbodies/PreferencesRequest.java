@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,7 @@ public class PreferencesRequest {
     private Map<String, List<String>> taskFilters = new HashMap<>();
     private Map<String, List<String>> caseFilters = new HashMap<>();
     private Map<String, List<String>> headers = new HashMap<>();
-    private Map<String, List<SortPreference>> sorts = new HashMap<>();
+    private Map<String, List<SortPreference>> sorts;
 
     public Preferences toPreferences() {
         Preferences preferences = new com.netgrif.application.engine.adapter.spring.preferences.Preferences(userId);

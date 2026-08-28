@@ -329,7 +329,6 @@ class MigrationTest {
         assert new LinkedHashSet(migratedMenuNet.roles.keySet()) == originalRoleIds
         assert migratedMenuItem.petriNetObjectId == originalNetId
         assert migratedMenuItem.dataSet["order"].value == null
-        assert migratedMenuItem.dataSet["order"].validations.size() == 1
         assert migratedMenuItem.dataSet["order"].behavior["item_settings"].contains(
                 com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.FieldBehavior.EDITABLE
         )

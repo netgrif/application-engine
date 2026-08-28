@@ -278,22 +278,33 @@ class MenuItemApiTest {
         assert equal.dataSet[MenuItemConstants.FIELD_ORDER].value == null
         assert parent.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value == [
                 negative.stringId,
-                equal.stringId,
                 positive.stringId,
-                missing.stringId
+                missing.stringId,
+                equal.stringId
         ]
-        assert menuItemService.getOrderedMenuItemChildren(parent)*.stringId == [
+        List<String> movedOrder = [
                 negative.stringId,
                 positive.stringId,
                 missing.stringId,
                 equal.stringId
         ]
+        assert menuItemService.getOrderedMenuItemChildren(parent)*.stringId == movedOrder
         assert parent.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_FORMS].value == [
                 negative,
                 positive,
                 missing,
                 equal
         ].collect { MenuItemUtils.findTaskIdInCase(it, MenuItemConstants.TRANS_ORDER_ROW_ID) }
+
+        [negative, positive, missing, equal].each { child ->
+            String taskId = MenuItemUtils.findTaskIdInCase(child, MenuItemConstants.TRANS_ORDER_ROW_ID)
+            dataService.setData(taskId, ImportHelper.populateDataset([
+                    (MenuItemConstants.FIELD_ORDER): ["type": "number", "value": null]
+            ]))
+        }
+        parent = workflowService.findOne(parent.stringId)
+        assert menuItemService.getOrderedMenuItemChildren(parent)*.stringId == movedOrder
+
         assert menuItemService.moveMenuItemInOrder(negative, -1).empty
         assertThrows(IllegalArgumentException.class, () -> menuItemService.moveMenuItemInOrder(negative, 0))
     }
