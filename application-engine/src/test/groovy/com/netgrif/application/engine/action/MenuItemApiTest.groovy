@@ -10,6 +10,9 @@ import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString
 import com.netgrif.application.engine.objects.utils.MenuItemUtils
 import com.netgrif.application.engine.objects.workflow.domain.Case
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.EventOutcome
+import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemConstants
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemView
 import com.netgrif.application.engine.objects.workflow.domain.menu.configurations.TabbedCaseViewConstants
@@ -22,6 +25,7 @@ import com.netgrif.application.engine.workflow.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.menu.services.interfaces.IMenuItemService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -67,6 +71,9 @@ class MenuItemApiTest {
     @Autowired
     private ITaskService taskService
 
+    @Autowired
+    private IMenuItemService menuItemService
+
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
@@ -85,6 +92,7 @@ class MenuItemApiTest {
         assert item.dataSet[MenuItemConstants.FIELD_IDENTIFIER].value.toString() == "new_menu_item"
         assert item.dataSet[MenuItemConstants.FIELD_BANNED_ROLES].options.containsKey("role_2:filter_api_test")
         assert item.dataSet[MenuItemConstants.FIELD_ALLOWED_ROLES].options.containsKey("role_1:filter_api_test")
+        assert item.dataSet[MenuItemConstants.FIELD_ORDER].value == 30
         assert item.dataSet[MenuItemConstants.FIELD_USE_TABBED_VIEW].value == true
         assert item.dataSet[MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE].value == MenuItemView.TABBED_CASE_VIEW.identifier
 
@@ -146,6 +154,7 @@ class MenuItemApiTest {
 
         assert item.dataSet[MenuItemConstants.FIELD_MENU_NAME].value.toString() == "CHANGED FILTER"
         assert item.dataSet[MenuItemConstants.FIELD_ALLOWED_ROLES].options.entrySet()[0].key.contains("role_2")
+        assert item.dataSet[MenuItemConstants.FIELD_ORDER].value == 5
         assert item.dataSet[MenuItemConstants.FIELD_USE_TABBED_VIEW].value == true
         assert item.dataSet[MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE].value == MenuItemView.TABBED_CASE_VIEW.identifier
 //        assert item.uriNodeId == newUri.stringId
@@ -243,6 +252,156 @@ class MenuItemApiTest {
     }
 
     @Test
+    void testMenuOrderUsesChildIdsAsFallbackAndKeepsArrowsInSync() {
+        Case negative = menuItemService.createMenuItem(menuItemBody("order_negative", -10d))
+        Case missing = menuItemService.createMenuItem(menuItemBody("order_missing", null))
+        Case positive = menuItemService.createMenuItem(menuItemBody("order_positive", 5d))
+        Case equal = menuItemService.createMenuItem(menuItemBody("order_equal", 5d))
+        Case parent = menuItemService.findFolderCase("/order_test")
+
+        assert menuItemService.getOrderedMenuItemChildren(parent)*.stringId == [
+                negative.stringId,
+                positive.stringId,
+                equal.stringId,
+                missing.stringId
+        ]
+
+        assert menuItemService.moveMenuItemInOrder(missing, -1).size() == 3
+
+        parent = workflowService.findOne(parent.stringId)
+        negative = workflowService.findOne(negative.stringId)
+        missing = workflowService.findOne(missing.stringId)
+        positive = workflowService.findOne(positive.stringId)
+        equal = workflowService.findOne(equal.stringId)
+
+        assert missing.dataSet[MenuItemConstants.FIELD_ORDER].value == 5d
+        assert equal.dataSet[MenuItemConstants.FIELD_ORDER].value == null
+        assert parent.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value == [
+                negative.stringId,
+                positive.stringId,
+                missing.stringId,
+                equal.stringId
+        ]
+        List<String> movedOrder = [
+                negative.stringId,
+                positive.stringId,
+                missing.stringId,
+                equal.stringId
+        ]
+        assert menuItemService.getOrderedMenuItemChildren(parent)*.stringId == movedOrder
+        assert parent.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_FORMS].value == [
+                negative,
+                positive,
+                missing,
+                equal
+        ].collect { MenuItemUtils.findTaskIdInCase(it, MenuItemConstants.TRANS_ORDER_ROW_ID) }
+
+        [negative, positive, missing, equal].each { child ->
+            String taskId = MenuItemUtils.findTaskIdInCase(child, MenuItemConstants.TRANS_ORDER_ROW_ID)
+            dataService.setData(taskId, ImportHelper.populateDataset([
+                    (MenuItemConstants.FIELD_ORDER): ["type": "number", "value": null]
+            ]))
+        }
+        parent = workflowService.findOne(parent.stringId)
+        assert menuItemService.getOrderedMenuItemChildren(parent)*.stringId == movedOrder
+
+        assert menuItemService.moveMenuItemInOrder(negative, -1).empty
+        assertThrows(IllegalArgumentException.class, () -> menuItemService.moveMenuItemInOrder(negative, 0))
+    }
+
+    @Test
+    void testRepeatedMenuMoveReloadsStaleTaskRefCase() {
+        Case first = menuItemService.createMenuItem(menuItemBody("stale_first", 1d))
+        Case second = menuItemService.createMenuItem(menuItemBody("stale_second", 2d))
+        Case third = menuItemService.createMenuItem(menuItemBody("stale_third", 3d))
+
+        assert menuItemService.moveMenuItemInOrder(third, -1).size() == 3
+        assert menuItemService.moveMenuItemInOrder(third, -1).size() == 3
+
+        first = workflowService.findOne(first.stringId)
+        second = workflowService.findOne(second.stringId)
+        third = workflowService.findOne(third.stringId)
+        Case parent = menuItemService.findFolderCase("/order_test")
+
+        assert third.dataSet[MenuItemConstants.FIELD_ORDER].value == 1d
+        assert first.dataSet[MenuItemConstants.FIELD_ORDER].value == 2d
+        assert second.dataSet[MenuItemConstants.FIELD_ORDER].value == 3d
+        assert menuItemService.getOrderedMenuItemChildren(parent)*.stringId == [
+                third.stringId,
+                first.stringId,
+                second.stringId
+        ]
+    }
+
+    @Test
+    void testOrderArrowReturnsImmediateChangedFields() {
+        Case first = menuItemService.createMenuItem(menuItemBody("arrow_first", 1d))
+        Case second = menuItemService.createMenuItem(menuItemBody("arrow_second", 2d))
+        Case third = menuItemService.createMenuItem(menuItemBody("arrow_third", 3d))
+        Case parent = menuItemService.findFolderCase("/order_test")
+        String rowTaskId = MenuItemUtils.findTaskIdInCase(third, MenuItemConstants.TRANS_ORDER_ROW_ID)
+
+        SetDataEventOutcome firstClick = dataService.setData(rowTaskId, ImportHelper.populateDataset([
+                "order_up": ["type": "button"]
+        ]))
+        List<SetDataEventOutcome> immediateUpdates = flattenOutcomes(firstClick)
+                .findAll { it instanceof SetDataEventOutcome } as List<SetDataEventOutcome>
+
+        assert immediateUpdates*.getCase()*.stringId.containsAll([
+                third.stringId,
+                second.stringId,
+                parent.stringId
+        ])
+        assert immediateUpdates.find {
+            it.getCase().stringId == third.stringId &&
+                    it.changedFields.containsKey(MenuItemConstants.FIELD_ORDER)
+        }
+        assert immediateUpdates.find {
+            it.getCase().stringId == second.stringId &&
+                    it.changedFields.containsKey(MenuItemConstants.FIELD_ORDER)
+        }
+        assert immediateUpdates.find {
+            it.getCase().stringId == parent.stringId &&
+                    it.changedFields.containsKey(MenuItemConstants.FIELD_CHILD_ITEM_FORMS)
+        }
+
+        dataService.setData(rowTaskId, ImportHelper.populateDataset([
+                "order_up": ["type": "button"]
+        ]))
+
+        first = workflowService.findOne(first.stringId)
+        second = workflowService.findOne(second.stringId)
+        third = workflowService.findOne(third.stringId)
+        assert third.dataSet[MenuItemConstants.FIELD_ORDER].value == 1d
+        assert first.dataSet[MenuItemConstants.FIELD_ORDER].value == 2d
+        assert second.dataSet[MenuItemConstants.FIELD_ORDER].value == 3d
+    }
+
+    @Test
+    void testMoveDestinationGetActionUsesMenuNodePath() {
+        Case apiCase = createMenuItem("/netgrif/test")
+        Case item = getMenuItem(apiCase)
+        String moveTaskId = item.tasks.find { it.transition == "move_item" }.task
+
+        def moveDestination = dataService.getData(moveTaskId).data.find {
+            it.importId == "move_dest_uri"
+        }
+
+        assert moveDestination != null
+        assert (moveDestination.value as List) == ["/", "netgrif", "test"]
+        assert moveDestination.options.keySet().containsAll(["/", "netgrif", "test", "new_menu_item"])
+
+        Case correctedItem = dataService.setData(moveTaskId, ImportHelper.populateDatasetWithObject([
+                "move_dest_uri": [
+                        "type" : "multichoice_map",
+                        "value": ["/", "netgrif", "test", "missing_node"]
+                ]
+        ])).case
+
+        assert (correctedItem.dataSet["move_dest_uri"].value as List) == ["/", "netgrif", "test"]
+    }
+
+    @Test
     void testDuplicateMenuItem() {
         String starterUri = "/netgrif/test"
         Case apiCase = createMenuItem(starterUri, "new_menu_item")
@@ -313,6 +472,16 @@ class MenuItemApiTest {
                 "create_filter_and_menu": "0"
         ])
         return caze
+    }
+
+    private static MenuItemBody menuItemBody(String identifier, Double order) {
+        MenuItemBody body = new MenuItemBody("/order_test", identifier, identifier, "sort")
+        body.setOrder(order)
+        return body
+    }
+
+    private static List<EventOutcome> flattenOutcomes(EventOutcome outcome) {
+        return [outcome] + (outcome.outcomes ?: []).collectMany { flattenOutcomes(it) }
     }
 
     @Test

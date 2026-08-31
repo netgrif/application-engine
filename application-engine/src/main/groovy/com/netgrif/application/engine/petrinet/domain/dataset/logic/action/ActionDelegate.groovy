@@ -1874,7 +1874,9 @@ class ActionDelegate extends DelegateExpando {
      * @return
      */
     @Deprecated
-    Case createMenuItem(String uri, String identifier, Case filter, String groupName, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
+    Case createMenuItem(String uri, String identifier, Case filter, String groupName, Map<String, String> allowedRoles,
+                        Map<String, String> bannedRoles = [:], List<String> caseDefaultHeaders = [],
+                        List<String> taskDefaultHeaders = [], Double order = null) {
         MenuItemBody body = new MenuItemBody(
                 uri,
                 identifier,
@@ -1885,6 +1887,7 @@ class ActionDelegate extends DelegateExpando {
         body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
         body.setUseCustomView(false)
         body.setUseTabbedView(true)
+        body.setOrder(order)
 
         body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
 
@@ -1902,7 +1905,9 @@ class ActionDelegate extends DelegateExpando {
      * @return
      */
     @Deprecated
-    Case createMenuItem(String uri, String identifier, Case filter, String groupName, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
+    Case createMenuItem(String uri, String identifier, Case filter, String groupName, List<ProcessRole> allowedRoles,
+                        List<ProcessRole> bannedRoles = [], List<String> caseDefaultHeaders = [],
+                        List<String> taskDefaultHeaders = [], Double order = null) {
         MenuItemBody body = new MenuItemBody(
                 uri,
                 identifier,
@@ -1914,6 +1919,7 @@ class ActionDelegate extends DelegateExpando {
         body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
         body.setUseCustomView(false)
         body.setUseTabbedView(true)
+        body.setOrder(order)
 
         body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
 
@@ -1932,7 +1938,10 @@ class ActionDelegate extends DelegateExpando {
      * @return
      */
     @Deprecated
-    Case createMenuItem(String uri, String identifier, Case filter, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], Case group = null, List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
+    Case createMenuItem(String uri, String identifier, Case filter, Map<String, String> allowedRoles,
+                        Map<String, String> bannedRoles = [:], Case group = null,
+                        List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = [],
+                        Double order = null) {
         MenuItemBody body = new MenuItemBody(
                 uri,
                 identifier,
@@ -1944,6 +1953,7 @@ class ActionDelegate extends DelegateExpando {
         body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
         body.setUseCustomView(false)
         body.setUseTabbedView(true)
+        body.setOrder(order)
 
         body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
 
@@ -1961,7 +1971,10 @@ class ActionDelegate extends DelegateExpando {
      * @return
      */
     @Deprecated
-    Case createMenuItem(String uri, String identifier, Case filter, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], Case group = null, List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
+    Case createMenuItem(String uri, String identifier, Case filter, List<ProcessRole> allowedRoles,
+                        List<ProcessRole> bannedRoles = [], Case group = null,
+                        List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = [],
+                        Double order = null) {
         MenuItemBody body = new MenuItemBody(
                 uri,
                 identifier,
@@ -1973,6 +1986,7 @@ class ActionDelegate extends DelegateExpando {
         body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
         body.setUseCustomView(false)
         body.setUseTabbedView(true)
+        body.setOrder(order)
 
         body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
 
@@ -1993,13 +2007,15 @@ class ActionDelegate extends DelegateExpando {
      * identifier where the role exists
      * @param caseDefaultHeaders List of headers displayed in case view
      * @param taskDefaultHeaders List of headers displayed in task view
+     * @param order optional ascending menu order; items without a value are displayed after ordered items
      *
      * @return created Case of menu_item
      * */
     @NamedVariant
     Case createMenuItem(String uri, String identifier, def name, String icon = "filter_none", Case filter = null,
                         Map<String, String> allowedRoles = [:], Map<String, String> bannedRoles = [:],
-                        List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
+                        List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = [],
+                        Double order = null) {
         MenuItemBody body = new MenuItemBody(
                 uri,
                 identifier,
@@ -2011,6 +2027,7 @@ class ActionDelegate extends DelegateExpando {
         body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
         body.setUseCustomView(false)
         body.setUseTabbedView(true)
+        body.setOrder(order)
 
         body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
 
@@ -2026,6 +2043,7 @@ class ActionDelegate extends DelegateExpando {
      * <li> <code>changeMenuItem item title { new I18nString("New title") }</code>
      * <li> <code>changeMenuItem item title { "New title" }</code>
      * <li> <code>changeMenuItem item menuIcon { "filter_alt" }</code>
+     * <li> <code>changeMenuItem item order { 0 }</code>
      * <li> <code>changeMenuItem item tabIcon { "filter_none" }</code>
      * </ul>
      * @param item {@link Case} instance of menu_item.xml
@@ -2058,6 +2076,12 @@ class ActionDelegate extends DelegateExpando {
                      (MenuItemConstants.FIELD_MENU_ICON): ["type": "text", "value": value]
              ])
          },
+         order             : { cl ->
+             Double value = validateMenuOrder(cl())
+             setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
+                     (MenuItemConstants.FIELD_ORDER): ["type": "number", "value": value]
+             ])
+         },
          tabIcon           : { cl ->
              def value = cl()
              setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
@@ -2079,6 +2103,55 @@ class ActionDelegate extends DelegateExpando {
 
     }
 
+    /**
+     * Changes the optional ascending order of an existing menu item. A {@code null} value clears the order.
+     *
+     * @param item menu item instance to update
+     * @param order optional finite number
+     * @return outcome of the set-data event
+     */
+    def changeMenuItemOrder(Case item, def order) {
+        if (item == null) {
+            throw new IllegalArgumentException("Menu item must not be null.")
+        }
+        Double value = validateMenuOrder(order)
+        return setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
+                (MenuItemConstants.FIELD_ORDER): ["type": "number", "value": value]
+        ])
+    }
+
+    /**
+     * Finds a menu item by its unique identifier and changes its optional ascending order.
+     *
+     * @param menuItemIdentifier unique menu item identifier
+     * @param order optional finite number; {@code null} clears the order
+     * @return outcome of the set-data event
+     */
+    def changeMenuItemOrder(String menuItemIdentifier, def order) {
+        Case item = findMenuItem(menuItemIdentifier)
+        if (item == null) {
+            throw new IllegalArgumentException("Menu item [$menuItemIdentifier] does not exist.")
+        }
+        return changeMenuItemOrder(item, order)
+    }
+
+    /**
+     * Returns process-backed children in the order used by the menu. Numeric order has priority and childItemIds is
+     * used as a stable fallback.
+     */
+    List<Case> getOrderedMenuItemChildren(Case parentItem) {
+        return menuItemService.getOrderedMenuItemChildren(parentItem)
+    }
+
+    /**
+     * Moves an item one position up or down among process-backed siblings and keeps numeric and fallback order in sync.
+     */
+    boolean moveMenuItemInOrder(Case item, int offset) {
+        def moveOutcomes = menuItemService.moveMenuItemInOrder(item, offset)
+        moveOutcomes.each { outcome -> addSetDataOutcomeToOutcomes(outcome) }
+        return !moveOutcomes.empty
+    }
+
     void updateMenuItemRoles(Case item, Closure cl, String roleFieldId) {
         item = workflowService.findOne(item.stringId)
         def roles = cl()
@@ -2091,6 +2164,20 @@ class ActionDelegate extends DelegateExpando {
             dataField.options = collectRolesForPreferenceItem(roles as Map<String, String>)
         }
         workflowService.save(item)
+    }
+
+    private static Double validateMenuOrder(def value) {
+        if (value == null) {
+            return null
+        }
+        if (!(value instanceof Number)) {
+            throw new IllegalArgumentException("Menu item order must be numeric.")
+        }
+        Double order = (value as Number).doubleValue()
+        if (!Double.isFinite(order)) {
+            throw new IllegalArgumentException("Order must be finite");
+        }
+        return order
     }
 
     /**
@@ -2195,6 +2282,7 @@ class ActionDelegate extends DelegateExpando {
      * @param itemCaseDefaultHeaders List of headers displayed in case view
      * @param itemTaskDefaultHeaders List of headers displayed in task view
      * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
+     * @param order optional ascending menu order; items without a value are displayed after ordered items
      *
      * @return created {@link Case} instance of menu_item
      * */
@@ -2203,7 +2291,8 @@ class ActionDelegate extends DelegateExpando {
                             String filterType, String filterVisibility, List<String> filterAllowedNets = [],
                             String itemAndFilterIcon = "filter_none", Map<String, String> itemAllowedRoles = [:],
                             Map<String, String> itemBannedRoles = [:], List<String> itemCaseDefaultHeaders = [],
-                            List<String> itemTaskDefaultHeaders = [], def filterMetadata = null) {
+                            List<String> itemTaskDefaultHeaders = [], def filterMetadata = null,
+                            Double order = null) {
         FilterBody filterBody = new FilterBody()
         filterBody.setTitle((itemAndFilterName instanceof I18nString) ? itemAndFilterName : new I18nString(itemAndFilterName as String))
         filterBody.setQuery(filterQuery)
@@ -2214,7 +2303,7 @@ class ActionDelegate extends DelegateExpando {
         filterBody.setMetadata(filterMetadata as Map<String, Object>)
         Case filter = menuItemService.createFilter(filterBody)
         Case menuItem = createMenuItem(uri, itemIdentifier, itemAndFilterName, itemAndFilterIcon, filter, itemAllowedRoles,
-                itemBannedRoles, itemCaseDefaultHeaders, itemTaskDefaultHeaders)
+                itemBannedRoles, itemCaseDefaultHeaders, itemTaskDefaultHeaders, order)
         return menuItem
     }
 
@@ -2614,13 +2703,16 @@ class ActionDelegate extends DelegateExpando {
     }
 
     @Deprecated
-    Map<String, Case> createMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles, Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
+    Map<String, Case> createMenuItem(String id, String uri, String query, String icon, String title,
+                                     List<String> allowedNets, Map<String, String> roles,
+                                     Map<String, String> bannedRoles = [:], Case group = null,
+                                     List<String> defaultHeaders = [], Double order = null) {
         if (existsMenuItem(id)) {
             log.info("$id menu exists")
             return null
         }
         Case filter = createCaseFilter(title, query, allowedNets, icon, DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE)
-        Case menu = createMenuItem(uri, id, filter, roles, bannedRoles, group, defaultHeaders)
+        Case menu = createMenuItem(uri, id, filter, roles, bannedRoles, group, defaultHeaders, [], order)
         return [
                 "filter"  : filter,
                 "menuItem": menu
@@ -2628,13 +2720,15 @@ class ActionDelegate extends DelegateExpando {
     }
 
     @Deprecated
-    Map<String, Case> createTaskMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles, Case group = null, List<String> defaultHeaders = []) {
+    Map<String, Case> createTaskMenuItem(String id, String uri, String query, String icon, String title,
+                                         List<String> allowedNets, Map<String, String> roles, Case group = null,
+                                         List<String> defaultHeaders = [], Double order = null) {
         if (existsMenuItem(id)) {
             log.info("$id menu exists")
             return null
         }
         Case filter = createTaskFilter(title, query, allowedNets, icon, DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE)
-        Case menu = createMenuItem(uri, id, filter, roles, [:], group, defaultHeaders)
+        Case menu = createMenuItem(uri, id, filter, roles, [:], group, defaultHeaders, [], order)
         return [
                 "filter"  : filter,
                 "menuItem": menu
@@ -2642,25 +2736,34 @@ class ActionDelegate extends DelegateExpando {
     }
 
     @Deprecated
-    Case createOrUpdateCaseMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles = [:], Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
+    Case createOrUpdateCaseMenuItem(String id, String uri, String query, String icon, String title,
+                                    List<String> allowedNets, Map<String, String> roles = [:],
+                                    Map<String, String> bannedRoles = [:], Case group = null,
+                                    List<String> defaultHeaders = [], Double order = null) {
         return createOrUpdateMenuItemAndFilter(uri, id, title, query, DefaultFiltersRunner.FILTER_TYPE_CASE,
-                DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, allowedNets, icon, roles, bannedRoles, defaultHeaders)
+                DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, allowedNets, icon, roles, bannedRoles, defaultHeaders,
+                [], null, order)
     }
 
     @Deprecated
-    Case createOrUpdateTaskMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles = [:], Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
+    Case createOrUpdateTaskMenuItem(String id, String uri, String query, String icon, String title,
+                                    List<String> allowedNets, Map<String, String> roles = [:],
+                                    Map<String, String> bannedRoles = [:], Case group = null,
+                                    List<String> defaultHeaders = [], Double order = null) {
         return createOrUpdateMenuItemAndFilter(uri, id, title, query, DefaultFiltersRunner.FILTER_TYPE_TASK,
-                DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, allowedNets, icon, roles, bannedRoles, defaultHeaders)
+                DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, allowedNets, icon, roles, bannedRoles, defaultHeaders,
+                [], null, order)
     }
 
     @Deprecated
     Case createOrUpdateMenuItem(String id, String uri, String type, String query, String icon, String title, List<String> allowedNets,
                                 Map<String, String> roles = [:], Map<String, String> bannedRoles = [:], Case group = null,
-                                List<String> defaultHeaders = []) {
+                                List<String> defaultHeaders = [], Double order = null) {
         MenuItemBody body = new MenuItemBody(uri, id, title, icon)
         body.setAllowedRoles(collectRolesForPreferenceItem(roles))
         body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
         body.setUseTabbedView(true)
+        body.setOrder(order)
 
         FilterBody filterBody = new FilterBody()
         filterBody.setTitle(new I18nString(title as String))
@@ -2688,17 +2791,20 @@ class ActionDelegate extends DelegateExpando {
      * identifier where the role exists
      * @param caseDefaultHeaders List of headers displayed in case view
      * @param taskDefaultHeaders List of headers displayed in task view
+     * @param order optional ascending menu order; items without a value are displayed after ordered items
      *
      * @return created or updated menu item instance
      * */
     @Deprecated(since = "6.5.0")
     Case createOrUpdateMenuItem(String uri, String identifier, def name, String icon = "filter_none", Case filter = null,
                                 Map<String, String> allowedRoles = [:], Map<String, String> bannedRoles = [:],
-                                List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
+                                List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = [],
+                                Double order = null) {
         MenuItemBody body = new MenuItemBody(uri, identifier, name, icon)
         body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
         body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
         body.setUseTabbedView(true)
+        body.setOrder(order)
         if (filter == null) {
             body.setView(createLegacyMenuItemViews(new FilterBody(null), caseDefaultHeaders, taskDefaultHeaders))
         } else {
@@ -2730,6 +2836,7 @@ class ActionDelegate extends DelegateExpando {
      * @param itemCaseDefaultHeaders List of headers displayed in case view
      * @param itemTaskDefaultHeaders List of headers displayed in task view
      * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
+     * @param order optional ascending menu order; items without a value are displayed after ordered items
      *
      * @return created or updated menu item instance along with the actual filter
      * */
@@ -2738,11 +2845,13 @@ class ActionDelegate extends DelegateExpando {
                                          String filterType, String filterVisibility, List<String> filterAllowedNets = [],
                                          String itemAndFilterIcon = "filter_none", Map<String, String> itemAllowedRoles = [:],
                                          Map<String, String> itemBannedRoles = [:], List<String> itemCaseDefaultHeaders = [],
-                                         List<String> itemTaskDefaultHeaders = [], def filterMetadata = null) {
+                                         List<String> itemTaskDefaultHeaders = [], def filterMetadata = null,
+                                         Double order = null) {
         MenuItemBody body = new MenuItemBody(uri, itemIdentifier, itemAndFilterName, itemAndFilterIcon)
         body.allowedRoles = collectRolesForPreferenceItem(itemAllowedRoles)
         body.bannedRoles = collectRolesForPreferenceItem(itemBannedRoles)
         body.setUseTabbedView(true)
+        body.setOrder(order)
 
         FilterBody filterBody = new FilterBody()
         filterBody.setTitle((itemAndFilterName instanceof I18nString) ? itemAndFilterName : new I18nString(itemAndFilterName as String))
@@ -2869,14 +2978,18 @@ class ActionDelegate extends DelegateExpando {
     }
 
     void updateMultichoiceWithCurrentNode(MultichoiceMapField field, String path) {
-        List<String> splitPathList = splitUriPath(path)
+        String currentPath = path ?: MenuItemConstants.PATH_SEPARATOR
+        List<String> splitPathList = splitUriPath(currentPath)
 
-        change field options { findOptionsBasedOnSelectedNode(path, splitPathList) }
+        change field options { findOptionsBasedOnSelectedNode(currentPath, splitPathList) }
         change field value { splitPathList }
     }
 
     List<String> splitUriPath(String path) {
         String rootPath = MenuItemConstants.PATH_SEPARATOR
+        if (path == null || path.isEmpty()) {
+            return [rootPath]
+        }
         String[] splitPath = path.split(MenuItemConstants.PATH_SEPARATOR)
         if (splitPath.length == 0 && path == rootPath) {
             splitPath = [rootPath]
@@ -2893,16 +3006,17 @@ class ActionDelegate extends DelegateExpando {
     }
 
     Map<String, I18nString> findOptionsBasedOnSelectedNode(String path, List<String> splitPathList) {
-        Map<String, I18nString> options = new HashMap<>()
+        Map<String, I18nString> options = new LinkedHashMap<>()
 
         options.putAll(splitPathList.collectEntries { [(it): new I18nString(it)] })
 
-        Case caseByPath = findCaseElastic("processIdentifier:$MenuProcessRunner.MENU_NET_IDENTIFIER AND dataSet.nodePath.textValue.keyword:\"$path\"")
-        Set<String> childrenIds = caseByPath.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS].value as Set
-        if (!childrenIds.isEmpty()) {
-            for (String id : childrenIds) {
-                Case childFolderCase = workflowService.findOne(id)
-                options.put(childFolderCase.dataSet[MenuItemConstants.FIELD_CHILD_ITEM_IDS.value].value as String, new I18nString(childFolderCase.dataSet[MenuItemConstants.FIELD_NODE_NAME.value].value as String))
+        Case caseByPath = findFolderCase(path)
+        Collection<String> childrenIds = caseByPath?.dataSet?.get(MenuItemConstants.FIELD_CHILD_ITEM_IDS)?.value as Collection<String>
+        for (String id : childrenIds ?: []) {
+            Case childCase = workflowService.findOne(id)
+            String childIdentifier = childCase?.dataSet?.get(MenuItemConstants.FIELD_IDENTIFIER)?.value as String
+            if (childIdentifier != null && !childIdentifier.isEmpty()) {
+                options.put(childIdentifier, new I18nString(childIdentifier))
             }
         }
 
@@ -2910,15 +3024,16 @@ class ActionDelegate extends DelegateExpando {
     }
 
     String getCorrectedUri(String uncheckedPath) {
-        String rootPath = MenuItemConstants.PATH_SEPARATOR.value
-        if (uncheckedPath == "") {
+        String rootPath = MenuItemConstants.PATH_SEPARATOR
+        if (uncheckedPath == null || uncheckedPath.isEmpty()) {
             return rootPath
         }
-        int lastIdx = uncheckedPath.lastIndexOf(MenuItemConstants.PATH_SEPARATOR)
-        if (lastIdx == -1) {
-            return rootPath
+
+        String correctedPath = uncheckedPath.startsWith(rootPath) ? uncheckedPath : rootPath + uncheckedPath
+        while (correctedPath != rootPath && findFolderCase(correctedPath) == null) {
+            correctedPath = parentPath(correctedPath)
         }
-        return uncheckedPath
+        return correctedPath
     }
 
     Field<?> getFieldOfTask(String taskId, String fieldId) {
