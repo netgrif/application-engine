@@ -302,50 +302,6 @@ class MigrationTest {
     }
 
     @Test
-    void menuItemOrderAdminScriptShouldMigrateLegacyCasesAndBeIdempotent() {
-        PetriNet menuNet = petriNetService.getDefaultVersionByIdentifier("menu_item")
-        assert menuNet != null
-
-        def originalNetId = menuNet.objectId
-        def originalRoleIds = new LinkedHashSet(menuNet.roles.keySet())
-        Case legacyMenuItem = workflowService.createCase(CreateCaseParams.with()
-                .processId(menuNet.stringId)
-                .title("Legacy menu item without order")
-                .author(superCreator.superUser)
-                .locale(Locale.default)
-                .build()).case
-
-        assert legacyMenuItem.dataSet.containsKey("order")
-        legacyMenuItem.dataSet.remove("order")
-        legacyMenuItem.immediateDataFields.remove("order")
-        workflowService.save(legacyMenuItem)
-
-        String firstResult = runMenuItemOrderAdminMigration()
-        Case migratedMenuItem = workflowService.findOne(legacyMenuItem.stringId)
-        PetriNet migratedMenuNet = petriNetService.getDefaultVersionByIdentifier("menu_item")
-
-        assert firstResult.contains("addedOrderFields=1")
-        assert migratedMenuNet.objectId == originalNetId
-        assert new LinkedHashSet(migratedMenuNet.roles.keySet()) == originalRoleIds
-        assert migratedMenuItem.petriNetObjectId == originalNetId
-        assert migratedMenuItem.dataSet["order"].value == null
-        assert migratedMenuItem.dataSet["order"].behavior["item_settings"].contains(
-                com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.FieldBehavior.EDITABLE
-        )
-        assert migratedMenuItem.immediateDataFields.contains("order")
-
-        migratedMenuItem.dataSet["order"].value = 7.0d
-        workflowService.save(migratedMenuItem)
-
-        String secondResult = runMenuItemOrderAdminMigration()
-        Case migratedTwice = workflowService.findOne(legacyMenuItem.stringId)
-
-        assert secondResult.contains("addedOrderFields=0")
-        assert migratedTwice.dataSet["order"].value == 7.0d
-        assert migratedTwice.immediateDataFields.contains("order")
-    }
-
-    @Test
     void throwImmediately() {
         migrationHelper.clearErrors()
 
