@@ -7,6 +7,7 @@ package com.netgrif.application.engine.objects.workflow.domain.menu;
 public class MenuItemConstants {
     public static final String FIELD_PARENT_ID = "parentId";
     public static final String FIELD_CHILD_ITEM_IDS = "childItemIds";
+    public static final String FIELD_CHILD_ITEM_FORMS = "childItemForms";
     public static final String FIELD_HAS_CHILDREN = "hasChildren";
     public static final String FIELD_IDENTIFIER = "menu_item_identifier";
     public static final String FIELD_APPEND_MENU_ITEM = "append_menu_item_stringId";
@@ -14,6 +15,7 @@ public class MenuItemConstants {
     public static final String FIELD_BANNED_ROLES = "banned_roles";
     public static final String FIELD_MENU_NAME = "menu_name";
     public static final String FIELD_MENU_ICON = "menu_icon";
+    public static final String FIELD_ORDER = "order";
     public static final String FIELD_TAB_NAME = "tab_name";
     public static final String FIELD_USE_TABBED_VIEW = "use_tabbed_view";
     public static final String FIELD_USE_TAB_ICON = "use_tab_icon";
@@ -33,6 +35,8 @@ public class MenuItemConstants {
     public static final String TRANS_SETTINGS_ID = "item_settings";
     public static final String TRANS_INIT_ID = "initialize";
     public static final String TRANS_SYNC_ID = "data_sync";
+    public static final String TRANS_CHILDREN_ORDER_ID = "children_order";
+    public static final String TRANS_ORDER_ROW_ID = "row_for_ordering";
 
     // SEPARATOR
     public static final String PATH_SEPARATOR = "/";
