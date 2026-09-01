@@ -151,7 +151,7 @@ class WorkflowAuthorizationServiceTest {
         testUser = importHelper.createUser(new User(firstName: "Role", lastName: "User", username: USER_EMAIL, email: USER_EMAIL, password: "password", state: UserState.ACTIVE),                [auths.get("user")]as Authority[],
 //                [org] as Group[],
                 [] as ProcessRole[])
-        AbstractUser adminUser = importHelper.createUser(new User(firstName: "Admin", lastName: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
+        AbstractUser adminUser = importHelper.createUser(new User(firstName: "Admin", lastName: "User", username: ADMIN_EMAIL, email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("admin")] as Authority[],
                 [] as ProcessRole[])
         userAuth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(testUser), "password", testUser.authoritySet as List)

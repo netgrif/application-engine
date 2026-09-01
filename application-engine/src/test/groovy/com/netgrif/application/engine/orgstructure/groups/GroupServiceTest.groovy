@@ -94,9 +94,9 @@ class GroupServiceTest {
     void addAndRemoveUser() {
         QGroup qGroup = new QGroup("group")
         Group group = groupService.findByPredicate(qGroup.identifier.eq(DUMMY_USER_MAIL), new FullPageRequest()).getContent().get(0)
-        group = groupService.addUser(userService.findUserByUsername(CUSTOMER_USER_MAIL, null).get(), group)
+        group = groupService.addUser(group, userService.findUserByUsername(CUSTOMER_USER_MAIL, null).get())
         assert group.getMemberIds().size() == 2
-        group = groupService.removeUser(userService.findUserByUsername(CUSTOMER_USER_MAIL, null).get(), group)
+        group = groupService.removeUser(group, userService.findUserByUsername(CUSTOMER_USER_MAIL, null).get())
         assert group.getMemberIds().size() == 1
     }
 

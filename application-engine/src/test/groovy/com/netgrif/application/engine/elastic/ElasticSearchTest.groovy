@@ -2,6 +2,7 @@ package com.netgrif.application.engine.elastic
 
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.auth.domain.User
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
@@ -119,7 +120,7 @@ class ElasticSearchTest {
 //        def org = importHelper.createGroup("Test")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 //        def processRoles = importHelper.getProcessRoles(net.get())
-        def testUser = importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
+        def testUser = importHelper.createUser(new User(firstName: "Test", lastName: "Integration", username: USER_EMAIL, email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [net.roles.values().find { it.importId == "process_role" }] as ProcessRole[])
         auth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(testUser), USER_PASSW, testUser.authoritySet as List)

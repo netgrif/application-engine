@@ -2,6 +2,7 @@ package com.netgrif.application.engine.insurance.mvc
 
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
 import com.netgrif.application.engine.adapter.spring.auth.domain.User
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.auth.service.UserService
@@ -139,10 +140,10 @@ class InsuranceTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         def processRoles = ImportHelper.getProcessRolesByImportId(net.getNet(), ["agent": "1", "company": "2"])
-        def testUser = importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        def testUser = importHelper.createUser(new User(firstName: "Test", lastName: "Integration", username: USER_EMAIL, email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
                 [processRoles.get("agent"), processRoles.get("company")] as ProcessRole[])
-        auth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(testUser), "password", testUser.authoritySet as List)
+        auth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(testUser), "password", (Set<AuthorityImpl>) testUser.authoritySet)
         auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
 
         mapper = net.getNet().dataSet.collectEntries { [(it.value.importId as int): (it.key)] }

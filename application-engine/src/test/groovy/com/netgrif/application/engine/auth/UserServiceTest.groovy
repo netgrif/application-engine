@@ -116,10 +116,10 @@ class UserServiceTest {
         User otherGroupMember = createUser("other-group-member@netgrif.com")
 
         def defaultSystemGroup = groupService.getDefaultSystemGroup()
-        groupService.removeUser(requester, defaultSystemGroup)
-        groupService.removeUser(sharedGroupMember, defaultSystemGroup)
-        groupService.removeUser(otherGroupMember, defaultSystemGroup)
-        groupService.addUser(sharedGroupMember, groupService.getDefaultUserGroup(requester))
+        groupService.removeUser(defaultSystemGroup, requester)
+        groupService.removeUser(defaultSystemGroup, sharedGroupMember)
+        groupService.removeUser(defaultSystemGroup, otherGroupMember)
+        groupService.addUser(groupService.getDefaultUserGroup(requester), sharedGroupMember)
 
         sharedGroupMember = (User) userService.addRole(sharedGroupMember, dummyRole.get_id())
         otherGroupMember = (User) userService.addRole(otherGroupMember, dummyRole.get_id())
