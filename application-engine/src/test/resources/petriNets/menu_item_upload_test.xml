@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
+    <id>menu_upload_test</id>
+    <initials>MTT</initials>
+    <title>Menu test</title>
+    <icon>account_tree</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <transitionRole>false</transitionRole>
+
+    <role>
+        <id>menu_test_viewer</id>
+        <title>Menu test viewer</title>
+    </role>
+
+    <processEvents>
+        <event type="upload">
+            <id>create_complete_test_menu</id>
+            <actions phase="post">
+                <action id="create_menu_tree"><![CDATA[
+                    def allowedNets = ["menu_upload_test"]
+                    def allowedRoles = collectRolesForPreferenceItem([
+                            "menu_test_viewer": "menu_upload_test"
+                    ])
+                    def caseQuery = 'processIdentifier:"menu_upload_test"'
+                    def taskQuery = 'processIdentifier:"menu_upload_test"'
+
+
+                    def menuRoot = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                            "/",
+                            "menu_test_root",
+                            new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                    "Test menu",
+                                    ["sk": "Testovacie menu", "en": "Test menu"]
+                            ),
+                            "account_tree"
+                    )
+                    menuRoot.setAllowedRoles(allowedRoles)
+                    menuRoot.setOrder(0)
+                    createOrUpdateMenuItem(menuRoot)
+
+                    def menuTOTOK = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                            "/",
+                            "totok",
+                            new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                    "TOTOK menu",
+                                    ["sk": "Hentok menu", "en": "TOTOK menu", "de": "Das TOTOK"]
+                            ),
+                            "favorite_border"
+                    )
+                    menuTOTOK.setOrder(6969)
+                    createOrUpdateMenuItem(menuTOTOK)
+
+                    def orderDemo = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                            "/menu_test_root",
+                            "menu_test_order_demo",
+                            new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                    "Order demo",
+                                    ["sk": "Ukážka poradia", "en": "Order demo"]
+                            ),
+                            "sort"
+                    )
+                    orderDemo.setAllowedRoles(allowedRoles)
+                    orderDemo.setOrder(1)
+                    createOrUpdateMenuItem(orderDemo)
+
+                    def noOrderItem = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                            "/menu_test_root/menu_test_order_demo",
+                            "menu_test_order_missing",
+                            new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                    "No order (always last)",
+                                    ["sk": "Bez poradia (vždy posledné)", "en": "No order (always last)"]
+                            ),
+                            "vertical_align_bottom"
+                    )
+                    noOrderItem.setAllowedRoles(allowedRoles)
+                    createOrUpdateMenuItemAndFilter(
+                            noOrderItem,
+                            caseQuery,
+                            "Case",
+                            "private",
+                            allowedNets
+                    )
+
+                    def clearedOrderItem = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                            "/menu_test_root/menu_test_order_demo",
+                            "menu_test_order_cleared",
+                            new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                    "Order cleared with setOrder(null) (always last)",
+                                    [
+                                            "sk": "Poradie zrušené cez setOrder(null) (vždy posledné)",
+                                            "en": "Order cleared with setOrder(null) (always last)"
+                                    ]
+                            ),
+                            "remove_circle_outline"
+                    )
+                    clearedOrderItem.setAllowedRoles(allowedRoles)
+                    clearedOrderItem.setOrder(999)
+                    createOrUpdateMenuItemAndFilter(
+                            clearedOrderItem,
+                            caseQuery,
+                            "Case",
+                            "private",
+                            allowedNets
+                    )
+                    clearedOrderItem.setOrder(null)
+                    createOrUpdateMenuItem(clearedOrderItem)
+
+                    def i18nOrderItem = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                            "/menu_test_root/menu_test_order_demo",
+                            "menu_test_order_i18n",
+                            new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                    "I18N menu test",
+                                    [
+                                            "sk": "I18N test – Slovenčina - 6.5",
+                                            "en": "I18N test – English - 6.5"
+                                    ]
+                            ),
+                            "translate"
+                    )
+                    i18nOrderItem.setAllowedRoles(allowedRoles)
+                    i18nOrderItem.setOrder(6.5)
+                    createOrUpdateMenuItemAndFilter(
+                            i18nOrderItem,
+                            caseQuery,
+                            "Case",
+                            "private",
+                            allowedNets
+                    )
+
+                    (1..15).each { order ->
+                        def title = "Order ${order}".toString()
+                        def orderedItem = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                                "/menu_test_root/menu_test_order_demo",
+                                "menu_test_order_${order}".toString(),
+                                new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                        title,
+                                        ["sk": "Poradie ${order}".toString(), "en": title]
+                                ),
+                                "sort"
+                        )
+                        orderedItem.setAllowedRoles(allowedRoles)
+                        orderedItem.setOrder(order)
+                        createOrUpdateMenuItemAndFilter(
+                                orderedItem,
+                                caseQuery,
+                                "Case",
+                                "private",
+                                allowedNets
+                        )
+                    }
+
+                    def randomDemo = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                            "/menu_test_root",
+                            "menu_test_random_demo",
+                            new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                    "Random 100",
+                                    ["sk": "Náhodných 100", "en": "Random 100"]
+                            ),
+                            "shuffle"
+                    )
+                    randomDemo.setAllowedRoles(allowedRoles)
+                    randomDemo.setOrder(2)
+                    createOrUpdateMenuItem(randomDemo)
+
+                    def randomCreationOrder = (0..<100).collect { index -> ((index * 37 + 17) % 100) + 1 }
+                    randomCreationOrder.each { itemOrder ->
+                        String paddedOrder = itemOrder.toString().padLeft(3, "0")
+                        String title = "Random item ${paddedOrder}".toString()
+                        def randomItem = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                                "/menu_test_root/menu_test_random_demo",
+                                "menu_test_random_${paddedOrder}".toString(),
+                                new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                        title,
+                                        [
+                                                "sk": "Náhodná položka ${paddedOrder}".toString(),
+                                                "en": title
+                                        ]
+                                ),
+                                "drag_indicator"
+                        )
+                        randomItem.setAllowedRoles(allowedRoles)
+                        randomItem.setOrder(itemOrder == 37 ? 1037 : itemOrder)
+                        createOrUpdateMenuItem(randomItem)
+                    }
+
+                    changeMenuItemOrder("menu_test_random_037", 37)
+
+                    def childItemIdsOnlyDemo = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                            "/menu_test_root",
+                            "menu_test_child_ids_only_demo",
+                            new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                    "childItemIds only (no order)",
+                                    [
+                                            "sk": "Iba childItemIds (bez order)",
+                                            "en": "childItemIds only (no order)"
+                                    ]
+                            ),
+                            "format_list_numbered"
+                    )
+                    childItemIdsOnlyDemo.setAllowedRoles(allowedRoles)
+                    createOrUpdateMenuItem(childItemIdsOnlyDemo)
+
+                    def childItemIdsOnlyCreationOrder = [7, 2, 9, 1, 5, 3, 10, 4, 8, 6]
+                    childItemIdsOnlyCreationOrder.each { itemNumber ->
+                        String paddedNumber = itemNumber.toString().padLeft(2, "0")
+                        String title = "Fallback item ${paddedNumber}".toString()
+                        def fallbackItem = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                                "/menu_test_root/menu_test_child_ids_only_demo",
+                                "menu_test_child_ids_only_${paddedNumber}".toString(),
+                                new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                        title,
+                                        [
+                                                "sk": "Fallback položka ${paddedNumber}".toString(),
+                                                "en": title
+                                        ]
+                                ),
+                                "low_priority"
+                        )
+                        fallbackItem.setAllowedRoles(allowedRoles)
+                        createOrUpdateMenuItemAndFilter(
+                                fallbackItem,
+                                caseQuery,
+                                "Case",
+                                "private",
+                                allowedNets
+                        )
+                    }
+
+                    def overview = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                            "/menu_test_root",
+                            "menu_test_overview",
+                            new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                    "Overview",
+                                    ["sk": "Prehľad", "en": "Overview"]
+                            ),
+                            "dashboard"
+                    )
+                    overview.setAllowedRoles(allowedRoles)
+                    createOrUpdateMenuItemAndFilter(
+                            overview,
+                            caseQuery,
+                            "Case",
+                            "private",
+                            allowedNets
+                    )
+
+                    def sales = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                            "/menu_test_root",
+                            "menu_test_sales",
+                            new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                    "Sales",
+                                    ["sk": "Predaj", "en": "Sales"]
+                            ),
+                            "storefront"
+                    )
+                    sales.setAllowedRoles(allowedRoles)
+                    sales.setOrder(20)
+                    createOrUpdateMenuItem(sales)
+
+                    def customers = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                            "/menu_test_root/menu_test_sales",
+                            "menu_test_customers",
+                            new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                    "Customers",
+                                    ["sk": "Zákazníci", "en": "Customers"]
+                            ),
+                            "groups"
+                    )
+                    customers.setAllowedRoles(allowedRoles)
+                    customers.setOrder(5)
+                    customers.setAutoSelect(true)
+                    def customersView = createSingleTaskViewBody(
+                            customers,
+                            caseQuery,
+                            "review",
+                            allowedNets,
+                            ["menu_upload_test-customer_name", "menu_upload_test-status"]
+                    )
+                    customersView.setRequireTitleInCreation(false)
+                    customersView.setShowCreateCaseButton(true)
+                    customers.setView(customersView)
+                    createOrUpdateMenuItem(customers)
+
+                    def offers = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                            "/menu_test_root/menu_test_sales",
+                            "menu_test_offers",
+                            new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                    "Offers",
+                                    ["sk": "Ponuky", "en": "Offers"]
+                            ),
+                            "request_quote"
+                    )
+                    offers.setAllowedRoles(allowedRoles)
+                    offers.setOrder(5)
+                    createOrUpdateMenuItemAndFilter(
+                            offers,
+                            caseQuery,
+                            "Case",
+                            "private",
+                            allowedNets
+                    )
+
+                    def operations = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                            "/menu_test_root",
+                            "menu_test_operations",
+                            new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                    "Operations",
+                                    ["sk": "Prevádzka", "en": "Operations"]
+                            ),
+                            "settings_suggest"
+                    )
+                    operations.setAllowedRoles(allowedRoles)
+                    operations.setOrder(10)
+                    createOrUpdateMenuItem(operations)
+
+                    def workQueue = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                            "/menu_test_root/menu_test_operations",
+                            "menu_test_work_queue",
+                            new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                    "Work queue",
+                                    ["sk": "Front úloh", "en": "Work queue"]
+                            ),
+                            "task_alt"
+                    )
+                    workQueue.setAllowedRoles(allowedRoles)
+
+                    def taskFilter = new com.netgrif.application.engine.objects.workflow.domain.menu.FilterBody()
+                    taskFilter.setTitle(workQueue.getMenuName())
+                    taskFilter.setQuery(taskQuery)
+                    taskFilter.setType("Task")
+                    taskFilter.setAllowedNets(allowedNets)
+                    taskFilter.setIcon(workQueue.getMenuIcon())
+                    taskFilter.setVisibility("private")
+
+                    def taskView = new com.netgrif.application.engine.objects.workflow.domain.menu.configurations.TabbedTaskViewBody()
+                    taskView.setFilterBody(taskFilter)
+                    taskView.setDefaultHeaders([
+                            "meta-caseTitleSortable",
+                            "meta-title",
+                            "meta-user",
+                            "meta-assign-date"
+                    ])
+                    workQueue.setView(taskView)
+                    createOrUpdateMenuItem(workQueue)
+
+                    def settings = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                            "/menu_test_root/menu_test_operations",
+                            "menu_test_settings",
+                            new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                    "Settings",
+                                    ["sk": "Nastavenia", "en": "Settings"]
+                            ),
+                            "settings"
+                    )
+                    settings.setAllowedRoles(allowedRoles)
+                    settings.setOrder(0)
+                    createOrUpdateMenuItem(settings)
+
+                    def users = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                            "/menu_test_root/menu_test_operations/menu_test_settings",
+                            "menu_test_users",
+                            new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                    "Users",
+                                    ["sk": "Používatelia", "en": "Users"]
+                            ),
+                            "manage_accounts"
+                    )
+                    users.setAllowedRoles(allowedRoles)
+                    createOrUpdateMenuItemAndFilter(
+                            users,
+                            caseQuery,
+                            "Case",
+                            "private",
+                            allowedNets
+                    )
+
+                    def audit = new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(
+                            "/menu_test_root/menu_test_operations/menu_test_settings",
+                            "menu_test_audit",
+                            new com.netgrif.application.engine.objects.petrinet.domain.I18nString(
+                                    "Audit",
+                                    ["sk": "Audit", "en": "Audit"]
+                            ),
+                            "policy"
+                    )
+                    audit.setAllowedRoles(allowedRoles)
+                    audit.setOrder(0)
+                    createOrUpdateMenuItemAndFilter(
+                            audit,
+                            caseQuery,
+                            "Case",
+                            "private",
+                            allowedNets
+                    )
+                ]]></action>
+            </actions>
+        </event>
+    </processEvents>
+
+    <data type="text">
+        <id>customer_name</id>
+        <title>Customer name</title>
+    </data>
+    <data type="text">
+        <id>status</id>
+        <title>Status</title>
+        <init>New</init>
+    </data>
+
+    <transition>
+        <id>review</id>
+        <label>Review</label>
+        <roleRef>
+            <id>menu_test_viewer</id>
+            <logic>
+                <perform>true</perform>
+                <view>true</view>
+                <assign>true</assign>
+                <cancel>true</cancel>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>review_form</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>customer_name</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>status</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>
