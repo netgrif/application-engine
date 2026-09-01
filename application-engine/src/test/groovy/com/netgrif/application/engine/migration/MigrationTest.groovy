@@ -359,4 +359,22 @@ class MigrationTest {
         assert migrationHelper.hasErrors()
         assert migrationHelper.popErrors().size() > 0
     }
+
+    private String runMenuItemOrderAdminMigration() {
+        URL scriptResource = this.class.classLoader.getResource("migrations/menu_item_add_order.groovy")
+        assert scriptResource != null
+
+        String scriptBody = scriptResource.getText("UTF-8")
+        Closure script = (Closure) new GroovyShell().evaluate("{ ->\n${scriptBody}\n}")
+        Expando delegate = new Expando(
+                petriNetService: petriNetService,
+                migrationHelper: migrationHelper,
+                log            : log,
+                cancellable    : { -> }
+        )
+
+        script = script.rehydrate(delegate, delegate, null)
+        script.resolveStrategy = Closure.DELEGATE_ONLY
+        return script.call() as String
+    }
 }
