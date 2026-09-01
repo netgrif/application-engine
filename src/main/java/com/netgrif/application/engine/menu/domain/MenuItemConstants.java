@@ -6,7 +6,7 @@ package com.netgrif.application.engine.menu.domain;
 public class MenuItemConstants {
     public static final String FIELD_PARENT_ID = "parentId";
     public static final String FIELD_CHILD_ITEM_IDS = "childItemIds";
-    public static final String FIELD_HAS_CHILDREN = "hasChildren";
+    public static final String FIELD_IS_FOLDER = "is_folder";
     public static final String FIELD_IDENTIFIER = "menu_item_identifier";
     public static final String FIELD_APPEND_MENU_ITEM = "append_menu_item_stringId";
     public static final String FIELD_ALLOWED_ROLES = "allowed_roles";

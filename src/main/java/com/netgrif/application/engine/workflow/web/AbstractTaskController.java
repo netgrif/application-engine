@@ -27,7 +27,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.web.responsebodies.*;
-import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -199,16 +199,20 @@ public abstract class AbstractTaskController {
 
     public PagedModel<LocalisedTaskResource> searchPfql(Authentication auth, Pageable pageable, SingleTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
         try {
-            Predicate completePredicate = searchBody.getList().stream()
+            BooleanBuilder builder = new BooleanBuilder();
+            searchBody.getList().stream()
                     .map((request) -> {
-                        if (request.query == null || request.query.isEmpty()) {
+                        if (!isPfqlQuery(request.query)) {
                             return searchService.buildSingleQuery(request, (LoggedUser) auth.getPrincipal(), locale);
                         } else {
                             QueryLangEvaluator evaluator = SearchUtils.evaluateQuery(request.query);
                             return evaluator.getFullMongoQuery();
                         }
                     })
-                    .reduce(ExpressionUtils::and).orElse(null);
+                    .filter(Objects::nonNull)
+                    .forEach(builder::and);
+
+            Predicate completePredicate = builder.hasValue() ? builder.getValue() : builder;
             Page<Task> tasks = taskService.search(completePredicate, pageable);
             Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                     .searchPfql(auth, pageable, searchBody, operation, assembler, locale)).withRel("search_pfql");
@@ -383,16 +387,16 @@ public abstract class AbstractTaskController {
 
     protected boolean isPfqlQuery(String query) {
         // todo: temporary until the frontend works fully with PFQL
-        return query != null && !query.isBlank() && (
-                startsWithPfqlPrefix("case", query) || startsWithPfqlPrefix("cases", query)
-                        || startsWithPfqlPrefix("task", query) || startsWithPfqlPrefix("tasks", query)
-                        || startsWithPfqlPrefix("process", query) || startsWithPfqlPrefix("processes", query)
-                        || startsWithPfqlPrefix("user", query) || startsWithPfqlPrefix("users", query)
-        );
+        return query != null && !query.isBlank() && hasValidPfqlPrefix(query);
+    }
+
+    protected boolean hasValidPfqlPrefix(String query) {
+        // todo: temporary until the frontend works fully with PFQL
+        return SearchUtils.validQueryResourcePrefixes.stream().anyMatch(prefix -> startsWithPfqlPrefix(prefix, query));
     }
 
     protected boolean startsWithPfqlPrefix(String prefix, String query) {
         // todo: temporary until the frontend works fully with PFQL
-        return query.startsWith(prefix + ":") || query.startsWith(prefix + " where");
+        return query.startsWith(prefix + ":") || query.startsWith(prefix + " where") || query.equals(prefix);
     }
 }

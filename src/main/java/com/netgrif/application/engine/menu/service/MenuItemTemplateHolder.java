@@ -33,7 +33,8 @@ public class MenuItemTemplateHolder {
             SimpleTaskViewTemplate.IDENTIFIER, new SimpleTaskViewTemplate(),
             SingleTaskViewTemplate.IDENTIFIER, new SingleTaskViewTemplate(),
             TabbedTicketViewTemplate.IDENTIFIER, new TabbedTicketViewTemplate(),
-            CustomViewTemplate.IDENTIFIER, new CustomViewTemplate()
+            CustomViewTemplate.IDENTIFIER, new CustomViewTemplate(),
+            FolderTemplate.IDENTIFIER, new FolderTemplate()
     );
 
 

@@ -3,24 +3,18 @@ package com.netgrif.application.engine.menu;
 import com.mongodb.client.MongoCollection;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.menu.domain.*;
 import com.netgrif.application.engine.menu.domain.configurations.*;
-import com.netgrif.application.engine.menu.domain.templates.CustomViewTemplate;
-import com.netgrif.application.engine.menu.domain.templates.SimpleTaskViewTemplate;
-import com.netgrif.application.engine.menu.domain.templates.TabbedCaseViewTemplate;
-import com.netgrif.application.engine.menu.domain.templates.Template;
+import com.netgrif.application.engine.menu.domain.templates.*;
 import com.netgrif.application.engine.menu.service.MenuItemService;
 import com.netgrif.application.engine.menu.service.MenuItemTemplateHolder;
 import com.netgrif.application.engine.menu.utils.MenuItemUtils;
-import com.netgrif.application.engine.petrinet.domain.DataGroup;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.startup.ImportHelper;
-import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.domain.TaskPair;
@@ -36,13 +30,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -58,9 +49,6 @@ public class MenuItemServiceTest {
     
     @Autowired
     private MenuItemService menuItemService;
-
-    @Autowired
-    private SuperCreator superCreator;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -260,7 +248,7 @@ public class MenuItemServiceTest {
         UriNode testNode = uriService.findByUri("/netgrif");
         UriNode netgrifNode = uriService.getRoot();
 
-        Case rootFolder = findMenuItem("");
+        Case rootFolder = findMenuItem("root");
 
         assertNotNull(testFolder);
         assertNotNull(testNode);
@@ -291,6 +279,11 @@ public class MenuItemServiceTest {
         List<String> rootFolderChildIds = MenuItemUtils.getCaseIdsFromCaseRef(rootFolder, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
         assertNotNull(rootFolderChildIds);
         assertTrue(rootFolderChildIds.contains(netgrifFolder.getStringId()));
+
+        Optional<MenuItemBody> bodyOpt = MenuItemTemplateHolder.get("simple_case_view", "/netgrif/test/new_menu_item", "someIdentifier");
+        assertTrue(bodyOpt.isPresent());
+        // cannot place item inside non-folder item
+        assertThrows(IllegalArgumentException.class, () -> menuItemService.createMenuItem(bodyOpt.get()));
     }
 
     @Test
@@ -385,7 +378,7 @@ public class MenuItemServiceTest {
         assertThrows(IllegalArgumentException.class, () -> menuItemService.findFolderCase(null));
         assertNull(menuItemService.findFolderCase(new UriNode()));
 
-        Optional<MenuItemBody> menuItemBodyOpt = MenuItemTemplateHolder.get(CustomViewTemplate.IDENTIFIER, "/folderik", "test");
+        Optional<MenuItemBody> menuItemBodyOpt = MenuItemTemplateHolder.get(FolderTemplate.IDENTIFIER, "/folderik", "test");
         assertTrue(menuItemBodyOpt.isPresent());
 
         Case createdMenuItemCase = menuItemService.createMenuItem(menuItemBodyOpt.get());
@@ -520,7 +513,7 @@ public class MenuItemServiceTest {
         List<String> duplicatedChildIds = MenuItemUtils.getCaseIdsFromCaseRef(duplicatedFolderCase, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
         assertNotNull(duplicatedChildIds);
         assertEquals(0, duplicatedChildIds.size());
-        assertFalse((Boolean) duplicatedFolderCase.getFieldValue(MenuItemConstants.FIELD_HAS_CHILDREN));
+        assertTrue((Boolean) duplicatedFolderCase.getFieldValue(MenuItemConstants.FIELD_IS_FOLDER));
         assertEquals(1, duplicatedFolderCase.getActivePlaces().get("initialized"));
     }
 
@@ -595,19 +588,20 @@ public class MenuItemServiceTest {
         assertNotNull(childrenCaseIds);
         assertEquals(1, childrenCaseIds.size());
         assertTrue(childrenCaseIds.contains(testItemCase.getStringId()));
-        assertTrue((Boolean) folderikCase.getFieldValue(MenuItemConstants.FIELD_HAS_CHILDREN));
+        assertTrue((Boolean) folderikCase.getFieldValue(MenuItemConstants.FIELD_IS_FOLDER));
 
         folderikCase = menuItemService.removeChildItemFromParent(folderikCase.getStringId(), testItemCase);
 
         childrenCaseIds = MenuItemUtils.getCaseIdsFromCaseRef(folderikCase, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
         assertNotNull(childrenCaseIds);
         assertEquals(0, childrenCaseIds.size());
-        assertFalse((Boolean) folderikCase.getFieldValue(MenuItemConstants.FIELD_HAS_CHILDREN));
+        assertTrue((Boolean) folderikCase.getFieldValue(MenuItemConstants.FIELD_IS_FOLDER));
     }
 
     @Test
     @SuppressWarnings("unchecked")
     public void handleConfigurationTemplateTest() throws TransitionNotExecutableException {
+        // tabbed case view
         Case menuItemCase = workflowService.createCaseByIdentifier(MenuItemConstants.PROCESS_IDENTIFIER, "", "",
                 userService.getSystem().transformToLoggedUser()).getCase();
 
@@ -622,6 +616,7 @@ public class MenuItemServiceTest {
 
         assertTrue((Boolean) outcome.getMapping().get(MenuItemConstants.FIELD_USE_TABBED_VIEW));
         assertFalse((Boolean) outcome.getMapping().get(MenuItemConstants.FIELD_USE_CUSTOM_VIEW));
+        assertFalse((Boolean) outcome.getMapping().get(MenuItemConstants.FIELD_IS_FOLDER));
         assertEquals(MenuItemViewType.CASE_VIEW.getIdentifier(), outcome.getMapping().get(MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE));
         List<String> viewCaseIdAsList = (List<String>) outcome.getMapping().get(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID);
         assertEquals(1, viewCaseIdAsList.size());
@@ -633,53 +628,65 @@ public class MenuItemServiceTest {
         List<String> viewAllFormTaskIdAsList = (List<String>) outcome.getMapping().get(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ALL_DATA_FORM);
         assertEquals(1, viewAllFormTaskIdAsList.size());
         assertEquals(MenuItemUtils.findTaskIdInCase(viewCase, ViewConstants.TRANS_ALL_MENU_DATA_ID), viewAllFormTaskIdAsList.get(0));
+
+        // folder item
+        menuItemCase = workflowService.createCaseByIdentifier(MenuItemConstants.PROCESS_IDENTIFIER, "", "",
+                userService.getSystem().transformToLoggedUser()).getCase();
+
+        menuItemCase = dataService.setData(MenuItemUtils.findTaskIdInCase(menuItemCase, MenuItemConstants.TRANS_INIT_ID),
+                ImportHelper.populateDataset(
+                        Map.of(MenuItemConstants.FIELD_CONFIGURATION_TEMPLATES,
+                                Map.of("type", FieldType.ENUMERATION_MAP.getName(), "value", FolderTemplate.IDENTIFIER))
+                )
+        ).getCase();
+
+        outcome = menuItemService.handleConfigurationTemplate(menuItemCase);
+        assertFalse((Boolean) outcome.getMapping().get(MenuItemConstants.FIELD_USE_TABBED_VIEW));
+        assertFalse((Boolean) outcome.getMapping().get(MenuItemConstants.FIELD_USE_CUSTOM_VIEW));
+        assertTrue((Boolean) outcome.getMapping().get(MenuItemConstants.FIELD_IS_FOLDER));
+
+        // custom view
+        menuItemCase = workflowService.createCaseByIdentifier(MenuItemConstants.PROCESS_IDENTIFIER, "", "",
+                userService.getSystem().transformToLoggedUser()).getCase();
+
+        menuItemCase = dataService.setData(MenuItemUtils.findTaskIdInCase(menuItemCase, MenuItemConstants.TRANS_INIT_ID),
+                ImportHelper.populateDataset(
+                        Map.of(MenuItemConstants.FIELD_CONFIGURATION_TEMPLATES,
+                                Map.of("type", FieldType.ENUMERATION_MAP.getName(), "value", CustomViewTemplate.IDENTIFIER))
+                )
+        ).getCase();
+
+        outcome = menuItemService.handleConfigurationTemplate(menuItemCase);
+        assertFalse((Boolean) outcome.getMapping().get(MenuItemConstants.FIELD_USE_TABBED_VIEW));
+        assertTrue((Boolean) outcome.getMapping().get(MenuItemConstants.FIELD_USE_CUSTOM_VIEW));
+        assertFalse((Boolean) outcome.getMapping().get(MenuItemConstants.FIELD_IS_FOLDER));
     }
 
     @Test
-    public void getAvailableViewsAsOptionsByIsPrimaryTest() {
+    public void getPrimaryViewsAsOptionsTest() {
         
-        Map<String, I18nString> options = menuItemService.getAvailableViewsAsOptions(true, true);
+        Map<String, I18nString> options = menuItemService.getPrimaryViewsAsOptions();
         assertNotNull(options);
         assertEquals(4, options.size());
         assertTrue(options.containsKey(MenuItemViewType.CASE_VIEW.getIdentifier()));
         assertTrue(options.containsKey(MenuItemViewType.TASK_VIEW.getIdentifier()));
         assertTrue(options.containsKey(MenuItemViewType.TABBED_TICKET_VIEW.getIdentifier()));
         assertTrue(options.containsKey(MenuItemViewType.SINGLE_TASK_VIEW.getIdentifier()));
-
-        options = menuItemService.getAvailableViewsAsOptions(true, false);
-        assertNotNull(options);
-        assertEquals(0, options.size());
-
-        options = menuItemService.getAvailableViewsAsOptions(false, false);
-        assertNotNull(options);
-        assertEquals(0, options.size());
-
-        options = menuItemService.getAvailableViewsAsOptions(false, true);
-        assertNotNull(options);
-        assertEquals(3, options.size());
-        assertTrue(options.containsKey(MenuItemViewType.CASE_VIEW.getIdentifier()));
-        assertTrue(options.containsKey(MenuItemViewType.TASK_VIEW.getIdentifier()));
-        assertTrue(options.containsKey(MenuItemViewType.SINGLE_TASK_VIEW.getIdentifier()));
     }
 
     @Test
     public void getAvailableViewsAsOptionsByViewIdentifierTest() {
-        Map<String, I18nString> options = menuItemService.getAvailableViewsAsOptions(true, MenuItemViewType.CASE_VIEW.getIdentifier());
+        Map<String, I18nString> options = menuItemService.getAvailableViewsAsOptions(MenuItemViewType.CASE_VIEW.getIdentifier());
         assertNotNull(options);
         assertEquals(1, options.size());
         assertTrue(options.containsKey(MenuItemViewType.TASK_VIEW.getIdentifier()));
 
-        options = menuItemService.getAvailableViewsAsOptions(true, MenuItemViewType.TABBED_TICKET_VIEW.getIdentifier());
+        options = menuItemService.getAvailableViewsAsOptions(MenuItemViewType.TABBED_TICKET_VIEW.getIdentifier());
         assertNotNull(options);
         assertEquals(1, options.size());
         assertTrue(options.containsKey(MenuItemViewType.SINGLE_TASK_VIEW.getIdentifier()));
 
-        options = menuItemService.getAvailableViewsAsOptions(false, MenuItemViewType.TABBED_TICKET_VIEW.getIdentifier());
-        assertNotNull(options);
-        assertEquals(1, options.size());
-        assertTrue(options.containsKey(MenuItemViewType.SINGLE_TASK_VIEW.getIdentifier()));
-
-        options = menuItemService.getAvailableViewsAsOptions(true, MenuItemViewType.TASK_VIEW.getIdentifier());
+        options = menuItemService.getAvailableViewsAsOptions(MenuItemViewType.TASK_VIEW.getIdentifier());
         assertNotNull(options);
         assertEquals(0, options.size());
     }
@@ -719,32 +726,6 @@ public class MenuItemServiceTest {
         assertThrows(IllegalArgumentException.class, () -> workflowService.findOne(leafItemCase.getStringId()));
         assertThrows(IllegalArgumentException.class, () -> workflowService.findOne(tabbedCaseViewId));
         assertThrows(IllegalArgumentException.class, () -> workflowService.findOne(tabbedTaskViewId));
-    }
-
-    private Case createDefaultMenuItem(String identifier, I18nString name) throws TransitionNotExecutableException {
-        FilterBody filterBody = new FilterBody();
-        filterBody.setQuery("processIdentifier:process1");
-        filterBody.setType(FieldType.CASE_FILTER);
-
-        CaseViewBody caseView = new CaseViewBody();
-        caseView.setFilterBody(filterBody);
-        caseView.setRequireTitleInCreation(false);
-        caseView.setChainedView(new TaskViewBody());
-
-        MenuItemBody menuItemBody = new MenuItemBody();
-        menuItemBody.setUri("/");
-        menuItemBody.setIdentifier(identifier);
-        menuItemBody.setMenuIcon("home");
-        menuItemBody.setMenuName(name);
-        menuItemBody.setTabIcon("folder");
-        menuItemBody.setTabName(name);
-        menuItemBody.setView(caseView);
-
-        return menuItemService.createMenuItem(menuItemBody);
-    }
-
-    private void login() {
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(superCreator.getLoggedSuper(), null));
     }
 
     private String getTaskId(Case useCase, String transId) {

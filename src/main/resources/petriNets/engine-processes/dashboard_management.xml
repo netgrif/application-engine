@@ -2,7 +2,7 @@
     <id>dashboard_management</id>
     <version>1.0.0</version>
     <initials>DBM</initials>
-    <title>Dashboard management</title>
+    <title name="model_title">Dashboard management</title>
     <icon>dashboard</icon>
     <defaultRole>true</defaultRole>
     <anonymousRole>false</anonymousRole>
@@ -21,6 +21,12 @@
         <caseLogic>
             <create>true</create>
             <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>default</id>
+        <caseLogic>
             <view>true</view>
         </caseLogic>
     </roleRef>
@@ -199,7 +205,7 @@
     <data type="button">
         <id>add_new_item</id>
         <title/>
-        <placeholder>Add new item</placeholder>
+        <placeholder name="add_new_item_placeholder">Add new item</placeholder>
         <event type="set">
             <id>add_new_item_set</id>
             <actions phase="post">
@@ -238,7 +244,7 @@
     <data type="button">
         <id>remove_new_item</id>
         <title/>
-        <placeholder>Remove item</placeholder>
+        <placeholder name="remove_new_item_placeholder">Remove item</placeholder>
         <event type="set">
             <id>remove_new_item_set</id>
             <actions phase="post">
@@ -381,6 +387,9 @@
         <i18nString name="profile_url_desc">URL adresa na stránku profilu</i18nString>
         <i18nString name="login_url">URL prihlásenia</i18nString>
         <i18nString name="login_url_desc">URL adresa na stránku prihlásenia. Nechajte prázdne pre rozhodnutie aplikáciou.</i18nString>
+        <i18nString name="add_new_item_placeholder">Pridať novú položku</i18nString>
+        <i18nString name="remove_new_item_placeholder">Odstrániť položku</i18nString>
+        <i18nString name="model_title">Manažment panelu</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="dashboard_id">Dashboard-ID</i18nString>
@@ -408,6 +417,9 @@
         <i18nString name="profile_url_desc">URL-Adresse der Profilseite</i18nString>
         <i18nString name="login_url">Anmelde-URL</i18nString>
         <i18nString name="login_url_desc">URL-Adresse der Anmeldeseite. Lassen Sie leer, um durch Anwendung zu entscheiden.</i18nString>
+        <i18nString name="add_new_item_placeholder">Neues Element hinzufügen</i18nString>
+        <i18nString name="remove_new_item_placeholder">Element entfernen</i18nString>
+        <i18nString name="model_title">Dashboard-Verwaltung</i18nString>
     </i18n>
 
     <!-- TRANSITIONS -->
