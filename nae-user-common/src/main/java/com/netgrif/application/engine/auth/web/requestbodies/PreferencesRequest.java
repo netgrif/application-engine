@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.auth.web.requestbodies;
 
 import com.netgrif.application.engine.objects.preferences.Preferences;
+import com.netgrif.application.engine.objects.preferences.SortPreference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class PreferencesRequest {
     private Map<String, List<String>> taskFilters = new HashMap<>();
     private Map<String, List<String>> caseFilters = new HashMap<>();
     private Map<String, List<String>> headers = new HashMap<>();
+    private Map<String, List<SortPreference>> sorts;
 
     public Preferences toPreferences() {
         Preferences preferences = new com.netgrif.application.engine.adapter.spring.preferences.Preferences(userId);
@@ -28,6 +30,7 @@ public class PreferencesRequest {
         preferences.setTaskFilters(taskFilters);
         preferences.setCaseFilters(caseFilters);
         preferences.setHeaders(headers);
+        preferences.setSorts(sorts);
         return preferences;
     }
 

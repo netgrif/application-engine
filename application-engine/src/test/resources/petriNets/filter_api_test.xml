@@ -88,7 +88,7 @@
 					def filter = createCaseFilter(title.value, query.value, allowed_nets.value.split(",") as List, icon.value)
 					def item = createMenuItem(uri.value, identifier.value, title.value, icon.value, filter,
 									["role_1": "filter_api_test"], ["role_2": "filter_api_test"],
-									["meta-title,meta-title"], ["meta-title,meta-title"])
+									["meta-title,meta-title"], ["meta-title,meta-title"], 30)
 
 					change menu_stringId value { item.stringId }
 					change filter_stringId value { filter.stringId }
@@ -117,9 +117,10 @@
 							"defaultSearchCategories": false,
 							"inheritAllowedNets"     : false
 					]
-					createOrUpdateMenuItemAndFilter(uri.value, identifier.value, title.value, query.value, "Case",
+					def item = createOrUpdateMenuItemAndFilter(uri.value, identifier.value, title.value, query.value, "Case",
 							"private", allowed_nets.value.split(",") as List, icon.value, ["role_2": "filter_api_test"],
-							[:], ["meta-title","meta-title","meta-title"], ["meta-title","meta-title","meta-title"], metadata)
+							[:], ["meta-title","meta-title","meta-title"], ["meta-title","meta-title","meta-title"], metadata, 15)
+					changeMenuItemOrder(item, 5)
 				</action>
 			</actions>
 		</event>
