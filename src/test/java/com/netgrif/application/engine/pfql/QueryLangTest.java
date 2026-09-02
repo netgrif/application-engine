@@ -98,10 +98,10 @@ public class QueryLangTest {
         assertEquals("Test 03", ((Case) case3).getTitle());
         assertEquals(3, ((Case) case3).getFieldValue("number_0"));
 
-        Object case4 = searchService.search("case: processIdentifier eq 'query_test' and data.text_0.value == '4'");
+        Object case4 = searchService.search("case: processIdentifier eq 'query_test' and data.text_0.value == '444'");
         assertNotNull(case4);
         assertEquals(Case.class, case4.getClass());
-        assertEquals("4", ((Case) case4).getFieldValue("text_0"));
+        assertEquals("444", ((Case) case4).getFieldValue("text_0"));
 
         Object case5 = searchService.search("case: processIdentifier eq 'query_test' and data.boolean_0.value == true");
         assertNotNull(case5);
@@ -121,14 +121,14 @@ public class QueryLangTest {
         cases = searchService.search("cases: processIdentifier eq 'query_test' and data.boolean_0.value == true");
         assertEquals(5, ((Page<Case>) cases).getTotalElements());
 
-        cases = searchService.search("cases: processIdentifier eq 'query_test'    and data.boolean_0.value == true and data.text_0.value != '4'");
+        cases = searchService.search("cases: processIdentifier eq 'query_test'    and data.boolean_0.value == true and data.text_0.value != '444'");
         assertEquals(4, ((Page<Case>) cases).getTotalElements());
 
         cases = searchService.search("cases: processIdentifier eq 'query_test' and author eq loggedUser.id");
         assertEquals(10, ((Page<Case>) cases).getTotalElements());
 
-        cases = searchService.search("cases: processIdentifier eq 'query_test' and data.text_0.value eq 'x'*");
-        assertEquals(10, ((Page<Case>) cases).getTotalElements());
+        cases = searchService.search("cases: processIdentifier eq 'query_test' and data.text_0.value eq 'x44'*");
+        assertEquals(1, ((Page<Case>) cases).getTotalElements());
     }
 
     @Test
@@ -1163,11 +1163,11 @@ public class QueryLangTest {
         checkDateComparisonElastic("case", "data.field3.value", "dataSet.field3.timestampValue");
 
         actual = evaluateQuery("case: data.field1.value eq 'somxthing'*").getFullElasticQuery();
-        expected = "dataSet.field1.fulltextValue:somxthing~2";
+        expected = "dataSet.field1.fulltextValue:somxthing~AUTO";
         assertEquals(expected, actual);
 
         actual = evaluateQuery("case: data.field1.value neq 'somxthing'*").getFullElasticQuery();
-        expected = "NOT dataSet.field1.fulltextValue:somxthing~2";
+        expected = "NOT dataSet.field1.fulltextValue:somxthing~AUTO";
         assertEquals(expected, actual);
 
         actual = evaluateQuery("case: data.field1.value eq true").getFullElasticQuery();
@@ -1217,11 +1217,15 @@ public class QueryLangTest {
         assertEquals(expected, actual);
 
         actual = evaluateQuery("case: title eq 'somxthing'*").getFullElasticQuery();
-        expected = "title:somxthing~2";
+        expected = "title:somxthing~AUTO";
         assertEquals(expected, actual);
 
         actual = evaluateQuery("case: title not eq 'somxthing anxthing'*").getFullElasticQuery();
-        expected = "NOT title:\"somxthing anxthing\"~2";
+        expected = "NOT title:(somxthing~AUTO AND anxthing~AUTO)";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: title not eq 'somxthing anxthing everxthing'*").getFullElasticQuery();
+        expected = "NOT title:(somxthing~AUTO AND anxthing~AUTO AND everxthing~AUTO)";
         assertEquals(expected, actual);
     }
 

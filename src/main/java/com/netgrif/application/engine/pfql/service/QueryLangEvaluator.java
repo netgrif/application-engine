@@ -40,7 +40,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     private final ParseTreeProperty<String> elasticQuery = new ParseTreeProperty<>();
     private final ParseTreeProperty<Predicate> mongoQuery = new ParseTreeProperty<>();
-    private final String elasticFuzzyMaxDistance = "2";
+    private final String elasticFuzzyMaxDistance = "AUTO";
 
     private final IUserService userService;
 

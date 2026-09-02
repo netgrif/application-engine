@@ -463,23 +463,29 @@ public class SearchUtils {
         return query;
     }
 
+    protected static List<String> quoteForElastic(List<String> values) {
+        return values.stream().map(SearchUtils::quoteForElastic).collect(Collectors.toList());
+    }
+
+    /**
+     * Adds quotes for value that is going to be used in the Elasticsearch query. If the value does not contain a fuzzy symbol,
+     * origin value wrapped in quotes is returned. For example, `someValue anotherValue` -> `"someValue anotherValue"`. If the value
+     * contains a fuzzy symbol, it places the fuzzy symbol after every term. For example, `someVxlue anotherVxlue~AUTO` ->
+     * `(someVxlue~AUTO AND anotherVxlue~AUTO)`
+     */
     protected static String quoteForElastic(String originValue) {
         if (originValue == null || !originValue.contains(" ")) {
             return originValue;
         }
 
-        String resultValue = originValue;
-        String fuzzy = "";
         int fuzzyIndex = originValue.indexOf('~');
-        if (fuzzyIndex != -1) {
-            fuzzy = originValue.substring(fuzzyIndex);
-            resultValue = originValue.substring(0, fuzzyIndex);
-        }
-
-        return "\"" + resultValue + "\"" + fuzzy;
+        return fuzzyIndex != -1 ? resolvePhraseWithFuzzy(originValue, fuzzyIndex) : "\"" + originValue + "\"";
     }
 
-    protected static List<String> quoteForElastic(List<String> values) {
-        return values.stream().map(SearchUtils::quoteForElastic).collect(Collectors.toList());
+    protected static String resolvePhraseWithFuzzy(String originPhraseWithFuzzy, int fuzzyIndex) {
+        String fuzzy = originPhraseWithFuzzy.substring(fuzzyIndex);
+        String originPhraseWithoutFuzzy = originPhraseWithFuzzy.substring(0, fuzzyIndex);
+        String[] splitPhrase = originPhraseWithoutFuzzy.split(" ");
+        return "(" + String.join(fuzzy + " AND ", splitPhrase) + fuzzy + ")";
     }
 }
