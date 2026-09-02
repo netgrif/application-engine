@@ -485,7 +485,7 @@ public class SearchUtils {
     protected static String resolvePhraseWithFuzzy(String originPhraseWithFuzzy, int fuzzyIndex) {
         String fuzzy = originPhraseWithFuzzy.substring(fuzzyIndex);
         String originPhraseWithoutFuzzy = originPhraseWithFuzzy.substring(0, fuzzyIndex);
-        String[] splitPhrase = originPhraseWithoutFuzzy.split(" ");
+        String[] splitPhrase = originPhraseWithoutFuzzy.trim().split("\\s+");
         return "(" + String.join(fuzzy + " AND ", splitPhrase) + fuzzy + ")";
     }
 }
