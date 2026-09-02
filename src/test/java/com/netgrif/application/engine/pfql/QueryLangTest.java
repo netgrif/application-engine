@@ -1204,7 +1204,7 @@ public class QueryLangTest {
         assertEquals(expected, actual);
 
         actual = evaluateQuery("cases: title in (loggedUser.username : loggedUser.fullName)").getFullElasticQuery();
-        expected = String.format("(title:>%s AND title:<%s)", systemUser.getUsername(), systemUser.getFullName());
+        expected = String.format("(title:>%s AND title:<%s)", systemUser.getUsername(), "\"" + systemUser.getFullName() + "\"");
 
         assertEquals(expected, actual);
 

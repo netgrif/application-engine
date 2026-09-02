@@ -1482,7 +1482,8 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         }
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQueryInRange("places." + placeId + ".marking", leftNumberAsString, leftEndpointOpen, rightNumberAsString, rightEndpointOpen, not));
+        setElasticQuery(ctx, buildElasticQueryInRange("places." + placeId + ".marking", leftNumberAsString,
+                leftEndpointOpen, rightNumberAsString, rightEndpointOpen, not));
         this.searchWithElastic = true;
     }
 
@@ -1842,6 +1843,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     public void exitTitleLike(QueryLangParser.TitleLikeContext ctx) {
         StringPath stringPath;
         Token op = ctx.stringLikeComparison().stringComparison().op;
+        checkOp(ComparisonType.LIKE, op);
         boolean not = ctx.stringLikeComparison().stringComparison().NOT() != null;
         String string = handleStringComparisonWithPlaceholders(ctx.stringLikeComparison().stringComparison());
 
@@ -1861,15 +1863,16 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 throw new IllegalArgumentException("Unknown query type: " + resourceType);
         }
 
+        boolean negate = (op.getType() == QueryLangParser.NEQ) != not;
         Predicate mongoQuery = stringPath.likeIgnoreCase("%" + string + "%");
-        setMongoQuery(ctx, not ? mongoQuery.not() : mongoQuery);
+        setMongoQuery(ctx, negate ? mongoQuery.not() : mongoQuery);
     }
 
     @Override
     public void exitDataStringLike(QueryLangParser.DataStringLikeContext ctx) {
         String fieldId = ctx.dataValue().fieldId.getText();
         Token op = ctx.stringLikeComparison().stringComparison().op;
-        checkOp(ComparisonType.STRING, op);
+        checkOp(ComparisonType.LIKE, op);
         boolean not = ctx.stringLikeComparison().stringComparison().NOT() != null;
         String string = handleStringComparisonWithPlaceholders(ctx.stringLikeComparison().stringComparison());
 

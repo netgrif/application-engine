@@ -46,7 +46,8 @@ public class SearchUtils {
             ComparisonType.DATE, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
             ComparisonType.DATETIME, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
             ComparisonType.BOOLEAN, List.of(QueryLangParser.EQ, QueryLangParser.NEQ),
-            ComparisonType.NULL, List.of(QueryLangParser.EQ, QueryLangParser.NEQ)
+            ComparisonType.NULL, List.of(QueryLangParser.EQ, QueryLangParser.NEQ),
+            ComparisonType.LIKE, List.of(QueryLangParser.EQ, QueryLangParser.NEQ)
     );
 
     public static final Map<String, String> processAttrToSortPropMapping = Map.of(
@@ -184,11 +185,7 @@ public class SearchUtils {
     }
 
     public static String getStringValue(String queryLangString) {
-        String result = queryLangString.replace("'", "");
-        if (result.isBlank()) {
-            return "\"\"";
-        }
-        return result.contains(" ") ? "\"" + result + "\"" : result;
+        return queryLangString.replace("'", "");
     }
 
     public static ObjectId getObjectIdValue(String queryLangString) {
@@ -407,6 +404,28 @@ public class SearchUtils {
     }
 
     public static String buildElasticQuery(String attribute, int op, String value, boolean not) {
+        value = quoteForElastic(value);
+        return doBuildElasticQuery(attribute, op, value, not);
+    }
+
+    public static String buildElasticQueryInList(String attribute, List<String> values, boolean not) {
+        values = quoteForElastic(values);
+        String valuesQuery = "(" + String.join(" OR ", values) + ")";
+        return doBuildElasticQuery(attribute, QueryLangParser.IN, valuesQuery, not);
+    }
+
+    public static String buildElasticQueryInRange(String attribute, String leftValue, boolean leftEndpointOpen, String rightValue, boolean rightEndpointOpen, boolean not) {
+        leftValue = quoteForElastic(leftValue);
+        rightValue = quoteForElastic(rightValue);
+        String query = "("
+                + doBuildElasticQuery(attribute, leftEndpointOpen ? QueryLangParser.GT : QueryLangParser.GTE, leftValue, false)
+                + " AND "
+                + doBuildElasticQuery(attribute, rightEndpointOpen ? QueryLangParser.LT : QueryLangParser.LTE, rightValue, false)
+                + ")";
+        return not ? "NOT " + query : query;
+    }
+
+    protected static String doBuildElasticQuery(String attribute, int op, String value, boolean not) {
         String query = null;
         switch (op) {
             case QueryLangParser.EQ:
@@ -444,17 +463,23 @@ public class SearchUtils {
         return query;
     }
 
-    public static String buildElasticQueryInList(String attribute, List<String> values, boolean not) {
-        String valuesQuery = "(" + String.join(" OR ", values) + ")";
-        return buildElasticQuery(attribute, QueryLangParser.IN, valuesQuery, not);
+    protected static String quoteForElastic(String originValue) {
+        if (originValue == null || !originValue.contains(" ")) {
+            return originValue;
+        }
+
+        String resultValue = originValue;
+        String fuzzy = "";
+        int fuzzyIndex = originValue.indexOf('~');
+        if (fuzzyIndex != -1) {
+            fuzzy = originValue.substring(fuzzyIndex);
+            resultValue = originValue.substring(0, fuzzyIndex);
+        }
+
+        return "\"" + resultValue + "\"" + fuzzy;
     }
 
-    public static String buildElasticQueryInRange(String attribute, String leftValue, boolean leftEndpointOpen, String rightValue, boolean rightEndpointOpen, boolean not) {
-        String query = "("
-                + buildElasticQuery(attribute, leftEndpointOpen ? QueryLangParser.GT : QueryLangParser.GTE, leftValue, false)
-                + " AND "
-                + buildElasticQuery(attribute, rightEndpointOpen ? QueryLangParser.LT : QueryLangParser.LTE, rightValue, false)
-                + ")";
-        return not ? "NOT " + query : query;
+    protected static List<String> quoteForElastic(List<String> values) {
+        return values.stream().map(SearchUtils::quoteForElastic).collect(Collectors.toList());
     }
 }
