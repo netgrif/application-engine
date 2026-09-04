@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.auth
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.auth.domain.User
 import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
@@ -181,7 +182,7 @@ class TaskAuthorizationServiceTest {
         this.netWithUserRefs = netWithUserRefs.getNet()
 
         def auths = importHelper.createAuthorities(["user": Authority.user])
-        testUser = importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Role", lastName: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        testUser = importHelper.createUser(new User(firstName: "Role", lastName: "User", username: USER_EMAIL, email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
 //                [org] as Group[],
                 [] as ProcessRole[]

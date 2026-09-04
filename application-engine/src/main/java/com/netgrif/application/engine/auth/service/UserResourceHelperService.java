@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.auth.service;
 
+import com.netgrif.application.engine.auth.web.responsebodies.UserDto;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserResourceHelperService;
-import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,20 +32,20 @@ public class UserResourceHelperService implements IUserResourceHelperService {
 //        User result = loggedUser.isImpersonating() ?
 //                getLocalisedUser(user, getImpersonated(loggedUser, small), locale) :
 //                getLocalisedUser(user, locale);
-        User result = getLocalisedUser(user, locale);
+        UserDto result = getLocalisedUser(user, locale);
         return new UserResource(result, "profile");
     }
 
     @Override
-    public User getLocalisedUser(AbstractUser user, AbstractUser impersonated, Locale locale) {
-        User localisedUser = getLocalisedUser(user, locale);
-        User impersonatedUser = userFactory.getUser(impersonated, locale);
+    public UserDto getLocalisedUser(AbstractUser user, AbstractUser impersonated, Locale locale) {
+        UserDto localisedUser = getLocalisedUser(user, locale);
+        UserDto impersonatedUser = userFactory.getUser(impersonated, locale);
         localisedUser.setImpersonated(impersonatedUser);
         return localisedUser;
     }
 
     @Override
-    public User getLocalisedUser(AbstractUser user, Locale locale) {
+    public UserDto getLocalisedUser(AbstractUser user, Locale locale) {
         return userFactory.getUser(user, locale);
     }
 
