@@ -474,7 +474,7 @@ public class SearchUtils {
      * `(someVxlue~AUTO AND anotherVxlue~AUTO)`
      */
     protected static String quoteForElastic(String originValue) {
-        if (originValue == null || !originValue.contains(" ") && !originValue.isEmpty()) {
+        if (originValue == null || (!containsWhitespace(originValue) && !originValue.isEmpty())) {
             return originValue;
         }
 
@@ -487,5 +487,14 @@ public class SearchUtils {
         String originPhraseWithoutFuzzy = originPhraseWithFuzzy.substring(0, fuzzyIndex);
         String[] splitPhrase = originPhraseWithoutFuzzy.trim().split("\\s+");
         return "(" + String.join(fuzzy + " AND ", splitPhrase) + fuzzy + ")";
+    }
+
+    protected static boolean containsWhitespace(String value) {
+        for (int i = 0; i < value.length(); i++) {
+            if (Character.isWhitespace(value.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 }

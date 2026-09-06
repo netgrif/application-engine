@@ -1220,6 +1220,14 @@ public class QueryLangTest {
         expected = "_exists_:title";
         assertEquals(expected, actual);
 
+        actual = evaluateQuery("case: title eq 'white space test 1'").getFullElasticQuery();
+        expected = "title.keyword:\"white space test 1\"";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: title eq 'white\tspace\ttest\t1'").getFullElasticQuery();
+        expected = "title.keyword:\"white\tspace\ttest\t1\"";
+        assertEquals(expected, actual);
+
         actual = evaluateQuery("case: title eq 'somxthing'*").getFullElasticQuery();
         expected = "title:somxthing~AUTO";
         assertEquals(expected, actual);
