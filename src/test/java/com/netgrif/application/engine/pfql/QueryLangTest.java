@@ -1190,6 +1190,10 @@ public class QueryLangTest {
         expected = "_exists_:dataSet.field1.fulltextValue";
         assertEquals(expected, actual);
 
+        actual = evaluateQuery("case: data.field1.value eq ''").getFullElasticQuery();
+        expected = "dataSet.field1.fulltextValue.keyword:\"\"";
+        assertEquals(expected, actual);
+
         // data options comparison
         checkStringComparisonElastic("case", "data.field1.options", "dataSet.field1.options");
 

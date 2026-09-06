@@ -474,7 +474,7 @@ public class SearchUtils {
      * `(someVxlue~AUTO AND anotherVxlue~AUTO)`
      */
     protected static String quoteForElastic(String originValue) {
-        if (originValue == null || !originValue.contains(" ")) {
+        if (originValue == null || !originValue.contains(" ") && !originValue.isEmpty()) {
             return originValue;
         }
 
