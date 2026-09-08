@@ -256,6 +256,20 @@
 		<id>childItemForms</id>
 		<title/>
 	</data>
+	<data type="i18n">
+		<id>empty_child_items_info</id>
+		<title/>
+		<init dynamic="true">
+			new com.netgrif.application.engine.petrinet.domain.I18nString("This menu item has no child items to order.",
+				[sk: "Táto menu položka neobsahuje žiadnu položku na zoradenie", de: "Zu diesem Menüpunkt gibt es keine Untergerichte."])
+		</init>
+		<component>
+			<name>text</name>
+			<property key="plainText">true</property>
+			<property key="fontSize">20</property>
+			<property key="boldText">true</property>
+		</component>
+	</data>
 	<data type="boolean" immediate="true">
 		<id>is_folder</id>
 		<title/>
@@ -1299,30 +1313,53 @@
 		</roleRef>
 		<dataGroup>
 			<id>children_order_0</id>
-			<cols>4</cols>
+			<cols>3</cols>
 			<layout>grid</layout>
+			<dataRef>
+				<id>empty_child_items_info</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
 			<dataRef>
 				<id>childItemForms</id>
 				<logic>
 					<behavior>editable</behavior>
-					<action trigger="get">
-						forms: f.childItemForms,
-						ids: f.childItemIds;
-
-						def orderedTaskIds = ids.value?.collect { id -> workflowService.findOne(id).tasks.find { it.transition == "row_for_ordering" }.task }
-						change forms value { orderedTaskIds }
-					</action>
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>0</y>
+					<y>1</y>
 					<rows>1</rows>
-					<cols>4</cols>
+					<cols>3</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
 		</dataGroup>
+		<event type="assign">
+			<id>assign</id>
+			<actions phase="pre">
+				<action>
+					trans: t.this,
+					empty_child_items_info: f.empty_child_items_info,
+					forms: f.childItemForms,
+					ids: f.childItemIds;
+
+					def orderedTaskIds = ids.value?.collect { id -> workflowService.findOne(id).tasks.find { it.transition == "row_for_ordering" }.task }
+					make empty_child_items_info, visible on trans when { orderedTaskIds.isEmpty() }
+					make empty_child_items_info, hidden on trans when { !orderedTaskIds.isEmpty() }
+					change forms value { orderedTaskIds }
+				</action>
+			</actions>
+		</event>
 	</transition>
 	<transition>
 		<id>row_for_ordering</id>
