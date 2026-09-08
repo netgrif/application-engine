@@ -1239,6 +1239,10 @@ public class QueryLangTest {
         actual = evaluateQuery("case: title not eq 'somxthing anxthing     everxthing    '*").getFullElasticQuery();
         expected = "NOT title:(somxthing~AUTO AND anxthing~AUTO AND everxthing~AUTO)";
         assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: title eq 'needsTo/BeEscaped'").getFullElasticQuery();
+        expected = "title.keyword:needsTo\\/BeEscaped";
+        assertEquals(expected, actual);
     }
 
     @Test

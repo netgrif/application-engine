@@ -2,6 +2,7 @@ package com.netgrif.application.engine.pfql.service.utils;
 
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.ApplicationContextProvider;
+import com.netgrif.application.engine.elastic.service.ElasticsearchQuerySanitizer;
 import com.netgrif.application.engine.petrinet.domain.QPetriNet;
 import com.netgrif.application.engine.petrinet.domain.version.QVersion;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
@@ -97,6 +98,7 @@ public class SearchUtils {
 
     public static final String LEFT_OPEN_ENDPOINT = "(";
     public static final String RIGHT_OPEN_ENDPOINT = ")";
+    protected static final String[] ELASTIC_EXCLUDE_FROM_ESCAPING = new String[]{"~", " "};
 
     public static String toDateString(LocalDate localDate) {
         return localDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
@@ -404,19 +406,19 @@ public class SearchUtils {
     }
 
     public static String buildElasticQuery(String attribute, int op, String value, boolean not) {
-        value = quoteForElastic(value);
+        value = quoteAndSanitizeForElastic(value);
         return doBuildElasticQuery(attribute, op, value, not);
     }
 
     public static String buildElasticQueryInList(String attribute, List<String> values, boolean not) {
-        values = quoteForElastic(values);
+        values = quoteAndSanitizeForElastic(values);
         String valuesQuery = "(" + String.join(" OR ", values) + ")";
         return doBuildElasticQuery(attribute, QueryLangParser.IN, valuesQuery, not);
     }
 
     public static String buildElasticQueryInRange(String attribute, String leftValue, boolean leftEndpointOpen, String rightValue, boolean rightEndpointOpen, boolean not) {
-        leftValue = quoteForElastic(leftValue);
-        rightValue = quoteForElastic(rightValue);
+        leftValue = quoteAndSanitizeForElastic(leftValue);
+        rightValue = quoteAndSanitizeForElastic(rightValue);
         String query = "("
                 + doBuildElasticQuery(attribute, leftEndpointOpen ? QueryLangParser.GT : QueryLangParser.GTE, leftValue, false)
                 + " AND "
@@ -463,17 +465,18 @@ public class SearchUtils {
         return query;
     }
 
-    protected static List<String> quoteForElastic(List<String> values) {
-        return values.stream().map(SearchUtils::quoteForElastic).collect(Collectors.toList());
+    protected static List<String> quoteAndSanitizeForElastic(List<String> values) {
+        return values.stream().map(SearchUtils::quoteAndSanitizeForElastic).collect(Collectors.toList());
     }
 
     /**
      * Adds quotes for value that is going to be used in the Elasticsearch query. If the value does not contain a fuzzy symbol,
      * origin value wrapped in quotes is returned. For example, `someValue anotherValue` -> `"someValue anotherValue"`. If the value
      * contains a fuzzy symbol, it places the fuzzy symbol after every term. For example, `someVxlue anotherVxlue~AUTO` ->
-     * `(someVxlue~AUTO AND anotherVxlue~AUTO)`
+     * `(someVxlue~AUTO AND anotherVxlue~AUTO)`. The originValue is also sanitized using {@link ElasticsearchQuerySanitizer#sanitize(String, String[])}.
      */
-    protected static String quoteForElastic(String originValue) {
+    protected static String quoteAndSanitizeForElastic(String originValue) {
+        originValue = ElasticsearchQuerySanitizer.sanitize(originValue, ELASTIC_EXCLUDE_FROM_ESCAPING);
         if (originValue == null || (!containsWhitespace(originValue) && !originValue.isEmpty())) {
             return originValue;
         }
