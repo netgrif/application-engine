@@ -190,6 +190,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public AbstractUser createUser(String username, String realmId, String authProviderId,
+                                   Map<String, ?> attributes, Map<String, ?> credentials) {
+        if (credentials != null && !credentials.isEmpty()) {
+            throw new UnsupportedOperationException("Provider credentials are not supported by the standalone user service");
+        }
+        Map<String, ?> values = attributes == null ? Map.of() : attributes;
+        String email = parameter(values, "email", username);
+        String firstName = parameter(values, "name", parameter(values, "firstName", username));
+        String lastName = parameter(values, "lastName", "");
+        return createUserFromThirdParty(username, email, firstName, lastName, realmId, authProviderId);
+    }
+
+    @Override
     public AbstractUser createUser(AbstractUser user, String realmId) {
         log.info("Creating user [{}] in realm [{}]", user.getUsername(), realmId);
         setPassword(user, user.getPassword());
@@ -225,6 +238,11 @@ public class UserServiceImpl implements UserService {
         userRepository.saveUser(user, mongoTemplate, collectionName);
         log.info("User [{}] from third-party auth [{}] successfully created in realm [{}]", username, authMethod, realmId);
         return user;
+    }
+
+    private String parameter(Map<String, ?> params, String name, String fallback) {
+        Object value = params.get(name);
+        return value == null || value.toString().isBlank() ? fallback : value.toString();
     }
 
     @Override
@@ -665,7 +683,8 @@ public class UserServiceImpl implements UserService {
 
     protected void setDisablePassword(AbstractUser user) {
         user.setPassword("N/A");
-        log.debug("Password N/A set for user [{}]", user.getUsername());
+        user.disableCredential("password");
+        log.debug("Password credential disabled for user [{}]", user.getUsername());
     }
 
     private <T> Page<AbstractUser> changeType(Page<T> users, Pageable pageable) {

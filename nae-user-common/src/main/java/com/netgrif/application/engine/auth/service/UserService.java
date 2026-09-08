@@ -16,6 +16,7 @@ import com.netgrif.application.engine.objects.auth.domain.ActorRef;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -95,6 +96,34 @@ public interface UserService {
      * @return the created user
      */
     AbstractUser createUser(String username, String email, String firstName, String lastName, String password, String realmName);
+
+    /**
+     * Creates a user whose login credential is managed by an authentication provider
+     * without additional provider-specific credentials.
+     *
+     * @param username the username of the new user
+     * @param realmId the realm identifier
+     * @param authProviderId the configured authentication provider ID in the selected realm
+     * @param attributes user profile attributes
+     * @return the created user
+     */
+    default AbstractUser createUser(String username, String realmId, String authProviderId,
+                                    Map<String, ?> attributes) {
+        return createUser(username, realmId, authProviderId, attributes, Map.of());
+    }
+
+    /**
+     * Creates a user whose login credential is managed by an authentication provider.
+     *
+     * @param username the username of the new user
+     * @param realmId the realm identifier
+     * @param authProviderId the configured authentication provider ID in the selected realm
+     * @param attributes user profile attributes
+     * @param credentials provider-specific credentials and provisioning options
+     * @return the created user
+     */
+    AbstractUser createUser(String username, String realmId, String authProviderId,
+                            Map<String, ?> attributes, Map<String, ?> credentials);
 
     /**
      * Creates a new user from an existing user object in a specific realm.
