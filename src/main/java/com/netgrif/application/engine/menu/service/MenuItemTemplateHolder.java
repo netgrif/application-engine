@@ -5,6 +5,7 @@ import com.netgrif.application.engine.menu.domain.templates.*;
 import com.netgrif.application.engine.menu.utils.MenuItemUtils;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,16 +27,19 @@ public class MenuItemTemplateHolder {
      * The key is the template identifier (String), and the value is the Template instance.
      * </p>
      */
-    private final static Map<String, Template> templates = Map.of(
-            TabbedCaseViewTemplate.IDENTIFIER, new TabbedCaseViewTemplate(),
-            TabbedTaskViewTemplate.IDENTIFIER, new TabbedTaskViewTemplate(),
-            SimpleCaseViewTemplate.IDENTIFIER, new SimpleCaseViewTemplate(),
-            SimpleTaskViewTemplate.IDENTIFIER, new SimpleTaskViewTemplate(),
-            SingleTaskViewTemplate.IDENTIFIER, new SingleTaskViewTemplate(),
-            TabbedTicketViewTemplate.IDENTIFIER, new TabbedTicketViewTemplate(),
-            CustomViewTemplate.IDENTIFIER, new CustomViewTemplate(),
-            FolderTemplate.IDENTIFIER, new FolderTemplate()
-    );
+    private final static Map<String, Template> templates;
+
+    static {
+        templates = new LinkedHashMap<>();
+        templates.put(FolderTemplate.IDENTIFIER, new FolderTemplate());
+        templates.put(TabbedCaseViewTemplate.IDENTIFIER, new TabbedCaseViewTemplate());
+        templates.put(TabbedTaskViewTemplate.IDENTIFIER, new TabbedTaskViewTemplate());
+        templates.put(SimpleCaseViewTemplate.IDENTIFIER, new SimpleCaseViewTemplate());
+        templates.put(SimpleTaskViewTemplate.IDENTIFIER, new SimpleTaskViewTemplate());
+        templates.put(SingleTaskViewTemplate.IDENTIFIER, new SingleTaskViewTemplate());
+        templates.put(TabbedTicketViewTemplate.IDENTIFIER, new TabbedTicketViewTemplate());
+        templates.put(CustomViewTemplate.IDENTIFIER, new CustomViewTemplate());
+    }
 
 
     /**
@@ -116,7 +120,9 @@ public class MenuItemTemplateHolder {
         return templates.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        entry -> entry.getValue().getName()
+                        entry -> entry.getValue().getName(),
+                        (a, b) -> a,
+                        LinkedHashMap::new
                 ));
     }
 }

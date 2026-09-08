@@ -665,6 +665,9 @@
 		<options>
 			<init dynamic="true">com.netgrif.application.engine.menu.service.MenuItemTemplateHolder.transformToOptions()</init>
 		</options>
+		<component>
+			<name>autocomplete</name>
+		</component>
 	</data>
 
 	<!-- I18NS -->
