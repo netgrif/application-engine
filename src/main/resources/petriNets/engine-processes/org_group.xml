@@ -90,7 +90,7 @@
 		<id>invite_by_mail</id>
 		<title name="invite_by_mail">Add e-mail address</title>
 		<placeholder>example@example.com</placeholder>
-		<desc name="invite_by_mail_desc">Add e-meail address to send invitation</desc>
+		<desc name="invite_by_mail_desc">Add e-mail address to send invitation</desc>
 		<validations>
 			<validation>
 				<expression>email</expression>

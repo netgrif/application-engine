@@ -2,6 +2,7 @@ package com.netgrif.application.engine.pfql.service.utils;
 
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.ApplicationContextProvider;
+import com.netgrif.application.engine.elastic.service.ElasticsearchQuerySanitizer;
 import com.netgrif.application.engine.petrinet.domain.QPetriNet;
 import com.netgrif.application.engine.petrinet.domain.version.QVersion;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
@@ -45,7 +46,9 @@ public class SearchUtils {
             ComparisonType.NUMBER, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
             ComparisonType.DATE, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
             ComparisonType.DATETIME, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
-            ComparisonType.BOOLEAN, List.of(QueryLangParser.EQ, QueryLangParser.NEQ)
+            ComparisonType.BOOLEAN, List.of(QueryLangParser.EQ, QueryLangParser.NEQ),
+            ComparisonType.NULL, List.of(QueryLangParser.EQ, QueryLangParser.NEQ),
+            ComparisonType.LIKE, List.of(QueryLangParser.EQ, QueryLangParser.NEQ)
     );
 
     public static final Map<String, String> processAttrToSortPropMapping = Map.of(
@@ -95,6 +98,7 @@ public class SearchUtils {
 
     public static final String LEFT_OPEN_ENDPOINT = "(";
     public static final String RIGHT_OPEN_ENDPOINT = ")";
+    protected static final String[] ELASTIC_EXCLUDE_FROM_ESCAPING = new String[]{"~", " "};
 
     public static String toDateString(LocalDate localDate) {
         return localDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
@@ -402,6 +406,28 @@ public class SearchUtils {
     }
 
     public static String buildElasticQuery(String attribute, int op, String value, boolean not) {
+        value = quoteAndSanitizeForElastic(value);
+        return doBuildElasticQuery(attribute, op, value, not);
+    }
+
+    public static String buildElasticQueryInList(String attribute, List<String> values, boolean not) {
+        values = quoteAndSanitizeForElastic(values);
+        String valuesQuery = "(" + String.join(" OR ", values) + ")";
+        return doBuildElasticQuery(attribute, QueryLangParser.IN, valuesQuery, not);
+    }
+
+    public static String buildElasticQueryInRange(String attribute, String leftValue, boolean leftEndpointOpen, String rightValue, boolean rightEndpointOpen, boolean not) {
+        leftValue = quoteAndSanitizeForElastic(leftValue);
+        rightValue = quoteAndSanitizeForElastic(rightValue);
+        String query = "("
+                + doBuildElasticQuery(attribute, leftEndpointOpen ? QueryLangParser.GT : QueryLangParser.GTE, leftValue, false)
+                + " AND "
+                + doBuildElasticQuery(attribute, rightEndpointOpen ? QueryLangParser.LT : QueryLangParser.LTE, rightValue, false)
+                + ")";
+        return not ? "NOT " + query : query;
+    }
+
+    protected static String doBuildElasticQuery(String attribute, int op, String value, boolean not) {
         String query = null;
         switch (op) {
             case QueryLangParser.EQ:
@@ -439,17 +465,39 @@ public class SearchUtils {
         return query;
     }
 
-    public static String buildElasticQueryInList(String attribute, List<String> values, boolean not) {
-        String valuesQuery = "(" + String.join(" OR ", values) + ")";
-        return buildElasticQuery(attribute, QueryLangParser.IN, valuesQuery, not);
+    protected static List<String> quoteAndSanitizeForElastic(List<String> values) {
+        return values.stream().map(SearchUtils::quoteAndSanitizeForElastic).collect(Collectors.toList());
     }
 
-    public static String buildElasticQueryInRange(String attribute, String leftValue, boolean leftEndpointOpen, String rightValue, boolean rightEndpointOpen, boolean not) {
-        String query = "("
-                + buildElasticQuery(attribute, leftEndpointOpen ? QueryLangParser.GT : QueryLangParser.GTE, leftValue, false)
-                + " AND "
-                + buildElasticQuery(attribute, rightEndpointOpen ? QueryLangParser.LT : QueryLangParser.LTE, rightValue, false)
-                + ")";
-        return not ? "NOT " + query : query;
+    /**
+     * Adds quotes for value that is going to be used in the Elasticsearch query. If the value does not contain a fuzzy symbol,
+     * origin value wrapped in quotes is returned. For example, `someValue anotherValue` -> `"someValue anotherValue"`. If the value
+     * contains a fuzzy symbol, it places the fuzzy symbol after every term. For example, `someVxlue anotherVxlue~AUTO` ->
+     * `(someVxlue~AUTO AND anotherVxlue~AUTO)`. The originValue is also sanitized using {@link ElasticsearchQuerySanitizer#sanitize(String, String[])}.
+     */
+    protected static String quoteAndSanitizeForElastic(String originValue) {
+        originValue = ElasticsearchQuerySanitizer.sanitize(originValue, ELASTIC_EXCLUDE_FROM_ESCAPING);
+        if (originValue == null || (!containsWhitespace(originValue) && !originValue.isEmpty())) {
+            return originValue;
+        }
+
+        int fuzzyIndex = originValue.indexOf('~');
+        return fuzzyIndex != -1 ? resolvePhraseWithFuzzy(originValue, fuzzyIndex) : "\"" + originValue + "\"";
+    }
+
+    protected static String resolvePhraseWithFuzzy(String originPhraseWithFuzzy, int fuzzyIndex) {
+        String fuzzy = originPhraseWithFuzzy.substring(fuzzyIndex);
+        String originPhraseWithoutFuzzy = originPhraseWithFuzzy.substring(0, fuzzyIndex);
+        String[] splitPhrase = originPhraseWithoutFuzzy.trim().split("\\s+");
+        return "(" + String.join(fuzzy + " AND ", splitPhrase) + fuzzy + ")";
+    }
+
+    protected static boolean containsWhitespace(String value) {
+        for (int i = 0; i < value.length(); i++) {
+            if (Character.isWhitespace(value.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 }
