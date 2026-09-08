@@ -1264,6 +1264,28 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							duplicate_view_identifier: f.duplicate_view_identifier,
+							duplicate_new_title: f.duplicate_new_title;
+
+							if (duplicate_view_identifier.value != null &amp;&amp; !duplicate_view_identifier.value.isEmpty()
+									|| duplicate_new_title.value == null) {
+								return
+							}
+
+							String defaultName = duplicate_new_title.value.defaultValue
+							if (defaultName == null || defaultName.isEmpty()) {
+								defaultName = menu_name.value.translations?.values()?.find()
+							}
+
+							String identifier = com.netgrif.application.engine.menu.utils.MenuItemUtils.sanitize(defaultName)
+							change duplicate_view_identifier value { identifier }
+						</action>
+					</actions>
+				</event>
 			</dataRef>
 			<dataRef>
 				<id>duplicate_view_identifier</id>
@@ -1279,6 +1301,27 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							duplicate_view_identifier: f.duplicate_view_identifier;
+
+							if (menuItemService.existsMenuItem(duplicate_view_identifier.value)) {
+								change duplicate_view_identifier validations { validation('''regex $.^''',
+										new com.netgrif.application.engine.petrinet.domain.I18nString("Such menu item already exists",
+												[sk: "Taká položka menu už existuje", de: "Ein solcher Menüeintrag existiert bereits"]))
+								}
+							} else {
+								change duplicate_view_identifier validations { null }
+								String sanitizedIdentifier = com.netgrif.application.engine.menu.utils.MenuItemUtils.sanitize(duplicate_view_identifier.value)
+								if (duplicate_view_identifier.value != sanitizedIdentifier) {
+									change duplicate_view_identifier value { sanitizedIdentifier }
+								}
+							}
+						</action>
+					</actions>
+				</event>
 			</dataRef>
 		</dataGroup>
 		<event type="finish">
@@ -1289,6 +1332,7 @@
 					title: f.duplicate_new_title;
 
 					duplicateMenuItem(useCase, title.value, identifier.value)
+					Frontend.reloadMenu()
 				</action>
 			</actions>
 			<title name="duplicate_item_finish">Duplicate</title>
