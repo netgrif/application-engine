@@ -416,10 +416,14 @@ public class UserServiceImpl implements UserService {
         AbstractUser user = this.findById(loggedUser.getStringId(), loggedUser.getRealmId());
         BooleanExpression predicate = buildPredicate(user, query);
         if (roleIds != null && !roleIds.isEmpty()) {
-            predicate = predicate.and(QUser.user.processRoles.any()._id.in(roleIds));
+            predicate = predicate.and(QUser.user.processRoleIds.any().in(
+                    roleIds.stream().map(ProcessResourceId::toString).toList()
+            ));
         }
         if (negateRoleIds != null && !negateRoleIds.isEmpty()) {
-            predicate = predicate.and(QUser.user.processRoles.any()._id.in(negateRoleIds).not());
+            predicate = predicate.and(QUser.user.processRoleIds.any().in(
+                    negateRoleIds.stream().map(ProcessResourceId::toString).toList()
+            ).not());
         }
 
         String collectionName = collectionNameProvider.getCollectionNameForRealm(loggedUser.getRealmId());

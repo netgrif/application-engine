@@ -2,7 +2,7 @@
 
 FROM eclipse-temurin:21-jre
 
-ARG VERSION="7.0.2"
+ARG VERSION="7.0.3"
 
 LABEL authors="Netgrif <devops@netgrif.com>" \
       org.opencontainers.image.authors="NETGRIF <devops@netgrif.com>" \

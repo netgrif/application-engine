@@ -3,6 +3,7 @@ package com.netgrif.application.engine.auth
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.auth.service.AuthorityService
+import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
@@ -39,6 +40,9 @@ class UserServiceTest {
 
     @Autowired
     private UserService userService
+
+    @Autowired
+    private GroupService groupService
 
     @Autowired
     private ProcessRoleService processRoleService;
@@ -106,6 +110,35 @@ class UserServiceTest {
     }
 
     @Test
+    void searchAllCoMembersByProcessRoleIdsWithinSharedGroups() {
+        User requester = createUser("requester@netgrif.com")
+        User sharedGroupMember = createUser("shared-group-member@netgrif.com")
+        User otherGroupMember = createUser("other-group-member@netgrif.com")
+
+        def defaultSystemGroup = groupService.getDefaultSystemGroup()
+        groupService.removeUser(requester, defaultSystemGroup)
+        groupService.removeUser(sharedGroupMember, defaultSystemGroup)
+        groupService.removeUser(otherGroupMember, defaultSystemGroup)
+        groupService.addUser(sharedGroupMember, groupService.getDefaultUserGroup(requester))
+
+        sharedGroupMember = (User) userService.addRole(sharedGroupMember, dummyRole.get_id())
+        otherGroupMember = (User) userService.addRole(otherGroupMember, dummyRole.get_id())
+        def loggedUser = ActorTransformer.toLoggedUser(requester)
+
+        Page<AbstractUser> usersWithRole = userService.searchAllCoMembers(
+                null, Set.of(dummyRole.get_id()), Collections.emptySet(), loggedUser, Pageable.unpaged())
+        assert usersWithRole.content.any { it.stringId == sharedGroupMember.stringId }
+        assert usersWithRole.content.every { it.stringId != otherGroupMember.stringId }
+        assert usersWithRole.content.every { it.stringId != requester.stringId }
+
+        Page<AbstractUser> usersWithoutRole = userService.searchAllCoMembers(
+                null, Collections.emptySet(), Set.of(dummyRole.get_id()), loggedUser, Pageable.unpaged())
+        assert usersWithoutRole.content.any { it.stringId == requester.stringId }
+        assert usersWithoutRole.content.every { it.stringId != sharedGroupMember.stringId }
+        assert usersWithoutRole.content.every { it.stringId != otherGroupMember.stringId }
+    }
+
+    @Test
     void findAllByStateAndExpirationDateBefore() {
         user = createUser()
         user.setState(UserState.INACTIVE)
@@ -130,14 +163,18 @@ class UserServiceTest {
     }
 
     private User createUser() {
-        Optional<AbstractUser> userOptional = userService.findUserByUsername("dummy@netgrif.com", null)
+        return createUser("dummy@netgrif.com")
+    }
+
+    private User createUser(String username) {
+        Optional<AbstractUser> userOptional = userService.findUserByUsername(username, null)
         User user = null
         if (userOptional.isEmpty()) {
             user = new com.netgrif.application.engine.adapter.spring.auth.domain.User()
             user.setFirstName("Dummy")
             user.setLastName("User")
-            user.setUsername("dummy@netgrif.com")
-            user.setEmail("dummy@netgrif.com")
+            user.setUsername(username)
+            user.setEmail(username)
             user.setPassword("password")
             user.setState(UserState.ACTIVE)
             user.setAuthoritySet([userAuth] as Set)
