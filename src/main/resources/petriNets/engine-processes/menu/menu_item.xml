@@ -299,7 +299,7 @@
 	<data type="text" immediate="true">
 		<id>menu_icon</id>
 		<title name="icon_identifier">Menu icon identifier</title>
-		<desc name="icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
+		<desc name="icon_identifier_desc">Material icon identifier</desc>
 		<action trigger="set">
 			icon: f.this,
 			iconPreview: f.menu_icon_preview;
@@ -326,7 +326,6 @@
 	<data type="enumeration">
 		<id>menu_name_as_visible</id>
 		<title name="name">Name of the item</title>
-		<desc name="name_desc">Will be shown in the menu</desc>
 		<component>
 			<name>autocomplete</name>
 		</component>
@@ -334,7 +333,6 @@
 	<data type="i18n" immediate="true">
 		<id>menu_name</id>
 		<title name="name">Name of the item</title>
-		<desc name="name_desc">Will be shown in the menu</desc>
 		<action trigger="set">
 			menu_name_as_visible: f.menu_name_as_visible,
 			name: f.menu_name;
@@ -502,7 +500,7 @@
 	<data type="text" immediate="true">
 		<id>tab_icon</id>
 		<title name="tab_icon">Tab icon identifier</title>
-		<desc name="tab_icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
+		<desc name="tab_icon_identifier_desc">Material icon identifier</desc>
 		<action trigger="set">
 			icon: f.this,
 			iconPreview: f.tab_icon_preview;
@@ -674,7 +672,7 @@
 	<i18n locale="sk">
 		<i18nString name="icon_preview">Náhľad ikony</i18nString>
 		<i18nString name="icon_identifier">Identifikátor ikony</i18nString>
-		<i18nString name="icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
+		<i18nString name="icon_identifier_desc">Identifikátor Material ikony.</i18nString>
 		<i18nString name="allow_roles">Pridaj k povoleným roliam</i18nString>
 		<i18nString name="remove_from_allowed_roles">Odstráň z povolených rolí</i18nString>
 		<i18nString name="ban_roles">Pridaj k zakázaným roliam</i18nString>
@@ -687,9 +685,8 @@
 		<i18nString name="duplicate_view_identifier">Identifikátor duplikovanej položky</i18nString>
 		<i18nString name="duplicate_view_identifier_desc">Musí byť jedinečný</i18nString>
 		<i18nString name="name">Názov položky</i18nString>
-		<i18nString name="name_desc">Bude zobrazený v menu</i18nString>
 		<i18nString name="tab_icon">Identifikátor ikony v karte</i18nString>
-		<i18nString name="tab_icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
+		<i18nString name="tab_icon_identifier_desc">Identifikátor Material ikony.</i18nString>
 		<i18nString name="tab_icon_preview">Náhľad ikony v karte</i18nString>
 		<i18nString name="display_tab_icon">Zobraziť ikonu v karte?</i18nString>
 		<i18nString name="tab_name">Názov položky</i18nString>
@@ -722,14 +719,14 @@
 		<i18nString name="children_order">Zoradiť pod-položky</i18nString>
 		<i18nString name="create_item_finish">Vytvoriť menu položku</i18nString>
 		<i18nString name="configuration_templates">Konfiguračná šablóna</i18nString>
-		<i18nString name="role_settings">Rola</i18nString>
-		<i18nString name="view_settings">Zobrazenie</i18nString>
+		<i18nString name="role_settings">Povolenia</i18nString>
+		<i18nString name="view_settings">Zobrazenie v karte</i18nString>
 		<i18nString name="model_title">Menu položka</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="icon_preview">Ikonevorschau</i18nString>
 		<i18nString name="icon_identifier">Ikone ID</i18nString>
-		<i18nString name="icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
+		<i18nString name="icon_identifier_desc">Material Ikone ID</i18nString>
 		<i18nString name="allow_roles">Zu zulässigen Rollen hinzufügen</i18nString>
 		<i18nString name="remove_from_allowed_roles">Aus zulässigen Rollen entfernen</i18nString>
 		<i18nString name="ban_roles">Zu verbotenen Rollen hinzufügen</i18nString>
@@ -737,7 +734,7 @@
 		<i18nString name="available_processes">Ihre Prozesse</i18nString>
 		<i18nString name="available_processes_desc">Wählen Sie einen Prozess mit Rollen aus, die Sie zu Listen mit zulässigen oder verbotenen Rollen hinzufügen möchten.</i18nString>
 		<i18nString name="available_roles">Verfügbare Rollen</i18nString>
-		<i18nString name="tab_icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
+		<i18nString name="tab_icon_identifier_desc">Material Ikone ID</i18nString>
 		<i18nString name="custom_view_selector_desc">Beispiel: "demo-tabbed-views"</i18nString>
 		<i18nString name="roles_management_title">Rollen</i18nString>
 		<i18nString name="roles_allowed">Zulässige Rollen</i18nString>
@@ -750,7 +747,6 @@
 		<i18nString name="duplicate_view_identifier">Identifikator der kopierten Ansicht</i18nString>
 		<i18nString name="duplicate_view_identifier_desc">Muss einzigartig sein</i18nString>
 		<i18nString name="name">Titel des Eintrages</i18nString>
-		<i18nString name="name_desc">Wird im Menü angezeigt</i18nString>
 		<i18nString name="tab_icon">Ikonen Identifikator der Registerkarte</i18nString>
 		<i18nString name="tab_icon_preview">Vorschau der Registerkarte Ikone</i18nString>
 		<i18nString name="display_tab_icon">Zeige die Registerkarte Ikone an?</i18nString>
@@ -777,8 +773,8 @@
 		<i18nString name="children_order">Untereintrage sortieren</i18nString>
 		<i18nString name="create_item_finish">Erstellen</i18nString>
 		<i18nString name="configuration_templates">Konfigurationsvorlage</i18nString>
-		<i18nString name="role_settings">Rolle</i18nString>
-		<i18nString name="view_settings">Ansicht</i18nString>
+		<i18nString name="role_settings">Berechtigungen</i18nString>
+		<i18nString name="view_settings">Ansicht der Registerkarte</i18nString>
 		<i18nString name="model_title">Menüeintrag</i18nString>
 	</i18n>
 
@@ -1455,7 +1451,7 @@
 		<id>role_settings</id>
 		<x>400</x>
 		<y>48</y>
-		<label name="role_settings">Role</label>
+		<label name="role_settings">Permissions</label>
 		<icon>person</icon>
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
@@ -1626,7 +1622,7 @@
 		<id>view_settings</id>
 		<x>528</x>
 		<y>48</y>
-		<label name="view_settings">View</label>
+		<label name="view_settings">Tab view</label>
 		<icon>image</icon>
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
