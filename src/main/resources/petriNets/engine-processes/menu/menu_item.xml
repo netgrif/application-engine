@@ -472,7 +472,6 @@
 	<data type="multichoice_map" immediate="true">
 		<id>allowed_authorities</id>
 		<title name="allowed_authorities">Allowed authorities</title>
-		<desc name="allowed_authorities_desc">todo 2472</desc>
 		<options>
 			<option key="ROLE_USER" name="opt_user">User</option>
 			<option key="ROLE_ADMIN" name="opt_admin">Admin</option>
@@ -747,11 +746,10 @@
 		<i18nString name="role_settings">Povolenia</i18nString>
 		<i18nString name="view_settings">Zobrazenie v karte</i18nString>
 		<i18nString name="model_title">Menu položka</i18nString>
-		<i18nString name="allowed_authorities">todo 2472</i18nString>
-		<i18nString name="allowed_authorities_desc">todo 2472</i18nString>
-		<i18nString name="opt_user">todo 2472</i18nString>
-		<i18nString name="opt_admin">todo 2472</i18nString>
-		<i18nString name="opt_anonym">todo 2472</i18nString>
+		<i18nString name="allowed_authorities">Povolené autority</i18nString>
+		<i18nString name="opt_user">Používateľ</i18nString>
+		<i18nString name="opt_admin">Admin</i18nString>
+		<i18nString name="opt_anonym">Anonymný používateľ</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="icon_preview">Ikonevorschau</i18nString>
@@ -806,11 +804,10 @@
 		<i18nString name="role_settings">Berechtigungen</i18nString>
 		<i18nString name="view_settings">Ansicht der Registerkarte</i18nString>
 		<i18nString name="model_title">Menüeintrag</i18nString>
-		<i18nString name="allowed_authorities">todo 2472</i18nString>
-		<i18nString name="allowed_authorities_desc">todo 2472</i18nString>
-		<i18nString name="opt_user">todo 2472</i18nString>
-		<i18nString name="opt_admin">todo 2472</i18nString>
-		<i18nString name="opt_anonym">todo 2472</i18nString>
+		<i18nString name="allowed_authorities">Zulässige Behörden</i18nString>
+		<i18nString name="opt_user">Benutzer</i18nString>
+		<i18nString name="opt_admin">Admin</i18nString>
+		<i18nString name="opt_anonym">Anonymer Nutzer</i18nString>
 	</i18n>
 
 	<!-- TRANSITIONS -->
