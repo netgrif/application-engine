@@ -367,11 +367,7 @@ public class UserServiceImpl implements UserService {
         log.debug("Finding user by ID [{}]", id);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
         Optional<User> userOpt = userRepository.findById(new ObjectId(id), mongoTemplate, collectionName);
-        if (userOpt.isPresent()) {
-            return userOpt.get();
-        }
-        Optional<AnonymousUserRef> anonymousUserRefOptional = anonymousUserRefService.getRef(realmId);
-        return anonymousUserRefOptional.map(anonymousUserRef -> new AnonymousUser(anonymousUserRef, authorityService.getOrCreate(Authority.anonymous))).orElse(null);
+        return userOpt.orElse(null);
     }
 
     @Override
