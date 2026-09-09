@@ -11,6 +11,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.expression.BeanFactoryResolver;
+import org.springframework.core.DefaultParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.expression.EvaluationException;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -112,9 +114,11 @@ public class BaseAuthorizationServiceAspect {
         }
 
         List<Object> args = Arrays.asList(joinPoint.getArgs());
-        List<String> argNames = Arrays.asList(((MethodSignature) joinPoint.getSignature()).getParameterNames());
 
-        argNames.forEach(name -> evaluationContext.setVariable(name, args.get(argNames.indexOf(name))));
+        for (int i = 0; i < args.size(); i++) {
+            evaluationContext.setVariable("arg" + i, args.get(i));
+        }
+
         boolean allowed;
         try {
             allowed = ExpressionUtils.evaluateAsBoolean(parser.parseExpression(expression), evaluationContext);

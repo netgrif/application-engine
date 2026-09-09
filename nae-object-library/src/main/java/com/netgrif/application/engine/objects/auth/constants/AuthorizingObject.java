@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 public enum AuthorizingObject {
     ADMIN,
     USER,
+    SYSTEMADMIN,
+    ANONYMOUS,
     PROCESS_UPLOAD,
     PROCESS_VIEW_ALL,
     PROCESS_VIEW_OWN,
