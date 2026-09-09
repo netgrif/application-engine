@@ -24,21 +24,27 @@ public class AnonymousUserRefServiceImpl implements AnonymousUserRefService {
 
     @Override
     public AnonymousUserRef getOrCreateRef(String realmId) {
-        return new AnonymousUserRef(realmId, Set.of(authorityService.getOrCreate(Authority.anonymous)), Set.of(processRoleService.getAnonymousRole()));
+        Realm realm = resolveRealm(realmId);
+        return new AnonymousUserRef(realm.getName(), Set.of(authorityService.getOrCreate(Authority.anonymous)), Set.of(processRoleService.getAnonymousRole()));
     }
 
     @Override
     public Optional<AnonymousUserRef> getRef(String realmId) {
-        Optional<Realm> realmOptional = realmService.getRealmById(realmId);
-        if (realmOptional.isEmpty()) {
-            throw new IllegalArgumentException("Realm with id " + realmId + " not found");
-        }
-        Realm realm = realmOptional.get();
+        Realm realm = resolveRealm(realmId);
         if (!realm.isPublicAccess()) {
-            log.warn("Public access is disabled for realm {}.", realmId);
+            log.warn("Public access is disabled for realm {}.", realm.getName());
             return Optional.empty();
         }
-        return Optional.of(new AnonymousUserRef(realmId, Set.of(authorityService.getOrCreate(Authority.anonymous)), Set.of(processRoleService.getAnonymousRole())));
+        return Optional.of(new AnonymousUserRef(realm.getName(), Set.of(authorityService.getOrCreate(Authority.anonymous)), Set.of(processRoleService.getAnonymousRole())));
+    }
+
+    private Realm resolveRealm(String realmId) {
+        if (realmId == null || realmId.isBlank() || "null".equals(realmId)) {
+            return realmService.getDefaultRealm()
+                    .orElseThrow(() -> new IllegalArgumentException("Default realm was not found"));
+        }
+        return realmService.getRealmById(realmId)
+                .orElseThrow(() -> new IllegalArgumentException("Realm with id " + realmId + " not found"));
     }
 
 }

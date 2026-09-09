@@ -190,7 +190,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AbstractUser createUser(String username, String realmId, String authProviderId,
+    public AbstractUser createUser(String username, String realmId, String authProviderName,
                                    Map<String, ?> attributes, Map<String, ?> credentials) {
         if (credentials != null && !credentials.isEmpty()) {
             throw new UnsupportedOperationException("Provider credentials are not supported by the standalone user service");
@@ -199,7 +199,7 @@ public class UserServiceImpl implements UserService {
         String email = parameter(values, "email", username);
         String firstName = parameter(values, "name", parameter(values, "firstName", username));
         String lastName = parameter(values, "lastName", "");
-        return createUserFromThirdParty(username, email, firstName, lastName, realmId, authProviderId);
+        return createUserFromThirdParty(username, email, firstName, lastName, realmId, authProviderName);
     }
 
     @Override

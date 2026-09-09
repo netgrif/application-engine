@@ -103,13 +103,13 @@ public interface UserService {
      *
      * @param username the username of the new user
      * @param realmId the realm identifier
-     * @param authProviderId the configured authentication provider ID in the selected realm
+     * @param authProviderName the configured authentication provider name in the selected realm
      * @param attributes user profile attributes
      * @return the created user
      */
-    default AbstractUser createUser(String username, String realmId, String authProviderId,
+    default AbstractUser createUser(String username, String realmId, String authProviderName,
                                     Map<String, ?> attributes) {
-        return createUser(username, realmId, authProviderId, attributes, Map.of());
+        return createUser(username, realmId, authProviderName, attributes, Map.of());
     }
 
     /**
@@ -117,12 +117,12 @@ public interface UserService {
      *
      * @param username the username of the new user
      * @param realmId the realm identifier
-     * @param authProviderId the configured authentication provider ID in the selected realm
+     * @param authProviderName the configured authentication provider name in the selected realm
      * @param attributes user profile attributes
      * @param credentials provider-specific credentials and provisioning options
      * @return the created user
      */
-    AbstractUser createUser(String username, String realmId, String authProviderId,
+    AbstractUser createUser(String username, String realmId, String authProviderName,
                             Map<String, ?> attributes, Map<String, ?> credentials);
 
     /**
