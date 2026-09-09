@@ -2,6 +2,7 @@ package com.netgrif.application.engine.pfql.service.processresource;
 
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.pfql.domain.antlr4.QueryLangParser;
 import com.netgrif.application.engine.pfql.domain.enums.QueryType;
 import com.netgrif.application.engine.pfql.service.AbstractResourceSearchService;
 import com.netgrif.application.engine.pfql.service.QueryLangEvaluator;
@@ -10,11 +11,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 
+import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.buildResourcePrefix;
+import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.hasResourcePrefix;
+
+
+// todo 2483 doc
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProcessSearchService extends AbstractResourceSearchService<PetriNet> {
+    protected static List<Integer> allowedResourcePrefixes = List.of(QueryLangParser.PROCESS, QueryLangParser.PROCESSES);
 
     protected final IPetriNetService petriNetService;
 
@@ -34,9 +42,11 @@ public class ProcessSearchService extends AbstractResourceSearchService<PetriNet
      * @return
      */
     @Override
-    protected String ensurePrefix(String query) {
-        // todo 2483
-        return query;
+    protected String ensurePrefix(String query, boolean isMulti) {
+        if (query == null || hasResourcePrefix(query, allowedResourcePrefixes)) {
+            return query;
+        }
+        return buildResourcePrefix(isMulti ? QueryLangParser.PROCESSES : QueryLangParser.PROCESS) + query;
     }
 
     /**

@@ -3,6 +3,7 @@ package com.netgrif.application.engine.pfql.service.caseresource;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.application.engine.pfql.domain.antlr4.QueryLangParser;
 import com.netgrif.application.engine.pfql.domain.enums.QueryType;
 import com.netgrif.application.engine.pfql.service.AbstractResourceSearchService;
 import com.netgrif.application.engine.pfql.service.QueryLangEvaluator;
@@ -18,6 +19,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.buildResourcePrefix;
+import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.hasResourcePrefix;
+
 /**
  * Service implementation for searching and querying Case resources.
  * Supports both MongoDB and Elasticsearch-based searches depending on the query configuration.
@@ -27,6 +31,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CaseSearchService extends AbstractResourceSearchService<Case> {
+
+    protected static List<Integer> allowedResourcePrefixes = List.of(QueryLangParser.CASE, QueryLangParser.CASES);
 
     protected final IWorkflowService workflowService;
     protected final IElasticCaseService elasticCaseService;
@@ -48,9 +54,11 @@ public class CaseSearchService extends AbstractResourceSearchService<Case> {
      * @return
      */
     @Override
-    protected String ensurePrefix(String query) {
-        // todo 2483
-        return query;
+    protected String ensurePrefix(String query, boolean isMulti) {
+        if (query == null || hasResourcePrefix(query, allowedResourcePrefixes)) {
+            return query;
+        }
+        return buildResourcePrefix(isMulti ? QueryLangParser.CASES : QueryLangParser.CASE) + query;
     }
 
     /**

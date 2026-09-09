@@ -22,12 +22,13 @@ public abstract class AbstractResourceSearchService<Resource> implements IResour
      * Pre-processes the raw query string: fills {@code {}} placeholders and ensures a correct PFQL prefix.
      *
      * @param rawQuery the raw query string, possibly with {@code {}} placeholders
+     * @param isMulti todo 2483
      * @param args     arguments to substitute into {@code {}} placeholders (in order)
      * @return the fully pre-processed query string ready for evaluation
      */
-    protected String preProcess(String rawQuery, Object... args) {
+    protected String preProcess(String rawQuery, boolean isMulti, Object... args) {
         String formatted = formatPlaceholders(rawQuery, args);
-        return ensurePrefix(formatted);
+        return ensurePrefix(formatted, isMulti);
     }
 
     /**
@@ -35,9 +36,10 @@ public abstract class AbstractResourceSearchService<Resource> implements IResour
      * Each implementation defines which prefix is expected and how to inject it if missing.
      *
      * @param query the query string after placeholder substitution
+     * @param isMulti todo 2483
      * @return the query string with the correct prefix guaranteed
      */
-    protected abstract String ensurePrefix(String query);
+    protected abstract String ensurePrefix(String query, boolean isMulti);
 
     protected abstract Resource doSearchOne(QueryLangEvaluator evaluator);
 
@@ -50,7 +52,7 @@ public abstract class AbstractResourceSearchService<Resource> implements IResour
     // todo 2483 doc
     @Override
     public Resource searchOne(String queryString, Object... args) {
-        final String processedQuery = preProcess(queryString, args);
+        final String processedQuery = preProcess(queryString, false, args);
         log.debug("Searching one with query: {}", processedQuery);
         return searchOne(evaluateQuery(processedQuery));
     }
@@ -65,7 +67,7 @@ public abstract class AbstractResourceSearchService<Resource> implements IResour
 
     @Override
     public Page<Resource> searchAll(String queryString, Object... args) {
-        final String processedQuery = preProcess(queryString, args);
+        final String processedQuery = preProcess(queryString, true, args);
         log.debug("Searching all with query: {}", processedQuery);
         return searchAll(evaluateQuery(processedQuery));
     }
@@ -80,7 +82,7 @@ public abstract class AbstractResourceSearchService<Resource> implements IResour
 
     @Override
     public long count(String queryString, Object... args) {
-        final String processedQuery = preProcess(queryString, args);
+        final String processedQuery = preProcess(queryString, true, args);
         log.debug("Counting with query: {}", processedQuery);
         return count(evaluateQuery(processedQuery));
     }
@@ -94,7 +96,7 @@ public abstract class AbstractResourceSearchService<Resource> implements IResour
 
     @Override
     public boolean exists(String queryString, Object... args) {
-        final String processedQuery = preProcess(queryString, args);
+        final String processedQuery = preProcess(queryString, false, args);
         log.debug("Checking existence with query: {}", processedQuery);
         return exists(evaluateQuery(processedQuery));
     }

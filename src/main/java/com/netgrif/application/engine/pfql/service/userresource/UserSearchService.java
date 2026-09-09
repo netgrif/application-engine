@@ -2,14 +2,19 @@ package com.netgrif.application.engine.pfql.service.userresource;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.pfql.domain.antlr4.QueryLangParser;
 import com.netgrif.application.engine.pfql.domain.enums.QueryType;
 import com.netgrif.application.engine.pfql.service.AbstractResourceSearchService;
-import com.netgrif.application.engine.pfql.service.IResourceSearchService;
 import com.netgrif.application.engine.pfql.service.QueryLangEvaluator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.buildResourcePrefix;
+import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.hasResourcePrefix;
 
 /**
  * Service for searching and querying user resources using PFQL (Process Flow Query Language).
@@ -18,15 +23,12 @@ import org.springframework.stereotype.Service;
  * based on PFQL query strings or evaluated query objects. It delegates the actual MongoDB
  * queries to the {@link IUserService}.
  * </p>
- *
- * @see IResourceSearchService
- * @see IUserService
- * @see QueryLangEvaluator
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserSearchService extends AbstractResourceSearchService<IUser> {
+    protected static List<Integer> allowedResourcePrefixes = List.of(QueryLangParser.USER, QueryLangParser.USERS);
 
     protected final IUserService userService;
 
@@ -46,9 +48,11 @@ public class UserSearchService extends AbstractResourceSearchService<IUser> {
      * @return
      */
     @Override
-    protected String ensurePrefix(String query) {
-        // todo 2483
-        return query;
+    protected String ensurePrefix(String query, boolean isMulti) {
+        if (query == null || hasResourcePrefix(query, allowedResourcePrefixes)) {
+            return query;
+        }
+        return buildResourcePrefix(isMulti ? QueryLangParser.USERS : QueryLangParser.USER) + query;
     }
 
     /**

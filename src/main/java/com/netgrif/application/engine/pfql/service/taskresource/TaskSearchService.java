@@ -3,6 +3,7 @@ package com.netgrif.application.engine.pfql.service.taskresource;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
+import com.netgrif.application.engine.pfql.domain.antlr4.QueryLangParser;
 import com.netgrif.application.engine.pfql.domain.enums.QueryType;
 import com.netgrif.application.engine.pfql.service.AbstractResourceSearchService;
 import com.netgrif.application.engine.pfql.service.QueryLangEvaluator;
@@ -18,6 +19,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.buildResourcePrefix;
+import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.hasResourcePrefix;
+
 /**
  * Service implementation for searching Task resources using query language expressions.
  * <p>
@@ -31,6 +35,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class TaskSearchService extends AbstractResourceSearchService<Task> {
+    protected static List<Integer> allowedResourcePrefixes = List.of(QueryLangParser.TASK, QueryLangParser.TASKS);
 
     protected final ITaskService taskService;
     protected final IElasticTaskService elasticTaskService;
@@ -52,9 +57,11 @@ public class TaskSearchService extends AbstractResourceSearchService<Task> {
      * @return
      */
     @Override
-    protected String ensurePrefix(String query) {
-        // todo 2483
-        return query;
+    protected String ensurePrefix(String query, boolean isMulti) {
+        if (query == null || hasResourcePrefix(query, allowedResourcePrefixes)) {
+            return query;
+        }
+        return buildResourcePrefix(isMulti ? QueryLangParser.TASKS : QueryLangParser.TASK) + query;
     }
 
     /**

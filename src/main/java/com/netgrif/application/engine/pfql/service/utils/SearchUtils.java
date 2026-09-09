@@ -18,6 +18,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.StringPath;
 import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
@@ -38,6 +39,8 @@ public class SearchUtils {
 
     public static final List<String> validQueryResourcePrefixes = List.of("case", "cases", "task", "tasks", "process",
             "processes", "user", "users");
+
+    private static final String QUERY_DELIMITER = ": ";
 
     public static final Map<ComparisonType, List<Integer>> comparisonOperators = Map.of(
             ComparisonType.ID, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.IN),
@@ -468,5 +471,39 @@ public class SearchUtils {
         }
         String pattern = query.replace("{}", "%s");
         return String.format(pattern, args);
+    }
+
+    // todo 2483
+    public static boolean hasResourcePrefix(String query, List<Integer> expectedTokenTypes) {
+        CharStream input = CharStreams.fromString(query.trim());
+        QueryLangLexer lexer = new QueryLangLexer(input);
+        lexer.removeErrorListeners();
+        Token firstToken = lexer.nextToken();
+        return expectedTokenTypes.contains(firstToken.getType());
+    }
+
+    /**
+     * Builds a canonical PFQL prefix string (resource keyword + delimiter).
+     * The keyword text is derived from the grammar via the lexer.
+     * The delimiter form ({@value QUERY_DELIMITER}) corresponds to the
+     * {@code SPACE? ':' SPACE} alternative of the {@code delimeter} rule.
+     *
+     * @param singularTokenType the singular resource token type (e.g. {@link QueryLangParser#CASE})
+     * @return the canonical prefix string (e.g. {@code "case: "})
+     */
+    public static String buildResourcePrefix(int singularTokenType) {
+        String symbolicName = QueryLangParser.VOCABULARY.getSymbolicName(singularTokenType);
+        if (symbolicName == null) {
+            throw new IllegalArgumentException("Unknown token type: " + singularTokenType);
+        }
+        CharStream input = CharStreams.fromString(symbolicName.toLowerCase());
+        QueryLangLexer lexer = new QueryLangLexer(input);
+        lexer.removeErrorListeners();
+        Token token = lexer.nextToken();
+        if (token.getType() != singularTokenType) {
+            throw new IllegalArgumentException(
+                    "Symbolic name '" + symbolicName + "' does not tokenize to expected type " + singularTokenType);
+        }
+        return token.getText() + QUERY_DELIMITER;
     }
 }
