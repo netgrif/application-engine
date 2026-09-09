@@ -25,16 +25,16 @@ public interface IResourceSearchService<Resource> {
 
     QueryType getQueryResourceType();
 
-    Resource searchOne(String queryString);
+    Resource searchOne(String queryString, Object... args);
     Resource searchOne(QueryLangEvaluator evaluator);
 
-    Page<Resource> searchAll(String queryString);
+    Page<Resource> searchAll(String queryString, Object... args);
     Page<Resource> searchAll(QueryLangEvaluator evaluator);
 
-    long count(String queryString);
+    long count(String queryString, Object... args);
     long count(QueryLangEvaluator evaluator);
 
-    boolean exists(String queryString);
+    boolean exists(String queryString, Object... args);
     boolean exists(QueryLangEvaluator evaluator);
 
     /**

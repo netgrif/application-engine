@@ -4,7 +4,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.pfql.domain.enums.QueryType;
-import com.netgrif.application.engine.pfql.service.IResourceSearchService;
+import com.netgrif.application.engine.pfql.service.AbstractResourceSearchService;
 import com.netgrif.application.engine.pfql.service.QueryLangEvaluator;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -18,8 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.evaluateQuery;
-
 /**
  * Service implementation for searching and querying Case resources.
  * Supports both MongoDB and Elasticsearch-based searches depending on the query configuration.
@@ -28,11 +26,11 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.eval
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CaseSearchService implements IResourceSearchService<Case> {
+public class CaseSearchService extends AbstractResourceSearchService<Case> {
 
-    private final IWorkflowService workflowService;
-    private final IElasticCaseService elasticCaseService;
-    private final IUserService userService;
+    protected final IWorkflowService workflowService;
+    protected final IElasticCaseService elasticCaseService;
+    protected final IUserService userService;
 
     /**
      * Returns the query type handled by this service.
@@ -45,16 +43,14 @@ public class CaseSearchService implements IResourceSearchService<Case> {
     }
 
     /**
-     * Searches for a single case matching the provided query string.
-     * The query string is evaluated and processed before execution.
-     *
-     * @param queryString the query string to be evaluated and executed
-     * @return the first matching Case, or null if no match is found
+     // todo 2483
+     * @param query the query string after placeholder substitution
+     * @return
      */
     @Override
-    public Case searchOne(String queryString) {
-        log.debug("Searching for single case with query: {}", queryString);
-        return searchOne(evaluateQuery(queryString));
+    protected String ensurePrefix(String query) {
+        // todo 2483
+        return query;
     }
 
     /**
@@ -66,11 +62,7 @@ public class CaseSearchService implements IResourceSearchService<Case> {
      * @throws IllegalArgumentException if the evaluator is null or configured for multiple results
      */
     @Override
-    public Case searchOne(QueryLangEvaluator evaluator) {
-        checkEvaluatorNotNull(evaluator);
-        checkEvaluatorIsSingle(evaluator);
-        checkEvaluatorResourceType(evaluator);
-
+    protected Case doSearchOne(QueryLangEvaluator evaluator) {
         log.debug("Searching for single case using {}", evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB");
         if (evaluator.getSearchWithElastic()) {
             log.trace("Executing Elasticsearch query: {}", evaluator.getFullElasticQuery());
@@ -87,19 +79,6 @@ public class CaseSearchService implements IResourceSearchService<Case> {
     }
 
     /**
-     * Searches for all cases matching the provided query string.
-     * The query string is evaluated and processed before execution.
-     *
-     * @param queryString the query string to be evaluated and executed
-     * @return a Page containing all matching Cases
-     */
-    @Override
-    public Page<Case> searchAll(String queryString) {
-        log.debug("Searching for all cases with query: {}", queryString);
-        return searchAll(evaluateQuery(queryString));
-    }
-
-    /**
      * Searches for all cases using a pre-evaluated query evaluator.
      * Routes the search to either Elasticsearch or MongoDB based on the evaluator configuration.
      * Supports pagination through the evaluator's pageable configuration.
@@ -109,11 +88,7 @@ public class CaseSearchService implements IResourceSearchService<Case> {
      * @throws IllegalArgumentException if the evaluator is null or configured for single result
      */
     @Override
-    public Page<Case> searchAll(QueryLangEvaluator evaluator) {
-        checkEvaluatorNotNull(evaluator);
-        checkEvaluatorIsMultiple(evaluator);
-        checkEvaluatorResourceType(evaluator);
-
+    protected Page<Case> doSearchAll(QueryLangEvaluator evaluator) {
         log.debug("Searching for all cases using {} with pagination: page={}, size={}",
                 evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB",
                 evaluator.getPageable().getPageNumber(), evaluator.getPageable().getPageSize());
@@ -131,19 +106,6 @@ public class CaseSearchService implements IResourceSearchService<Case> {
     }
 
     /**
-     * Counts the number of cases matching the provided query string.
-     * The query string is evaluated and processed before execution.
-     *
-     * @param queryString the query string to be evaluated and executed
-     * @return the count of matching cases
-     */
-    @Override
-    public long count(String queryString) {
-        log.debug("Counting cases with query: {}", queryString);
-        return count(evaluateQuery(queryString));
-    }
-
-    /**
      * Counts the number of cases using a pre-evaluated query evaluator.
      * Routes the count operation to either Elasticsearch or MongoDB based on the evaluator configuration.
      *
@@ -152,10 +114,7 @@ public class CaseSearchService implements IResourceSearchService<Case> {
      * @throws IllegalArgumentException if the evaluator is null
      */
     @Override
-    public long count(QueryLangEvaluator evaluator) {
-        checkEvaluatorNotNull(evaluator);
-        checkEvaluatorResourceType(evaluator);
-
+    protected long doCount(QueryLangEvaluator evaluator) {
         log.debug("Counting cases using {}", evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB");
         if (evaluator.getSearchWithElastic()) {
             log.trace("Executing Elasticsearch count query: {}", evaluator.getFullElasticQuery());
@@ -171,19 +130,6 @@ public class CaseSearchService implements IResourceSearchService<Case> {
     }
 
     /**
-     * Checks whether any cases exist that match the provided query string.
-     * The query string is evaluated and processed before execution.
-     *
-     * @param queryString the query string to be evaluated and executed
-     * @return true if at least one matching case exists, false otherwise
-     */
-    @Override
-    public boolean exists(String queryString) {
-        log.debug("Checking existence of case with query: {}", queryString);
-        return exists(evaluateQuery(queryString));
-    }
-
-    /**
      * Checks whether any cases exist using a pre-evaluated query evaluator.
      * Routes the existence check to either Elasticsearch or MongoDB based on the evaluator configuration.
      *
@@ -192,10 +138,7 @@ public class CaseSearchService implements IResourceSearchService<Case> {
      * @throws IllegalArgumentException if the evaluator is null
      */
     @Override
-    public boolean exists(QueryLangEvaluator evaluator) {
-        checkEvaluatorNotNull(evaluator);
-        checkEvaluatorResourceType(evaluator);
-
+    protected boolean doExists(QueryLangEvaluator evaluator) {
         log.debug("Checking existence of cases using {}", evaluator.getSearchWithElastic() ? "Elasticsearch" : "MongoDB");
         if (evaluator.getSearchWithElastic()) {
             log.trace("Executing Elasticsearch exists query: {}", evaluator.getFullElasticQuery());
@@ -210,21 +153,21 @@ public class CaseSearchService implements IResourceSearchService<Case> {
         }
     }
 
-    private long countCasesElastic(String elasticQuery) {
+    protected long countCasesElastic(String elasticQuery) {
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest();
         caseSearchRequest.query = elasticQuery;
         return elasticCaseService.count(List.of(caseSearchRequest), userService.getLoggedOrSystem().transformToLoggedUser(),
                 LocaleContextHolder.getLocale(), false);
     }
 
-    private Page<Case> findCasesElastic(String elasticQuery, Pageable pageable) {
+    protected Page<Case> findCasesElastic(String elasticQuery, Pageable pageable) {
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest();
         caseSearchRequest.query = elasticQuery;
         return elasticCaseService.search(List.of(caseSearchRequest), userService.getLoggedOrSystem().transformToLoggedUser(),
                 pageable, LocaleContextHolder.getLocale(), false);
     }
 
-    private boolean existsCasesElastic(String elasticQuery) {
+    protected boolean existsCasesElastic(String elasticQuery) {
         return countCasesElastic(elasticQuery) > 0;
     }
 }

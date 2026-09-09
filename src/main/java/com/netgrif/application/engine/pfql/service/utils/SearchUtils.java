@@ -452,4 +452,21 @@ public class SearchUtils {
                 + ")";
         return not ? "NOT " + query : query;
     }
+
+    /**
+     * Fills {@code {}} placeholders in the query string with the provided arguments, in order.
+     * Uses {@link String#format} semantics by replacing {@code {}} with {@code %s} internally.
+     *
+     * @param query the query string with optional {@code {}} placeholders
+     * @param args  values to substitute
+     * @return the query string with placeholders filled
+     */
+    public static String formatPlaceholders(String query, Object... args) {
+        // todo 2483
+        if (args == null || args.length == 0) {
+            return query;
+        }
+        String pattern = query.replace("{}", "%s");
+        return String.format(pattern, args);
+    }
 }
