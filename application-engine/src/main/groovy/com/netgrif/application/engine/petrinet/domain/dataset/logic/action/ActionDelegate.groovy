@@ -29,6 +29,7 @@ import com.netgrif.application.engine.integration.modules.ModuleHolder
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
 import com.netgrif.application.engine.mail.interfaces.IMailService
+import com.netgrif.application.engine.objects.annotations.Authorize
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.menu.services.interfaces.DashboardItemService
@@ -1409,6 +1410,8 @@ class ActionDelegate extends DelegateExpando {
         mailService.sendMail(mailDraft)
     }
 
+    @Authorize(authority = "USER_EDIT_ALL")
+    @Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().email.equals(#email)")
     def changeUserByEmail(String email) {
         [email  : { cl ->
             changeUserByEmail(email, "email", cl)
@@ -1425,6 +1428,8 @@ class ActionDelegate extends DelegateExpando {
         ]
     }
 
+    @Authorize(authority = "USER_EDIT_ALL")
+    @Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().id.equals(#id)")
     def changeUser(String id) {
         [email  : { cl ->
             changeUser(id, "email", cl)
@@ -1441,6 +1446,8 @@ class ActionDelegate extends DelegateExpando {
         ]
     }
 
+    @Authorize(authority = "USER_EDIT_ALL")
+    @Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().id.equals(#user.id)")
     def changeUser(AbstractUser user) {
         [email  : { cl ->
             changeUser(user, "email", cl)
@@ -1457,6 +1464,8 @@ class ActionDelegate extends DelegateExpando {
         ]
     }
 
+    @Authorize(authority = "USER_EDIT_ALL")
+    @Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().email.equals(#email)")
     def changeUserByEmail(String email, String attribute, def cl) {
         Optional<AbstractUser> userOptional = userService.findUserByUsername(email, null)
         if (!userOptional.isPresent()) {

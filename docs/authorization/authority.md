@@ -51,7 +51,7 @@ application startup by the `AuthorityRunner`.
 
 ### Predefined authorizing objects
 
-The following authorizing objects are defined by the engine:
+The application engine defines the following authorizing objects:
 
 **Process**
 
@@ -124,8 +124,7 @@ The following authorizing objects are defined by the engine:
 - `LDAP_GROUP_GET_ALL` — get all LDAP groups
 - `LDAP_GROUP_ASSIGN_ROLES` — assign roles to LDAP groups
 
-> The enum also declares the `DEFAULT` value and the deprecated `ADMIN` and `USER`
-> values, which are kept for backward compatibility and should not be used in new code.
+> The enum also declares the default values as `ADMIN` and `USER` values.
 
 ### Custom authorizing objects
 
@@ -156,7 +155,7 @@ Newly created users receive a set of default authorities. These defaults are con
 per user type using scopes and concrete authority names:
 
 ```properties
-nae.authority.defaultUserAuthorities=FILTER_UPLOAD,FILTER_DELETE_OWN,USER_EDIT_SELF,GROUP_OWN_ADD_USER,...
+nae.authority.defaultUserAuthorities=FILTER_UPLOAD,FILTER_DELETE_OWN,USER_EDIT_OWN,GROUP_OWN_ADD_USER,...
 nae.authority.defaultAnonymousAuthorities=...
 nae.authority.defaultAdminAuthorities=*
 ```
@@ -227,7 +226,7 @@ The annotation targets both **methods** and **types**, so it can be applied to:
     - Spring beans (e.g. `@userService`).
 
 ```groovy
-@Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().email.equals(#email)")
+@Authorize(authority = "USER_EDIT_OWN", expression = "@userService.getLoggedUser().email.equals(#email)")
 def changeUserByEmail(String email) {
     // ...
 }
@@ -269,11 +268,11 @@ are combined with a logical **OR** — the user is authorized if **at least one*
 the `@Authorizations` container annotation.
 
 In the example below the user is authorized if they hold `USER_EDIT_ALL`, **or** if they
-hold `USER_EDIT_SELF` and are editing their own account:
+hold `USER_EDIT_OWN` and are editing their own account:
 
 ```groovy
 @Authorize(authority = "USER_EDIT_ALL")
-@Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().stringId.equals(#id)")
+@Authorize(authority = "USER_EDIT_OWN", expression = "@userService.getLoggedUser().stringId.equals(#id)")
 def changeUser(String id) {
     // ...
 }
