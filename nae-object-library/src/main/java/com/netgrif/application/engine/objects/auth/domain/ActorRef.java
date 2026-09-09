@@ -47,7 +47,7 @@ public class ActorRef implements Serializable {
      *
      * @see Authority
      */
-    private Set<Authority> authorities;
+    private Set<String> authorities;
 
     /**
      * Gets the username of the actor.
@@ -84,6 +84,6 @@ public class ActorRef implements Serializable {
      * @see Authority#anonymous
      */
     public boolean isAnonymous() {
-        return authorities != null && authorities.stream().allMatch(it -> it.getName().equals(Authority.anonymous));
+        return authorities != null && authorities.stream().allMatch(it -> it.equals(Authority.anonymous));
     }
 }

@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import java.time.Duration;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  * Transformer class responsible for converting between different user/actor representations
@@ -153,7 +154,7 @@ public class ActorTransformer {
                 user.getRealmId(),
                 user.getUsername(),
                 user.getName(),
-                user.getAuthoritySet()
+                user.getAuthoritySet().stream().map(Authority::getName).collect(Collectors.toSet())
         );
     }
 
@@ -168,7 +169,7 @@ public class ActorTransformer {
                 loggedUser.getRealmId(),
                 loggedUser.getUsername(),
                 loggedUser.getName(),
-                loggedUser.getAuthoritySet()
+                loggedUser.getAuthoritySet().stream().map(Authority::getName).collect(Collectors.toSet())
         );
     }
 
@@ -183,7 +184,7 @@ public class ActorTransformer {
                 group.getRealmId(),
                 group.getIdentifier(),
                 group.getName(),
-                group.getAuthoritySet()
+                group.getAuthoritySet().stream().map(Authority::getName).collect(Collectors.toSet())
         );
     }
 
