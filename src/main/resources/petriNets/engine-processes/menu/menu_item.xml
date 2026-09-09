@@ -469,6 +469,17 @@
 			<init dynamic="true">[:]</init>
 		</options>
 	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>allowed_authorities</id>
+		<title name="allowed_authorities">Allowed authorities</title>
+		<desc name="allowed_authorities_desc">todo 2472</desc>
+		<options>
+			<option key="ROLE_USER" name="opt_user">User</option>
+			<option key="ROLE_ADMIN" name="opt_admin">Admin</option>
+			<option key="ROLE_ANONYMOUS" name="opt_anonym">Anonymous</option>
+		</options>
+		<init>user</init>
+	</data>
 	<data type="boolean" immediate="true">
 		<id>use_custom_view</id>
 		<title name="use_custom_view">Use custom view?</title>
@@ -736,6 +747,11 @@
 		<i18nString name="role_settings">Povolenia</i18nString>
 		<i18nString name="view_settings">Zobrazenie v karte</i18nString>
 		<i18nString name="model_title">Menu položka</i18nString>
+		<i18nString name="allowed_authorities">todo 2472</i18nString>
+		<i18nString name="allowed_authorities_desc">todo 2472</i18nString>
+		<i18nString name="opt_user">todo 2472</i18nString>
+		<i18nString name="opt_admin">todo 2472</i18nString>
+		<i18nString name="opt_anonym">todo 2472</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="icon_preview">Ikonevorschau</i18nString>
@@ -790,6 +806,11 @@
 		<i18nString name="role_settings">Berechtigungen</i18nString>
 		<i18nString name="view_settings">Ansicht der Registerkarte</i18nString>
 		<i18nString name="model_title">Menüeintrag</i18nString>
+		<i18nString name="allowed_authorities">todo 2472</i18nString>
+		<i18nString name="allowed_authorities_desc">todo 2472</i18nString>
+		<i18nString name="opt_user">todo 2472</i18nString>
+		<i18nString name="opt_admin">todo 2472</i18nString>
+		<i18nString name="opt_anonym">todo 2472</i18nString>
 	</i18n>
 
 	<!-- TRANSITIONS -->
@@ -1580,13 +1601,28 @@
 			<cols>3</cols>
 			<layout>grid</layout>
 			<dataRef>
-				<id>processes_available</id>
+				<id>allowed_authorities</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
 					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>processes_available</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
 					<rows>2</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -1601,7 +1637,7 @@
 				</logic>
 				<layout>
 					<x>1</x>
-					<y>0</y>
+					<y>1</y>
 					<rows>2</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -1616,7 +1652,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>0</y>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -1630,7 +1666,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>1</y>
+					<y>2</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -1644,7 +1680,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>2</y>
+					<y>3</y>
 					<rows>1</rows>
 					<cols>3</cols>
 					<offset>0</offset>
@@ -1658,7 +1694,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>3</y>
+					<y>4</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<offset>0</offset>
@@ -1673,7 +1709,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>3</y>
+					<y>4</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -1687,7 +1723,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>4</y>
+					<y>5</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<offset>0</offset>
@@ -1702,7 +1738,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>4</y>
+					<y>5</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>

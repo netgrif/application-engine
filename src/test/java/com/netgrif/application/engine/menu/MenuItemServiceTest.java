@@ -135,6 +135,7 @@ public class MenuItemServiceTest {
         assertEquals(menuItemBody.isUseTabbedView(), menuItemCase.getFieldValue(MenuItemConstants.FIELD_USE_TABBED_VIEW));
         assertEquals(menuItemBody.isUseCustomView(), menuItemCase.getFieldValue(MenuItemConstants.FIELD_USE_CUSTOM_VIEW));
         assertEquals(menuItemBody.getConfigurationTemplateIdentifier(), menuItemCase.getFieldValue(MenuItemConstants.FIELD_CONFIGURATION_TEMPLATES));
+        assertEquals(List.of("ROLE_USER"), menuItemCase.getFieldValue(MenuItemConstants.FIELD_ALLOWED_AUTHORITIES));
         assertEquals((menuItemBody.getUri() + uriService.getUriSeparator() + menuItemBody.getIdentifier()).replaceAll("//", uriService.getUriSeparator()),
                 menuItemCase.getFieldValue(MenuItemConstants.FIELD_NODE_PATH));
 
