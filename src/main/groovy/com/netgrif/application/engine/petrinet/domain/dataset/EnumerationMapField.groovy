@@ -11,12 +11,12 @@ class EnumerationMapField extends MapOptionsField<I18nString, String> {
         super()
     }
 
-    EnumerationMapField(Map<String, I18nString> choices) {
-        super(choices)
+    EnumerationMapField(Map<String, I18nString> options) {
+        super(options)
     }
 
-    EnumerationMapField(Map<String, I18nString> choices, String defaultValue) {
-        super(choices)
+    EnumerationMapField(Map<String, I18nString> options, String defaultValue) {
+        super(options)
         this.defaultValue = defaultValue
     }
 
@@ -45,6 +45,14 @@ class EnumerationMapField extends MapOptionsField<I18nString, String> {
         super.setDefaultValue(defaultValue)
     }
 
+    // todo 2483 doc
+    I18nString getI18nValue() {
+        // todo 2483 test
+        if (this.getValue() == null) {
+            return null;
+        }
+        return this.options?.get(this.getValue())
+    }
 
     @Override
     Field clone() {

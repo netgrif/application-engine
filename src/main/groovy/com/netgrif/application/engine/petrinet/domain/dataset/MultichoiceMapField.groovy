@@ -11,13 +11,13 @@ class MultichoiceMapField extends MapOptionsField<I18nString, LinkedHashSet<Stri
         this.defaultValue = new LinkedHashSet<>()
     }
 
-    MultichoiceMapField(Map<String, I18nString> choices) {
-        super(choices)
+    MultichoiceMapField(Map<String, I18nString> options) {
+        super(options)
         this.defaultValue = new LinkedHashSet<>()
     }
 
-    MultichoiceMapField(Map<String, I18nString> choices, LinkedHashSet<String> defaultValues) {
-        this(choices)
+    MultichoiceMapField(Map<String, I18nString> options, LinkedHashSet<String> defaultValues) {
+        this(options)
         this.defaultValue = defaultValues
     }
 
@@ -44,6 +44,15 @@ class MultichoiceMapField extends MapOptionsField<I18nString, LinkedHashSet<Stri
     @Override
     void setDefaultValue(LinkedHashSet<String> defaultValue) {
         super.setDefaultValue(defaultValue)
+    }
+
+    // todo 2483 doc
+    Set<I18nString> getI18nValue() {
+        // todo 2483 test
+        if (this.options == null || this.options.isEmpty() || this.getValue() == null) {
+            return new LinkedHashSet<>()
+        }
+        return this.getValue().collect { this.options[it] } as LinkedHashSet
     }
 
     @Override
