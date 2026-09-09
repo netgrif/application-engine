@@ -155,6 +155,24 @@
         <id>show_create_case_button</id>
         <title name="show_create_case_button">Show create case button?</title>
         <init>true</init>
+        <event type="set">
+            <id>0</id>
+            <actions phase="post">
+                <action>
+                    trans: t.create_case_btn_settings,
+                    show_create_case_button: f.show_create_case_button,
+                    require_title_in_creation: f.require_title_in_creation,
+                    create_case_button_title: f.create_case_button_title,
+                    create_case_button_icon: f.create_case_button_icon,
+                    create_case_button_icon_preview: f.create_case_button_icon_preview,
+                    banned_nets_in_creation: f.banned_nets_in_creation;
+
+                    make [require_title_in_creation, create_case_button_title, create_case_button_icon, create_case_button_icon_preview, banned_nets_in_creation], hidden on trans when { !show_create_case_button.value }
+                    make [require_title_in_creation, create_case_button_title, create_case_button_icon, banned_nets_in_creation], editable on trans when { show_create_case_button.value }
+                    make create_case_button_icon_preview, visible on trans when { show_create_case_button.value }
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="boolean" immediate="true">
         <id>require_title_in_creation</id>
@@ -351,6 +369,20 @@
         <id>case_all_allowed_nets</id>
         <title name="case_all_allowed_nets">All allowed nets?</title>
         <init>true</init>
+        <event type="set">
+            <id>0</id>
+            <actions phase="post">
+                <action>
+                    trans: t.settings,
+                    case_all_allowed_nets: f.case_all_allowed_nets,
+                    case_allowed_nets: f.case_allowed_nets,
+                    case_inherit_allowed_nets: f.case_inherit_allowed_nets;
+
+                    make [case_allowed_nets, case_inherit_allowed_nets], hidden on trans when { case_all_allowed_nets.value }
+                    make [case_allowed_nets, case_inherit_allowed_nets], editable on trans when { !case_all_allowed_nets.value }
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="boolean">
         <id>case_inherit_allowed_nets</id>
@@ -613,20 +645,6 @@
                     <template>material</template>
                     <appearance>outline</appearance>
                 </layout>
-                <event type="set">
-                    <id>0</id>
-                    <actions phase="post">
-                        <action>
-                            trans: t.this,
-                            case_all_allowed_nets: f.case_all_allowed_nets,
-                            case_allowed_nets: f.case_allowed_nets,
-                            case_inherit_allowed_nets: f.case_inherit_allowed_nets;
-
-                            make [case_allowed_nets, case_inherit_allowed_nets], hidden on trans when { case_all_allowed_nets.value }
-                            make [case_allowed_nets, case_inherit_allowed_nets], editable on trans when { !case_all_allowed_nets.value }
-                        </action>
-                    </actions>
-                </event>
             </dataRef>
             <dataRef>
                 <id>case_allowed_nets</id>
@@ -842,24 +860,6 @@
                     <template>material</template>
                     <appearance>outline</appearance>
                 </layout>
-                <event type="set">
-                    <id>0</id>
-                    <actions phase="post">
-                        <action>
-                            trans: t.this,
-                            show_create_case_button: f.show_create_case_button,
-                            require_title_in_creation: f.require_title_in_creation,
-                            create_case_button_title: f.create_case_button_title,
-                            create_case_button_icon: f.create_case_button_icon,
-                            create_case_button_icon_preview: f.create_case_button_icon_preview,
-                            banned_nets_in_creation: f.banned_nets_in_creation;
-
-                            make [require_title_in_creation, create_case_button_title, create_case_button_icon, create_case_button_icon_preview, banned_nets_in_creation], hidden on trans when { !show_create_case_button.value }
-                            make [require_title_in_creation, create_case_button_title, create_case_button_icon, banned_nets_in_creation], editable on trans when { show_create_case_button.value }
-                            make create_case_button_icon_preview, visible on trans when { show_create_case_button.value }
-                        </action>
-                    </actions>
-                </event>
             </dataRef>
             <dataRef>
                 <id>require_title_in_creation</id>

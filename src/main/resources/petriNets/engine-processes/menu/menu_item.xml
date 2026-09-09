@@ -477,7 +477,7 @@
 			<option key="ROLE_ADMIN" name="opt_admin">Admin</option>
 			<option key="ROLE_ANONYMOUS" name="opt_anonym">Anonymous</option>
 		</options>
-		<init>user</init>
+		<init>ROLE_USER</init>
 	</data>
 	<data type="boolean" immediate="true">
 		<id>use_custom_view</id>
@@ -1324,7 +1324,7 @@
 
 							String defaultName = duplicate_new_title.value.defaultValue
 							if (defaultName == null || defaultName.isEmpty()) {
-								defaultName = menu_name.value.translations?.values()?.find()
+								defaultName = duplicate_new_title.value.translations?.values()?.find()
 							}
 
 							String identifier = com.netgrif.application.engine.menu.utils.MenuItemUtils.sanitize(defaultName)
@@ -1443,7 +1443,7 @@
 					forms: f.childItemForms,
 					ids: f.childItemIds;
 
-					def orderedTaskIds = ids.value?.collect { id -> workflowService.findOne(id).tasks.find { it.transition == "row_for_ordering" }.task }
+					def orderedTaskIds = ids.value?.collect { id -> workflowService.findOne(id).tasks.find { it.transition == "row_for_ordering" }.task } ?: []
 					make empty_child_items_info, visible on trans when { orderedTaskIds.isEmpty() }
 					make empty_child_items_info, hidden on trans when { !orderedTaskIds.isEmpty() }
 					change forms value { orderedTaskIds }
