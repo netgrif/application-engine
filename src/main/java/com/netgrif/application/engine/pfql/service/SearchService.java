@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.pfql.service;
 
 import com.netgrif.application.engine.pfql.domain.enums.QueryType;
+import com.netgrif.application.engine.pfql.service.formatters.QueryLangPlaceholderHandler;
 import com.netgrif.application.engine.pfql.service.utils.SearchUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,11 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.form
 @Service
 public class SearchService implements ISearchService {
 
+    protected final QueryLangPlaceholderHandler placeholderHandler;
     protected final Map<QueryType, IResourceSearchService<?>> serviceRegistry;
 
-    public SearchService(List<IResourceSearchService<?>> services) {
+    public SearchService(QueryLangPlaceholderHandler placeholderHandler, List<IResourceSearchService<?>> services) {
+        this.placeholderHandler = placeholderHandler;
         this.serviceRegistry = services.stream()
                 .collect(Collectors.toMap(IResourceSearchService::getQueryResourceType, Function.identity()));
     }
@@ -32,7 +35,7 @@ public class SearchService implements ISearchService {
      */
     @Override
     public String explainQuery(String input, Object... args) {
-        final String processedQuery = formatPlaceholders(input, args);
+        final String processedQuery = formatPlaceholders(input, placeholderHandler, args);
         log.debug("Explaining query: {}", processedQuery);
         String explanation = SearchUtils.explainQuery(processedQuery);
         log.trace("Query explanation result: {}", explanation);
@@ -49,7 +52,7 @@ public class SearchService implements ISearchService {
      */
     @Override
     public Object search(String input, Object... args) {
-        final String processedQuery = formatPlaceholders(input, args);
+        final String processedQuery = formatPlaceholders(input, placeholderHandler, args);
         log.debug("Executing search with query: {}", processedQuery);
         QueryLangEvaluator evaluator = evaluateQuery(processedQuery);
         log.trace("Evaluated query type: {}, multiple: {}", evaluator.getResourceType(), evaluator.getMultiple());
@@ -70,7 +73,7 @@ public class SearchService implements ISearchService {
      */
     @Override
     public long count(String input, Object... args) {
-        final String processedQuery = formatPlaceholders(input, args);
+        final String processedQuery = formatPlaceholders(input, placeholderHandler, args);
         log.debug("Counting resources with query: {}", processedQuery);
         QueryLangEvaluator evaluator = evaluateQuery(processedQuery);
         log.trace("Evaluated query type for count: {}", evaluator.getResourceType());
@@ -91,7 +94,7 @@ public class SearchService implements ISearchService {
      */
     @Override
     public boolean exists(String input, Object... args) {
-        final String processedQuery = formatPlaceholders(input, args);
+        final String processedQuery = formatPlaceholders(input, placeholderHandler, args);
         log.debug("Checking existence with query: {}", processedQuery);
         QueryLangEvaluator evaluator = evaluateQuery(processedQuery);
         log.trace("Evaluated query type for exists: {}", evaluator.getResourceType());

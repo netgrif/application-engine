@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -72,6 +73,21 @@ public class CaseSearchServiceTest {
         assertEquals(testCase.getStringId(), result.getStringId());
 
         result = caseSearchService.searchOne("title eq 'test'");
+        assertNotNull(result);
+        assertNotNull(result.getPetriNet());
+        assertEquals(testCase.getStringId(), result.getStringId());
+
+        result = caseSearchService.searchOne("title eq {}", "test");
+        assertNotNull(result);
+        assertNotNull(result.getPetriNet());
+        assertEquals(testCase.getStringId(), result.getStringId());
+
+        result = caseSearchService.searchOne("title in ('test', 'test2')");
+        assertNotNull(result);
+        assertNotNull(result.getPetriNet());
+        assertEquals(testCase.getStringId(), result.getStringId());
+
+        result = caseSearchService.searchOne("title in {}", List.of("test", "test2"));
         assertNotNull(result);
         assertNotNull(result.getPetriNet());
         assertEquals(testCase.getStringId(), result.getStringId());

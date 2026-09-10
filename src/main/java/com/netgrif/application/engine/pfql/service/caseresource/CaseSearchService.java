@@ -7,9 +7,9 @@ import com.netgrif.application.engine.pfql.domain.antlr4.QueryLangParser;
 import com.netgrif.application.engine.pfql.domain.enums.QueryType;
 import com.netgrif.application.engine.pfql.service.AbstractResourceSearchService;
 import com.netgrif.application.engine.pfql.service.QueryLangEvaluator;
+import com.netgrif.application.engine.pfql.service.formatters.QueryLangPlaceholderHandler;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -29,7 +29,6 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.hasR
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class CaseSearchService extends AbstractResourceSearchService<Case> {
 
     protected static List<Integer> allowedResourcePrefixes = List.of(QueryLangParser.CASE, QueryLangParser.CASES);
@@ -37,6 +36,14 @@ public class CaseSearchService extends AbstractResourceSearchService<Case> {
     protected final IWorkflowService workflowService;
     protected final IElasticCaseService elasticCaseService;
     protected final IUserService userService;
+
+    public CaseSearchService(QueryLangPlaceholderHandler placeholderHandler, IWorkflowService workflowService,
+                             IElasticCaseService elasticCaseService, IUserService userService) {
+        super(placeholderHandler);
+        this.workflowService = workflowService;
+        this.elasticCaseService = elasticCaseService;
+        this.userService = userService;
+    }
 
     /**
      * Returns the query type handled by this service.

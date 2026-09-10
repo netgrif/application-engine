@@ -12,6 +12,7 @@ import com.netgrif.application.engine.pfql.domain.enums.ComparisonType;
 import com.netgrif.application.engine.pfql.service.QueryLangErrorListener;
 import com.netgrif.application.engine.pfql.service.QueryLangEvaluator;
 import com.netgrif.application.engine.pfql.service.QueryLangExplainEvaluator;
+import com.netgrif.application.engine.pfql.service.formatters.QueryLangPlaceholderHandler;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -464,13 +465,25 @@ public class SearchUtils {
      * @param args  values to substitute
      * @return the query string with placeholders filled
      */
-    public static String formatPlaceholders(String query, Object... args) {
-        // todo 2483
+    public static String formatPlaceholders(String query, QueryLangPlaceholderHandler handler, Object... args) {
         if (args == null || args.length == 0) {
             return query;
         }
-        String pattern = query.replace("{}", "%s");
-        return String.format(pattern, args);
+
+        StringBuilder result = new StringBuilder(query);
+        int argIndex = 0;
+        int searchFrom = 0;
+
+        while (argIndex < args.length) {
+            int idx = result.indexOf("{}", searchFrom);
+            if (idx == -1) {
+                break;
+            }
+            String replacement = handler.format(args[argIndex++]);
+            result.replace(idx, idx + 2, replacement);
+            searchFrom = idx + replacement.length();
+        }
+        return result.toString();
     }
 
     // todo 2483

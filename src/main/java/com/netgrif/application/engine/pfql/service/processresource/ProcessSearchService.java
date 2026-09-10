@@ -6,7 +6,7 @@ import com.netgrif.application.engine.pfql.domain.antlr4.QueryLangParser;
 import com.netgrif.application.engine.pfql.domain.enums.QueryType;
 import com.netgrif.application.engine.pfql.service.AbstractResourceSearchService;
 import com.netgrif.application.engine.pfql.service.QueryLangEvaluator;
-import lombok.RequiredArgsConstructor;
+import com.netgrif.application.engine.pfql.service.formatters.QueryLangPlaceholderHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -20,11 +20,15 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.hasR
 // todo 2483 doc
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class ProcessSearchService extends AbstractResourceSearchService<PetriNet> {
     protected static List<Integer> allowedResourcePrefixes = List.of(QueryLangParser.PROCESS, QueryLangParser.PROCESSES);
 
     protected final IPetriNetService petriNetService;
+
+    public ProcessSearchService(QueryLangPlaceholderHandler placeholderHandler, IPetriNetService petriNetService) {
+        super(placeholderHandler);
+        this.petriNetService = petriNetService;
+    }
 
     /**
      * Returns the query type handled by this service.

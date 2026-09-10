@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.pfql.service;
 
+import com.netgrif.application.engine.pfql.service.formatters.QueryLangPlaceholderHandler;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 
@@ -16,7 +18,10 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.form
  * </ol>
  */
 @Slf4j
+@RequiredArgsConstructor
 public abstract class AbstractResourceSearchService<Resource> implements IResourceSearchService<Resource> {
+
+    protected final QueryLangPlaceholderHandler placeholderHandler;
 
     /**
      * Pre-processes the raw query string: fills {@code {}} placeholders and ensures a correct PFQL prefix.
@@ -27,7 +32,7 @@ public abstract class AbstractResourceSearchService<Resource> implements IResour
      * @return the fully pre-processed query string ready for evaluation
      */
     protected String preProcess(String rawQuery, boolean isMulti, Object... args) {
-        String formatted = formatPlaceholders(rawQuery, args);
+        String formatted = formatPlaceholders(rawQuery, placeholderHandler, args);
         return ensurePrefix(formatted, isMulti);
     }
 
