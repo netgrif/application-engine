@@ -102,7 +102,7 @@ class ActionDelegateTest {
         List<Case> filters = workflowService.search(
                 QCase.case$.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER),
                 Pageable.ofSize(4)
-        )
+        ).content
         assert filters.size() == 4
     }
 
