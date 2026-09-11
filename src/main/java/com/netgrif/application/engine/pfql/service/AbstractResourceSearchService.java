@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 
-import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.evaluateQuery;
-import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.formatPlaceholders;
+import java.util.List;
+
+import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.*;
+import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.buildResourcePrefix;
 
 /**
  * Abstract base class for resource search services providing shared query pre-processing.
@@ -36,14 +38,7 @@ public abstract class AbstractResourceSearchService<Resource> implements IResour
         return ensurePrefix(formatted, isMulti);
     }
 
-    /**
-     * Ensures the query string has the correct PFQL resource prefix.
-     * Each implementation defines which prefix is expected and how to inject it if missing.
-     *
-     * @param query the query string after placeholder substitution
-     * @param isMulti if the prefix should address multiple resources
-     * @return the query string with the correct prefix guaranteed
-     */
+
     protected abstract String ensurePrefix(String query, boolean isMulti);
 
     protected abstract Resource doSearchOne(QueryLangEvaluator evaluator);
@@ -53,6 +48,23 @@ public abstract class AbstractResourceSearchService<Resource> implements IResour
     protected abstract long doCount(QueryLangEvaluator evaluator);
 
     protected abstract boolean doExists(QueryLangEvaluator evaluator);
+
+    /**
+     * Ensures the query string has the correct PFQL resource prefix.
+     * Each implementation defines which prefix is expected and how to inject it if missing.
+     *
+     * @param query the query string after placeholder substitution
+     * @param isMulti if the prefix should address multiple resources
+     * @param multiPrefixToken token of prefix to search multiple resources
+     * @param singlePrefixToken token of prefix to search single resource
+     * @return the query string with the correct prefix guaranteed
+     */
+    protected String doEnsurePrefix(String query, boolean isMulti, int multiPrefixToken, int singlePrefixToken) {
+        if (query == null || hasResourcePrefix(query, List.of(multiPrefixToken, singlePrefixToken))) {
+            return query;
+        }
+        return buildResourcePrefix(isMulti ? multiPrefixToken : singlePrefixToken) + query;
+    }
 
     @Override
     public Resource searchOne(String queryString, Object... args) {

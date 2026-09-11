@@ -19,9 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.buildResourcePrefix;
-import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.hasResourcePrefix;
-
 /**
  * Service implementation for searching and querying Case resources.
  * Supports both MongoDB and Elasticsearch-based searches depending on the query configuration.
@@ -30,8 +27,6 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.hasR
 @Slf4j
 @Service
 public class CaseSearchService extends AbstractResourceSearchService<Case> {
-
-    protected static List<Integer> allowedResourcePrefixes = List.of(QueryLangParser.CASE, QueryLangParser.CASES);
 
     protected final IWorkflowService workflowService;
     protected final IElasticCaseService elasticCaseService;
@@ -57,10 +52,7 @@ public class CaseSearchService extends AbstractResourceSearchService<Case> {
 
     @Override
     protected String ensurePrefix(String query, boolean isMulti) {
-        if (query == null || hasResourcePrefix(query, allowedResourcePrefixes)) {
-            return query;
-        }
-        return buildResourcePrefix(isMulti ? QueryLangParser.CASES : QueryLangParser.CASE) + query;
+        return doEnsurePrefix(query, isMulti, QueryLangParser.CASES, QueryLangParser.CASE);
     }
 
     /**

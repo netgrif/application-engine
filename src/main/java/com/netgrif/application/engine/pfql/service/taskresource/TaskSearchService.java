@@ -19,9 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.buildResourcePrefix;
-import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.hasResourcePrefix;
-
 /**
  * Service implementation for searching Task resources using query language expressions.
  * <p>
@@ -34,8 +31,6 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.hasR
 @Slf4j
 @Service
 public class TaskSearchService extends AbstractResourceSearchService<Task> {
-    protected static List<Integer> allowedResourcePrefixes = List.of(QueryLangParser.TASK, QueryLangParser.TASKS);
-
     protected final ITaskService taskService;
     protected final IElasticTaskService elasticTaskService;
     protected final IUserService userService;
@@ -60,10 +55,7 @@ public class TaskSearchService extends AbstractResourceSearchService<Task> {
 
     @Override
     protected String ensurePrefix(String query, boolean isMulti) {
-        if (query == null || hasResourcePrefix(query, allowedResourcePrefixes)) {
-            return query;
-        }
-        return buildResourcePrefix(isMulti ? QueryLangParser.TASKS : QueryLangParser.TASK) + query;
+        return doEnsurePrefix(query, isMulti, QueryLangParser.TASKS, QueryLangParser.TASK);
     }
 
     /**

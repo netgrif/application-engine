@@ -11,12 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
-import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.buildResourcePrefix;
-import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.hasResourcePrefix;
-
-
 /**
  * Service for searching and querying process resources using PFQL.
  * <p>
@@ -29,7 +23,6 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.hasR
 @Slf4j
 @Service
 public class ProcessSearchService extends AbstractResourceSearchService<PetriNet> {
-    protected static List<Integer> allowedResourcePrefixes = List.of(QueryLangParser.PROCESS, QueryLangParser.PROCESSES);
 
     protected final IPetriNetService petriNetService;
 
@@ -50,10 +43,7 @@ public class ProcessSearchService extends AbstractResourceSearchService<PetriNet
 
     @Override
     protected String ensurePrefix(String query, boolean isMulti) {
-        if (query == null || hasResourcePrefix(query, allowedResourcePrefixes)) {
-            return query;
-        }
-        return buildResourcePrefix(isMulti ? QueryLangParser.PROCESSES : QueryLangParser.PROCESS) + query;
+        return doEnsurePrefix(query, isMulti, QueryLangParser.PROCESSES, QueryLangParser.PROCESS);
     }
 
     /**
