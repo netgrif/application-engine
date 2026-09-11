@@ -706,7 +706,6 @@
                 <id>task_headers_sort_mode_active</id>
                 <logic>
                     <behavior>editable</behavior>
-                    <behavior>required</behavior>
                 </logic>
                 <layout>
                     <x>0</x>

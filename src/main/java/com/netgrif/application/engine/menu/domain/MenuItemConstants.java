@@ -9,6 +9,7 @@ public class MenuItemConstants {
     public static final String FIELD_IS_FOLDER = "is_folder";
     public static final String FIELD_IDENTIFIER = "menu_item_identifier";
     public static final String FIELD_APPEND_MENU_ITEM = "append_menu_item_stringId";
+    public static final String FIELD_ALLOWED_AUTHORITIES = "allowed_authorities";
     public static final String FIELD_ALLOWED_ROLES = "allowed_roles";
     public static final String FIELD_BANNED_ROLES = "banned_roles";
     public static final String FIELD_MENU_NAME = "menu_name";

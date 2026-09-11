@@ -10,9 +10,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Class, that holds configurable attributes of menu item.
@@ -26,6 +24,7 @@ public class MenuItemBody {
 
     private String menuIcon = "filter_none";
     private I18nString menuName;
+    private List<String> allowedAuthorities = List.of("ROLE_USER");
     private Map<String, I18nString> allowedRoles = new HashMap<>();
     private Map<String, I18nString> bannedRoles = new HashMap<>();
     private boolean useCustomView = false;
@@ -198,6 +197,7 @@ public class MenuItemBody {
         outcome.putDataSetEntry(MenuItemConstants.FIELD_CUSTOM_VIEW_SELECTOR, FieldType.TEXT,
                 this.customViewSelector);
         outcome.putDataSetEntry(MenuItemConstants.FIELD_IS_AUTO_SELECT, FieldType.BOOLEAN, this.isAutoSelect);
+        outcome.putDataSetEntry(MenuItemConstants.FIELD_ALLOWED_AUTHORITIES, FieldType.MULTICHOICE_MAP, this.allowedAuthorities);
         outcome.putDataSetEntryOptions(MenuItemConstants.FIELD_ALLOWED_ROLES, FieldType.MULTICHOICE_MAP, this.allowedRoles);
         outcome.putDataSetEntryOptions(MenuItemConstants.FIELD_BANNED_ROLES, FieldType.MULTICHOICE_MAP, this.bannedRoles);
         outcome.putDataSetEntry(MenuItemConstants.FIELD_CONFIGURATION_TEMPLATES, FieldType.ENUMERATION_MAP, this.configurationTemplateIdentifier);
