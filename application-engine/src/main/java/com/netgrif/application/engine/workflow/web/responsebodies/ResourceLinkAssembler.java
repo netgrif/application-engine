@@ -21,25 +21,25 @@ public class ResourceLinkAssembler {
     private static void addTasksLinks(PagedModel pagedResources, String selfRel) {
         if (!selfRel.equalsIgnoreCase("all"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                    .getAll(null, null, null, null)).withRel("all"));
+                    .getAll(null, null, null)).withRel("all"));
         if (!selfRel.equalsIgnoreCase("case"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                     .getAllByCases(null, null, null, null)).withRel("case"));
         if (!selfRel.equalsIgnoreCase("my"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                    .getMy(null, null, null, null)).withRel("my"));
+                    .getMy(null, null, null)).withRel("my"));
         if (!selfRel.equalsIgnoreCase("finished"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                    .getMyFinished(null, null, null, null)).withRel("finished"));
+                    .getMyFinished(null, null, null)).withRel("finished"));
         if (!selfRel.equalsIgnoreCase("search"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                    .search(null, null, null, null, null, null)).withRel("search"));
+                    .search(null, null, null, null, null)).withRel("search"));
         if (!selfRel.equalsIgnoreCase("search_es"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                    .searchElastic(null, null, null, null, null, null)).withRel("search_es"));
+                    .searchElastic(null, null, null, null, null)).withRel("search_es"));
         if (!selfRel.equalsIgnoreCase("count"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                    .count(null, null, null, null)).withRel("count"));
+                    .count(null, null, null)).withRel("count"));
     }
 
     private static void addCasesLinks(PagedModel pagedResources, String selfRel) {
@@ -48,10 +48,10 @@ public class ResourceLinkAssembler {
                     .getAll(null, null)).withRel("all"));
         if (!selfRel.equalsIgnoreCase("search"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
-                    .search(null, MergeFilterOperation.OR, null, null, null, null)).withRel("search"));
+                    .search(null, MergeFilterOperation.OR, null, null, null)).withRel("search"));
         if (!selfRel.equalsIgnoreCase("count"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
-                    .count(null, MergeFilterOperation.OR, null, null)).withRel("count"));
+                    .count(null, MergeFilterOperation.OR, null)).withRel("count"));
         if (!selfRel.equalsIgnoreCase("author"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                     .findAllByAuthor(null, "", null, null)).withRel("author"));
