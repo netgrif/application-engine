@@ -568,7 +568,13 @@ public class QueryLangPlaceholderHandlerTest {
 
     @Test
     public void testUnsupportedType_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> placeholderHandler.format(new Object()));
+        assertThrows(IllegalArgumentException.class, () -> formatPlaceholders("user: name contains {}", placeholderHandler, new Object()));
+    }
+
+    @Test
+    public void testWrongNumOfArgs_ThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> formatPlaceholders("user: name contains {}", placeholderHandler, "John", "Small"));
+        assertThrows(IllegalArgumentException.class, () -> formatPlaceholders("user: name contains {} {}", placeholderHandler, "John"));
     }
 
     @Test

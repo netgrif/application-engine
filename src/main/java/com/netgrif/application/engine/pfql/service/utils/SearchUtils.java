@@ -469,6 +469,9 @@ public class SearchUtils {
         if (args == null || args.length == 0) {
             return query;
         }
+        if (query == null) {
+            throw new IllegalArgumentException("Query cannot be null when placeholder arguments are provided.");
+        }
 
         StringBuilder result = new StringBuilder(query);
         int argIndex = 0;
@@ -482,6 +485,13 @@ public class SearchUtils {
             String replacement = handler.format(args[argIndex++]);
             result.replace(idx, idx + 2, replacement);
             searchFrom = idx + replacement.length();
+        }
+        if (argIndex < args.length) {
+            throw new IllegalArgumentException(
+                    "Too many placeholder arguments supplied: expected " + argIndex + " but got " + args.length + ".");
+        }
+        if (result.indexOf("{}", searchFrom) != -1) {
+            throw new IllegalArgumentException("Too many placeholders present: not enough arguments provided.");
         }
         return result.toString();
     }
